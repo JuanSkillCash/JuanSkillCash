@@ -78,31 +78,9 @@ nav{
 /* HERO */
 .hero{min-height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 20px 48px;position:relative;overflow:hidden}
 
-.hero-photo-wrap{position:relative;width:210px;height:280px;margin:0 auto 18px;opacity:0;animation:fadeUp .7s ease forwards .05s;perspective:480px}
-.shark-glow{position:absolute;inset:-60px;z-index:0;pointer-events:none}
-.shark-glow span{position:absolute;border-radius:46% 54% 61% 39% / 55% 42% 58% 45%;background:radial-gradient(circle,rgba(255,47,79,.5) 0%,rgba(255,47,79,.22) 40%,transparent 72%);filter:blur(18px);opacity:0;transition:opacity 1.1s ease}
-.shark-glow span:nth-child(1){inset:6% 10% 14% 4%;animation:blobMorph1 7s ease-in-out infinite}
-.shark-glow span:nth-child(2){inset:-4% 22% 30% -8%;animation:blobMorph2 9s ease-in-out infinite;animation-delay:.4s}
-.shark-glow span:nth-child(3){inset:22% -6% -10% 26%;animation:blobMorph3 8s ease-in-out infinite;animation-delay:1.1s}
-.hero-photo-wrap.shark-turned .shark-glow span{opacity:1}
-@keyframes blobMorph1{0%,100%{border-radius:46% 54% 61% 39% / 55% 42% 58% 45%;transform:scale(1) translate(0,0)}50%{border-radius:60% 40% 38% 62% / 40% 62% 38% 60%;transform:scale(1.14) translate(3%,-2%)}}
-@keyframes blobMorph2{0%,100%{border-radius:38% 62% 55% 45% / 60% 45% 55% 40%;transform:scale(1) translate(0,0)}50%{border-radius:55% 45% 40% 60% / 45% 58% 42% 55%;transform:scale(1.2) translate(-4%,3%)}}
-@keyframes blobMorph3{0%,100%{border-radius:52% 48% 44% 56% / 48% 55% 45% 52%;transform:scale(1) translate(0,0)}50%{border-radius:40% 60% 58% 42% / 60% 40% 60% 40%;transform:scale(1.1) translate(2%,4%)}}
-@keyframes glowPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
-.shark-img{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 14px 30px rgba(0,0,0,.55));transition:transform .7s cubic-bezier(.22,1,.36,1),filter .5s ease;transform-origin:50% 17%;cursor:pointer}
-.hero-photo-wrap.shark-turned .shark-img{filter:drop-shadow(0 14px 30px rgba(0,0,0,.55)) drop-shadow(0 0 30px rgba(255,47,79,.6)) saturate(1.25) brightness(1.04)}
-.eye-glow{position:absolute;left:50.4%;top:17%;width:15%;padding-top:15%;transform:translate(-50%,-50%) scale(.4);border-radius:50%;background:radial-gradient(circle,#fff 0%,var(--red) 30%,rgba(255,47,79,.15) 68%,rgba(255,47,79,0) 78%);opacity:0;transition:opacity .3s ease,transform .45s cubic-bezier(.34,1.56,.64,1);z-index:4;box-shadow:0 0 34px 14px var(--red-glow);pointer-events:none;mix-blend-mode:screen}
-.eye-glow::after{content:'';position:absolute;left:96%;top:50%;width:280%;height:22%;transform:translateY(-50%) scaleX(0);transform-origin:left center;background:linear-gradient(90deg,#fff 0%,var(--red) 25%,rgba(255,47,79,.4) 60%,transparent 100%);opacity:.9;filter:blur(1.5px);transition:transform .35s ease .15s}
-.hero-photo-wrap.shark-turned .eye-glow{opacity:1;transform:translate(-50%,-50%) scale(1);animation:eyePulse 1.1s ease-in-out .45s infinite}
-.hero-photo-wrap.shark-turned .eye-glow::after{transform:translateY(-50%) scaleX(1)}
-@keyframes eyePulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)}}
-
-.hero-badge{position:absolute;background:var(--card);border:1px solid var(--border2);border-radius:50px;padding:6px 13px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:4;transition:opacity .3s ease}
-.hero-photo-wrap.shark-turned .hero-badge{opacity:0}
-.hero-badge.b1{top:14px;right:-58px;animation:float1 6s ease-in-out infinite;color:var(--gold)}
-.hero-badge.b2{bottom:14px;left:-60px;animation:float2 7s ease-in-out infinite;color:var(--red)}
-@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.hero-logo{opacity:0;animation:fadeUp .7s ease forwards .05s;margin-bottom:6px}
+.hero-logo-text{font-family:'Archivo Black',sans-serif;font-size:clamp(44px,11vw,88px);line-height:1;letter-spacing:-.02em;color:var(--white);text-shadow:0 0 40px rgba(255,47,79,.25)}
+.hero-logo-text span{color:var(--red);text-shadow:0 0 30px var(--red-glow)}
 
 .chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,47,79,.1);border:1px solid rgba(255,47,79,.35);border-radius:50px;padding:7px 18px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--red);margin-bottom:24px;opacity:0;animation:fadeUp .7s ease forwards .15s}
 .chip-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.4s infinite;box-shadow:0 0 8px var(--red)}
@@ -155,15 +133,15 @@ nav{
 .about-box strong{color:var(--white)}
 
 /* MODULES */
-.mod-list{display:grid;gap:8px}
-.mod-item{display:grid;grid-template-columns:4px 44px 1fr auto;align-items:center;gap:16px;background:var(--surface);padding:16px 20px 16px 0;border:1px solid var(--border);border-radius:12px;transition:border-color .25s,transform .25s;overflow:hidden}
-.mod-item::before{content:'';grid-row:1;height:100%;background:var(--border2);transition:background .25s}
-.mod-item:hover{border-color:var(--red);transform:translateX(4px)}
-.mod-item:hover::before{background:var(--red)}
-.mod-num{font-family:'Archivo Black',sans-serif;font-size:15px;color:var(--muted2);flex-shrink:0}
-.mod-content h3{font-size:14px;font-weight:700;margin-bottom:2px}
-.mod-content p{font-size:12px;color:var(--muted2)}
-.mod-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.05em;white-space:nowrap;border:1px solid rgba(240,178,61,.35);padding:4px 9px;border-radius:20px;margin-right:20px}
+.mod-list{display:grid;gap:10px}
+.mod-item{display:flex;align-items:flex-start;gap:16px;background:var(--surface);padding:18px 20px;border:1px solid var(--border);border-left:3px solid var(--border2);border-radius:12px;transition:border-color .25s,transform .25s}
+.mod-item:hover{border-color:var(--red);border-left-color:var(--red);transform:translateX(4px)}
+.mod-num{font-family:'Archivo Black',sans-serif;font-size:20px;color:var(--muted2);flex:0 0 auto;width:34px;line-height:1.4;padding-top:1px}
+.mod-body{flex:1 1 auto;min-width:0}
+.mod-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-bottom:4px}
+.mod-content h3{font-size:14.5px;font-weight:700}
+.mod-content p{font-size:12.5px;color:var(--muted2);line-height:1.55}
+.mod-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.05em;white-space:nowrap;border:1px solid rgba(240,178,61,.35);padding:3px 9px;border-radius:20px;flex:0 0 auto}
 
 /* RECEIVES — stacked tilted mockup cards */
 .rec-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px;padding:20px 10px 10px}
@@ -208,7 +186,6 @@ nav{
 .plan.feat{border-color:var(--red);box-shadow:0 0 50px var(--red-glow);padding-top:46px}
 .plan.feat:hover{box-shadow:0 20px 60px var(--red-glow)}
 .feat-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:6px 18px;border-radius:0 0 12px 12px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.vip-shark{width:22px;height:22px;border-radius:50%;object-fit:cover}
 .plan-name{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.02em;color:var(--muted2);margin-bottom:18px;text-transform:uppercase}
 .plan-price{font-family:'Archivo Black',sans-serif;font-size:50px;line-height:1;margin-bottom:6px;letter-spacing:-.02em}
 .plan-price sup{font-size:22px;vertical-align:top;margin-top:8px;display:inline-block}
@@ -267,7 +244,6 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
 @media(max-width:640px){
   nav{padding:14px 16px}
   .nav-links{display:none}
-  .hero-badge{display:none}
   .hero{padding:36px 20px 32px}
   .hero-stats{margin-top:32px}
   .hero-desc{margin-bottom:26px}
@@ -284,11 +260,8 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
   .rec-card:hover{transform:translateY(-6px) scale(1.02)}
   .chat-card,.chat-card:nth-child(1),.chat-card:nth-child(2),.chat-card:nth-child(3){transform:none;margin-bottom:14px}
   .chat-card:hover{transform:scale(1.01)}
-  .mod-item{grid-template-columns:4px 34px 1fr;grid-template-rows:auto auto;row-gap:6px;padding:14px 14px 14px 0}
-  .mod-item > div:first-child{grid-row:1 / 3}
-  .mod-num{grid-row:1;grid-column:2}
-  .mod-content{grid-row:1;grid-column:3}
-  .mod-tag{grid-row:2;grid-column:3;justify-self:start;margin-top:2px;margin-right:0}
+  .mod-item{padding:14px 16px;gap:12px}
+  .mod-num{font-size:17px;width:26px}
 }
 </style>
 </head>
@@ -309,13 +282,7 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-photo-wrap" id="sharkStage">
-    <div class="shark-glow"><span></span><span></span><span></span></div>
-    <img class="shark-img" id="sharkImg" src="data:image/png;base64,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" alt="SkillCash Zona VIP — tiburón mascota">
-    <div class="eye-glow"></div>
-    <div class="hero-badge b1">💰 Cripto real</div>
-    <div class="hero-badge b2">🦈 Zona VIP</div>
-  </div>
+  <div class="hero-logo"><div class="hero-logo-text">SKILL<span>CASH</span></div></div>
   <div class="chip"><span class="chip-dot"></span>Plazas VIP limitadas</div>
   <h1>Deja de perder dinero en cripto por <span class="accent">no entender</span> el mercado</h1>
   <p class="hero-tag">Mentoría · Juan SkillCash</p>
@@ -377,14 +344,62 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
     <div class="s-label reveal">Contenido</div>
     <h2 class="s-title reveal">Lo que vas a <em>aprender</em></h2>
     <div class="mod-list reveal-stagger">
-      <div class="mod-item"><div></div><div class="mod-num">00</div><div class="mod-content"><h3>Bienvenida y hoja de ruta</h3><p>Bienvenida, requisitos, comunidad VIP y cómo usar Telegram bien.</p></div><div class="mod-tag">INICIO</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">01</div><div class="mod-content"><h3>Fundamentos: tu primer Exchange</h3><p>Binance, OKX y Bybit — cuenta, seguridad, depósitos, retiros y compra/venta.</p></div><div class="mod-tag">BÁSICO</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">02</div><div class="mod-content"><h3>Aprende a leer el mercado</h3><p>Glosario, Coingecko, CoinMarketCap, Cryptobubbles, DexScreener, Velo, Bubblemaps y TradingView.</p></div><div class="mod-tag">ANÁLISIS</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">03</div><div class="mod-content"><h3>Wallets no custodiales</h3><p>Instalación y uso de Phantom y MetaMask para tener el control de tus fondos.</p></div><div class="mod-tag">SEGURIDAD</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">04</div><div class="mod-content"><h3>Modelos de generación de ingresos</h3><p>HODL, staking, Launchpool de Binance y plantilla de ahorro.</p></div><div class="mod-tag">INGRESOS</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">05</div><div class="mod-content"><h3>Construye tu portafolio</h3><p>Portafolio según tu perfil de riesgo, en DEX y en CEX.</p></div><div class="mod-tag">ESTRATEGIA</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">06</div><div class="mod-content"><h3>Análisis Crypto</h3><p>Ciclos de mercado, altseason, dominancia, oro vs Bitcoin y bear market.</p></div><div class="mod-tag">AVANZADO</div></div>
-      <div class="mod-item"><div></div><div class="mod-num">07</div><div class="mod-content"><h3>Adiciones y otros</h3><p>Cómo entrar a una IPO sin comprar en el pico y cómo invertir en el S&P 500.</p></div><div class="mod-tag">BONUS</div></div>
+      <div class="mod-item">
+        <div class="mod-num">00</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Bienvenida y hoja de ruta</h3><span class="mod-tag">INICIO</span></div>
+          <p>Vas a entender cómo está estructurada la mentoría, qué necesitas para empezar y cómo moverte en la comunidad VIP para sacarle el máximo provecho.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">01</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Fundamentos: tu primer Exchange</h3><span class="mod-tag">BÁSICO</span></div>
+          <p>Vas a aprender a crear y proteger tu cuenta, depositar, comprar, vender y retirar tu dinero con seguridad en Binance, OKX y Bybit.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">02</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Aprende a leer el mercado</h3><span class="mod-tag">ANÁLISIS</span></div>
+          <p>Vas a aprender a interpretar gráficos, comparar proyectos y detectar movimientos del mercado con las mismas herramientas que usan los traders.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">03</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Wallets no custodiales</h3><span class="mod-tag">SEGURIDAD</span></div>
+          <p>Vas a aprender a instalar y usar tu propia billetera cripto, sin depender de un exchange, para tener el control total de tu dinero.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">04</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Modelos de generación de ingresos</h3><span class="mod-tag">INGRESOS</span></div>
+          <p>Vas a aprender distintas formas de hacer crecer tu dinero en cripto: desde estrategias de largo plazo hasta staking y programas de recompensas.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">05</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Construye tu portafolio</h3><span class="mod-tag">ESTRATEGIA</span></div>
+          <p>Vas a aprender a armar tu propio portafolio de inversión según tu perfil de riesgo, tanto en exchanges centralizados como descentralizados.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">06</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Análisis Crypto</h3><span class="mod-tag">AVANZADO</span></div>
+          <p>Vas a aprender a identificar en qué momento del ciclo está el mercado, cuándo rota el dinero hacia las altcoins y cómo actuar en un bear market.</p>
+        </div>
+      </div>
+      <div class="mod-item">
+        <div class="mod-num">07</div>
+        <div class="mod-body">
+          <div class="mod-head"><h3>Adiciones y otros</h3><span class="mod-tag">BONUS</span></div>
+          <p>Vas a aprender a entrar a nuevos proyectos sin comprar en el pico y a dar tus primeros pasos invirtiendo también fuera de cripto, en el S&P 500.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -487,7 +502,7 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
 
       <!-- PREMIUM -->
       <div class="plan feat">
-        <div class="feat-badge">🦈 MÁS POPULAR</div>
+        <div class="feat-badge">⭐ MÁS POPULAR</div>
         <div class="plan-name">Plan Premium · Tutoriales + Acompañamiento 1 a 1</div>
         <div class="plan-price"><sup>$</sup>120</div>
         <div class="plan-sub">Único pago</div>
@@ -571,26 +586,6 @@ footer{padding:40px 20px 30px;text-align:center;position:relative;z-index:1;bord
 </div>
 
 <script>
-// Shark interactive effect: scroll + click triggers head turn + red eyes
-const sharkStage = document.getElementById('sharkStage');
-if (sharkStage) {
-  let clickTimer = null;
-  const SCROLL_THRESHOLD = 40;
-  const updateSharkScrollState = () => {
-    if (clickTimer) return; // let click effect finish first
-    sharkStage.classList.toggle('shark-turned', window.scrollY > SCROLL_THRESHOLD);
-  };
-  window.addEventListener('scroll', updateSharkScrollState);
-  sharkStage.addEventListener('click', () => {
-    sharkStage.classList.add('shark-turned');
-    clearTimeout(clickTimer);
-    clickTimer = setTimeout(() => {
-      clickTimer = null;
-      sharkStage.classList.toggle('shark-turned', window.scrollY > SCROLL_THRESHOLD);
-    }, 1500);
-  });
-}
-
 const progressBar = document.getElementById('progressBar');
 window.addEventListener('scroll', () => {
   const h = document.documentElement;
