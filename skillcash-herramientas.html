@@ -2767,10 +2767,12 @@ const CHECKLIST_STORAGE_KEY = 'skillcash_checklist_v1';
 const CHECKLIST_DATA = [
   { id: 'cuenta', title: '🔐 Cuenta de exchange', items: [
     { id: 'c1', text: 'Tienes activada la <strong>verificación en dos pasos (2FA)</strong> con una app como Google Authenticator — no solo con SMS.' },
-    { id: 'c2', text: 'Usas una <strong>contraseña única</strong> para el exchange, que no repites en ningún otro sitio.' },
+    { id: 'c2', text: 'Usas una <strong>contraseña única y segura</strong> para el exchange, que cambias de vez en cuando y no repites en ningún otro sitio.' },
     { id: 'c3', text: 'Activaste la <strong>whitelist de direcciones de retiro</strong>, para que solo se pueda retirar a direcciones que tú aprobaste antes.' },
     { id: 'c4', text: 'El <strong>correo asociado</strong> a tu cuenta del exchange también tiene su propio 2FA activado.' },
-    { id: 'c5', text: 'Nunca has compartido tu contraseña ni tu código 2FA con nadie, ni siquiera con alguien que dice ser "soporte".' }
+    { id: 'c5', text: 'Nunca has compartido tu contraseña ni tu código 2FA con nadie, ni siquiera con alguien que dice ser "soporte".' },
+    { id: 'c6', text: 'Tienes activadas las <strong>notificaciones de seguridad</strong> del exchange, para enterarte al momento de cualquier actividad sospechosa.' },
+    { id: 'c7', text: 'Revisas de vez en cuando el <strong>historial de inicio de sesión</strong> y la actividad reciente de tu cuenta, para confirmar que solo has sido tú.' }
   ]},
   { id: 'wallet', title: '👛 Wallet / billetera', items: [
     { id: 'w1', text: 'Tu <strong>frase semilla (seed phrase)</strong> está escrita en papel — nunca en una foto, nota del celular o la nube.' },
@@ -2779,14 +2781,18 @@ const CHECKLIST_DATA = [
     { id: 'w4', text: 'Nunca has escrito ni ingresado tu frase semilla en ninguna página web, ni siquiera una que parecía oficial.' }
   ]},
   { id: 'phishing', title: '🎣 Phishing y estafas', items: [
-    { id: 'p1', text: 'Siempre revisas que la <strong>URL exacta</strong> del exchange o wallet sea la correcta antes de iniciar sesión.' },
-    { id: 'p2', text: 'Desconfías de mensajes o DMs que ofrecen <strong>"duplicar" tu dinero</strong> o inversiones con retorno garantizado.' },
-    { id: 'p3', text: 'No haces clic en enlaces de <strong>correos o mensajes no solicitados</strong>, aunque parezcan venir de un exchange real.' },
-    { id: 'p4', text: 'Sabes que el soporte real de un exchange <strong>nunca te va a pedir</strong> tu contraseña, tu 2FA ni tu frase semilla.' }
+    { id: 'p1', text: 'Siempre revisas que la <strong>URL exacta</strong> del exchange o wallet sea la correcta antes de iniciar sesión, y evitas páginas que la imitan.' },
+    { id: 'p2', text: 'Entras al exchange o descargas su app <strong>solo desde fuentes oficiales</strong> — nunca desde un enlace que te llega por redes o mensajes.' },
+    { id: 'p3', text: 'Verificas que los <strong>correos del exchange</strong> realmente vengan de su dominio oficial antes de confiar en ellos.' },
+    { id: 'p4', text: 'No haces clic en enlaces ni descargas archivos de <strong>correos o mensajes no solicitados</strong>, aunque parezcan venir de un exchange real.' },
+    { id: 'p5', text: 'Desconfías de mensajes o DMs que ofrecen <strong>"duplicar" tu dinero</strong> o inversiones con retorno garantizado.' },
+    { id: 'p6', text: 'No compartes <strong>datos personales</strong> en redes sociales ni en grupos públicos de trading.' },
+    { id: 'p7', text: 'Sabes que el soporte real de un exchange <strong>nunca te va a pedir</strong> tu contraseña, tu 2FA ni tu frase semilla.' },
+    { id: 'p8', text: 'Si detectas algo raro en tu cuenta, contactas de inmediato al <strong>soporte oficial</strong> del exchange — nunca a alguien que te escribe primero por privado.' }
   ]},
   { id: 'dispositivos', title: '📱 Dispositivos', items: [
     { id: 'd1', text: 'Tu celular y computador tienen <strong>clave o huella</strong> para desbloquearse.' },
-    { id: 'd2', text: 'Mantienes el <strong>sistema operativo y apps actualizados</strong>, sobre todo las de tus exchanges y wallets.' },
+    { id: 'd2', text: 'Mantienes el <strong>sistema operativo, las apps y el antivirus actualizados</strong>, sobre todo en tus exchanges y wallets.' },
     { id: 'd3', text: 'Evitas operar o iniciar sesión en tus cuentas usando <strong>wifi público</strong>.' }
   ]}
 ];
@@ -3302,9 +3308,13 @@ document.getElementById('corrCalcBtn').addEventListener('click', async () => {
   try{
     const returnsByAsset = {};
     for(const asset of corrSelectedAssets){
-      const res = await fetch('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(asset.id) + '/market_chart?vs_currency=usd&days=' + corrPeriodDays + '&interval=daily');
+      const res = await fetch('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(asset.id) + '/market_chart?vs_currency=usd&days=' + corrPeriodDays);
       const json = await res.json();
-      const prices = (json.prices || []).map(p => p[1]);
+      if(!json.prices || json.prices.length < 2){
+        const apiMsg = json.status && json.status.error_message ? json.status.error_message : null;
+        throw new Error('Sin datos históricos para ' + asset.symbol.toUpperCase() + (apiMsg ? ' (' + apiMsg + ')' : '.'));
+      }
+      const prices = json.prices.map(p => p[1]);
       returnsByAsset[asset.id] = pricesToReturns(prices);
     }
 
@@ -3329,7 +3339,8 @@ document.getElementById('corrCalcBtn').addEventListener('click', async () => {
     wrap.innerHTML = html;
     document.getElementById('corrLegend').style.display = 'flex';
   } catch(err){
-    wrap.innerHTML = '<div class="asset-empty">No se pudo calcular. Revisa tu conexión e intenta de nuevo.</div>';
+    const detail = err && err.message ? err.message : 'Revisa tu conexión e intenta de nuevo.';
+    wrap.innerHTML = '<div class="asset-empty">No se pudo calcular. ' + detail + '</div>';
   } finally {
     btn.disabled = false;
     btn.textContent = original;
