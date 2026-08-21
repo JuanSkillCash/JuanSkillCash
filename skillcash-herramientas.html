@@ -183,6 +183,8 @@ button{font-family:inherit;color:inherit}
 .dir-btn{flex:1;padding:13px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:14.5px;cursor:pointer;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .dir-btn.active[data-dir="long"]{background:rgba(46,204,113,.15);color:var(--green);box-shadow:inset 0 0 0 1px rgba(46,204,113,.4)}
 .dir-btn.active[data-dir="short"]{background:rgba(255,47,79,.15);color:var(--red);box-shadow:inset 0 0 0 1px rgba(255,47,79,.4)}
+.mode-btn{flex:1;padding:13px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:14.5px;cursor:pointer;transition:background .2s,color .2s}
+.mode-btn.active{background:rgba(255,47,79,.15);color:var(--white);box-shadow:inset 0 0 0 1px rgba(255,47,79,.4)}
 
 .calc-body{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
 .calc-inputs{min-width:0}
@@ -1015,20 +1017,30 @@ button{font-family:inherit;color:inherit}
       <div class="calc-inputs">
 
       <div class="dir-toggle">
-        <button class="dir-btn active" data-bemode="spot">Spot</button>
-        <button class="dir-btn" data-bemode="futuros">Futuros</button>
+        <button class="mode-btn active" data-bemode="spot">Spot</button>
+        <button class="mode-btn" data-bemode="futuros">Futuros</button>
       </div>
 
       <div class="calc-grid" style="margin-top:16px">
-        <div class="field" id="f-be-fee">
-          <label for="beFee">Comisión por operación (%)</label>
+        <div class="field" id="f-be-fee-entry">
+          <label for="beFeeEntry">Comisión de entrada (%)</label>
           <div class="input-stepper">
-            <button type="button" class="step-btn" data-target="beFee" data-dir="-1" aria-label="Disminuir">−</button>
-            <input type="number" id="beFee" inputmode="decimal" value="0.1" step="any">
-            <button type="button" class="step-btn" data-target="beFee" data-dir="1" aria-label="Aumentar">+</button>
+            <button type="button" class="step-btn" data-target="beFeeEntry" data-dir="-1" aria-label="Disminuir">−</button>
+            <input type="number" id="beFeeEntry" inputmode="decimal" value="0.1" step="any">
+            <button type="button" class="step-btn" data-target="beFeeEntry" data-dir="1" aria-label="Aumentar">+</button>
           </div>
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
+        <div class="field" id="f-be-fee-exit">
+          <label for="beFeeExit">Comisión de salida (%)</label>
+          <div class="input-stepper">
+            <button type="button" class="step-btn" data-target="beFeeExit" data-dir="-1" aria-label="Disminuir">−</button>
+            <input type="number" id="beFeeExit" inputmode="decimal" value="0.1" step="any">
+            <button type="button" class="step-btn" data-target="beFeeExit" data-dir="1" aria-label="Aumentar">+</button>
+          </div>
+          <div class="field-err">Debe ser mayor a 0</div>
+        </div>
+        <div class="be-note" style="margin:0;grid-column:1/-1">💡 Escribe el número sin el símbolo %. Si tu exchange muestra "0.0800%", escribe <strong>0.08</strong> — no 0.8, porque sería 10 veces más.</div>
         <div class="field" id="f-be-capital">
           <label for="beCapital">Capital / Margen (USD)</label>
           <div class="input-stepper">
@@ -1059,10 +1071,15 @@ button{font-family:inherit;color:inherit}
 
       <div class="calc-results">
       <div class="res-grid">
-        <div class="res-card sl"><div class="r-label">Break-even normal</div><div class="r-val" id="outBeNormal">—</div></div>
-        <div class="res-card tp"><div class="r-label">Break-even con Bitunix</div><div class="r-val" id="outBeCashback">—</div></div>
+        <div class="res-card sl"><div class="r-label">Movimiento de precio (normal)</div><div class="r-val" id="outBeNormal">—</div></div>
+        <div class="res-card tp"><div class="r-label">Movimiento de precio (Bitunix)</div><div class="r-val" id="outBeCashback">—</div></div>
         <div class="res-card"><div class="r-label">Comisión total (normal)</div><div class="r-val" id="outFeeNormal">—</div></div>
         <div class="res-card liq"><div class="r-label">Comisión con Bitunix</div><div class="r-val" id="outFeeCashback">—</div></div>
+      </div>
+
+      <div class="res-grid" id="beLevResultRow" style="display:none;margin-top:-15px">
+        <div class="res-card sl"><div class="r-label">Rendimiento sobre tu capital, apalancado (normal)</div><div class="r-val" id="outBeLevNormal">—</div></div>
+        <div class="res-card tp"><div class="r-label">Rendimiento sobre tu capital, apalancado (Bitunix)</div><div class="r-val" id="outBeLevCashback">—</div></div>
       </div>
 
       <div class="be-savings-box">
@@ -2897,25 +2914,27 @@ breakevenModal.addEventListener('click', (e) => { if(e.target === breakevenModal
 let beMode = 'spot';
 const BE_CASHBACK = 0.20; // 20% cashback de Bitunix sobre la comisión
 
-document.querySelectorAll('#breakevenModal .dir-btn').forEach(btn => {
+document.querySelectorAll('#breakevenModal .mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     beMode = btn.dataset.bemode;
-    document.querySelectorAll('#breakevenModal .dir-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#breakevenModal .mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('beLevField').style.display = beMode === 'futuros' ? 'block' : 'none';
+    document.getElementById('beLevResultRow').style.display = beMode === 'futuros' ? 'grid' : 'none';
     document.getElementById('beModeNote').textContent = beMode === 'spot'
       ? 'En Spot, la comisión se paga sobre tu capital al comprar y al vender.'
-      : 'En Futuros, la comisión se paga sobre el tamaño de la posición (capital × apalancamiento) — por eso el % de movimiento necesario no cambia con el apalancamiento, aunque el costo en dólares sí.';
+      : 'En Futuros, la comisión se paga sobre el tamaño de la posición (capital × apalancamiento) — por eso el % de movimiento de precio necesario no cambia con el apalancamiento, pero el rendimiento que necesitas sobre TU capital sí, porque el apalancamiento lo multiplica.';
     computeBreakeven();
   });
 });
 
-const beFeeInput = document.getElementById('beFee');
+const beFeeEntryInput = document.getElementById('beFeeEntry');
+const beFeeExitInput = document.getElementById('beFeeExit');
 const beCapitalInput = document.getElementById('beCapital');
 const beLevSlider = document.getElementById('beLevSlider');
 const beLevVal = document.getElementById('beLevVal');
 
-[beFeeInput, beCapitalInput].forEach(inp => inp.addEventListener('input', computeBreakeven));
+[beFeeEntryInput, beFeeExitInput, beCapitalInput].forEach(inp => inp.addEventListener('input', computeBreakeven));
 beLevSlider.addEventListener('input', () => {
   beLevVal.textContent = beLevSlider.value + 'x';
   document.querySelectorAll('#breakevenModal .lev-chip').forEach(c => c.classList.toggle('active', c.dataset.lev === beLevSlider.value));
@@ -2936,9 +2955,10 @@ document.querySelectorAll('#breakevenModal .step-btn').forEach(btn => {
     const dir = parseFloat(btn.dataset.dir);
     const input = document.getElementById(targetId);
     const current = parseFloat(input.value) || 0;
-    const step = targetId === 'beFee' ? 0.01 : (current >= 1000 ? 100 : 10);
+    const isFeeField = targetId === 'beFeeEntry' || targetId === 'beFeeExit';
+    const step = isFeeField ? 0.01 : (current >= 1000 ? 100 : 10);
     let next = Math.max(step, current + dir * step);
-    const decimals = targetId === 'beFee' ? 2 : 2;
+    const decimals = isFeeField ? 2 : 2;
     next = parseFloat(next.toFixed(decimals));
     input.value = next;
     computeBreakeven();
@@ -2946,33 +2966,37 @@ document.querySelectorAll('#breakevenModal .step-btn').forEach(btn => {
 });
 
 function computeBreakeven(){
-  const feePct = parseFloat(beFeeInput.value);
+  const feeEntryPct = parseFloat(beFeeEntryInput.value);
+  const feeExitPct = parseFloat(beFeeExitInput.value);
   const capital = parseFloat(beCapitalInput.value);
   const lev = beMode === 'futuros' ? parseFloat(beLevSlider.value) : 1;
 
-  const validFee = validateField(beFeeInput, 'f-be-fee', feePct > 0);
+  const validFeeEntry = validateField(beFeeEntryInput, 'f-be-fee-entry', feeEntryPct > 0);
+  const validFeeExit = validateField(beFeeExitInput, 'f-be-fee-exit', feeExitPct > 0);
   const validCapital = validateField(beCapitalInput, 'f-be-capital', capital > 0);
-  if(!validFee || !validCapital){
-    ['outBeNormal','outBeCashback','outFeeNormal','outFeeCashback'].forEach(id => document.getElementById(id).textContent = '—');
+  if(!validFeeEntry || !validFeeExit || !validCapital){
+    ['outBeNormal','outBeCashback','outFeeNormal','outFeeCashback','outBeLevNormal','outBeLevCashback'].forEach(id => document.getElementById(id).textContent = '—');
     return;
   }
 
-  const feeDecimal = feePct / 100;
-  const feeDecimalCashback = feeDecimal * (1 - BE_CASHBACK);
+  const feeEntryDecimal = feeEntryPct / 100;
+  const feeExitDecimal = feeExitPct / 100;
+  const feeEntryDecimalCB = feeEntryDecimal * (1 - BE_CASHBACK);
+  const feeExitDecimalCB = feeExitDecimal * (1 - BE_CASHBACK);
 
   let bePctNormal, bePctCashback, feeDollarNormal, feeDollarCashback;
 
   if(beMode === 'spot'){
-    bePctNormal = (Math.pow(1 - feeDecimal, -2) - 1) * 100;
-    bePctCashback = (Math.pow(1 - feeDecimalCashback, -2) - 1) * 100;
-    feeDollarNormal = capital * (1 - Math.pow(1 - feeDecimal, 2));
-    feeDollarCashback = capital * (1 - Math.pow(1 - feeDecimalCashback, 2));
+    bePctNormal = ((1 / ((1 - feeEntryDecimal) * (1 - feeExitDecimal))) - 1) * 100;
+    bePctCashback = ((1 / ((1 - feeEntryDecimalCB) * (1 - feeExitDecimalCB))) - 1) * 100;
+    feeDollarNormal = capital * (1 - (1 - feeEntryDecimal) * (1 - feeExitDecimal));
+    feeDollarCashback = capital * (1 - (1 - feeEntryDecimalCB) * (1 - feeExitDecimalCB));
   } else {
-    bePctNormal = 2 * feePct;
-    bePctCashback = 2 * feePct * (1 - BE_CASHBACK);
+    bePctNormal = feeEntryPct + feeExitPct;
+    bePctCashback = (feeEntryPct + feeExitPct) * (1 - BE_CASHBACK);
     const notional = capital * lev;
-    feeDollarNormal = notional * feeDecimal * 2;
-    feeDollarCashback = notional * feeDecimalCashback * 2;
+    feeDollarNormal = notional * (feeEntryDecimal + feeExitDecimal);
+    feeDollarCashback = notional * (feeEntryDecimalCB + feeExitDecimalCB);
   }
 
   const savings = feeDollarNormal - feeDollarCashback;
@@ -2984,6 +3008,13 @@ function computeBreakeven(){
   document.getElementById('outSavings').textContent = '$' + savings.toFixed(2);
   document.getElementById('outSavingsSub').textContent =
     'por esta operación — tu break-even baja de ' + bePctNormal.toFixed(3) + '% a ' + bePctCashback.toFixed(3) + '% solo por el cashback de Bitunix.';
+
+  if(beMode === 'futuros'){
+    const bePctLevNormal = bePctNormal * lev;
+    const bePctLevCashback = bePctCashback * lev;
+    document.getElementById('outBeLevNormal').textContent = bePctLevNormal.toFixed(2) + '%';
+    document.getElementById('outBeLevCashback').textContent = bePctLevCashback.toFixed(2) + '%';
+  }
 }
 
 /* ========= QUIZ DE PERFIL DE RIESGO ========= */
@@ -3307,9 +3338,22 @@ document.getElementById('corrCalcBtn').addEventListener('click', async () => {
 
   try{
     const returnsByAsset = {};
-    for(const asset of corrSelectedAssets){
+    for(let i = 0; i < corrSelectedAssets.length; i++){
+      const asset = corrSelectedAssets[i];
+      if(i > 0) await new Promise(resolve => setTimeout(resolve, 1300)); // pausa para no golpear el límite de CoinGecko
+      wrap.innerHTML = '<div class="asset-loading">Trayendo datos de ' + asset.symbol.toUpperCase() + ' (' + (i + 1) + '/' + corrSelectedAssets.length + ')…</div>';
+
       const res = await fetch('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(asset.id) + '/market_chart?vs_currency=usd&days=' + corrPeriodDays);
-      const json = await res.json();
+      const rawText = await res.text();
+      let json;
+      try{
+        json = JSON.parse(rawText);
+      } catch(parseErr){
+        if(/throttl/i.test(rawText)){
+          throw new Error('CoinGecko está limitando las solicitudes en este momento — espera unos 30-60 segundos e intenta de nuevo.');
+        }
+        throw new Error('Respuesta inesperada del servidor de precios para ' + asset.symbol.toUpperCase() + '.');
+      }
       if(!json.prices || json.prices.length < 2){
         const apiMsg = json.status && json.status.error_message ? json.status.error_message : null;
         throw new Error('Sin datos históricos para ' + asset.symbol.toUpperCase() + (apiMsg ? ' (' + apiMsg + ')' : '.'));
