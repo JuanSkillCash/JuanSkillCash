@@ -317,6 +317,9 @@ button{font-family:inherit;color:inherit}
 .res-card.mult .r-val{color:var(--gold)}
 
 /* ===== CALCULADORA DE BREAK-EVEN ===== */
+.be-section-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.be-section-label.bitunix{color:var(--bitunix-green)}
+.be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:8px}
 .be-savings-box{background:linear-gradient(155deg,rgba(191,250,44,.1),rgba(191,250,44,.02));border:1px solid rgba(191,250,44,.28);border-radius:14px;padding:18px 20px;margin:20px 0;text-align:center}
 .be-savings-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
 .be-savings-value{font-family:'Archivo Black',sans-serif;font-size:30px;color:var(--bitunix-green);letter-spacing:-.01em;margin-bottom:6px}
@@ -408,6 +411,20 @@ button{font-family:inherit;color:inherit}
 .checklist-item-text strong{color:inherit}
 
 /* ===== SIMULADOR DE PORTAFOLIO ===== */
+.avg-sim-box{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.avg-sim-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.avg-sim-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--white);font-size:13.5px;font-family:'Space Grotesk',sans-serif;outline:none;margin-bottom:11px}
+.avg-sim-select:focus{border-color:var(--gold)}
+.avg-sim-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.avg-sim-fields input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--white);font-size:13.5px;outline:none}
+.avg-sim-fields input:focus{border-color:var(--gold)}
+.avg-sim-current{font-size:12px;color:var(--muted2);margin-bottom:12px;line-height:1.6}
+.avg-sim-current b{color:var(--white);font-family:'Space Mono',monospace}
+.avg-sim-result{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;margin-top:12px;display:none}
+.avg-sim-result.show{display:block}
+.avg-sim-result-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted2);padding:4px 0}
+.avg-sim-result-row b{color:var(--gold);font-family:'Space Mono',monospace}
+.avg-sim-actions{display:flex;gap:8px;margin-top:4px}
 .auth-tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:18px;max-width:420px}
 .auth-tab{flex:1;padding:11px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .2s,color .2s}
 .auth-tab.active{background:rgba(255,47,79,.14);color:var(--white)}
@@ -449,6 +466,7 @@ button{font-family:inherit;color:inherit}
 .portfolio-detail-head span{font-size:15px;font-weight:700;color:var(--white)}
 .portfolio-del-btn{background:none;border:1px solid var(--border2);color:var(--muted);border-radius:8px;width:32px;height:32px;cursor:pointer;flex-shrink:0;transition:border-color .2s,color .2s}
 .portfolio-del-btn:hover{border-color:var(--red);color:var(--red)}
+.portfolio-del-btn.copied{border-color:var(--green);color:var(--green)}
 
 .pending-item{background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:13px 15px;margin-bottom:14px}
 .pending-item-head{display:flex;align-items:center;gap:10px;margin-bottom:11px}
@@ -1070,16 +1088,20 @@ button{font-family:inherit;color:inherit}
       </div>
 
       <div class="calc-results">
-      <div class="res-grid">
-        <div class="res-card sl"><div class="r-label">Movimiento de precio (normal)</div><div class="r-val" id="outBeNormal">—</div></div>
-        <div class="res-card tp"><div class="r-label">Movimiento de precio (Bitunix)</div><div class="r-val" id="outBeCashback">—</div></div>
-        <div class="res-card"><div class="r-label">Comisión total (normal)</div><div class="r-val" id="outFeeNormal">—</div></div>
-        <div class="res-card liq"><div class="r-label">Comisión con Bitunix</div><div class="r-val" id="outFeeCashback">—</div></div>
+      <div class="be-section-label">📋 Comisión normal (sin cashback)</div>
+      <div class="be-metric-grid" id="beNormalGrid">
+        <div class="res-card sl"><div class="r-label">Movimiento de precio necesario</div><div class="r-val" id="outBeNormal">—</div></div>
+        <div class="res-card" id="beLevNormalCard" style="display:none"><div class="r-label">Rendimiento sobre tu capital (apalancado)</div><div class="r-val" id="outBeLevNormal">—</div></div>
+        <div class="res-card"><div class="r-label">Comisión total pagada</div><div class="r-val" id="outFeeNormal">—</div></div>
       </div>
 
-      <div class="res-grid" id="beLevResultRow" style="display:none;margin-top:-15px">
-        <div class="res-card sl"><div class="r-label">Rendimiento sobre tu capital, apalancado (normal)</div><div class="r-val" id="outBeLevNormal">—</div></div>
-        <div class="res-card tp"><div class="r-label">Rendimiento sobre tu capital, apalancado (Bitunix)</div><div class="r-val" id="outBeLevCashback">—</div></div>
+      <div class="auth-divider">VS</div>
+
+      <div class="be-section-label bitunix">🚀 Con el cashback de Bitunix (20%)</div>
+      <div class="be-metric-grid" id="beCashbackGrid">
+        <div class="res-card tp"><div class="r-label">Movimiento de precio necesario</div><div class="r-val" id="outBeCashback">—</div></div>
+        <div class="res-card" id="beLevCashbackCard" style="display:none"><div class="r-label">Rendimiento sobre tu capital (apalancado)</div><div class="r-val" id="outBeLevCashback">—</div></div>
+        <div class="res-card liq"><div class="r-label">Comisión total pagada</div><div class="r-val" id="outFeeCashback">—</div></div>
       </div>
 
       <div class="be-savings-box">
@@ -1393,7 +1415,10 @@ button{font-family:inherit;color:inherit}
           <div class="calc-results" id="portfolioDetail" style="display:none">
             <div class="portfolio-detail-head">
               <span id="portfolioDetailName">—</span>
-              <button class="portfolio-del-btn" id="deletePortfolioBtn" title="Eliminar portafolio" type="button">🗑</button>
+              <div style="display:flex;gap:8px">
+                <button class="portfolio-del-btn" id="copyPortfolioBtn" title="Copiar portafolio como respaldo" type="button">📋</button>
+                <button class="portfolio-del-btn" id="deletePortfolioBtn" title="Eliminar portafolio" type="button">🗑</button>
+              </div>
             </div>
 
             <div class="asset-search">
@@ -1415,6 +1440,9 @@ button{font-family:inherit;color:inherit}
             <div class="portfolio-empty" id="portfolioItemsEmpty" style="display:none">Todavía no agregaste ningún activo.</div>
 
             <div id="portfolioTotals"></div>
+
+            <button class="a-btn" id="openAvgSimBtn" type="button" style="display:none;margin:14px 0">🧮 Simular nueva compra (sin guardar)</button>
+            <div id="avgSimBox"></div>
 
             <div class="calc-disclaimer" style="margin-top:16px">
               Los precios de cripto se traen en vivo vía CoinGecko. El plan de asignación (%) es solo una guía de referencia — no ejecuta operaciones reales.<br>
@@ -2227,7 +2255,14 @@ authSubmitBtn.addEventListener('click', async () => {
 });
 
 document.getElementById('googleSignInBtn').addEventListener('click', async () => {
-  const { error } = await sbClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+  const cleanUrl = window.location.origin + window.location.pathname;
+  const { error } = await sbClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: cleanUrl,
+      queryParams: { prompt: 'select_account' }
+    }
+  });
   if(error) showAuthError('No se pudo iniciar con Google: ' + error.message);
 });
 
@@ -2429,8 +2464,47 @@ async function selectPortfolio(p){
   portfolioDetail.style.display = 'block';
   pendingAsset = null;
   renderPendingItem();
+  avgSimOpen = false;
+  document.getElementById('avgSimBox').innerHTML = '';
   await loadPortfolioItems();
 }
+
+document.getElementById('copyPortfolioBtn').addEventListener('click', () => {
+  if(!selectedPortfolio) return;
+  const btn = document.getElementById('copyPortfolioBtn');
+  if(portfolioItems.length === 0){
+    alert('Este portafolio todavía no tiene activos para copiar.');
+    return;
+  }
+  const isPlan = selectedPortfolio.mode === 'plan';
+  const lines = [];
+  lines.push('SKILLCASH · Respaldo de portafolio');
+  lines.push('Nombre: ' + selectedPortfolio.name);
+  lines.push('Modo: ' + (isPlan ? 'Plan de asignación (%)' : 'Holdings reales'));
+  lines.push('Fecha de exportación: ' + new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }));
+  lines.push('—');
+  portfolioItems.forEach((item, idx) => {
+    lines.push((idx + 1) + '. ' + item.asset_name + ' (' + item.asset_symbol.toUpperCase() + ')');
+    if(isPlan){
+      lines.push('   % objetivo: ' + Number(item.target_pct) + '%');
+    } else {
+      lines.push('   Cantidad: ' + formatPrice(Number(item.quantity)));
+      lines.push('   Precio de compra: $' + item.buy_price);
+      lines.push('   Fecha de compra: ' + (item.purchased_at ? formatDateEs(item.purchased_at) : 'sin fecha'));
+    }
+  });
+  lines.push('—');
+  lines.push('Generado desde el Simulador de Portafolio de SkillCash.');
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
+  }).catch(() => {
+    alert('No se pudo copiar. Intenta de nuevo.');
+  });
+});
 
 document.getElementById('deletePortfolioBtn').addEventListener('click', async () => {
   if(!selectedPortfolio) return;
@@ -2628,6 +2702,16 @@ function renderPortfolioItems(){
   portfolioItemsList.innerHTML = '';
   populateAssetFilter();
 
+  const isPlanCheck = selectedPortfolio.mode === 'plan';
+  const avgSimBtn = document.getElementById('openAvgSimBtn');
+  avgSimBtn.style.display = (!isPlanCheck && portfolioItems.length > 0) ? 'block' : 'none';
+  if(isPlanCheck || portfolioItems.length === 0){
+    avgSimOpen = false;
+    document.getElementById('avgSimBox').innerHTML = '';
+  } else if(avgSimOpen){
+    renderAvgSimBox();
+  }
+
   if(portfolioItems.length === 0){
     document.getElementById('portfolioTotals').innerHTML = '';
     return;
@@ -2746,6 +2830,94 @@ async function deletePortfolioItem(id){
   const { error } = await sbClient.from('portfolio_items').delete().eq('id', id);
   if(error){ alert('No se pudo eliminar: ' + error.message); return; }
   await loadPortfolioItems();
+}
+
+/* ========= SIMULADOR DE COSTO PROMEDIO (no guarda nada) ========= */
+function getPortfolioAssetGroups(){
+  const groups = {};
+  portfolioItems.forEach(item => {
+    if(!groups[item.asset_id]){
+      groups[item.asset_id] = { id: item.asset_id, name: item.asset_name, symbol: item.asset_symbol, thumb: item.asset_thumb, qty: 0, invested: 0 };
+    }
+    const g = groups[item.asset_id];
+    g.qty += Number(item.quantity) || 0;
+    g.invested += (Number(item.quantity) || 0) * (Number(item.buy_price) || 0);
+  });
+  Object.values(groups).forEach(g => { g.avgCost = g.qty > 0 ? g.invested / g.qty : 0; });
+  return groups;
+}
+
+let avgSimOpen = false;
+
+document.getElementById('openAvgSimBtn').addEventListener('click', () => {
+  avgSimOpen = !avgSimOpen;
+  if(avgSimOpen) renderAvgSimBox();
+  else document.getElementById('avgSimBox').innerHTML = '';
+});
+
+function renderAvgSimBox(){
+  const groups = getPortfolioAssetGroups();
+  const assets = Object.values(groups);
+  if(assets.length === 0){ document.getElementById('avgSimBox').innerHTML = ''; return; }
+
+  const optionsHtml = assets.map(a =>
+    '<option value="' + a.id + '">' + a.name + ' (' + a.symbol.toUpperCase() + ')</option>'
+  ).join('');
+
+  document.getElementById('avgSimBox').innerHTML = `
+    <div class="avg-sim-box">
+      <div class="avg-sim-title">🧮 Simulación — no se guarda, es solo una vista previa</div>
+      <select class="avg-sim-select" id="avgSimAsset">${optionsHtml}</select>
+      <div class="avg-sim-current" id="avgSimCurrent"></div>
+      <div class="avg-sim-fields">
+        <input type="number" id="avgSimQty" placeholder="Cantidad a comprar" step="any">
+        <input type="number" id="avgSimPrice" placeholder="Precio de compra (USD)" step="any">
+      </div>
+      <div class="avg-sim-actions">
+        <button class="a-btn" id="avgSimCalcBtn" type="button">Calcular nuevo costo promedio</button>
+      </div>
+      <div class="avg-sim-result" id="avgSimResult"></div>
+    </div>`;
+
+  const select = document.getElementById('avgSimAsset');
+  function updateCurrentLabel(){
+    const g = groups[select.value];
+    document.getElementById('avgSimCurrent').innerHTML =
+      'Ahora tienes <b>' + formatPrice(g.qty) + '</b> ' + g.symbol.toUpperCase() +
+      ' con un costo promedio de <b>$' + g.avgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b>.';
+    document.getElementById('avgSimResult').classList.remove('show');
+    const priceInput = document.getElementById('avgSimPrice');
+    const liveData = livePricesCache[select.value];
+    if(liveData && typeof liveData.usd === 'number' && !priceInput.value){
+      priceInput.value = liveData.usd;
+    }
+  }
+  select.addEventListener('change', updateCurrentLabel);
+  updateCurrentLabel();
+
+  document.getElementById('avgSimCalcBtn').addEventListener('click', () => {
+    const g = groups[select.value];
+    const newQty = parseFloat(document.getElementById('avgSimQty').value);
+    const newPrice = parseFloat(document.getElementById('avgSimPrice').value);
+    const resultEl = document.getElementById('avgSimResult');
+    if(!(newQty > 0) || !(newPrice > 0)){
+      resultEl.innerHTML = '<div class="avg-sim-result-row" style="color:var(--red)">Ingresa una cantidad y un precio válidos.</div>';
+      resultEl.classList.add('show');
+      return;
+    }
+    const totalQty = g.qty + newQty;
+    const totalInvested = g.invested + (newQty * newPrice);
+    const newAvgCost = totalQty > 0 ? totalInvested / totalQty : 0;
+    const change = g.avgCost > 0 ? ((newAvgCost - g.avgCost) / g.avgCost) * 100 : 0;
+
+    resultEl.innerHTML =
+      '<div class="avg-sim-result-row"><span>Costo promedio actual</span><b>$' + g.avgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
+      '<div class="avg-sim-result-row"><span>Costo promedio si compras</span><b>$' + newAvgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
+      '<div class="avg-sim-result-row"><span>Cambio</span><b>' + (change >= 0 ? '+' : '') + change.toFixed(2) + '%</b></div>' +
+      '<div class="avg-sim-result-row"><span>Cantidad total después</span><b>' + formatPrice(totalQty) + ' ' + g.symbol.toUpperCase() + '</b></div>' +
+      '<div class="avg-sim-result-row"><span>Total invertido después</span><b>$' + totalInvested.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</b></div>';
+    resultEl.classList.add('show');
+  });
 }
 
 function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue){
@@ -2920,7 +3092,8 @@ document.querySelectorAll('#breakevenModal .mode-btn').forEach(btn => {
     document.querySelectorAll('#breakevenModal .mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('beLevField').style.display = beMode === 'futuros' ? 'block' : 'none';
-    document.getElementById('beLevResultRow').style.display = beMode === 'futuros' ? 'grid' : 'none';
+    document.getElementById('beLevNormalCard').style.display = beMode === 'futuros' ? 'block' : 'none';
+    document.getElementById('beLevCashbackCard').style.display = beMode === 'futuros' ? 'block' : 'none';
     document.getElementById('beModeNote').textContent = beMode === 'spot'
       ? 'En Spot, la comisión se paga sobre tu capital al comprar y al vender.'
       : 'En Futuros, la comisión se paga sobre el tamaño de la posición (capital × apalancamiento) — por eso el % de movimiento de precio necesario no cambia con el apalancamiento, pero el rendimiento que necesitas sobre TU capital sí, porque el apalancamiento lo multiplica.';
@@ -3433,6 +3606,18 @@ async function loadFearGreedIndex(){
   }
 }
 loadFearGreedIndex();
+
+/* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
+(function checkOAuthReturnError(){
+  const raw = window.location.hash || window.location.search;
+  if(!raw || raw.indexOf('error') === -1) return;
+  const params = new URLSearchParams(raw.replace(/^[#?]/, ''));
+  const errDesc = params.get('error_description') || params.get('error');
+  if(errDesc){
+    openAuthModal();
+    showAuthError('Google: ' + decodeURIComponent(errDesc.replace(/\+/g, ' ')));
+  }
+})();
 </script>
 </body>
 </html>
