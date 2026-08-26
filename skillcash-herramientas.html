@@ -1949,26 +1949,31 @@ let marginMode = 'aislado';
 
 const DEFAULTS = { entry: 0.01362, capital: 100, sl: 12, tp: 25, lev: 3, dir: 'long' };
 
+/* ---- formato numérico en español: coma decimal, punto de miles, sin ceros de más ---- */
+function numES(n, minDec, maxDec){
+  if(maxDec === undefined) maxDec = minDec;
+  if(!isFinite(n) || n === null) return '—';
+  return n.toLocaleString('es-ES', { minimumFractionDigits: minDec, maximumFractionDigits: maxDec });
+}
+
 function formatPrice(n){
   if(!isFinite(n) || n === null) return '—';
   const abs = Math.abs(n);
-  let decimals;
-  if(abs === 0) decimals = 2;
-  else if(abs >= 1000) decimals = 2;
-  else if(abs >= 1) decimals = 4;
-  else {
-    const exp = Math.floor(Math.log10(abs));
-    decimals = Math.min(12, Math.max(4, -exp + 4));
-  }
-  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  if(abs === 0) return numES(0, 2, 2);
+  if(abs >= 1) return numES(n, 2, 2);
+  // precios muy pequeños (monedas con muchos ceros): mostramos los decimales que hagan
+  // falta para ver cifras significativas, pero sin rellenar con ceros de más
+  const exp = Math.floor(Math.log10(abs));
+  const maxDec = Math.min(10, Math.max(2, -exp + 3));
+  return numES(n, 2, maxDec);
 }
 function formatUSD(n){
   const sign = n >= 0 ? '+' : '';
-  return sign + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USDT';
+  return sign + numES(n, 2, 2) + ' USDT';
 }
 function formatPct(n){
   const sign = n >= 0 ? '+' : '';
-  return sign + n.toFixed(2) + '%';
+  return sign + numES(n, 2, 2) + '%';
 }
 
 function validateField(el, wrapId, isValid){
@@ -1999,11 +2004,12 @@ function calc(){
 
   const posSize = capital * lev;
   const effectiveMargin = marginMode === 'cruzado' ? (capital + crossExtra) : capital;
-  const liqMovePct = Math.min(99, (effectiveMargin / posSize) * 100); // % price move to hit liquidation
+  const liqMovePct = (effectiveMargin / posSize) * 100; // % price move to hit liquidation
+  const liqImpossible = direction === 'long' && liqMovePct >= 100; // con este margen, ni un -100% de precio te liquida
 
   let liq, sl, tp;
   if(direction === 'long'){
-    liq = entry * (1 - (liqMovePct / 100));
+    liq = liqImpossible ? 0 : entry * (1 - (liqMovePct / 100));
     sl  = entry * (1 - ((slPct / 100) / lev));
     tp  = entry * (1 + ((tpPct / 100) / lev));
   } else {
@@ -2021,34 +2027,37 @@ function calc(){
 
   // ---- render result cards ----
   $('outEntry').textContent = formatPrice(entry);
-  $('outLiq').textContent = formatPrice(liq);
+  $('outLiq').textContent = liqImpossible ? '🛡️ No se liquida' : formatPrice(liq);
   $('outSL').textContent = formatPrice(sl);
   $('outTP').textContent = formatPrice(tp);
 
   // ---- summary ----
   $('sumDir').textContent = direction === 'long' ? 'LONG 🟢' : 'SHORT 🔴';
   const rrEl = $('sumRR');
-  rrEl.textContent = '1 : ' + rr.toFixed(2);
+  rrEl.textContent = '1 : ' + numES(rr, 2);
   rrEl.classList.remove('rr-bad', 'rr-ok', 'rr-good');
   if(rr < 1) rrEl.classList.add('rr-bad');
   else if(rr < 2) rrEl.classList.add('rr-ok');
   else rrEl.classList.add('rr-good');
-  $('sumSLmove').textContent = '-' + slMovePct.toFixed(2) + '% precio';
-  $('sumTPmove').textContent = '+' + tpMovePct.toFixed(2) + '% precio';
-  $('sumLoss').textContent = '-' + loss.toFixed(2) + ' USDT';
-  $('sumGain').textContent = '+' + gain.toFixed(2) + ' USDT';
-  $('sumPos').textContent = posSize.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USDT (' + lev + 'x)';
+  $('sumSLmove').textContent = '-' + numES(slMovePct, 2) + '% precio';
+  $('sumTPmove').textContent = '+' + numES(tpMovePct, 2) + '% precio';
+  $('sumLoss').textContent = '-' + numES(loss, 2) + ' USDT';
+  $('sumGain').textContent = '+' + numES(gain, 2) + ' USDT';
+  $('sumPos').textContent = posSize.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USDT (' + lev + 'x)';
 
   // ---- risk visualization ----
   // Fracción de la distancia a liquidación consumida por el SL (ahora relativa a liqMovePct real,
   // que cambia según el modo de margen: aislado usa solo tu capital, cruzado suma el margen adicional)
-  const safetyUsed = liqMovePct > 0 ? Math.min(999, (slMovePct / liqMovePct) * 100) : 100;
-  const unreachable = slMovePct >= liqMovePct; // SL sits at/beyond the liquidation price
-  const tooTight = !unreachable && slPct <= 1; // SL sits right on top of the entry price — no real room to operate
+  const safetyUsed = liqImpossible ? 0 : (liqMovePct > 0 ? Math.min(999, (slMovePct / liqMovePct) * 100) : 100);
+  const unreachable = !liqImpossible && slMovePct >= liqMovePct; // SL sits at/beyond the liquidation price
+  const tooTight = !unreachable && !liqImpossible && slPct <= 1; // SL sits right on top of the entry price — no real room to operate
+
+  // para el gauge visual, evitamos que un liqMovePct enorme (o "imposible") aplaste el resto de marcadores
+  const liqMovePctGauge = liqImpossible ? Math.max(tpMovePct, slMovePct) * 1.3 : liqMovePct;
 
   // include slMovePct in the range so an unreachable SL still fits on the track
-  const maxRange = Math.max(liqMovePct, tpMovePct, slMovePct) * 1.15;
-  const liqOffset = 50 - (liqMovePct / maxRange) * 50;
+  const maxRange = Math.max(liqMovePctGauge, tpMovePct, slMovePct) * 1.15;
+  const liqOffset = 50 - (liqMovePctGauge / maxRange) * 50;
   const slOffset = 50 - (slMovePct / maxRange) * 50;
   const tpOffset = 50 + (tpMovePct / maxRange) * 50;
 
@@ -2081,7 +2090,11 @@ function calc(){
 
   const dot = $('safetyDot'), txt = $('safetyText'), note = $('safetyNote');
   let color, msg;
-  if(unreachable){
+  if(liqImpossible){
+    color = 'var(--green)';
+    note.classList.remove('danger');
+    msg = '🛡️ <b>Con este margen cruzado, un movimiento de precio por sí solo no te liquida</b> — tu margen total cubre incluso una caída del 100%. Ojo: esto no te protege de otras cosas (funding, comisiones) y ese margen extra igual está en riesgo si cierras en pérdida.';
+  } else if(unreachable){
     color = 'var(--red)';
     note.classList.add('danger');
     msg = '⚠️ <b>Tu Stop Loss es inalcanzable.</b> Con este SL% y apalancamiento, el precio de liquidación llega antes que tu SL — el exchange te liquidaría primero. Baja el SL% o reduce el apalancamiento.';
@@ -2093,13 +2106,13 @@ function calc(){
     note.classList.remove('danger');
     if(safetyUsed < 40){
       color = 'var(--green)';
-      msg = 'Buen margen. Tu SL está al <b>' + safetyUsed.toFixed(0) + '%</b> de la distancia hasta la liquidación.';
+      msg = 'Buen margen. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación.';
     } else if(safetyUsed < 75){
       color = 'var(--gold)';
-      msg = 'Margen moderado. Tu SL está al <b>' + safetyUsed.toFixed(0) + '%</b> de la distancia hasta la liquidación — vigila el apalancamiento.';
+      msg = 'Margen moderado. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación — vigila el apalancamiento.';
     } else {
       color = 'var(--red)';
-      msg = 'Margen bajo. Tu SL está al <b>' + safetyUsed.toFixed(0) + '%</b> de la distancia hasta la liquidación — riesgo de ser liquidado antes de que tu SL se ejecute.';
+      msg = 'Margen bajo. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación — riesgo de ser liquidado antes de que tu SL se ejecute.';
     }
   }
   dot.style.background = color;
@@ -2219,12 +2232,12 @@ $('btnCopy').addEventListener('click', () => {
 Dirección: ${direction.toUpperCase()}
 Entrada: ${formatPrice(r.entry)}
 Liquidación: ${formatPrice(r.liq)}
-Stop Loss: ${formatPrice(r.sl)} (-${r.slMovePct.toFixed(2)}%)
-Take Profit: ${formatPrice(r.tp)} (+${r.tpMovePct.toFixed(2)}%)
-R:R → 1 : ${r.rr.toFixed(2)}
-Pérdida estimada: -${r.loss.toFixed(2)} USDT
-Ganancia estimada: +${r.gain.toFixed(2)} USDT
-Tamaño de posición: ${r.posSize.toFixed(2)} USDT
+Stop Loss: ${formatPrice(r.sl)} (-${numES(r.slMovePct, 2)}%)
+Take Profit: ${formatPrice(r.tp)} (+${numES(r.tpMovePct, 2)}%)
+R:R → 1 : ${numES(r.rr, 2)}
+Pérdida estimada: -${numES(r.loss, 2)} USDT
+Ganancia estimada: +${numES(r.gain, 2)} USDT
+Tamaño de posición: ${numES(r.posSize, 2)} USDT
 —
 Herramienta educativa. No constituye asesoría financiera.`;
   navigator.clipboard.writeText(text).then(() => {
@@ -2462,15 +2475,15 @@ function computeProfit(){
   const priceChangePct = ((sell - buy) / buy) * 100;
 
   $('outQty').textContent = formatPrice(qty);
-  $('outSaleVal').textContent = '$' + saleVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  $('outSaleVal').textContent = '$' + saleVal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   $('gainCard').classList.toggle('neg', gain < 0);
-  $('outGain').textContent = (gain >= 0 ? '+$' : '-$') + Math.abs(gain).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  $('outMult').textContent = mult.toFixed(2) + 'x';
+  $('outGain').textContent = (gain >= 0 ? '+$' : '-$') + Math.abs(gain).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  $('outMult').textContent = numES(mult, 2) + 'x';
 
-  $('sumBuyTotal').textContent = '$' + cap.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  $('sumPriceChange').textContent = (priceChangePct >= 0 ? '+' : '') + priceChangePct.toFixed(2) + '%';
+  $('sumBuyTotal').textContent = '$' + cap.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  $('sumPriceChange').textContent = (priceChangePct >= 0 ? '+' : '') + numES(priceChangePct, 2) + '%';
   const gainPctEl = $('sumGainPct');
-  gainPctEl.textContent = (gainPct >= 0 ? '+' : '') + gainPct.toFixed(2) + '%';
+  gainPctEl.textContent = (gainPct >= 0 ? '+' : '') + numES(gainPct, 2) + '%';
   gainPctEl.classList.toggle('pos', gainPct >= 0);
   gainPctEl.classList.toggle('neg', gainPct < 0);
 
@@ -2503,9 +2516,9 @@ Precio de compra: $${buyInput.value}
 Precio de venta: $${sellInput.value}
 Capital invertido: $${profitCapInput.value}
 Cantidad: ${formatPrice(r.qty)}
-Valor de venta: $${r.saleVal.toFixed(2)}
-Ganancia: ${r.gain >= 0 ? '+' : '-'}$${Math.abs(r.gain).toFixed(2)} (${r.gainPct >= 0 ? '+' : ''}${r.gainPct.toFixed(2)}%)
-Múltiplo: ${r.mult.toFixed(2)}x
+Valor de venta: $${numES(r.saleVal, 2)}
+Ganancia: ${r.gain >= 0 ? '+' : '-'}$${numES(Math.abs(r.gain), 2)} (${r.gainPct >= 0 ? '+' : ''}${numES(r.gainPct, 2)}%)
+Múltiplo: ${numES(r.mult, 2)}x
 —
 Herramienta educativa. No constituye asesoría financiera.`;
   navigator.clipboard.writeText(text).then(() => {
@@ -3206,7 +3219,7 @@ function renderPortfolioItems(){
       const mainEl = document.createElement('div');
       mainEl.className = 'irv-main';
       totalTargetPct += Number(item.target_pct) || 0;
-      mainEl.textContent = Number(item.target_pct).toFixed(1) + '%';
+      mainEl.textContent = numES(Number(item.target_pct), 1) + '%';
       valWrap.appendChild(mainEl);
 
       info.append(nameEl, subEl);
@@ -3266,11 +3279,11 @@ function renderPortfolioItems(){
         const currentValue = g.qty * currentPrice;
         const gain = currentValue - g.invested;
         const gainPct = g.invested > 0 ? (gain / g.invested) * 100 : 0;
-        mainEl.textContent = '$' + currentValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        subValEl.textContent = (gain >= 0 ? '+' : '-') + '$' + Math.abs(gain).toFixed(2) + ' (' + (gainPct >= 0 ? '+' : '') + gainPct.toFixed(1) + '%)';
+        mainEl.textContent = '$' + currentValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+        subValEl.textContent = (gain >= 0 ? '+' : '-') + '$' + numES(Math.abs(gain), 2) + ' (' + (gainPct >= 0 ? '+' : '') + numES(gainPct, 1) + '%)';
         subValEl.classList.add(gain >= 0 ? 'pos' : 'neg');
       } else {
-        mainEl.textContent = '$' + g.invested.toFixed(2);
+        mainEl.textContent = '$' + numES(g.invested, 2);
         subValEl.textContent = 'Sin precio en vivo';
       }
 
@@ -3318,7 +3331,7 @@ function renderPieChart(){
 
   const legend = entries.map((e, idx) => {
     const pct = (e.value / total) * 100;
-    return '<div class="pie-legend-row"><span class="pie-legend-dot" style="background:' + colors[idx % colors.length] + '"></span>' + e.name + ' (' + e.symbol.toUpperCase() + ')<b>' + pct.toFixed(1) + '%</b></div>';
+    return '<div class="pie-legend-row"><span class="pie-legend-dot" style="background:' + colors[idx % colors.length] + '"></span>' + e.name + ' (' + e.symbol.toUpperCase() + ')<b>' + numES(pct, 1) + '%</b></div>';
   }).join('');
 
   section.innerHTML =
@@ -3380,10 +3393,10 @@ function renderAssetDetail(){
   document.getElementById('assetDetailSummary').innerHTML =
     '<div class="summary-grid">' +
       '<div class="sum-row"><span class="s-label">Cantidad total</span><span class="s-val">' + formatPrice(totalQty) + '</span></div>' +
-      '<div class="sum-row"><span class="s-label">Costo promedio</span><span class="s-val">$' + avgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</span></div>' +
-      '<div class="sum-row"><span class="s-label">Total invertido</span><span class="s-val">$' + totalInvested.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span></div>' +
-      '<div class="sum-row"><span class="s-label">Valor actual</span><span class="s-val">$' + currentValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span></div>' +
-      '<div class="sum-row full"><span class="s-label">Ganancia / Pérdida total</span><span class="s-val ' + (gain >= 0 ? 'pos' : 'neg') + '">' + (gain >= 0 ? '+' : '-') + '$' + Math.abs(gain).toFixed(2) + ' (' + (gainPct >= 0 ? '+' : '') + gainPct.toFixed(1) + '%)</span></div>' +
+      '<div class="sum-row"><span class="s-label">Costo promedio</span><span class="s-val">$' + avgCost.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</span></div>' +
+      '<div class="sum-row"><span class="s-label">Total invertido</span><span class="s-val">$' + totalInvested.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span></div>' +
+      '<div class="sum-row"><span class="s-label">Valor actual</span><span class="s-val">$' + currentValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span></div>' +
+      '<div class="sum-row full"><span class="s-label">Ganancia / Pérdida total</span><span class="s-val ' + (gain >= 0 ? 'pos' : 'neg') + '">' + (gain >= 0 ? '+' : '-') + '$' + numES(Math.abs(gain), 2) + ' (' + (gainPct >= 0 ? '+' : '') + numES(gainPct, 1) + '%)</span></div>' +
     '</div>';
 
   const list = document.getElementById('assetDetailMovements');
@@ -3413,7 +3426,7 @@ function renderAssetDetail(){
     valWrap.className = 'item-row-val';
     const mainEl = document.createElement('div');
     mainEl.className = 'irv-main';
-    mainEl.textContent = '$' + invested.toFixed(2);
+    mainEl.textContent = '$' + numES(invested, 2);
     valWrap.appendChild(mainEl);
 
     const delBtn = document.createElement('button');
@@ -3505,7 +3518,7 @@ function renderAvgSimBox(){
     const g = groups[select.value];
     document.getElementById('avgSimCurrent').innerHTML =
       'Ahora tienes <b>' + formatPrice(g.qty) + '</b> ' + g.symbol.toUpperCase() +
-      ' con un costo promedio de <b>$' + g.avgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b>.';
+      ' con un costo promedio de <b>$' + g.avgCost.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b>.';
     document.getElementById('avgSimResult').classList.remove('show');
     const priceInput = document.getElementById('avgSimPrice');
     const liveData = livePricesCache[select.value];
@@ -3532,11 +3545,11 @@ function renderAvgSimBox(){
     const change = g.avgCost > 0 ? ((newAvgCost - g.avgCost) / g.avgCost) * 100 : 0;
 
     resultEl.innerHTML =
-      '<div class="avg-sim-result-row"><span>Costo promedio actual</span><b>$' + g.avgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
-      '<div class="avg-sim-result-row"><span>Costo promedio si compras</span><b>$' + newAvgCost.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
-      '<div class="avg-sim-result-row"><span>Cambio</span><b>' + (change >= 0 ? '+' : '') + change.toFixed(2) + '%</b></div>' +
+      '<div class="avg-sim-result-row"><span>Costo promedio actual</span><b>$' + g.avgCost.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
+      '<div class="avg-sim-result-row"><span>Costo promedio si compras</span><b>$' + newAvgCost.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b></div>' +
+      '<div class="avg-sim-result-row"><span>Cambio</span><b>' + (change >= 0 ? '+' : '') + numES(change, 2) + '%</b></div>' +
       '<div class="avg-sim-result-row"><span>Cantidad total después</span><b>' + formatPrice(totalQty) + ' ' + g.symbol.toUpperCase() + '</b></div>' +
-      '<div class="avg-sim-result-row"><span>Total invertido después</span><b>$' + totalInvested.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</b></div>';
+      '<div class="avg-sim-result-row"><span>Total invertido después</span><b>$' + totalInvested.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</b></div>';
     resultEl.classList.add('show');
   });
 }
@@ -3555,7 +3568,7 @@ function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurre
       '<div class="alloc-bar-wrap">' +
         '<div class="alloc-bar">' + segs + '</div>' +
         '<div class="alloc-bar-label ' + (over ? 'over' : (totalTargetPct === 100 ? 'ok' : '')) + '">' +
-          '<span>Asignado</span><b>' + totalTargetPct.toFixed(1) + '%</b>' +
+          '<span>Asignado</span><b>' + numES(totalTargetPct, 1) + '%</b>' +
         '</div>' +
       '</div>' +
       (over ? '<div class="auth-error show">La suma pasa de 100% — ajusta los porcentajes.</div>' : '');
@@ -3564,9 +3577,9 @@ function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurre
     const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
     totalsEl.innerHTML =
       '<div class="summary-grid" style="margin-top:16px">' +
-        '<div class="sum-row"><span class="s-label">Total invertido</span><span class="s-val">$' + totalInvested.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
-        '<div class="sum-row"><span class="s-label">Valor actual</span><span class="s-val">$' + totalCurrentValue.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
-        '<div class="sum-row full"><span class="s-label">Ganancia / Pérdida total</span><span class="s-val ' + (gain >= 0 ? 'pos' : 'neg') + '">' + (gain >= 0 ? '+' : '-') + '$' + Math.abs(gain).toFixed(2) + ' (' + (gainPct >= 0 ? '+' : '') + gainPct.toFixed(1) + '%)</span></div>' +
+        '<div class="sum-row"><span class="s-label">Total invertido</span><span class="s-val">$' + totalInvested.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
+        '<div class="sum-row"><span class="s-label">Valor actual</span><span class="s-val">$' + totalCurrentValue.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
+        '<div class="sum-row full"><span class="s-label">Ganancia / Pérdida total</span><span class="s-val ' + (gain >= 0 ? 'pos' : 'neg') + '">' + (gain >= 0 ? '+' : '-') + '$' + numES(Math.abs(gain), 2) + ' (' + (gainPct >= 0 ? '+' : '') + numES(gainPct, 1) + '%)</span></div>' +
       '</div>';
   }
 }
@@ -3795,19 +3808,19 @@ function computeBreakeven(){
 
   const savings = feeDollarNormal - feeDollarCashback;
 
-  document.getElementById('outBeNormal').textContent = bePctNormal.toFixed(3) + '%';
-  document.getElementById('outBeCashback').textContent = bePctCashback.toFixed(3) + '%';
-  document.getElementById('outFeeNormal').textContent = '$' + feeDollarNormal.toFixed(2);
-  document.getElementById('outFeeCashback').textContent = '$' + feeDollarCashback.toFixed(2);
-  document.getElementById('outSavings').textContent = '$' + savings.toFixed(2);
+  document.getElementById('outBeNormal').textContent = numES(bePctNormal, 3) + '%';
+  document.getElementById('outBeCashback').textContent = numES(bePctCashback, 3) + '%';
+  document.getElementById('outFeeNormal').textContent = '$' + numES(feeDollarNormal, 2);
+  document.getElementById('outFeeCashback').textContent = '$' + numES(feeDollarCashback, 2);
+  document.getElementById('outSavings').textContent = '$' + numES(savings, 2);
   document.getElementById('outSavingsSub').textContent =
-    'por esta operación — tu break-even baja de ' + bePctNormal.toFixed(3) + '% a ' + bePctCashback.toFixed(3) + '% solo por el cashback de Bitunix.';
+    'por esta operación — tu break-even baja de ' + numES(bePctNormal, 3) + '% a ' + numES(bePctCashback, 3) + '% solo por el cashback de Bitunix.';
 
   if(beMode === 'futuros'){
     const bePctLevNormal = bePctNormal * lev;
     const bePctLevCashback = bePctCashback * lev;
-    document.getElementById('outBeLevNormal').textContent = bePctLevNormal.toFixed(2) + '%';
-    document.getElementById('outBeLevCashback').textContent = bePctLevCashback.toFixed(2) + '%';
+    document.getElementById('outBeLevNormal').textContent = numES(bePctLevNormal, 2) + '%';
+    document.getElementById('outBeLevCashback').textContent = numES(bePctLevCashback, 2) + '%';
   }
 }
 
@@ -4095,27 +4108,27 @@ function computeDca(){
   });
 
   // ---- render métricas ----
-  document.getElementById('outDcaInvested').textContent = totalInvested.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
-  document.getElementById('outDcaUnits').textContent = totalUnits.toLocaleString('en-US', {minimumFractionDigits:6, maximumFractionDigits:6}) + ' ' + (dcaSelectedAsset.symbol || '').toUpperCase();
+  document.getElementById('outDcaInvested').textContent = totalInvested.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  document.getElementById('outDcaUnits').textContent = totalUnits.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:6}) + ' ' + (dcaSelectedAsset.symbol || '').toUpperCase();
   document.getElementById('outDcaAvgPrice').textContent = formatPrice(avgPrice) + ' USD';
   document.getElementById('outDcaFinalPrice').textContent = formatPrice(finalPrice) + ' USD';
-  document.getElementById('outDcaFinalValue').textContent = finalValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  document.getElementById('outDcaFinalValue').textContent = finalValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
 
   const pnlEl = document.getElementById('outDcaPnl');
   const pnlCard = document.getElementById('dcaPnlCard');
-  pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD (' + (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(1) + '%)';
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD (' + (pnlPct >= 0 ? '+' : '') + numES(pnlPct, 1) + '%)';
   pnlCard.classList.remove('tp', 'sl');
   pnlCard.classList.add(pnl >= 0 ? 'tp' : 'sl');
 
-  document.getElementById('outDcaLumpBest').textContent = lumpBestValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
-  document.getElementById('outDcaLumpWorst').textContent = lumpWorstValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  document.getElementById('outDcaLumpBest').textContent = lumpBestValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  document.getElementById('outDcaLumpWorst').textContent = lumpWorstValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
 
   const diffVsWorst = finalValue - lumpWorstValue;
   const compareLabel = document.getElementById('dcaCompareLabel');
   const compareEl = document.getElementById('outDcaCompare');
   const compareSub = document.getElementById('outDcaCompareSub');
   compareLabel.textContent = '📌 Comparado con comprar todo en la peor compra individual';
-  compareEl.textContent = (diffVsWorst >= 0 ? '+' : '') + diffVsWorst.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  compareEl.textContent = (diffVsWorst >= 0 ? '+' : '') + diffVsWorst.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
   compareSub.textContent = diffVsWorst >= 0
     ? 'El DCA te habría protegido de haber metido todo tu dinero justo en el peor momento simulado.'
     : 'En esta simulación, comprar todo de una vez hubiera salido mejor incluso en el peor precio — el DCA no es magia, es manejo de riesgo.';
@@ -4384,7 +4397,7 @@ document.getElementById('corrCalcBtn').addEventListener('click', async () => {
           const r = pearsonCorrelation(returnsByAsset[rowAsset.id], returnsByAsset[colAsset.id]);
           const abs = Math.abs(r);
           const cls = abs >= 0.7 ? 'corr-cell-high' : (abs >= 0.3 ? 'corr-cell-mid' : 'corr-cell-low');
-          html += '<td class="' + cls + '">' + r.toFixed(2) + '</td>';
+          html += '<td class="' + cls + '">' + numES(r, 2) + '</td>';
         }
       });
       html += '</tr>';
@@ -4669,7 +4682,7 @@ async function loadMarketDominance(){
     const btcPct = pct.btc;
     const usdtPct = pct.usdt;
     if(typeof btcPct === 'number'){
-      btcValueEl.textContent = btcPct.toFixed(1) + '%';
+      btcValueEl.textContent = numES(btcPct, 1) + '%';
       btcBarEl.style.width = Math.min(btcPct, 100) + '%';
       btcSubEl.textContent = 'del market cap total cripto';
     } else {
@@ -4677,7 +4690,7 @@ async function loadMarketDominance(){
       btcSubEl.textContent = 'No disponible';
     }
     if(typeof usdtPct === 'number'){
-      usdtValueEl.textContent = usdtPct.toFixed(1) + '%';
+      usdtValueEl.textContent = numES(usdtPct, 1) + '%';
       usdtBarEl.style.width = Math.min(usdtPct, 100) + '%';
       usdtSubEl.textContent = 'del market cap total cripto';
     } else {
