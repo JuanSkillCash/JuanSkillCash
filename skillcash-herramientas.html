@@ -124,12 +124,12 @@ button{font-family:inherit;color:inherit}
 
 .desktop-center-brand{display:none}
 
-.market-overview{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:26px;align-items:stretch}
+.market-overview{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:26px;align-items:stretch}
 @media(max-width:900px){
   .market-overview{grid-template-columns:1fr}
 }
 
-.fng-section{background:var(--bg);border:none;border-radius:0;padding:16px 20px 14px;margin-bottom:0}
+.fng-section{background:transparent;border:none;border-radius:0;padding:16px 20px 14px;margin-bottom:0}
 .fng-section-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .fng-section-title{font-size:13px;font-weight:700;color:var(--white);margin-right:auto}
 .fng-section-value{font-family:'Archivo Black',sans-serif;font-size:21px;color:var(--white);letter-spacing:-.01em}
@@ -145,13 +145,14 @@ button{font-family:inherit;color:inherit}
   .fng-gauge-labels span:nth-child(2),.fng-gauge-labels span:nth-child(4){display:none}
 }
 
-.dom-card{background:var(--bg);border:none;border-radius:0;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:100%}
+.dom-card{background:transparent;border:none;border-radius:0;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:100%}
 .dom-card-label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Archivo Black',sans-serif;font-size:26px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
 .dom-card-bar-fill{position:absolute;top:0;left:0;height:100%;border-radius:6px;transition:width .6s cubic-bezier(.16,1,.3,1)}
 .dom-card.btc .dom-card-bar-fill{background:linear-gradient(90deg,#f0b23d,#ffcf6b)}
 .dom-card.usdt .dom-card-bar-fill{background:linear-gradient(90deg,#2ecc71,#7bf5ab)}
+.dom-card.halving .dom-card-bar-fill{background:linear-gradient(90deg,#ff2f4f,#ff8a9a)}
 .dom-card-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.02em}
 
 .bitunix-flash-btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(155deg,#d4ff4d,var(--bitunix-green));color:#08080b;padding:9px 14px 9px 12px;border-radius:20px;text-decoration:none;font-weight:800;font-size:12.5px;box-shadow:0 2px 8px rgba(191,250,44,.2);transition:box-shadow .2s}
@@ -912,6 +913,13 @@ button{font-family:inherit;color:inherit}
         <div class="dom-card-value" id="usdtDomValue">—</div>
         <div class="dom-card-bar"><div class="dom-card-bar-fill" id="usdtDomBar" style="width:0%"></div></div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
+      </div>
+
+      <div class="dom-card halving">
+        <div class="dom-card-label">⏳ Próximo Halving</div>
+        <div class="dom-card-value" id="halvingCountdown" style="font-size:19px">—</div>
+        <div class="dom-card-bar"><div class="dom-card-bar-fill" id="halvingBar" style="width:0%"></div></div>
+        <div class="dom-card-sub" id="halvingSub">Calculando…</div>
       </div>
     </div>
 
@@ -6653,6 +6661,46 @@ async function loadMarketDominance(){
 }
 loadMarketDominance();
 setInterval(loadMarketDominance, 120000); // se refresca solo cada 2 minutos
+
+/* ---- countdown al próximo halving de Bitcoin (matemática de bloques, sin API) ---- */
+// Referencia real: bloque 840.000 minado el 20 abr 2024 00:09:27 UTC (fuente: mempool.space)
+// Próximo halving: bloque 1.050.000 (840.000 + 210.000), con el tiempo objetivo de 10 min/bloque de la red.
+// Esto da como estimado el 17 abr 2028 — coincide con la proyección pública de CoinGecko.
+const HALVING_REF_DATE = new Date('2024-04-20T00:09:27Z');
+const HALVING_REF_BLOCK = 840000;
+const HALVING_TARGET_BLOCK = 1050000;
+const HALVING_AVG_BLOCK_SECONDS = 600;
+const HALVING_PROJECTED_DATE = new Date(HALVING_REF_DATE.getTime() + (HALVING_TARGET_BLOCK - HALVING_REF_BLOCK) * HALVING_AVG_BLOCK_SECONDS * 1000);
+
+function updateHalvingCountdown(){
+  const valueEl = document.getElementById('halvingCountdown');
+  const subEl = document.getElementById('halvingSub');
+  const barEl = document.getElementById('halvingBar');
+  const now = new Date();
+  const msRemaining = HALVING_PROJECTED_DATE.getTime() - now.getTime();
+
+  if(msRemaining <= 0){
+    valueEl.textContent = '¡Ya pasó! 🎉';
+    subEl.textContent = 'Bloque 1.050.000 alcanzado (estimado)';
+    barEl.style.width = '100%';
+    return;
+  }
+
+  const totalSeconds = Math.floor(msRemaining / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  valueEl.textContent = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+
+  const secondsSinceRef = (now.getTime() - HALVING_REF_DATE.getTime()) / 1000;
+  const estimatedBlock = Math.min(HALVING_TARGET_BLOCK, HALVING_REF_BLOCK + Math.floor(secondsSinceRef / HALVING_AVG_BLOCK_SECONDS));
+  const progressPct = Math.min(100, Math.max(0, ((estimatedBlock - HALVING_REF_BLOCK) / (HALVING_TARGET_BLOCK - HALVING_REF_BLOCK)) * 100));
+  barEl.style.width = progressPct + '%';
+  subEl.textContent = 'Bloque ≈' + estimatedBlock.toLocaleString('es-ES') + ' de 1.050.000 (estimado)';
+}
+updateHalvingCountdown();
+setInterval(updateHalvingCountdown, 1000);
 
 /* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
 (function checkOAuthReturnError(){
