@@ -324,6 +324,11 @@ button{font-family:inherit;color:inherit}
 .cat-tab.active{background:rgba(255,47,79,.14);border-color:var(--red);color:var(--white)}
 .cat-tab.locked{opacity:.5;cursor:default}
 .cat-tab .lock-ic{font-size:9.5px}
+.curated-asset-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.curated-asset-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border2);color:var(--white);cursor:pointer;text-align:left;transition:border-color .2s,background .2s}
+.curated-asset-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
+.curated-asset-btn .curated-asset-emoji{font-size:20px;flex-shrink:0}
+.curated-asset-btn .curated-asset-name{font-size:14px;font-weight:700}
 .cat-locked-note{font-size:12px;color:var(--gold);line-height:1.5;margin:-6px 0 14px;max-height:0;overflow:hidden;opacity:0;transition:opacity .25s ease,max-height .25s ease}
 .cat-locked-note.show{max-height:60px;opacity:1;margin-bottom:14px}
 
@@ -1193,16 +1198,17 @@ button{font-family:inherit;color:inherit}
 
       <div class="cat-tabs" id="catTabs">
         <button class="cat-tab active" data-cat="cripto">Cripto</button>
-        <button class="cat-tab locked" data-cat="acciones" data-name="Acciones">Acciones <span class="lock-ic">🔒</span></button>
-        <button class="cat-tab locked" data-cat="materias" data-name="Materias primas">Materias primas <span class="lock-ic">🔒</span></button>
-        <button class="cat-tab locked" data-cat="indices" data-name="Índices">Índices <span class="lock-ic">🔒</span></button>
+        <button class="cat-tab" data-cat="acciones">Acciones</button>
+        <button class="cat-tab" data-cat="materias">Materias primas</button>
+        <button class="cat-tab" data-cat="indices">Índices</button>
       </div>
-      <div class="cat-locked-note" id="catLockedNote"></div>
 
-      <div class="asset-search">
+      <div class="asset-search" id="assetSearchWrap">
         <input type="text" id="assetSearch" class="search-highlight" placeholder="Busca un activo (ej. Bitcoin, Ethereum...)" autocomplete="off">
         <div class="asset-dropdown" id="assetDropdown"></div>
       </div>
+
+      <div class="curated-asset-list" id="curatedAssetList" style="display:none"></div>
 
       <div class="asset-placeholder" id="assetPlaceholder">Aún no has elegido un activo — búscalo arriba para traer su precio en vivo.</div>
 
@@ -2153,10 +2159,19 @@ button{font-family:inherit;color:inherit}
               </div>
             </div>
 
-            <div class="asset-search">
+            <div class="cat-tabs" id="portfolioCatTabs">
+              <button class="cat-tab active" data-cat="cripto">Cripto</button>
+              <button class="cat-tab" data-cat="acciones">Acciones</button>
+              <button class="cat-tab" data-cat="materias">Materias primas</button>
+              <button class="cat-tab" data-cat="indices">Índices</button>
+            </div>
+
+            <div class="asset-search" id="portfolioAssetSearchWrap">
               <input type="text" id="portfolioAssetSearch" class="search-highlight" placeholder="Busca un activo para agregar..." autocomplete="off">
               <div class="asset-dropdown" id="portfolioAssetDropdown"></div>
             </div>
+
+            <div class="curated-asset-list" id="portfolioCuratedAssetList" style="display:none"></div>
 
             <div id="pendingItemBox"></div>
 
@@ -2667,23 +2682,87 @@ sbProfitItem.addEventListener('click', openProfitModal);
 closeProfit.addEventListener('click', closeProfitModal);
 profitModal.addEventListener('click', (e) => { if(e.target === profitModal) closeProfitModal(); });
 
-/* ---- category tabs (solo cripto activo por ahora) ---- */
+/* ---- API keys ---- */
+const COINGECKO_API_KEY = 'CG-B17Pfy5LygHBnhQCoxkh2U2W';
+const TWELVE_DATA_API_KEY = '9a29593d7a534876afbf043270133831';
+function cgUrl(url){
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'x_cg_demo_api_key=' + COINGECKO_API_KEY;
+}
+function tdUrl(url){
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'apikey=' + TWELVE_DATA_API_KEY;
+}
+
+/* ---- catálogo curado: índices y materias primas (vía ETF, mostrados con su nombre real) ---- */
+const CURATED_INDICES = [
+  { id: 'idx_spx', name: 'S&P 500', symbol: 'SPX', proxy: 'SPY', scale: 10.0, emoji: '📈' },
+  { id: 'idx_dji', name: 'Dow Jones', symbol: 'DJI', proxy: 'DIA', scale: 100.0, emoji: '📊' },
+  { id: 'idx_ndx', name: 'Nasdaq 100', symbol: 'NDX', proxy: 'QQQ', scale: 40.0, emoji: '💻' }
+];
+const CURATED_COMMODITIES = [
+  { id: 'com_xau', name: 'Oro (XAU/USD)', symbol: 'XAU/USD', proxy: 'GLD', scale: 10.95, emoji: '🥇' },
+  { id: 'com_wti', name: 'Petróleo WTI', symbol: 'WTI/USD', proxy: 'USO', scale: 0.60, emoji: '🛢️' }
+];
+
+/* ---- category tabs ---- */
+let activeAssetCategory = 'cripto';
 document.querySelectorAll('#catTabs .cat-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    if(tab.classList.contains('locked')){
-      const note = $('catLockedNote');
-      note.textContent = (tab.dataset.name || tab.textContent.trim()) + ' estará disponible pronto — requiere conectar una API key.';
-      note.classList.add('show');
-      clearTimeout(window.__catNoteTimer);
-      window.__catNoteTimer = setTimeout(() => note.classList.remove('show'), 3200);
-      return;
-    }
     document.querySelectorAll('#catTabs .cat-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
+    activeAssetCategory = tab.dataset.cat;
+
+    // reset selección actual al cambiar de categoría
+    selectedAsset = null;
+    lastPriceFetchTime = null;
+    $('assetChip').style.display = 'none';
+    $('assetPlaceholder').style.display = 'block';
+    assetInput.value = '';
+    assetDropdown.classList.remove('show');
+    assetDropdown.innerHTML = '';
+
+    if(activeAssetCategory === 'indices' || activeAssetCategory === 'materias'){
+      $('assetSearchWrap').style.display = 'none';
+      renderCuratedList(activeAssetCategory);
+      $('curatedAssetList').style.display = 'flex';
+    } else {
+      $('curatedAssetList').style.display = 'none';
+      $('assetSearchWrap').style.display = 'block';
+      assetInput.placeholder = activeAssetCategory === 'acciones'
+        ? 'Busca una acción (ej. Apple, Tesla, MSFT...)'
+        : 'Busca un activo (ej. Bitcoin, Ethereum...)';
+    }
   });
 });
 
-/* ---- búsqueda de activos (CoinGecko) ---- */
+function renderCuratedList(cat){
+  const list = cat === 'indices' ? CURATED_INDICES : CURATED_COMMODITIES;
+  const container = $('curatedAssetList');
+  container.innerHTML = '';
+  list.forEach(item => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'curated-asset-btn';
+    btn.innerHTML = '<span class="curated-asset-emoji">' + item.emoji + '</span><span class="curated-asset-name">' + item.name + '</span>';
+    btn.addEventListener('click', () => selectCuratedAsset(item));
+    container.appendChild(btn);
+  });
+}
+
+async function selectCuratedAsset(item){
+  selectedAsset = { id: item.id, name: item.name, symbol: item.symbol, thumb: '', category: activeAssetCategory, proxy: item.proxy, scale: item.scale };
+  $('assetPlaceholder').style.display = 'none';
+  const chip = $('assetChip');
+  chip.style.display = 'flex';
+  $('assetChipImg').style.display = 'none';
+  $('assetChipName').textContent = item.name;
+  $('assetChipPrice').textContent = 'Cargando precio…';
+  $('assetChipTime').textContent = '';
+  await refreshAssetPrice();
+}
+
+/* ---- búsqueda de activos (CoinGecko para cripto, Twelve Data para acciones) ---- */
 const assetInput = $('assetSearch');
 const assetDropdown = $('assetDropdown');
 let searchAbort = null;
@@ -2699,12 +2778,17 @@ assetInput.addEventListener('input', () => {
 });
 
 async function runAssetSearch(query){
+  if(activeAssetCategory === 'acciones') return runStockSearch(query);
+  return runCryptoSearch(query);
+}
+
+async function runCryptoSearch(query){
   if(searchAbort) searchAbort.abort();
   searchAbort = new AbortController();
   assetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
   assetDropdown.classList.add('show');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query), { signal: searchAbort.signal });
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: searchAbort.signal });
     const data = await res.json();
     const coins = (data.coins || []).slice(0, 8);
     if(coins.length === 0){
@@ -2731,6 +2815,38 @@ async function runAssetSearch(query){
   }
 }
 
+async function runStockSearch(query){
+  if(searchAbort) searchAbort.abort();
+  searchAbort = new AbortController();
+  assetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
+  assetDropdown.classList.add('show');
+  try{
+    const res = await fetch(tdUrl('https://api.twelvedata.com/symbol_search?symbol=' + encodeURIComponent(query)), { signal: searchAbort.signal });
+    const data = await res.json();
+    let results = (data.data || []).filter(r => r.instrument_type === 'Common Stock' || r.instrument_type === 'ETF' || !r.instrument_type);
+    results = results.slice(0, 8);
+    if(results.length === 0){
+      assetDropdown.innerHTML = '<div class="asset-empty">No se encontraron resultados</div>';
+      return;
+    }
+    assetDropdown.innerHTML = '';
+    results.forEach(r => {
+      const opt = document.createElement('div');
+      opt.className = 'asset-option';
+      const name = document.createElement('span');
+      name.className = 'asset-option-name'; name.textContent = r.instrument_name || r.symbol;
+      const sym = document.createElement('span');
+      sym.className = 'asset-option-sym'; sym.textContent = r.symbol;
+      opt.append(name, sym);
+      opt.addEventListener('click', () => selectStockAsset(r));
+      assetDropdown.appendChild(opt);
+    });
+  } catch(err){
+    if(err.name === 'AbortError') return;
+    assetDropdown.innerHTML = '<div class="asset-empty">No se pudo conectar. Intenta de nuevo.</div>';
+  }
+}
+
 document.addEventListener('click', (e) => {
   if(!assetInput.contains(e.target) && !assetDropdown.contains(e.target)){
     assetDropdown.classList.remove('show');
@@ -2738,14 +2854,29 @@ document.addEventListener('click', (e) => {
 });
 
 async function selectAsset(coin){
-  selectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb };
+  selectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, category: 'cripto' };
   assetDropdown.classList.remove('show');
   assetInput.value = '';
   $('assetPlaceholder').style.display = 'none';
   const chip = $('assetChip');
   chip.style.display = 'flex';
+  $('assetChipImg').style.display = '';
   $('assetChipImg').src = coin.thumb;
   $('assetChipName').textContent = coin.name + ' (' + coin.symbol.toUpperCase() + ')';
+  $('assetChipPrice').textContent = 'Cargando precio…';
+  $('assetChipTime').textContent = '';
+  await refreshAssetPrice();
+}
+
+async function selectStockAsset(r){
+  selectedAsset = { id: r.symbol, name: r.instrument_name || r.symbol, symbol: r.symbol, thumb: '', category: 'acciones' };
+  assetDropdown.classList.remove('show');
+  assetInput.value = '';
+  $('assetPlaceholder').style.display = 'none';
+  const chip = $('assetChip');
+  chip.style.display = 'flex';
+  $('assetChipImg').style.display = 'none';
+  $('assetChipName').textContent = selectedAsset.name + ' (' + r.symbol + ')';
   $('assetChipPrice').textContent = 'Cargando precio…';
   $('assetChipTime').textContent = '';
   await refreshAssetPrice();
@@ -2756,18 +2887,50 @@ async function refreshAssetPrice(){
   const btn = $('assetRefreshBtn');
   btn.classList.add('spinning');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(selectedAsset.id) + '&vs_currencies=usd');
-    const data = await res.json();
-    const price = data[selectedAsset.id] && data[selectedAsset.id].usd;
-    if(typeof price === 'number'){
-      selectedAsset.price = price;
-      lastPriceFetchTime = Date.now();
-      $('assetChipPrice').textContent = formatPrice(price) + ' USD';
-      sellInput.value = price;
-      updateChipTime();
-      computeProfit();
+    if(selectedAsset.category === 'cripto'){
+      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(selectedAsset.id) + '&vs_currencies=usd'));
+      const data = await res.json();
+      const price = data[selectedAsset.id] && data[selectedAsset.id].usd;
+      if(typeof price === 'number'){
+        selectedAsset.price = price;
+        lastPriceFetchTime = Date.now();
+        $('assetChipPrice').textContent = formatPrice(price) + ' USD';
+        sellInput.value = price;
+        updateChipTime();
+        computeProfit();
+      } else {
+        $('assetChipPrice').textContent = 'Precio no disponible';
+      }
+    } else if(selectedAsset.category === 'acciones'){
+      const res = await fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(selectedAsset.symbol)));
+      const data = await res.json();
+      const price = parseFloat(data.close);
+      if(!isNaN(price)){
+        selectedAsset.price = price;
+        lastPriceFetchTime = Date.now();
+        $('assetChipPrice').textContent = formatPrice(price) + ' USD';
+        sellInput.value = price;
+        updateChipTime();
+        computeProfit();
+      } else {
+        $('assetChipPrice').textContent = 'Precio no disponible';
+      }
     } else {
-      $('assetChipPrice').textContent = 'Precio no disponible';
+      // índices / materias primas: se consulta el ETF proxy y se escala para mostrar el nivel real
+      const res = await fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(selectedAsset.proxy)));
+      const data = await res.json();
+      const proxyPrice = parseFloat(data.close);
+      if(!isNaN(proxyPrice)){
+        const displayPrice = proxyPrice * selectedAsset.scale;
+        selectedAsset.price = displayPrice;
+        lastPriceFetchTime = Date.now();
+        $('assetChipPrice').textContent = formatPrice(displayPrice) + ' pts';
+        sellInput.value = displayPrice;
+        updateChipTime();
+        computeProfit();
+      } else {
+        $('assetChipPrice').textContent = 'Precio no disponible';
+      }
     }
   } catch(err){
     $('assetChipPrice').textContent = 'No se pudo obtener el precio';
@@ -3345,7 +3508,7 @@ document.getElementById('deletePortfolioBtn').addEventListener('click', async ()
   await loadPortfolios();
 });
 
-/* ---- activos del portafolio ---- */
+/* ---- activos del portafolio (Cripto / Acciones / Índices / Materias primas) ---- */
 const portfolioAssetInput = document.getElementById('portfolioAssetSearch');
 const portfolioAssetDropdown = document.getElementById('portfolioAssetDropdown');
 const portfolioItemsList = document.getElementById('portfolioItemsList');
@@ -3354,6 +3517,47 @@ const pendingItemBox = document.getElementById('pendingItemBox');
 let pendingAsset = null;
 let portfolioSearchDebounce = null;
 let portfolioSearchAbort = null;
+let activePortfolioAssetCategory = 'cripto';
+
+document.querySelectorAll('#portfolioCatTabs .cat-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#portfolioCatTabs .cat-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activePortfolioAssetCategory = tab.dataset.cat;
+
+    pendingAsset = null;
+    renderPendingItem();
+    portfolioAssetInput.value = '';
+    portfolioAssetDropdown.classList.remove('show');
+    portfolioAssetDropdown.innerHTML = '';
+
+    if(activePortfolioAssetCategory === 'indices' || activePortfolioAssetCategory === 'materias'){
+      document.getElementById('portfolioAssetSearchWrap').style.display = 'none';
+      renderPortfolioCuratedList(activePortfolioAssetCategory);
+      document.getElementById('portfolioCuratedAssetList').style.display = 'flex';
+    } else {
+      document.getElementById('portfolioCuratedAssetList').style.display = 'none';
+      document.getElementById('portfolioAssetSearchWrap').style.display = 'block';
+      portfolioAssetInput.placeholder = activePortfolioAssetCategory === 'acciones'
+        ? 'Busca una acción para agregar (ej. Apple, Tesla...)'
+        : 'Busca un activo para agregar...';
+    }
+  });
+});
+
+function renderPortfolioCuratedList(cat){
+  const list = cat === 'indices' ? CURATED_INDICES : CURATED_COMMODITIES;
+  const container = document.getElementById('portfolioCuratedAssetList');
+  container.innerHTML = '';
+  list.forEach(item => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'curated-asset-btn';
+    btn.innerHTML = '<span class="curated-asset-emoji">' + item.emoji + '</span><span class="curated-asset-name">' + item.name + '</span>';
+    btn.addEventListener('click', () => selectCuratedPendingAsset(item, cat));
+    container.appendChild(btn);
+  });
+}
 
 portfolioAssetInput.addEventListener('input', () => {
   const q = portfolioAssetInput.value.trim();
@@ -3368,12 +3572,17 @@ document.addEventListener('click', (e) => {
 });
 
 async function runPortfolioAssetSearch(query){
+  if(activePortfolioAssetCategory === 'acciones') return runPortfolioStockSearch(query);
+  return runPortfolioCryptoSearch(query);
+}
+
+async function runPortfolioCryptoSearch(query){
   if(portfolioSearchAbort) portfolioSearchAbort.abort();
   portfolioSearchAbort = new AbortController();
   portfolioAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
   portfolioAssetDropdown.classList.add('show');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query), { signal: portfolioSearchAbort.signal });
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: portfolioSearchAbort.signal });
     const data = await res.json();
     const coins = (data.coins || []).slice(0, 8);
     if(coins.length === 0){
@@ -3400,6 +3609,38 @@ async function runPortfolioAssetSearch(query){
   }
 }
 
+async function runPortfolioStockSearch(query){
+  if(portfolioSearchAbort) portfolioSearchAbort.abort();
+  portfolioSearchAbort = new AbortController();
+  portfolioAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
+  portfolioAssetDropdown.classList.add('show');
+  try{
+    const res = await fetch(tdUrl('https://api.twelvedata.com/symbol_search?symbol=' + encodeURIComponent(query)), { signal: portfolioSearchAbort.signal });
+    const data = await res.json();
+    let results = (data.data || []).filter(r => r.instrument_type === 'Common Stock' || r.instrument_type === 'ETF' || !r.instrument_type);
+    results = results.slice(0, 8);
+    if(results.length === 0){
+      portfolioAssetDropdown.innerHTML = '<div class="asset-empty">No se encontraron resultados</div>';
+      return;
+    }
+    portfolioAssetDropdown.innerHTML = '';
+    results.forEach(r => {
+      const opt = document.createElement('div');
+      opt.className = 'asset-option';
+      const name = document.createElement('span');
+      name.className = 'asset-option-name'; name.textContent = r.instrument_name || r.symbol;
+      const sym = document.createElement('span');
+      sym.className = 'asset-option-sym'; sym.textContent = r.symbol;
+      opt.append(name, sym);
+      opt.addEventListener('click', () => selectStockPendingAsset(r));
+      portfolioAssetDropdown.appendChild(opt);
+    });
+  } catch(err){
+    if(err.name === 'AbortError') return;
+    portfolioAssetDropdown.innerHTML = '<div class="asset-empty">No se pudo conectar. Intenta de nuevo.</div>';
+  }
+}
+
 function selectPendingAsset(coin){
   pendingAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb };
   portfolioAssetDropdown.classList.remove('show');
@@ -3407,14 +3648,30 @@ function selectPendingAsset(coin){
   renderPendingItem();
 }
 
+function selectStockPendingAsset(r){
+  pendingAsset = { id: 'stock:' + r.symbol, name: r.instrument_name || r.symbol, symbol: r.symbol, thumb: '' };
+  portfolioAssetDropdown.classList.remove('show');
+  portfolioAssetInput.value = '';
+  renderPendingItem();
+}
+
+function selectCuratedPendingAsset(item, cat){
+  const prefix = cat === 'indices' ? 'idx:' : 'com:';
+  pendingAsset = { id: prefix + item.id, name: item.name, symbol: item.symbol, thumb: '', emoji: item.emoji };
+  renderPendingItem();
+}
+
 function renderPendingItem(){
   if(!pendingAsset){ pendingItemBox.innerHTML = ''; return; }
   const isPlan = selectedPortfolio.mode === 'plan';
   const today = new Date().toISOString().slice(0, 10);
+  const iconHtml = pendingAsset.thumb
+    ? '<img src="' + pendingAsset.thumb + '" alt="">'
+    : '<span style="font-size:22px;line-height:1">' + (pendingAsset.emoji || '💼') + '</span>';
   pendingItemBox.innerHTML = `
     <div class="pending-item">
       <div class="pending-item-head">
-        <img src="${pendingAsset.thumb}" alt="">
+        ${iconHtml}
         <span>${pendingAsset.name} (${pendingAsset.symbol.toUpperCase()})</span>
       </div>
       <div class="pending-item-fields ${isPlan ? 'single' : ''}">
@@ -3490,11 +3747,57 @@ async function refreshLivePricesAndRender(){
   const isPlan = selectedPortfolio.mode === 'plan';
   livePricesCache = {};
   if(!isPlan && portfolioItems.length > 0){
-    const ids = [...new Set(portfolioItems.map(i => i.asset_id))].join(',');
-    try{
-      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids) + '&vs_currencies=usd');
-      livePricesCache = await res.json();
-    } catch(err){ /* si falla, se muestra solo lo registrado */ }
+    const uniqueIds = [...new Set(portfolioItems.map(i => i.asset_id))];
+    const cryptoIds = uniqueIds.filter(id => !id.startsWith('stock:') && !id.startsWith('idx:') && !id.startsWith('com:'));
+    const stockIds = uniqueIds.filter(id => id.startsWith('stock:'));
+    const idxIds = uniqueIds.filter(id => id.startsWith('idx:'));
+    const comIds = uniqueIds.filter(id => id.startsWith('com:'));
+
+    // cripto: un solo batch a CoinGecko
+    if(cryptoIds.length > 0){
+      try{
+        const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(cryptoIds.join(',')) + '&vs_currencies=usd'));
+        const data = await res.json();
+        Object.assign(livePricesCache, data);
+      } catch(err){ /* si falla, se muestra solo lo registrado */ }
+    }
+
+    // acciones: una consulta por símbolo a Twelve Data
+    for(const sid of stockIds){
+      const symbol = sid.slice('stock:'.length);
+      try{
+        const res = await fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(symbol)));
+        const data = await res.json();
+        const price = parseFloat(data.close);
+        if(!isNaN(price)) livePricesCache[sid] = { usd: price };
+      } catch(err){ /* silencioso */ }
+    }
+
+    // índices (vía ETF proxy escalado)
+    for(const iid of idxIds){
+      const curatedId = iid.slice('idx:'.length);
+      const item = CURATED_INDICES.find(c => c.id === curatedId);
+      if(!item) continue;
+      try{
+        const res = await fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(item.proxy)));
+        const data = await res.json();
+        const proxyPrice = parseFloat(data.close);
+        if(!isNaN(proxyPrice)) livePricesCache[iid] = { usd: proxyPrice * item.scale };
+      } catch(err){ /* silencioso */ }
+    }
+
+    // materias primas (vía ETF proxy escalado)
+    for(const cid of comIds){
+      const curatedId = cid.slice('com:'.length);
+      const item = CURATED_COMMODITIES.find(c => c.id === curatedId);
+      if(!item) continue;
+      try{
+        const res = await fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(item.proxy)));
+        const data = await res.json();
+        const proxyPrice = parseFloat(data.close);
+        if(!isNaN(proxyPrice)) livePricesCache[cid] = { usd: proxyPrice * item.scale };
+      } catch(err){ /* silencioso */ }
+    }
   }
   renderPortfolioItems();
   renderPieChart();
@@ -4317,7 +4620,7 @@ async function runDcaAssetSearch(query){
   dcaAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
   dcaAssetDropdown.classList.add('show');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query), { signal: dcaSearchAbort.signal });
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: dcaSearchAbort.signal });
     const data = await res.json();
     const coins = (data.coins || []).slice(0, 8);
     if(coins.length === 0){
@@ -4359,7 +4662,7 @@ async function selectDcaAsset(coin){
   document.getElementById('dcaAssetPrice').textContent = 'Cargando precio…';
   dcaPriceSeries = null; // cambiamos de activo: hay que volver a pedir el histórico
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd');
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd'));
     const data = await res.json();
     const price = data[coin.id] && data[coin.id].usd;
     dcaSelectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, price: (typeof price === 'number' ? price : 100) };
@@ -4477,7 +4780,7 @@ async function runDcaSimulation(){
     const fromSec = Math.floor(new Date(dcaStartInput.value + 'T00:00:00Z').getTime() / 1000);
     const toSec = Math.floor(new Date(dcaEndInput.value + 'T00:00:00Z').getTime() / 1000) + 86400;
     const assetId = dcaSelectedAsset.id;
-    const res = await fetch('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(assetId) + '/market_chart/range?vs_currency=usd&from=' + fromSec + '&to=' + toSec);
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(assetId) + '/market_chart/range?vs_currency=usd&from=' + fromSec + '&to=' + toSec));
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if(!data.prices || data.prices.length === 0) throw new Error('sin datos');
@@ -4596,7 +4899,7 @@ async function runCoinmAssetSearch(query){
   coinmAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
   coinmAssetDropdown.classList.add('show');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query), { signal: coinmSearchAbort.signal });
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: coinmSearchAbort.signal });
     const data = await res.json();
     const coins = (data.coins || []).slice(0, 8);
     if(coins.length === 0){
@@ -4636,7 +4939,7 @@ async function selectCoinmAsset(coin){
   document.getElementById('coinmAssetName').textContent = coin.name + ' (' + coin.symbol.toUpperCase() + ')';
   document.getElementById('coinmAssetPrice').textContent = 'Cargando precio…';
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd');
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd'));
     const data = await res.json();
     const price = data[coin.id] && data[coin.id].usd;
     coinmSelectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, price: (typeof price === 'number' ? price : 100) };
@@ -5048,7 +5351,7 @@ async function runCorrAssetSearch(query){
   corrAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
   corrAssetDropdown.classList.add('show');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query), { signal: corrSearchAbort.signal });
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: corrSearchAbort.signal });
     const data = await res.json();
     const coins = (data.coins || []).filter(c => !corrSelectedAssets.some(a => a.id === c.id)).slice(0, 8);
     if(coins.length === 0){
@@ -5151,7 +5454,7 @@ document.getElementById('corrCalcBtn').addEventListener('click', async () => {
       if(i > 0) await new Promise(resolve => setTimeout(resolve, 1300)); // pausa para no golpear el límite de CoinGecko
       wrap.innerHTML = '<div class="asset-loading">Trayendo datos de ' + asset.symbol.toUpperCase() + ' (' + (i + 1) + '/' + corrSelectedAssets.length + ')…</div>';
 
-      const res = await fetch('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(asset.id) + '/market_chart?vs_currency=usd&days=' + corrPeriodDays);
+      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/' + encodeURIComponent(asset.id) + '/market_chart?vs_currency=usd&days=' + corrPeriodDays));
       const rawText = await res.text();
       let json;
       try{
@@ -5588,6 +5891,7 @@ async function loadFearGreedIndex(){
   }
 }
 loadFearGreedIndex();
+setInterval(loadFearGreedIndex, 120000); // se refresca solo cada 2 minutos
 
 /* ---- dominancia BTC / USDT ---- */
 async function loadMarketDominance(){
@@ -5598,7 +5902,7 @@ async function loadMarketDominance(){
   const usdtBarEl = document.getElementById('usdtDomBar');
   const usdtSubEl = document.getElementById('usdtDomSub');
   try{
-    const res = await fetch('https://api.coingecko.com/api/v3/global');
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/global'));
     const json = await res.json();
     const pct = json.data && json.data.market_cap_percentage;
     if(!pct) throw new Error('sin datos');
@@ -5628,6 +5932,7 @@ async function loadMarketDominance(){
   }
 }
 loadMarketDominance();
+setInterval(loadMarketDominance, 120000); // se refresca solo cada 2 minutos
 
 /* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
 (function checkOAuthReturnError(){
