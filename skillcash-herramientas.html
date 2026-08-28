@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- skc-origin-juan · hecho-por-skillcash — SkillCash Tools, propiedad original de Juan SkillCash -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -55,6 +56,7 @@
   --shadow-lg:0 20px 50px rgba(0,0,0,.5);
   --shadow-glow-red:0 8px 28px rgba(255,47,79,.22);
   --icon-stroke:1.6;
+  --skc-marca-de-agua:'tiburon-skillcash-2026';
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;min-height:100vh}
@@ -865,7 +867,8 @@ button{font-family:inherit;color:inherit}
 }
 </style>
 </head>
-<body>
+<body data-skillcash-adn="skillcash-forge" data-origen="Charly19">
+<span aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">skillcash-huella · origen-skillcash-tools</span>
 
 <div class="app">
 
@@ -1447,6 +1450,7 @@ button{font-family:inherit;color:inherit}
   </div>
 </div>
 
+<!-- no-copies-esto-skillcash -->
 <!-- ===== MODAL: CALCULADORA DE RENTABILIDAD ===== -->
 <div class="modal-overlay" id="profitModal">
   <button class="modal-close" id="closeProfit" aria-label="Cerrar">✕</button>
@@ -2171,6 +2175,31 @@ button{font-family:inherit;color:inherit}
             <div>
               <div class="dca-selected-name" id="tzSelectedNameB">Londres</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cat-tabs" id="tzModeTabs" style="margin-top:20px">
+        <button class="cat-tab active" data-tzmode="live">🕐 Ahora en vivo</button>
+        <button class="cat-tab" data-tzmode="custom">🗓️ Elegir una hora</button>
+      </div>
+
+      <div id="tzCustomTimeWrap" style="display:none;margin-top:14px">
+        <div class="calc-grid">
+          <div class="field">
+            <label for="tzCustomDate">Fecha</label>
+            <input type="date" id="tzCustomDate" style="width:100%;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;outline:none">
+          </div>
+          <div class="field">
+            <label for="tzCustomTime">Hora que quieres fijar</label>
+            <input type="time" id="tzCustomTime" value="20:30" style="width:100%;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;outline:none">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px">
+          <label>Esa fecha y hora son en...</label>
+          <div class="dir-toggle" id="tzCustomRefToggle" style="margin-bottom:0">
+            <button class="mode-btn active" data-ref="A" id="tzRefLabelA">Ciudad A</button>
+            <button class="mode-btn" data-ref="B" id="tzRefLabelB">Ciudad B</button>
           </div>
         </div>
       </div>
@@ -3139,6 +3168,7 @@ button{font-family:inherit;color:inherit}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ========= SISTEMA DE ÍCONOS (reemplaza emojis por SVG de línea consistente) ========= */
+// juanskll-build — sistema de íconos original de SkillCash Tools
 function svgIcon(inner, size){
   size = size || 20;
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
@@ -3163,7 +3193,9 @@ const TOOL_ICONS = {
   inheritance: '<circle cx="7" cy="6.5" r="2.5"/><path d="M2.5 17c0-3 2-5 4.5-5s4.5 2 4.5 5"/><circle cx="15" cy="7.5" r="2"/><path d="M12 17c.3-2.3 1.7-4 3.5-4s3.3 1.7 3.5 4"/>',
   glosario: '<path d="M4 4.5A1.5 1.5 0 015.5 3H10v14H5.5A1.5 1.5 0 004 15.5z"/><path d="M16 4.5A1.5 1.5 0 0014.5 3H10v14h4.5a1.5 1.5 0 001.5-1.5z"/>',
   mistakes: '<path d="M10 3l8 14H2z"/><line x1="10" y1="8" x2="10" y2="12"/><circle cx="10" cy="14.5" r=".9" fill="currentColor" stroke="none"/>',
-  unitconverter: '<path d="M4 7h10M14 7l-3-3M14 7l-3 3"/><path d="M16 13H6M6 13l3-3M6 13l3 3"/>'
+  unitconverter: '<path d="M4 7h10M14 7l-3-3M14 7l-3 3"/><path d="M16 13H6M6 13l3-3M6 13l3 3"/>',
+  pctcalc: '<circle cx="6" cy="6" r="2.2"/><circle cx="14" cy="14" r="2.2"/><line x1="15" y1="5" x2="5" y2="15"/>',
+  tzclock: '<circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l3 2"/>'
 };
 
 const CATEGORY_ICONS = {
@@ -7235,41 +7267,143 @@ tzClockModal.addEventListener('click', (e) => { if(e.target === tzClockModal) cl
 // sin emojis de bandera: en varios sistemas (sobre todo Windows) no tienen el glifo instalado
 // y en vez de la banderita se ven las dos letras del código de país sueltas — mejor texto limpio.
 const TZ_CITIES = [
-  { name: 'Bogotá', country: 'Colombia', tz: 'America/Bogota' },
-  { name: 'Ciudad de México', country: 'México', tz: 'America/Mexico_City' },
+  // España (varias ciudades — todas comparten zona horaria, pero la gente busca por nombre de ciudad)
   { name: 'Madrid', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Barcelona', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Valencia', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Sevilla', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Bilbao', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Málaga', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Islas Canarias', country: 'España', tz: 'Atlantic/Canary' },
+  // Latinoamérica
+  { name: 'Bogotá', country: 'Colombia', tz: 'America/Bogota' },
+  { name: 'Medellín', country: 'Colombia', tz: 'America/Bogota' },
+  { name: 'Cali', country: 'Colombia', tz: 'America/Bogota' },
+  { name: 'Ciudad de México', country: 'México', tz: 'America/Mexico_City' },
+  { name: 'Guadalajara', country: 'México', tz: 'America/Mexico_City' },
+  { name: 'Monterrey', country: 'México', tz: 'America/Monterrey' },
+  { name: 'Tijuana', country: 'México', tz: 'America/Tijuana' },
+  { name: 'Cancún', country: 'México', tz: 'America/Cancun' },
   { name: 'Buenos Aires', country: 'Argentina', tz: 'America/Argentina/Buenos_Aires' },
+  { name: 'Córdoba', country: 'Argentina', tz: 'America/Argentina/Cordoba' },
   { name: 'Santiago', country: 'Chile', tz: 'America/Santiago' },
   { name: 'Lima', country: 'Perú', tz: 'America/Lima' },
   { name: 'Montevideo', country: 'Uruguay', tz: 'America/Montevideo' },
   { name: 'Caracas', country: 'Venezuela', tz: 'America/Caracas' },
   { name: 'Quito', country: 'Ecuador', tz: 'America/Guayaquil' },
+  { name: 'Guayaquil', country: 'Ecuador', tz: 'America/Guayaquil' },
+  { name: 'La Paz', country: 'Bolivia', tz: 'America/La_Paz' },
+  { name: 'Santa Cruz de la Sierra', country: 'Bolivia', tz: 'America/La_Paz' },
+  { name: 'Asunción', country: 'Paraguay', tz: 'America/Asuncion' },
   { name: 'San José', country: 'Costa Rica', tz: 'America/Costa_Rica' },
   { name: 'Panamá', country: 'Panamá', tz: 'America/Panama' },
+  { name: 'San Salvador', country: 'El Salvador', tz: 'America/El_Salvador' },
+  { name: 'Ciudad de Guatemala', country: 'Guatemala', tz: 'America/Guatemala' },
+  { name: 'Tegucigalpa', country: 'Honduras', tz: 'America/Tegucigalpa' },
+  { name: 'Managua', country: 'Nicaragua', tz: 'America/Managua' },
+  { name: 'Santo Domingo', country: 'Rep. Dominicana', tz: 'America/Santo_Domingo' },
+  { name: 'San Juan', country: 'Puerto Rico', tz: 'America/Puerto_Rico' },
+  { name: 'La Habana', country: 'Cuba', tz: 'America/Havana' },
+  // Estados Unidos y Canadá
   { name: 'Nueva York', country: 'Estados Unidos', tz: 'America/New_York' },
-  { name: 'Los Ángeles', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
-  { name: 'Chicago', country: 'Estados Unidos', tz: 'America/Chicago' },
   { name: 'Miami', country: 'Estados Unidos', tz: 'America/New_York' },
+  { name: 'Washington D.C.', country: 'Estados Unidos', tz: 'America/New_York' },
+  { name: 'Boston', country: 'Estados Unidos', tz: 'America/New_York' },
+  { name: 'Chicago', country: 'Estados Unidos', tz: 'America/Chicago' },
+  { name: 'Houston', country: 'Estados Unidos', tz: 'America/Chicago' },
+  { name: 'Dallas', country: 'Estados Unidos', tz: 'America/Chicago' },
+  { name: 'Denver', country: 'Estados Unidos', tz: 'America/Denver' },
+  { name: 'Phoenix', country: 'Estados Unidos', tz: 'America/Phoenix' },
+  { name: 'Los Ángeles', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
+  { name: 'San Francisco', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
+  { name: 'Las Vegas', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
+  { name: 'Seattle', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
+  { name: 'Honolulu', country: 'Estados Unidos', tz: 'Pacific/Honolulu' },
   { name: 'Toronto', country: 'Canadá', tz: 'America/Toronto' },
+  { name: 'Vancouver', country: 'Canadá', tz: 'America/Vancouver' },
+  { name: 'Montreal', country: 'Canadá', tz: 'America/Toronto' },
+  // Europa
   { name: 'Londres', country: 'Reino Unido', tz: 'Europe/London' },
+  { name: 'Dublín', country: 'Irlanda', tz: 'Europe/Dublin' },
   { name: 'París', country: 'Francia', tz: 'Europe/Paris' },
   { name: 'Berlín', country: 'Alemania', tz: 'Europe/Berlin' },
+  { name: 'Múnich', country: 'Alemania', tz: 'Europe/Berlin' },
   { name: 'Roma', country: 'Italia', tz: 'Europe/Rome' },
+  { name: 'Milán', country: 'Italia', tz: 'Europe/Rome' },
   { name: 'Lisboa', country: 'Portugal', tz: 'Europe/Lisbon' },
   { name: 'Ámsterdam', country: 'Países Bajos', tz: 'Europe/Amsterdam' },
-  { name: 'Dubái', country: 'Emiratos Árabes Unidos', tz: 'Asia/Dubai' },
+  { name: 'Bruselas', country: 'Bélgica', tz: 'Europe/Brussels' },
+  { name: 'Zúrich', country: 'Suiza', tz: 'Europe/Zurich' },
+  { name: 'Viena', country: 'Austria', tz: 'Europe/Vienna' },
+  { name: 'Estocolmo', country: 'Suecia', tz: 'Europe/Stockholm' },
+  { name: 'Oslo', country: 'Noruega', tz: 'Europe/Oslo' },
+  { name: 'Copenhague', country: 'Dinamarca', tz: 'Europe/Copenhagen' },
+  { name: 'Varsovia', country: 'Polonia', tz: 'Europe/Warsaw' },
+  { name: 'Atenas', country: 'Grecia', tz: 'Europe/Athens' },
+  { name: 'Moscú', country: 'Rusia', tz: 'Europe/Moscow' },
   { name: 'Estambul', country: 'Turquía', tz: 'Europe/Istanbul' },
+  // Medio Oriente y África
+  { name: 'Dubái', country: 'Emiratos Árabes Unidos', tz: 'Asia/Dubai' },
+  { name: 'Abu Dabi', country: 'Emiratos Árabes Unidos', tz: 'Asia/Dubai' },
+  { name: 'Doha', country: 'Catar', tz: 'Asia/Qatar' },
+  { name: 'Riad', country: 'Arabia Saudita', tz: 'Asia/Riyadh' },
+  { name: 'Tel Aviv', country: 'Israel', tz: 'Asia/Jerusalem' },
+  { name: 'El Cairo', country: 'Egipto', tz: 'Africa/Cairo' },
+  { name: 'Johannesburgo', country: 'Sudáfrica', tz: 'Africa/Johannesburg' },
+  { name: 'Lagos', country: 'Nigeria', tz: 'Africa/Lagos' },
+  { name: 'Nairobi', country: 'Kenia', tz: 'Africa/Nairobi' },
+  // Asia y Oceanía
   { name: 'Tokio', country: 'Japón', tz: 'Asia/Tokyo' },
+  { name: 'Osaka', country: 'Japón', tz: 'Asia/Tokyo' },
   { name: 'Shanghái', country: 'China', tz: 'Asia/Shanghai' },
+  { name: 'Pekín', country: 'China', tz: 'Asia/Shanghai' },
   { name: 'Hong Kong', country: 'Hong Kong', tz: 'Asia/Hong_Kong' },
+  { name: 'Taipéi', country: 'Taiwán', tz: 'Asia/Taipei' },
   { name: 'Singapur', country: 'Singapur', tz: 'Asia/Singapore' },
+  { name: 'Kuala Lumpur', country: 'Malasia', tz: 'Asia/Kuala_Lumpur' },
+  { name: 'Yakarta', country: 'Indonesia', tz: 'Asia/Jakarta' },
+  { name: 'Bangkok', country: 'Tailandia', tz: 'Asia/Bangkok' },
+  { name: 'Manila', country: 'Filipinas', tz: 'Asia/Manila' },
   { name: 'Seúl', country: 'Corea del Sur', tz: 'Asia/Seoul' },
   { name: 'Mumbai', country: 'India', tz: 'Asia/Kolkata' },
-  { name: 'Sídney', country: 'Australia', tz: 'Australia/Sydney' }
+  { name: 'Nueva Delhi', country: 'India', tz: 'Asia/Kolkata' },
+  { name: 'Sídney', country: 'Australia', tz: 'Australia/Sydney' },
+  { name: 'Melbourne', country: 'Australia', tz: 'Australia/Melbourne' },
+  { name: 'Auckland', country: 'Nueva Zelanda', tz: 'Pacific/Auckland' }
 ];
 
-let tzSelectedA = TZ_CITIES[0]; // Bogotá por defecto
-let tzSelectedB = TZ_CITIES[16]; // Londres por defecto
+let tzSelectedA = TZ_CITIES.find(c => c.name === 'Bogotá'); // Bogotá por defecto
+let tzSelectedB = TZ_CITIES.find(c => c.name === 'Londres'); // Londres por defecto
+let tzMode = 'live'; // 'live' o 'custom'
+let tzCustomRef = 'A'; // a qué ciudad se le está fijando la hora en modo personalizado
+
+document.querySelectorAll('#tzModeTabs .cat-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#tzModeTabs .cat-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    tzMode = tab.dataset.tzmode;
+    document.getElementById('tzCustomTimeWrap').style.display = tzMode === 'custom' ? 'block' : 'none';
+    updateTzClock();
+  });
+});
+
+document.querySelectorAll('#tzCustomRefToggle .mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tzCustomRefToggle .mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tzCustomRef = btn.dataset.ref;
+    updateTzClock();
+  });
+});
+
+document.getElementById('tzCustomTime').addEventListener('input', updateTzClock);
+document.getElementById('tzCustomDate').addEventListener('input', updateTzClock);
+(function initTzCustomDate(){
+  const d = new Date();
+  const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  document.getElementById('tzCustomDate').value = iso;
+})();
+
 
 function tzRenderDropdown(query, which){
   const dropdown = document.getElementById(which === 'A' ? 'tzDropdownA' : 'tzDropdownB');
@@ -7301,9 +7435,11 @@ function tzSelectCity(city, which){
   const input = document.getElementById(which === 'A' ? 'tzSearchA' : 'tzSearchB');
   const dropdown = document.getElementById(which === 'A' ? 'tzDropdownA' : 'tzDropdownB');
   const nameEl = document.getElementById(which === 'A' ? 'tzSelectedNameA' : 'tzSelectedNameB');
+  const refBtn = document.getElementById(which === 'A' ? 'tzRefLabelA' : 'tzRefLabelB');
   input.value = '';
   dropdown.classList.remove('show');
   nameEl.textContent = city.name + ' — ' + city.country;
+  if(refBtn) refBtn.textContent = city.name;
   if(which === 'A') tzSelectedA = city; else tzSelectedB = city;
   updateTzClock();
 }
@@ -7321,14 +7457,39 @@ function tzSelectCity(city, which){
 // muestra los nombres seleccionados por defecto al cargar la página
 document.getElementById('tzSelectedNameA').textContent = tzSelectedA.name + ' — ' + tzSelectedA.country;
 document.getElementById('tzSelectedNameB').textContent = tzSelectedB.name + ' — ' + tzSelectedB.country;
+document.getElementById('tzRefLabelA').textContent = tzSelectedA.name;
+document.getElementById('tzRefLabelB').textContent = tzSelectedB.name;
 
 function updateTzClock(){
   const cityA = tzSelectedA;
   const cityB = tzSelectedB;
-  const now = new Date();
 
-  const { hour: hA, minute: mA, second: sA } = getZoneSecondsSinceMidnight(cityA.tz, now);
-  const { hour: hB, minute: mB, second: sB } = getZoneSecondsSinceMidnight(cityB.tz, now);
+  let referenceDate; // el instante real (UTC) usado para calcular ambas horas mostradas
+
+  if(tzMode === 'custom'){
+    const timeInput = document.getElementById('tzCustomTime').value || '00:00';
+    const dateInput = document.getElementById('tzCustomDate').value;
+    const [hh, mm] = timeInput.split(':').map(n => parseInt(n, 10));
+    const refCity = tzCustomRef === 'A' ? cityA : cityB;
+    let yy, mo, dd;
+    if(dateInput){
+      [yy, mo, dd] = dateInput.split('-').map(n => parseInt(n, 10));
+    } else {
+      const now = new Date();
+      yy = now.getFullYear(); mo = now.getMonth() + 1; dd = now.getDate();
+    }
+    const asUTC = Date.UTC(yy, mo - 1, dd, hh, mm, 0);
+    // se usa el desfase de la fecha elegida (no el de "hoy"), para que el horario de verano
+    // quede correcto incluso si eliges una fecha futura o pasada en otra época del año
+    const approxDateForOffset = new Date(Date.UTC(yy, mo - 1, dd, 12, 0, 0));
+    const refOffset = getTzOffsetMinutes(refCity.tz, approxDateForOffset);
+    referenceDate = new Date(asUTC - refOffset * 60000);
+  } else {
+    referenceDate = new Date();
+  }
+
+  const { hour: hA, minute: mA, second: sA } = getZoneSecondsSinceMidnight(cityA.tz, referenceDate);
+  const { hour: hB, minute: mB, second: sB } = getZoneSecondsSinceMidnight(cityB.tz, referenceDate);
 
   document.getElementById('tzLabelA').textContent = cityA.name;
   document.getElementById('tzLabelB').textContent = cityB.name;
@@ -7337,16 +7498,17 @@ function updateTzClock(){
 
   const dateFmtA = new Intl.DateTimeFormat('es-ES', { timeZone: cityA.tz, weekday: 'long', day: 'numeric', month: 'long' });
   const dateFmtB = new Intl.DateTimeFormat('es-ES', { timeZone: cityB.tz, weekday: 'long', day: 'numeric', month: 'long' });
-  document.getElementById('tzDateA').textContent = dateFmtA.format(now);
-  document.getElementById('tzDateB').textContent = dateFmtB.format(now);
+  document.getElementById('tzDateA').textContent = dateFmtA.format(referenceDate);
+  document.getElementById('tzDateB').textContent = dateFmtB.format(referenceDate);
 
   // diferencia horaria entre las dos zonas, calculada a partir del offset real de cada una (respeta horario de verano)
-  const offsetA = getTzOffsetMinutes(cityA.tz, now);
-  const offsetB = getTzOffsetMinutes(cityB.tz, now);
+  const offsetA = getTzOffsetMinutes(cityA.tz, referenceDate);
+  const offsetB = getTzOffsetMinutes(cityB.tz, referenceDate);
   const diffHours = (offsetB - offsetA) / 60;
   const diffNote = document.getElementById('tzDiffNote');
+  const momento = tzMode === 'custom' ? 'en ese momento' : 'ahora mismo';
   if(diffHours === 0){
-    diffNote.textContent = '🕐 ' + cityA.name + ' y ' + cityB.name + ' están en la misma hora ahora mismo.';
+    diffNote.textContent = '🕐 ' + cityA.name + ' y ' + cityB.name + ' están en la misma hora ' + momento + '.';
   } else {
     const ahead = diffHours > 0 ? cityB.name : cityA.name;
     const behind = diffHours > 0 ? cityA.name : cityB.name;
@@ -8590,7 +8752,7 @@ if(bellToggleBtn){
   bellToggleBtn.addEventListener('click', () => {
     setBellEnabled(!isBellEnabled());
     refreshBellButton();
-    if(isBellEnabled()) playBellChime(3); // una probadita corta al activarlo, para que sepas cómo suena
+    if(isBellEnabled()) playBellChime(5); // una probadita corta al activarlo, para que sepas cómo suena
   });
   refreshBellButton();
 }
@@ -8629,7 +8791,7 @@ function playBellChime(ringCount){
     if(bellAudioCtx.state === 'suspended') bellAudioCtx.resume();
     const ctx = bellAudioCtx;
     const now = ctx.currentTime;
-    const spacing = 0.24; // ritmo medio-rápido entre campanadas, como la campana de apertura de bolsa
+    const spacing = 0.2; // un poco más rápido que el original, sin acortar el tono
     const baseFreq = 1250; // frecuencia base más aguda, tipo campanita brillante
     // una campana de verdad no suena en una sola nota pura: son varios armónicos
     // "desafinados" entre sí (no múltiplos exactos) sonando juntos, cada uno apagándose
@@ -8669,7 +8831,7 @@ function updateMarketSessions(){
     const isOpen = totalSeconds >= session.openSec && totalSeconds < session.closeSec;
 
     if(marketSessionPrevState[session.id] !== undefined && marketSessionPrevState[session.id] !== isOpen && isBellEnabled()){
-      playBellChime(5);
+      playBellChime(7);
     }
     marketSessionPrevState[session.id] = isOpen;
 
@@ -8719,5 +8881,6 @@ setInterval(updateMarketSessions, 1000);
   }
 })();
 </script>
+<!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
