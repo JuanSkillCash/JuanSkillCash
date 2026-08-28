@@ -8553,7 +8553,7 @@ async function loadFearGreedIndex(){
   }
 }
 loadFearGreedIndex();
-setInterval(loadFearGreedIndex, 120000); // se refresca solo cada 2 minutos
+setInterval(loadFearGreedIndex, 86400000); // se refresca solo cada 24 horas — el índice en sí solo se calcula una vez al día
 
 /* ---- dominancia BTC / USDT ---- */
 let lastDominanceUpdate = null; // guarda cuándo llegó el último dato exitoso, para el relojito
