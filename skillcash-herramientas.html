@@ -8672,6 +8672,49 @@ const MARKET_SESSIONS = [
   { id: 'ny', name: 'EE. UU. (N. York)', tz: 'America/New_York', openSec: 9.5 * 3600, closeSec: 16 * 3600 }
 ];
 
+// Festivos oficiales 2026 de cada bolsa (Tokyo Stock Exchange, London Stock Exchange, NYSE).
+// Nota de mantenimiento: esta lista es específica del año 2026 — hay que actualizarla a mano
+// cada año nuevo, ya que varios festivos cambian de fecha (Semana Santa, días "observados", etc).
+const MARKET_HOLIDAYS_2026 = {
+  tokyo: ['2026-01-01','2026-01-02','2026-01-03','2026-01-12','2026-02-11','2026-02-23','2026-03-20','2026-04-29','2026-05-04','2026-05-05','2026-05-06','2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23','2026-10-12','2026-11-03','2026-11-23','2026-12-31'],
+  london: ['2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28'],
+  ny: ['2026-01-01','2026-01-19','2026-02-16','2026-04-03','2026-05-25','2026-06-19','2026-07-03','2026-09-07','2026-11-26','2026-12-25']
+};
+
+function getZoneDateStr(timeZone, date){
+  // 'en-CA' da directamente el formato AAAA-MM-DD, cómodo para comparar contra la lista de festivos
+  return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+function getZoneWeekday(timeZone, date){
+  return new Intl.DateTimeFormat('en-US', { timeZone, weekday: 'short' }).format(date); // 'Mon','Tue'...'Sat','Sun'
+}
+function isMarketDayOpen(session, date){
+  const weekday = getZoneWeekday(session.tz, date);
+  if(weekday === 'Sat' || weekday === 'Sun') return false;
+  const dateStr = getZoneDateStr(session.tz, date);
+  const holidays = MARKET_HOLIDAYS_2026[session.id] || [];
+  return !holidays.includes(dateStr);
+}
+function computeSecondsUntilNextOpen(session, now, totalSecondsToday, todayIsValid){
+  if(todayIsValid && totalSecondsToday < session.openSec){
+    return session.openSec - totalSecondsToday;
+  }
+  for(let daysAhead = 1; daysAhead <= 10; daysAhead++){
+    const candidateDate = new Date(now.getTime() + daysAhead * 86400000);
+    if(isMarketDayOpen(session, candidateDate)){
+      const dateStr = getZoneDateStr(session.tz, candidateDate);
+      const [yy, mo, dd] = dateStr.split('-').map(n => parseInt(n, 10));
+      const openHour = Math.floor(session.openSec / 3600);
+      const openMin = Math.round((session.openSec % 3600) / 60);
+      const asUTC = Date.UTC(yy, mo - 1, dd, openHour, openMin, 0);
+      const offset = getTzOffsetMinutes(session.tz, candidateDate);
+      const openInstant = new Date(asUTC - offset * 60000);
+      return Math.max(1, Math.round((openInstant.getTime() - now.getTime()) / 1000));
+    }
+  }
+  return session.openSec; // resguardo por seguridad, no debería llegar aquí
+}
+
 function getZoneSecondsSinceMidnight(timeZone, date){
   const fmt = new Intl.DateTimeFormat('en-US', { timeZone, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const parts = fmt.formatToParts(date);
@@ -8828,7 +8871,8 @@ function updateMarketSessions(){
 
   MARKET_SESSIONS.forEach(session => {
     const { hour, minute, totalSeconds } = getZoneSecondsSinceMidnight(session.tz, now);
-    const isOpen = totalSeconds >= session.openSec && totalSeconds < session.closeSec;
+    const todayIsValid = isMarketDayOpen(session, now); // ya revisa fin de semana Y festivos de esa bolsa
+    const isOpen = todayIsValid && totalSeconds >= session.openSec && totalSeconds < session.closeSec;
 
     if(marketSessionPrevState[session.id] !== undefined && marketSessionPrevState[session.id] !== isOpen && isBellEnabled()){
       playBellChime(7);
@@ -8838,10 +8882,8 @@ function updateMarketSessions(){
     let secondsRemaining;
     if(isOpen){
       secondsRemaining = session.closeSec - totalSeconds;
-    } else if(totalSeconds < session.openSec){
-      secondsRemaining = session.openSec - totalSeconds;
     } else {
-      secondsRemaining = (86400 - totalSeconds) + session.openSec;
+      secondsRemaining = computeSecondsUntilNextOpen(session, now, totalSeconds, todayIsValid);
     }
 
     document.getElementById('time-' + session.id).textContent = formatTime12h(hour, minute);
