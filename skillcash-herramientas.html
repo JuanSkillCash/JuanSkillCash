@@ -470,6 +470,8 @@ button{font-family:inherit;color:inherit}
 .be-section-label.bitunix{color:var(--bitunix-green)}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
+.be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
+.be-savings-box.is-loss .be-savings-value{color:var(--red);text-shadow:0 0 30px rgba(255,47,79,.35)}
 
 /* DCA calculator */
 .dca-selected-asset{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-top:10px}
@@ -6880,10 +6882,17 @@ function computeMcap(){
 
   const hypoPrice = mcapTargetSelected.marketCap / mcapMySelected.circulatingSupply;
   const multiplier = hypoPrice / mcapMySelected.price;
+  const isLoss = multiplier < 1;
 
   document.getElementById('mcapResultLabel').textContent = '📌 Si ' + mcapMySelected.name + ' tuviera la capitalización de ' + mcapTargetSelected.name + '...';
   document.getElementById('mcapHypoPrice').textContent = formatPrice(hypoPrice) + '\u00A0USD';
-  document.getElementById('mcapMultText').textContent = 'Eso sería ' + numES(multiplier, 2) + 'x el precio actual (' + formatPrice(mcapMySelected.price) + ' USD).';
+
+  const pctChange = (multiplier - 1) * 100;
+  const multText = isLoss
+    ? '⚠️ Esto sería una PÉRDIDA de ' + numES(Math.abs(pctChange), 1) + '% frente al precio actual (' + formatPrice(mcapMySelected.price) + ' USD) — ' + mcapTargetSelected.name + ' tiene una capitalización más baja que ' + mcapMySelected.name + '.'
+    : 'Eso sería ' + numES(multiplier, 2) + 'x el precio actual (' + formatPrice(mcapMySelected.price) + ' USD) — una ganancia de ' + numES(pctChange, 1) + '%.';
+  document.getElementById('mcapMultText').textContent = multText;
+  document.getElementById('mcapResultBox').classList.toggle('is-loss', isLoss);
 }
 
 /* ========= TIEMPO HASTA LA LIBERTAD FINANCIERA ========= */
@@ -7603,6 +7612,13 @@ document.getElementById('tzCustomDate').addEventListener('input', updateTzClock)
 function tzRenderDropdown(query, which){
   const dropdown = document.getElementById(which === 'A' ? 'tzDropdownA' : 'tzDropdownB');
   const q = query.trim().toLowerCase();
+
+  if(q === ''){
+    dropdown.innerHTML = '<div class="asset-empty">Escribe para buscar entre 281 ciudades — cualquier país del mundo</div>';
+    dropdown.classList.add('show');
+    return;
+  }
+
   const matches = TZ_CITIES.filter(c => c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q)).slice(0, 8);
 
   if(matches.length === 0){
