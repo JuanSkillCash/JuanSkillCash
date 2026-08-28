@@ -8791,7 +8791,7 @@ function playBellChime(ringCount){
     if(bellAudioCtx.state === 'suspended') bellAudioCtx.resume();
     const ctx = bellAudioCtx;
     const now = ctx.currentTime;
-    const spacing = 0.2; // un poco más rápido que el original, sin acortar el tono
+    const spacing = 0.17; // un poco más rápido
     const baseFreq = 1250; // frecuencia base más aguda, tipo campanita brillante
     // una campana de verdad no suena en una sola nota pura: son varios armónicos
     // "desafinados" entre sí (no múltiplos exactos) sonando juntos, cada uno apagándose
