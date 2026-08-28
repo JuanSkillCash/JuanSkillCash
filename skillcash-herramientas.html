@@ -90,6 +90,22 @@ button{font-family:inherit;color:inherit}
 .sb-toggle:hover{background:rgba(255,47,79,.12);color:var(--red)}
 .sb-section-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:20px 20px 10px;white-space:nowrap}
 .sidebar.collapsed .sb-section-label{opacity:0}
+.sb-search-wrap{position:relative;margin:2px 18px 12px;display:flex;align-items:center}
+.sb-search-icon{position:absolute;left:11px;color:var(--muted);pointer-events:none;flex-shrink:0}
+.sb-search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:9px 12px 9px 33px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.sb-search-wrap input:focus{border-color:var(--red)}
+.sidebar.collapsed .sb-search-wrap{display:none}
+
+.fav-star{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:4px;flex-shrink:0;transition:color .2s,transform .15s}
+.fav-star:hover{transform:scale(1.15)}
+.fav-star.active{color:var(--gold)}
+.sb-item{position:relative}
+.sb-item .fav-star{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+.sb-item .fav-star:hover{transform:translateY(-50%) scale(1.15)}
+.sidebar.collapsed .sb-item .fav-star{display:none}
+.tool-card-actions{grid-column:3;grid-row:1/3;display:flex;align-items:center;gap:4px;justify-self:end}
+.tool-card-actions::after{content:'›';color:var(--muted);font-size:20px}
+
 .sb-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;text-transform:none}
 .sb-nav > .sb-cat-label:first-child{padding-top:0}
 .sidebar.collapsed .sb-cat-label{opacity:0;padding-top:8px;padding-bottom:0}
@@ -203,7 +219,6 @@ button{font-family:inherit;color:inherit}
 .tool-card:last-child{border-bottom:none}
 .tool-card:hover{background:rgba(255,255,255,.03)}
 .tool-card:focus-visible{background:rgba(255,255,255,.03)}
-.tool-card::after{content:'›';grid-column:3;grid-row:1/3;color:var(--muted);font-size:20px;justify-self:end;align-self:center}
 .tool-icon{grid-column:1;grid-row:1/3;width:auto;height:auto;background:none;border-radius:0;font-size:22px;margin-bottom:0;align-self:center}
 .tool-card h3{grid-column:2;grid-row:1;font-size:14.5px;font-weight:700;margin-bottom:0;color:var(--white)}
 .tool-card p{grid-column:2;grid-row:2;font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:0}
@@ -732,6 +747,7 @@ button{font-family:inherit;color:inherit}
 .footer-social-btn{width:38px;height:38px;border-radius:10px;background:var(--surface);border:1px solid var(--border2);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s,transform .2s}
 .footer-social-btn:hover{border-color:var(--red);color:var(--red);transform:translateY(-2px)}
 .site-footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted)}
+.site-footer-note{margin-top:14px;font-size:12.5px;line-height:1.75;color:var(--muted2);max-width:760px}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -804,16 +820,28 @@ button{font-family:inherit;color:inherit}
 
     <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
     <div class="sb-section-label">Herramientas</div>
+    <div class="sb-search-wrap">
+      <svg class="sb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
+    </div>
     <nav class="sb-nav">
-      <div class="sb-cat-label">📐 Cálculo y simulación</div>
+      <div class="sb-cat-label">📈 Trading y Futuros</div>
       <button class="sb-item active" data-tool="calculadora">
         <span class="sb-item-icon">🧮</span><span class="sb-item-label">Calculadora</span>
       </button>
-      <button class="sb-item" data-tool="rentabilidad">
-        <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
-      </button>
       <button class="sb-item" data-tool="breakeven">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Break-even</span>
+      </button>
+      <button class="sb-item" data-tool="coinm">
+        <span class="sb-item-icon">₿</span><span class="sb-item-label">Calculadora Coin-M</span>
+      </button>
+      <button class="sb-item" data-tool="fees">
+        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de Comisiones</span>
+      </button>
+
+      <div class="sb-cat-label">🪙 Inversión y Acumulación</div>
+      <button class="sb-item" data-tool="rentabilidad">
+        <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
       </button>
       <button class="sb-item" data-tool="dca">
         <span class="sb-item-icon">🪙</span><span class="sb-item-label">Calculadora DCA</span>
@@ -827,19 +855,13 @@ button{font-family:inherit;color:inherit}
       <button class="sb-item" data-tool="fifreedom">
         <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad Financiera</span>
       </button>
-      <button class="sb-item" data-tool="coinm">
-        <span class="sb-item-icon">₿</span><span class="sb-item-label">Calculadora Coin-M</span>
-      </button>
-      <button class="sb-item" data-tool="fees">
-        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de Comisiones</span>
-      </button>
 
-      <div class="sb-cat-label">💼 Gestión de portafolio</div>
-      <button class="sb-item" data-tool="portafolio">
-        <span class="sb-item-icon">📊</span><span class="sb-item-label">Simulador de portafolio</span>
-      </button>
+      <div class="sb-cat-label">💼 Portafolio</div>
       <button class="sb-item" data-tool="quiz">
         <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
+      </button>
+      <button class="sb-item" data-tool="portafolio">
+        <span class="sb-item-icon">📊</span><span class="sb-item-label">Simulador de portafolio</span>
       </button>
       <button class="sb-item" data-tool="correlacion">
         <span class="sb-item-icon">🔗</span><span class="sb-item-label">Correlación</span>
@@ -859,13 +881,15 @@ button{font-family:inherit;color:inherit}
         <span class="sb-item-icon">👨‍👩‍👧</span><span class="sb-item-label">Herencia digital</span>
       </button>
 
-      <div class="sb-cat-label">📖 Recursos</div>
+      <div class="sb-cat-label">📖 Aprender</div>
       <button class="sb-item" data-tool="glosario">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario Cripto</span>
       </button>
       <button class="sb-item" data-tool="mistakes">
         <span class="sb-item-icon">⚠️</span><span class="sb-item-label">Errores comunes</span>
       </button>
+
+      <div class="sb-cat-label">🧰 Utilidades</div>
       <button class="sb-item" data-tool="unitconverter">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">Conversor de unidades</span>
       </button>
@@ -982,20 +1006,15 @@ button{font-family:inherit;color:inherit}
       </div>
     </a>
 
+    <div id="favoritesSection"></div>
+
     <div class="tool-section">
-      <div class="tool-cat-label">📐 Cálculo y simulación</div>
+      <div class="tool-cat-label">📈 Trading y Futuros</div>
       <div class="tool-grid">
-        <button class="tool-card" id="openCalcCard" data-tool="calculadora">
+<button class="tool-card" id="openCalcCard" data-tool="calculadora">
           <div class="tool-icon">🧮</div>
           <h3>Calculadora de Trading</h3>
           <p>Calcula liquidación, SL, TP, riesgo/beneficio y tamaño de posición en futuros.</p>
-          <span class="tool-status open">Disponible</span>
-        </button>
-
-        <button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
-          <div class="tool-icon">📈</div>
-          <h3>Calculadora de Rentabilidad</h3>
-          <p>Simula cuánto ganarías comprando y vendiendo un activo, con precios de cripto en vivo.</p>
           <span class="tool-status open">Disponible</span>
         </button>
 
@@ -1003,6 +1022,32 @@ button{font-family:inherit;color:inherit}
           <div class="tool-icon">⚖️</div>
           <h3>Calculadora de Break-even</h3>
           <p>Cuánto tiene que moverse el precio solo para cubrir las comisiones — y cuánto bajas ese número con el cashback de Bitunix.</p>
+          <span class="tool-status open">Disponible</span>
+        </button>
+
+        <button class="tool-card" id="openCoinmCard" data-tool="coinm">
+          <div class="tool-icon">₿</div>
+          <h3>Calculadora Coin-M</h3>
+          <p>Para futuros con margen en la propia moneda: calcula la ganancia del trade MÁS la revalorización de tu margen — algo que la calculadora normal (USDT-M) no captura.</p>
+          <span class="tool-status open">Disponible</span>
+        </button>
+
+        <button class="tool-card" id="openFeesCard" data-tool="fees">
+          <div class="tool-icon">🧾</div>
+          <h3>Calculadora de Comisiones</h3>
+          <p>Cuánto te come el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
+          <span class="tool-status open">Disponible</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tool-section">
+      <div class="tool-cat-label">🪙 Inversión y Acumulación</div>
+      <div class="tool-grid">
+<button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
+          <div class="tool-icon">📈</div>
+          <h3>Calculadora de Rentabilidad</h3>
+          <p>Simula cuánto ganarías comprando y vendiendo un activo, con precios de cripto en vivo.</p>
           <span class="tool-status open">Disponible</span>
         </button>
 
@@ -1033,37 +1078,23 @@ button{font-family:inherit;color:inherit}
           <p>Con tu aporte mensual y un rendimiento esperado conservador, cuánto tardarías en llegar a tu meta.</p>
           <span class="tool-status open">Disponible</span>
         </button>
-
-        <button class="tool-card" id="openCoinmCard" data-tool="coinm">
-          <div class="tool-icon">₿</div>
-          <h3>Calculadora Coin-M</h3>
-          <p>Para futuros con margen en la propia moneda: calcula la ganancia del trade MÁS la revalorización de tu margen — algo que la calculadora normal (USDT-M) no captura.</p>
-          <span class="tool-status open">Disponible</span>
-        </button>
-
-        <button class="tool-card" id="openFeesCard" data-tool="fees">
-          <div class="tool-icon">🧾</div>
-          <h3>Calculadora de Comisiones</h3>
-          <p>Cuánto te come el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
-          <span class="tool-status open">Disponible</span>
-        </button>
       </div>
     </div>
 
     <div class="tool-section">
-      <div class="tool-cat-label">💼 Gestión de portafolio</div>
+      <div class="tool-cat-label">💼 Portafolio</div>
       <div class="tool-grid">
+<button class="tool-card" id="openQuizCard" data-tool="quiz">
+          <div class="tool-icon">🎯</div>
+          <h3>Perfil de Riesgo</h3>
+          <p>Responde 6 preguntas cortas y descubre si eres conservador, moderado o agresivo.</p>
+          <span class="tool-status open">Disponible</span>
+        </button>
+
         <button class="tool-card" id="openPortfolioCard" data-tool="portafolio">
           <div class="tool-icon">📊</div>
           <h3>Simulador de portafolio</h3>
           <p>Arma tu plan de asignación por activo o registra tus holdings reales, con valor en vivo.</p>
-          <span class="tool-status open">Disponible</span>
-        </button>
-
-        <button class="tool-card" id="openQuizCard" data-tool="quiz">
-          <div class="tool-icon">🎯</div>
-          <h3>Perfil de Riesgo</h3>
-          <p>Responde 6 preguntas cortas y descubre si eres conservador, moderado o agresivo.</p>
           <span class="tool-status open">Disponible</span>
         </button>
 
@@ -1079,7 +1110,7 @@ button{font-family:inherit;color:inherit}
     <div class="tool-section">
       <div class="tool-cat-label">🛡️ Seguridad</div>
       <div class="tool-grid">
-        <button class="tool-card" id="openChecklistCard" data-tool="checklist">
+<button class="tool-card" id="openChecklistCard" data-tool="checklist">
           <div class="tool-icon">🛡️</div>
           <h3>Checklist de seguridad</h3>
           <p>Verifica que tu wallet y tus cuentas de exchange estén correctamente protegidas.</p>
@@ -1110,9 +1141,9 @@ button{font-family:inherit;color:inherit}
     </div>
 
     <div class="tool-section">
-      <div class="tool-cat-label">📖 Recursos</div>
+      <div class="tool-cat-label">📖 Aprender</div>
       <div class="tool-grid">
-        <button class="tool-card" id="openGlossaryCard" data-tool="glosario">
+<button class="tool-card" id="openGlossaryCard" data-tool="glosario">
           <div class="tool-icon">📖</div>
           <h3>Glosario Cripto</h3>
           <p>Más de 100 términos explicados sin jerga — con buscador, categorías y ejemplos.</p>
@@ -1125,8 +1156,13 @@ button{font-family:inherit;color:inherit}
           <p>Casos reales de cómo la gente pierde dinero en cripto — y la lección de cada uno. Por categoría: Spot, Futuros, Wallets, Exchanges y Estafas.</p>
           <span class="tool-status open">Disponible</span>
         </button>
+      </div>
+    </div>
 
-        <button class="tool-card" id="openUnitConverterCard" data-tool="unitconverter">
+    <div class="tool-section">
+      <div class="tool-cat-label">🧰 Utilidades</div>
+      <div class="tool-grid">
+<button class="tool-card" id="openUnitConverterCard" data-tool="unitconverter">
           <div class="tool-icon">🔁</div>
           <h3>Conversor de Unidades</h3>
           <p>Sats↔BTC, gwei↔ETH, wei↔ETH — las conversiones que se buscan en Google todo el tiempo, en un solo lugar.</p>
@@ -1161,8 +1197,8 @@ button{font-family:inherit;color:inherit}
       </div>
       <div class="site-footer-bottom">
         <span>© <span id="footerYear"></span> SkillCash. Todos los derechos reservados.</span>
-        <span class="site-footer-disclaimer">Contenido educativo — no es asesoría financiera.</span>
       </div>
+      <p class="site-footer-note">Esto lo construí para mi comunidad, pensando en lo que a mí me hubiera servido tener desde el día uno. Aprovéchalo, y si te sirve, compártelo con alguien más que esté empezando.</p>
     </footer>
 
   </main>
@@ -3346,6 +3382,138 @@ function setRandomPromoText(elId){
   el.innerHTML = phrase;
 }
 
+/* ========= BUSCADOR + FAVORITOS ========= */
+const FAVORITES_STORAGE_KEY = 'skillcash_favorites_v1';
+
+function loadFavorites(){
+  try{
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(err){ return []; }
+}
+function saveFavorites(list){
+  try{ localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list)); } catch(err){ /* almacenamiento no disponible */ }
+}
+function isFavorite(tool){
+  return loadFavorites().includes(tool);
+}
+function toggleFavorite(tool){
+  let favs = loadFavorites();
+  if(favs.includes(tool)) favs = favs.filter(t => t !== tool);
+  else favs.push(tool);
+  saveFavorites(favs);
+  refreshAllStarIcons();
+  renderFavoritesSection();
+}
+function refreshAllStarIcons(){
+  document.querySelectorAll('.fav-star[data-tool]').forEach(star => {
+    const active = isFavorite(star.dataset.tool);
+    star.textContent = active ? '★' : '☆';
+    star.classList.toggle('active', active);
+    star.setAttribute('aria-label', active ? 'Quitar de favoritos' : 'Agregar a favoritos');
+  });
+}
+
+function createFavStar(tool){
+  const star = document.createElement('span');
+  star.className = 'fav-star';
+  star.dataset.tool = tool;
+  const active = isFavorite(tool);
+  star.textContent = active ? '★' : '☆';
+  if(active) star.classList.add('active');
+  star.setAttribute('role', 'button');
+  star.setAttribute('tabindex', '0');
+  star.setAttribute('aria-label', active ? 'Quitar de favoritos' : 'Agregar a favoritos');
+  star.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    toggleFavorite(tool);
+  });
+  star.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.stopPropagation();
+      e.preventDefault();
+      toggleFavorite(tool);
+    }
+  });
+  return star;
+}
+
+/* ---- inyectar estrellas en el sidebar y en las tarjetas de la cuadrícula ---- */
+document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
+  item.appendChild(createFavStar(item.dataset.tool));
+});
+document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
+  const actions = document.createElement('div');
+  actions.className = 'tool-card-actions';
+  actions.appendChild(createFavStar(card.dataset.tool));
+  card.appendChild(actions);
+});
+
+/* ---- sección de favoritos, arriba de todo, debajo de la publicidad de Bitunix ---- */
+function renderFavoritesSection(){
+  const section = document.getElementById('favoritesSection');
+  const favs = loadFavorites();
+  if(favs.length === 0){ section.innerHTML = ''; return; }
+
+  const grid = document.createElement('div');
+  grid.className = 'tool-grid';
+
+  favs.forEach(tool => {
+    const original = document.querySelector('.tool-card[data-tool="' + tool + '"]');
+    if(!original) return;
+    const icon = original.querySelector('.tool-icon');
+    const title = original.querySelector('h3');
+    const desc = original.querySelector('p');
+    if(!icon || !title || !desc) return;
+
+    const clone = document.createElement('button');
+    clone.className = 'tool-card';
+    clone.type = 'button';
+    clone.innerHTML =
+      '<div class="tool-icon">' + icon.innerHTML + '</div>' +
+      '<h3>' + title.textContent + '</h3>' +
+      '<p>' + desc.textContent + '</p>';
+    const actions = document.createElement('div');
+    actions.className = 'tool-card-actions';
+    actions.appendChild(createFavStar(tool));
+    clone.appendChild(actions);
+    clone.addEventListener('click', () => original.click());
+    grid.appendChild(clone);
+  });
+
+  section.innerHTML =
+    '<div class="tool-section">' +
+      '<div class="tool-cat-label">⭐ Favoritos</div>' +
+    '</div>';
+  section.querySelector('.tool-section').appendChild(grid);
+}
+renderFavoritesSection();
+
+/* ---- buscador del sidebar ---- */
+const sbSearchInput = document.getElementById('sbSearchInput');
+sbSearchInput.addEventListener('input', () => {
+  const query = sbSearchInput.value.trim().toLowerCase();
+  const nav = document.querySelector('.sb-nav');
+  let currentLabel = null;
+  let labelHasVisibleItem = false;
+
+  Array.from(nav.children).forEach(el => {
+    if(el.classList.contains('sb-cat-label')){
+      if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
+      currentLabel = el;
+      labelHasVisibleItem = false;
+    } else if(el.classList.contains('sb-item')){
+      const label = el.querySelector('.sb-item-label');
+      const text = label ? label.textContent.toLowerCase() : '';
+      const match = query === '' || text.includes(query);
+      el.style.display = match ? '' : 'none';
+      if(match) labelHasVisibleItem = true;
+    }
+  });
+  if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
+});
+
 /* ---- API keys ---- */
 const COINGECKO_API_KEY = 'CG-B17Pfy5LygHBnhQCoxkh2U2W';
 const TWELVE_DATA_API_KEY = '9a29593d7a534876afbf043270133831';
@@ -4995,7 +5163,7 @@ const CHECKLIST_DATA = [
   { id: 'cuenta', title: '🔐 Cuenta de exchange', items: [
     { id: 'c1', text: 'Tienes activada la <strong>verificación en dos pasos (2FA)</strong> con una app como Google Authenticator — no solo con SMS.' },
     { id: 'c2', text: 'Usas una <strong>contraseña única y segura</strong> para el exchange, que cambias de vez en cuando y no repites en ningún otro sitio.' },
-    { id: 'c3', text: 'Activaste la <strong>whitelist de direcciones de retiro</strong>, para que solo se pueda retirar a direcciones que tú aprobaste antes.' },
+    { id: 'c3', text: 'Activaste la <strong>whitelist (lista blanca) de direcciones de retiro</strong>, para que solo se pueda retirar a direcciones que tú aprobaste antes.' },
     { id: 'c4', text: 'El <strong>correo asociado</strong> a tu cuenta del exchange también tiene su propio 2FA activado.' },
     { id: 'c5', text: 'Nunca has compartido tu contraseña ni tu código 2FA con nadie, ni siquiera con alguien que dice ser "soporte".' },
     { id: 'c6', text: 'Tienes activadas las <strong>notificaciones de seguridad</strong> del exchange, para enterarte al momento de cualquier actividad sospechosa.' },
@@ -5012,7 +5180,7 @@ const CHECKLIST_DATA = [
     { id: 'p2', text: 'Entras al exchange o descargas su app <strong>solo desde fuentes oficiales</strong> — nunca desde un enlace que te llega por redes o mensajes.' },
     { id: 'p3', text: 'Verificas que los <strong>correos del exchange</strong> realmente vengan de su dominio oficial antes de confiar en ellos.' },
     { id: 'p4', text: 'No haces clic en enlaces ni descargas archivos de <strong>correos o mensajes no solicitados</strong>, aunque parezcan venir de un exchange real.' },
-    { id: 'p5', text: 'Desconfías de mensajes o DMs que ofrecen <strong>"duplicar" tu dinero</strong> o inversiones con retorno garantizado.' },
+    { id: 'p5', text: 'Desconfías de mensajes o DMs (mensajes privados) que ofrecen <strong>"duplicar" tu dinero</strong> o inversiones con retorno garantizado.' },
     { id: 'p6', text: 'No compartes <strong>datos personales</strong> en redes sociales ni en grupos públicos de trading.' },
     { id: 'p7', text: 'Sabes que el soporte real de un exchange <strong>nunca te va a pedir</strong> tu contraseña, tu 2FA ni tu frase semilla.' },
     { id: 'p8', text: 'Si detectas algo raro en tu cuenta, contactas de inmediato al <strong>soporte oficial</strong> del exchange — nunca a alguien que te escribe primero por privado.' }
@@ -5317,22 +5485,22 @@ const APPROVALS_DATA = [
   { id: 'entender', title: '🧠 Entender el riesgo', items: [
     { id: 'a1', text: 'Sabes qué es una <strong>aprobación (approve)</strong>: el permiso que le das a un contrato inteligente para mover cierto token en tu nombre.' },
     { id: 'a2', text: 'Entiendes que muchas aprobaciones son <strong>"ilimitadas" por defecto</strong> — a menos que el sitio te deje elegir un monto específico, el permiso suele quedar abierto para siempre.' },
-    { id: 'a3', text: 'Sabes que una aprobación <strong>sigue activa</strong> aunque ya no vuelvas a usar esa DApp — hay que revocarla manualmente.' }
+    { id: 'a3', text: 'Sabes que una aprobación <strong>sigue activa</strong> aunque ya no vuelvas a usar esa DApp (aplicación descentralizada) — hay que revocarla manualmente.' }
   ]},
   { id: 'revisar', title: '🔍 Revisar tus aprobaciones', items: [
     { id: 'a4', text: 'Conoces al menos una herramienta para revisar aprobaciones, como <strong>revoke.cash</strong> o el <strong>Token Approval Checker de Etherscan</strong>.' },
     { id: 'a5', text: 'Entraste a una de esas herramientas, conectaste tu wallet (solo en modo lectura, sin firmar nada raro) y viste la lista de <strong>contratos con permiso activo</strong>.' },
-    { id: 'a6', text: 'Revisaste la lista buscando <strong>DApps que ya no usas</strong> o que no reconoces.' },
+    { id: 'a6', text: 'Revisaste la lista buscando <strong>DApps (aplicaciones descentralizadas) que ya no usas</strong> o que no reconoces.' },
     { id: 'a7', text: 'Prestaste atención especial a los permisos marcados como <strong>"Unlimited" (ilimitado)</strong> — son los de mayor riesgo.' }
   ]},
   { id: 'revocar', title: '🚫 Revocar lo que no necesitas', items: [
     { id: 'a8', text: 'Revocaste las aprobaciones de <strong>proyectos que ya no usas</strong> o que no reconoces.' },
     { id: 'a9', text: 'Entiendes que revocar <strong>cuesta una pequeña comisión de red (gas)</strong>, porque es una transacción más.' },
-    { id: 'a10', text: 'Dejaste activas solo las aprobaciones de <strong>DApps que sigues usando activamente</strong> y en las que confías.' }
+    { id: 'a10', text: 'Dejaste activas solo las aprobaciones de <strong>DApps (aplicaciones descentralizadas) que sigues usando activamente</strong> y en las que confías.' }
   ]},
   { id: 'habito', title: '🔁 Hacerlo un hábito', items: [
     { id: 'a11', text: 'Te propusiste <strong>revisar tus aprobaciones cada cierto tiempo</strong> (por ejemplo, una vez al mes), no solo cuando algo salió mal.' },
-    { id: 'a12', text: 'Sabes que después de probar una <strong>DApp nueva o poco conocida</strong>, conviene volver a revisar y revocar si no piensas seguir usándola.' }
+    { id: 'a12', text: 'Sabes que después de probar una <strong>DApp (aplicación descentralizada) nueva o poco conocida</strong>, conviene volver a revisar y revocar si no piensas seguir usándola.' }
   ]}
 ];
 const APPROVALS_TOTAL_ITEMS = APPROVALS_DATA.reduce((sum, cat) => sum + cat.items.length, 0);
@@ -5589,7 +5757,7 @@ const QUIZ_QUESTIONS = [
     { text: 'Podría perderlo todo y seguiría bien', points: 3 }
   ]},
   { text: 'Cuando el mercado sube fuerte y todos hablan de una moneda nueva, ¿qué haces?', options: [
-    { text: 'Nunca compro solo por el hype', points: 1 },
+    { text: 'Nunca compro solo por el hype (la euforia del momento)', points: 1 },
     { text: 'Investigo un poco antes de decidir', points: 2 },
     { text: 'Entro rápido para no quedarme afuera', points: 3 }
   ]},
