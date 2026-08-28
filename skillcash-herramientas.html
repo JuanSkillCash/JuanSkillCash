@@ -151,7 +151,9 @@ button{font-family:inherit;color:inherit}
 [data-tool="quiz"] .tool-icon,[data-tool="quiz"] .sb-item-icon,
 [data-tool="portafolio"] .tool-icon,[data-tool="portafolio"] .sb-item-icon,
 [data-tool="correlacion"] .tool-icon,[data-tool="correlacion"] .sb-item-icon,
-[data-tool="unitconverter"] .tool-icon,[data-tool="unitconverter"] .sb-item-icon
+[data-tool="unitconverter"] .tool-icon,[data-tool="unitconverter"] .sb-item-icon,
+[data-tool="pctcalc"] .tool-icon,[data-tool="pctcalc"] .sb-item-icon,
+[data-tool="tzclock"] .tool-icon,[data-tool="tzclock"] .sb-item-icon
 { background:rgba(46,204,113,.13); color:var(--green); }
 .sb-item-icon,.tool-icon{display:inline-flex;align-items:center;justify-content:center}
 .sb-nav > .sb-cat-label:first-child{padding-top:0}
@@ -2143,13 +2145,33 @@ button{font-family:inherit;color:inherit}
       </div>
 
       <div class="calc-grid">
-        <div class="field">
-          <label for="tzSelectA">País / ciudad A</label>
-          <select id="tzSelectA" style="width:100%;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;outline:none"></select>
+        <div>
+          <div class="field" style="margin-bottom:4px">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">País / ciudad A</label>
+          </div>
+          <div class="asset-search" id="tzSearchWrapA">
+            <input type="text" id="tzSearchA" class="search-highlight" placeholder="Busca un país o ciudad..." autocomplete="off">
+            <div class="asset-dropdown" id="tzDropdownA"></div>
+          </div>
+          <div class="dca-selected-asset" id="tzSelectedBoxA">
+            <div>
+              <div class="dca-selected-name" id="tzSelectedNameA">Bogotá</div>
+            </div>
+          </div>
         </div>
-        <div class="field">
-          <label for="tzSelectB">País / ciudad B</label>
-          <select id="tzSelectB" style="width:100%;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;outline:none"></select>
+        <div>
+          <div class="field" style="margin-bottom:4px">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">País / ciudad B</label>
+          </div>
+          <div class="asset-search" id="tzSearchWrapB">
+            <input type="text" id="tzSearchB" class="search-highlight" placeholder="Busca un país o ciudad..." autocomplete="off">
+            <div class="asset-dropdown" id="tzDropdownB"></div>
+          </div>
+          <div class="dca-selected-asset" id="tzSelectedBoxB">
+            <div>
+              <div class="dca-selected-name" id="tzSelectedNameB">Londres</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -7210,58 +7232,106 @@ sbTzClockItem.addEventListener('click', openTzClockModal);
 closeTzClock.addEventListener('click', closeTzClockModal);
 tzClockModal.addEventListener('click', (e) => { if(e.target === tzClockModal) closeTzClockModal(); });
 
+// sin emojis de bandera: en varios sistemas (sobre todo Windows) no tienen el glifo instalado
+// y en vez de la banderita se ven las dos letras del código de país sueltas — mejor texto limpio.
 const TZ_CITIES = [
-  { label: '🇨🇴 Bogotá', tz: 'America/Bogota' },
-  { label: '🇲🇽 Ciudad de México', tz: 'America/Mexico_City' },
-  { label: '🇪🇸 Madrid', tz: 'Europe/Madrid' },
-  { label: '🇦🇷 Buenos Aires', tz: 'America/Argentina/Buenos_Aires' },
-  { label: '🇨🇱 Santiago', tz: 'America/Santiago' },
-  { label: '🇵🇪 Lima', tz: 'America/Lima' },
-  { label: '🇺🇾 Montevideo', tz: 'America/Montevideo' },
-  { label: '🇻🇪 Caracas', tz: 'America/Caracas' },
-  { label: '🇪🇨 Quito', tz: 'America/Guayaquil' },
-  { label: '🇺🇸 Nueva York', tz: 'America/New_York' },
-  { label: '🇺🇸 Los Ángeles', tz: 'America/Los_Angeles' },
-  { label: '🇺🇸 Miami', tz: 'America/New_York' },
-  { label: '🇬🇧 Londres', tz: 'Europe/London' },
-  { label: '🇫🇷 París', tz: 'Europe/Paris' },
-  { label: '🇩🇪 Berlín', tz: 'Europe/Berlin' },
-  { label: '🇦🇪 Dubái', tz: 'Asia/Dubai' },
-  { label: '🇯🇵 Tokio', tz: 'Asia/Tokyo' },
-  { label: '🇨🇳 Shanghái', tz: 'Asia/Shanghai' },
-  { label: '🇸🇬 Singapur', tz: 'Asia/Singapore' },
-  { label: '🇦🇺 Sídney', tz: 'Australia/Sydney' }
+  { name: 'Bogotá', country: 'Colombia', tz: 'America/Bogota' },
+  { name: 'Ciudad de México', country: 'México', tz: 'America/Mexico_City' },
+  { name: 'Madrid', country: 'España', tz: 'Europe/Madrid' },
+  { name: 'Buenos Aires', country: 'Argentina', tz: 'America/Argentina/Buenos_Aires' },
+  { name: 'Santiago', country: 'Chile', tz: 'America/Santiago' },
+  { name: 'Lima', country: 'Perú', tz: 'America/Lima' },
+  { name: 'Montevideo', country: 'Uruguay', tz: 'America/Montevideo' },
+  { name: 'Caracas', country: 'Venezuela', tz: 'America/Caracas' },
+  { name: 'Quito', country: 'Ecuador', tz: 'America/Guayaquil' },
+  { name: 'San José', country: 'Costa Rica', tz: 'America/Costa_Rica' },
+  { name: 'Panamá', country: 'Panamá', tz: 'America/Panama' },
+  { name: 'Nueva York', country: 'Estados Unidos', tz: 'America/New_York' },
+  { name: 'Los Ángeles', country: 'Estados Unidos', tz: 'America/Los_Angeles' },
+  { name: 'Chicago', country: 'Estados Unidos', tz: 'America/Chicago' },
+  { name: 'Miami', country: 'Estados Unidos', tz: 'America/New_York' },
+  { name: 'Toronto', country: 'Canadá', tz: 'America/Toronto' },
+  { name: 'Londres', country: 'Reino Unido', tz: 'Europe/London' },
+  { name: 'París', country: 'Francia', tz: 'Europe/Paris' },
+  { name: 'Berlín', country: 'Alemania', tz: 'Europe/Berlin' },
+  { name: 'Roma', country: 'Italia', tz: 'Europe/Rome' },
+  { name: 'Lisboa', country: 'Portugal', tz: 'Europe/Lisbon' },
+  { name: 'Ámsterdam', country: 'Países Bajos', tz: 'Europe/Amsterdam' },
+  { name: 'Dubái', country: 'Emiratos Árabes Unidos', tz: 'Asia/Dubai' },
+  { name: 'Estambul', country: 'Turquía', tz: 'Europe/Istanbul' },
+  { name: 'Tokio', country: 'Japón', tz: 'Asia/Tokyo' },
+  { name: 'Shanghái', country: 'China', tz: 'Asia/Shanghai' },
+  { name: 'Hong Kong', country: 'Hong Kong', tz: 'Asia/Hong_Kong' },
+  { name: 'Singapur', country: 'Singapur', tz: 'Asia/Singapore' },
+  { name: 'Seúl', country: 'Corea del Sur', tz: 'Asia/Seoul' },
+  { name: 'Mumbai', country: 'India', tz: 'Asia/Kolkata' },
+  { name: 'Sídney', country: 'Australia', tz: 'Australia/Sydney' }
 ];
 
-function populateTzSelects(){
-  const selA = document.getElementById('tzSelectA');
-  const selB = document.getElementById('tzSelectB');
-  if(selA.children.length > 0) return; // ya se llenaron antes
-  TZ_CITIES.forEach((c, idx) => {
-    const optA = document.createElement('option');
-    optA.value = idx; optA.textContent = c.label;
-    selA.appendChild(optA);
-    const optB = document.createElement('option');
-    optB.value = idx; optB.textContent = c.label;
-    selB.appendChild(optB);
+let tzSelectedA = TZ_CITIES[0]; // Bogotá por defecto
+let tzSelectedB = TZ_CITIES[16]; // Londres por defecto
+
+function tzRenderDropdown(query, which){
+  const dropdown = document.getElementById(which === 'A' ? 'tzDropdownA' : 'tzDropdownB');
+  const q = query.trim().toLowerCase();
+  const matches = TZ_CITIES.filter(c => c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q)).slice(0, 8);
+
+  if(matches.length === 0){
+    dropdown.innerHTML = '<div class="asset-empty">No se encontraron resultados</div>';
+    dropdown.classList.add('show');
+    return;
+  }
+
+  dropdown.innerHTML = '';
+  matches.forEach(city => {
+    const opt = document.createElement('div');
+    opt.className = 'asset-option';
+    const name = document.createElement('span');
+    name.className = 'asset-option-name'; name.textContent = city.name;
+    const country = document.createElement('span');
+    country.className = 'asset-option-sym'; country.textContent = city.country;
+    opt.append(name, country);
+    opt.addEventListener('click', () => tzSelectCity(city, which));
+    dropdown.appendChild(opt);
   });
-  selA.value = 0; // Bogotá por defecto
-  selB.value = 12; // Londres por defecto
-  selA.addEventListener('change', updateTzClock);
-  selB.addEventListener('change', updateTzClock);
+  dropdown.classList.add('show');
 }
-populateTzSelects();
+
+function tzSelectCity(city, which){
+  const input = document.getElementById(which === 'A' ? 'tzSearchA' : 'tzSearchB');
+  const dropdown = document.getElementById(which === 'A' ? 'tzDropdownA' : 'tzDropdownB');
+  const nameEl = document.getElementById(which === 'A' ? 'tzSelectedNameA' : 'tzSelectedNameB');
+  input.value = '';
+  dropdown.classList.remove('show');
+  nameEl.textContent = city.name + ' — ' + city.country;
+  if(which === 'A') tzSelectedA = city; else tzSelectedB = city;
+  updateTzClock();
+}
+
+['A', 'B'].forEach(which => {
+  const input = document.getElementById('tzSearch' + which);
+  const dropdown = document.getElementById('tzDropdown' + which);
+  input.addEventListener('input', () => tzRenderDropdown(input.value, which));
+  input.addEventListener('focus', () => tzRenderDropdown(input.value, which));
+  document.addEventListener('click', (e) => {
+    if(!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.remove('show');
+  });
+});
+
+// muestra los nombres seleccionados por defecto al cargar la página
+document.getElementById('tzSelectedNameA').textContent = tzSelectedA.name + ' — ' + tzSelectedA.country;
+document.getElementById('tzSelectedNameB').textContent = tzSelectedB.name + ' — ' + tzSelectedB.country;
 
 function updateTzClock(){
-  const cityA = TZ_CITIES[parseInt(document.getElementById('tzSelectA').value, 10)];
-  const cityB = TZ_CITIES[parseInt(document.getElementById('tzSelectB').value, 10)];
+  const cityA = tzSelectedA;
+  const cityB = tzSelectedB;
   const now = new Date();
 
   const { hour: hA, minute: mA, second: sA } = getZoneSecondsSinceMidnight(cityA.tz, now);
   const { hour: hB, minute: mB, second: sB } = getZoneSecondsSinceMidnight(cityB.tz, now);
 
-  document.getElementById('tzLabelA').textContent = cityA.label;
-  document.getElementById('tzLabelB').textContent = cityB.label;
+  document.getElementById('tzLabelA').textContent = cityA.name;
+  document.getElementById('tzLabelB').textContent = cityB.name;
   document.getElementById('tzTimeA').textContent = formatTime12hWithSeconds(hA, mA, sA);
   document.getElementById('tzTimeB').textContent = formatTime12hWithSeconds(hB, mB, sB);
 
@@ -7270,16 +7340,16 @@ function updateTzClock(){
   document.getElementById('tzDateA').textContent = dateFmtA.format(now);
   document.getElementById('tzDateB').textContent = dateFmtB.format(now);
 
-  // diferencia horaria entre las dos zonas, calculada a partir del offset real de cada una (respeta horario de verano solo)
+  // diferencia horaria entre las dos zonas, calculada a partir del offset real de cada una (respeta horario de verano)
   const offsetA = getTzOffsetMinutes(cityA.tz, now);
   const offsetB = getTzOffsetMinutes(cityB.tz, now);
   const diffHours = (offsetB - offsetA) / 60;
   const diffNote = document.getElementById('tzDiffNote');
   if(diffHours === 0){
-    diffNote.textContent = '🕐 ' + cityA.label + ' y ' + cityB.label + ' están en la misma hora ahora mismo.';
+    diffNote.textContent = '🕐 ' + cityA.name + ' y ' + cityB.name + ' están en la misma hora ahora mismo.';
   } else {
-    const ahead = diffHours > 0 ? cityB.label : cityA.label;
-    const behind = diffHours > 0 ? cityA.label : cityB.label;
+    const ahead = diffHours > 0 ? cityB.name : cityA.name;
+    const behind = diffHours > 0 ? cityA.name : cityB.name;
     diffNote.textContent = '🕐 ' + ahead + ' va ' + numES(Math.abs(diffHours), Math.abs(diffHours) % 1 === 0 ? 0 : 1) + ' horas adelante de ' + behind + '.';
   }
 }
@@ -7291,6 +7361,7 @@ function getTzOffsetMinutes(timeZone, date){
   const asUTC = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'));
   return (asUTC - date.getTime()) / 60000;
 }
+
 
 /* ========= CALCULADORA COIN-M (FUTUROS INVERSOS) ========= */
 const coinmModal = document.getElementById('coinmModal');
