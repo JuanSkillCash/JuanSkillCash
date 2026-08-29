@@ -1363,25 +1363,9 @@ button{font-family:inherit;color:inherit}
           </div>
         </div>
 
-        <div class="calc-grid" id="addMarginFields" style="display:none;margin-top:2px">
-          <div class="field" id="f-add-price">
-            <label for="addMarginPrice">Precio al que agregaste</label>
-            <div class="input-stepper">
-              <button type="button" class="step-btn" data-target="addMarginPrice" data-dir="-1" aria-label="Disminuir">−</button>
-              <input type="number" id="addMarginPrice" inputmode="decimal" value="0.01300" step="any">
-              <button type="button" class="step-btn" data-target="addMarginPrice" data-dir="1" aria-label="Aumentar">+</button>
-            </div>
-            <div class="field-err">Debe ser mayor a 0</div>
-          </div>
-          <div class="field" id="f-add-capital">
-            <label for="addMarginCapital">Capital adicional agregado (USDT)</label>
-            <div class="input-stepper">
-              <button type="button" class="step-btn" data-target="addMarginCapital" data-dir="-1" aria-label="Disminuir">−</button>
-              <input type="number" id="addMarginCapital" inputmode="decimal" value="50" step="any">
-              <button type="button" class="step-btn" data-target="addMarginCapital" data-dir="1" aria-label="Aumentar">+</button>
-            </div>
-            <div class="field-err">Debe ser mayor a 0</div>
-          </div>
+        <div id="addMarginFields" style="display:none;margin-top:2px;grid-column:1/-1">
+          <div id="addMarginRowsList"></div>
+          <button type="button" class="dca-simulate-btn" id="addMarginAddRowBtn">+ Agregar otra adición</button>
         </div>
         <div class="be-note" id="addMarginNote" style="display:none;grid-column:1/-1"></div>
 
@@ -3355,6 +3339,7 @@ const levSlider = $('levSlider'), levVal = $('levVal'), levQuick = $('levQuick')
 let direction = 'long';
 let marginMode = 'aislado';
 let addMarginMode = 'no';
+let addMarginRows = [];
 
 const DEFAULTS = { entry: 0.01362, capital: 100, sl: 12, tp: 25, lev: 3, dir: 'long' };
 
@@ -3411,26 +3396,30 @@ function calc(){
     return;
   }
 
-  // ---- ¿agregó margen a la posición? promedia el precio de entrada y suma el capital ----
+  // ---- ¿agregó margen a la posición? promedia el precio de entrada y suma el capital de todas las adiciones válidas ----
   let effectiveEntry = entry;
   let effectiveCapital = capital;
-  if(addMarginMode === 'yes'){
-    const addPriceInput = $('addMarginPrice');
-    const addCapitalInput = $('addMarginCapital');
-    const addPrice = parseFloat(addPriceInput.value);
-    const addCapital = parseFloat(addCapitalInput.value);
-    const validAddPrice = validateField(addPriceInput, 'f-add-price', addPrice > 0);
-    const validAddCapital = validateField(addCapitalInput, 'f-add-capital', addCapital > 0);
+  if(addMarginMode === 'yes' && addMarginRows.length > 0){
+    let totalPosSize = capital * lev;
+    let totalQty = totalPosSize / entry;
+    let totalAddedCapital = 0;
+    let anyValid = false;
 
-    if(validAddPrice && validAddCapital){
-      const posSize1 = capital * lev;
-      const posSize2 = addCapital * lev;
-      const qty1 = posSize1 / entry;
-      const qty2 = posSize2 / addPrice;
-      effectiveEntry = (posSize1 + posSize2) / (qty1 + qty2);
-      effectiveCapital = capital + addCapital;
+    addMarginRows.forEach(row => {
+      if(row.price > 0 && row.capital > 0){
+        const posSizeN = row.capital * lev;
+        totalQty += posSizeN / row.price;
+        totalPosSize += posSizeN;
+        totalAddedCapital += row.capital;
+        anyValid = true;
+      }
+    });
 
-      $('addMarginNote').innerHTML = '📊 Con esto, tu <b>precio de entrada promedio</b> pasa de ' + formatPrice(entry) + ' a <b>' + formatPrice(effectiveEntry) + '</b>, y tu capital total en la posición sube a <b>' + numES(effectiveCapital, 2) + ' USDT</b>. Los cálculos de abajo ya usan estos nuevos valores.';
+    if(anyValid){
+      effectiveEntry = totalPosSize / totalQty;
+      effectiveCapital = capital + totalAddedCapital;
+      const numAdds = addMarginRows.filter(r => r.price > 0 && r.capital > 0).length;
+      $('addMarginNote').innerHTML = '📊 Con ' + numAdds + (numAdds === 1 ? ' adición' : ' adiciones') + ', tu <b>precio de entrada promedio</b> pasa de ' + formatPrice(entry) + ' a <b>' + formatPrice(effectiveEntry) + '</b>, y tu capital total en la posición sube a <b>' + numES(effectiveCapital, 2) + ' USDT</b>. Los cálculos de abajo ya usan estos nuevos valores.';
     }
   }
 
@@ -3508,7 +3497,60 @@ document.querySelectorAll('#calcModal .mode-btn[data-marginmode]').forEach(btn =
   });
 });
 
-/* ---- ¿agregaste margen a la posición? (promedia el precio de entrada) ---- */
+/* ---- ¿agregaste margen a la posición? (promedia el precio de entrada, hasta 3 adiciones) ---- */
+function renderAddMarginRows(){
+  const list = $('addMarginRowsList');
+  list.innerHTML = '';
+  addMarginRows.forEach((row, i) => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'dcaexit-tranche';
+    rowEl.innerHTML = `
+      <div class="dcaexit-tranche-num">${i + 1}</div>
+      <div class="dcaexit-tranche-fields">
+        <div>
+          <span class="dcaexit-tranche-label">Precio al que agregaste</span>
+          <input type="number" class="add-margin-price-input" data-idx="${i}" value="${row.price}" min="0" step="any">
+        </div>
+        <div>
+          <span class="dcaexit-tranche-label">Capital adicional (USDT)</span>
+          <input type="number" class="add-margin-capital-input" data-idx="${i}" value="${row.capital}" min="0" step="any">
+        </div>
+      </div>
+      <button type="button" class="dcaexit-tranche-remove" data-idx="${i}" aria-label="Quitar adición">✕</button>
+    `;
+    list.appendChild(rowEl);
+  });
+
+  list.querySelectorAll('.add-margin-price-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      addMarginRows[parseInt(inp.dataset.idx)].price = parseFloat(inp.value) || 0;
+      calc();
+    });
+  });
+  list.querySelectorAll('.add-margin-capital-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      addMarginRows[parseInt(inp.dataset.idx)].capital = parseFloat(inp.value) || 0;
+      calc();
+    });
+  });
+  list.querySelectorAll('.dcaexit-tranche-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      addMarginRows.splice(parseInt(btn.dataset.idx), 1);
+      renderAddMarginRows();
+      $('addMarginAddRowBtn').style.display = addMarginRows.length >= 3 ? 'none' : 'block';
+      calc();
+    });
+  });
+}
+$('addMarginAddRowBtn').addEventListener('click', () => {
+  if(addMarginRows.length >= 3) return;
+  const lastPrice = addMarginRows.length > 0 ? addMarginRows[addMarginRows.length - 1].price : parseFloat(entryInput.value) || 0;
+  addMarginRows.push({ price: lastPrice, capital: 50 });
+  renderAddMarginRows();
+  $('addMarginAddRowBtn').style.display = addMarginRows.length >= 3 ? 'none' : 'block';
+  calc();
+});
+
 document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(btn => {
   btn.addEventListener('click', () => {
     addMarginMode = btn.dataset.addmargin;
@@ -3516,13 +3558,15 @@ document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(
     btn.classList.add('active');
     const fields = $('addMarginFields');
     const note = $('addMarginNote');
-    fields.style.display = addMarginMode === 'yes' ? 'grid' : 'none';
+    fields.style.display = addMarginMode === 'yes' ? 'block' : 'none';
     note.style.display = addMarginMode === 'yes' ? 'block' : 'none';
+    if(addMarginMode === 'yes' && addMarginRows.length === 0){
+      addMarginRows.push({ price: parseFloat(entryInput.value) || 0, capital: 50 });
+      renderAddMarginRows();
+    }
     calc();
   });
 });
-$('addMarginPrice').addEventListener('input', calc);
-$('addMarginCapital').addEventListener('input', calc);
 
 $('btnSwap').addEventListener('click', () => {
   direction = direction === 'long' ? 'short' : 'long';
@@ -3607,8 +3651,9 @@ $('btnReset').addEventListener('click', () => {
   $('marginModeNote').textContent = 'En modo aislado, solo arriesgas el capital/margen que definiste arriba — si te liquidan, pierdes exactamente eso.';
   document.querySelectorAll('#calcModal .mode-btn[data-marginmode]').forEach(b => b.classList.toggle('active', b.dataset.marginmode === 'aislado'));
   addMarginMode = 'no';
-  $('addMarginPrice').value = DEFAULTS.entry;
-  $('addMarginCapital').value = 50;
+  addMarginRows = [];
+  renderAddMarginRows();
+  $('addMarginAddRowBtn').style.display = 'block';
   $('addMarginFields').style.display = 'none';
   $('addMarginNote').style.display = 'none';
   document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(b => b.classList.toggle('active', b.dataset.addmargin === 'no'));
