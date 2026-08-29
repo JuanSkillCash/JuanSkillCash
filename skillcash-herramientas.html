@@ -3110,6 +3110,7 @@ img[src=""]{display:none}
             <div class="portfolio-detail-head">
               <span id="portfolioDetailName">—</span>
               <div style="display:flex;gap:8px">
+                <button class="portfolio-del-btn" id="renamePortfolioBtn" title="Renombrar portafolio" type="button">✏️</button>
                 <button class="portfolio-del-btn" id="copyPortfolioBtn" title="Copiar portafolio como respaldo" type="button">📋</button>
                 <button class="portfolio-del-btn" id="deletePortfolioBtn" title="Eliminar portafolio" type="button">🗑</button>
               </div>
@@ -4729,6 +4730,39 @@ async function selectPortfolio(p){
   await loadPortfolioItems();
 }
 
+document.getElementById('renamePortfolioBtn').addEventListener('click', () => {
+  if(!selectedPortfolio) return;
+  const nameEl = document.getElementById('portfolioDetailName');
+  if(document.getElementById('renamePortfolioInput')) return; // ya está editando
+  const currentName = selectedPortfolio.name;
+  nameEl.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'renamePortfolioInput';
+  input.value = currentName;
+  input.style.cssText = "font-size:15px;font-weight:700;color:var(--white);background:none;border:none;border-bottom:1px dashed var(--border2);padding:2px 2px 4px 0;font-family:inherit;max-width:220px";
+  nameEl.parentNode.insertBefore(input, nameEl);
+  input.focus();
+  input.select();
+
+  async function saveRename(){
+    const newName = input.value.trim();
+    input.remove();
+    nameEl.style.display = '';
+    if(!newName || newName === currentName) return;
+    const { error } = await sbClient.from('portfolios').update({ name: newName }).eq('id', selectedPortfolio.id);
+    if(error){ alert('No se pudo renombrar: ' + error.message); return; }
+    selectedPortfolio.name = newName;
+    nameEl.textContent = newName + (selectedPortfolio.mode === 'plan' ? ' · Plan (%)' : ' · Holdings');
+    await loadPortfolios();
+  }
+  input.addEventListener('blur', saveRename);
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') input.blur();
+    if(e.key === 'Escape'){ input.removeEventListener('blur', saveRename); input.remove(); nameEl.style.display = ''; }
+  });
+});
+
 document.getElementById('copyPortfolioBtn').addEventListener('click', () => {
   if(!selectedPortfolio) return;
   const btn = document.getElementById('copyPortfolioBtn');
@@ -5360,6 +5394,22 @@ async function updatePortfolioItemPct(id, newValue){
   await loadPortfolioItems();
 }
 
+async function updatePortfolioMovement(id, qtyRaw, priceRaw, dateRaw){
+  const qty = parseFloat(String(qtyRaw).replace(',', '.'));
+  const price = parseFloat(String(priceRaw).replace(',', '.'));
+  if(!isFinite(qty) || qty <= 0 || !isFinite(price) || price < 0){
+    alert('Revisa la cantidad y el precio — deben ser números válidos.');
+    return;
+  }
+  const payload = { quantity: qty, buy_price: price };
+  if(dateRaw) payload.purchased_at = dateRaw;
+  const { error } = await sbClient.from('portfolio_items').update(payload).eq('id', id);
+  if(error){ alert('No se pudo actualizar la compra: ' + error.message); return; }
+  editingMovementId = null;
+  await loadPortfolioItems();
+  if(currentDetailAssetId) renderAssetDetail();
+}
+
 async function deletePortfolioItem(id){
   const { error } = await sbClient.from('portfolio_items').delete().eq('id', id);
   if(error){ alert('No se pudo eliminar: ' + error.message); return; }
@@ -5372,6 +5422,7 @@ const assetDetailModal = document.getElementById('assetDetailModal');
 const assetDetailPanel = assetDetailModal.querySelector('.modal-panel');
 const closeAssetDetail = document.getElementById('closeAssetDetail');
 let currentDetailAssetId = null;
+let editingMovementId = null;
 
 function openAssetDetailModal(assetId){
   currentDetailAssetId = assetId;
@@ -5387,6 +5438,7 @@ function openAssetDetailModal(assetId){
 function closeAssetDetailModal(){
   assetDetailModal.classList.remove('open');
   currentDetailAssetId = null;
+  editingMovementId = null;
   portfolioModal.classList.add('open');
   activeModalPanel = portfolioPanel;
 }
@@ -5437,6 +5489,32 @@ function renderAssetDetail(){
     const row = document.createElement('div');
     row.className = 'item-row';
 
+    if(editingMovementId === m.id){
+      row.style.cssText = 'flex-direction:column;align-items:stretch;gap:8px';
+      row.innerHTML = `
+        <div class="pending-item-fields">
+          <input type="number" id="editMovQty" placeholder="Cantidad" step="any" value="${m.quantity}">
+          <input type="number" id="editMovPrice" placeholder="Precio de compra (USD)" step="any" value="${m.buy_price}">
+        </div>
+        <div class="pending-item-fields single">
+          <input type="date" id="editMovDate" value="${m.purchased_at ? String(m.purchased_at).slice(0,10) : ''}" max="${new Date().toISOString().slice(0,10)}">
+        </div>
+        <div class="pending-item-actions">
+          <button class="pending-confirm" id="editMovSaveBtn" type="button">Guardar</button>
+          <button class="pending-cancel" id="editMovCancelBtn" type="button">Cancelar</button>
+        </div>
+      `;
+      list.appendChild(row);
+      document.getElementById('editMovSaveBtn').addEventListener('click', async () => {
+        await updatePortfolioMovement(m.id, document.getElementById('editMovQty').value, document.getElementById('editMovPrice').value, document.getElementById('editMovDate').value);
+      });
+      document.getElementById('editMovCancelBtn').addEventListener('click', () => {
+        editingMovementId = null;
+        renderAssetDetail();
+      });
+      return;
+    }
+
     const info = document.createElement('div');
     info.className = 'item-row-info';
     const nameEl = document.createElement('div');
@@ -5454,6 +5532,15 @@ function renderAssetDetail(){
     mainEl.textContent = '$' + numES(invested, 2);
     valWrap.appendChild(mainEl);
 
+    const editBtn = document.createElement('button');
+    editBtn.className = 'item-row-del';
+    editBtn.innerHTML = '✏️';
+    editBtn.title = 'Editar esta compra';
+    editBtn.addEventListener('click', () => {
+      editingMovementId = m.id;
+      renderAssetDetail();
+    });
+
     const delBtn = document.createElement('button');
     delBtn.className = 'item-row-del';
     delBtn.innerHTML = '✕';
@@ -5462,7 +5549,7 @@ function renderAssetDetail(){
       if(currentDetailAssetId) renderAssetDetail();
     });
 
-    row.append(info, valWrap, delBtn);
+    row.append(info, valWrap, editBtn, delBtn);
     list.appendChild(row);
   });
 }
