@@ -1356,6 +1356,36 @@ button{font-family:inherit;color:inherit}
         </div>
 
         <div class="margin-mode-field" style="grid-column:1/-1">
+          <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">¿Le agregaste margen a esta posición?</label>
+          <div class="dir-toggle" id="addMarginToggle">
+            <button class="mode-btn active" data-addmargin="no">No</button>
+            <button class="mode-btn" data-addmargin="yes">➕ Sí, agregué</button>
+          </div>
+        </div>
+
+        <div class="calc-grid" id="addMarginFields" style="display:none;margin-top:2px">
+          <div class="field" id="f-add-price">
+            <label for="addMarginPrice">Precio al que agregaste</label>
+            <div class="input-stepper">
+              <button type="button" class="step-btn" data-target="addMarginPrice" data-dir="-1" aria-label="Disminuir">−</button>
+              <input type="number" id="addMarginPrice" inputmode="decimal" value="0.01300" step="any">
+              <button type="button" class="step-btn" data-target="addMarginPrice" data-dir="1" aria-label="Aumentar">+</button>
+            </div>
+            <div class="field-err">Debe ser mayor a 0</div>
+          </div>
+          <div class="field" id="f-add-capital">
+            <label for="addMarginCapital">Capital adicional agregado (USDT)</label>
+            <div class="input-stepper">
+              <button type="button" class="step-btn" data-target="addMarginCapital" data-dir="-1" aria-label="Disminuir">−</button>
+              <input type="number" id="addMarginCapital" inputmode="decimal" value="50" step="any">
+              <button type="button" class="step-btn" data-target="addMarginCapital" data-dir="1" aria-label="Aumentar">+</button>
+            </div>
+            <div class="field-err">Debe ser mayor a 0</div>
+          </div>
+        </div>
+        <div class="be-note" id="addMarginNote" style="display:none;grid-column:1/-1"></div>
+
+        <div class="margin-mode-field" style="grid-column:1/-1">
           <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Modo de margen</label>
           <div class="dir-toggle">
             <button class="mode-btn active" data-marginmode="aislado">🔒 Aislado</button>
@@ -3324,6 +3354,7 @@ const entryInput = $('entry'), capitalInput = $('capital'), slInput = $('slpct')
 const levSlider = $('levSlider'), levVal = $('levVal'), levQuick = $('levQuick');
 let direction = 'long';
 let marginMode = 'aislado';
+let addMarginMode = 'no';
 
 const DEFAULTS = { entry: 0.01362, capital: 100, sl: 12, tp: 25, lev: 3, dir: 'long' };
 
@@ -3380,31 +3411,54 @@ function calc(){
     return;
   }
 
-  const posSize = capital * lev;
-  const effectiveMargin = marginMode === 'cruzado' ? (capital + crossExtra) : capital;
+  // ---- ¿agregó margen a la posición? promedia el precio de entrada y suma el capital ----
+  let effectiveEntry = entry;
+  let effectiveCapital = capital;
+  if(addMarginMode === 'yes'){
+    const addPriceInput = $('addMarginPrice');
+    const addCapitalInput = $('addMarginCapital');
+    const addPrice = parseFloat(addPriceInput.value);
+    const addCapital = parseFloat(addCapitalInput.value);
+    const validAddPrice = validateField(addPriceInput, 'f-add-price', addPrice > 0);
+    const validAddCapital = validateField(addCapitalInput, 'f-add-capital', addCapital > 0);
+
+    if(validAddPrice && validAddCapital){
+      const posSize1 = capital * lev;
+      const posSize2 = addCapital * lev;
+      const qty1 = posSize1 / entry;
+      const qty2 = posSize2 / addPrice;
+      effectiveEntry = (posSize1 + posSize2) / (qty1 + qty2);
+      effectiveCapital = capital + addCapital;
+
+      $('addMarginNote').innerHTML = '📊 Con esto, tu <b>precio de entrada promedio</b> pasa de ' + formatPrice(entry) + ' a <b>' + formatPrice(effectiveEntry) + '</b>, y tu capital total en la posición sube a <b>' + numES(effectiveCapital, 2) + ' USDT</b>. Los cálculos de abajo ya usan estos nuevos valores.';
+    }
+  }
+
+  const posSize = effectiveCapital * lev;
+  const effectiveMargin = marginMode === 'cruzado' ? (effectiveCapital + crossExtra) : effectiveCapital;
   const liqMovePct = (effectiveMargin / posSize) * 100; // % price move to hit liquidation
   const liqImpossible = direction === 'long' && liqMovePct >= 100; // con este margen, ni un -100% de precio te liquida
 
   let liq, sl, tp;
   if(direction === 'long'){
-    liq = liqImpossible ? 0 : entry * (1 - (liqMovePct / 100));
-    sl  = entry * (1 - ((slPct / 100) / lev));
-    tp  = entry * (1 + ((tpPct / 100) / lev));
+    liq = liqImpossible ? 0 : effectiveEntry * (1 - (liqMovePct / 100));
+    sl  = effectiveEntry * (1 - ((slPct / 100) / lev));
+    tp  = effectiveEntry * (1 + ((tpPct / 100) / lev));
   } else {
-    liq = entry * (1 + (liqMovePct / 100));
-    sl  = entry * (1 + ((slPct / 100) / lev));
-    tp  = entry * (1 - ((tpPct / 100) / lev));
+    liq = effectiveEntry * (1 + (liqMovePct / 100));
+    sl  = effectiveEntry * (1 + ((slPct / 100) / lev));
+    tp  = effectiveEntry * (1 - ((tpPct / 100) / lev));
   }
 
-  const loss = capital * (slPct / 100);
-  const gain = capital * (tpPct / 100);
+  const loss = effectiveCapital * (slPct / 100);
+  const gain = effectiveCapital * (tpPct / 100);
   const rr = slPct > 0 ? (tpPct / slPct) : 0;
 
   const slMovePct = slPct / lev;   // % price move to hit SL
   const tpMovePct = tpPct / lev;   // % price move to hit TP
 
   // ---- render result cards ----
-  $('outEntry').textContent = formatPrice(entry);
+  $('outEntry').textContent = formatPrice(effectiveEntry);
   $('outLiq').textContent = liqImpossible ? '🛡️ No se liquida' : formatPrice(liq);
   $('outSL').textContent = formatPrice(sl);
   $('outTP').textContent = formatPrice(tp);
@@ -3423,7 +3477,7 @@ function calc(){
   $('sumGain').textContent = '+' + numES(gain, 2) + ' USDT';
   $('sumPos').textContent = posSize.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USDT (' + lev + 'x)';
 
-  return { entry, liq, sl, tp, loss, gain, rr, posSize, slMovePct, tpMovePct };
+  return { entry: effectiveEntry, liq, sl, tp, loss, gain, rr, posSize, slMovePct, tpMovePct };
 }
 
 /* ---- direction toggle ---- */
@@ -3444,16 +3498,32 @@ document.querySelectorAll('#calcModal .mode-btn[data-marginmode]').forEach(btn =
     btn.classList.add('active');
     const crossFields = $('crossMarginFields');
     const note = $('marginModeNote');
+    crossFields.style.display = marginMode === 'cruzado' ? 'grid' : 'none';
     if(marginMode === 'cruzado'){
-      crossFields.style.display = 'grid';
       note.textContent = 'En modo cruzado, todo el saldo extra que dejes disponible también respalda esta posición: te alejas más de la liquidación, pero si te liquidan puedes perder el capital de arriba MÁS este margen adicional.';
     } else {
-      crossFields.style.display = 'none';
       note.textContent = 'En modo aislado, solo arriesgas el capital/margen que definiste arriba — si te liquidan, pierdes exactamente eso.';
     }
     calc();
   });
 });
+
+/* ---- ¿agregaste margen a la posición? (promedia el precio de entrada) ---- */
+document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    addMarginMode = btn.dataset.addmargin;
+    document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const fields = $('addMarginFields');
+    const note = $('addMarginNote');
+    fields.style.display = addMarginMode === 'yes' ? 'grid' : 'none';
+    note.style.display = addMarginMode === 'yes' ? 'block' : 'none';
+    calc();
+  });
+});
+$('addMarginPrice').addEventListener('input', calc);
+$('addMarginCapital').addEventListener('input', calc);
+
 $('btnSwap').addEventListener('click', () => {
   direction = direction === 'long' ? 'short' : 'long';
   document.querySelectorAll('#calcModal .dir-btn').forEach(b => b.classList.toggle('active', b.dataset.dir === direction));
@@ -3536,6 +3606,12 @@ $('btnReset').addEventListener('click', () => {
   $('crossMarginFields').style.display = 'none';
   $('marginModeNote').textContent = 'En modo aislado, solo arriesgas el capital/margen que definiste arriba — si te liquidan, pierdes exactamente eso.';
   document.querySelectorAll('#calcModal .mode-btn[data-marginmode]').forEach(b => b.classList.toggle('active', b.dataset.marginmode === 'aislado'));
+  addMarginMode = 'no';
+  $('addMarginPrice').value = DEFAULTS.entry;
+  $('addMarginCapital').value = 50;
+  $('addMarginFields').style.display = 'none';
+  $('addMarginNote').style.display = 'none';
+  document.querySelectorAll('#addMarginToggle .mode-btn[data-addmargin]').forEach(b => b.classList.toggle('active', b.dataset.addmargin === 'no'));
   calc();
 });
 
