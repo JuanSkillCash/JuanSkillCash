@@ -3092,6 +3092,13 @@ img[src=""]{display:none}
             </div>
           </div>
 
+          <div class="calc-results" id="newPortfolioExplain" style="display:none">
+            <div class="be-savings-box" style="text-align:left">
+              <div class="be-savings-label" id="newPortfolioExplainTitle">📋 Plan (%)</div>
+              <div class="be-savings-sub" id="newPortfolioExplainText" style="font-size:13.5px;line-height:1.7">—</div>
+            </div>
+          </div>
+
           <div class="calc-results" id="portfolioDetail" style="display:none">
             <div class="portfolio-detail-head">
               <span id="portfolioDetailName">—</span>
@@ -4617,20 +4624,42 @@ const newPortfolioBtn = document.getElementById('newPortfolioBtn');
 const newPortfolioForm = document.getElementById('newPortfolioForm');
 const newPortfolioName = document.getElementById('newPortfolioName');
 const portfolioDetail = document.getElementById('portfolioDetail');
+const newPortfolioExplain = document.getElementById('newPortfolioExplain');
 let newPortfolioMode = 'plan';
 
+const PORTFOLIO_MODE_EXPLAIN = {
+  plan: {
+    title: '📋 Plan (%)',
+    text: 'Es para <b>diseñar una estrategia</b>, sin que ese portafolio exista todavía (o sin importar cuánto tienes realmente). Por cada activo solo metes un <b>% objetivo</b> — por ejemplo "quiero 40% BTC, 30% ETH, 30% SOL". No pide cantidad, ni precio de compra, ni fecha. Sirve para responder <b>"¿cómo debería repartir mi dinero?"</b>'
+  },
+  holdings: {
+    title: '💼 Holdings reales',
+    text: 'Es para <b>registrar lo que de verdad tienes comprado</b>. Por cada activo metes cuánto tienes, a qué precio lo compraste, y cuándo. Con esos datos reales, la herramienta te calcula tu <b>ganancia o pérdida real</b> comparando tu precio de compra contra el precio actual. Sirve para responder <b>"esto es lo que tengo, ¿cuánto he ganado o perdido?"</b>'
+  }
+};
+function updatePortfolioModeExplain(){
+  const info = PORTFOLIO_MODE_EXPLAIN[newPortfolioMode];
+  document.getElementById('newPortfolioExplainTitle').textContent = info.title;
+  document.getElementById('newPortfolioExplainText').innerHTML = info.text;
+}
+
 newPortfolioBtn.addEventListener('click', () => {
-  newPortfolioForm.style.display = newPortfolioForm.style.display === 'none' ? 'block' : 'none';
+  const opening = newPortfolioForm.style.display === 'none';
+  newPortfolioForm.style.display = opening ? 'block' : 'none';
+  newPortfolioExplain.style.display = opening ? 'block' : 'none';
+  if(opening){ portfolioDetail.style.display = 'none'; updatePortfolioModeExplain(); }
   newPortfolioName.value = '';
 });
 document.getElementById('cancelNewPortfolioBtn').addEventListener('click', () => {
   newPortfolioForm.style.display = 'none';
+  newPortfolioExplain.style.display = 'none';
 });
 document.querySelectorAll('#newPortfolioForm .mode-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     newPortfolioMode = tab.dataset.mode;
     document.querySelectorAll('#newPortfolioForm .mode-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
+    updatePortfolioModeExplain();
   });
 });
 
@@ -4669,6 +4698,7 @@ document.getElementById('createPortfolioBtn').addEventListener('click', async ()
       .select().single();
     if(error) throw error;
     newPortfolioForm.style.display = 'none';
+    newPortfolioExplain.style.display = 'none';
     await loadPortfolios();
     selectPortfolio(data);
   } catch(err){
@@ -4683,6 +4713,8 @@ async function selectPortfolio(p){
   renderPortfolioList();
   document.getElementById('portfolioDetailName').textContent = p.name + (p.mode === 'plan' ? ' · Plan (%)' : ' · Holdings');
   portfolioDetail.style.display = 'block';
+  newPortfolioForm.style.display = 'none';
+  newPortfolioExplain.style.display = 'none';
   pendingAsset = null;
   renderPendingItem();
   avgSimOpen = false;
