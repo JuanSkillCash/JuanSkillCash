@@ -644,6 +644,9 @@ img[src=""]{display:none}
 .auth-tab.active{background:rgba(255,47,79,.14);color:var(--white)}
 .auth-form{max-width:420px}
 .auth-error{color:var(--red);font-size:12.5px;line-height:1.6;margin:-4px 0 12px;display:none}
+.alloc-over-warning{display:flex;align-items:center;gap:10px;background:rgba(255,47,79,.12);border:1px solid rgba(255,47,79,.4);border-radius:var(--r-md);padding:12px 14px;margin-top:10px;font-size:13px;color:var(--white);font-weight:600;animation:alloc-pulse 1.6s ease-in-out infinite}
+.alloc-over-warning .icon{font-size:18px;flex-shrink:0}
+@keyframes alloc-pulse{0%,100%{box-shadow:0 0 0 rgba(255,47,79,0)}50%{box-shadow:0 0 14px rgba(255,47,79,.35)}}
 .auth-error.show{display:block}
 .auth-success{color:var(--green);font-size:12.5px;line-height:1.6;margin:-4px 0 12px;display:none}
 .auth-success.show{display:block}
@@ -703,6 +706,10 @@ img[src=""]{display:none}
 .item-row-sub{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px}
 .item-row-val{text-align:right;flex-shrink:0}
 .item-row-val .irv-main{font-size:13px;font-weight:700;color:var(--white);font-family:'Space Mono',monospace}
+.irv-pct-input{width:56px;text-align:right;font-size:13px;font-weight:700;color:var(--white);font-family:'Space Mono',monospace;background:none;border:none;border-bottom:1px dashed var(--border2);padding:2px 2px 2px 0;transition:border-color .2s,background .2s}
+.irv-pct-input:hover{border-color:var(--muted2)}
+.irv-pct-input:focus{outline:none;border-color:var(--red);background:rgba(255,47,79,.06)}
+.irv-pct-input::-webkit-inner-spin-button,.irv-pct-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .item-row-val .irv-sub{font-size:10.5px;font-family:'Space Mono',monospace;margin-top:2px}
 .item-row-val .irv-sub.pos{color:var(--green)}
 .item-row-val .irv-sub.neg{color:var(--red)}
@@ -5133,11 +5140,20 @@ function renderPortfolioItems(){
 
       const valWrap = document.createElement('div');
       valWrap.className = 'item-row-val';
-      const mainEl = document.createElement('div');
-      mainEl.className = 'irv-main';
+      const mainInput = document.createElement('input');
+      mainInput.type = 'number';
+      mainInput.className = 'irv-pct-input';
+      mainInput.min = '0';
+      mainInput.max = '100';
+      mainInput.step = 'any';
       totalTargetPct += Number(item.target_pct) || 0;
-      mainEl.textContent = numES(Number(item.target_pct), 1) + '%';
-      valWrap.appendChild(mainEl);
+      mainInput.value = Number(item.target_pct);
+      mainInput.addEventListener('change', () => updatePortfolioItemPct(item.id, mainInput.value));
+      const pctSign = document.createElement('span');
+      pctSign.className = 'irv-main';
+      pctSign.style.marginLeft = '2px';
+      pctSign.textContent = '%';
+      valWrap.append(mainInput, pctSign);
 
       info.append(nameEl, subEl);
 
@@ -5334,6 +5350,14 @@ function renderSectorBreakdown(){
       '<div class="sector-bar">' + bar + '</div>' +
       '<div class="sector-legend">' + legend + '</div>' +
     '</div>';
+}
+
+async function updatePortfolioItemPct(id, newValue){
+  const pct = parseFloat(String(newValue).replace(',', '.'));
+  if(!isFinite(pct) || pct < 0){ await loadPortfolioItems(); return; } // valor inválido, se restaura el que había
+  const { error } = await sbClient.from('portfolio_items').update({ target_pct: pct }).eq('id', id);
+  if(error){ alert('No se pudo actualizar el %: ' + error.message); return; }
+  await loadPortfolioItems();
 }
 
 async function deletePortfolioItem(id){
@@ -5572,7 +5596,7 @@ function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurre
           '<span>Asignado</span><b>' + numES(totalTargetPct, 1) + '%</b>' +
         '</div>' +
       '</div>' +
-      (over ? '<div class="auth-error show">La suma pasa de 100% — ajusta los porcentajes.</div>' : '');
+      (over ? '<div class="alloc-over-warning"><span class="icon">⚠️</span><span>La suma pasa de <b>100%</b> (' + numES(totalTargetPct, 1) + '%) — edita los números de la lista de abajo para corregirlo.</span></div>' : '');
   } else {
     const gain = totalCurrentValue - totalInvested;
     const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
