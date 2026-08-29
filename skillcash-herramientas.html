@@ -1739,7 +1739,7 @@ img[src=""]{display:none}
           <div class="res-card"><div class="r-label">Total invertido</div><div class="r-val" id="outDcaInvested">—</div></div>
           <div class="res-card"><div class="r-label">Unidades acumuladas</div><div class="r-val" id="outDcaUnits">—</div></div>
           <div class="res-card"><div class="r-label">Precio promedio de compra</div><div class="r-val" id="outDcaAvgPrice">—</div></div>
-          <div class="res-card"><div class="r-label">Precio final simulado</div><div class="r-val" id="outDcaFinalPrice">—</div></div>
+          <div class="res-card"><div class="r-label" id="outDcaFinalPriceLabel">Precio final del período</div><div class="r-val" id="outDcaFinalPrice">—</div></div>
           <div class="res-card tp"><div class="r-label">Valor final del portafolio</div><div class="r-val" id="outDcaFinalValue">—</div></div>
           <div class="res-card" id="dcaPnlCard"><div class="r-label">Ganancia / Pérdida</div><div class="r-val" id="outDcaPnl">—</div></div>
         </div>
@@ -1748,8 +1748,8 @@ img[src=""]{display:none}
 
         <div class="be-section-label">🎯 Si hubieras comprado todo de una sola vez</div>
         <div class="be-metric-grid">
-          <div class="res-card"><div class="r-label">Todo desde el día 1 (comprando todo de una vez)</div><div class="r-val" id="outDcaLumpBest">—</div></div>
-          <div class="res-card"><div class="r-label">Todo en la peor compra individual del período</div><div class="r-val" id="outDcaLumpWorst">—</div></div>
+          <div class="res-card"><div class="r-label" id="outDcaLumpBestLabel">Todo desde el día 1</div><div class="r-val" id="outDcaLumpBest">—</div></div>
+          <div class="res-card"><div class="r-label" id="outDcaLumpWorstLabel">Todo en la peor compra del período</div><div class="r-val" id="outDcaLumpWorst">—</div></div>
         </div>
 
         <div class="be-savings-box">
@@ -6417,6 +6417,11 @@ async function runDcaSimulation(){
   }
 }
 
+function formatDcaDateEs(dateObj){
+  try{ return dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  catch(err){ return ''; }
+}
+
 function renderDcaFromCache(){
   if(!dcaPriceSeries) return;
   const amount = parseFloat(dcaAmountInput.value);
@@ -6461,6 +6466,7 @@ function renderDcaFromCache(){
   document.getElementById('outDcaInvested').textContent = totalInvested.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
   document.getElementById('outDcaUnits').textContent = totalUnits.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:6}) + ' ' + (dcaSelectedAsset.symbol || '').toUpperCase();
   document.getElementById('outDcaAvgPrice').textContent = formatPrice(avgPrice) + ' USD';
+  document.getElementById('outDcaFinalPriceLabel').textContent = 'Precio real de ' + (dcaSelectedAsset.symbol || '').toUpperCase() + ' el ' + formatDcaDateEs(dates[dates.length - 1]);
   document.getElementById('outDcaFinalPrice').textContent = formatPrice(finalPrice) + ' USD';
   document.getElementById('outDcaFinalValue').textContent = finalValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
 
@@ -6470,7 +6476,9 @@ function renderDcaFromCache(){
   pnlCard.classList.remove('tp', 'sl');
   pnlCard.classList.add(pnl >= 0 ? 'tp' : 'sl');
 
+  document.getElementById('outDcaLumpBestLabel').textContent = 'Todo el ' + formatDcaDateEs(dates[0]) + ' (a ' + formatPrice(path[0]) + ' USD)';
   document.getElementById('outDcaLumpBest').textContent = lumpBestValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
+  document.getElementById('outDcaLumpWorstLabel').textContent = 'Todo en el punto más caro (a ' + formatPrice(worstPrice) + ' USD)';
   document.getElementById('outDcaLumpWorst').textContent = lumpWorstValue.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USD';
 
   const diffVsWorst = finalValue - lumpWorstValue;
