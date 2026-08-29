@@ -454,6 +454,7 @@ button{font-family:inherit;color:inherit}
 
 /* DCA calculator */
 .dca-selected-asset{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-top:10px}
+img[src=""]{display:none}
 .dca-selected-asset img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
 .dca-selected-name{font-size:14px;font-weight:700;color:var(--white)}
 .dca-selected-price{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);margin-top:2px}
@@ -1467,7 +1468,7 @@ button{font-family:inherit;color:inherit}
       <div class="asset-placeholder" id="assetPlaceholder">Aún no has elegido un activo — búscalo arriba para traer su precio en vivo.</div>
 
       <div class="asset-chip" id="assetChip">
-        <img id="assetChipImg" src="" alt="">
+        <img id="assetChipImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
         <div class="asset-chip-info">
           <div class="asset-chip-name" id="assetChipName">—</div>
           <div class="asset-chip-price" id="assetChipPrice">—</div>
@@ -1683,7 +1684,7 @@ button{font-family:inherit;color:inherit}
           <div class="asset-dropdown" id="dcaAssetDropdown"></div>
         </div>
         <div class="dca-selected-asset" id="dcaSelectedAsset" style="display:none">
-          <img id="dcaAssetImg" src="" alt="">
+          <img id="dcaAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
           <div>
             <div class="dca-selected-name" id="dcaAssetName">—</div>
             <div class="dca-selected-price" id="dcaAssetPrice">—</div>
@@ -1801,7 +1802,7 @@ button{font-family:inherit;color:inherit}
           <div class="asset-dropdown" id="mcapMyAssetDropdown"></div>
         </div>
         <div class="dca-selected-asset" id="mcapMySelectedAsset">
-          <img id="mcapMyAssetImg" src="" alt="">
+          <img id="mcapMyAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
           <div>
             <div class="dca-selected-name" id="mcapMyAssetName">Solana (SOL)</div>
             <div class="dca-selected-price" id="mcapMyAssetPrice">Cargando datos…</div>
@@ -1816,7 +1817,7 @@ button{font-family:inherit;color:inherit}
           <div class="asset-dropdown" id="mcapTargetAssetDropdown"></div>
         </div>
         <div class="dca-selected-asset" id="mcapTargetSelectedAsset">
-          <img id="mcapTargetAssetImg" src="" alt="">
+          <img id="mcapTargetAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
           <div>
             <div class="dca-selected-name" id="mcapTargetAssetName">Bitcoin (BTC)</div>
             <div class="dca-selected-price" id="mcapTargetAssetPrice">Cargando datos…</div>
@@ -2227,7 +2228,7 @@ button{font-family:inherit;color:inherit}
           <div class="asset-dropdown" id="coinmAssetDropdown"></div>
         </div>
         <div class="dca-selected-asset" id="coinmSelectedAsset">
-          <img id="coinmAssetImg" src="" alt="">
+          <img id="coinmAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
           <div>
             <div class="dca-selected-name" id="coinmAssetName">Bitcoin (BTC)</div>
             <div class="dca-selected-price" id="coinmAssetPrice">Precio actual: cargando…</div>
@@ -2633,7 +2634,7 @@ button{font-family:inherit;color:inherit}
           <div class="asset-dropdown" id="dcaExitAssetDropdown"></div>
         </div>
         <div class="dca-selected-asset" id="dcaExitSelectedAsset">
-          <img id="dcaExitAssetImg" src="" alt="">
+          <img id="dcaExitAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
           <div>
             <div class="dca-selected-name" id="dcaExitAssetName">Bitcoin (BTC)</div>
             <div class="dca-selected-price" id="dcaExitAssetPrice">Precio actual: cargando…</div>
@@ -6495,6 +6496,7 @@ function openDcaExitModal(){
   renderDcaExitTranches();
   computeDcaExit();
   setRandomPromoText('promoTextDcaExit');
+  refreshDcaExitDefaultAsset();
 }
 function closeDcaExitModal(){ closeModalGeneric(dcaExitModal); }
 openDcaExitCard.addEventListener('click', openDcaExitModal);
@@ -6575,6 +6577,24 @@ async function selectDcaExitAsset(coin){
   resetDcaExitTranches();
   renderDcaExitTranches();
   computeDcaExit();
+}
+
+/* ---- trae logo y precio real de la moneda predefinida (Bitcoin) la primera vez que se abre el modal ---- */
+async function refreshDcaExitDefaultAsset(){
+  if(dcaExitSelectedAsset.thumb) return; // ya tiene datos reales, no hace falta pedir de nuevo
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + encodeURIComponent(dcaExitSelectedAsset.id)));
+    const data = await res.json();
+    const entry = data && data[0];
+    if(entry){
+      dcaExitSelectedAsset = { ...dcaExitSelectedAsset, price: entry.current_price, thumb: entry.image };
+      document.getElementById('dcaExitAssetImg').src = entry.image;
+      document.getElementById('dcaExitAssetPrice').textContent = 'Precio actual: ' + formatPrice(entry.current_price) + ' USD';
+      if(dcaExitTranches.length === 0) resetDcaExitTranches();
+      renderDcaExitTranches();
+      computeDcaExit();
+    }
+  } catch(err){ /* si falla, se queda con el precio de respaldo hasta que el usuario busque manualmente */ }
 }
 
 /* ---- tramos de venta ---- */
@@ -6760,7 +6780,8 @@ async function fetchMcapAssetData(coinId){
   return {
     price: entry.current_price,
     marketCap: entry.market_cap,
-    circulatingSupply: entry.circulating_supply
+    circulatingSupply: entry.circulating_supply,
+    thumb: entry.image
   };
 }
 
@@ -6871,6 +6892,8 @@ async function refreshMcapBothAssets(){
     mcapTargetSelected = { ...mcapTargetSelected, ...targetInfo };
     document.getElementById('mcapMyAssetPrice').textContent = 'Market cap: ' + numES(myInfo.marketCap, 0) + ' USD';
     document.getElementById('mcapTargetAssetPrice').textContent = 'Market cap: ' + numES(targetInfo.marketCap, 0) + ' USD';
+    if(myInfo.thumb) document.getElementById('mcapMyAssetImg').src = myInfo.thumb;
+    if(targetInfo.thumb) document.getElementById('mcapTargetAssetImg').src = targetInfo.thumb;
   } catch(err){
     document.getElementById('mcapErrorNote').textContent = '⚠️ No se pudo cargar los datos iniciales. Busca de nuevo tu moneda o la moneda meta para reintentar.';
   }
@@ -7754,7 +7777,7 @@ const openCoinmCard = document.getElementById('openCoinmCard');
 const sbCoinmItem = document.querySelector('.sb-item[data-tool="coinm"]');
 const closeCoinm = document.getElementById('closeCoinm');
 
-function openCoinmModal(){ openModalGeneric(coinmModal, coinmPanel, closeCoinm); computeCoinm(); setRandomPromoText('promoTextCoinm'); }
+function openCoinmModal(){ openModalGeneric(coinmModal, coinmPanel, closeCoinm); computeCoinm(); setRandomPromoText('promoTextCoinm'); refreshCoinmDefaultAsset(); }
 function closeCoinmModal(){ closeModalGeneric(coinmModal); }
 openCoinmCard.addEventListener('click', openCoinmModal);
 sbCoinmItem.addEventListener('click', openCoinmModal);
@@ -7832,6 +7855,23 @@ async function selectCoinmAsset(coin){
     document.getElementById('coinmAssetPrice').textContent = 'No se pudo obtener el precio — usando $100 de referencia';
   }
   computeCoinm();
+}
+
+/* ---- trae logo y precio real de la moneda predefinida (Bitcoin) la primera vez que se abre el modal ---- */
+async function refreshCoinmDefaultAsset(){
+  if(coinmSelectedAsset.thumb) return; // ya tiene datos reales, no hace falta pedir de nuevo
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + encodeURIComponent(coinmSelectedAsset.id)));
+    const data = await res.json();
+    const entry = data && data[0];
+    if(entry){
+      coinmSelectedAsset = { ...coinmSelectedAsset, price: entry.current_price, thumb: entry.image };
+      document.getElementById('coinmAssetImg').src = entry.image;
+      document.getElementById('coinmAssetPrice').textContent = 'Precio actual: ' + formatPrice(entry.current_price) + ' USD';
+      document.getElementById('coinmEntry').value = entry.current_price;
+      computeCoinm();
+    }
+  } catch(err){ /* si falla, se queda con el precio de respaldo hasta que el usuario busque manualmente */ }
 }
 
 /* ---- dirección long/short ---- */
