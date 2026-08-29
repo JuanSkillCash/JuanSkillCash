@@ -369,27 +369,6 @@ button{font-family:inherit;color:inherit}
 .res-card.tp::before{background:var(--green)}
 
 /* RISK BAR */
-.risk-viz{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 18px 18px;margin-bottom:22px}
-.risk-viz-title{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:18px;line-height:1.5}
-.risk-track{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.07);margin:26px 6px 32px;overflow:visible}
-.risk-zone{position:absolute;top:0;bottom:0;border-radius:8px;transition:left .3s ease,width .3s ease,background .3s ease}
-.risk-zone-buffer{background:var(--green)}
-.risk-zone-risk{background:rgba(255,255,255,.14)}
-.risk-zone-reward{background:var(--green);opacity:.55}
-.risk-marker{position:absolute;top:50%;width:2px;height:22px;background:var(--white);transform:translate(-50%,-50%);z-index:2}
-.risk-marker::after{content:attr(data-label);position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;white-space:nowrap;color:var(--muted2);letter-spacing:.02em}
-.risk-marker.entry{height:26px;background:var(--white)}
-.risk-marker.entry::after{content:'ENTRADA';color:var(--white);top:18px}
-.risk-marker.liq{background:var(--gold)}
-.risk-marker.liq::after{color:var(--gold)}
-.risk-marker.sl{background:var(--red)}
-.risk-marker.sl::after{color:var(--red);top:-26px}
-.risk-marker.tp{background:var(--green)}
-.risk-marker.tp::after{color:var(--green);top:-26px}
-.safety-note{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.6;color:var(--muted2);border-top:1px solid var(--border);margin-top:4px;padding-top:14px}
-.safety-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.safety-note b{color:var(--white)}
-.safety-note.danger{color:var(--white)}
 
 /* SUMMARY */
 .summary-title{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:13px}
@@ -1405,20 +1384,6 @@ button{font-family:inherit;color:inherit}
         <div class="res-card liq"><div class="r-label">Liquidación</div><div class="r-val" id="outLiq">—</div></div>
         <div class="res-card sl"><div class="r-label">Stop Loss</div><div class="r-val" id="outSL">—</div></div>
         <div class="res-card tp"><div class="r-label">Take Profit</div><div class="r-val" id="outTP">—</div></div>
-      </div>
-
-      <div class="risk-viz">
-        <div class="risk-viz-title">Margen de seguridad — qué tan cerca está tu SL de la liquidación</div>
-        <div class="risk-track">
-          <div class="risk-zone risk-zone-buffer" id="zoneBuffer"></div>
-          <div class="risk-zone risk-zone-risk" id="zoneRisk"></div>
-          <div class="risk-zone risk-zone-reward" id="zoneReward"></div>
-          <div class="risk-marker liq" id="mkLiq" data-label="LIQ"></div>
-          <div class="risk-marker sl" id="mkSL" data-label="SL"></div>
-          <div class="risk-marker entry" id="mkEntry" data-label="ENTRADA"></div>
-          <div class="risk-marker tp" id="mkTP" data-label="TP"></div>
-        </div>
-        <div class="safety-note" id="safetyNote"><span class="safety-dot" id="safetyDot"></span><span id="safetyText"></span></div>
       </div>
 
       <div class="summary-title">Resumen de la operación</div>
@@ -3458,80 +3423,6 @@ function calc(){
   $('sumGain').textContent = '+' + numES(gain, 2) + ' USDT';
   $('sumPos').textContent = posSize.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' USDT (' + lev + 'x)';
 
-  // ---- risk visualization ----
-  // Fracción de la distancia a liquidación consumida por el SL (ahora relativa a liqMovePct real,
-  // que cambia según el modo de margen: aislado usa solo tu capital, cruzado suma el margen adicional)
-  const safetyUsed = liqImpossible ? 0 : (liqMovePct > 0 ? Math.min(999, (slMovePct / liqMovePct) * 100) : 100);
-  const unreachable = !liqImpossible && slMovePct >= liqMovePct; // SL sits at/beyond the liquidation price
-  const tooTight = !unreachable && !liqImpossible && slPct <= 1; // SL sits right on top of the entry price — no real room to operate
-
-  // para el gauge visual, evitamos que un liqMovePct enorme (o "imposible") aplaste el resto de marcadores
-  const liqMovePctGauge = liqImpossible ? Math.max(tpMovePct, slMovePct) * 1.3 : liqMovePct;
-
-  // include slMovePct in the range so an unreachable SL still fits on the track
-  const maxRange = Math.max(liqMovePctGauge, tpMovePct, slMovePct) * 1.15;
-  const liqOffset = 50 - (liqMovePctGauge / maxRange) * 50;
-  const slOffset = 50 - (slMovePct / maxRange) * 50;
-  const tpOffset = 50 + (tpMovePct / maxRange) * 50;
-
-  $('mkLiq').style.left = liqOffset + '%';
-  $('mkSL').style.left = slOffset + '%';
-  $('mkEntry').style.left = '50%';
-  $('mkTP').style.left = tpOffset + '%';
-
-  // colour of the "buffer" zone (between SL and liquidation) encodes the danger level directly
-  let zoneColor;
-  if(unreachable) zoneColor = 'var(--red)';
-  else if(tooTight) zoneColor = 'var(--gold)';
-  else if(safetyUsed < 40) zoneColor = 'var(--green)';
-  else if(safetyUsed < 75) zoneColor = 'var(--gold)';
-  else zoneColor = 'var(--red)';
-
-  const bufferLeft = Math.min(liqOffset, slOffset);
-  const bufferWidth = Math.abs(slOffset - liqOffset);
-  $('zoneBuffer').style.left = bufferLeft + '%';
-  $('zoneBuffer').style.width = bufferWidth + '%';
-  $('zoneBuffer').style.background = zoneColor;
-
-  const riskLeft = Math.min(slOffset, 50);
-  const riskWidth = Math.abs(50 - slOffset);
-  $('zoneRisk').style.left = riskLeft + '%';
-  $('zoneRisk').style.width = (unreachable ? 0 : riskWidth) + '%';
-
-  $('zoneReward').style.left = '50%';
-  $('zoneReward').style.width = (tpOffset - 50) + '%';
-
-  const dot = $('safetyDot'), txt = $('safetyText'), note = $('safetyNote');
-  let color, msg;
-  if(liqImpossible){
-    color = 'var(--green)';
-    note.classList.remove('danger');
-    msg = '🛡️ <b>Con este margen cruzado, un movimiento de precio por sí solo no te liquida</b> — tu margen total cubre incluso una caída del 100%. Ojo: esto no te protege de otras cosas (funding, comisiones) y ese margen extra igual está en riesgo si cierras en pérdida.';
-  } else if(unreachable){
-    color = 'var(--red)';
-    note.classList.add('danger');
-    msg = '⚠️ <b>Tu Stop Loss es inalcanzable.</b> Con este SL% y apalancamiento, el precio de liquidación llega antes que tu SL — el exchange te liquidaría primero. Baja el SL% o reduce el apalancamiento.';
-  } else if(tooTight){
-    color = 'var(--gold)';
-    note.classList.remove('danger');
-    msg = '⚠️ <b>Tu Stop Loss está prácticamente en tu precio de entrada.</b> Sí, estás lejos de la liquidación — pero eso no significa que estés bien: con un SL tan pegado, casi cualquier movimiento normal del mercado te va a sacar de la operación antes de que tenga chance de funcionar. Estar lejos de la liquidación no es lo mismo que tener un buen SL.';
-  } else {
-    note.classList.remove('danger');
-    if(safetyUsed < 40){
-      color = 'var(--green)';
-      msg = 'Buen margen. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación.';
-    } else if(safetyUsed < 75){
-      color = 'var(--gold)';
-      msg = 'Margen moderado. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación — vigila el apalancamiento.';
-    } else {
-      color = 'var(--red)';
-      msg = 'Margen bajo. Tu SL está al <b>' + numES(safetyUsed, 0) + '%</b> de la distancia hasta la liquidación — riesgo de ser liquidado antes de que tu SL se ejecute.';
-    }
-  }
-  dot.style.background = color;
-  dot.style.boxShadow = '0 0 8px ' + color;
-  txt.innerHTML = msg;
-
   return { entry, liq, sl, tp, loss, gain, rr, posSize, slMovePct, tpMovePct };
 }
 
@@ -3655,7 +3546,6 @@ $('btnCopy').addEventListener('click', () => {
   const text =
 `SKILLCASH · Calculadora de Trading
 Dirección: ${direction.toUpperCase()}
-Entrada: ${formatPrice(r.entry)}
 Liquidación: ${formatPrice(r.liq)}
 Stop Loss: ${formatPrice(r.sl)} (-${numES(r.slMovePct, 2)}%)
 Take Profit: ${formatPrice(r.tp)} (+${numES(r.tpMovePct, 2)}%)
