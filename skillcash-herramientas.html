@@ -1532,7 +1532,7 @@ img[src=""]{display:none}
       </div>
 
       <div class="calc-disclaimer">
-        Precios de cripto en tiempo real vía CoinGecko — pueden diferir levemente de tu exchange por unos segundos de retraso. Acciones, materias primas e índices estarán disponibles próximamente.<br>
+        Precios de cripto en tiempo real vía CoinGecko — pueden diferir levemente de tu exchange por unos segundos de retraso. Acciones vía Twelve Data. Índices y materias primas usan un ETF equivalente como referencia (ej. SPY para el S&P 500), no el índice exacto — puede haber una pequeña diferencia frente al valor real.<br>
         <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
       </div>
 
@@ -2397,7 +2397,7 @@ img[src=""]{display:none}
         </div>
 
         <div class="lev-field" style="margin-top:14px">
-          <div class="lev-head"><label>¿Cómo sueles operar?</label><span class="lev-val" id="feesSplitVal">40% Maker / 60% Taker</span></div>
+          <div class="lev-head"><label>¿Cómo sueles operar?</label><span class="lev-val" id="feesSplitVal">40% Maker (límite) / 60% Taker (mercado)</span></div>
 
           <div class="curated-asset-list" id="feesStyleQuick" style="display:flex;margin-bottom:12px">
             <button class="curated-asset-btn" data-makerpct="0"><span class="curated-asset-emoji">🔴</span><span class="curated-asset-name">Solo compro/vendo "ya" (mercado)</span></button>
@@ -2411,7 +2411,7 @@ img[src=""]{display:none}
 
         <div class="calc-grid" style="margin-top:14px">
           <div class="field" id="f-fees-maker">
-            <label for="feesMakerPct">Comisión Maker (%)</label>
+            <label for="feesMakerPct">Comisión Maker — límite (%)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="feesMakerPct" data-dir="-1" aria-label="Disminuir">−</button>
               <input type="number" id="feesMakerPct" inputmode="decimal" value="0.02" step="any">
@@ -2420,7 +2420,7 @@ img[src=""]{display:none}
             <div class="field-err">Debe ser 0 o mayor</div>
           </div>
           <div class="field" id="f-fees-taker">
-            <label for="feesTakerPct">Comisión Taker (%)</label>
+            <label for="feesTakerPct">Comisión Taker — mercado (%)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="feesTakerPct" data-dir="-1" aria-label="Disminuir">−</button>
               <input type="number" id="feesTakerPct" inputmode="decimal" value="0.06" step="any">
@@ -2445,8 +2445,8 @@ img[src=""]{display:none}
       <div class="calc-results">
         <div class="be-section-label">🧾 Lo que pagas en comisiones</div>
         <div class="be-metric-grid">
-          <div class="res-card"><div class="r-label">Comisión Maker pagada</div><div class="r-val" id="outFeesMakerPaid">—</div></div>
-          <div class="res-card"><div class="r-label">Comisión Taker pagada</div><div class="r-val" id="outFeesTakerPaid">—</div></div>
+          <div class="res-card"><div class="r-label">Comisión Maker (límite) pagada</div><div class="r-val" id="outFeesMakerPaid">—</div></div>
+          <div class="res-card"><div class="r-label">Comisión Taker (mercado) pagada</div><div class="r-val" id="outFeesTakerPaid">—</div></div>
           <div class="res-card sl"><div class="r-label">Total mensual</div><div class="r-val" id="outFeesTotalMonth">—</div></div>
           <div class="res-card"><div class="r-label">Proyección anual</div><div class="r-val" id="outFeesTotalYear">—</div></div>
           <div class="res-card"><div class="r-label">% efectivo promedio</div><div class="r-val" id="outFeesEffectivePct">—</div></div>
@@ -3924,11 +3924,14 @@ function tdUrl(url){
 const CURATED_INDICES = [
   { id: 'idx_spx', name: 'S&P 500', symbol: 'SPX', proxy: 'SPY', scale: 10.0, emoji: '📈' },
   { id: 'idx_dji', name: 'Dow Jones', symbol: 'DJI', proxy: 'DIA', scale: 100.0, emoji: '📊' },
-  { id: 'idx_ndx', name: 'Nasdaq 100', symbol: 'NDX', proxy: 'QQQ', scale: 40.0, emoji: '💻' }
+  { id: 'idx_ndx', name: 'Nasdaq 100', symbol: 'NDX', proxy: 'QQQ', scale: 40.0, emoji: '💻' },
+  { id: 'idx_rut', name: 'Russell 2000', symbol: 'RUT', proxy: 'IWM', scale: 10.0, emoji: '🏢' }
 ];
 const CURATED_COMMODITIES = [
   { id: 'com_xau', name: 'Oro (XAU/USD)', symbol: 'XAU/USD', proxy: 'GLD', scale: 10.95, emoji: '🥇' },
-  { id: 'com_wti', name: 'Petróleo WTI', symbol: 'WTI/USD', proxy: 'USO', scale: 0.60, emoji: '🛢️' }
+  { id: 'com_xag', name: 'Plata (XAG/USD)', symbol: 'XAG/USD', proxy: 'SLV', scale: 1.09, emoji: '🥈' },
+  { id: 'com_wti', name: 'Petróleo WTI', symbol: 'WTI/USD', proxy: 'USO', scale: 0.60, emoji: '🛢️' },
+  { id: 'com_brent', name: 'Petróleo Brent', symbol: 'BRENT/USD', proxy: 'BNO', scale: 1.66, emoji: '🛢️' }
 ];
 
 /* ---- category tabs ---- */
@@ -8057,7 +8060,7 @@ const feesSplitVal = document.getElementById('feesSplitVal');
 
 feesMakerSlider.addEventListener('input', () => {
   const m = feesMakerSlider.value;
-  feesSplitVal.textContent = m + '% Maker / ' + (100 - m) + '% Taker';
+  feesSplitVal.textContent = m + '% Maker (límite) / ' + (100 - m) + '% Taker (mercado)';
   document.querySelectorAll('#feesStyleQuick .curated-asset-btn').forEach(b => b.classList.toggle('active', b.dataset.makerpct === m));
   computeFees();
 });
@@ -8066,7 +8069,7 @@ document.querySelectorAll('#feesStyleQuick .curated-asset-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const m = btn.dataset.makerpct;
     feesMakerSlider.value = m;
-    feesSplitVal.textContent = m + '% Maker / ' + (100 - m) + '% Taker';
+    feesSplitVal.textContent = m + '% Maker (límite) / ' + (100 - m) + '% Taker (mercado)';
     document.querySelectorAll('#feesStyleQuick .curated-asset-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     computeFees();
@@ -8136,7 +8139,7 @@ function computeFees(){
   const tipNote = document.getElementById('feesMakerTipNote');
   const diffVsAllTaker = allTakerTotal - totalMonth;
   if(diffVsAllTaker > 0.01){
-    tipNote.innerHTML = '💡 Operar más como <b>Maker</b> (órdenes límite) en vez de Taker te está ahorrando <b>' + numES(diffVsAllTaker, 2) + ' USD al mes</b> — si fueras 100% Taker pagarías eso de más.';
+    tipNote.innerHTML = '💡 Operar más como <b>Maker (límite)</b> en vez de <b>Taker (mercado)</b> te está ahorrando <b>' + numES(diffVsAllTaker, 2) + ' USD al mes</b> — si fueras 100% Taker pagarías eso de más.';
   } else {
     tipNote.innerHTML = '💡 Tu comisión Maker y Taker son casi iguales en este exchange — en ese caso no hay mucha ventaja en usar órdenes límite solo por el costo.';
   }
