@@ -20,10 +20,10 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#08080b;
-  --bg2:#0d0b10;
-  --surface:#131017;
-  --card:#18141d;
+  --bg:#0a1024;
+  --bg2:#0d1530;
+  --surface:#131a2e;
+  --card:#1a2338;
   --border:rgba(255,255,255,.08);
   --border2:rgba(255,255,255,.16);
   --red:#ff2f4f;
@@ -33,6 +33,12 @@
   --gold-glow:rgba(240,178,61,.3);
   --green:#2ecc71;
   --green-glow:rgba(46,204,113,.3);
+  --cat-orange:#ff8a3d;
+  --cat-purple:#a855f7;
+  --cat-cyan:#22d3ee;
+  --cat-indigo:#7c7ff5;
+  --cat-pink:#ec4899;
+  --cat-teal:#2dd4bf;
   --white:#f7f6fb;
   --muted:#847e93;
   --muted2:#b3aec2;
@@ -63,7 +69,7 @@ body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-se
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 900px 480px at 12% -8%,rgba(255,47,79,.09),transparent 58%),
+    radial-gradient(ellipse 900px 480px at 12% -8%,rgba(255,47,79,.05),transparent 58%),
     radial-gradient(ellipse 700px 420px at 100% 10%,rgba(240,178,61,.07),transparent 58%),
     radial-gradient(ellipse 700px 500px at 20% 100%,rgba(46,204,113,.04),transparent 60%);
 }
@@ -93,18 +99,18 @@ button{font-family:inherit;color:inherit}
 .sidebar::-webkit-scrollbar{width:0;height:0;display:none}
 .sidebar.collapsed{width:var(--sidebar-w-collapsed)}
 .sidebar.collapsed .sb-top{flex-direction:column;gap:10px;padding:16px 8px}
-.sb-top{display:flex;align-items:center;justify-content:space-between;padding:20px 14px;border-bottom:1px solid var(--border);gap:6px}
+.sb-top{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 8px;gap:6px}
 .sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 8px rgba(255,255,255,.22))}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
 .mobile-topbar-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,255,255,.22))}
-.mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:22px;border-bottom:1px solid var(--border);flex-wrap:nowrap}
+.mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
-.brand-glow-bar{position:relative;height:2px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden}
+.brand-glow-bar{position:relative;height:3.5px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
 .brand-glow-bar::after{
   content:'';position:absolute;top:0;left:-3%;width:20%;height:100%;
-  background:linear-gradient(90deg,transparent,var(--red),#fff,var(--red),transparent);
+  background:linear-gradient(90deg,transparent,var(--red),var(--red),var(--red),transparent);
   animation:brand-comet 2s ease-in-out infinite alternate;
   box-shadow:0 0 10px rgba(255,47,79,.85),0 0 18px rgba(255,47,79,.6);
 }
@@ -140,33 +146,39 @@ button{font-family:inherit;color:inherit}
 .sb-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;text-transform:none;display:flex;align-items:center;gap:6px}
 .cat-icon{display:inline-flex;flex-shrink:0;opacity:.85}
 
-/* color por categoría — le devuelve variedad de color a los íconos de línea */
+/* color por categoría — cada una de las 6 categorías tiene su propio color, distinto de rojo/dorado/verde (esos ya tienen su significado reservado: marca, alerta, ganancia) */
 [data-tool="calculadora"] .tool-icon,[data-tool="calculadora"] .sb-item-icon,
 [data-tool="breakeven"] .tool-icon,[data-tool="breakeven"] .sb-item-icon,
 [data-tool="coinm"] .tool-icon,[data-tool="coinm"] .sb-item-icon,
-[data-tool="fees"] .tool-icon,[data-tool="fees"] .sb-item-icon,
-[data-tool="checklist"] .tool-icon,[data-tool="checklist"] .sb-item-icon,
-[data-tool="walletcompare"] .tool-icon,[data-tool="walletcompare"] .sb-item-icon,
-[data-tool="approvals"] .tool-icon,[data-tool="approvals"] .sb-item-icon,
-[data-tool="inheritance"] .tool-icon,[data-tool="inheritance"] .sb-item-icon
-{ background:rgba(255,47,79,.13); color:var(--red); }
+[data-tool="fees"] .tool-icon,[data-tool="fees"] .sb-item-icon
+{ background:rgba(255,138,61,.14); color:var(--cat-orange); }
 
 [data-tool="rentabilidad"] .tool-icon,[data-tool="rentabilidad"] .sb-item-icon,
 [data-tool="dca"] .tool-icon,[data-tool="dca"] .sb-item-icon,
 [data-tool="dcaexit"] .tool-icon,[data-tool="dcaexit"] .sb-item-icon,
 [data-tool="mcapcompare"] .tool-icon,[data-tool="mcapcompare"] .sb-item-icon,
-[data-tool="fifreedom"] .tool-icon,[data-tool="fifreedom"] .sb-item-icon,
-[data-tool="glosario"] .tool-icon,[data-tool="glosario"] .sb-item-icon,
-[data-tool="mistakes"] .tool-icon,[data-tool="mistakes"] .sb-item-icon
-{ background:rgba(240,178,61,.14); color:var(--gold); }
+[data-tool="fifreedom"] .tool-icon,[data-tool="fifreedom"] .sb-item-icon
+{ background:rgba(168,85,247,.14); color:var(--cat-purple); }
 
 [data-tool="quiz"] .tool-icon,[data-tool="quiz"] .sb-item-icon,
 [data-tool="portafolio"] .tool-icon,[data-tool="portafolio"] .sb-item-icon,
-[data-tool="correlacion"] .tool-icon,[data-tool="correlacion"] .sb-item-icon,
+[data-tool="correlacion"] .tool-icon,[data-tool="correlacion"] .sb-item-icon
+{ background:rgba(34,211,238,.14); color:var(--cat-cyan); }
+
+[data-tool="checklist"] .tool-icon,[data-tool="checklist"] .sb-item-icon,
+[data-tool="walletcompare"] .tool-icon,[data-tool="walletcompare"] .sb-item-icon,
+[data-tool="approvals"] .tool-icon,[data-tool="approvals"] .sb-item-icon,
+[data-tool="inheritance"] .tool-icon,[data-tool="inheritance"] .sb-item-icon
+{ background:rgba(124,127,245,.16); color:var(--cat-indigo); }
+
+[data-tool="glosario"] .tool-icon,[data-tool="glosario"] .sb-item-icon,
+[data-tool="mistakes"] .tool-icon,[data-tool="mistakes"] .sb-item-icon
+{ background:rgba(236,72,153,.14); color:var(--cat-pink); }
+
 [data-tool="unitconverter"] .tool-icon,[data-tool="unitconverter"] .sb-item-icon,
 [data-tool="pctcalc"] .tool-icon,[data-tool="pctcalc"] .sb-item-icon,
 [data-tool="tzclock"] .tool-icon,[data-tool="tzclock"] .sb-item-icon
-{ background:rgba(46,204,113,.13); color:var(--green); }
+{ background:rgba(45,212,191,.14); color:var(--cat-teal); }
 .sb-item-icon,.tool-icon{display:inline-flex;align-items:center;justify-content:center}
 .sb-nav > .sb-cat-label:first-child{padding-top:0}
 .sidebar.collapsed .sb-cat-label{opacity:0;padding-top:8px;padding-bottom:0}
@@ -261,7 +273,7 @@ button{font-family:inherit;color:inherit}
 .bitunix-flash-btn:hover{box-shadow:0 4px 14px rgba(191,250,44,.32)}
 .bitunix-flash-dot{width:6px;height:6px;border-radius:50%;background:#ff2f4f;flex-shrink:0;animation:pulse 1.3s infinite}
 .bitunix-flash-text{letter-spacing:-.01em}
-.bitunix-flash-cta{background:#08080b;color:var(--bitunix-green);padding:3px 8px;border-radius:14px;font-size:10.5px;font-weight:800}
+.bitunix-flash-cta{background:#0a0e1a;color:var(--bitunix-green);padding:3px 8px;border-radius:14px;font-size:10.5px;font-weight:800}
 .account-mini{position:relative;margin-left:auto;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .account-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
@@ -481,7 +493,9 @@ img[src=""]{display:none}
 .dca-bar.dip{background:linear-gradient(180deg,var(--green),#7bf5ab)}
 
 .be-savings-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;position:relative}
-.be-savings-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.8vw,38px);color:var(--bitunix-green);letter-spacing:-.02em;margin-bottom:8px;line-height:1.25;text-shadow:0 0 30px rgba(191,250,44,.35);position:relative;overflow-wrap:break-word;word-break:break-word}
+.be-savings-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.8vw,38px);color:var(--green);letter-spacing:-.02em;margin-bottom:8px;line-height:1.25;text-shadow:0 0 30px rgba(46,204,113,.3);position:relative;overflow-wrap:break-word;word-break:break-word}
+.be-savings-value.bitunix-cashback{color:var(--bitunix-green);text-shadow:0 0 30px rgba(191,250,44,.35)}
+.be-savings-value.neutral{color:var(--white);text-shadow:none}
 .be-savings-sub{font-size:12.5px;color:var(--muted2);line-height:1.6;position:relative}
 .be-note{font-size:11.5px;color:var(--muted);line-height:1.7;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px}
 
@@ -1654,7 +1668,7 @@ img[src=""]{display:none}
 
       <div class="be-savings-box">
         <div class="be-savings-label">🚀 Ahorras con el cashback de Bitunix</div>
-        <div class="be-savings-value" id="outSavings">$0.00</div>
+        <div class="be-savings-value bitunix-cashback" id="outSavings">$0.00</div>
         <div class="be-savings-sub" id="outSavingsSub">por esta operación, solo por usar tu 20% de cashback en comisiones.</div>
       </div>
 
@@ -2066,7 +2080,7 @@ img[src=""]{display:none}
         </div>
         <div class="be-savings-box" style="margin-top:20px">
           <div class="be-savings-label">📌 Resultado</div>
-          <div class="be-savings-value" id="pctResultWhatpct">—</div>
+          <div class="be-savings-value neutral" id="pctResultWhatpct">—</div>
           <div class="be-savings-sub" id="pctSubWhatpct">—</div>
         </div>
       </div>
@@ -2085,7 +2099,7 @@ img[src=""]{display:none}
         </div>
         <div class="be-savings-box" style="margin-top:20px">
           <div class="be-savings-label">📌 Resultado</div>
-          <div class="be-savings-value" id="pctResultPctof">—</div>
+          <div class="be-savings-value neutral" id="pctResultPctof">—</div>
           <div class="be-savings-sub" id="pctSubPctof">—</div>
         </div>
       </div>
@@ -2108,7 +2122,7 @@ img[src=""]{display:none}
         </div>
         <div class="be-savings-box" style="margin-top:20px">
           <div class="be-savings-label">📌 Nuevo número</div>
-          <div class="be-savings-value" id="pctResultChange">—</div>
+          <div class="be-savings-value neutral" id="pctResultChange">—</div>
           <div class="be-savings-sub" id="pctSubChange">—</div>
         </div>
       </div>
@@ -2127,7 +2141,7 @@ img[src=""]{display:none}
         </div>
         <div class="be-savings-box" style="margin-top:20px">
           <div class="be-savings-label">📌 Cambio porcentual</div>
-          <div class="be-savings-value" id="pctResultDiff">—</div>
+          <div class="be-savings-value neutral" id="pctResultDiff">—</div>
           <div class="be-savings-sub" id="pctSubDiff">—</div>
         </div>
       </div>
@@ -2478,7 +2492,7 @@ img[src=""]{display:none}
 
         <div class="be-savings-box">
           <div class="be-savings-label">📌 Con el 20% de cashback de Bitunix</div>
-          <div class="be-savings-value" id="outFeesCashback">—</div>
+          <div class="be-savings-value bitunix-cashback" id="outFeesCashback">—</div>
           <div class="be-savings-sub" id="outFeesCashbackSub">Cashback aplicado sobre el total de comisiones que pagas cada mes.</div>
         </div>
 
@@ -2807,7 +2821,7 @@ img[src=""]{display:none}
       <div class="calc-results">
         <div class="be-savings-box" id="wcRecommendationBox">
           <div class="be-savings-label">📌 Recomendación para tu caso</div>
-          <div class="be-savings-value" id="wcRecommendationTitle">—</div>
+          <div class="be-savings-value neutral" id="wcRecommendationTitle">—</div>
           <div class="be-savings-sub" id="wcRecommendationText">—</div>
         </div>
 
