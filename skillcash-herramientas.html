@@ -220,7 +220,7 @@ button{font-family:inherit;color:inherit}
   .market-overview .dom-card.halving{grid-column:1 / -1}
 }
 
-.fng-section{background:transparent;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0}
+.fng-section{background:#080c20;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0}
 .fng-section-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .fng-section-title{font-size:11px;font-weight:700;color:var(--white);margin-right:auto}
 .fng-section-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
@@ -238,7 +238,7 @@ button{font-family:inherit;color:inherit}
   .fng-gauge-labels span:nth-child(2),.fng-gauge-labels span:nth-child(4){display:none}
 }
 
-.dom-card{background:transparent;border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:100%}
+.dom-card{background:#080c20;border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:100%}
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -253,7 +253,7 @@ button{font-family:inherit;color:inherit}
 @media(max-width:480px){
   .market-sessions-row{gap:0}
 }
-.session-card{background:transparent;padding:9px 13px;display:flex;flex-direction:column;gap:4px}
+.session-card{background:#080c20;padding:9px 13px;display:flex;flex-direction:column;gap:4px}
 .session-card-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted2)}
 .session-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 1.4s infinite}
 .session-dot.open{background:var(--green);box-shadow:0 0 6px rgba(46,204,113,.6)}
@@ -348,7 +348,9 @@ button{font-family:inherit;color:inherit}
 .field:focus-within{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09),var(--shadow-sm);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
 .field.invalid{border-color:var(--red);border-left-color:var(--red)}
 .field label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.field input[type="number"]{width:100%;min-width:0;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;outline:none}
+.field input[type="number"],#maintMarginPct,#coinmMaintMarginPct{width:100%;min-width:0;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;outline:none}
+#maintMarginPct::-webkit-outer-spin-button,#maintMarginPct::-webkit-inner-spin-button,#coinmMaintMarginPct::-webkit-outer-spin-button,#coinmMaintMarginPct::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#maintMarginPct,#coinmMaintMarginPct{-moz-appearance:textfield}
 .field input[type="number"]::-webkit-outer-spin-button,.field input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .field input[type="number"]{-moz-appearance:textfield}
 .field input[type="text"],.field input[type="email"],.field input[type="password"],.field input[type="date"]{width:100%;min-width:0;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;outline:none}
@@ -383,7 +385,7 @@ button{font-family:inherit;color:inherit}
 .res-card{background:none;border:none;border-radius:0;padding:0 0 0 12px;text-align:left;position:relative}
 .res-card::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;background:var(--border2)}
 .res-card .r-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.res-card .r-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(13px,2.4vw,17px);letter-spacing:-.01em;word-break:break-all}
+.res-card .r-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(13px,2.4vw,17px);letter-spacing:-.01em;word-break:normal;overflow-wrap:break-word}
 .res-card.entry .r-val{color:var(--white)}
 .res-card.liq .r-val{color:var(--gold)}
 .res-card.liq::before{background:var(--gold)}
@@ -470,7 +472,7 @@ button{font-family:inherit;color:inherit}
 
 /* ===== CALCULADORA DE BREAK-EVEN ===== */
 .be-section-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.be-section-label.bitunix{color:var(--bitunix-green)}
+.be-section-label.bitunix{color:var(--green)}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
 .be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
@@ -494,7 +496,6 @@ img[src=""]{display:none}
 
 .be-savings-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;position:relative}
 .be-savings-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.8vw,38px);color:var(--green);letter-spacing:-.02em;margin-bottom:8px;line-height:1.25;text-shadow:0 0 30px rgba(46,204,113,.3);position:relative;overflow-wrap:break-word;word-break:break-word}
-.be-savings-value.bitunix-cashback{color:var(--bitunix-green);text-shadow:0 0 30px rgba(191,250,44,.35)}
 .be-savings-value.neutral{color:var(--white);text-shadow:none}
 .be-savings-sub{font-size:12.5px;color:var(--muted2);line-height:1.6;position:relative}
 .be-note{font-size:11.5px;color:var(--muted);line-height:1.7;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px}
@@ -1405,6 +1406,16 @@ img[src=""]{display:none}
         </div>
         <div class="be-note" id="addMarginNote" style="display:none;grid-column:1/-1"></div>
 
+        <div class="margin-mode-field field" style="grid-column:1/-1">
+          <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Margen de mantenimiento (%) — opcional, para mayor precisión</label>
+          <div class="input-stepper">
+            <button type="button" class="step-btn" data-target="maintMarginPct" data-dir="-1" aria-label="Disminuir">−</button>
+            <input type="number" id="maintMarginPct" inputmode="decimal" value="0" min="0" step="any">
+            <button type="button" class="step-btn" data-target="maintMarginPct" data-dir="1" aria-label="Aumentar">+</button>
+          </div>
+          <div class="be-note" style="margin-top:8px">💡 Todo exchange te liquida un poco ANTES de que tu margen llegue a $0 — exige guardar un colchón mínimo. Búscalo en la tabla de niveles/tiers de tu exchange (para BTC suele ser 0,2%-0,5%, varía según tu apalancamiento y el tamaño de tu posición). Si lo dejas en 0, la calculadora usa la estimación teórica normal.</div>
+        </div>
+
         <div class="margin-mode-field" style="grid-column:1/-1">
           <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Modo de margen</label>
           <div class="dir-toggle">
@@ -1668,7 +1679,7 @@ img[src=""]{display:none}
 
       <div class="be-savings-box">
         <div class="be-savings-label">🚀 Ahorras con el cashback de Bitunix</div>
-        <div class="be-savings-value bitunix-cashback" id="outSavings">$0.00</div>
+        <div class="be-savings-value" id="outSavings">$0.00</div>
         <div class="be-savings-sub" id="outSavingsSub">por esta operación, solo por usar tu 20% de cashback en comisiones.</div>
       </div>
 
@@ -2327,6 +2338,16 @@ img[src=""]{display:none}
             </div>
           </div>
 
+          <div class="margin-mode-field field" style="grid-column:1/-1">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Margen de mantenimiento (%) — opcional, para mayor precisión</label>
+            <div class="input-stepper">
+              <button type="button" class="step-btn" data-target="coinmMaintMarginPct" data-dir="-1" aria-label="Disminuir">−</button>
+              <input type="number" id="coinmMaintMarginPct" inputmode="decimal" value="0" min="0" step="any">
+              <button type="button" class="step-btn" data-target="coinmMaintMarginPct" data-dir="1" aria-label="Aumentar">+</button>
+            </div>
+            <div class="be-note" style="margin-top:8px">💡 Todo exchange te liquida un poco ANTES de que tu margen llegue a $0 — exige guardar un colchón mínimo. Búscalo en la tabla de niveles/tiers de tu exchange. Si lo dejas en 0, la calculadora usa la estimación teórica normal.</div>
+          </div>
+
           <div class="margin-mode-field" style="grid-column:1/-1">
             <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Modo de margen</label>
             <div class="dir-toggle">
@@ -2492,7 +2513,7 @@ img[src=""]{display:none}
 
         <div class="be-savings-box">
           <div class="be-savings-label">📌 Con el 20% de cashback de Bitunix</div>
-          <div class="be-savings-value bitunix-cashback" id="outFeesCashback">—</div>
+          <div class="be-savings-value" id="outFeesCashback">—</div>
           <div class="be-savings-sub" id="outFeesCashbackSub">Cashback aplicado sobre el total de comisiones que pagas cada mes.</div>
         </div>
 
@@ -3481,7 +3502,8 @@ function calc(){
 
   const posSize = effectiveCapital * lev;
   const effectiveMargin = marginMode === 'cruzado' ? (effectiveCapital + crossExtra) : effectiveCapital;
-  const liqMovePct = (effectiveMargin / posSize) * 100; // % price move to hit liquidation
+  const maintMarginPct = parseFloat($('maintMarginPct').value) || 0; // margen de mantenimiento (%), opcional — el colchón que el exchange te exige antes de liquidarte
+  const liqMovePct = Math.max(0, ((effectiveMargin / posSize) - (maintMarginPct / 100)) * 100); // % price move to hit liquidation
   const liqImpossible = direction === 'long' && liqMovePct >= 100; // con este margen, ni un -100% de precio te liquida
 
   let liq, sl, tp;
@@ -3536,6 +3558,8 @@ document.querySelectorAll('#calcModal .dir-btn').forEach(btn => {
 });
 
 /* ---- modo de margen: aislado / cruzado ---- */
+$('maintMarginPct').addEventListener('input', calc);
+
 document.querySelectorAll('#calcModal .mode-btn[data-marginmode]').forEach(btn => {
   btn.addEventListener('click', () => {
     marginMode = btn.dataset.marginmode;
@@ -3698,6 +3722,7 @@ $('btnReset').addEventListener('click', () => {
   tpInput.value = DEFAULTS.tp;
   levSlider.value = DEFAULTS.lev;
   levVal.textContent = DEFAULTS.lev + 'x';
+  $('maintMarginPct').value = 0;
   direction = DEFAULTS.dir;
   document.querySelectorAll('#calcModal .dir-btn').forEach(b => b.classList.toggle('active', b.dataset.dir === direction));
   document.querySelectorAll('.lev-chip').forEach(c => c.classList.toggle('active', c.dataset.lev === String(DEFAULTS.lev)));
@@ -3727,9 +3752,6 @@ Liquidación: ${formatPrice(r.liq)}
 Stop Loss: ${formatPrice(r.sl)} (-${numES(r.slMovePct, 2)}%)
 Take Profit: ${formatPrice(r.tp)} (+${numES(r.tpMovePct, 2)}%)
 R:R → 1 : ${numES(r.rr, 2)}
-Pérdida estimada: -${numES(r.loss, 2)} USDT
-Ganancia estimada: +${numES(r.gain, 2)} USDT
-Tamaño de posición: ${numES(r.posSize, 2)} USDT
 —
 Herramienta educativa. No constituye asesoría financiera.`;
   navigator.clipboard.writeText(text).then(() => {
@@ -4310,10 +4332,8 @@ $('btnProfitCopy').addEventListener('click', () => {
 Activo: ${assetLabel}
 Precio de compra: $${buyInput.value}
 Precio de venta: $${sellInput.value}
-Capital invertido: $${profitCapInput.value}
-Cantidad: ${formatPrice(r.qty)}
-Valor de venta: $${numES(r.saleVal, 2)}
-Ganancia: ${r.gain >= 0 ? '+' : '-'}$${numES(Math.abs(r.gain), 2)} (${r.gainPct >= 0 ? '+' : ''}${numES(r.gainPct, 2)}%)
+Cambio de precio: ${(r.priceChangePct >= 0 ? '+' : '')}${numES(r.priceChangePct, 2)}%
+Ganancia: ${r.gainPct >= 0 ? '+' : ''}${numES(r.gainPct, 2)}%
 Múltiplo: ${numES(r.mult, 2)}x
 —
 Herramienta educativa. No constituye asesoría financiera.`;
@@ -8123,6 +8143,7 @@ const coinmSlInput = document.getElementById('coinmSlPct');
 const coinmTpInput = document.getElementById('coinmTpPct');
 [coinmEntryInput, coinmMarginInput, coinmSlInput, coinmTpInput].forEach(inp => inp.addEventListener('input', computeCoinm));
 document.getElementById('coinmCrossExtraMargin').addEventListener('input', computeCoinm);
+document.getElementById('coinmMaintMarginPct').addEventListener('input', computeCoinm);
 
 document.querySelectorAll('#coinmModal .step-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -8176,7 +8197,8 @@ function computeCoinm(){
   // effMargin es el margen que realmente respalda la posición: solo el tuyo en aislado,
   // el tuyo + el adicional disponible en cruzado (por eso te alejas más de la liquidación).
   const effMargin = coinmMarginMode === 'cruzado' ? (margin + crossExtra) : margin;
-  const marginRatio = effMargin / (margin * lev);
+  const coinmMaintMarginPct = parseFloat(document.getElementById('coinmMaintMarginPct').value) || 0;
+  const marginRatio = Math.max(0, (effMargin / (margin * lev)) - (coinmMaintMarginPct / 100));
   let liq, liqImpossible = false;
   if(coinmDirection === 'long'){
     liq = entry / (1 + marginRatio);
@@ -8211,7 +8233,7 @@ function computeCoinm(){
   const atTP = gainsAt(tpPrice);
   document.getElementById('outCoinmTradeGainTP').textContent = numES(atTP.tradeUSD, 2) + ' USD';
   document.getElementById('outCoinmCollateralGainTP').textContent = numES(atTP.collateralUSD, 2) + ' USD';
-  document.getElementById('outCoinmTotalGainTP').textContent = numES(atTP.totalUSD, 2) + ' USD (' + margin.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:6}) + ' ' + symbol + ' → valorizado)';
+  document.getElementById('outCoinmTotalGainTP').textContent = numES(atTP.totalUSD, 2) + ' USD';
 
   const atSL = gainsAt(Math.max(slPrice, 0.0000001));
   document.getElementById('outCoinmTradeLossSL').textContent = numES(atSL.tradeUSD, 2) + ' USD';
