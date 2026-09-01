@@ -3748,6 +3748,8 @@ $('btnCopy').addEventListener('click', () => {
   const text =
 `SKILLCASH · Calculadora de Trading
 Dirección: ${direction.toUpperCase()}
+Entrada: ${formatPrice(r.entry)}
+Apalancamiento: ${levSlider.value}x
 Liquidación: ${formatPrice(r.liq)}
 Stop Loss: ${formatPrice(r.sl)} (-${numES(r.slMovePct, 2)}%)
 Take Profit: ${formatPrice(r.tp)} (+${numES(r.tpMovePct, 2)}%)
