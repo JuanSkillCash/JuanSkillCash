@@ -349,6 +349,7 @@ button{font-family:inherit;color:inherit}
 .field.invalid{border-color:var(--red);border-left-color:var(--red)}
 .field label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .field input[type="number"],#maintMarginPct,#coinmMaintMarginPct{width:100%;min-width:0;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;outline:none}
+#btnMcapSwap:hover{color:var(--red);border-color:var(--red)}
 #maintMarginPct::-webkit-outer-spin-button,#maintMarginPct::-webkit-inner-spin-button,#coinmMaintMarginPct::-webkit-outer-spin-button,#coinmMaintMarginPct::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 #maintMarginPct,#coinmMaintMarginPct{-moz-appearance:textfield}
 .field input[type="number"]::-webkit-outer-spin-button,.field input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -1855,7 +1856,13 @@ img[src=""]{display:none}
           </div>
         </div>
 
-        <div class="field" style="margin-top:18px;margin-bottom:4px">
+        <div style="display:flex;justify-content:center;margin:10px 0">
+          <button type="button" id="btnMcapSwap" title="Intercambiar Moneda A y Moneda B" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--muted2);cursor:pointer;transition:transform var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4l4 4-4 4"/><path d="M17 8H5"/><path d="M7 12l-4 4 4 4"/><path d="M3 16h12"/></svg>
+          </button>
+        </div>
+
+        <div class="field" style="margin-top:0;margin-bottom:4px">
           <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🎯 Moneda B</label>
         </div>
         <div class="asset-search" id="mcapTargetAssetSearchWrap">
@@ -7115,6 +7122,19 @@ async function refreshMcapBothAssets(){
   }
   computeMcap();
 }
+
+document.getElementById('btnMcapSwap').addEventListener('click', function(){
+  [mcapMySelected, mcapTargetSelected] = [mcapTargetSelected, mcapMySelected];
+  document.getElementById('mcapMyAssetName').textContent = mcapMySelected.name + ' (' + mcapMySelected.symbol.toUpperCase() + ')';
+  document.getElementById('mcapTargetAssetName').textContent = mcapTargetSelected.name + ' (' + mcapTargetSelected.symbol.toUpperCase() + ')';
+  document.getElementById('mcapMyAssetImg').src = mcapMySelected.thumb || '';
+  document.getElementById('mcapTargetAssetImg').src = mcapTargetSelected.thumb || '';
+  document.getElementById('mcapMyAssetPrice').textContent = mcapMySelected.marketCap ? 'Market cap: ' + numES(mcapMySelected.marketCap, 0) + ' USD' : 'Cargando datos…';
+  document.getElementById('mcapTargetAssetPrice').textContent = mcapTargetSelected.marketCap ? 'Market cap: ' + numES(mcapTargetSelected.marketCap, 0) + ' USD' : 'Cargando datos…';
+  this.style.transform = 'rotate(180deg)';
+  setTimeout(() => { this.style.transform = 'rotate(0deg)'; }, 300);
+  computeMcap();
+});
 
 function computeMcap(){
   const errorNote = document.getElementById('mcapErrorNote');
