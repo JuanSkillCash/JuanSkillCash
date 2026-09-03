@@ -90,7 +90,7 @@ button{font-family:inherit;color:inherit}
 
 /* SIDEBAR */
 .sidebar{
-  width:var(--sidebar-w);flex-shrink:0;background:rgba(13,11,16,.9);backdrop-filter:blur(20px);
+  width:var(--sidebar-w);flex-shrink:0;background:rgba(8,12,32,.9);backdrop-filter:blur(20px);
   border-right:1px solid var(--border);display:flex;flex-direction:column;
   position:sticky;top:0;height:100vh;transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
   scrollbar-width:none;-ms-overflow-style:none;
@@ -143,7 +143,9 @@ button{font-family:inherit;color:inherit}
 .tool-card-actions{grid-column:3;grid-row:1/3;display:flex;align-items:center;gap:4px;justify-self:end}
 .tool-card-actions::after{content:'›';color:var(--muted);font-size:20px}
 
-.sb-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;text-transform:none;display:flex;align-items:center;gap:6px}
+.sb-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;text-transform:none;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.sb-cat-label::after{content:'';margin-left:auto;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform var(--dur-base) var(--ease-out);flex-shrink:0}
+.sb-cat-label.collapsed::after{transform:rotate(-45deg)}
 .cat-icon{display:inline-flex;flex-shrink:0;opacity:.85}
 
 /* color por categoría — cada una de las 6 categorías tiene su propio color, distinto de rojo/dorado/verde (esos ya tienen su significado reservado: marca, alerta, ganancia) */
@@ -290,6 +292,32 @@ button{font-family:inherit;color:inherit}
 .tool-section{margin-bottom:28px}
 .tool-section:last-of-type{margin-bottom:0}
 .tool-cat-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--muted2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* ---- panel de categorías (portada de herramientas) ---- */
+.cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:900px){ .cat-overview-grid{grid-template-columns:1fr 1fr} }
+@media(max-width:480px){ .cat-overview-grid{grid-template-columns:1fr} }
+.cat-overview-card{
+  border-radius:18px;padding:20px;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);
+  border:1px solid var(--bc);cursor:pointer;text-align:left;width:100%;font-family:inherit;
+  background:radial-gradient(ellipse 130% 100% at 0% 0%, var(--tint), transparent 65%), #080c20;
+}
+.cat-overview-card:hover{transform:translateY(-3px)}
+.cat-overview-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.cat-overview-num{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;color:var(--c);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.cat-overview-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;flex:1;color:var(--white)}
+.cat-overview-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:20px;background:rgba(46,204,113,.16);color:#4ade80;border:1px solid rgba(46,204,113,.35)}
+.cat-overview-sub{font-size:11px;color:var(--c);font-family:'Space Mono',monospace;letter-spacing:.03em;margin:3px 0 14px;padding-left:36px;font-weight:600}
+.cat-overview-preview{height:78px;border-radius:12px;margin-bottom:14px;position:relative;overflow:hidden;background:rgba(255,255,255,.02)}
+.cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
+.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
+
+.cat-back-btn{
+  display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--muted2);
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;cursor:pointer;margin-bottom:18px;
+  transition:border-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out);
+}
+.cat-back-btn:hover{border-color:var(--red);color:var(--white)}
 .tool-cat-label::after{content:'';flex:1;height:1px;background:var(--border)}
 .tool-grid{display:flex;flex-direction:column}
 .tool-card{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:14px;row-gap:2px;background:none;border:none;border-bottom:1px solid var(--border);border-radius:var(--r-sm);padding:14px 8px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out),padding var(--dur-fast) var(--ease-out);text-align:left;position:relative}
@@ -824,13 +852,34 @@ img[src=""]{display:none}
 /* FOOTER */
 .site-footer{margin-top:48px;padding-top:28px;border-top:1px solid var(--border)}
 .site-footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+
+.telegram-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;text-decoration:none;
+  background:linear-gradient(135deg,rgba(34,158,217,.15),rgba(34,158,217,.03));
+  border:1px solid rgba(34,158,217,.35);border-radius:16px;padding:16px 20px;margin:0 auto 28px;
+  transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);
+  max-width:60%;
+}
+@media(max-width:700px){ .telegram-banner{max-width:100%} }
+.telegram-banner:hover{border-color:#229ed9;transform:translateY(-2px)}
+.telegram-banner-left{display:flex;align-items:center;gap:14px}
+.telegram-banner-icon{width:38px;height:38px;border-radius:50%;background:#229ed9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.telegram-banner-title{font-weight:700;font-size:15px;color:#5fc4ee}
+.telegram-banner-sub{font-size:12.5px;color:var(--muted2);margin-top:2px}
+.telegram-banner-btn{background:transparent;border:1.5px solid #229ed9;color:#5fc4ee;font-weight:700;font-size:14px;padding:12px 24px;border-radius:22px;white-space:nowrap;font-family:'Space Grotesk',sans-serif;flex:1 0 100%;text-align:center;margin-top:6px;transition:background var(--dur-base) var(--ease-out)}
+.telegram-banner-btn:hover{background:rgba(34,158,217,.15)}
 .site-footer-brand{max-width:420px}
 .site-footer-tagline{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.6}
-.site-footer-social{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.footer-social-btn{width:38px;height:38px;border-radius:10px;background:var(--surface);border:1px solid var(--border2);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s,transform .2s}
-.footer-social-btn:hover{border-color:var(--red);color:var(--red);transform:translateY(-2px)}
-.site-footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted)}
-.site-footer-note{margin-top:14px;font-size:12.5px;line-height:1.75;color:var(--muted2);max-width:760px}
+.site-footer-social-label{text-align:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.site-footer-social{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap;gap:12px;max-width:60%;margin:0 auto 32px}
+@media(max-width:700px){ .site-footer-social{max-width:100%} }
+.footer-social-btn{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1 1 140px;max-width:180px;padding:16px 14px;border-radius:14px;background:var(--surface);border:1.5px solid var(--border2);text-decoration:none;transition:border-color .2s,transform .2s}
+.footer-social-btn:hover{border-color:var(--hover);transform:translateY(-2px)}
+.footer-social-top{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:var(--white)}
+.footer-social-handle{font-size:11.5px;color:var(--muted2)}
+.site-footer-brand-center{text-align:center;margin-bottom:14px}
+.site-footer-bottom{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:0;padding-top:0;font-size:11.5px;color:var(--muted);text-align:center}
+.site-footer-note{margin:14px auto 0;font-size:12.5px;line-height:1.75;color:var(--muted2);max-width:760px;text-align:center}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -1045,6 +1094,7 @@ img[src=""]{display:none}
     </div>
     <div class="brand-glow-bar" style="margin:0 0 18px"></div>
 
+    <div id="marketDashboardBlock">
     <div class="market-overview reveal">
       <div class="fng-section">
         <div class="fng-section-head">
@@ -1108,10 +1158,134 @@ img[src=""]{display:none}
       </div>
     </a>
 
+    </div>
+
     <div id="favoritesSection"></div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">📈 Trading y Futuros</div>
+    <div id="categoryOverviewGrid" class="cat-overview-grid">
+
+      <button type="button" class="cat-overview-card" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">1</div>
+          <div class="cat-overview-title">📈 Calculadoras de Trading</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">4 HERRAMIENTAS</div>
+        <div class="cat-overview-preview">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
+            <defs><linearGradient id="catg1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ff8a3d" stop-opacity=".45"/>
+              <stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
+            </linearGradient></defs>
+            <polyline points="0,55 30,48 60,58 90,40 120,45 150,25 180,32 210,18 240,28 270,12 300,20" fill="none" stroke="#ff8a3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polygon points="0,55 30,48 60,58 90,40 120,45 150,25 180,32 210,18 240,28 270,12 300,20 300,78 0,78" fill="url(#catg1)"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Calcula tu precio de liquidación, break-even, comisiones y ganancia real — todo antes de arriesgar tu dinero en una posición apalancada.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+      <button type="button" class="cat-overview-card" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">2</div>
+          <div class="cat-overview-title">🪙 Calculadoras de Inversión</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">5 HERRAMIENTAS</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:flex-end;justify-content:center;gap:7px;padding:12px 0">
+          <div style="width:16px;height:24%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:38%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:32%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:55%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:48%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:72%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c084fc,#a855f7)"></div>
+          <div style="width:16px;height:88%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#e9d5ff,#c084fc)"></div>
+        </div>
+        <div class="cat-overview-desc">Simula tus compras periódicas, calcula tu rentabilidad real, compara capitalizaciones de mercado, y descubre cuándo podrías vivir de tus inversiones.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+      <button type="button" class="cat-overview-card" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">3</div>
+          <div class="cat-overview-title">💼 Simulador de Portafolio</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">3 HERRAMIENTAS</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="72" height="72" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="rgba(255,255,255,.08)" stroke-width="6.5"/>
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#22d3ee" stroke-width="6.5" stroke-dasharray="42 100" stroke-dashoffset="25" stroke-linecap="round"/>
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#67e8f9" stroke-width="6.5" stroke-dasharray="30 100" stroke-dashoffset="-17" stroke-linecap="round"/>
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#a5f3fc" stroke-width="6.5" stroke-dasharray="18 100" stroke-dashoffset="-47" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+      <button type="button" class="cat-overview-card" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">4</div>
+          <div class="cat-overview-title">🛡️ Checklists de Seguridad</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">4 HERRAMIENTAS</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="60" height="60" viewBox="0 0 24 24">
+            <defs><linearGradient id="catg4" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#a5b4fc"/><stop offset="100%" stop-color="#7c7ff5"/>
+            </linearGradient></defs>
+            <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z" fill="url(#catg4)" opacity=".9"/>
+            <path d="M9 12l2 2 4-4" fill="none" stroke="#0a1024" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+      <button type="button" class="cat-overview-card" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">5</div>
+          <div class="cat-overview-title">📖 Guías y Glosario</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">2 HERRAMIENTAS</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="62" height="52" viewBox="0 0 24 24">
+            <defs><linearGradient id="catg5" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#f9a8d4"/><stop offset="100%" stop-color="#ec4899"/>
+            </linearGradient></defs>
+            <path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z" fill="url(#catg5)"/>
+            <path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z" fill="url(#catg5)" opacity=".65"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+      <button type="button" class="cat-overview-card" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">6</div>
+          <div class="cat-overview-title">🧰 Herramientas Rápidas</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">3 HERRAMIENTAS</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center;gap:14px">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.6"><path d="M4 7h10M14 7l-3-3M14 7l-3 3"/><path d="M16 13H6M6 13l3-3M6 13l3 3"/></svg>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+        </div>
+        <div class="cat-overview-desc">Convierte entre unidades cripto, calcula porcentajes al instante, y compara la hora entre países para coordinar con tu comunidad.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
+    </div>
+
+    <div id="categoryDetailView" style="display:none">
+      <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
+
+    <div class="tool-section" data-category="trading">
+      <div class="tool-cat-label">📈 Calculadoras de Trading</div>
       <div class="tool-grid">
 <button class="tool-card" id="openCalcCard" data-tool="calculadora">
           <div class="tool-icon">🧮</div>
@@ -1143,8 +1317,8 @@ img[src=""]{display:none}
       </div>
     </div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">🪙 Inversión y Acumulación</div>
+    <div class="tool-section" data-category="inversion">
+      <div class="tool-cat-label">🪙 Calculadoras de Inversión</div>
       <div class="tool-grid">
 <button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
           <div class="tool-icon">📈</div>
@@ -1183,8 +1357,8 @@ img[src=""]{display:none}
       </div>
     </div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">💼 Portafolio</div>
+    <div class="tool-section" data-category="portafolio">
+      <div class="tool-cat-label">💼 Simulador de Portafolio</div>
       <div class="tool-grid">
 <button class="tool-card" id="openQuizCard" data-tool="quiz">
           <div class="tool-icon">🎯</div>
@@ -1209,8 +1383,8 @@ img[src=""]{display:none}
       </div>
     </div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">🛡️ Seguridad</div>
+    <div class="tool-section" data-category="seguridad">
+      <div class="tool-cat-label">🛡️ Checklists de Seguridad</div>
       <div class="tool-grid">
 <button class="tool-card" id="openChecklistCard" data-tool="checklist">
           <div class="tool-icon">🛡️</div>
@@ -1242,8 +1416,8 @@ img[src=""]{display:none}
       </div>
     </div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">📖 Aprender</div>
+    <div class="tool-section" data-category="aprender">
+      <div class="tool-cat-label">📖 Guías y Glosario</div>
       <div class="tool-grid">
 <button class="tool-card" id="openGlossaryCard" data-tool="glosario">
           <div class="tool-icon">📖</div>
@@ -1261,8 +1435,8 @@ img[src=""]{display:none}
       </div>
     </div>
 
-    <div class="tool-section">
-      <div class="tool-cat-label">🧰 Utilidades</div>
+    <div class="tool-section" data-category="utilidades">
+      <div class="tool-cat-label">🧰 Herramientas Rápidas</div>
       <div class="tool-grid">
 <button class="tool-card" id="openUnitConverterCard" data-tool="unitconverter">
           <div class="tool-icon">🔁</div>
@@ -1287,34 +1461,75 @@ img[src=""]{display:none}
       </div>
     </div>
 
+    </div>
+
     <footer class="site-footer">
-      <div class="site-footer-top">
-        <div class="site-footer-brand">
-          <span class="sb-logo-text" style="font-size:15px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
-          <p class="site-footer-tagline">Herramientas y contenido cripto sin jerga, hechos para que aprendas y operes con más criterio.</p>
+      <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner">
+        <div class="telegram-banner-left">
+          <div class="telegram-banner-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
+          </div>
+          <div>
+            <div class="telegram-banner-title">Entrá al grupo de Telegram</div>
+            <div class="telegram-banner-sub">Análisis, trading y las noticias de economía y geopolítica que de verdad mueven el mercado.</div>
+          </div>
         </div>
-        <div class="site-footer-social">
-          <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Telegram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
-          </a>
-          <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-btn" aria-label="TikTok">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg>
-          </a>
-          <a href="https://www.facebook.com/share/1BHKVvnWbo/" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Facebook">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.1c0-5.5-4.5-10-10-10S2 6.6 2 12.1c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.9c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7c4.7-.8 8.4-4.9 8.4-9.9z"/></svg>
-          </a>
-          <a href="https://www.instagram.com/juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Instagram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.7 0-3.1 0-4.1.1-1.1 0-1.8.2-2.4.4-.7.3-1.2.6-1.8 1.2-.6.6-.9 1.1-1.2 1.8-.2.6-.4 1.3-.4 2.4C2 8.9 2 9.3 2 12s0 3.1.1 4.1c0 1.1.2 1.8.4 2.4.3.7.6 1.2 1.2 1.8.6.6 1.1.9 1.8 1.2.6.2 1.3.4 2.4.4C8.9 22 9.3 22 12 22s3.1 0 4.1-.1c1.1 0 1.8-.2 2.4-.4.7-.3 1.2-.6 1.8-1.2.6-.6.9-1.1 1.2-1.8.2-.6.4-1.3.4-2.4.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c0-1.1-.2-1.8-.4-2.4-.3-.7-.6-1.2-1.2-1.8-.6-.6-1.1-.9-1.8-1.2-.6-.2-1.3-.4-2.4-.4C15.1 2 14.7 2 12 2zm0 1.8c2.6 0 2.9 0 4 .1.9 0 1.5.2 1.8.3.5.2.8.4 1.1.7.3.3.5.6.7 1.1.1.3.3.9.3 1.8.1 1.1.1 1.4.1 4s0 2.9-.1 4c0 .9-.2 1.5-.3 1.8-.2.5-.4.8-.7 1.1-.3.3-.6.5-1.1.7-.3.1-.9.3-1.8.3-1.1.1-1.4.1-4 .1s-2.9 0-4-.1c-.9 0-1.5-.2-1.8-.3-.5-.2-.8-.4-1.1-.7-.3-.3-.5-.6-.7-1.1-.1-.3-.3-.9-.3-1.8-.1-1.1-.1-1.4-.1-4s0-2.9.1-4c0-.9.2-1.5.3-1.8.2-.5.4-.8.7-1.1.3-.3.6-.5 1.1-.7.3-.1.9-.3 1.8-.3 1.1-.1 1.4-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
-          </a>
-          <a href="https://www.threads.com/@juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Threads">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 11.3c-.1-2.8-1.7-5.2-4.8-5.2-2.9 0-4.9 1.9-4.9 5.1v1.6c0 3.2 2 5.1 4.9 5.1 2.1 0 3.5-1 4.2-2.6l1.9.9c-1 2.3-3.1 3.6-6.1 3.6-4.1 0-7-2.7-7-7v-1.6c0-4.3 2.9-7 7-7 4.3 0 6.9 2.9 7 6.7v.8c0 1.6-.5 2.8-1.7 2.8-1 0-1.5-.6-1.6-1.5-.7.8-1.7 1.3-3 1.3-2 0-3.3-1.2-3.3-3s1.4-2.9 3.5-2.9c.8 0 1.5.1 2 .4 0-.9-.7-1.6-1.9-1.6-.9 0-1.6.3-2.2.8l-1.3-1.3c.9-.8 2.1-1.3 3.6-1.3 2.5 0 4.2 1.5 4.4 3.8.1.6.1 1.2.1 1.7v.1c0 .6.1 1 .5 1 .5 0 .6-.6.6-1.3v-.5zm-5.4 3.1c1 0 1.9-.5 1.9-1.6 0-.9-.7-1.3-1.7-1.3-1.2 0-1.9.5-1.9 1.4 0 .8.7 1.5 1.7 1.5z"/></svg>
-          </a>
-        </div>
+        <span class="telegram-banner-btn">UNIRME</span>
+      </a>
+
+      <div class="site-footer-social-label">Seguime en mis otras redes</div>
+      <div class="site-footer-social">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#229ed9">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#5fc4ee"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
+            <span>Telegram</span>
+          </div>
+          <div class="footer-social-handle">@juanskll</div>
+        </a>
+        <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#25F4EE">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg>
+            <span>TikTok</span>
+          </div>
+          <div class="footer-social-handle">@juanskll</div>
+        </a>
+        <a href="https://www.facebook.com/share/1BHKVvnWbo/" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#4267B2">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#4267B2"><path d="M22 12.1c0-5.5-4.5-10-10-10S2 6.6 2 12.1c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.9c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7c4.7-.8 8.4-4.9 8.4-9.9z"/></svg>
+            <span>Facebook</span>
+          </div>
+          <div class="footer-social-handle">@juanskillcash</div>
+        </a>
+        <a href="https://www.instagram.com/juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#e0479e">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#e0479e"><path d="M12 2c-2.7 0-3.1 0-4.1.1-1.1 0-1.8.2-2.4.4-.7.3-1.2.6-1.8 1.2-.6.6-.9 1.1-1.2 1.8-.2.6-.4 1.3-.4 2.4C2 8.9 2 9.3 2 12s0 3.1.1 4.1c0 1.1.2 1.8.4 2.4.3.7.6 1.2 1.2 1.8.6.6 1.1.9 1.8 1.2.6.2 1.3.4 2.4.4C8.9 22 9.3 22 12 22s3.1 0 4.1-.1c1.1 0 1.8-.2 2.4-.4.7-.3 1.2-.6 1.8-1.2.6-.6.9-1.1 1.2-1.8.2-.6.4-1.3.4-2.4.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c0-1.1-.2-1.8-.4-2.4-.3-.7-.6-1.2-1.2-1.8-.6-.6-1.1-.9-1.8-1.2-.6-.2-1.3-.4-2.4-.4C15.1 2 14.7 2 12 2zm0 1.8c2.6 0 2.9 0 4 .1.9 0 1.5.2 1.8.3.5.2.8.4 1.1.7.3.3.5.6.7 1.1.1.3.3.9.3 1.8.1 1.1.1 1.4.1 4s0 2.9-.1 4c0 .9-.2 1.5-.3 1.8-.2.5-.4.8-.7 1.1-.3.3-.6.5-1.1.7-.3.1-.9.3-1.8.3-1.1.1-1.4.1-4 .1s-2.9 0-4-.1c-.9 0-1.5-.2-1.8-.3-.5-.2-.8-.4-1.1-.7-.3-.3-.5-.6-.7-1.1-.1-.3-.3-.9-.3-1.8-.1-1.1-.1-1.4-.1-4s0-2.9.1-4c0-.9.2-1.5.3-1.8.2-.5.4-.8.7-1.1.3-.3.6-.5 1.1-.7.3-.1.9-.3 1.8-.3 1.1-.1 1.4-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
+            <span>Instagram</span>
+          </div>
+          <div class="footer-social-handle">@juanskillcash</div>
+        </a>
+        <a href="https://www.threads.com/@juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#ffffff">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 11.3c-.1-2.8-1.7-5.2-4.8-5.2-2.9 0-4.9 1.9-4.9 5.1v1.6c0 3.2 2 5.1 4.9 5.1 2.1 0 3.5-1 4.2-2.6l1.9.9c-1 2.3-3.1 3.6-6.1 3.6-4.1 0-7-2.7-7-7v-1.6c0-4.3 2.9-7 7-7 4.3 0 6.9 2.9 7 6.7v.8c0 1.6-.5 2.8-1.7 2.8-1 0-1.5-.6-1.6-1.5-.7.8-1.7 1.3-3 1.3-2 0-3.3-1.2-3.3-3s1.4-2.9 3.5-2.9c.8 0 1.5.1 2 .4 0-.9-.7-1.6-1.9-1.6-.9 0-1.6.3-2.2.8l-1.3-1.3c.9-.8 2.1-1.3 3.6-1.3 2.5 0 4.2 1.5 4.4 3.8.1.6.1 1.2.1 1.7v.1c0 .6.1 1 .5 1 .5 0 .6-.6.6-1.3v-.5zm-5.4 3.1c1 0 1.9-.5 1.9-1.6 0-.9-.7-1.3-1.7-1.3-1.2 0-1.9.5-1.9 1.4 0 .8.7 1.5 1.7 1.5z"/></svg>
+            <span>Threads</span>
+          </div>
+          <div class="footer-social-handle">@juanskillcash</div>
+        </a>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#f0b23d">
+          <div class="footer-social-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0b23d" stroke-width="1.8" stroke-linecap="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="#f0b23d" stroke="none"/></svg>
+            <span>Beacons</span>
+          </div>
+          <div class="footer-social-handle">@skillcash</div>
+        </a>
+      </div>
+
+      <div class="site-footer-brand-center">
+        <span class="sb-logo-text" style="font-size:15px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
       </div>
       <div class="site-footer-bottom">
         <span>© <span id="footerYear"></span> SkillCash. Todos los derechos reservados.</span>
       </div>
-      <p class="site-footer-note">Esto lo construí para mi comunidad, pensando en lo que a mí me hubiera servido tener desde el día uno. Aprovéchalo, y si te sirve, compártelo con alguien más que esté empezando.</p>
+      <p class="site-footer-note">SkillCash Tools es contenido educativo. Nada de lo que encuentres aquí constituye asesoría financiera, de inversión ni una recomendación de compra o venta — opera siempre bajo tu propio criterio y asumiendo tu propio riesgo.</p>
     </footer>
 
   </main>
@@ -3261,6 +3476,30 @@ const CATEGORY_ICONS = {
   'Favoritos': { svg: '<path d="M10 2.5l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.9l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/>', color: 'var(--gold)' }
 };
 
+/* ========= PANEL DE CATEGORÍAS (portada de herramientas) ========= */
+const categoryOverviewGrid = document.getElementById('categoryOverviewGrid');
+const categoryDetailView = document.getElementById('categoryDetailView');
+
+function showCategoryDetail(cat){
+  categoryOverviewGrid.style.display = 'none';
+  categoryDetailView.style.display = 'block';
+  document.getElementById('marketDashboardBlock').style.display = 'none';
+  document.querySelectorAll('.tool-section[data-category]').forEach(section => {
+    section.style.display = section.dataset.category === cat ? 'block' : 'none';
+  });
+  categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function showCategoryOverview(){
+  categoryDetailView.style.display = 'none';
+  categoryOverviewGrid.style.display = 'grid';
+  document.getElementById('marketDashboardBlock').style.display = 'block';
+  categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+document.querySelectorAll('.cat-overview-card').forEach(card => {
+  card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
+});
+document.getElementById('catBackBtn').addEventListener('click', showCategoryOverview);
+
 function applyIconSet(){
   document.querySelectorAll('.sb-item-icon, .tool-icon').forEach(el => {
     const wrapper = el.closest('[data-tool]');
@@ -3971,24 +4210,47 @@ function renderFavoritesSection(){
 renderFavoritesSection();
 
 /* ---- buscador del sidebar ---- */
+/* ---- categorías del sidebar plegables — clic en el título muestra/oculta sus herramientas ---- */
+document.querySelectorAll('.sb-cat-label').forEach(label => {
+  label.classList.add('collapsed'); // empiezan plegadas
+  let el = label.nextElementSibling;
+  while(el && el.classList.contains('sb-item')){
+    el.style.display = 'none';
+    el = el.nextElementSibling;
+  }
+  label.addEventListener('click', () => {
+    const collapsing = !label.classList.contains('collapsed');
+    label.classList.toggle('collapsed', collapsing);
+    let sib = label.nextElementSibling;
+    while(sib && sib.classList.contains('sb-item')){
+      sib.style.display = collapsing ? 'none' : '';
+      sib = sib.nextElementSibling;
+    }
+  });
+});
+
 const sbSearchInput = document.getElementById('sbSearchInput');
 sbSearchInput.addEventListener('input', () => {
   const query = sbSearchInput.value.trim().toLowerCase();
   const nav = document.querySelector('.sb-nav');
   let currentLabel = null;
+  let currentCollapsed = false;
   let labelHasVisibleItem = false;
 
   Array.from(nav.children).forEach(el => {
     if(el.classList.contains('sb-cat-label')){
       if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
       currentLabel = el;
+      currentCollapsed = el.classList.contains('collapsed');
       labelHasVisibleItem = false;
     } else if(el.classList.contains('sb-item')){
       const label = el.querySelector('.sb-item-label');
       const text = label ? label.textContent.toLowerCase() : '';
       const match = query === '' || text.includes(query);
-      el.style.display = match ? '' : 'none';
-      if(match) labelHasVisibleItem = true;
+      // si la categoría está plegada y no hay búsqueda activa, se queda oculta
+      const shouldShow = match && !(currentCollapsed && query === '');
+      el.style.display = shouldShow ? '' : 'none';
+      if(shouldShow) labelHasVisibleItem = true;
     }
   });
   if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
