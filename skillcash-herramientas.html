@@ -854,19 +854,20 @@ img[src=""]{display:none}
 .site-footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
 
 .telegram-banner{
-  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;text-decoration:none;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:nowrap;text-decoration:none;
   background:linear-gradient(135deg,rgba(34,158,217,.15),rgba(34,158,217,.03));
-  border:1px solid rgba(34,158,217,.35);border-radius:16px;padding:16px 20px;margin:0 auto 28px;
+  border:1px solid rgba(34,158,217,.35);border-radius:14px;padding:12px 16px;margin:0 auto 28px;
   transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);
   max-width:60%;
 }
-@media(max-width:700px){ .telegram-banner{max-width:100%} }
+@media(max-width:700px){ .telegram-banner{max-width:100%;flex-wrap:wrap} }
 .telegram-banner:hover{border-color:#229ed9;transform:translateY(-2px)}
-.telegram-banner-left{display:flex;align-items:center;gap:14px}
-.telegram-banner-icon{width:38px;height:38px;border-radius:50%;background:#229ed9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.telegram-banner-title{font-weight:700;font-size:15px;color:#5fc4ee}
-.telegram-banner-sub{font-size:12.5px;color:var(--muted2);margin-top:2px}
-.telegram-banner-btn{background:transparent;border:1.5px solid #229ed9;color:#5fc4ee;font-weight:700;font-size:14px;padding:12px 24px;border-radius:22px;white-space:nowrap;font-family:'Space Grotesk',sans-serif;flex:1 0 100%;text-align:center;margin-top:6px;transition:background var(--dur-base) var(--ease-out)}
+.telegram-banner-left{display:flex;align-items:center;gap:11px;min-width:0}
+.telegram-banner-icon{width:32px;height:32px;border-radius:50%;background:#229ed9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.telegram-banner-icon svg{width:16px;height:16px}
+.telegram-banner-title{font-weight:700;font-size:13.5px;color:#5fc4ee}
+.telegram-banner-sub{font-size:11.5px;color:var(--muted2);margin-top:1px}
+.telegram-banner-btn{background:transparent;border:1.5px solid #229ed9;color:#5fc4ee;font-weight:700;font-size:12.5px;padding:9px 18px;border-radius:20px;white-space:nowrap;font-family:'Space Grotesk',sans-serif;flex-shrink:0;transition:background var(--dur-base) var(--ease-out)}
 .telegram-banner-btn:hover{background:rgba(34,158,217,.15)}
 .site-footer-brand{max-width:420px}
 .site-footer-tagline{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.6}
@@ -880,6 +881,11 @@ img[src=""]{display:none}
 .site-footer-brand-center{text-align:center;margin-bottom:14px}
 .site-footer-bottom{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:0;padding-top:0;font-size:11.5px;color:var(--muted);text-align:center}
 .site-footer-note{margin:14px auto 0;font-size:12.5px;line-height:1.75;color:var(--muted2);max-width:760px;text-align:center}
+
+.tool-footer-links{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);font-size:11px}
+.tool-footer-links a{color:var(--muted);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
+.tool-footer-links a:hover{color:var(--red)}
+.tool-footer-links span{color:var(--border2)}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -1471,7 +1477,7 @@ img[src=""]{display:none}
           </div>
           <div>
             <div class="telegram-banner-title">Entrá al grupo de Telegram</div>
-            <div class="telegram-banner-sub">Análisis, trading y las noticias de economía y geopolítica que de verdad mueven el mercado.</div>
+            <div class="telegram-banner-sub">Análisis, trading, noticias y comunidad de skillianos — gratis.</div>
           </div>
         </div>
         <span class="telegram-banner-btn">UNIRME</span>
@@ -1479,13 +1485,6 @@ img[src=""]{display:none}
 
       <div class="site-footer-social-label">Seguime en mis otras redes</div>
       <div class="site-footer-social">
-        <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#229ed9">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#5fc4ee"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
-            <span>Telegram</span>
-          </div>
-          <div class="footer-social-handle">@juanskll</div>
-        </a>
         <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#25F4EE">
           <div class="footer-social-top">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg>
@@ -1691,7 +1690,15 @@ img[src=""]{display:none}
 
       <div class="scroll-fade" id="scrollFade"><span class="scroll-fade-arrow">▼ más abajo</span></div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- no-copies-esto-skillcash -->
@@ -1802,7 +1809,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE BREAK-EVEN ===== -->
@@ -1920,7 +1935,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CALCULADORA DCA ===== -->
@@ -2035,7 +2058,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: COMPARADOR DE MARKET CAP ===== -->
@@ -2120,7 +2151,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: LIBERTAD FINANCIERA ===== -->
@@ -2217,7 +2256,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CONVERSOR DE UNIDADES ===== -->
@@ -2274,7 +2321,15 @@ img[src=""]{display:none}
 
       <div class="be-note" style="margin-top:20px">💡 <strong>Gwei</strong> es la unidad en la que casi siempre se muestra el "gas" (comisión) en Ethereum — mucho más fácil de leer que wei, que tiene demasiados ceros. <strong>Satoshi</strong> es la unidad más pequeña de Bitcoin, útil cuando hablas de montos chicos sin decimales largos.</div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE PORCENTAJES ===== -->
@@ -2380,7 +2435,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: RELOJ DE ZONA HORARIA ===== -->
@@ -2470,7 +2533,15 @@ img[src=""]{display:none}
       <div class="be-note" style="margin-top:16px" id="tzDiffNote">—</div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CALCULADORA COIN-M ===== -->
@@ -2640,7 +2711,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE COMISIONES ===== -->
@@ -2754,7 +2833,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: PERFIL DE RIESGO ===== -->
@@ -2806,7 +2893,15 @@ img[src=""]{display:none}
         </div>
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: MONITOR DE CORRELACIÓN ===== -->
@@ -2854,7 +2949,15 @@ img[src=""]{display:none}
         <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: GLOSARIO CRIPTO ===== -->
@@ -2886,7 +2989,15 @@ img[src=""]{display:none}
 
       <div id="glossList"></div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: DCA DE SALIDA (RETIRO ESCALONADO) ===== -->
@@ -2984,7 +3095,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: BIBLIOTECA DE ERRORES COMUNES ===== -->
@@ -3016,7 +3135,15 @@ img[src=""]{display:none}
         Estos casos son ilustrativos y educativos — combinan patrones reales y comunes de errores, no relatos de personas específicas.
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: COMPARADOR DE WALLETS ===== -->
@@ -3084,7 +3211,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: VERIFICAR APROBACIONES DE WALLET ===== -->
@@ -3124,7 +3259,15 @@ img[src=""]{display:none}
         <strong>Tu progreso se guarda solo en este navegador.</strong>
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: HERENCIA DIGITAL ===== -->
@@ -3164,7 +3307,15 @@ img[src=""]{display:none}
         <strong>Tu progreso se guarda solo en este navegador.</strong>
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: CHECKLIST DE SEGURIDAD ===== -->
@@ -3202,7 +3353,15 @@ img[src=""]{display:none}
         <strong>Tu progreso se guarda solo en este navegador.</strong>
       </div>
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <!-- ===== MODAL: LOGIN (general de la página) ===== -->
@@ -3430,7 +3589,15 @@ img[src=""]{display:none}
       </div>
 
     </div>
-  </div>
+  
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
