@@ -231,6 +231,9 @@ button{font-family:inherit;color:inherit}
 .fng-section-value.fng-red{color:var(--red)}
 .fng-section-value.fng-gold{color:var(--gold)}
 .fng-section-value.fng-green{color:var(--green)}
+.fng-big-value.fng-red{color:var(--red)}
+.fng-big-value.fng-gold{color:var(--gold)}
+.fng-big-value.fng-green{color:var(--green)}
 .fng-section-class{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted2)}
 
 .fng-gauge-track{position:relative;height:5px;border-radius:8px;background:linear-gradient(90deg,#ff2f4f,#ff2f4f 20%,#f0b23d 45%,#f0b23d 55%,#2ecc71 80%,#2ecc71);margin:2px 4px 4px}
@@ -886,6 +889,12 @@ img[src=""]{display:none}
 .tool-footer-links a{color:var(--muted);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
 .tool-footer-links a:hover{color:var(--red)}
 .tool-footer-links span{color:var(--border2)}
+
+.fng-big-gauge{max-width:280px;margin:10px auto 0}
+.fng-big-gauge line{transition:transform 1s cubic-bezier(.16,1,.3,1)}
+.fng-big-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:44px;margin-top:-16px}
+.fng-big-class{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);margin-top:2px}
+.fng-chart-svg{width:100%;height:auto;display:block}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -1102,7 +1111,7 @@ img[src=""]{display:none}
 
     <div id="marketDashboardBlock">
     <div class="market-overview reveal">
-      <div class="fng-section">
+      <div class="fng-section" id="fngSectionBox" style="cursor:pointer">
         <div class="fng-section-head">
           <span class="fng-section-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Índice de Miedo y Codicia</span>
           <span class="fng-section-value skeleton" id="fngValue"></span>
@@ -3362,6 +3371,67 @@ img[src=""]{display:none}
         <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
       </div>
 </div>
+</div>
+
+<!-- ===== MODAL: DETALLE ÍNDICE DE MIEDO Y CODICIA ===== -->
+<div class="modal-overlay" id="fngDetailModal">
+  <button class="modal-close" id="closeFngDetail" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="fngDetailTitleEl">
+    <div class="calc">
+      <div class="calc-head">
+        <h2 class="calc-title" id="fngDetailTitleEl">😨 Índice de Miedo y Codicia</h2>
+        <p class="calc-sub">Qué tan asustado o codicioso está el mercado cripto ahora — y qué ha pasado históricamente en momentos parecidos</p>
+      </div>
+
+      <div id="fngDetailLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando historial…</div>
+      <div id="fngDetailError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el historial ahora mismo. Intenta de nuevo en un momento.</div>
+
+      <div id="fngDetailContent" style="display:none">
+
+        <div class="calc-body">
+          <div class="calc-inputs" style="text-align:center">
+            <div class="be-savings-label" style="text-align:center">AHORA MISMO</div>
+            <div class="fng-big-gauge">
+              <svg viewBox="0 0 200 110" width="100%">
+                <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#fngGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="fngGaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#ff2f4f"/>
+                    <stop offset="50%" stop-color="#f0b23d"/>
+                    <stop offset="100%" stop-color="#2ecc71"/>
+                  </linearGradient>
+                </defs>
+                <line id="fngDetailNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                <circle cx="100" cy="100" r="5" fill="#fff"/>
+              </svg>
+            </div>
+            <div class="fng-big-value" id="fngDetailValue">—</div>
+            <div class="fng-big-class" id="fngDetailClass">—</div>
+
+            <div class="be-note" id="fngDetailRecommendation" style="text-align:left;margin-top:18px"></div>
+          </div>
+
+          <div class="calc-results">
+            <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
+            <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
+            <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
+            <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
+            <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
+            <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
+
+            <div class="be-section-label" style="margin-top:18px">📈 Histórico (último año)</div>
+            <div id="fngChartWrap" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <div class="calc-disclaimer">
+          El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta.<br>
+          <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== MODAL: LOGIN (general de la página) ===== -->
@@ -9458,6 +9528,93 @@ function fngColorClass(val){
   if(val <= 55) return 'fng-gold';
   return 'fng-green';
 }
+
+/* ---- panel de detalle del índice, con historial real (gratis, vía alternative.me) ---- */
+function fngRecommendationText(val){
+  if(val <= 24){
+    return '💡 <b>Miedo extremo.</b> Históricamente, estos niveles han coincidido con zonas donde el mercado ya castigó mucho el precio — algunos lo ven como momento de acumular con cautela. No es garantía de que no siga bajando.';
+  }
+  if(val <= 44){
+    return '💡 <b>Miedo.</b> El mercado está nervioso. Algunos inversionistas ven esto como una zona interesante para ir comprando de a poco, sin apurarse.';
+  }
+  if(val <= 55){
+    return '💡 <b>Neutral.</b> No hay una señal fuerte en ningún sentido — ni de euforia ni de pánico. Momento de simplemente seguir tu plan.';
+  }
+  if(val <= 75){
+    return '💡 <b>Codicia.</b> El optimismo está subiendo. Es un buen momento para revisar tu gestión de riesgo — muchos prefieren tener cuidado con comprar más aquí, en vez de perseguir el precio.';
+  }
+  return '💡 <b>Codicia extrema.</b> Históricamente, estos niveles han precedido correcciones. Muchos toman esto como momento de asegurar ganancias o subir el stop loss — no de comprar más.';
+}
+
+async function openFngDetailModal(){
+  document.getElementById('fngDetailModal').classList.add('open');
+  document.getElementById('fngDetailLoading').style.display = 'block';
+  document.getElementById('fngDetailError').style.display = 'none';
+  document.getElementById('fngDetailContent').style.display = 'none';
+
+  try{
+    const res = await fetch('https://api.alternative.me/fng/?limit=370');
+    const json = await res.json();
+    const data = json.data;
+    if(!data || !data.length) throw new Error('sin datos');
+
+    // viene del más nuevo al más viejo
+    const today = parseInt(data[0].value, 10);
+    const yesterday = data[1] ? parseInt(data[1].value, 10) : null;
+    const weekAgo = data[7] ? parseInt(data[7].value, 10) : null;
+    const monthAgo = data[30] ? parseInt(data[30].value, 10) : null;
+    const yearValues = data.map(d => parseInt(d.value, 10));
+    const yearHigh = Math.max(...yearValues);
+    const yearLow = Math.min(...yearValues);
+    const yearAvg = yearValues.reduce((s, v) => s + v, 0) / yearValues.length;
+
+    document.getElementById('fngDetailValue').textContent = fngEmoji(today) + ' ' + today;
+    document.getElementById('fngDetailValue').className = 'fng-big-value ' + fngColorClass(today);
+    document.getElementById('fngDetailClass').textContent = FNG_LABELS_ES[data[0].value_classification] || data[0].value_classification;
+    document.getElementById('fngDetailNeedle').style.transform = 'rotate(' + (today / 100 * 180 - 90) + 'deg)';
+    document.getElementById('fngDetailRecommendation').innerHTML = fngRecommendationText(today);
+
+    document.getElementById('fngYesterday').textContent = yesterday !== null ? (fngEmoji(yesterday) + ' ' + yesterday) : '—';
+    document.getElementById('fngWeekAgo').textContent = weekAgo !== null ? (fngEmoji(weekAgo) + ' ' + weekAgo) : '—';
+    document.getElementById('fngMonthAgo').textContent = monthAgo !== null ? (fngEmoji(monthAgo) + ' ' + monthAgo) : '—';
+    document.getElementById('fngYearHigh').textContent = fngEmoji(yearHigh) + ' ' + yearHigh;
+    document.getElementById('fngYearLow').textContent = fngEmoji(yearLow) + ' ' + yearLow;
+    document.getElementById('fngYearAvg').textContent = Math.round(yearAvg);
+
+    // gráfica: la data viene del más nuevo al más viejo, la volteamos para dibujar de izquierda (viejo) a derecha (hoy)
+    const chartValues = yearValues.slice().reverse();
+    const w = 600, h = 140;
+    const stepX = w / (chartValues.length - 1);
+    const points = chartValues.map((v, i) => `${(i * stepX).toFixed(1)},${(h - (v / 100 * h)).toFixed(1)}`).join(' ');
+    const fillPoints = `0,${h} ${points} ${w},${h}`;
+    document.getElementById('fngChartWrap').innerHTML = `
+      <svg class="fng-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="fngFillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f0b23d" stop-opacity=".4"/>
+            <stop offset="100%" stop-color="#f0b23d" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points="${fillPoints}" fill="url(#fngFillGrad)"/>
+        <polyline points="${points}" fill="none" stroke="#f0b23d" stroke-width="2"/>
+      </svg>
+    `;
+
+    document.getElementById('fngDetailLoading').style.display = 'none';
+    document.getElementById('fngDetailContent').style.display = 'block';
+  } catch(err){
+    document.getElementById('fngDetailLoading').style.display = 'none';
+    document.getElementById('fngDetailError').style.display = 'block';
+  }
+}
+document.getElementById('fngSectionBox').addEventListener('click', openFngDetailModal);
+document.getElementById('closeFngDetail').addEventListener('click', () => {
+  document.getElementById('fngDetailModal').classList.remove('open');
+});
+document.getElementById('fngDetailModal').addEventListener('click', (e) => {
+  if(e.target.id === 'fngDetailModal') document.getElementById('fngDetailModal').classList.remove('open');
+});
+
 async function loadFearGreedIndex(){
   const valueEl = document.getElementById('fngValue');
   const classEl = document.getElementById('fngClass');
