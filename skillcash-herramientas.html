@@ -895,6 +895,7 @@ img[src=""]{display:none}
 .fng-big-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:44px;margin-top:-16px}
 .fng-big-class{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);margin-top:2px}
 .fng-chart-svg{width:100%;height:auto;display:block}
+.fng-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;text-align:left}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -3409,24 +3410,42 @@ img[src=""]{display:none}
             <div class="fng-big-class" id="fngDetailClass">—</div>
 
             <div class="be-note" id="fngDetailRecommendation" style="text-align:left;margin-top:18px"></div>
+
+            <div class="fng-stats-grid">
+              <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
+              <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
+              <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
+              <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
+              <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
+              <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
+            </div>
           </div>
 
           <div class="calc-results">
-            <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
-            <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
-            <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
-            <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
-            <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
-            <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
-
-            <div class="be-section-label" style="margin-top:18px">📈 Histórico (último año)</div>
-            <div id="fngChartWrap" style="margin-top:10px"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+              <div class="be-section-label" style="margin:0">📈 Histórico</div>
+              <div class="dir-toggle" id="fngRangeToggle" style="margin-bottom:0;padding:3px">
+                <button class="mode-btn" data-range="7" style="padding:7px 10px;font-size:12px">7D</button>
+                <button class="mode-btn" data-range="30" style="padding:7px 10px;font-size:12px">30D</button>
+                <button class="mode-btn" data-range="90" style="padding:7px 10px;font-size:12px">90D</button>
+                <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
+              </div>
+            </div>
+            <div id="fngChartWrap"></div>
           </div>
         </div>
 
         <div class="calc-disclaimer">
-          El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta.<br>
+          El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta. La actualización es diaria (no existe un dato "por hora").<br>
           <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+        </div>
+
+        <div class="tool-footer-links">
+          <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+          <span>·</span>
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+          <span>·</span>
+          <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
         </div>
 
       </div>
@@ -9546,6 +9565,77 @@ function fngRecommendationText(val){
   return '💡 <b>Codicia extrema.</b> Históricamente, estos niveles han precedido correcciones. Muchos toman esto como momento de asegurar ganancias o subir el stop loss — no de comprar más.';
 }
 
+let fngCachedData = null; // guarda los 370 días ya traídos, para no pedirle de nuevo a la API al cambiar de rango
+
+function renderFngChart(days){
+  if(!fngCachedData) return;
+  const sliceCount = Math.min(days, fngCachedData.length);
+  const slice = fngCachedData.slice(0, sliceCount).slice().reverse(); // de más viejo a más nuevo, para dibujar izquierda→derecha
+  const values = slice.map(d => parseInt(d.value, 10));
+  const dates = slice.map(d => new Date(parseInt(d.timestamp, 10) * 1000));
+
+  const totalW = 620, totalH = 190;
+  const marginLeft = 32, marginRight = 6, marginTop = 6, marginBottom = 22;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+  const xFor = i => marginLeft + (values.length > 1 ? (i / (values.length - 1)) * drawW : drawW / 2);
+  const yFor = v => marginTop + drawH - (v / 100) * drawH;
+
+  // bandas de fondo por zona, para ver de un vistazo dónde empieza el miedo y dónde la codicia
+  const zones = [
+    { from: 0, to: 25, color: 'rgba(255,47,79,.14)' },
+    { from: 25, to: 45, color: 'rgba(240,178,61,.10)' },
+    { from: 45, to: 55, color: 'rgba(255,255,255,.05)' },
+    { from: 55, to: 75, color: 'rgba(46,204,113,.09)' },
+    { from: 75, to: 100, color: 'rgba(46,204,113,.18)' }
+  ];
+  const zonesHtml = zones.map(z =>
+    `<rect x="${marginLeft}" y="${yFor(z.to).toFixed(1)}" width="${drawW}" height="${(yFor(z.from) - yFor(z.to)).toFixed(1)}" fill="${z.color}"/>`
+  ).join('');
+
+  // líneas y números del eje Y
+  const yGridHtml = [0, 25, 50, 75, 100].map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 5}" y="${(yFor(t) + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="#847e93" font-family="'Space Mono',monospace">${t}</text>
+  `).join('');
+
+  // fechas del eje X (5 puntos repartidos)
+  const xLabelCount = Math.min(5, dates.length);
+  let xLabelsHtml = '';
+  for(let k = 0; k < xLabelCount; k++){
+    const idx = xLabelCount === 1 ? 0 : Math.round(k * (dates.length - 1) / (xLabelCount - 1));
+    const label = dates[idx].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    xLabelsHtml += `<text x="${xFor(idx).toFixed(1)}" y="${totalH - 4}" text-anchor="middle" font-size="8" fill="#847e93" font-family="'Space Mono',monospace">${label}</text>`;
+  }
+
+  const points = values.map((v, i) => `${xFor(i).toFixed(1)},${yFor(v).toFixed(1)}`).join(' ');
+  const fillPoints = `${xFor(0).toFixed(1)},${yFor(0).toFixed(1)} ${points} ${xFor(values.length - 1).toFixed(1)},${yFor(0).toFixed(1)}`;
+
+  document.getElementById('fngChartWrap').innerHTML = `
+    <svg class="fng-chart-svg" viewBox="0 0 ${totalW} ${totalH}">
+      <defs>
+        <linearGradient id="fngFillGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f0b23d" stop-opacity=".45"/>
+          <stop offset="100%" stop-color="#f0b23d" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${zonesHtml}
+      ${yGridHtml}
+      <polygon points="${fillPoints}" fill="url(#fngFillGrad)"/>
+      <polyline points="${points}" fill="none" stroke="#f0b23d" stroke-width="1.8" stroke-linejoin="round"/>
+      ${xLabelsHtml}
+    </svg>
+  `;
+}
+
+document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFngChart(parseInt(btn.dataset.range, 10));
+  });
+});
+
 async function openFngDetailModal(){
   document.getElementById('fngDetailModal').classList.add('open');
   document.getElementById('fngDetailLoading').style.display = 'block';
@@ -9557,6 +9647,7 @@ async function openFngDetailModal(){
     const json = await res.json();
     const data = json.data;
     if(!data || !data.length) throw new Error('sin datos');
+    fngCachedData = data;
 
     // viene del más nuevo al más viejo
     const today = parseInt(data[0].value, 10);
@@ -9581,24 +9672,8 @@ async function openFngDetailModal(){
     document.getElementById('fngYearLow').textContent = fngEmoji(yearLow) + ' ' + yearLow;
     document.getElementById('fngYearAvg').textContent = Math.round(yearAvg);
 
-    // gráfica: la data viene del más nuevo al más viejo, la volteamos para dibujar de izquierda (viejo) a derecha (hoy)
-    const chartValues = yearValues.slice().reverse();
-    const w = 600, h = 140;
-    const stepX = w / (chartValues.length - 1);
-    const points = chartValues.map((v, i) => `${(i * stepX).toFixed(1)},${(h - (v / 100 * h)).toFixed(1)}`).join(' ');
-    const fillPoints = `0,${h} ${points} ${w},${h}`;
-    document.getElementById('fngChartWrap').innerHTML = `
-      <svg class="fng-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="fngFillGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f0b23d" stop-opacity=".4"/>
-            <stop offset="100%" stop-color="#f0b23d" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <polygon points="${fillPoints}" fill="url(#fngFillGrad)"/>
-        <polyline points="${points}" fill="none" stroke="#f0b23d" stroke-width="2"/>
-      </svg>
-    `;
+    // por defecto se dibuja con el rango de 1 año (el botón "1A" ya está activo desde el HTML)
+    renderFngChart(365);
 
     document.getElementById('fngDetailLoading').style.display = 'none';
     document.getElementById('fngDetailContent').style.display = 'block';
