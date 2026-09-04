@@ -902,9 +902,12 @@ img[src=""]{display:none}
 .fng-legend-zones i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
 .fng-legend-lines{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11.5px;color:var(--muted)}
 .fng-legend-lines i{width:14px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0}
+.fng-share-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 .fng-chart-breakout{margin:0 -32px;padding:0 8px}
 @media(max-width:900px){ .fng-chart-breakout{margin:0 -18px;padding:0 6px} }
-.fng-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px;text-align:left}
+.fng-stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px;text-align:left}
+@media(max-width:700px){ .fng-stats-grid{grid-template-columns:1fr 1fr 1fr} }
+@media(max-width:420px){ .fng-stats-grid{grid-template-columns:1fr 1fr} }
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -957,6 +960,7 @@ img[src=""]{display:none}
   .sb-logo-text.desktop-center-text{font-size:21px;letter-spacing:-.02em}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body data-skillcash-adn="skillcash-forge" data-origen="Charly19">
 <span aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">skillcash-huella · origen-skillcash-tools</span>
@@ -3403,7 +3407,7 @@ img[src=""]{display:none}
 
       <div id="fngDetailContent" style="display:none">
 
-        <div class="calc-body">
+        <div class="calc-body" id="fngCaptureAll">
           <div class="calc-inputs" style="text-align:center">
             <div class="be-savings-label" style="text-align:center">AHORA MISMO</div>
             <div class="fng-big-gauge">
@@ -3448,6 +3452,12 @@ img[src=""]{display:none}
             </div>
           </div>
         </div>
+
+        <div class="fng-share-row">
+          <button type="button" class="a-btn" id="fngShareAllBtn">📸 Descargar imagen del panel completo</button>
+          <button type="button" class="a-btn" id="fngShareChartBtn">📸 Descargar solo el gráfico</button>
+        </div>
+        <div class="calc-disclaimer" id="fngShareStatus" style="display:none"></div>
 
         <div class="calc-disclaimer">
           El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta. La actualización es diaria (no existe un dato "por hora").<br>
@@ -9812,6 +9822,34 @@ async function openFngDetailModal(){
   }
 }
 document.getElementById('fngSectionBox').addEventListener('click', openFngDetailModal);
+
+/* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
+async function captureAndShare(elementId, filename){
+  const statusEl = document.getElementById('fngShareStatus');
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Generando imagen…';
+  try{
+    const el = document.getElementById(elementId);
+    const canvas = await html2canvas(el, {
+      backgroundColor: '#0a1024',
+      scale: 2,
+      windowWidth: 1400, // fuerza el layout de escritorio, sin importar si estás en celular
+      useCORS: true
+    });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = '✓ Imagen descargada — ya la puedes compartir desde tu galería.';
+  } catch(err){
+    statusEl.textContent = '⚠️ No se pudo generar la imagen. Intenta de nuevo.';
+  }
+  setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
+}
+document.getElementById('fngShareAllBtn').addEventListener('click', () => captureAndShare('fngCaptureAll', 'indice-miedo-codicia-skillcash.png'));
+document.getElementById('fngShareChartBtn').addEventListener('click', () => captureAndShare('fngChartWrap', 'grafico-miedo-codicia-skillcash.png'));
 document.getElementById('closeFngDetail').addEventListener('click', () => {
   document.getElementById('fngDetailModal').classList.remove('open');
 });
