@@ -223,7 +223,7 @@ button{font-family:inherit;color:inherit}
 }
 
 .fng-section{background:#080c20;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0}
-.fng-click-hint{position:absolute;top:9px;right:14px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;transition:color var(--dur-fast) var(--ease-out)}
+.fng-click-hint{text-align:right;margin-top:6px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .fng-section-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .fng-section-title{font-size:11px;font-weight:700;color:var(--white);margin-right:auto}
@@ -1115,7 +1115,6 @@ img[src=""]{display:none}
     <div id="marketDashboardBlock">
     <div class="market-overview reveal">
       <div class="fng-section" id="fngSectionBox" style="cursor:pointer;position:relative">
-        <span class="fng-click-hint">Ver detalle →</span>
         <div class="fng-section-head">
           <span class="fng-section-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Índice de Miedo y Codicia</span>
           <span class="fng-section-value skeleton" id="fngValue"></span>
@@ -1127,6 +1126,7 @@ img[src=""]{display:none}
         <div class="fng-gauge-labels">
           <span>Miedo extremo</span><span>Miedo</span><span>Neutral</span><span>Codicia</span><span>Codicia extrema</span>
         </div>
+        <div class="fng-click-hint">Ver detalle →</div>
       </div>
 
       <div class="dom-card btc">
@@ -9587,7 +9587,7 @@ let btcPriceCache = null; // {timestamp_ms: price} — se trae una sola vez, jun
 async function fetchBtcPriceHistory(){
   if(btcPriceCache) return btcPriceCache;
   try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=370&interval=daily'));
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily'));
     const json = await res.json();
     btcPriceCache = json.prices || []; // [[timestamp_ms, price], ...]
   } catch(err){
@@ -9619,16 +9619,17 @@ function renderFngChart(days){
   const hasBtc = btcValues.some(v => v !== null);
 
   const totalW = 700, totalH = 300;
-  const marginLeft = 34, marginRight = hasBtc ? 46 : 10, marginTop = 10, marginBottom = 24;
+  const marginLeft = 78, marginRight = hasBtc ? 46 : 10, marginTop = 10, marginBottom = 24;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
   const xFor = i => marginLeft + (values.length > 1 ? (i / (values.length - 1)) * drawW : drawW / 2);
   const yFor = v => marginTop + drawH - (v / 100) * drawH;
 
-  // eje Y izquierdo — el índice (0 a 100)
+  // eje Y izquierdo — el índice (0 a 100), con el nombre de la zona junto a cada línea
+  const yZoneNames = { 0: 'Miedo extremo', 25: 'Miedo', 50: 'Neutral', 75: 'Codicia', 100: 'Codicia extrema' };
   const yGridHtml = [0, 25, 50, 75, 100].map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
-    <text x="${marginLeft - 5}" y="${(yFor(t) + 3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="#847e93" font-family="'Space Mono',monospace">${t}</text>
+    <text x="${marginLeft - 5}" y="${(yFor(t) + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="#847e93" font-family="'Space Mono',monospace"><tspan font-weight="700">${t}</tspan> · ${yZoneNames[t]}</text>
   `).join('');
 
   // fechas del eje X
@@ -9671,6 +9672,15 @@ function renderFngChart(days){
   document.getElementById('fngChartWrap').innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="fngChartSvg" viewBox="0 0 ${totalW} ${totalH}" style="aspect-ratio:${totalW}/${totalH}">
+        <defs>
+          <linearGradient id="fngBgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2ecc71" stop-opacity=".16"/>
+            <stop offset="22%" stop-color="#2ecc71" stop-opacity="0"/>
+            <stop offset="78%" stop-color="#ff2f4f" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#ff2f4f" stop-opacity=".16"/>
+          </linearGradient>
+        </defs>
+        <rect x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="url(#fngBgGrad)"/>
         ${yGridHtml}
         ${btcHtml}
         ${btcAxisHtml}
@@ -9681,9 +9691,9 @@ function renderFngChart(days){
         <rect id="fngHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
       <div id="fngTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:11px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-      <div style="display:flex;gap:14px;margin-top:6px;font-size:9.5px;color:var(--muted);font-family:'Space Mono',monospace">
-        <span>▬ Índice de Miedo y Codicia</span>
-        ${hasBtc ? '<span style="color:#5a6280">┄ Precio de Bitcoin</span>' : ''}
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:9.5px;color:var(--muted);font-family:'Space Mono',monospace">
+        <span><span style="color:#f0b23d">▬</span> Línea de color = Índice de Miedo y Codicia (rojo = miedo, verde = codicia)</span>
+        ${hasBtc ? '<span><span style="color:#5a6280">┄</span> Línea gris punteada = precio de Bitcoin (referencia, eje derecho)</span>' : ''}
       </div>
     </div>
   `;
