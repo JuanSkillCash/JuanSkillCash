@@ -892,11 +892,18 @@ img[src=""]{display:none}
 .tool-footer-links a:hover{color:var(--red)}
 .tool-footer-links span{color:var(--border2)}
 
-.fng-big-gauge{max-width:280px;margin:10px auto 0}
+.fng-big-gauge{max-width:210px;margin:6px auto 0}
 .fng-big-gauge line{transition:transform 1s cubic-bezier(.16,1,.3,1)}
-.fng-big-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:44px;margin-top:-16px}
+.fng-big-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:36px;margin-top:-12px}
 .fng-big-class{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);margin-top:2px}
 .fng-chart-svg{width:100%;height:auto;display:block}
+.fng-legend-zones{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:12.5px;color:var(--muted2)}
+.fng-legend-zones span,.fng-legend-lines span{display:inline-flex;align-items:center;gap:6px}
+.fng-legend-zones i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.fng-legend-lines{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11.5px;color:var(--muted)}
+.fng-legend-lines i{width:14px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0}
+.fng-chart-breakout{margin:0 -32px;padding:0 8px}
+@media(max-width:900px){ .fng-chart-breakout{margin:0 -18px;padding:0 6px} }
 .fng-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px;text-align:left}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
@@ -3429,7 +3436,7 @@ img[src=""]{display:none}
                 <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
               </div>
             </div>
-            <div id="fngChartWrap"></div>
+            <div id="fngChartWrap" class="fng-chart-breakout"></div>
 
             <div class="fng-stats-grid">
               <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
@@ -9618,36 +9625,35 @@ function renderFngChart(days){
   const btcValues = timestampsMs.map(ms => closestBtcPrice(ms));
   const hasBtc = btcValues.some(v => v !== null);
 
-  const totalW = 700, totalH = 300;
-  const marginLeft = 78, marginRight = hasBtc ? 46 : 10, marginTop = 10, marginBottom = 24;
+  const totalW = 760, totalH = 380;
+  const marginLeft = 52, marginRight = hasBtc ? 62 : 14, marginTop = 14, marginBottom = 40;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
   const xFor = i => marginLeft + (values.length > 1 ? (i / (values.length - 1)) * drawW : drawW / 2);
   const yFor = v => marginTop + drawH - (v / 100) * drawH;
 
-  // eje Y izquierdo — el índice (0 a 100), con el nombre de la zona junto a cada línea
-  const yZoneNames = { 0: 'Miedo extremo', 25: 'Miedo', 50: 'Neutral', 75: 'Codicia', 100: 'Codicia extrema' };
+  // eje Y izquierdo — solo números, grandes, legibles de verdad
   const yGridHtml = [0, 25, 50, 75, 100].map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
-    <text x="${marginLeft - 5}" y="${(yFor(t) + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="#847e93" font-family="'Space Mono',monospace"><tspan font-weight="700">${t}</tspan> · ${yZoneNames[t]}</text>
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 6).toFixed(1)}" text-anchor="end" font-size="20" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${t}</text>
   `).join('');
 
-  // fechas del eje X
-  const xLabelCount = Math.min(6, dates.length);
+  // fechas del eje X, también grandes
+  const xLabelCount = Math.min(5, dates.length);
   let xLabelsHtml = '';
   const xTickIdx = [];
   for(let k = 0; k < xLabelCount; k++){
     const idx = xLabelCount === 1 ? 0 : Math.round(k * (dates.length - 1) / (xLabelCount - 1));
     xTickIdx.push(idx);
     const label = dates[idx].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-    xLabelsHtml += `<text x="${xFor(idx).toFixed(1)}" y="${totalH - 6}" text-anchor="middle" font-size="8.5" fill="#847e93" font-family="'Space Mono',monospace">${label}</text>`;
+    xLabelsHtml += `<text x="${xFor(idx).toFixed(1)}" y="${totalH - 12}" text-anchor="middle" font-size="18" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>`;
   }
 
   // línea del índice, dibujada por segmentos de color según la zona en la que está cada tramo
   let segmentsHtml = '';
   for(let i = 0; i < values.length - 1; i++){
     const color = fngZoneColor((values[i] + values[i + 1]) / 2);
-    segmentsHtml += `<line x1="${xFor(i).toFixed(1)}" y1="${yFor(values[i]).toFixed(1)}" x2="${xFor(i + 1).toFixed(1)}" y2="${yFor(values[i + 1]).toFixed(1)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`;
+    segmentsHtml += `<line x1="${xFor(i).toFixed(1)}" y1="${yFor(values[i]).toFixed(1)}" x2="${xFor(i + 1).toFixed(1)}" y2="${yFor(values[i + 1]).toFixed(1)}" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>`;
   }
 
   // precio de Bitcoin de fondo, en gris oscuro, con su propia escala independiente (eje derecho)
@@ -9662,10 +9668,10 @@ function renderFngChart(days){
       if(v === null) return;
       btcPoints += `${xFor(i).toFixed(1)},${btcYFor(v).toFixed(1)} `;
     });
-    btcHtml = `<polyline points="${btcPoints.trim()}" fill="none" stroke="#5a6280" stroke-width="1.3" stroke-dasharray="3,3" opacity=".7"/>`;
+    btcHtml = `<polyline points="${btcPoints.trim()}" fill="none" stroke="#8890ac" stroke-width="2.2" stroke-dasharray="5,4" opacity=".8"/>`;
     const fmtUsd = v => v >= 1000 ? Math.round(v / 1000) + 'K' : Math.round(v);
     btcAxisHtml = [btcMin, (btcMin + btcMax) / 2, btcMax].map(v => `
-      <text x="${totalW - marginRight + 6}" y="${(btcYFor(v) + 3).toFixed(1)}" font-size="8" fill="#5a6280" font-family="'Space Mono',monospace">$${fmtUsd(v)}</text>
+      <text x="${totalW - marginRight + 8}" y="${(btcYFor(v) + 6).toFixed(1)}" font-size="17" fill="#a8afc4" font-family="'Space Mono',monospace">$${fmtUsd(v)}</text>
     `).join('');
   }
 
@@ -9687,13 +9693,21 @@ function renderFngChart(days){
         ${segmentsHtml}
         ${xLabelsHtml}
         <line id="fngHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="display:none"/>
-        <circle id="fngHoverDot" r="4" fill="#fff" style="display:none"/>
+        <circle id="fngHoverDot" r="7" fill="#fff" style="display:none"/>
         <rect id="fngHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
-      <div id="fngTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:11px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:9.5px;color:var(--muted);font-family:'Space Mono',monospace">
-        <span><span style="color:#f0b23d">▬</span> Línea de color = Índice de Miedo y Codicia (rojo = miedo, verde = codicia)</span>
-        ${hasBtc ? '<span><span style="color:#5a6280">┄</span> Línea gris punteada = precio de Bitcoin (referencia, eje derecho)</span>' : ''}
+      <div id="fngTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+
+      <div class="fng-legend-zones">
+        <span><i style="background:#ff2f4f"></i>Miedo extremo</span>
+        <span><i style="background:#f0793d"></i>Miedo</span>
+        <span><i style="background:#f0b23d"></i>Neutral</span>
+        <span><i style="background:#8bc34a"></i>Codicia</span>
+        <span><i style="background:#2ecc71"></i>Codicia extrema</span>
+      </div>
+      <div class="fng-legend-lines">
+        <span><i style="background:#f0b23d"></i>Índice de Miedo y Codicia (el color cambia según la zona)</span>
+        ${hasBtc ? '<span><i style="background:#8890ac;border-radius:0;height:2px"></i>Precio de Bitcoin (referencia, eje derecho)</span>' : ''}
       </div>
     </div>
   `;
