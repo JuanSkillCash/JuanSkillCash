@@ -223,6 +223,8 @@ button{font-family:inherit;color:inherit}
 }
 
 .fng-section{background:#080c20;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0}
+.fng-click-hint{position:absolute;top:9px;right:14px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;transition:color var(--dur-fast) var(--ease-out)}
+.fng-section:hover .fng-click-hint{color:var(--gold)}
 .fng-section-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .fng-section-title{font-size:11px;font-weight:700;color:var(--white);margin-right:auto}
 .fng-section-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
@@ -895,7 +897,7 @@ img[src=""]{display:none}
 .fng-big-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:44px;margin-top:-16px}
 .fng-big-class{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);margin-top:2px}
 .fng-chart-svg{width:100%;height:auto;display:block}
-.fng-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;text-align:left}
+.fng-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px;text-align:left}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -1112,7 +1114,8 @@ img[src=""]{display:none}
 
     <div id="marketDashboardBlock">
     <div class="market-overview reveal">
-      <div class="fng-section" id="fngSectionBox" style="cursor:pointer">
+      <div class="fng-section" id="fngSectionBox" style="cursor:pointer;position:relative">
+        <span class="fng-click-hint">Ver detalle →</span>
         <div class="fng-section-head">
           <span class="fng-section-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Índice de Miedo y Codicia</span>
           <span class="fng-section-value skeleton" id="fngValue"></span>
@@ -3414,15 +3417,6 @@ img[src=""]{display:none}
             <div class="fng-big-class" id="fngDetailClass">—</div>
 
             <div class="be-note" id="fngDetailRecommendation" style="text-align:left;margin-top:18px"></div>
-
-            <div class="fng-stats-grid">
-              <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
-              <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
-              <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
-              <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
-              <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
-              <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
-            </div>
           </div>
 
           <div class="calc-results">
@@ -3436,6 +3430,15 @@ img[src=""]{display:none}
               </div>
             </div>
             <div id="fngChartWrap"></div>
+
+            <div class="fng-stats-grid">
+              <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
+              <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
+              <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
+              <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
+              <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
+              <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
+            </div>
           </div>
         </div>
 
@@ -9615,7 +9618,7 @@ function renderFngChart(days){
   const btcValues = timestampsMs.map(ms => closestBtcPrice(ms));
   const hasBtc = btcValues.some(v => v !== null);
 
-  const totalW = 640, totalH = 230;
+  const totalW = 700, totalH = 300;
   const marginLeft = 34, marginRight = hasBtc ? 46 : 10, marginTop = 10, marginBottom = 24;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
@@ -10175,6 +10178,44 @@ renderMarketSessions();
 setInterval(updateMarketSessions, 1000);
 
 /* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
+/* ---- botón "atrás" del celular: cierra lo que esté abierto (modal o categoría) en vez de salir de la página ---- */
+(function setupMobileBackButton(){
+  let depth = 0;
+
+  // 1) categorías: si estás viendo el detalle de una, "atrás" te regresa a las cajitas
+  const originalShowDetail = showCategoryDetail;
+  showCategoryDetail = function(cat){
+    originalShowDetail(cat);
+    depth++;
+    history.pushState({ skillcashNav: true, depth }, '');
+  };
+
+  // 2) cualquier modal (las 21 herramientas y los demás): "atrás" lo cierra
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    let wasOpen = modal.classList.contains('open');
+    new MutationObserver(() => {
+      const isOpen = modal.classList.contains('open');
+      if(isOpen && !wasOpen){
+        depth++;
+        history.pushState({ skillcashNav: true, depth }, '');
+      }
+      wasOpen = isOpen;
+    }).observe(modal, { attributes: true, attributeFilter: ['class'] });
+  });
+
+  window.addEventListener('popstate', () => {
+    const openModal = document.querySelector('.modal-overlay.open');
+    if(openModal){
+      openModal.classList.remove('open');
+      return;
+    }
+    const detailView = document.getElementById('categoryDetailView');
+    if(detailView && detailView.style.display === 'block'){
+      showCategoryOverview();
+    }
+  });
+})();
+
 (function checkOAuthReturnError(){
   const raw = window.location.hash || window.location.search;
   if(!raw || raw.indexOf('error') === -1) return;
