@@ -9832,12 +9832,26 @@ async function captureAndShare(elementId, filename){
   const statusEl = document.getElementById('fngShareStatus');
   statusEl.style.display = 'block';
   statusEl.textContent = '⏳ Generando imagen…';
+  let wrapper = null;
   try{
-    const el = document.getElementById(elementId);
-    const canvas = await html2canvas(el, {
+    const original = document.getElementById(elementId);
+
+    // en vez de "engañar" a la librería con un ancho virtual (falla en algunos celulares),
+    // clonamos el contenido real dentro de una caja invisible con ancho fijo de escritorio,
+    // así el navegador (que sí sabe hacer esto bien en cualquier dispositivo) calcula el diseño real
+    const clone = original.cloneNode(true);
+    clone.removeAttribute('id');
+    wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;top:0;left:0;width:1100px;background:#0a1024;padding:32px;z-index:-1;opacity:0;pointer-events:none';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    // le damos un instante al navegador para que calcule el nuevo diseño ancho antes de capturar
+    await new Promise(resolve => setTimeout(resolve, 80));
+
+    const canvas = await html2canvas(clone, {
       backgroundColor: '#0a1024',
       scale: 2,
-      windowWidth: 1400, // fuerza el layout de escritorio, sin importar si estás en celular
       useCORS: true
     });
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
@@ -9850,6 +9864,7 @@ async function captureAndShare(elementId, filename){
   } catch(err){
     statusEl.textContent = '⚠️ No se pudo generar la imagen. Intenta de nuevo.';
   }
+  if(wrapper) wrapper.remove();
   setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
 }
 document.getElementById('fngShareAllBtn').addEventListener('click', () => captureAndShare('fngCaptureAll', 'indice-miedo-codicia-skillcash.png'));
