@@ -191,6 +191,7 @@ button{font-family:inherit;color:inherit}
 .sidebar.indic-active .indic-mobile-nav{display:flex}
 .sb-item{display:flex;align-items:center;gap:13px;padding:12px 11px;border-radius:10px;color:var(--muted2);text-decoration:none;font-size:14.5px;line-height:1.3;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s;white-space:nowrap;overflow:hidden;background:none;width:100%;text-align:left}
 .sb-item-icon{font-size:18px;flex-shrink:0;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:var(--muted2);transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.sb-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;padding-right:22px}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--white)}
 .sb-item.active{background:rgba(255,47,79,.1);border-color:rgba(255,47,79,.35);color:var(--white)}
 .sb-item.locked{cursor:default;opacity:.6}
@@ -313,6 +314,7 @@ button{font-family:inherit;color:inherit}
 /* TOOL GRID */
 .tool-section{margin-bottom:28px}
 .tool-section:last-of-type{margin-bottom:0}
+#favoritesSection .tool-section{margin-bottom:28px}
 .tool-cat-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--muted2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
 /* ---- indicadores de mercado: pestañas (navegación real vive en el menú lateral) ---- */
@@ -421,7 +423,7 @@ button{font-family:inherit;color:inherit}
 }
 .tool-card:hover{transform:translateY(-3px)}
 .tool-card:focus-visible{transform:translateY(-3px)}
-.tool-icon{font-size:24px;margin-bottom:8px;line-height:1;color:inherit}
+.tool-icon{font-size:24px;margin-bottom:8px;line-height:1;color:inherit;display:flex;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin:0 0 6px;padding-right:20px}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
 .tool-section[data-category="trading"] .tool-card{--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)}
@@ -1131,6 +1133,17 @@ img[src=""]{display:none}
       <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
     </div>
     <nav class="sb-nav">
+      <div class="sb-cat-label">Portafolio</div>
+      <button class="sb-item" data-tool="quiz">
+        <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
+      </button>
+      <button class="sb-item" data-tool="portafolio">
+        <span class="sb-item-icon">📊</span><span class="sb-item-label">Simulador de portafolio</span>
+      </button>
+      <button class="sb-item" data-tool="correlacion">
+        <span class="sb-item-icon">🔗</span><span class="sb-item-label">Correlación</span>
+      </button>
+
       <div class="sb-cat-label">Trading y Futuros</div>
       <button class="sb-item" data-tool="calculadora">
         <span class="sb-item-icon">🧮</span><span class="sb-item-label">Calculadora</span>
@@ -1160,17 +1173,6 @@ img[src=""]{display:none}
       </button>
       <button class="sb-item" data-tool="fifreedom">
         <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad Financiera</span>
-      </button>
-
-      <div class="sb-cat-label">Portafolio</div>
-      <button class="sb-item" data-tool="quiz">
-        <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
-      </button>
-      <button class="sb-item" data-tool="portafolio">
-        <span class="sb-item-icon">📊</span><span class="sb-item-label">Simulador de portafolio</span>
-      </button>
-      <button class="sb-item" data-tool="correlacion">
-        <span class="sb-item-icon">🔗</span><span class="sb-item-label">Correlación</span>
       </button>
 
       <div class="sb-cat-label">Seguridad</div>
