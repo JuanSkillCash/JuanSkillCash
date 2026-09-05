@@ -963,15 +963,15 @@ img[src=""]{display:none}
 
 /* ===== HERO MASCOTA (tiburón grande) ===== */
 .hero-mascot{
-  position:relative;display:flex;align-items:stretch;gap:24px;
+  position:relative;display:flex;align-items:center;gap:24px;
   padding:0 8px 4px;margin-bottom:6px;overflow:visible;
 }
-.hero-mascot-imgwrap{position:relative;flex-shrink:0;width:auto;min-width:260px;max-width:460px;line-height:0}
+.hero-mascot-imgwrap{position:relative;flex-shrink:0;width:320px;line-height:0}
 .hero-mascot-imgwrap img,.hero-mascot-tint{
   -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
   mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
 }
-.hero-mascot-imgwrap img{height:100%;width:auto;max-width:100%;display:block;margin:0 auto}
+.hero-mascot-imgwrap img{width:100%;height:auto;display:block}
 .hero-mascot-tint{
   position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
   background:radial-gradient(ellipse 55% 60% at 50% 45%,rgba(255,47,79,.5),transparent 70%);
@@ -981,13 +981,30 @@ img[src=""]{display:none}
 @keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
 .hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
-.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(40px,9vw,124px);color:var(--white)}
+.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(36px,6.8vw,88px);color:var(--white)}
 .hero-mascot-title .ht-cash{color:var(--red)}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
 .hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
+
+/* ===== CINTA DE CRIPTOS ===== */
+.crypto-ticker{
+  position:relative;overflow:hidden;margin:0 0 22px;padding:12px 0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+}
+.crypto-ticker-track{display:flex;align-items:center;gap:14px;width:max-content;animation:ticker-scroll 55s linear infinite}
+.crypto-ticker:hover .crypto-ticker-track{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-size:13.5px;color:var(--muted2);white-space:nowrap;flex-shrink:0}
+.ticker-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+.ticker-item b{color:var(--white);font-weight:700}
+.ticker-sep{color:var(--red);opacity:.45;flex-shrink:0}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.crypto-ticker-track{animation:none}}
 @media(max-width:860px){
   .hero-mascot{flex-direction:column;align-items:center;text-align:center;padding:0 20px 4px;gap:4px}
-  .hero-mascot-imgwrap{width:230px}
+  .hero-mascot-imgwrap{width:210px}
   .hero-mascot-text{padding:0}
   .hero-mascot-desc{margin-left:auto;margin-right:auto}
 }
@@ -1165,6 +1182,10 @@ img[src=""]{display:none}
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
         <p class="hero-mascot-desc">Calculadoras, simuladores y guías 100% gratuitas para operar cripto con criterio: liquidación, break-even, DCA, portafolio, seguridad y más — sin señales ni promesas vacías.</p>
       </div>
+    </div>
+
+    <div class="crypto-ticker" aria-hidden="true">
+      <div class="crypto-ticker-track" id="cryptoTickerTrack"></div>
     </div>
 
     <div id="marketDashboardBlock">
@@ -10346,6 +10367,27 @@ setInterval(updateMarketSessions, 1000);
   if(errDesc){
     openAuthModal();
     showAuthError('Google: ' + decodeURIComponent(errDesc.replace(/\+/g, ' ')));
+  }
+})();
+</script>
+<script>
+(function(){
+  var coins = [
+    ['btc','BTC','Bitcoin'],['eth','ETH','Ethereum'],['usdt','USDT','Tether'],
+    ['bnb','BNB','BNB'],['sol','SOL','Solana'],['usdc','USDC','USD Coin'],
+    ['doge','DOGE','Dogecoin'],['ada','ADA','Cardano'],['trx','TRX','TRON'],
+    ['link','LINK','Chainlink'],['avax','AVAX','Avalanche'],['ton','TON','Toncoin'],
+    ['shib','SHIB','Shiba Inu'],['dot','DOT','Polkadot'],['bch','BCH','Bitcoin Cash'],
+    ['ltc','LTC','Litecoin'],['uni','UNI','Uniswap'],['near','NEAR','NEAR Protocol'],
+    ['icp','ICP','Internet Computer'],['etc','ETC','Ethereum Classic']
+  ];
+  function itemHtml(c){
+    return '<span class="ticker-item"><img src="https://assets.coincap.io/assets/icons/'+c[0]+'@2x.png" alt="" onerror="this.style.display=\'none\'"><b>'+c[1]+'</b> '+c[2]+'</span><span class="ticker-sep">•</span>';
+  }
+  var track = document.getElementById('cryptoTickerTrack');
+  if (track){
+    var html = coins.map(itemHtml).join('');
+    track.innerHTML = html + html;
   }
 })();
 </script>
