@@ -4402,6 +4402,18 @@ function openModalGeneric(overlay, panel, focusTarget){
   const category = TOOL_CATEGORY[overlay.dataset.tool];
   if(category){
     showCategoryDetail(category);
+    // si ya había otra herramienta abierta en línea (p.ej. la cambiaron desde el menú lateral sin cerrarla), se quita primero para que nunca queden dos apiladas
+    const previousWrap = toolDetailSlot.querySelector('.tool-detail-card');
+    let hadPreviousTool = false;
+    if(previousWrap){
+      const previousOverlay = previousWrap.querySelector('.modal-overlay');
+      if(previousOverlay && previousOverlay !== overlay){
+        previousOverlay.classList.remove('inline-mode');
+        document.body.appendChild(previousOverlay);
+        hadPreviousTool = true;
+      }
+      previousWrap.remove();
+    }
     const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
     if(grid) grid.style.display = 'none';
     const wrap = document.createElement('div');
@@ -4411,7 +4423,11 @@ function openModalGeneric(overlay, panel, focusTarget){
     toolDetailSlot.appendChild(wrap);
     overlay.classList.add('inline-mode');
     toolDetailSlot.style.display = 'block';
-    history.pushState({ skillcashModal: true }, '', location.href);
+    if(hadPreviousTool){
+      history.replaceState({ skillcashModal: true }, '', location.href);
+    } else {
+      history.pushState({ skillcashModal: true }, '', location.href);
+    }
     toolDetailSlot.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => { (focusTarget || panel.querySelector('.modal-close')).focus({ preventScroll: true }); }, 60);
   } else {
