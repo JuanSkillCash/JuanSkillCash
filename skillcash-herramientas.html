@@ -1009,10 +1009,6 @@ img[src=""]{display:none}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
 .fng-chart-breakout{margin:0 -32px;padding:0 8px}
 @media(max-width:900px){ .fng-chart-breakout{margin:0 -18px;padding:0 6px} }
-@media(max-width:640px){
-  .fng-chart-breakout{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .fng-chart-svg{width:700px!important;max-width:none!important;flex-shrink:0}
-}
 .fng-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .fng-stats-grid .res-card{min-width:0}
 .fng-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -4223,6 +4219,7 @@ function showCategoryDetail(cat){
   setIndicMobileMode(cat === 'indicadores');
   filterSidebarNav(cat);
   if(enteringFromOverview) renderCatPillTabs(cat);
+  if(enteringFromOverview && cat === 'indicadores') jumpToIndicator('guia');
   if(enteringFromOverview && !closingFromPopstate){
     history.pushState({ skillcashDepth: 'category' }, '', location.href);
   }
@@ -4324,6 +4321,9 @@ function jumpToIndicator(id){
     const active = pill.dataset.indicJump === id;
     pill.classList.toggle('active', active);
     if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
+  document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
+    item.classList.toggle('active', item.dataset.indicJump === id);
   });
 }
 const indicGroupTabs = document.getElementById('indicGroupTabs');
@@ -10277,7 +10277,10 @@ function renderFngChart(days){
   const btcValues = timestampsMs.map(ms => closestBtcPrice(ms));
   const hasBtc = btcValues.some(v => v !== null);
 
-  const totalW = 760, totalH = 380;
+  // en celular el ancho real disponible es mucho menor — se usa un lienzo más angosto y alto
+  // para que el mismo tamaño de letra (en unidades del SVG) se vea más grande al escalarlo, sin salirse de la pantalla
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 760, totalH = isMobileChart ? 460 : 380;
   const marginLeft = 52, marginRight = hasBtc ? 62 : 14, marginTop = 14, marginBottom = 40;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
