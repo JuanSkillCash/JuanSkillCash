@@ -315,8 +315,8 @@ button{font-family:inherit;color:inherit}
 .tool-section:last-of-type{margin-bottom:0}
 .tool-cat-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--muted2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
-/* ---- indicadores de mercado: pestañas ---- */
-.indic-tabs{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:14px;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+/* ---- indicadores de mercado: pestañas (navegación real vive en el menú lateral) ---- */
+.indic-tabs{display:none}
 .indic-tabs::-webkit-scrollbar{display:none}
 .indic-tab{
   font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;
@@ -326,8 +326,7 @@ button{font-family:inherit;color:inherit}
 }
 .indic-tab:hover{background:rgba(255,255,255,.06);color:var(--white)}
 .indic-tab.active{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.55);color:#60a5fa}
-.indic-subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.indic-subtabs:empty{margin-bottom:0}
+.indic-subtabs{display:none}
 .indic-subtab{
   font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;
   padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:none;
@@ -335,8 +334,6 @@ button{font-family:inherit;color:inherit}
 }
 .indic-subtab:hover{color:var(--white)}
 .indic-subtab.active{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.4);color:#60a5fa}
-.indic-fng-wrap{border-radius:16px;overflow:hidden;margin-bottom:16px;max-width:560px}
-.indic-fng-wrap .fng-section{border-radius:16px}
 .indic-placeholder{
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
   padding:48px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);
@@ -1606,31 +1603,92 @@ img[src=""]{display:none}
         </div>
 
         <div class="indic-panel" data-indic="fng" style="display:none">
-          <div class="indic-fng-wrap">
-            <div class="fng-section" id="fngSectionBox2" style="position:relative">
-              <div class="fng-section-head">
-                <span class="fng-section-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Índice de Miedo y Codicia</span>
-                <span class="fng-section-value skeleton" id="fngValue2"></span>
-                <span class="fng-section-class" id="fngClass2">Cargando…</span>
+          <div class="indic-chart-card">
+            <div class="calc" style="padding:0">
+              <div id="fngCaptureAll">
+                <div class="calc-head">
+                  <div class="calc-eyebrow">
+                    <img src="logo-skillcash-600.png" alt="SkillCash">
+                    <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                  </div>
+                  <h2 class="calc-title" id="fngDetailTitleEl">Índice de Miedo y Codicia</h2>
+                  <p class="calc-sub">Qué tan asustado o codicioso está el mercado cripto ahora — y qué ha pasado históricamente en momentos parecidos</p>
+                </div>
+
+                <div id="fngDetailLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando historial…</div>
+                <div id="fngDetailError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el historial ahora mismo. Intenta de nuevo en un momento.</div>
+
+                <div id="fngDetailContent" style="display:none">
+
+                  <div class="calc-body">
+                    <div class="calc-inputs" style="text-align:center">
+                      <div class="be-savings-label" style="text-align:center">AHORA MISMO</div>
+                      <div class="fng-big-gauge">
+                        <svg viewBox="0 0 200 110" width="100%">
+                          <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#fngGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
+                          <defs>
+                            <linearGradient id="fngGaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stop-color="#ff2f4f"/>
+                              <stop offset="50%" stop-color="#f0b23d"/>
+                              <stop offset="100%" stop-color="#2ecc71"/>
+                            </linearGradient>
+                          </defs>
+                          <line id="fngDetailNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                          <circle cx="100" cy="100" r="5" fill="#fff"/>
+                        </svg>
+                      </div>
+                      <div class="fng-big-value" id="fngDetailValue">—</div>
+                      <div class="fng-big-class" id="fngDetailClass">—</div>
+
+                      <div class="be-note" id="fngDetailRecommendation" style="text-align:left;margin-top:18px"></div>
+                    </div>
+
+                    <div class="calc-results">
+                      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+                        <div class="be-section-label" style="margin:0">📈 Histórico</div>
+                        <div class="dir-toggle" id="fngRangeToggle" style="margin-bottom:0;padding:3px">
+                          <button class="mode-btn" data-range="7" style="padding:7px 10px;font-size:12px">7D</button>
+                          <button class="mode-btn" data-range="30" style="padding:7px 10px;font-size:12px">30D</button>
+                          <button class="mode-btn" data-range="90" style="padding:7px 10px;font-size:12px">90D</button>
+                          <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
+                        </div>
+                      </div>
+                      <div id="fngChartWrap" class="fng-chart-breakout"></div>
+
+                      <div class="fng-stats-grid">
+                        <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
+                        <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
+                        <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
+                        <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
+                        <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
+                        <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
               </div>
-              <div class="fng-gauge-track">
-                <div class="fng-gauge-marker" id="fngMarker2"></div>
+
+              <div class="fng-share-row">
+                <button type="button" class="a-btn" id="fngShareAllBtn">📸 Descargar imagen del panel completo</button>
               </div>
-              <div class="fng-gauge-labels">
-                <span>Miedo extremo</span><span>Miedo</span><span>Neutral</span><span>Codicia</span><span>Codicia extrema</span>
+              <div class="calc-disclaimer" id="fngShareStatus" style="display:none"></div>
+
+              <div class="calc-disclaimer">
+                El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta. La actualización es diaria (no existe un dato "por hora").<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+
+              <div class="tool-footer-links">
+                <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+                <span>·</span>
+                <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+                <span>·</span>
+                <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
               </div>
             </div>
           </div>
-          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
-            <div class="promo-note-head">
-              <img class="promo-note-avatar" src="logo-skillcash-600.png" alt="Juan SkillCash">
-              <span class="promo-note-name">Juan SkillCash</span>
-            </div>
-            <p class="promo-note-text">El exchange que yo uso para operar — tiene buena liquidez y soporte en español. Desde aquí obtienes <strong>20% de cashback</strong> en tus comisiones, directo a tu cuenta spot.</p>
-            <div class="promo-note-foot">
-              <span class="promo-note-link">Ver Bitunix →</span>
-            </div>
-          </a>
         </div>
 
         <div class="indic-panel" data-indic="halving" style="display:none">
@@ -3771,97 +3829,6 @@ img[src=""]{display:none}
         <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
       </div>
 </div>
-</div>
-
-<!-- ===== MODAL: DETALLE ÍNDICE DE MIEDO Y CODICIA ===== -->
-<div class="modal-overlay" id="fngDetailModal">
-  <button class="modal-close" id="closeFngDetail" aria-label="Cerrar">✕</button>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="fngDetailTitleEl">
-    <div class="calc">
-      <div id="fngCaptureAll">
-      <div class="calc-head">
-        <div class="calc-eyebrow">
-          <img src="logo-skillcash-600.png" alt="SkillCash">
-          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-        </div>
-        <h2 class="calc-title" id="fngDetailTitleEl">Índice de Miedo y Codicia</h2>
-        <p class="calc-sub">Qué tan asustado o codicioso está el mercado cripto ahora — y qué ha pasado históricamente en momentos parecidos</p>
-      </div>
-
-      <div id="fngDetailLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando historial…</div>
-      <div id="fngDetailError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el historial ahora mismo. Intenta de nuevo en un momento.</div>
-
-      <div id="fngDetailContent" style="display:none">
-
-        <div class="calc-body">
-          <div class="calc-inputs" style="text-align:center">
-            <div class="be-savings-label" style="text-align:center">AHORA MISMO</div>
-            <div class="fng-big-gauge">
-              <svg viewBox="0 0 200 110" width="100%">
-                <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#fngGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
-                <defs>
-                  <linearGradient id="fngGaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#ff2f4f"/>
-                    <stop offset="50%" stop-color="#f0b23d"/>
-                    <stop offset="100%" stop-color="#2ecc71"/>
-                  </linearGradient>
-                </defs>
-                <line id="fngDetailNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
-                <circle cx="100" cy="100" r="5" fill="#fff"/>
-              </svg>
-            </div>
-            <div class="fng-big-value" id="fngDetailValue">—</div>
-            <div class="fng-big-class" id="fngDetailClass">—</div>
-
-            <div class="be-note" id="fngDetailRecommendation" style="text-align:left;margin-top:18px"></div>
-          </div>
-
-          <div class="calc-results">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-              <div class="be-section-label" style="margin:0">📈 Histórico</div>
-              <div class="dir-toggle" id="fngRangeToggle" style="margin-bottom:0;padding:3px">
-                <button class="mode-btn" data-range="7" style="padding:7px 10px;font-size:12px">7D</button>
-                <button class="mode-btn" data-range="30" style="padding:7px 10px;font-size:12px">30D</button>
-                <button class="mode-btn" data-range="90" style="padding:7px 10px;font-size:12px">90D</button>
-                <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
-              </div>
-            </div>
-            <div id="fngChartWrap" class="fng-chart-breakout"></div>
-
-            <div class="fng-stats-grid">
-              <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
-              <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
-              <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
-              <div class="res-card"><div class="r-label">Máximo del año</div><div class="r-val" id="fngYearHigh">—</div></div>
-              <div class="res-card"><div class="r-label">Mínimo del año</div><div class="r-val" id="fngYearLow">—</div></div>
-              <div class="res-card"><div class="r-label">Promedio (1 año)</div><div class="r-val" id="fngYearAvg">—</div></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-        <div class="fng-share-row">
-          <button type="button" class="a-btn" id="fngShareAllBtn">📸 Descargar imagen del panel completo</button>
-        </div>
-        <div class="calc-disclaimer" id="fngShareStatus" style="display:none"></div>
-
-        <div class="calc-disclaimer">
-          El índice mide el sentimiento del mercado (0 = miedo extremo, 100 = codicia extrema), no predice el futuro. Es un dato para tener contexto, no una señal de compra o venta. La actualización es diaria (no existe un dato "por hora").<br>
-          <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
-        </div>
-
-        <div class="tool-footer-links">
-          <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
-          <span>·</span>
-          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
-          <span>·</span>
-          <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
-        </div>
-
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ===== MODAL: LOGIN (general de la página) ===== -->
@@ -10253,8 +10220,7 @@ document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(btn => {
   });
 });
 
-async function openFngDetailModal(){
-  document.getElementById('fngDetailModal').classList.add('open');
+async function loadFngDetail(){
   document.getElementById('fngDetailLoading').style.display = 'block';
   document.getElementById('fngDetailError').style.display = 'none';
   document.getElementById('fngDetailContent').style.display = 'none';
@@ -10302,6 +10268,7 @@ async function openFngDetailModal(){
     document.getElementById('fngDetailError').style.display = 'block';
   }
 }
+loadFngDetail();
 document.getElementById('fngSectionBox').addEventListener('click', () => {
   showCategoryDetail('indicadores');
   jumpToIndicator('fng');
@@ -10348,12 +10315,6 @@ async function captureAndShare(elementId, filename){
   setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
 }
 document.getElementById('fngShareAllBtn').addEventListener('click', () => captureAndShare('fngCaptureAll', 'indice-miedo-codicia-skillcash.png'));
-document.getElementById('closeFngDetail').addEventListener('click', () => {
-  document.getElementById('fngDetailModal').classList.remove('open');
-});
-document.getElementById('fngDetailModal').addEventListener('click', (e) => {
-  if(e.target.id === 'fngDetailModal') document.getElementById('fngDetailModal').classList.remove('open');
-});
 
 async function loadFearGreedIndex(){
   const valueEl = document.getElementById('fngValue');
