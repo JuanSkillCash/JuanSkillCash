@@ -185,12 +185,10 @@ button{font-family:inherit;color:inherit}
 .sb-nav{display:flex;flex-direction:column;gap:4px;padding:0 10px}
 .indic-mobile-nav{display:none;flex-direction:column;gap:4px;padding:0 10px}
 .indic-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-@media(max-width:860px){
-  .sidebar.indic-active .sb-search-wrap,
-  .sidebar.indic-active .sb-section-label,
-  .sidebar.indic-active .sb-nav{display:none}
-  .sidebar.indic-active .indic-mobile-nav{display:flex}
-}
+.sidebar.indic-active .sb-search-wrap,
+.sidebar.indic-active .sb-section-label,
+.sidebar.indic-active .sb-nav{display:none}
+.sidebar.indic-active .indic-mobile-nav{display:flex}
 .sb-item{display:flex;align-items:center;gap:13px;padding:12px 11px;border-radius:10px;color:var(--muted2);text-decoration:none;font-size:14.5px;line-height:1.3;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s;white-space:nowrap;overflow:hidden;background:none;width:100%;text-align:left}
 .sb-item-icon{font-size:18px;flex-shrink:0;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:var(--muted2);transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--white)}
@@ -1205,22 +1203,22 @@ img[src=""]{display:none}
 
     <nav class="indic-mobile-nav" id="indicMobileNav">
       <button type="button" class="sb-item" id="indicMobileBackBtn">
-        <span class="sb-item-icon">←</span><span class="sb-item-label">Volver a categorías</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></span><span class="sb-item-label">Volver a categorías</span>
       </button>
-      <div class="indic-cat-label" style="margin-top:10px">📊 Indicadores de Mercado</div>
+      <div class="indic-cat-label" style="margin-top:10px">Indicadores de Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="guia">
-        <span class="sb-item-icon">👋</span><span class="sb-item-label">Guía de esta sección</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Guía de esta sección</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
-        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label">😐 Sentimiento</div>
+      <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
-      <div class="indic-cat-label">⏳ Ciclos</div>
+      <div class="indic-cat-label">Ciclos</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Halving Cycles</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Halving Cycles</span>
       </button>
     </nav>
 
@@ -1545,8 +1543,8 @@ img[src=""]{display:none}
       <div class="tool-cat-label">📊 Indicadores de Mercado</div>
 
       <div class="indic-tabs" id="indicGroupTabs">
-        <button type="button" class="indic-tab active" data-group="guia">👋 Guía</button>
-        <button type="button" class="indic-tab" data-group="predicciones">🔮 Predicciones</button>
+        <button type="button" class="indic-tab active" data-group="guia">Guía</button>
+        <button type="button" class="indic-tab" data-group="predicciones">Predicciones</button>
         <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
