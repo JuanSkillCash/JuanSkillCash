@@ -145,38 +145,38 @@ button{font-family:inherit;color:inherit}
 .sb-cat-label.collapsed::after{transform:rotate(-45deg)}
 .cat-icon{display:inline-flex;flex-shrink:0;opacity:.85}
 
-/* color por categoría — cada una de las 6 categorías tiene su propio color, distinto de rojo/dorado/verde (esos ya tienen su significado reservado: marca, alerta, ganancia) */
-[data-tool="calculadora"] .tool-icon,[data-tool="calculadora"] .sb-item-icon,
-[data-tool="breakeven"] .tool-icon,[data-tool="breakeven"] .sb-item-icon,
-[data-tool="coinm"] .tool-icon,[data-tool="coinm"] .sb-item-icon,
-[data-tool="fees"] .tool-icon,[data-tool="fees"] .sb-item-icon
+/* color por categoría — cada una de las 6 categorías tiene su propio color, distinto de rojo/dorado/verde (esos ya tienen su significado reservado: marca, alerta, ganancia). Solo aplica a las tarjetas del contenido (.tool-icon); el menú lateral se mantiene neutro/minimalista (igual que el menú de Indicadores). */
+[data-tool="calculadora"] .tool-icon,
+[data-tool="breakeven"] .tool-icon,
+[data-tool="coinm"] .tool-icon,
+[data-tool="fees"] .tool-icon
 { background:rgba(255,138,61,.14); color:var(--cat-orange); }
 
-[data-tool="rentabilidad"] .tool-icon,[data-tool="rentabilidad"] .sb-item-icon,
-[data-tool="dca"] .tool-icon,[data-tool="dca"] .sb-item-icon,
-[data-tool="dcaexit"] .tool-icon,[data-tool="dcaexit"] .sb-item-icon,
-[data-tool="mcapcompare"] .tool-icon,[data-tool="mcapcompare"] .sb-item-icon,
-[data-tool="fifreedom"] .tool-icon,[data-tool="fifreedom"] .sb-item-icon
+[data-tool="rentabilidad"] .tool-icon,
+[data-tool="dca"] .tool-icon,
+[data-tool="dcaexit"] .tool-icon,
+[data-tool="mcapcompare"] .tool-icon,
+[data-tool="fifreedom"] .tool-icon
 { background:rgba(168,85,247,.14); color:var(--cat-purple); }
 
-[data-tool="quiz"] .tool-icon,[data-tool="quiz"] .sb-item-icon,
-[data-tool="portafolio"] .tool-icon,[data-tool="portafolio"] .sb-item-icon,
-[data-tool="correlacion"] .tool-icon,[data-tool="correlacion"] .sb-item-icon
+[data-tool="quiz"] .tool-icon,
+[data-tool="portafolio"] .tool-icon,
+[data-tool="correlacion"] .tool-icon
 { background:rgba(34,211,238,.14); color:var(--cat-cyan); }
 
-[data-tool="checklist"] .tool-icon,[data-tool="checklist"] .sb-item-icon,
-[data-tool="walletcompare"] .tool-icon,[data-tool="walletcompare"] .sb-item-icon,
-[data-tool="approvals"] .tool-icon,[data-tool="approvals"] .sb-item-icon,
-[data-tool="inheritance"] .tool-icon,[data-tool="inheritance"] .sb-item-icon
+[data-tool="checklist"] .tool-icon,
+[data-tool="walletcompare"] .tool-icon,
+[data-tool="approvals"] .tool-icon,
+[data-tool="inheritance"] .tool-icon
 { background:rgba(124,127,245,.16); color:var(--cat-indigo); }
 
-[data-tool="glosario"] .tool-icon,[data-tool="glosario"] .sb-item-icon,
-[data-tool="mistakes"] .tool-icon,[data-tool="mistakes"] .sb-item-icon
+[data-tool="glosario"] .tool-icon,
+[data-tool="mistakes"] .tool-icon
 { background:rgba(236,72,153,.14); color:var(--cat-pink); }
 
-[data-tool="unitconverter"] .tool-icon,[data-tool="unitconverter"] .sb-item-icon,
-[data-tool="pctcalc"] .tool-icon,[data-tool="pctcalc"] .sb-item-icon,
-[data-tool="tzclock"] .tool-icon,[data-tool="tzclock"] .sb-item-icon
+[data-tool="unitconverter"] .tool-icon,
+[data-tool="pctcalc"] .tool-icon,
+[data-tool="tzclock"] .tool-icon
 { background:rgba(45,212,191,.14); color:var(--cat-teal); }
 .sb-item-icon,.tool-icon{display:inline-flex;align-items:center;justify-content:center}
 .sb-nav > .sb-cat-label:first-child{padding-top:0}
@@ -1131,8 +1131,8 @@ img[src=""]{display:none}
       <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
     </div>
     <nav class="sb-nav">
-      <div class="sb-cat-label">📈 Trading y Futuros</div>
-      <button class="sb-item active" data-tool="calculadora">
+      <div class="sb-cat-label">Trading y Futuros</div>
+      <button class="sb-item" data-tool="calculadora">
         <span class="sb-item-icon">🧮</span><span class="sb-item-label">Calculadora</span>
       </button>
       <button class="sb-item" data-tool="breakeven">
@@ -1145,7 +1145,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de Comisiones</span>
       </button>
 
-      <div class="sb-cat-label">🪙 Inversión y Acumulación</div>
+      <div class="sb-cat-label">Inversión y Acumulación</div>
       <button class="sb-item" data-tool="rentabilidad">
         <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
       </button>
@@ -1162,7 +1162,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad Financiera</span>
       </button>
 
-      <div class="sb-cat-label">💼 Portafolio</div>
+      <div class="sb-cat-label">Portafolio</div>
       <button class="sb-item" data-tool="quiz">
         <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
       </button>
@@ -1173,7 +1173,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🔗</span><span class="sb-item-label">Correlación</span>
       </button>
 
-      <div class="sb-cat-label">🛡️ Seguridad</div>
+      <div class="sb-cat-label">Seguridad</div>
       <button class="sb-item" data-tool="checklist">
         <span class="sb-item-icon">🛡️</span><span class="sb-item-label">Checklist de seguridad</span>
       </button>
@@ -1187,7 +1187,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">👨‍👩‍👧</span><span class="sb-item-label">Herencia digital</span>
       </button>
 
-      <div class="sb-cat-label">📖 Aprender</div>
+      <div class="sb-cat-label">Aprender</div>
       <button class="sb-item" data-tool="glosario">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario Cripto</span>
       </button>
@@ -1195,7 +1195,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">⚠️</span><span class="sb-item-label">Errores comunes</span>
       </button>
 
-      <div class="sb-cat-label">🧰 Utilidades</div>
+      <div class="sb-cat-label">Utilidades</div>
       <button class="sb-item" data-tool="unitconverter">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">Conversor de unidades</span>
       </button>
@@ -4238,7 +4238,7 @@ function applyIconSet(){
       el.innerHTML = svgIcon(TOOL_ICONS[tool], size);
     }
   });
-  document.querySelectorAll('.sb-cat-label, .tool-cat-label').forEach(el => {
+  document.querySelectorAll('.tool-cat-label').forEach(el => {
     if(el.dataset.iconified) return;
     for(const key in CATEGORY_ICONS){
       if(el.textContent.includes(key)){
@@ -4895,6 +4895,16 @@ document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
   actions.className = 'tool-card-actions';
   actions.appendChild(createFavStar(card.dataset.tool));
   card.appendChild(actions);
+});
+
+/* ---- marcar en el menú lateral cuál herramienta está abierta ahora mismo ---- */
+document.querySelectorAll('[data-tool]').forEach(el => {
+  el.addEventListener('click', () => {
+    const tool = el.dataset.tool;
+    document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
+      item.classList.toggle('active', item.dataset.tool === tool);
+    });
+  });
 });
 
 /* ---- sección de favoritos, arriba de todo, debajo de la publicidad de Bitunix ---- */
