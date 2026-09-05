@@ -427,7 +427,7 @@ button{font-family:inherit;color:inherit}
   box-shadow:0 0 32px rgba(59,130,246,.1);
 }
 .modal-overlay.inline-mode{position:relative;inset:auto;display:block;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:auto;padding:0;overflow:visible}
-.modal-overlay.inline-mode .modal-panel{max-width:900px;margin:0 auto;opacity:1;transform:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none}
+.modal-overlay.inline-mode .modal-panel{max-width:none;width:100%;margin:0;opacity:1;transform:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none}
 .modal-overlay.inline-mode .modal-close{position:absolute;top:14px;right:14px}
 
 /* ---- pastillas de navegación dentro de una categoría — solo celular; el menú lateral ya cubre esto en escritorio ---- */
@@ -1630,7 +1630,7 @@ img[src=""]{display:none}
 
         <div class="indic-panel" data-indic="fng" style="display:none">
           <div class="indic-chart-card">
-            <div class="calc" style="max-width:900px;margin:0 auto">
+            <div class="calc">
               <div id="fngCaptureAll">
                 <div class="calc-head">
                   <div class="calc-eyebrow">
@@ -10280,13 +10280,14 @@ function renderFngChart(days){
   // en celular el ancho real disponible es mucho menor — se usa un lienzo más angosto y alto
   // para que el mismo tamaño de letra (en unidades del SVG) se vea más grande al escalarlo, sin salirse de la pantalla
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 760, totalH = isMobileChart ? 460 : 380;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 460 : 380;
   // en celular los números del eje bajan a un tamaño parecido al de la leyenda de colores,
   // y los márgenes se recortan para que el área del gráfico use casi todo el ancho de la tarjeta
   // (se deja espacio suficiente a la derecha para cuando el precio de Bitcoin llegue a 6 cifras)
   const yAxisFontSize = isMobileChart ? 14 : 20;
   const xAxisFontSize = isMobileChart ? 13 : 18;
   const btcFontSize = isMobileChart ? 13 : 17;
+  const lineStrokeWidth = isMobileChart ? 2 : 2.6;
   const marginLeft = isMobileChart ? 32 : 52;
   const marginRight = hasBtc ? (isMobileChart ? 46 : 62) : (isMobileChart ? 6 : 14);
   const marginTop = 14, marginBottom = isMobileChart ? 32 : 40;
@@ -10316,7 +10317,7 @@ function renderFngChart(days){
   let segmentsHtml = '';
   for(let i = 0; i < values.length - 1; i++){
     const color = fngZoneColor((values[i] + values[i + 1]) / 2);
-    segmentsHtml += `<line x1="${xFor(i).toFixed(1)}" y1="${yFor(values[i]).toFixed(1)}" x2="${xFor(i + 1).toFixed(1)}" y2="${yFor(values[i + 1]).toFixed(1)}" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>`;
+    segmentsHtml += `<line x1="${xFor(i).toFixed(1)}" y1="${yFor(values[i]).toFixed(1)}" x2="${xFor(i + 1).toFixed(1)}" y2="${yFor(values[i + 1]).toFixed(1)}" stroke="${color}" stroke-width="${lineStrokeWidth}" stroke-linecap="round"/>`;
   }
 
   // precio de Bitcoin de fondo, en gris oscuro, con su propia escala independiente (eje derecho)
