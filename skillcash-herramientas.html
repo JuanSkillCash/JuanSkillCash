@@ -960,18 +960,17 @@ img[src=""]{display:none}
   padding:0 8px 4px;margin-bottom:6px;overflow:visible;
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:260px;line-height:0}
-.hero-mascot-imgwrap::after{
-  content:'';position:absolute;left:50%;bottom:8%;transform:translateX(-50%);
-  width:72%;height:24%;z-index:-1;pointer-events:none;filter:blur(6px);
-  background:radial-gradient(ellipse,rgba(255,47,79,.4),transparent 72%);
+.hero-mascot-imgwrap img,.hero-mascot-tint{
+  -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
+  mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
 }
-.hero-mascot-imgwrap img{
-  width:100%;height:auto;display:block;
-  filter:drop-shadow(0 0 40px rgba(255,47,79,.45)) drop-shadow(0 0 90px rgba(255,47,79,.2));
-  -webkit-mask-image:linear-gradient(to bottom,#000 60%,transparent 97%);
-  mask-image:linear-gradient(to bottom,#000 60%,transparent 97%);
-  animation:hero-mascot-float 4.6s ease-in-out infinite;
+.hero-mascot-imgwrap img{width:100%;height:auto;display:block}
+.hero-mascot-tint{
+  position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
+  background:radial-gradient(ellipse 55% 60% at 50% 45%,rgba(255,47,79,.5),transparent 70%);
 }
+.hero-mascot-glow{position:absolute;inset:0;z-index:0;filter:blur(24px);opacity:.6;transform:scale(1.05);pointer-events:none}
+.hero-mascot-img{position:relative;z-index:1;animation:hero-mascot-float 4.6s ease-in-out infinite}
 @keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
 .hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
@@ -1116,6 +1115,7 @@ img[src=""]{display:none}
   </aside>
 
   <main class="main">
+    <div class="brand-glow-bar" style="margin:0 0 18px"></div>
     <div class="mobile-topbar">
       <div class="topbar-brand">
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
@@ -1140,11 +1140,12 @@ img[src=""]{display:none}
         </div>
       </div>
     </div>
-    <div class="brand-glow-bar" style="margin:0 0 18px"></div>
 
     <div class="hero-mascot">
       <div class="hero-mascot-imgwrap">
-        <img src="logo-skillcash-1050.png" alt="SkillCash">
+        <div class="hero-mascot-tint" aria-hidden="true"></div>
+        <img class="hero-mascot-glow" src="logo-skillcash-1050.png" alt="" aria-hidden="true">
+        <img class="hero-mascot-img" src="logo-skillcash-1050.png" alt="SkillCash">
       </div>
       <div class="hero-mascot-text">
         <div class="hero-mascot-eyebrow">Bienvenido a</div>
