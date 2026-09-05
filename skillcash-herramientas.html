@@ -1149,7 +1149,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
       <button class="sb-item" data-indic-jump="halving">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Halving Cycles</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
@@ -1245,7 +1245,7 @@ img[src=""]{display:none}
       </button>
       <div class="indic-cat-label">Ciclos</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Halving Cycles</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
     </nav>
 
@@ -1720,33 +1720,44 @@ img[src=""]{display:none}
 
         <div class="indic-panel" data-indic="halving" style="display:none">
           <div class="indic-chart-card">
-            <div class="indic-chart-head">
-              <div>
-                <div class="indic-chart-eyebrow">CICLOS · HALVING</div>
-                <div class="indic-chart-title">Bitcoin Halving Cycles</div>
-                <div class="indic-chart-sub">Precio de BTC alineado a cada halving histórico</div>
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Ciclos de Halving de Bitcoin</h2>
+                <p class="calc-sub">Cada ~4 años la recompensa que reciben los mineros se reduce a la mitad ("halving"). Este gráfico compara cómo se movió el precio de Bitcoin después de cada halving, para ver si el ciclo actual se parece a los anteriores.</p>
               </div>
-              <div class="indic-chart-controls" id="halvingCycleTabs">
+
+              <div class="indic-chart-controls" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
                 <button type="button" class="indic-chart-btn" data-cycle="0">2012</button>
                 <button type="button" class="indic-chart-btn" data-cycle="1">2016</button>
                 <button type="button" class="indic-chart-btn" data-cycle="2">2020</button>
                 <button type="button" class="indic-chart-btn active" data-cycle="3">2024</button>
+                <button type="button" class="indic-chart-btn" data-cycle="all">Todo el historial</button>
+              </div>
+
+              <div class="indic-chart-body" id="halvingChartBody">
+                <div class="indic-chart-soon" id="halvingLoading">
+                  <div class="indic-placeholder-icon">⏳</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin desde 2010 para alinear cada ciclo de halving.</div>
+                </div>
+                <div class="indic-chart-soon" id="halvingError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="halvingChartWrap" style="display:none;width:100%"></div>
+              </div>
+              <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📐 <b>El eje vertical (precio) usa escala logarítmica</b>, no lineal — así se puede comparar un ciclo donde Bitcoin costaba $13 con uno donde costaba $100.000, sin que el primero se vea como una línea plana en cero.<br>
+                📅 <b>El eje horizontal</b> son días desde el halving de ese ciclo (no fechas de calendario) — el día 0 es siempre el halving, así los 4 ciclos arrancan en el mismo punto y se pueden comparar entre sí. En "Todo el historial" sí se usan fechas reales, con una línea vertical marcando cada halving.
               </div>
             </div>
-            <div class="indic-chart-body" id="halvingChartBody">
-              <div class="indic-chart-soon" id="halvingLoading">
-                <div class="indic-placeholder-icon">⏳</div>
-                <div class="indic-placeholder-title">Cargando historial…</div>
-                <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin desde 2010 para alinear cada ciclo de halving.</div>
-              </div>
-              <div class="indic-chart-soon" id="halvingError" style="display:none">
-                <div class="indic-placeholder-icon">⚠️</div>
-                <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-              </div>
-              <div id="halvingChartWrap" style="display:none;width:100%"></div>
-            </div>
-            <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
           </div>
         </div>
 
@@ -4274,7 +4285,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Halving Cycles' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }],
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
@@ -10528,7 +10539,7 @@ function niceLogTicks(minV, maxV){
   // si el ciclo abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón 1-2-5 deja muy pocas
   // marcas visibles — se usa uno más denso para que el eje no se quede casi vacío
   const spanDecades = Math.log10(maxV) - Math.log10(minV);
-  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : [1, 2, 5];
+  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : spanDecades > 4 ? [1, 5] : [1, 2, 5];
   for(let p = lo; p <= hi; p++){
     multipliers.forEach(m => {
       const v = m * Math.pow(10, p);
@@ -10557,6 +10568,11 @@ function renderHalvingChart(cycleIndex){
     errorEl.style.display = 'none';
     wrap.style.display = 'none';
     statsEl.style.display = 'none';
+    return;
+  }
+
+  if(cycleIndex === 'all'){
+    renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl);
     return;
   }
 
@@ -10697,11 +10713,156 @@ function renderHalvingChart(cycleIndex){
   `;
 }
 
+// vista "Todo el historial": línea de tiempo real (no alineada por días-desde-halving), con una
+// línea vertical marcando cada halving, para ver de un vistazo los 4 ciclos completos
+function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
+  const points = halvingBtcHistory;
+  if(!points || points.length < 2){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  statsEl.style.display = '';
+
+  const startMs = points[0].t;
+  const endMs = points[points.length - 1].t;
+  const prices = points.map(p => p.c);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const spanMs = (endMs - startMs) || 1;
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 400;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const lineStrokeWidth = isMobileChart ? 2 : 2.4;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  // una línea vertical punteada por cada halving que ya haya ocurrido, con su año encima
+  let halvingLinesHtml = '';
+  HALVING_CYCLES.forEach(h => {
+    const hMs = h.date.getTime();
+    if(hMs < startMs || hMs > endMs) return;
+    const px = xFor(hMs);
+    halvingLinesHtml += `
+      <line x1="${px.toFixed(1)}" y1="${marginTop}" x2="${px.toFixed(1)}" y2="${marginTop + drawH}" stroke="rgba(96,165,250,.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="${px.toFixed(1)}" y="${marginTop - 12}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#60a5fa" font-family="'Space Mono',monospace">${h.label}</text>
+    `;
+  });
+
+  // fechas de inicio y fin, para ubicarse en el tiempo
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const endLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${totalW - marginRight}" y="${totalH - 10}" text-anchor="end" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${endLabel}</text>
+  `;
+
+  let pathD = '';
+  points.forEach((p, i) => {
+    pathD += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `;
+  });
+
+  const lastPx = xFor(points[points.length - 1].t), lastPy = yFor(points[points.length - 1].c);
+  const todayMarkerHtml = `
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${halvingLinesHtml}
+        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="${lineStrokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="display:none"/>
+        <circle id="halvingHoverDot" r="6" fill="#f0b23d" style="display:none"/>
+        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="halvingTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const svg = document.getElementById('halvingChartSvg');
+  const catcher = document.getElementById('halvingHoverCatcher');
+  const hoverLine = document.getElementById('halvingHoverLine');
+  const hoverDot = document.getElementById('halvingHoverDot');
+  const tooltip = document.getElementById('halvingTooltip');
+
+  function showAt(clientX){
+    const rect = svg.getBoundingClientRect();
+    const scaleX = totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    const targetMs = startMs + ((svgX - marginLeft) / drawW) * spanMs;
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < points.length; i++){
+      const diff = Math.abs(points[i].t - targetMs);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    const px = xFor(points[idx].t), py = yFor(points[idx].c);
+    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+    hoverLine.style.display = 'block';
+    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+    hoverDot.style.display = 'block';
+    const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    tooltip.innerHTML = `<b>${fmtHalvingPrice(points[idx].c)}</b><br>${dateLabel}`;
+    tooltip.style.left = ((px / totalW) * rect.width) + 'px';
+    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
+    tooltip.style.display = 'block';
+  }
+  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
+  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+  catcher.addEventListener('mouseleave', () => {
+    hoverLine.style.display = 'none';
+    hoverDot.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+
+  const firstPrice = points[0].c;
+  const lastPrice = points[points.length - 1].c;
+  const changePct = ((lastPrice - firstPrice) / firstPrice) * 100;
+  const halvingsSoFar = HALVING_CYCLES.filter(h => h.date.getTime() <= endMs).length;
+  statsEl.innerHTML = `
+    <div class="res-card"><div class="r-label">Primer precio registrado</div><div class="r-val">${fmtHalvingPrice(firstPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(lastPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Máximo histórico</div><div class="r-val">${fmtHalvingPrice(maxPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Variación total</div><div class="r-val" style="color:${changePct >= 0 ? '#2ecc71' : '#ff2f4f'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(0)}%</div></div>
+    <div class="res-card"><div class="r-label">Halvings hasta ahora</div><div class="r-val">${halvingsSoFar}</div></div>
+  `;
+}
+
 document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderHalvingChart(parseInt(btn.dataset.cycle, 10));
+    renderHalvingChart(btn.dataset.cycle === 'all' ? 'all' : parseInt(btn.dataset.cycle, 10));
   });
 });
 
