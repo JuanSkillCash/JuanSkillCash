@@ -413,24 +413,25 @@ button{font-family:inherit;color:inherit}
 .tool-cat-label::after{content:'';flex:1;height:1px;background:var(--border)}
 .section-intro-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
 .section-intro-text{font-size:13.5px;color:var(--muted2);line-height:1.65;max-width:640px;margin-bottom:20px}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .tool-card{
-  display:flex;flex-direction:column;align-items:flex-start;gap:10px;width:100%;
-  background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(255,255,255,.03),transparent 65%),#080c20;
-  border:1px solid var(--border2);border-radius:16px;padding:20px;
-  cursor:pointer;text-align:left;position:relative;
-  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);
+  --bc:rgba(255,255,255,.14);--tint:rgba(255,255,255,.05);
+  border-radius:14px;padding:18px;border:1px solid var(--bc);
+  background:radial-gradient(ellipse 130% 100% at 0% 0%,var(--tint),transparent 65%),#080c20;
+  cursor:pointer;text-align:left;position:relative;width:100%;
+  transition:transform var(--dur-base) var(--ease-out);
 }
-.tool-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}
-.tool-card:focus-visible{border-color:rgba(255,255,255,.3)}
-.tool-icon{
-  width:44px;height:44px;background:rgba(255,255,255,.04);border-radius:50%;font-size:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted2);
-  box-shadow:inset 0 3px 6px rgba(0,0,0,.55),inset 0 -3px 5px rgba(255,255,255,.07),inset 3px 0 6px rgba(0,0,0,.3),inset -2px 0 4px rgba(255,255,255,.05),0 1px 1px rgba(255,255,255,.05);
-  transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
-}
-.tool-card:hover .tool-icon{transform:scale(1.06);box-shadow:inset 0 3px 6px rgba(0,0,0,.6),inset 0 -3px 5px rgba(255,255,255,.09),inset 3px 0 6px rgba(0,0,0,.32),0 0 18px currentColor}
-.tool-card h3{font-size:15px;font-weight:700;margin:0;color:var(--white);padding-right:20px}
+.tool-card:hover{transform:translateY(-3px)}
+.tool-card:focus-visible{transform:translateY(-3px)}
+.tool-icon{font-size:24px;margin-bottom:8px;line-height:1;color:inherit}
+.tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin:0 0 6px;padding-right:20px}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
+.tool-section[data-category="trading"] .tool-card{--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)}
+.tool-section[data-category="inversion"] .tool-card{--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)}
+.tool-section[data-category="portafolio"] .tool-card{--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)}
+.tool-section[data-category="seguridad"] .tool-card{--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)}
+.tool-section[data-category="aprender"] .tool-card{--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)}
+.tool-section[data-category="utilidades"] .tool-card{--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)}
 .tool-status{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 13px;border-radius:20px}
 .tool-status.open{display:none}
 .tool-status.soon{background:rgba(240,178,61,.08);color:var(--gold);border:1px solid rgba(240,178,61,.3)}
@@ -4155,6 +4156,10 @@ function showCategoryDetail(cat){
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
   document.getElementById('marketDashboardBlock').style.display = 'none';
+  const hero = document.querySelector('.hero-mascot');
+  const ticker = document.querySelector('.crypto-ticker');
+  if(hero) hero.style.display = 'none';
+  if(ticker) ticker.style.display = 'none';
   document.querySelectorAll('.tool-section[data-category]').forEach(section => {
     section.style.display = section.dataset.category === cat ? 'block' : 'none';
   });
@@ -4165,6 +4170,10 @@ function showCategoryOverview(){
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
+  const hero = document.querySelector('.hero-mascot');
+  const ticker = document.querySelector('.crypto-ticker');
+  if(hero) hero.style.display = '';
+  if(ticker) ticker.style.display = '';
   setIndicMobileMode(false);
   categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
