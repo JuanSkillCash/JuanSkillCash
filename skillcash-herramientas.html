@@ -1246,9 +1246,9 @@ img[src=""]{display:none}
         </div>
         <p class="promo-note-text">El exchange que uso yo. <strong>20% de cashback</strong> en tus comisiones.</p>
       </a>
-      <a href="index.html" class="sb-back">
+      <a href="#" class="sb-back" id="sbBackToMenu">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
-        <span>Volver a SkillCash</span>
+        <span>Volver al menú</span>
       </a>
     </div>
   </aside>
@@ -1263,7 +1263,7 @@ img[src=""]{display:none}
       </div>
 
       <nav class="topbar-links">
-        <a href="index.html">Inicio</a>
+        <a href="#" id="topbarInicio">Inicio</a>
         <a href="https://t.me/juanskll" target="_blank" rel="noopener">Comunidad</a>
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
       </nav>
@@ -4148,6 +4148,14 @@ document.querySelectorAll('.cat-overview-card').forEach(card => {
   card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
 });
 document.getElementById('catBackBtn').addEventListener('click', showCategoryOverview);
+function goToMainMenu(e){
+  e.preventDefault();
+  showCategoryOverview();
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbBackdrop').classList.remove('show');
+}
+document.getElementById('sbBackToMenu').addEventListener('click', goToMainMenu);
+document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
