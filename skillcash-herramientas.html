@@ -183,6 +183,14 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed .sb-cat-label{opacity:0;padding-top:8px;padding-bottom:0}
 .sidebar.collapsed .mh-eyebrow{opacity:0;pointer-events:none}
 .sb-nav{display:flex;flex-direction:column;gap:4px;padding:0 10px}
+.indic-mobile-nav{display:none;flex-direction:column;gap:4px;padding:0 10px}
+.indic-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+@media(max-width:860px){
+  .sidebar.indic-active .sb-search-wrap,
+  .sidebar.indic-active .sb-section-label,
+  .sidebar.indic-active .sb-nav{display:none}
+  .sidebar.indic-active .indic-mobile-nav{display:flex}
+}
 .sb-item{display:flex;align-items:center;gap:13px;padding:12px 11px;border-radius:10px;color:var(--muted2);text-decoration:none;font-size:14.5px;line-height:1.3;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s;white-space:nowrap;overflow:hidden;background:none;width:100%;text-align:left}
 .sb-item-icon{font-size:18px;flex-shrink:0;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:var(--muted2);transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--white)}
@@ -339,6 +347,17 @@ button{font-family:inherit;color:inherit}
 .indic-placeholder-icon{font-size:32px;margin-bottom:2px}
 .indic-placeholder-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
 .indic-placeholder-text{font-size:13px;color:var(--muted2);max-width:420px;line-height:1.55}
+.indic-guide-intro{margin-bottom:20px}
+.indic-guide-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
+.indic-guide-text{font-size:13.5px;color:var(--muted2);line-height:1.65;max-width:640px}
+.indic-guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.indic-guide-card{
+  border-radius:14px;padding:18px;border:1px solid rgba(59,130,246,.22);
+  background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
+}
+.indic-guide-icon{font-size:24px;margin-bottom:8px}
+.indic-guide-card-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin-bottom:6px}
+.indic-guide-card-text{font-size:12.5px;color:var(--muted2);line-height:1.55}
 
 /* ---- panel de categorías (portada de herramientas) ---- */
 .cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
@@ -1164,6 +1183,24 @@ img[src=""]{display:none}
       </button>
     </nav>
 
+    <nav class="indic-mobile-nav" id="indicMobileNav">
+      <button type="button" class="sb-item" id="indicMobileBackBtn">
+        <span class="sb-item-icon">←</span><span class="sb-item-label">Volver a categorías</span>
+      </button>
+      <div class="indic-cat-label" style="margin-top:10px">📊 Indicadores de Mercado</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="guia">
+        <span class="sb-item-icon">👋</span><span class="sb-item-label">Guía de esta sección</span>
+      </button>
+      <div class="indic-cat-label">😐 Sentimiento</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+      </button>
+      <div class="indic-cat-label">⏳ Ciclos</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Halving Cycles</span>
+      </button>
+    </nav>
+
     <div class="sb-bottom">
       <div class="sb-session" id="sbSession">
         <div class="sb-session-row">
@@ -1468,16 +1505,51 @@ img[src=""]{display:none}
       <div class="tool-cat-label">📊 Indicadores de Mercado</div>
 
       <div class="indic-tabs" id="indicGroupTabs">
+        <button type="button" class="indic-tab active" data-group="guia">👋 Guía</button>
         <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
-        <button type="button" class="indic-tab active" data-group="sentimiento">Sentimiento</button>
+        <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
       </div>
 
       <div class="indic-subtabs" id="indicSubTabs"></div>
 
       <div id="indicPanels">
+        <div class="indic-panel" data-indic="guia" style="display:block">
+          <div class="indic-guide-intro">
+            <div class="indic-guide-title">Bienvenido a Indicadores de Mercado</div>
+            <p class="indic-guide-text">Aquí vas a encontrar señales para entender en qué momento del mercado estamos — organizadas por pestañas para que sea rápido encontrar la que buscas. Esto va a ir creciendo con el tiempo. Por ahora, así está organizado:</p>
+          </div>
+          <div class="indic-guide-grid">
+            <div class="indic-guide-card">
+              <div class="indic-guide-icon">⏳</div>
+              <div class="indic-guide-card-title">Ciclos</div>
+              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
+            </div>
+            <div class="indic-guide-card">
+              <div class="indic-guide-icon">⛏️</div>
+              <div class="indic-guide-card-title">Minería</div>
+              <div class="indic-guide-card-text">Salud de la red: cuánto cuesta minar, y si los mineros están acumulando o vendiendo.</div>
+            </div>
+            <div class="indic-guide-card">
+              <div class="indic-guide-icon">🏛️</div>
+              <div class="indic-guide-card-title">Macro</div>
+              <div class="indic-guide-card-text">El contexto económico global que mueve el apetito por riesgo: tasas, liquidez, calendario de la Fed.</div>
+            </div>
+            <div class="indic-guide-card">
+              <div class="indic-guide-icon">😐</div>
+              <div class="indic-guide-card-title">Sentimiento</div>
+              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
+            </div>
+            <div class="indic-guide-card">
+              <div class="indic-guide-icon">⛓️</div>
+              <div class="indic-guide-card-title">On-Chain</div>
+              <div class="indic-guide-card-text">Qué están haciendo realmente las billeteras on-chain, más allá del precio.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="indic-panel" data-indic="fng" style="display:none">
           <div class="indic-fng-wrap">
             <div class="fng-section" id="fngSectionBox2" style="cursor:pointer;position:relative">
@@ -3973,6 +4045,10 @@ const CATEGORY_ICONS = {
 const categoryOverviewGrid = document.getElementById('categoryOverviewGrid');
 const categoryDetailView = document.getElementById('categoryDetailView');
 
+function setIndicMobileMode(active){
+  const sb = document.getElementById('sidebar');
+  if(sb) sb.classList.toggle('indic-active', active);
+}
 function showCategoryDetail(cat){
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
@@ -3980,12 +4056,14 @@ function showCategoryDetail(cat){
   document.querySelectorAll('.tool-section[data-category]').forEach(section => {
     section.style.display = section.dataset.category === cat ? 'block' : 'none';
   });
+  setIndicMobileMode(cat === 'indicadores');
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
+  setIndicMobileMode(false);
   categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 document.querySelectorAll('.cat-overview-card').forEach(card => {
@@ -4001,12 +4079,19 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   onchain: []
 };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
   });
 }
 function renderIndicSubtabs(group){
+  if(group === 'guia'){
+    const wrap = document.getElementById('indicSubTabs');
+    if(wrap) wrap.innerHTML = '';
+    showIndicPanel('guia');
+    return;
+  }
   const items = INDIC_GROUPS[group] || [];
   const wrap = document.getElementById('indicSubTabs');
   if(!wrap) return;
@@ -4027,6 +4112,18 @@ function renderIndicSubtabs(group){
   });
   showIndicPanel(items[0].id);
 }
+function jumpToIndicator(id){
+  const group = id === 'guia' ? 'guia' : (INDIC_ID_TO_GROUP[id] || 'guia');
+  if(indicGroupTabs){
+    indicGroupTabs.querySelectorAll('.indic-tab').forEach(b => b.classList.toggle('active', b.dataset.group === group));
+  }
+  renderIndicSubtabs(group);
+  if(group !== 'guia'){
+    showIndicPanel(id);
+    const wrap = document.getElementById('indicSubTabs');
+    if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
+  }
+}
 const indicGroupTabs = document.getElementById('indicGroupTabs');
 if(indicGroupTabs){
   indicGroupTabs.querySelectorAll('.indic-tab').forEach(btn => {
@@ -4036,7 +4133,21 @@ if(indicGroupTabs){
       renderIndicSubtabs(btn.dataset.group);
     });
   });
-  renderIndicSubtabs('sentimiento');
+}
+const indicMobileNav = document.getElementById('indicMobileNav');
+if(indicMobileNav){
+  indicMobileNav.querySelectorAll('[data-indic-jump]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      jumpToIndicator(btn.dataset.indicJump);
+      document.getElementById('sidebar').classList.remove('mobile-open');
+      document.getElementById('sbBackdrop').classList.remove('show');
+    });
+  });
+  document.getElementById('indicMobileBackBtn').addEventListener('click', () => {
+    showCategoryOverview();
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sbBackdrop').classList.remove('show');
+  });
 }
 
 function applyIconSet(){
