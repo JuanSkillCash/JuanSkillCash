@@ -217,7 +217,7 @@ button{font-family:inherit;color:inherit}
   .market-overview .dom-card.halving{grid-column:1 / -1}
 }
 
-.fng-section{background:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px) 0 0/100% 15px,linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px) 0 0/20px 100%,#080c20;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0}
+.fng-section{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(240,178,61,.12), transparent 65%), #080c20;border:1px solid rgba(240,178,61,.25);border-radius:0;padding:9px 14px 8px;margin-bottom:0}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .fng-section-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
@@ -241,12 +241,11 @@ button{font-family:inherit;color:inherit}
 }
 
 .dom-card{
-  background:
-    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px) 0 0/100% 15px,
-    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px) 0 0/20px 100%,
-    rgba(8,12,32,.55);
-  backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:100%
+  background:#080c20;border:1px solid var(--border);border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:100%
 }
+.dom-card.btc{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(240,178,61,.12), transparent 65%), #080c20;border-color:rgba(240,178,61,.25)}
+.dom-card.usdt{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(46,204,113,.12), transparent 65%), #080c20;border-color:rgba(46,204,113,.25)}
+.dom-card.halving{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(255,47,79,.12), transparent 65%), #080c20;border-color:rgba(255,47,79,.25)}
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -262,10 +261,8 @@ button{font-family:inherit;color:inherit}
   .market-sessions-row{gap:0}
 }
 .session-card{
-  background:
-    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px) 0 0/100% 15px,
-    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px) 0 0/20px 100%,
-    #080c20;
+  background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(34,211,238,.1), transparent 65%), #080c20;
+  border:1px solid rgba(34,211,238,.22);
   padding:9px 13px;display:flex;flex-direction:column;gap:4px
 }
 .session-card-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted2)}
@@ -1351,12 +1348,10 @@ img[src=""]{display:none}
         </div>
         <div class="cat-overview-sub">4 HERRAMIENTAS</div>
         <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="60" height="60" viewBox="0 0 24 24">
-            <defs><linearGradient id="catg4" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#a5b4fc"/><stop offset="100%" stop-color="#7c7ff5"/>
-            </linearGradient></defs>
-            <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z" fill="url(#catg4)" opacity=".9"/>
-            <path d="M9 12l2 2 4-4" fill="none" stroke="#0a1024" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="76" height="76" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4.5"/>
+            <circle cx="21" cy="21" r="16" fill="none" stroke="#7c7ff5" stroke-width="4.5" stroke-dasharray="93 100" stroke-linecap="round" transform="rotate(-90 21 21)"/>
+            <path d="M17 21l2.6 2.6L26 17.5" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="cat-overview-desc">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
@@ -1370,13 +1365,14 @@ img[src=""]{display:none}
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">2 HERRAMIENTAS</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="62" height="52" viewBox="0 0 24 24">
-            <defs><linearGradient id="catg5" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#f9a8d4"/><stop offset="100%" stop-color="#ec4899"/>
-            </linearGradient></defs>
-            <path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z" fill="url(#catg5)"/>
-            <path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z" fill="url(#catg5)" opacity=".65"/>
+        <div class="cat-overview-preview">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
+            <line x1="24" y1="39" x2="276" y2="39" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+            <circle cx="24" cy="39" r="8" fill="#ec4899"/>
+            <circle cx="92" cy="39" r="8" fill="#ec4899"/>
+            <circle cx="160" cy="39" r="8" fill="#ec4899"/>
+            <circle cx="228" cy="39" r="7" fill="none" stroke="#ec4899" stroke-width="2.5"/>
+            <circle cx="276" cy="39" r="6" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
           </svg>
         </div>
         <div class="cat-overview-desc">Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
@@ -1390,9 +1386,15 @@ img[src=""]{display:none}
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">3 HERRAMIENTAS</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center;gap:14px">
-          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.6"><path d="M4 7h10M14 7l-3-3M14 7l-3 3"/><path d="M16 13H6M6 13l3-3M6 13l3 3"/></svg>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+        <div class="cat-overview-preview">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
+            <line x1="60" y1="54" x2="150" y2="20" stroke="#2dd4bf" stroke-width="1.6" opacity=".55"/>
+            <line x1="150" y1="20" x2="240" y2="54" stroke="#2dd4bf" stroke-width="1.6" opacity=".55"/>
+            <line x1="60" y1="54" x2="240" y2="54" stroke="#2dd4bf" stroke-width="1.6" opacity=".55"/>
+            <circle cx="60" cy="54" r="9" fill="#2dd4bf"/>
+            <circle cx="150" cy="20" r="9" fill="#5eead4"/>
+            <circle cx="240" cy="54" r="9" fill="#2dd4bf"/>
+          </svg>
         </div>
         <div class="cat-overview-desc">Convierte entre unidades cripto, calcula porcentajes al instante, y compara la hora entre países para coordinar con tu comunidad.</div>
         <div class="cat-overview-btn">Explorar →</div>
