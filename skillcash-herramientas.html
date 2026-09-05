@@ -4179,6 +4179,7 @@ function renderCatPillTabs(cat){
 }
 function showCategoryDetail(cat){
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
+  closeAnyOpenToolInline();
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
   document.getElementById('marketDashboardBlock').style.display = 'none';
@@ -4199,6 +4200,7 @@ function showCategoryDetail(cat){
 }
 function showCategoryOverview(){
   const wasInCategory = categoryDetailView.style.display === 'block';
+  closeAnyOpenToolInline();
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
@@ -4391,24 +4393,32 @@ const TOOL_CATEGORY = {};
 document.querySelectorAll('.tool-section[data-category] .tool-card[data-tool]').forEach(card => {
   TOOL_CATEGORY[card.dataset.tool] = card.closest('.tool-section').dataset.category;
 });
+/* ---- cierra y repone en su sitio cualquier herramienta que haya quedado abierta en línea, sin importar de qué categoría era — se llama siempre antes de cambiar de vista para que nunca quede una "pegada" ---- */
+function closeAnyOpenToolInline(){
+  const wrap = toolDetailSlot.querySelector('.tool-detail-card');
+  if(!wrap) return;
+  const overlay = wrap.querySelector('.modal-overlay');
+  if(overlay){
+    overlay.classList.remove('inline-mode');
+    document.body.appendChild(overlay);
+    if(activeModalPanel && activeModalPanel.closest('.modal-overlay') === overlay){
+      activeModalPanel = null;
+    }
+  }
+  const prevCategory = wrap.dataset.category;
+  wrap.remove();
+  toolDetailSlot.style.display = 'none';
+  const grid = document.querySelector('.tool-section[data-category="' + prevCategory + '"] .tool-grid');
+  if(grid) grid.style.display = '';
+}
 function openModalGeneric(overlay, panel, focusTarget){
   lastFocusedEl = document.activeElement;
   activeModalPanel = panel;
   const category = TOOL_CATEGORY[overlay.dataset.tool];
   if(category){
-    showCategoryDetail(category);
     // si ya había otra herramienta abierta en línea (p.ej. la cambiaron desde el menú lateral sin cerrarla), se quita primero para que nunca queden dos apiladas
-    const previousWrap = toolDetailSlot.querySelector('.tool-detail-card');
-    let hadPreviousTool = false;
-    if(previousWrap){
-      const previousOverlay = previousWrap.querySelector('.modal-overlay');
-      if(previousOverlay && previousOverlay !== overlay){
-        previousOverlay.classList.remove('inline-mode');
-        document.body.appendChild(previousOverlay);
-        hadPreviousTool = true;
-      }
-      previousWrap.remove();
-    }
+    const hadPreviousTool = !!toolDetailSlot.querySelector('.tool-detail-card');
+    showCategoryDetail(category);
     const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
     if(grid) grid.style.display = 'none';
     const wrap = document.createElement('div');
@@ -4435,13 +4445,7 @@ function openModalGeneric(overlay, panel, focusTarget){
 function closeModalGeneric(overlay){
   const category = TOOL_CATEGORY[overlay.dataset.tool];
   if(category){
-    overlay.classList.remove('inline-mode');
-    document.body.appendChild(overlay);
-    const wrap = toolDetailSlot.querySelector('.tool-detail-card');
-    if(wrap) wrap.remove();
-    toolDetailSlot.style.display = 'none';
-    const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
-    if(grid) grid.style.display = '';
+    closeAnyOpenToolInline();
   } else {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
