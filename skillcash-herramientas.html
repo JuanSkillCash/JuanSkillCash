@@ -431,13 +431,17 @@ button{font-family:inherit;color:inherit}
 .modal-overlay.inline-mode .modal-close{position:absolute;top:14px;right:14px}
 
 /* ---- pastillas de navegación dentro de una categoría — solo celular; el menú lateral ya cubre esto en escritorio ---- */
-.cat-pill-tabs{display:none}
+.cat-pill-tabs-wrap{display:none}
 @media(max-width:860px){
+  .cat-pill-tabs-wrap{display:block;position:relative;margin-bottom:16px}
+  .cat-pill-tabs-wrap::after{
+    content:'';position:absolute;top:0;right:0;bottom:4px;width:44px;
+    background:linear-gradient(to right,transparent,var(--bg) 70%);
+    pointer-events:none;
+  }
   .cat-pill-tabs{
-    display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px;
+    display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;padding-right:28px;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;
-    mask-image:linear-gradient(to right,#000 90%,transparent 100%);
-    -webkit-mask-image:linear-gradient(to right,#000 90%,transparent 100%);
   }
   .cat-pill-tabs::-webkit-scrollbar{display:none}
 }
@@ -448,6 +452,7 @@ button{font-family:inherit;color:inherit}
   transition:background .2s,color .2s,border-color .2s;
 }
 .cat-pill:hover{background:rgba(255,255,255,.06);color:var(--white)}
+.cat-pill.active{background:none;border-color:var(--red);color:var(--white)}
 
 /* ===== CALCULATOR ===== */
 .calc{padding:32px 32px 30px}
@@ -1004,6 +1009,10 @@ img[src=""]{display:none}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
 .fng-chart-breakout{margin:0 -32px;padding:0 8px}
 @media(max-width:900px){ .fng-chart-breakout{margin:0 -18px;padding:0 6px} }
+@media(max-width:640px){
+  .fng-chart-breakout{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .fng-chart-svg{width:700px!important;max-width:none!important;flex-shrink:0}
+}
 .fng-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .fng-stats-grid .res-card{min-width:0}
 .fng-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -1560,7 +1569,9 @@ img[src=""]{display:none}
     <div id="categoryDetailView" style="display:none">
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
 
-      <div class="cat-pill-tabs" id="catPillTabs" style="display:none"></div>
+      <div class="cat-pill-tabs-wrap" id="catPillTabsWrap" style="display:none">
+        <div class="cat-pill-tabs" id="catPillTabs"></div>
+      </div>
       <div id="toolDetailSlot" style="display:none"></div>
 
     <div class="tool-section" data-category="indicadores">
@@ -4159,27 +4170,32 @@ function filterSidebarNav(cat){
 }
 /* ---- pastillas de navegación (solo celular) con las opciones de la categoría activa ---- */
 const catPillTabs = document.getElementById('catPillTabs');
+const catPillTabsWrap = document.getElementById('catPillTabsWrap');
 function renderCatPillTabs(cat){
   catPillTabs.innerHTML = '';
   let items = [];
   if(cat === 'indicadores'){
     items = [...document.querySelectorAll('#indicMobileNav [data-indic-jump]')].map(btn => ({
       label: btn.querySelector('.sb-item-label').textContent,
+      indicJump: btn.dataset.indicJump,
       onClick: () => jumpToIndicator(btn.dataset.indicJump),
     }));
   } else if(cat && cat !== 'partners'){
     items = [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
       label: card.querySelector('h3').textContent,
+      tool: card.dataset.tool,
       onClick: () => card.click(),
     }));
   }
-  if(items.length === 0){ catPillTabs.style.display = 'none'; return; }
-  catPillTabs.style.display = '';
+  if(items.length === 0){ catPillTabsWrap.style.display = 'none'; return; }
+  catPillTabsWrap.style.display = '';
   items.forEach(it => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'cat-pill';
     btn.textContent = it.label;
+    if(it.tool) btn.dataset.tool = it.tool;
+    if(it.indicJump) btn.dataset.indicJump = it.indicJump;
     btn.addEventListener('click', it.onClick);
     catPillTabs.appendChild(btn);
   });
@@ -4304,6 +4320,11 @@ function jumpToIndicator(id){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
+  document.querySelectorAll('.cat-pill[data-indic-jump]').forEach(pill => {
+    const active = pill.dataset.indicJump === id;
+    pill.classList.toggle('active', active);
+    if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
 }
 const indicGroupTabs = document.getElementById('indicGroupTabs');
 if(indicGroupTabs){
@@ -5054,12 +5075,17 @@ document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
   card.appendChild(actions);
 });
 
-/* ---- marcar en el menú lateral cuál herramienta está abierta ahora mismo ---- */
+/* ---- marcar en el menú lateral y en las pastillas de celular cuál herramienta está abierta ahora mismo ---- */
 document.querySelectorAll('[data-tool]').forEach(el => {
   el.addEventListener('click', () => {
     const tool = el.dataset.tool;
     document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
       item.classList.toggle('active', item.dataset.tool === tool);
+    });
+    document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => {
+      const active = pill.dataset.tool === tool;
+      pill.classList.toggle('active', active);
+      if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     });
   });
 });
