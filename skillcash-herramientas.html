@@ -331,7 +331,8 @@ button{font-family:inherit;color:inherit}
 .indic-chart-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;color:var(--white)}
 .indic-chart-sub{font-size:12.5px;color:var(--muted2);margin-top:3px}
 .indic-chart-controls{display:flex;gap:6px;flex-wrap:wrap}
-.indic-chart-btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);color:var(--muted2)}
+.indic-chart-btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);color:var(--muted2);background:none;cursor:pointer;transition:border-color .2s,color .2s}
+.indic-chart-btn:hover{color:var(--white)}
 .indic-chart-btn.active{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.5);color:#60a5fa}
 .indic-chart-body{
   position:relative;min-height:260px;border-radius:12px;overflow:hidden;
@@ -1009,10 +1010,10 @@ img[src=""]{display:none}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
 .fng-chart-breakout{margin:0 -32px;padding:0 8px}
 @media(max-width:900px){ .fng-chart-breakout{margin:0 -38px;padding:0 4px} }
-.fng-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
-.fng-stats-grid .res-card{min-width:0}
-.fng-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
-.fng-stats-grid .r-val{overflow-wrap:anywhere}
+.chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
+.chart-stats-grid .res-card{min-width:0}
+.chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
+.chart-stats-grid .r-val{overflow-wrap:anywhere}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -1681,7 +1682,7 @@ img[src=""]{display:none}
                       </div>
                       <div id="fngChartWrap" class="fng-chart-breakout"></div>
 
-                      <div class="fng-stats-grid">
+                      <div class="chart-stats-grid">
                         <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
                         <div class="res-card"><div class="r-label">Hace 7 días</div><div class="r-val" id="fngWeekAgo">—</div></div>
                         <div class="res-card"><div class="r-label">Hace 30 días</div><div class="r-val" id="fngMonthAgo">—</div></div>
@@ -1725,20 +1726,27 @@ img[src=""]{display:none}
                 <div class="indic-chart-title">Bitcoin Halving Cycles</div>
                 <div class="indic-chart-sub">Precio de BTC alineado a cada halving histórico</div>
               </div>
-              <div class="indic-chart-controls">
-                <span class="indic-chart-btn">2012</span>
-                <span class="indic-chart-btn">2016</span>
-                <span class="indic-chart-btn">2020</span>
-                <span class="indic-chart-btn active">2024</span>
+              <div class="indic-chart-controls" id="halvingCycleTabs">
+                <button type="button" class="indic-chart-btn" data-cycle="0">2012</button>
+                <button type="button" class="indic-chart-btn" data-cycle="1">2016</button>
+                <button type="button" class="indic-chart-btn" data-cycle="2">2020</button>
+                <button type="button" class="indic-chart-btn active" data-cycle="3">2024</button>
               </div>
             </div>
-            <div class="indic-chart-body">
-              <div class="indic-chart-soon">
+            <div class="indic-chart-body" id="halvingChartBody">
+              <div class="indic-chart-soon" id="halvingLoading">
                 <div class="indic-placeholder-icon">⏳</div>
-                <div class="indic-placeholder-title">Próximamente</div>
-                <div class="indic-placeholder-text">Conectando datos históricos reales de BTC para mostrar en qué punto del ciclo estamos.</div>
+                <div class="indic-placeholder-title">Cargando historial…</div>
+                <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin desde 2010 para alinear cada ciclo de halving.</div>
               </div>
+              <div class="indic-chart-soon" id="halvingError" style="display:none">
+                <div class="indic-placeholder-icon">⚠️</div>
+                <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+              </div>
+              <div id="halvingChartWrap" style="display:none;width:100%"></div>
             </div>
+            <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
           </div>
         </div>
 
@@ -10479,6 +10487,223 @@ document.getElementById('fngSectionBox').addEventListener('click', () => {
   showCategoryDetail('indicadores');
   jumpToIndicator('fng');
 });
+
+/* ---- Halving Cycles: precio de BTC alineado a "días desde el halving", un ciclo a la vez ---- */
+// fechas reales de cada halving (la de 2024 coincide con HALVING_REF_DATE, definida más abajo)
+const HALVING_CYCLES = [
+  { label: '2012', date: new Date('2012-11-28T00:00:00Z') },
+  { label: '2016', date: new Date('2016-07-09T00:00:00Z') },
+  { label: '2020', date: new Date('2020-05-11T00:00:00Z') },
+  { label: '2024', date: new Date('2024-04-20T00:09:27Z') }
+];
+let halvingActiveCycle = 3; // arranca mostrando el ciclo actual
+let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo, ascendente
+let halvingLoadFailed = false;
+
+// CryptoCompare da el histórico diario completo de BTC (desde 2010) en una sola llamada, sin necesitar API key
+async function fetchHalvingHistory(){
+  if(halvingBtcHistory) return halvingBtcHistory;
+  const res = await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&allData=true');
+  const json = await res.json();
+  const rows = (json.Data && json.Data.Data) || [];
+  const points = rows.filter(r => r.close > 0).map(r => ({ t: r.time * 1000, c: r.close }));
+  points.sort((a, b) => a.t - b.t);
+  halvingBtcHistory = points;
+  return points;
+}
+
+function fmtHalvingPrice(v){
+  if(v >= 1000000) return '$' + (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + 'M';
+  if(v >= 1000) return '$' + Math.round(v / 1000) + 'K';
+  if(v >= 1) return '$' + Math.round(v);
+  return '$' + v.toFixed(2);
+}
+
+// marcas "1-2-5" (estándar en ejes logarítmicos) dentro del rango de precio del ciclo
+function niceLogTicks(minV, maxV){
+  const ticks = [];
+  const lo = Math.floor(Math.log10(minV));
+  const hi = Math.ceil(Math.log10(maxV));
+  for(let p = lo; p <= hi; p++){
+    [1, 2, 5].forEach(m => {
+      const v = m * Math.pow(10, p);
+      if(v >= minV * 0.9 && v <= maxV * 1.1) ticks.push(v);
+    });
+  }
+  return ticks;
+}
+
+function renderHalvingChart(cycleIndex){
+  halvingActiveCycle = cycleIndex;
+  const loadingEl = document.getElementById('halvingLoading');
+  const errorEl = document.getElementById('halvingError');
+  const wrap = document.getElementById('halvingChartWrap');
+  const statsEl = document.getElementById('halvingStats');
+
+  if(halvingLoadFailed){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  if(!halvingBtcHistory){
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+
+  const cycle = HALVING_CYCLES[cycleIndex];
+  const startMs = cycle.date.getTime();
+  const next = HALVING_CYCLES[cycleIndex + 1];
+  const endMs = next ? next.date.getTime() : Date.now();
+  const isOngoing = !next;
+  const points = halvingBtcHistory.filter(p => p.t >= startMs && p.t <= endMs);
+
+  if(points.length < 2){
+    loadingEl.style.display = 'none';
+    errorEl.querySelector('.indic-placeholder-title').textContent = 'Sin datos para este ciclo todavía';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  statsEl.style.display = '';
+
+  const days = points.map(p => (p.t - startMs) / 86400000);
+  const prices = points.map(p => p.c);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const maxDay = days[days.length - 1] || 1;
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 400;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 12 : 13;
+  const lineStrokeWidth = isMobileChart ? 2 : 2.4;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = d => marginLeft + (d / maxDay) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice);
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  let xLabelsHtml = '';
+  for(let y = 0; y * 365 <= maxDay + 1; y++){
+    const d = y * 365;
+    xLabelsHtml += `<text x="${xFor(d).toFixed(1)}" y="${totalH - 10}" text-anchor="${y === 0 ? 'start' : 'middle'}" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${y === 0 ? 'Halving' : 'Año ' + y}</text>`;
+  }
+
+  let pathD = '';
+  points.forEach((p, i) => {
+    pathD += `${i === 0 ? 'M' : 'L'}${xFor(days[i]).toFixed(1)},${yFor(p.c).toFixed(1)} `;
+  });
+
+  let todayMarkerHtml = '';
+  if(isOngoing){
+    const px = xFor(days[days.length - 1]), py = yFor(prices[prices.length - 1]);
+    todayMarkerHtml = `
+      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="#fff"/>
+      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>
+      <text x="${Math.min(px, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(py - 14, marginTop - 16).toFixed(1)}" text-anchor="${px > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    `;
+  }
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="${lineStrokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="display:none"/>
+        <circle id="halvingHoverDot" r="6" fill="#f0b23d" style="display:none"/>
+        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="halvingTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const svg = document.getElementById('halvingChartSvg');
+  const catcher = document.getElementById('halvingHoverCatcher');
+  const hoverLine = document.getElementById('halvingHoverLine');
+  const hoverDot = document.getElementById('halvingHoverDot');
+  const tooltip = document.getElementById('halvingTooltip');
+
+  function showAt(clientX){
+    const rect = svg.getBoundingClientRect();
+    const scaleX = totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    const targetDay = ((svgX - marginLeft) / drawW) * maxDay;
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < days.length; i++){
+      const diff = Math.abs(days[i] - targetDay);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    const px = xFor(days[idx]), py = yFor(prices[idx]);
+    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+    hoverLine.style.display = 'block';
+    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+    hoverDot.style.display = 'block';
+    const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    tooltip.innerHTML = `<b>${fmtHalvingPrice(prices[idx])}</b><br>Día ${Math.round(days[idx])} · ${dateLabel}`;
+    tooltip.style.left = ((px / totalW) * rect.width) + 'px';
+    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
+    tooltip.style.display = 'block';
+  }
+  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
+  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+  catcher.addEventListener('mouseleave', () => {
+    hoverLine.style.display = 'none';
+    hoverDot.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+
+  const startPrice = prices[0];
+  const lastPrice = prices[prices.length - 1];
+  const changePct = ((lastPrice - startPrice) / startPrice) * 100;
+  statsEl.innerHTML = `
+    <div class="res-card"><div class="r-label">Precio en el halving</div><div class="r-val">${fmtHalvingPrice(startPrice)}</div></div>
+    <div class="res-card"><div class="r-label">${isOngoing ? 'Precio actual' : 'Precio al cierre del ciclo'}</div><div class="r-val">${fmtHalvingPrice(lastPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Máximo del ciclo</div><div class="r-val">${fmtHalvingPrice(maxPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Variación</div><div class="r-val" style="color:${changePct >= 0 ? '#2ecc71' : '#ff2f4f'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(0)}%</div></div>
+    <div class="res-card"><div class="r-label">Días ${isOngoing ? 'transcurridos' : 'del ciclo'}</div><div class="r-val">${Math.round(maxDay)}</div></div>
+  `;
+}
+
+document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderHalvingChart(parseInt(btn.dataset.cycle, 10));
+  });
+});
+
+async function loadHalvingDetail(){
+  try{
+    await fetchHalvingHistory();
+  } catch(err){
+    halvingLoadFailed = true;
+  }
+  renderHalvingChart(halvingActiveCycle);
+}
+loadHalvingDetail();
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
