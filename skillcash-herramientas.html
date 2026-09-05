@@ -10500,13 +10500,14 @@ let halvingActiveCycle = 3; // arranca mostrando el ciclo actual
 let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo, ascendente
 let halvingLoadFailed = false;
 
-// CryptoCompare da el histórico diario completo de BTC (desde 2010) en una sola llamada, sin necesitar API key
+// Blockchain.com da el histórico diario completo de BTC (desde 2009) en una sola llamada, gratis,
+// sin API key, y con &cors=true pensado justo para poder llamarlo desde el navegador
 async function fetchHalvingHistory(){
   if(halvingBtcHistory) return halvingBtcHistory;
-  const res = await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&allData=true');
+  const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
   const json = await res.json();
-  const rows = (json.Data && json.Data.Data) || [];
-  const points = rows.filter(r => r.close > 0).map(r => ({ t: r.time * 1000, c: r.close }));
+  const rows = json.values || [];
+  const points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
   points.sort((a, b) => a.t - b.t);
   halvingBtcHistory = points;
   return points;
@@ -10524,8 +10525,12 @@ function niceLogTicks(minV, maxV){
   const ticks = [];
   const lo = Math.floor(Math.log10(minV));
   const hi = Math.ceil(Math.log10(maxV));
+  // si el ciclo abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón 1-2-5 deja muy pocas
+  // marcas visibles — se usa uno más denso para que el eje no se quede casi vacío
+  const spanDecades = Math.log10(maxV) - Math.log10(minV);
+  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : [1, 2, 5];
   for(let p = lo; p <= hi; p++){
-    [1, 2, 5].forEach(m => {
+    multipliers.forEach(m => {
       const v = m * Math.pow(10, p);
       if(v >= minV * 0.9 && v <= maxV * 1.1) ticks.push(v);
     });
@@ -10598,7 +10603,12 @@ function renderHalvingChart(cycleIndex){
   const xFor = d => marginLeft + (d / maxDay) * drawW;
   const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
 
-  const yTicks = niceLogTicks(minPrice, maxPrice);
+  // se excluyen marcas demasiado pegadas al borde superior o inferior, para que no choquen
+  // con la línea del halving/años de abajo ni se corten arriba
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
     <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
