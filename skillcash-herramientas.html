@@ -145,39 +145,6 @@ button{font-family:inherit;color:inherit}
 .sb-cat-label.collapsed::after{transform:rotate(-45deg)}
 .cat-icon{display:inline-flex;flex-shrink:0;opacity:.85}
 
-/* color por categoría — cada una de las 6 categorías tiene su propio color, distinto de rojo/dorado/verde (esos ya tienen su significado reservado: marca, alerta, ganancia). Solo aplica a las tarjetas del contenido (.tool-icon); el menú lateral se mantiene neutro/minimalista (igual que el menú de Indicadores). */
-[data-tool="calculadora"] .tool-icon,
-[data-tool="breakeven"] .tool-icon,
-[data-tool="coinm"] .tool-icon,
-[data-tool="fees"] .tool-icon
-{ background:rgba(255,138,61,.14); color:var(--cat-orange); }
-
-[data-tool="rentabilidad"] .tool-icon,
-[data-tool="dca"] .tool-icon,
-[data-tool="dcaexit"] .tool-icon,
-[data-tool="mcapcompare"] .tool-icon,
-[data-tool="fifreedom"] .tool-icon
-{ background:rgba(168,85,247,.14); color:var(--cat-purple); }
-
-[data-tool="quiz"] .tool-icon,
-[data-tool="portafolio"] .tool-icon,
-[data-tool="correlacion"] .tool-icon
-{ background:rgba(34,211,238,.14); color:var(--cat-cyan); }
-
-[data-tool="checklist"] .tool-icon,
-[data-tool="walletcompare"] .tool-icon,
-[data-tool="approvals"] .tool-icon,
-[data-tool="inheritance"] .tool-icon
-{ background:rgba(124,127,245,.16); color:var(--cat-indigo); }
-
-[data-tool="glosario"] .tool-icon,
-[data-tool="mistakes"] .tool-icon
-{ background:rgba(236,72,153,.14); color:var(--cat-pink); }
-
-[data-tool="unitconverter"] .tool-icon,
-[data-tool="pctcalc"] .tool-icon,
-[data-tool="tzclock"] .tool-icon
-{ background:rgba(45,212,191,.14); color:var(--cat-teal); }
 .sb-item-icon,.tool-icon{display:inline-flex;align-items:center;justify-content:center}
 .sb-nav > .sb-cat-label:first-child{padding-top:0}
 .sidebar.collapsed .sb-cat-label{opacity:0;padding-top:8px;padding-bottom:0}
@@ -419,12 +386,13 @@ button{font-family:inherit;color:inherit}
   border-radius:14px;padding:18px;border:1px solid var(--bc);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,var(--tint),transparent 65%),#080c20;
   cursor:pointer;text-align:left;position:relative;width:100%;
+  display:flex;flex-direction:column;align-items:stretch;
   transition:transform var(--dur-base) var(--ease-out);
 }
 .tool-card:hover{transform:translateY(-3px)}
 .tool-card:focus-visible{transform:translateY(-3px)}
-.tool-icon{font-size:24px;margin-bottom:8px;line-height:1;color:inherit;display:flex;justify-content:center;width:100%}
-.tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin:0 0 6px;padding-right:20px}
+.tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
+.tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;padding-right:20px;min-height:2.7em}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
 .tool-section[data-category="trading"] .tool-card{--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)}
 .tool-section[data-category="inversion"] .tool-card{--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)}
@@ -4240,12 +4208,11 @@ if(indicMobileNav){
 }
 
 function applyIconSet(){
-  document.querySelectorAll('.sb-item-icon, .tool-icon').forEach(el => {
+  document.querySelectorAll('.sb-item-icon').forEach(el => {
     const wrapper = el.closest('[data-tool]');
     const tool = wrapper ? wrapper.dataset.tool : null;
     if(tool && TOOL_ICONS[tool]){
-      const size = el.classList.contains('tool-icon') ? 22 : 15;
-      el.innerHTML = svgIcon(TOOL_ICONS[tool], size);
+      el.innerHTML = svgIcon(TOOL_ICONS[tool], 15);
     }
   });
   document.querySelectorAll('.tool-cat-label').forEach(el => {
