@@ -160,7 +160,7 @@ button{font-family:inherit;color:inherit}
 .sb-item-icon{font-size:18px;flex-shrink:0;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:var(--muted2);transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
 .sb-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;padding-right:22px}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--white)}
-.sb-item.active{background:rgba(255,47,79,.1);border-color:rgba(255,47,79,.35);color:var(--white)}
+.sb-item.active{background:none;border-color:var(--red);color:var(--white)}
 .sb-item.locked{cursor:default;opacity:.6}
 .sb-item.locked:hover{background:none;color:var(--muted2)}
 .sb-item-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.03em;color:var(--gold);border:1px solid rgba(240,178,61,.35);padding:3px 8px;border-radius:20px;flex-shrink:0}
@@ -1132,6 +1132,20 @@ img[src=""]{display:none}
       <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
     </div>
     <nav class="sb-nav">
+      <div class="sb-cat-label" data-category="indicadores">Indicadores de Mercado</div>
+      <button class="sb-item" data-indic-jump="guia">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Guía de esta sección</span>
+      </button>
+      <button class="sb-item" data-indic-jump="predicciones">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
+      </button>
+      <button class="sb-item" data-indic-jump="fng">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+      </button>
+      <button class="sb-item" data-indic-jump="halving">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Halving Cycles</span>
+      </button>
+
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
       <button class="sb-item" data-tool="quiz">
         <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
@@ -4220,6 +4234,14 @@ document.querySelectorAll('.cat-overview-card').forEach(card => {
   card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
 });
 document.getElementById('catBackBtn').addEventListener('click', showCategoryOverview);
+document.querySelectorAll('.sb-nav [data-indic-jump]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    showCategoryDetail('indicadores');
+    jumpToIndicator(btn.dataset.indicJump);
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sbBackdrop').classList.remove('show');
+  });
+});
 function goToMainMenu(e){
   e.preventDefault();
   showCategoryOverview();
