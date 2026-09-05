@@ -358,6 +358,26 @@ button{font-family:inherit;color:inherit}
 .indic-guide-icon{font-size:24px;margin-bottom:8px}
 .indic-guide-card-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin-bottom:6px}
 .indic-guide-card-text{font-size:12.5px;color:var(--muted2);line-height:1.55}
+.indic-chart-card{
+  border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
+  background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
+}
+.indic-chart-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.indic-chart-eyebrow{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#60a5fa;margin-bottom:4px}
+.indic-chart-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;color:var(--white)}
+.indic-chart-sub{font-size:12.5px;color:var(--muted2);margin-top:3px}
+.indic-chart-controls{display:flex;gap:6px;flex-wrap:wrap}
+.indic-chart-btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);color:var(--muted2)}
+.indic-chart-btn.active{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.5);color:#60a5fa}
+.indic-chart-body{
+  position:relative;min-height:260px;border-radius:12px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 15px,
+    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
+    rgba(255,255,255,.02);
+}
+.indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px}
 
 /* ---- panel de categorías (portada de herramientas) ---- */
 .cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
@@ -1191,6 +1211,9 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="guia">
         <span class="sb-item-icon">👋</span><span class="sb-item-label">Guía de esta sección</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
+        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
+      </button>
       <div class="indic-cat-label">😐 Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1496,6 +1519,23 @@ img[src=""]{display:none}
         <div class="cat-overview-btn">Explorar →</div>
       </button>
 
+      <button type="button" class="cat-overview-card" data-category="partners" style="--c:#64748b;--bc:rgba(100,116,139,.32);--tint:rgba(100,116,139,.12)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">8</div>
+          <div class="cat-overview-title">🤝 Partners</div>
+          <div class="cat-overview-tag">GRATIS</div>
+        </div>
+        <div class="cat-overview-sub">1 ALIANZA</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="90" height="60" viewBox="0 0 90 60">
+            <circle cx="32" cy="30" r="20" fill="none" stroke="#64748b" stroke-width="2.5"/>
+            <circle cx="58" cy="30" r="20" fill="none" stroke="#94a3b8" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+      </button>
+
     </div>
 
     <div id="categoryDetailView" style="display:none">
@@ -1506,6 +1546,7 @@ img[src=""]{display:none}
 
       <div class="indic-tabs" id="indicGroupTabs">
         <button type="button" class="indic-tab active" data-group="guia">👋 Guía</button>
+        <button type="button" class="indic-tab" data-group="predicciones">🔮 Predicciones</button>
         <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
@@ -1550,6 +1591,14 @@ img[src=""]{display:none}
           </div>
         </div>
 
+        <div class="indic-panel" data-indic="predicciones" style="display:none">
+          <div class="indic-placeholder">
+            <div class="indic-placeholder-icon">🔮</div>
+            <div class="indic-placeholder-title">Predicciones de Precio</div>
+            <div class="indic-placeholder-text">Acá vas a encontrar las predicciones de precio que hago públicamente, con la fecha en que las hice — y más adelante, si se cumplieron o no. Todavía no hay ninguna publicada.</div>
+          </div>
+        </div>
+
         <div class="indic-panel" data-indic="fng" style="display:none">
           <div class="indic-fng-wrap">
             <div class="fng-section" id="fngSectionBox2" style="cursor:pointer;position:relative">
@@ -1580,10 +1629,27 @@ img[src=""]{display:none}
         </div>
 
         <div class="indic-panel" data-indic="halving" style="display:none">
-          <div class="indic-placeholder">
-            <div class="indic-placeholder-icon">⏳</div>
-            <div class="indic-placeholder-title">Halving Cycles</div>
-            <div class="indic-placeholder-text">Próximamente: el precio de BTC alineado a cada halving histórico, para ver en qué punto del ciclo estamos.</div>
+          <div class="indic-chart-card">
+            <div class="indic-chart-head">
+              <div>
+                <div class="indic-chart-eyebrow">CICLOS · HALVING</div>
+                <div class="indic-chart-title">Bitcoin Halving Cycles</div>
+                <div class="indic-chart-sub">Precio de BTC alineado a cada halving histórico</div>
+              </div>
+              <div class="indic-chart-controls">
+                <span class="indic-chart-btn">2012</span>
+                <span class="indic-chart-btn">2016</span>
+                <span class="indic-chart-btn">2020</span>
+                <span class="indic-chart-btn active">2024</span>
+              </div>
+            </div>
+            <div class="indic-chart-body">
+              <div class="indic-chart-soon">
+                <div class="indic-placeholder-icon">⏳</div>
+                <div class="indic-placeholder-title">Próximamente</div>
+                <div class="indic-placeholder-text">Conectando datos históricos reales de BTC para mostrar en qué punto del ciclo estamos.</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1772,6 +1838,25 @@ img[src=""]{display:none}
           <span class="tool-status open">Disponible</span>
         </button>
       </div>
+    </div>
+
+    <div class="tool-section" data-category="partners">
+      <div class="tool-cat-label">🤝 Partners</div>
+      <div class="indic-placeholder" style="max-width:100%;margin-bottom:20px">
+        <div class="indic-placeholder-icon">🤝</div>
+        <div class="indic-placeholder-title">Bitunix</div>
+        <div class="indic-placeholder-text">Por ahora Bitunix es el único partner — más adelante se irán sumando otros aquí, cada uno con sus propios beneficios.</div>
+      </div>
+      <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
+        <div class="promo-note-head">
+          <img class="promo-note-avatar" src="logo-skillcash-600.png" alt="Juan SkillCash">
+          <span class="promo-note-name">Juan SkillCash</span>
+        </div>
+        <p class="promo-note-text">El exchange que yo uso para operar — tiene buena liquidez y soporte en español. Desde aquí obtienes <strong>20% de cashback</strong> en tus comisiones, directo a tu cuenta spot.</p>
+        <div class="promo-note-foot">
+          <span class="promo-note-link">Ver Bitunix →</span>
+        </div>
+      </a>
     </div>
 
     </div>
@@ -4086,10 +4171,10 @@ function showIndicPanel(id){
   });
 }
 function renderIndicSubtabs(group){
-  if(group === 'guia'){
+  if(group === 'guia' || group === 'predicciones'){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.innerHTML = '';
-    showIndicPanel('guia');
+    showIndicPanel(group);
     return;
   }
   const items = INDIC_GROUPS[group] || [];
@@ -4113,12 +4198,13 @@ function renderIndicSubtabs(group){
   showIndicPanel(items[0].id);
 }
 function jumpToIndicator(id){
-  const group = id === 'guia' ? 'guia' : (INDIC_ID_TO_GROUP[id] || 'guia');
+  const standalone = id === 'guia' || id === 'predicciones';
+  const group = standalone ? id : (INDIC_ID_TO_GROUP[id] || 'guia');
   if(indicGroupTabs){
     indicGroupTabs.querySelectorAll('.indic-tab').forEach(b => b.classList.toggle('active', b.dataset.group === group));
   }
   renderIndicSubtabs(group);
-  if(group !== 'guia'){
+  if(!standalone){
     showIndicPanel(id);
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
