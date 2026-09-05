@@ -276,7 +276,14 @@ button{font-family:inherit;color:inherit}
 .bitunix-flash-dot{width:6px;height:6px;border-radius:50%;background:#ff2f4f;flex-shrink:0;animation:pulse 1.3s infinite}
 .bitunix-flash-text{letter-spacing:-.01em}
 .bitunix-flash-cta{background:#0a0e1a;color:var(--bitunix-green);padding:3px 8px;border-radius:14px;font-size:10.5px;font-weight:800}
+.topbar-links{display:none}
+@media(min-width:861px){
+  .topbar-links{display:flex;align-items:center;gap:26px;margin-left:auto;font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:600}
+  .topbar-links a{color:var(--muted2);text-decoration:none;transition:color .2s}
+  .topbar-links a:hover{color:var(--white)}
+}
 .account-mini{position:relative;margin-left:auto;flex-shrink:0}
+@media(min-width:861px){ .account-mini{margin-left:24px} }
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .account-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
 .account-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
@@ -1122,6 +1129,12 @@ img[src=""]{display:none}
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
       </div>
+
+      <nav class="topbar-links">
+        <a href="index.html">Inicio</a>
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Comunidad</a>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+      </nav>
 
       <div class="account-mini" id="accountMini">
         <button class="account-mini-btn" id="accountMiniBtn" type="button" aria-label="Cuenta" aria-haspopup="true" aria-expanded="false">👤</button>
