@@ -10281,7 +10281,15 @@ function renderFngChart(days){
   // para que el mismo tamaño de letra (en unidades del SVG) se vea más grande al escalarlo, sin salirse de la pantalla
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 760, totalH = isMobileChart ? 460 : 380;
-  const marginLeft = 52, marginRight = hasBtc ? 62 : 14, marginTop = 14, marginBottom = 40;
+  // en celular los números del eje bajan a un tamaño parecido al de la leyenda de colores,
+  // y los márgenes se recortan para que el área del gráfico use casi todo el ancho de la tarjeta
+  // (se deja espacio suficiente a la derecha para cuando el precio de Bitcoin llegue a 6 cifras)
+  const yAxisFontSize = isMobileChart ? 14 : 20;
+  const xAxisFontSize = isMobileChart ? 13 : 18;
+  const btcFontSize = isMobileChart ? 13 : 17;
+  const marginLeft = isMobileChart ? 34 : 52;
+  const marginRight = hasBtc ? (isMobileChart ? 52 : 62) : (isMobileChart ? 10 : 14);
+  const marginTop = 14, marginBottom = isMobileChart ? 32 : 40;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
   const xFor = i => marginLeft + (values.length > 1 ? (i / (values.length - 1)) * drawW : drawW / 2);
@@ -10290,7 +10298,7 @@ function renderFngChart(days){
   // eje Y izquierdo — solo números, grandes, legibles de verdad
   const yGridHtml = [0, 25, 50, 75, 100].map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 6).toFixed(1)}" text-anchor="end" font-size="20" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${t}</text>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 6).toFixed(1)}" text-anchor="end" font-size="${yAxisFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${t}</text>
   `).join('');
 
   // fechas del eje X, también grandes
@@ -10301,7 +10309,7 @@ function renderFngChart(days){
     const idx = xLabelCount === 1 ? 0 : Math.round(k * (dates.length - 1) / (xLabelCount - 1));
     xTickIdx.push(idx);
     const label = dates[idx].toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-    xLabelsHtml += `<text x="${xFor(idx).toFixed(1)}" y="${totalH - 12}" text-anchor="middle" font-size="18" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>`;
+    xLabelsHtml += `<text x="${xFor(idx).toFixed(1)}" y="${totalH - 12}" text-anchor="middle" font-size="${xAxisFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>`;
   }
 
   // línea del índice, dibujada por segmentos de color según la zona en la que está cada tramo
@@ -10326,7 +10334,7 @@ function renderFngChart(days){
     btcHtml = `<polyline points="${btcPoints.trim()}" fill="none" stroke="#8890ac" stroke-width="2.2" stroke-dasharray="5,4" opacity=".8"/>`;
     const fmtUsd = v => v >= 1000 ? Math.round(v / 1000) + 'K' : Math.round(v);
     btcAxisHtml = [btcMin, (btcMin + btcMax) / 2, btcMax].map(v => `
-      <text x="${totalW - marginRight + 8}" y="${(btcYFor(v) + 6).toFixed(1)}" font-size="17" fill="#a8afc4" font-family="'Space Mono',monospace">$${fmtUsd(v)}</text>
+      <text x="${totalW - marginRight + 8}" y="${(btcYFor(v) + 6).toFixed(1)}" font-size="${btcFontSize}" fill="#a8afc4" font-family="'Space Mono',monospace">$${fmtUsd(v)}</text>
     `).join('');
   }
 
