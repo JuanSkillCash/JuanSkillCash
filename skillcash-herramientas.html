@@ -100,10 +100,10 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed{width:var(--sidebar-w-collapsed)}
 .sidebar.collapsed .sb-top{flex-direction:column;gap:10px;padding:16px 8px}
 .sb-top{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 8px;gap:6px}
-.sb-logo{display:flex;align-items:center;gap:9px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0}
-.sb-logo-mark{width:52px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 14px rgba(255,47,79,.55)) drop-shadow(0 0 4px rgba(255,255,255,.25))}
+.sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0}
+.sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 8px rgba(255,255,255,.22))}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
-.mobile-topbar-logo{width:80px;height:80px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 16px rgba(255,47,79,.6)) drop-shadow(0 0 4px rgba(255,255,255,.25))}
+.mobile-topbar-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,255,255,.22))}
 .mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
@@ -957,13 +957,39 @@ img[src=""]{display:none}
 @media(min-width:861px){
   .topbar-brand{display:none}
   .mobile-topbar{position:relative;min-height:58px}
-  .desktop-center-brand{display:flex;align-items:center;gap:14px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
-  .desktop-center-logo{width:88px;height:88px;object-fit:contain;flex-shrink:0;animation:logo-pulse-glow 3.2s ease-in-out infinite}
-  .sb-logo-text.desktop-center-text{font-size:23px;letter-spacing:-.02em}
-  @keyframes logo-pulse-glow{
-    0%,100%{filter:drop-shadow(0 0 18px rgba(255,47,79,.55)) drop-shadow(0 0 6px rgba(255,255,255,.25))}
-    50%{filter:drop-shadow(0 0 32px rgba(255,47,79,.85)) drop-shadow(0 0 8px rgba(255,255,255,.35))}
-  }
+  .desktop-center-brand{display:flex;align-items:center;gap:12px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .desktop-center-logo{width:52px;height:52px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,255,255,.25))}
+  .sb-logo-text.desktop-center-text{font-size:21px;letter-spacing:-.02em}
+}
+
+/* ===== HERO MASCOTA (tiburón grande) ===== */
+.hero-mascot{
+  position:relative;display:flex;align-items:flex-end;gap:8px;
+  background:linear-gradient(135deg,rgba(255,47,79,.1),rgba(13,21,48,.55) 55%,rgba(10,14,32,.7));
+  border:1px solid rgba(255,255,255,.09);border-radius:24px;
+  padding:0 32px 30px;margin-bottom:22px;overflow:visible;isolation:isolate;
+}
+.hero-mascot::before{
+  content:'';position:absolute;inset:0;z-index:-1;border-radius:24px;pointer-events:none;
+  background:radial-gradient(ellipse 460px 320px at 16% 30%,rgba(255,47,79,.22),transparent 68%);
+}
+.hero-mascot-imgwrap{flex-shrink:0;width:250px;margin-top:-46px;line-height:0}
+.hero-mascot-imgwrap img{
+  width:100%;height:auto;display:block;
+  filter:drop-shadow(0 0 36px rgba(255,47,79,.5)) drop-shadow(0 0 80px rgba(255,47,79,.22));
+  animation:hero-mascot-float 4.6s ease-in-out infinite;
+}
+@keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero-mascot-text{min-width:0;padding:30px 0 4px}
+.hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px}
+.hero-mascot-title{font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.02em;line-height:1.05;font-size:clamp(26px,3.6vw,42px);color:var(--white)}
+.hero-mascot-title span{color:var(--red)}
+.hero-mascot-desc{margin-top:10px;max-width:560px;color:var(--muted2);font-size:14.5px;line-height:1.65}
+@media(max-width:860px){
+  .hero-mascot{flex-direction:column;align-items:center;text-align:center;padding:0 20px 24px}
+  .hero-mascot-imgwrap{width:168px;margin-top:-40px}
+  .hero-mascot-text{padding:14px 0 0}
+  .hero-mascot-desc{margin-left:auto;margin-right:auto}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
@@ -1128,6 +1154,17 @@ img[src=""]{display:none}
       </div>
     </div>
     <div class="brand-glow-bar" style="margin:0 0 18px"></div>
+
+    <div class="hero-mascot">
+      <div class="hero-mascot-imgwrap">
+        <img src="logo-skillcash-1050.png" alt="SkillCash">
+      </div>
+      <div class="hero-mascot-text">
+        <div class="hero-mascot-eyebrow">Bienvenido a</div>
+        <h1 class="hero-mascot-title">Skill<span>Cash</span> Tools</h1>
+        <p class="hero-mascot-desc">Calculadoras, simuladores y guías 100% gratuitas para operar cripto con criterio: liquidación, break-even, DCA, portafolio, seguridad y más — sin señales ni promesas vacías.</p>
+      </div>
+    </div>
 
     <div id="marketDashboardBlock">
     <div class="market-overview reveal">
