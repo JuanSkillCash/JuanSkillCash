@@ -1008,7 +1008,7 @@ img[src=""]{display:none}
 .fng-share-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
 .fng-chart-breakout{margin:0 -32px;padding:0 8px}
-@media(max-width:900px){ .fng-chart-breakout{margin:0 -18px;padding:0 6px} }
+@media(max-width:900px){ .fng-chart-breakout{margin:0 -38px;padding:0 4px} }
 .fng-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .fng-stats-grid .res-card{min-width:0}
 .fng-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -10287,8 +10287,8 @@ function renderFngChart(days){
   const yAxisFontSize = isMobileChart ? 14 : 20;
   const xAxisFontSize = isMobileChart ? 13 : 18;
   const btcFontSize = isMobileChart ? 13 : 17;
-  const marginLeft = isMobileChart ? 34 : 52;
-  const marginRight = hasBtc ? (isMobileChart ? 52 : 62) : (isMobileChart ? 10 : 14);
+  const marginLeft = isMobileChart ? 32 : 52;
+  const marginRight = hasBtc ? (isMobileChart ? 46 : 62) : (isMobileChart ? 6 : 14);
   const marginTop = 14, marginBottom = isMobileChart ? 32 : 40;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
