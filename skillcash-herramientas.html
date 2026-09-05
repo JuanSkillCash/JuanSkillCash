@@ -418,6 +418,42 @@ button{font-family:inherit;color:inherit}
 .modal-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(6px);border:1px solid var(--border2);color:var(--white);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:background .2s,transform .2s}
 .modal-close:hover{background:rgba(255,47,79,.2);transform:rotate(90deg)}
 
+/* ===== HERRAMIENTA ABIERTA "EN LÍNEA" (dentro de su categoría, no como popup) ===== */
+#toolDetailSlot{margin-bottom:28px}
+.tool-detail-card{
+  --bc:rgba(255,255,255,.14);--tint:rgba(255,255,255,.05);
+  border-radius:18px;border:1px solid var(--bc);
+  background:radial-gradient(ellipse 130% 100% at 0% 0%,var(--tint),transparent 65%),#080c20;
+}
+.tool-detail-card[data-category="trading"]{--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)}
+.tool-detail-card[data-category="inversion"]{--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)}
+.tool-detail-card[data-category="portafolio"]{--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)}
+.tool-detail-card[data-category="seguridad"]{--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)}
+.tool-detail-card[data-category="aprender"]{--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)}
+.tool-detail-card[data-category="utilidades"]{--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)}
+.modal-overlay.inline-mode{position:relative;inset:auto;display:block;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:auto;padding:0;overflow:visible}
+.modal-overlay.inline-mode .modal-panel{max-width:900px;margin:0 auto;opacity:1;transform:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none}
+.modal-overlay.inline-mode .modal-close{position:absolute;top:14px;right:14px}
+
+/* ---- pastillas de navegación dentro de una categoría — solo celular; el menú lateral ya cubre esto en escritorio ---- */
+.cat-pill-tabs{display:none}
+@media(max-width:860px){
+  .cat-pill-tabs{
+    display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    mask-image:linear-gradient(to right,#000 90%,transparent 100%);
+    -webkit-mask-image:linear-gradient(to right,#000 90%,transparent 100%);
+  }
+  .cat-pill-tabs::-webkit-scrollbar{display:none}
+}
+.cat-pill{
+  font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;
+  padding:8px 16px;border-radius:20px;border:1px solid var(--border2);background:rgba(255,255,255,.03);
+  color:var(--muted2);cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.cat-pill:hover{background:rgba(255,255,255,.06);color:var(--white)}
+
 /* ===== CALCULATOR ===== */
 .calc{padding:32px 32px 30px}
 .calc-head{text-align:center;margin:-32px -32px 26px -32px;padding:34px 32px 26px;position:relative;border-bottom:1px solid var(--border);border-radius:20px 20px 0 0}
@@ -1101,7 +1137,7 @@ img[src=""]{display:none}
       <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
     </div>
     <nav class="sb-nav">
-      <div class="sb-cat-label">Portafolio</div>
+      <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
       <button class="sb-item" data-tool="quiz">
         <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
       </button>
@@ -1112,7 +1148,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🔗</span><span class="sb-item-label">Correlación</span>
       </button>
 
-      <div class="sb-cat-label">Trading y Futuros</div>
+      <div class="sb-cat-label" data-category="trading">Trading y Futuros</div>
       <button class="sb-item" data-tool="calculadora">
         <span class="sb-item-icon">🧮</span><span class="sb-item-label">Calculadora</span>
       </button>
@@ -1126,7 +1162,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de Comisiones</span>
       </button>
 
-      <div class="sb-cat-label">Inversión y Acumulación</div>
+      <div class="sb-cat-label" data-category="inversion">Inversión y Acumulación</div>
       <button class="sb-item" data-tool="rentabilidad">
         <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
       </button>
@@ -1143,7 +1179,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad Financiera</span>
       </button>
 
-      <div class="sb-cat-label">Seguridad</div>
+      <div class="sb-cat-label" data-category="seguridad">Seguridad</div>
       <button class="sb-item" data-tool="checklist">
         <span class="sb-item-icon">🛡️</span><span class="sb-item-label">Checklist de seguridad</span>
       </button>
@@ -1157,7 +1193,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">👨‍👩‍👧</span><span class="sb-item-label">Herencia digital</span>
       </button>
 
-      <div class="sb-cat-label">Aprender</div>
+      <div class="sb-cat-label" data-category="aprender">Aprender</div>
       <button class="sb-item" data-tool="glosario">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario Cripto</span>
       </button>
@@ -1165,7 +1201,7 @@ img[src=""]{display:none}
         <span class="sb-item-icon">⚠️</span><span class="sb-item-label">Errores comunes</span>
       </button>
 
-      <div class="sb-cat-label">Utilidades</div>
+      <div class="sb-cat-label" data-category="utilidades">Utilidades</div>
       <button class="sb-item" data-tool="unitconverter">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">Conversor de unidades</span>
       </button>
@@ -1514,6 +1550,9 @@ img[src=""]{display:none}
 
     <div id="categoryDetailView" style="display:none">
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
+
+      <div class="cat-pill-tabs" id="catPillTabs" style="display:none"></div>
+      <div id="toolDetailSlot" style="display:none"></div>
 
     <div class="tool-section" data-category="indicadores">
       <div class="tool-cat-label">📊 Indicadores de Mercado</div>
@@ -1973,7 +2012,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA ===== -->
-<div class="modal-overlay" id="calcModal">
+<div class="modal-overlay" id="calcModal" data-tool="calculadora">
   <button class="modal-close" id="closeCalc" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="calcTitleEl">
 
@@ -2141,7 +2180,7 @@ img[src=""]{display:none}
 
 <!-- no-copies-esto-skillcash -->
 <!-- ===== MODAL: CALCULADORA DE RENTABILIDAD ===== -->
-<div class="modal-overlay" id="profitModal">
+<div class="modal-overlay" id="profitModal" data-tool="rentabilidad">
   <button class="modal-close" id="closeProfit" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="profitTitleEl">
 
@@ -2259,7 +2298,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE BREAK-EVEN ===== -->
-<div class="modal-overlay" id="breakevenModal">
+<div class="modal-overlay" id="breakevenModal" data-tool="breakeven">
   <button class="modal-close" id="closeBreakeven" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="breakevenTitleEl">
 
@@ -2385,7 +2424,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA DCA ===== -->
-<div class="modal-overlay" id="dcaModal">
+<div class="modal-overlay" id="dcaModal" data-tool="dca">
   <button class="modal-close" id="closeDca" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="dcaTitleEl">
 
@@ -2508,7 +2547,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: COMPARADOR DE MARKET CAP ===== -->
-<div class="modal-overlay" id="mcapCompareModal">
+<div class="modal-overlay" id="mcapCompareModal" data-tool="mcapcompare">
   <button class="modal-close" id="closeMcapCompare" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="mcapCompareTitleEl">
 
@@ -2601,7 +2640,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: LIBERTAD FINANCIERA ===== -->
-<div class="modal-overlay" id="fiFreedomModal">
+<div class="modal-overlay" id="fiFreedomModal" data-tool="fifreedom">
   <button class="modal-close" id="closeFiFreedom" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="fiFreedomTitleEl">
 
@@ -2706,7 +2745,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CONVERSOR DE UNIDADES ===== -->
-<div class="modal-overlay" id="unitConverterModal">
+<div class="modal-overlay" id="unitConverterModal" data-tool="unitconverter">
   <button class="modal-close" id="closeUnitConverter" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="unitConverterTitleEl">
 
@@ -2771,7 +2810,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE PORCENTAJES ===== -->
-<div class="modal-overlay" id="pctCalcModal">
+<div class="modal-overlay" id="pctCalcModal" data-tool="pctcalc">
   <button class="modal-close" id="closePctCalc" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="pctCalcTitleEl">
 
@@ -2885,7 +2924,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: RELOJ DE ZONA HORARIA ===== -->
-<div class="modal-overlay" id="tzClockModal">
+<div class="modal-overlay" id="tzClockModal" data-tool="tzclock">
   <button class="modal-close" id="closeTzClock" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="tzClockTitleEl">
 
@@ -2983,7 +3022,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA COIN-M ===== -->
-<div class="modal-overlay" id="coinmModal">
+<div class="modal-overlay" id="coinmModal" data-tool="coinm">
   <button class="modal-close" id="closeCoinm" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="coinmTitleEl">
 
@@ -3161,7 +3200,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CALCULADORA DE COMISIONES ===== -->
-<div class="modal-overlay" id="feesModal">
+<div class="modal-overlay" id="feesModal" data-tool="fees">
   <button class="modal-close" id="closeFees" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="feesTitleEl">
 
@@ -3283,7 +3322,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: PERFIL DE RIESGO ===== -->
-<div class="modal-overlay" id="quizModal">
+<div class="modal-overlay" id="quizModal" data-tool="quiz">
   <button class="modal-close" id="closeQuiz" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="quizTitleEl" style="max-width:560px">
 
@@ -3343,7 +3382,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: MONITOR DE CORRELACIÓN ===== -->
-<div class="modal-overlay" id="correlationModal">
+<div class="modal-overlay" id="correlationModal" data-tool="correlacion">
   <button class="modal-close" id="closeCorrelation" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="correlationTitleEl">
 
@@ -3399,7 +3438,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: GLOSARIO CRIPTO ===== -->
-<div class="modal-overlay" id="glossaryModal">
+<div class="modal-overlay" id="glossaryModal" data-tool="glosario">
   <button class="modal-close" id="closeGlossary" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="glossaryTitleEl">
 
@@ -3439,7 +3478,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: DCA DE SALIDA (RETIRO ESCALONADO) ===== -->
-<div class="modal-overlay" id="dcaExitModal">
+<div class="modal-overlay" id="dcaExitModal" data-tool="dcaexit">
   <button class="modal-close" id="closeDcaExit" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="dcaExitTitleEl">
 
@@ -3545,7 +3584,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: BIBLIOTECA DE ERRORES COMUNES ===== -->
-<div class="modal-overlay" id="mistakesModal">
+<div class="modal-overlay" id="mistakesModal" data-tool="mistakes">
   <button class="modal-close" id="closeMistakes" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="mistakesTitleEl">
 
@@ -3585,7 +3624,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: COMPARADOR DE WALLETS ===== -->
-<div class="modal-overlay" id="walletCompareModal">
+<div class="modal-overlay" id="walletCompareModal" data-tool="walletcompare">
   <button class="modal-close" id="closeWalletCompare" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="walletCompareTitleEl">
 
@@ -3661,7 +3700,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: VERIFICAR APROBACIONES DE WALLET ===== -->
-<div class="modal-overlay" id="approvalsModal">
+<div class="modal-overlay" id="approvalsModal" data-tool="approvals">
   <button class="modal-close" id="closeApprovals" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="approvalsTitleEl">
 
@@ -3709,7 +3748,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: HERENCIA DIGITAL ===== -->
-<div class="modal-overlay" id="inheritanceModal">
+<div class="modal-overlay" id="inheritanceModal" data-tool="inheritance">
   <button class="modal-close" id="closeInheritance" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="inheritanceTitleEl">
 
@@ -3757,7 +3796,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: CHECKLIST DE SEGURIDAD ===== -->
-<div class="modal-overlay" id="checklistModal">
+<div class="modal-overlay" id="checklistModal" data-tool="checklist">
   <button class="modal-close" id="closeChecklist" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="checklistTitleEl">
 
@@ -3914,7 +3953,7 @@ img[src=""]{display:none}
 </div>
 
 <!-- ===== MODAL: SIMULADOR DE PORTAFOLIO ===== -->
-<div class="modal-overlay" id="portfolioModal">
+<div class="modal-overlay" id="portfolioModal" data-tool="portafolio">
   <button class="modal-close" id="closePortfolio" aria-label="Cerrar">✕</button>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="portfolioTitleEl">
 
@@ -4089,7 +4128,62 @@ function setIndicMobileMode(active){
   const sb = document.getElementById('sidebar');
   if(sb) sb.classList.toggle('indic-active', active);
 }
+/* ---- el menú lateral muestra solo las herramientas de la categoría activa (o todas, colapsadas, en el resumen) ---- */
+function filterSidebarNav(cat){
+  document.querySelectorAll('.sb-cat-label').forEach(label => {
+    const items = [];
+    let el = label.nextElementSibling;
+    while(el && el.classList.contains('sb-item')){ items.push(el); el = el.nextElementSibling; }
+    if(cat === null){
+      label.style.display = '';
+      label.classList.add('collapsed');
+      items.forEach(it => it.style.display = 'none');
+    } else if(label.dataset.category === cat){
+      label.style.display = '';
+      label.classList.remove('collapsed');
+      items.forEach(it => it.style.display = '');
+    } else {
+      label.style.display = 'none';
+      items.forEach(it => it.style.display = 'none');
+    }
+  });
+}
+/* ---- pastillas de navegación (solo celular) con las opciones de la categoría activa ---- */
+const catPillTabs = document.getElementById('catPillTabs');
+function renderCatPillTabs(cat){
+  catPillTabs.innerHTML = '';
+  let items = [];
+  if(cat === 'indicadores'){
+    items = [...document.querySelectorAll('#indicMobileNav [data-indic-jump]')].map(btn => ({
+      label: btn.querySelector('.sb-item-label').textContent,
+      onClick: () => jumpToIndicator(btn.dataset.indicJump),
+    }));
+  } else if(cat && cat !== 'partners'){
+    items = [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
+      label: card.querySelector('h3').textContent,
+      onClick: () => card.click(),
+    }));
+  }
+  if(items.length === 0){ catPillTabs.style.display = 'none'; return; }
+  catPillTabs.style.display = '';
+  items.forEach(it => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cat-pill';
+    btn.textContent = it.label;
+    btn.addEventListener('click', it.onClick);
+    catPillTabs.appendChild(btn);
+  });
+  catPillTabs.scrollLeft = 0;
+  if(catPillTabs.scrollWidth > catPillTabs.clientWidth){
+    setTimeout(() => {
+      catPillTabs.scrollTo({ left: 28, behavior: 'smooth' });
+      setTimeout(() => catPillTabs.scrollTo({ left: 0, behavior: 'smooth' }), 550);
+    }, 300);
+  }
+}
 function showCategoryDetail(cat){
+  const enteringFromOverview = categoryDetailView.style.display !== 'block';
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
   document.getElementById('marketDashboardBlock').style.display = 'none';
@@ -4101,9 +4195,15 @@ function showCategoryDetail(cat){
     section.style.display = section.dataset.category === cat ? 'block' : 'none';
   });
   setIndicMobileMode(cat === 'indicadores');
+  filterSidebarNav(cat);
+  if(enteringFromOverview) renderCatPillTabs(cat);
+  if(enteringFromOverview && !closingFromPopstate){
+    history.pushState({ skillcashDepth: 'category' }, '', location.href);
+  }
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
+  const wasInCategory = categoryDetailView.style.display === 'block';
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
@@ -4112,6 +4212,11 @@ function showCategoryOverview(){
   if(hero) hero.style.display = '';
   if(ticker) ticker.style.display = '';
   setIndicMobileMode(false);
+  filterSidebarNav(null);
+  if(wasInCategory && !closingFromPopstate && history.state && history.state.skillcashDepth === 'category'){
+    suppressNextPopstate = true;
+    history.back();
+  }
   categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 document.querySelectorAll('.cat-overview-card').forEach(card => {
@@ -4285,33 +4390,71 @@ function getFocusable(container){
     .filter(el => !el.disabled && el.offsetParent !== null);
 }
 let closingFromPopstate = false;
+let suppressNextPopstate = false;
+const toolDetailSlot = document.getElementById('toolDetailSlot');
+const TOOL_CATEGORY = {};
+document.querySelectorAll('.tool-section[data-category] .tool-card[data-tool]').forEach(card => {
+  TOOL_CATEGORY[card.dataset.tool] = card.closest('.tool-section').dataset.category;
+});
 function openModalGeneric(overlay, panel, focusTarget){
   lastFocusedEl = document.activeElement;
   activeModalPanel = panel;
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  history.pushState({ skillcashModal: true }, '', location.href);
-  setTimeout(() => { (focusTarget || panel.querySelector('.modal-close')).focus(); }, 60);
+  const category = TOOL_CATEGORY[overlay.dataset.tool];
+  if(category){
+    showCategoryDetail(category);
+    const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
+    if(grid) grid.style.display = 'none';
+    const wrap = document.createElement('div');
+    wrap.className = 'tool-detail-card';
+    wrap.dataset.category = category;
+    wrap.appendChild(overlay);
+    toolDetailSlot.appendChild(wrap);
+    overlay.classList.add('inline-mode');
+    toolDetailSlot.style.display = 'block';
+    history.pushState({ skillcashModal: true }, '', location.href);
+    toolDetailSlot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { (focusTarget || panel.querySelector('.modal-close')).focus({ preventScroll: true }); }, 60);
+  } else {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    history.pushState({ skillcashModal: true }, '', location.href);
+    setTimeout(() => { (focusTarget || panel.querySelector('.modal-close')).focus(); }, 60);
+  }
 }
 function closeModalGeneric(overlay){
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
+  const category = TOOL_CATEGORY[overlay.dataset.tool];
+  if(category){
+    overlay.classList.remove('inline-mode');
+    document.body.appendChild(overlay);
+    const wrap = toolDetailSlot.querySelector('.tool-detail-card');
+    if(wrap) wrap.remove();
+    toolDetailSlot.style.display = 'none';
+    const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
+    if(grid) grid.style.display = '';
+  } else {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
   activeModalPanel = null;
   if(lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
   if(!closingFromPopstate && history.state && history.state.skillcashModal){
+    suppressNextPopstate = true;
     history.back();
   }
 }
 window.addEventListener('popstate', () => {
+  if(suppressNextPopstate){ suppressNextPopstate = false; return; }
+  closingFromPopstate = true;
   if(activeModalPanel){
-    closingFromPopstate = true;
     const overlay = activeModalPanel.closest('.modal-overlay');
     if(overlay){
       if(overlay.id === 'assetDetailModal') closeAssetDetailModal();
       else closeModalGeneric(overlay);
     }
-    closingFromPopstate = false;
+  } else if(categoryDetailView.style.display === 'block'){
+    showCategoryOverview();
   }
+  closingFromPopstate = false;
 });
 document.addEventListener('keydown', (e) => {
   if(!activeModalPanel) return;
@@ -10703,44 +10846,6 @@ renderMarketSessions();
 setInterval(updateMarketSessions, 1000);
 
 /* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
-/* ---- botón "atrás" del celular: cierra lo que esté abierto (modal o categoría) en vez de salir de la página ---- */
-(function setupMobileBackButton(){
-  let depth = 0;
-
-  // 1) categorías: si estás viendo el detalle de una, "atrás" te regresa a las cajitas
-  const originalShowDetail = showCategoryDetail;
-  showCategoryDetail = function(cat){
-    originalShowDetail(cat);
-    depth++;
-    history.pushState({ skillcashNav: true, depth }, '');
-  };
-
-  // 2) cualquier modal (las 21 herramientas y los demás): "atrás" lo cierra
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    let wasOpen = modal.classList.contains('open');
-    new MutationObserver(() => {
-      const isOpen = modal.classList.contains('open');
-      if(isOpen && !wasOpen){
-        depth++;
-        history.pushState({ skillcashNav: true, depth }, '');
-      }
-      wasOpen = isOpen;
-    }).observe(modal, { attributes: true, attributeFilter: ['class'] });
-  });
-
-  window.addEventListener('popstate', () => {
-    const openModal = document.querySelector('.modal-overlay.open');
-    if(openModal){
-      openModal.classList.remove('open');
-      return;
-    }
-    const detailView = document.getElementById('categoryDetailView');
-    if(detailView && detailView.style.display === 'block'){
-      showCategoryOverview();
-    }
-  });
-})();
-
 (function checkOAuthReturnError(){
   const raw = window.location.hash || window.location.search;
   if(!raw || raw.indexOf('error') === -1) return;
