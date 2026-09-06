@@ -195,7 +195,7 @@ button{font-family:inherit;color:inherit}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
-.dom-card-click-hint{display:block;text-align:right;width:100%;margin-top:2px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
+.dom-card-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:6px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .dom-card.halving:hover .dom-card-click-hint{color:var(--red)}
 .fng-section-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .fng-section-title{font-size:11px;font-weight:700;color:var(--white);margin-right:auto}
@@ -1734,13 +1734,6 @@ img[src=""]{display:none}
                 <p class="calc-sub">Cada ~4 años la recompensa que reciben los mineros se reduce a la mitad ("halving"). Este gráfico compara cómo se movió el precio de Bitcoin después de cada halving, para ver si el ciclo actual se parece a los anteriores.</p>
               </div>
 
-              <div class="dom-card halving" style="max-width:420px;margin:0 auto 22px">
-                <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:var(--red)"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo Halving (estimado)</div>
-                <div class="dom-card-value halving-countdown-value" style="font-size:19px">—</div>
-                <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%"></div></div>
-                <div class="dom-card-sub halving-countdown-sub">Calculando…</div>
-              </div>
-
               <div class="indic-chart-controls" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
                 <button type="button" class="indic-chart-btn" data-cycle="0">2012</button>
                 <button type="button" class="indic-chart-btn" data-cycle="1">2016</button>
@@ -1763,6 +1756,13 @@ img[src=""]{display:none}
                 <div id="halvingChartWrap" style="display:none;width:100%"></div>
               </div>
               <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
+
+              <div class="dom-card" style="max-width:420px;margin:22px auto 0;background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(59,130,246,.12), transparent 65%), #080c20;border-color:rgba(59,130,246,.3)">
+                <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:#60a5fa"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo Halving (estimado)</div>
+                <div class="dom-card-value halving-countdown-value" style="font-size:19px">—</div>
+                <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#93c5fd);box-shadow:0 0 8px rgba(59,130,246,.6)"></div></div>
+                <div class="dom-card-sub halving-countdown-sub">Calculando…</div>
+              </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>El eje vertical (precio) usa escala logarítmica</b>, no lineal — así se puede comparar un ciclo donde Bitcoin costaba $13 con uno donde costaba $100.000, sin que el primero se vea como una línea plana en cero.<br>
