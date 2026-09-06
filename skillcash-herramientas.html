@@ -10529,8 +10529,24 @@ async function fetchHalvingHistory(){
   const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
   const json = await res.json();
   const rows = json.values || [];
-  const points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
+  let points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
   points.sort((a, b) => a.t - b.t);
+
+  // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
+  // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
+  // para que el precio y la fecha de "hoy" sean lo más recientes posibles
+  try{
+    const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
+    if(recent && recent.length){
+      const recentStart = recent[0][0];
+      points = points.filter(p => p.t < recentStart);
+      recent.forEach(([t, c]) => points.push({ t, c }));
+      points.sort((a, b) => a.t - b.t);
+    }
+  } catch(err){
+    // si falla, nos quedamos con el historial de blockchain.info tal cual
+  }
+
   halvingBtcHistory = points;
   return points;
 }
