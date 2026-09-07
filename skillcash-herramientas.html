@@ -951,11 +951,13 @@ img[src=""]{display:none}
 /* NOTA PERSONAL — BITUNIX */
 :root{ --bitunix-green:#bffa2c; }
 .promo-note{
-  display:block;background:var(--card);border:1px solid var(--border2);border-radius:14px;
+  display:block;
+  background:radial-gradient(ellipse 130% 110% at 100% -10%,rgba(191,250,44,.12),transparent 60%),#080c20;
+  border:1px solid rgba(191,250,44,.3);border-radius:14px;
   padding:15px 17px;text-decoration:none;transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out);
   box-shadow:var(--shadow-sm);
 }
-.promo-note:hover{border-color:rgba(191,250,44,.4);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.promo-note:hover{border-color:rgba(191,250,44,.55);transform:translateY(-2px);box-shadow:var(--shadow-md)}
 .promo-note-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
 .promo-note-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--surface);flex-shrink:0;border:1px solid var(--border2);padding:3px}
 .promo-note-name{font-size:12.5px;font-weight:700;color:var(--white)}
