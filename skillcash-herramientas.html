@@ -11576,7 +11576,7 @@ function renderRainbowChart(){
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
-  const yFontSize = isMobileChart ? 12 : 14;
+  const yFontSize = isMobileChart ? 9 : 11;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
   const marginRight = isMobileChart ? 8 : 14;
@@ -11605,7 +11605,12 @@ function renderRainbowChart(){
     <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
   `).join('');
 
-  const lowClip = logMin * Math.LN10 - 1, highClip = logMax * Math.LN10 + 1;
+  // las fronteras externas (arriba de "Zona de venta" y abajo de "Liquidación total") deben ser
+  // relativas a la curva central, igual que las demás — antes se calculaban en términos
+  // absolutos (a partir del rango del eje) y se volvían a sumar sobre la curva, lo que en fechas
+  // viejas (curva central muy baja) podía invertir la banda: un polígono que se cruza a sí mismo,
+  // que se veía como una franja gruesa y de color raro
+  const lowClip = -2.3, highClip = 2.3;
   const boundaries = [lowClip, ...boundaryOffsets, highClip];
   let bandsHtml = '';
   for(let bi = 0; bi < RAINBOW_BANDS.length; bi++){
@@ -11617,7 +11622,7 @@ function renderRainbowChart(){
     for(let i = SAMPLES; i >= 0; i--){
       d += 'L' + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + loOff).toFixed(1) + ' ';
     }
-    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}" opacity=".62"/>`;
+    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}"/>`;
   }
 
   let pathD = '';
