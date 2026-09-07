@@ -346,14 +346,10 @@ button{font-family:inherit;color:inherit}
 .indic-chart-btn.active{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.5);color:#60a5fa}
 .indic-chart-body{
   position:relative;min-height:260px;border-radius:12px;
-  background:
-    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 15px,
-    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
-    rgba(255,255,255,.02);
 }
-/* el gráfico real (#halvingChartWrap) es más ancho que .indic-chart-body por el
-   "breakout" — sin esto, el fondo de cuadrícula se quedaba angosto y se veía un corte
-   justo donde el gráfico ya se salía de esa franja */
+/* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
+   lo tuvieran, al no compartir el mismo origen (el gráfico es más ancho por el
+   "breakout") las líneas quedaban desfasadas y se veían como dos cuadrículas encimadas */
 #halvingChartWrap{
   border-radius:12px;
   background:
@@ -364,7 +360,7 @@ button{font-family:inherit;color:inherit}
 /* antes .indic-chart-body los centraba con flex; ahora se centran solos para que ese
    contenedor pueda quedar en flujo normal y el gráfico real (adentro) sí pueda "romper"
    el margen hacia los lados sin que el flex se lo impida */
-.indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px;max-width:400px;margin:0 auto}
+.indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px;max-width:400px;margin:60px auto;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02)}
 
 /* ---- panel de categorías (portada de herramientas) ---- */
 .cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
