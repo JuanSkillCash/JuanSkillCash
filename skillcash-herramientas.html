@@ -5380,6 +5380,7 @@ sbSearchInput.addEventListener('input', () => {
 /* ---- API keys ---- */
 const COINGECKO_API_KEY = 'CG-B17Pfy5LygHBnhQCoxkh2U2W';
 const TWELVE_DATA_API_KEY = '9a29593d7a534876afbf043270133831';
+const CRYPTOCOMPARE_API_KEY = '67012918682ea6d4d2877d6f5200bf9950e4521a888b9a7c48173ab417e9c3d5';
 function cgUrl(url){
   const sep = url.includes('?') ? '&' : '?';
   return url + sep + 'x_cg_demo_api_key=' + COINGECKO_API_KEY;
@@ -5387,6 +5388,27 @@ function cgUrl(url){
 function tdUrl(url){
   const sep = url.includes('?') ? '&' : '?';
   return url + sep + 'apikey=' + TWELVE_DATA_API_KEY;
+}
+function ccUrl(url){
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'api_key=' + CRYPTOCOMPARE_API_KEY;
+}
+/* ---- precio en USD de un solo activo cripto, con CoinGecko como fuente principal y
+   CryptoCompare como respaldo automático si CoinGecko falla o no responde el precio ---- */
+async function fetchCryptoPriceUSD(coingeckoId, symbol){
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coingeckoId) + '&vs_currencies=usd'));
+    const data = await res.json();
+    const price = data[coingeckoId] && data[coingeckoId].usd;
+    if(typeof price === 'number') return price;
+  } catch(err){ /* sigue al respaldo */ }
+  if(!symbol) return null;
+  try{
+    const res = await fetch(ccUrl('https://min-api.cryptocompare.com/data/price?fsym=' + encodeURIComponent(symbol.toUpperCase()) + '&tsyms=USD'));
+    const data = await res.json();
+    if(typeof data.USD === 'number') return data.USD;
+  } catch(err){ /* sin respaldo disponible */ }
+  return null;
 }
 
 /* ---- catálogo curado: índices y materias primas (vía ETF, mostrados con su nombre real) ---- */
@@ -5586,9 +5608,7 @@ async function refreshAssetPrice(){
   btn.classList.add('spinning');
   try{
     if(selectedAsset.category === 'cripto'){
-      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(selectedAsset.id) + '&vs_currencies=usd'));
-      const data = await res.json();
-      const price = data[selectedAsset.id] && data[selectedAsset.id].usd;
+      const price = await fetchCryptoPriceUSD(selectedAsset.id, selectedAsset.symbol);
       if(typeof price === 'number'){
         selectedAsset.price = price;
         lastPriceFetchTime = Date.now();
@@ -7878,9 +7898,7 @@ async function selectDcaAsset(coin){
   document.getElementById('dcaAssetPrice').textContent = 'Cargando precio…';
   dcaPriceSeries = null; // cambiamos de activo: hay que volver a pedir el histórico
   try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd'));
-    const data = await res.json();
-    const price = data[coin.id] && data[coin.id].usd;
+    const price = await fetchCryptoPriceUSD(coin.id, coin.symbol);
     dcaSelectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, price: (typeof price === 'number' ? price : 100) };
     document.getElementById('dcaAssetPrice').textContent = formatPrice(dcaSelectedAsset.price) + ' USD ahora mismo';
   } catch(err){
@@ -8171,9 +8189,7 @@ async function selectDcaExitAsset(coin){
   document.getElementById('dcaExitAssetName').textContent = coin.name + ' (' + coin.symbol.toUpperCase() + ')';
   document.getElementById('dcaExitAssetPrice').textContent = 'Cargando precio…';
   try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd'));
-    const data = await res.json();
-    const price = data[coin.id] && data[coin.id].usd;
+    const price = await fetchCryptoPriceUSD(coin.id, coin.symbol);
     dcaExitSelectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, price: (typeof price === 'number' ? price : 100) };
     document.getElementById('dcaExitAssetPrice').textContent = 'Precio actual: ' + formatPrice(dcaExitSelectedAsset.price) + ' USD';
   } catch(err){
@@ -8698,15 +8714,12 @@ let unitConverterBtcPrice = null;
 let unitConverterEthPrice = null;
 
 async function refreshUnitConverterPrices(){
-  try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd'));
-    const data = await res.json();
-    unitConverterBtcPrice = data.bitcoin && data.bitcoin.usd;
-    unitConverterEthPrice = data.ethereum && data.ethereum.usd;
-  } catch(err){
-    unitConverterBtcPrice = null;
-    unitConverterEthPrice = null;
-  }
+  const [btc, eth] = await Promise.all([
+    fetchCryptoPriceUSD('bitcoin', 'BTC'),
+    fetchCryptoPriceUSD('ethereum', 'ETH'),
+  ]);
+  unitConverterBtcPrice = btc;
+  unitConverterEthPrice = eth;
   updateUnitConverterUsd();
 }
 
@@ -9463,9 +9476,7 @@ async function selectCoinmAsset(coin){
   document.getElementById('coinmAssetName').textContent = coin.name + ' (' + coin.symbol.toUpperCase() + ')';
   document.getElementById('coinmAssetPrice').textContent = 'Cargando precio…';
   try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(coin.id) + '&vs_currencies=usd'));
-    const data = await res.json();
-    const price = data[coin.id] && data[coin.id].usd;
+    const price = await fetchCryptoPriceUSD(coin.id, coin.symbol);
     coinmSelectedAsset = { id: coin.id, name: coin.name, symbol: coin.symbol, thumb: coin.thumb, price: (typeof price === 'number' ? price : 100) };
     document.getElementById('coinmAssetPrice').textContent = 'Precio actual: ' + formatPrice(coinmSelectedAsset.price) + ' USD';
     document.getElementById('coinmEntry').value = coinmSelectedAsset.price;
