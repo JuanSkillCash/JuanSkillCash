@@ -339,24 +339,44 @@ button{font-family:inherit;color:inherit}
 .indic-guide-card-soon{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
-.pred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
-@media(max-width:900px){ .pred-grid{grid-template-columns:1fr} }
+.pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
+@media(max-width:640px){ .pred-grid{grid-template-columns:1fr} }
 .pred-ticket{
-  display:flex;height:100%;background:#f3ead6;border:1px solid rgba(0,0,0,.14);border-radius:12px;
-  overflow:hidden;box-shadow:0 16px 34px -20px rgba(0,0,0,.6);
+  display:flex;height:100%;background:#fdfcf8;border:1px solid rgba(0,0,0,.14);border-radius:12px;
+  overflow:hidden;box-shadow:0 16px 34px -20px rgba(0,0,0,.6);position:relative;
+}
+.pred-watermark{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  font-family:'Poppins',sans-serif;font-weight:800;font-size:32px;letter-spacing:.02em;
+  color:rgba(36,27,18,.05);white-space:nowrap;pointer-events:none;z-index:0;
 }
 .pred-stub{
-  width:88px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  gap:4px;padding:20px 6px 16px;border-right:2px dashed rgba(36,27,18,.3);position:relative;
+  width:100px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:5px;padding:20px 8px 16px;position:relative;background:linear-gradient(165deg,#ff3f5c,var(--red));
+  z-index:1;
 }
-.pred-stub::before,.pred-stub::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#080c20;right:-9px}
-.pred-stub::before{top:-8px}
-.pred-stub::after{bottom:-8px}
-.pred-logo{width:22px;height:22px;object-fit:contain;margin-bottom:3px;filter:sepia(.45) saturate(1.5) hue-rotate(-8deg) opacity(.88)}
-.pred-month{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:#7a6b52;text-transform:uppercase}
-.pred-day{font-family:'Poppins',sans-serif;font-weight:800;font-size:23px;line-height:1;color:#241b12}
-.pred-year{font-family:'Space Mono',monospace;font-size:10px;color:#7a6b52}
-.pred-body{flex:1;padding:20px 18px 16px;position:relative;min-width:0;display:flex;flex-direction:column}
+.pred-stub::before,.pred-stub::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#080c20;right:-11px;z-index:2}
+.pred-stub::before{top:-11px}
+.pred-stub::after{bottom:-11px}
+.pred-stub-tear{
+  position:absolute;right:0;top:0;bottom:0;width:2px;z-index:1;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.55) 0 6px,transparent 6px 12px);
+}
+.pred-stub-tear::before{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;background:#080c20;z-index:2;
+}
+.pred-logo{width:22px;height:22px;object-fit:contain;margin-bottom:2px;border-radius:50%;background:#fff;padding:2px}
+.pred-ticket-no-label{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:2px}
+.pred-ticket-no{font-family:'Poppins',sans-serif;font-weight:800;font-size:15px;line-height:1.15;color:#fff;text-align:center}
+.pred-month{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:rgba(255,255,255,.85);text-transform:uppercase;margin-top:6px}
+.pred-year{font-family:'Space Mono',monospace;font-size:9.5px;color:rgba(255,255,255,.85)}
+.pred-barcode{
+  margin-top:auto;width:76px;height:26px;border-radius:3px;background:#fff;
+  background-image:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 3px,#111 3px 4px,transparent 4px 6px,#111 6px 9px,transparent 9px 10px,#111 10px 11px,transparent 11px 14px);
+  background-repeat:no-repeat;background-position:center;background-size:64px 16px;
+}
+.pred-body{flex:1;padding:20px 18px 16px;position:relative;min-width:0;display:flex;flex-direction:column;z-index:1}
 .pred-coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:#241b12;margin-bottom:7px;padding-right:70px}
 .pred-text{font-size:13px;color:#4a3f2e;line-height:1.5;margin-bottom:10px}
 .pred-price{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:#241b12}
@@ -365,13 +385,13 @@ button{font-family:inherit;color:inherit}
   padding:10px 12px;border-radius:8px;border-left:3px solid currentColor;
 }
 .pred-note b{font-weight:800}
-.pred-note.fail{background:rgba(200,30,58,.13);color:#8a1226}
-.pred-note.open{background:rgba(184,121,10,.15);color:#7a4e00}
-.pred-note.win{background:rgba(31,153,84,.14);color:#0e6b3a}
-.pred-stamp{position:absolute;top:20px;right:18px;font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:6px;padding:3px 8px;transform:rotate(-8deg);opacity:.88}
-.pred-stamp.fail{color:#c81e3a}
-.pred-stamp.open{color:#b8790a}
-.pred-stamp.win{color:#1f9954}
+.pred-note.fail{background:rgba(255,47,79,.12);color:#d2123a}
+.pred-note.open{background:rgba(139,90,20,.14);color:#6e4413}
+.pred-note.win{background:rgba(15,163,74,.13);color:#0d7c3a}
+.pred-stamp{position:absolute;top:20px;right:18px;font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:6px;padding:3px 8px;transform:rotate(-8deg);opacity:.9;z-index:1}
+.pred-stamp.fail{color:#ff2f4f}
+.pred-stamp.open{color:#8b5a14}
+.pred-stamp.win{color:#0fa34a}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
@@ -1815,11 +1835,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="pred-grid">
                 <div class="pred-ticket">
+                  <div class="pred-watermark">SkillCash</div>
                   <div class="pred-stub">
                     <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-month">ABR</div>
-                    <div class="pred-day">—</div>
-                    <div class="pred-year">2025</div>
+                    <div class="pred-ticket-no-label">N° de boleto</div>
+                    <div class="pred-ticket-no">2025-001</div>
+                    <div class="pred-month">ABR 2025</div>
+                    <div class="pred-barcode"></div>
+                    <div class="pred-stub-tear"></div>
                   </div>
                   <div class="pred-body">
                     <span class="pred-stamp fail">Fallida</span>
@@ -1831,11 +1854,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
 
                 <div class="pred-ticket">
+                  <div class="pred-watermark">SkillCash</div>
                   <div class="pred-stub">
                     <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-month">FEB</div>
-                    <div class="pred-day">24</div>
-                    <div class="pred-year">2026</div>
+                    <div class="pred-ticket-no-label">N° de boleto</div>
+                    <div class="pred-ticket-no">2025-002</div>
+                    <div class="pred-month">FEB 2026</div>
+                    <div class="pred-barcode"></div>
+                    <div class="pred-stub-tear"></div>
                   </div>
                   <div class="pred-body">
                     <span class="pred-stamp open">Abierta</span>
@@ -1847,11 +1873,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
 
                 <div class="pred-ticket">
+                  <div class="pred-watermark">SkillCash</div>
                   <div class="pred-stub">
                     <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-month">AGO</div>
-                    <div class="pred-day">12</div>
-                    <div class="pred-year">2026</div>
+                    <div class="pred-ticket-no-label">N° de boleto</div>
+                    <div class="pred-ticket-no">2025-003</div>
+                    <div class="pred-month">AGO 2026</div>
+                    <div class="pred-barcode"></div>
+                    <div class="pred-stub-tear"></div>
                   </div>
                   <div class="pred-body">
                     <span class="pred-stamp open">Abierta</span>
