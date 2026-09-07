@@ -11631,19 +11631,21 @@ setInterval(updateMarketSessions, 1000);
 </script>
 <script>
 (function(){
+  // listado fijo y definitivo elegido por Juan — no agregar/quitar monedas sin que lo pida
   var coins = [
-    ['btc','BTC','Bitcoin','bitcoin'],['eth','ETH','Ethereum','ethereum'],['pepe','PEPE','Pepe','pepe'],
-    ['usdt','USDT','Tether','tether'],['bnb','BNB','BNB','binancecoin'],['sol','SOL','Solana','solana'],
-    ['popcat','POPCAT','Popcat','popcat'],['usdc','USDC','USD Coin','usd-coin'],['doge','DOGE','Dogecoin','dogecoin'],
-    ['ada','ADA','Cardano','cardano'],['brett','BRETT','Brett','based-brett'],['trx','TRX','TRON','tron'],
-    ['link','LINK','Chainlink','chainlink'],['avax','AVAX','Avalanche','avalanche-2'],['ponke','PONKE','Ponke','ponke'],
-    ['ton','TON','Toncoin','the-open-network'],['shib','SHIB','Shiba Inu','shiba-inu'],['bch','BCH','Bitcoin Cash','bitcoin-cash'],
-    ['hype','HYPE','Hyperliquid','hyperliquid'],['ltc','LTC','Litecoin','litecoin'],['uni','UNI','Uniswap','uniswap'],
-    ['near','NEAR','NEAR Protocol','near'],['jup','JUP','Jupiter','jupiter-exchange-solana'],['icp','ICP','Internet Computer','internet-computer'],
-    ['etc','ETC','Ethereum Classic','ethereum-classic'],['1inch','1INCH','1inch Network','1inch'],['retardio','RETARDIO','Retardio','retardio']
+    ['BTC','Bitcoin','bitcoin'],['ETH','Ethereum','ethereum'],['PEPE','Pepe','pepe'],
+    ['XMR','Monero','monero'],['USDT','Tether','tether'],['SOL','Solana','solana'],
+    ['POPCAT','Popcat','popcat'],['AAVE','Aave','aave'],['USDC','USD Coin','usd-coin'],
+    ['DOGE','Dogecoin','dogecoin'],['BRETT','Brett','based-brett'],['ONDO','Ondo','ondo-finance'],
+    ['TRX','TRON','tron'],['LINK','Chainlink','chainlink'],['AVAX','Avalanche','avalanche-2'],
+    ['PUMP','Pump','pump-fun'],['PONKE','Ponke','ponke'],['TON','Toncoin','the-open-network'],
+    ['SHIB','Shiba Inu','shiba-inu'],['BGB','Bitget Token','bitget-token'],['HYPE','Hyperliquid','hyperliquid'],
+    ['UNI','Uniswap','uniswap'],['NEAR','NEAR Protocol','near'],['PENGU','Pudgy Penguins','pudgy-penguins'],
+    ['JUP','Jupiter','jupiter-exchange-solana'],['1INCH','1inch Network','1inch'],['RETARDIO','Retardio','retardio'],
+    ['SPX','SPX6900','spx6900']
   ];
   function itemHtml(c){
-    return '<span class="ticker-item"><img data-cid="'+c[3]+'" alt="" onerror="this.style.display=\'none\'"><b>'+c[1]+'</b> '+c[2]+'</span><span class="ticker-sep">•</span>';
+    return '<span class="ticker-item"><img data-cid="'+c[2]+'" alt="" onerror="this.style.display=\'none\'"><b>'+c[0]+'</b> '+c[1]+'</span><span class="ticker-sep">•</span>';
   }
   var track = document.getElementById('cryptoTickerTrack');
   if (track){
@@ -11654,7 +11656,7 @@ setInterval(updateMarketSessions, 1000);
     // se cachean en localStorage para siempre, así este navegador solo pide la lista UNA vez
     // en total (no en cada carga de página) — si algún ícono cambia, hay que borrar la llave
     // 'skc_ticker_icons_v1' de localStorage (o subir la versión del nombre) para forzar un refresh
-    var CACHE_KEY = 'skc_ticker_icons_v1';
+    var CACHE_KEY = 'skc_ticker_icons_v2';
     function applyIcons(imgById){
       track.querySelectorAll('img[data-cid]').forEach(function(img){
         var url = imgById[img.dataset.cid];
@@ -11666,7 +11668,7 @@ setInterval(updateMarketSessions, 1000);
     if(cached){
       applyIcons(cached);
     } else if(typeof cgUrl === 'function'){
-      var ids = coins.map(function(c){ return c[3]; }).join(',');
+      var ids = coins.map(function(c){ return c[2]; }).join(',');
       fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + encodeURIComponent(ids)))
         .then(function(r){ return r.json(); })
         .then(function(list){
