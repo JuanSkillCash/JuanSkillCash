@@ -10645,16 +10645,25 @@ function fngZoneColor(v){
 
 let btcPriceCache = null; // {timestamp_ms: price} — se trae una sola vez, junto con el índice
 
+let btcPriceCacheInFlight = null;
 async function fetchBtcPriceHistory(){
   if(btcPriceCache) return btcPriceCache;
-  try{
-    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily'));
-    const json = await res.json();
-    btcPriceCache = json.prices || []; // [[timestamp_ms, price], ...]
-  } catch(err){
-    btcPriceCache = [];
-  }
-  return btcPriceCache;
+  // varias herramientas (F&G, Halving, Rainbow, Pi Cycle...) pueden pedir esto casi al mismo
+  // tiempo al cargar la página — sin esto, cada una dispara su propia llamada a CoinGecko en
+  // vez de compartir una sola, lo cual en una red lenta puede saturar y hacer fallar todo
+  if(btcPriceCacheInFlight) return btcPriceCacheInFlight;
+  btcPriceCacheInFlight = (async () => {
+    try{
+      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily'));
+      const json = await res.json();
+      btcPriceCache = json.prices || []; // [[timestamp_ms, price], ...]
+    } catch(err){
+      btcPriceCache = [];
+    }
+    btcPriceCacheInFlight = null;
+    return btcPriceCache;
+  })();
+  return btcPriceCacheInFlight;
 }
 
 function closestBtcPrice(targetMs){
@@ -10893,34 +10902,47 @@ const HALVING_CYCLES = [
 let halvingActiveCycle = 3; // arranca mostrando el ciclo actual
 let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo, ascendente
 let halvingLoadFailed = false;
+let halvingHistoryInFlight = null;
 
 // Blockchain.com da el histórico diario completo de BTC (desde 2009) en una sola llamada, gratis,
 // sin API key, y con &cors=true pensado justo para poder llamarlo desde el navegador
 async function fetchHalvingHistory(){
   if(halvingBtcHistory) return halvingBtcHistory;
-  const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
-  const json = await res.json();
-  const rows = json.values || [];
-  let points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
-  points.sort((a, b) => a.t - b.t);
+  // Halving, Rainbow Chart y Pi Cycle piden este mismo historial casi al mismo tiempo al cargar
+  // la página — sin esto, cada uno dispara su propia llamada por separado (a blockchain.info Y a
+  // CoinGecko) en vez de compartir una sola, lo cual en una red de celular puede saturar y hacer
+  // fallar la carga de todos, incluidas herramientas que no dependen de esto (ej. F&G)
+  if(halvingHistoryInFlight) return halvingHistoryInFlight;
+  halvingHistoryInFlight = (async () => {
+    const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
+    const json = await res.json();
+    const rows = json.values || [];
+    let points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
+    points.sort((a, b) => a.t - b.t);
 
-  // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
-  // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
-  // para que el precio y la fecha de "hoy" sean lo más recientes posibles
-  try{
-    const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
-    if(recent && recent.length){
-      const recentStart = recent[0][0];
-      points = points.filter(p => p.t < recentStart);
-      recent.forEach(([t, c]) => points.push({ t, c }));
-      points.sort((a, b) => a.t - b.t);
+    // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
+    // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
+    // para que el precio y la fecha de "hoy" sean lo más recientes posibles
+    try{
+      const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
+      if(recent && recent.length){
+        const recentStart = recent[0][0];
+        points = points.filter(p => p.t < recentStart);
+        recent.forEach(([t, c]) => points.push({ t, c }));
+        points.sort((a, b) => a.t - b.t);
+      }
+    } catch(err){
+      // si falla, nos quedamos con el historial de blockchain.info tal cual
     }
-  } catch(err){
-    // si falla, nos quedamos con el historial de blockchain.info tal cual
-  }
 
-  halvingBtcHistory = points;
-  return points;
+    halvingBtcHistory = points;
+    halvingHistoryInFlight = null;
+    return points;
+  })().catch(err => {
+    halvingHistoryInFlight = null;
+    throw err;
+  });
+  return halvingHistoryInFlight;
 }
 
 function fmtHalvingPrice(v){
