@@ -981,6 +981,31 @@ img[src=""]{display:none}
 
 .promo-note-modal{margin-top:16px}
 
+/* PARTNERS — bloques grandes tipo "vitrina", uno por partner */
+.partner-block{
+  position:relative;overflow:hidden;
+  border-radius:22px;border:1px solid var(--pbc,var(--border2));
+  background:radial-gradient(ellipse 130% 110% at 100% -10%,var(--pt,rgba(255,255,255,.05)),transparent 60%),var(--card);
+  padding:36px;margin-bottom:22px;
+}
+.partner-block:last-child{margin-bottom:0}
+.partner-block-top{display:flex;align-items:center;gap:13px;margin-bottom:20px;flex-wrap:wrap}
+.partner-block-logo{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:var(--pc,var(--white));background:var(--pt,rgba(255,255,255,.06));border:1px solid var(--pbc,var(--border2));flex-shrink:0}
+.partner-block-logo img{width:100%;height:100%;object-fit:contain;border-radius:12px}
+.partner-block-kicker{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pc,var(--muted));margin-bottom:4px}
+.partner-block-name{font-family:'Poppins',sans-serif;font-weight:900;font-size:23px;color:var(--white);letter-spacing:-.01em}
+.partner-block-body{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:center}
+@media(max-width:900px){ .partner-block-body{grid-template-columns:1fr} .partner-block{padding:24px} }
+.partner-block-desc{font-size:14.5px;color:var(--muted2);line-height:1.7;margin-bottom:20px;max-width:540px}
+.partner-perks{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:26px}
+.perk-chip{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--white);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:99px;padding:7px 13px 7px 11px}
+.perk-chip-dot{width:6px;height:6px;border-radius:50%;background:var(--pc,var(--muted));flex-shrink:0}
+.partner-cta{display:inline-flex;align-items:center;gap:9px;font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:#050810;background:var(--pc,var(--white));padding:14px 26px;border-radius:12px;text-decoration:none;transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
+.partner-cta:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px var(--pt,rgba(0,0,0,.5))}
+.partner-cta-sub{font-size:11px;color:var(--muted);margin-top:11px}
+.partner-block-visual{display:flex;align-items:center;justify-content:center;min-height:160px}
+.partner-block-pending{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--border2);border-radius:99px;padding:6px 14px;margin-left:auto}
+
 /* FOOTER */
 .site-footer{margin-top:48px;padding-top:28px;border-top:1px solid var(--border)}
 .site-footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
@@ -2021,21 +2046,72 @@ img[src=""]{display:none}
 
     <div class="tool-section" data-category="partners">
       <div class="tool-cat-label">🤝 Partners</div>
-      <div class="indic-placeholder" style="max-width:100%;margin-bottom:20px">
-        <div class="indic-placeholder-icon">🤝</div>
-        <div class="indic-placeholder-title">Bitunix</div>
-        <div class="indic-placeholder-text">Por ahora Bitunix es el único partner — más adelante se irán sumando otros aquí, cada uno con sus propios beneficios.</div>
+
+      <div class="partner-block" style="--pc:var(--bitunix-green);--pbc:rgba(191,250,44,.3);--pt:rgba(191,250,44,.12)">
+        <div class="partner-block-top">
+          <div class="partner-block-logo">B</div>
+          <div>
+            <div class="partner-block-kicker">Exchange aliado</div>
+            <div class="partner-block-name">Bitunix</div>
+          </div>
+        </div>
+        <div class="partner-block-body">
+          <div>
+            <p class="partner-block-desc">El exchange que uso a diario para operar. Buena liquidez, ejecución rápida y soporte real en español — no un bot. Si te registras desde mi link entras directo con mi código de socio y activas beneficios que no vienen por defecto si te registras por tu cuenta.</p>
+            <div class="partner-perks">
+              <span class="perk-chip"><span class="perk-chip-dot"></span>20% cashback en comisiones</span>
+              <span class="perk-chip"><span class="perk-chip-dot"></span>Soporte en español</span>
+              <span class="perk-chip"><span class="perk-chip-dot"></span>Spot y futuros</span>
+              <span class="perk-chip"><span class="perk-chip-dot"></span>Buena liquidez</span>
+            </div>
+            <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Suscríbete con mi código →</a>
+            <div class="partner-cta-sub">O usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte por tu cuenta.</div>
+          </div>
+          <div class="partner-block-visual">
+            <svg width="100%" height="160" viewBox="0 0 260 160" preserveAspectRatio="xMidYMid meet">
+              <line x1="14" y1="140" x2="250" y2="140" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+              <g stroke="#bffa2c" stroke-width="2">
+                <line x1="40" y1="70" x2="40" y2="110"/><rect x="34" y="85" width="12" height="18" fill="#bffa2c" opacity=".85"/>
+                <line x1="75" y1="50" x2="75" y2="100"/><rect x="69" y="60" width="12" height="28" fill="#bffa2c" opacity=".85"/>
+                <line x1="110" y1="80" x2="110" y2="120"/><rect x="104" y="95" width="12" height="16" fill="#8fae1f" opacity=".7"/>
+                <line x1="145" y1="40" x2="145" y2="90"/><rect x="139" y="45" width="12" height="30" fill="#bffa2c" opacity=".85"/>
+                <line x1="180" y1="55" x2="180" y2="105"/><rect x="174" y="65" width="12" height="24" fill="#bffa2c" opacity=".85"/>
+              </g>
+              <circle cx="212" cy="38" r="28" fill="rgba(191,250,44,.12)" stroke="#bffa2c" stroke-width="1.5"/>
+              <text x="212" y="34" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="14" fill="#bffa2c">20%</text>
+              <text x="212" y="48" text-anchor="middle" font-family="Space Mono,monospace" font-size="7.5" fill="#bffa2c" letter-spacing="1">CASHBACK</text>
+            </svg>
+          </div>
+        </div>
       </div>
-      <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
-        <div class="promo-note-head">
-          <img class="promo-note-avatar" src="logo-skillcash-600.png" alt="Juan SkillCash">
-          <span class="promo-note-name">Juan SkillCash</span>
+
+      <div class="partner-block" style="--pc:var(--red);--pbc:rgba(255,47,79,.3);--pt:rgba(255,47,79,.12)">
+        <div class="partner-block-top">
+          <div class="partner-block-logo"><img src="logo-skillcash-600.png" alt="SkillCash"></div>
+          <div>
+            <div class="partner-block-kicker">Programa propio</div>
+            <div class="partner-block-name">Mentoría SkillCash</div>
+          </div>
+          <span class="partner-block-pending">Contenido pendiente</span>
         </div>
-        <p class="promo-note-text">El exchange que yo uso para operar — tiene buena liquidez y soporte en español. Desde aquí obtienes <strong>20% de cashback</strong> en tus comisiones, directo a tu cuenta spot.</p>
-        <div class="promo-note-foot">
-          <span class="promo-note-link">Ver Bitunix →</span>
+        <div class="partner-block-body">
+          <div>
+            <p class="partner-block-desc">Mi acompañamiento personal para llevar tu forma de invertir y operar en cripto de la teoría a la práctica, directamente conmigo. Estamos afinando los detalles finales de esta sección — muy pronto vas a poder ver aquí exactamente qué incluye.</p>
+            <a href="#" class="partner-cta" style="opacity:.5;pointer-events:none" aria-disabled="true">Regístrate →</a>
+            <div class="partner-cta-sub">El botón se activa apenas esté lista la página de la mentoría.</div>
+          </div>
+          <div class="partner-block-visual">
+            <svg width="100%" height="160" viewBox="0 0 260 160" preserveAspectRatio="xMidYMid meet">
+              <path d="M18 130 Q75 65 135 92 T246 32" fill="none" stroke="#ff2f4f" stroke-width="2" opacity=".55"/>
+              <circle cx="18" cy="130" r="7" fill="#ff2f4f"/>
+              <circle cx="97" cy="86" r="7" fill="#ff2f4f"/>
+              <circle cx="176" cy="66" r="7" fill="#ff6b83"/>
+              <circle cx="246" cy="32" r="11" fill="none" stroke="#ff2f4f" stroke-width="2.5"/>
+              <path d="M241 27l4 4 7-8" stroke="#ff2f4f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </a>
+      </div>
     </div>
 
     </div>
