@@ -1696,6 +1696,36 @@ img[src=""]{display:none}
               <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
+              <div class="indic-guide-icon">🌈</div>
+              <div class="indic-guide-card-title">Rainbow Chart</div>
+              <div class="indic-guide-card-text">Franjas de color sobre el precio histórico de BTC: de "muy barato" a "burbuja".</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="picycle">
+              <div class="indic-guide-icon">📐</div>
+              <div class="indic-guide-card-title">Pi Cycle Top</div>
+              <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
+              <div class="indic-guide-icon">♾️</div>
+              <div class="indic-guide-card-title">Coinbase Premium</div>
+              <div class="indic-guide-card-text">Diferencia en vivo entre el precio de BTC en Coinbase y en Binance.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="treasuries">
+              <div class="indic-guide-icon">🏢</div>
+              <div class="indic-guide-card-title">Balances Corporativos</div>
+              <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
+              <div class="indic-guide-icon">🐋</div>
+              <div class="indic-guide-card-title">Whale Bias</div>
+              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
           </div>
         </div>
 
@@ -11437,6 +11467,55 @@ function rainbowBandForResidual(res){
   }
   return RAINBOW_BANDS[RAINBOW_BANDS.length - 1];
 }
+/* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
+   Halving — reusado por Rainbow Chart y Pi Cycle para no duplicar la misma lógica dos veces ---- */
+function wireChartHover(cfg){
+  const catcher = document.getElementById(cfg.catcherId);
+  const hoverLine = document.getElementById(cfg.lineId);
+  const hoverDot = document.getElementById(cfg.dotId);
+  const hoverDateLabel = document.getElementById(cfg.dateLabelId);
+  const hoverDateBg = document.getElementById(cfg.dateBgId);
+  const tooltip = document.getElementById(cfg.tooltipId);
+  if(!catcher) return;
+  function showAt(clientX){
+    const rect = cfg.svg.getBoundingClientRect();
+    const scaleX = cfg.totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    const targetMs = cfg.startMs + ((svgX - cfg.marginLeft) / cfg.drawW) * cfg.spanMs;
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < cfg.points.length; i++){
+      const diff = Math.abs(cfg.points[i].t - targetMs);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    const px = cfg.xFor(cfg.points[idx].t), py = cfg.yForIdx(idx);
+    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+    hoverLine.style.display = 'block';
+    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+    hoverDot.style.display = 'block';
+    const dateLabel = new Date(cfg.points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    tooltip.innerHTML = cfg.tooltipHtml(idx);
+    tooltip.style.left = ((px / cfg.totalW) * rect.width) + 'px';
+    tooltip.style.top = ((py / cfg.totalH) * rect.height) + 'px';
+    tooltip.style.display = 'block';
+    const clampedPx = Math.min(Math.max(px, cfg.marginLeft + 24), cfg.totalW - cfg.marginRight - 24);
+    hoverDateLabel.setAttribute('x', clampedPx);
+    hoverDateLabel.textContent = dateLabel;
+    hoverDateLabel.style.display = 'block';
+    const bboxW = hoverDateLabel.getBBox().width;
+    hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
+    hoverDateBg.setAttribute('width', bboxW + 24);
+    hoverDateBg.style.display = 'block';
+  }
+  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
+  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+  catcher.addEventListener('mouseleave', () => {
+    hoverLine.style.display = 'none';
+    hoverDot.style.display = 'none';
+    hoverDateLabel.style.display = 'none';
+    hoverDateBg.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+}
 function renderRainbowChart(){
   const loadingEl = document.getElementById('rainbowLoading');
   const errorEl = document.getElementById('rainbowError');
@@ -11473,7 +11552,9 @@ function renderRainbowChart(){
   const prices = points.map(p => p.c);
   let minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
   minPrice = Math.min(minPrice, Math.exp(lastCenterLog - 2.0));
-  maxPrice = Math.max(maxPrice, Math.exp(lastCenterLog + 2.6));
+  // el margen de arriba es angosto a propósito: solo lo justo para insinuar la banda roja
+  // ("Burbuja máxima"), sin que domine visualmente un espacio que el precio nunca ha tocado
+  maxPrice = Math.max(maxPrice, Math.exp(lastCenterLog + 1.75));
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
@@ -11491,9 +11572,15 @@ function renderRainbowChart(){
   const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
   const yForLogE = logePrice => marginTop + drawH - ((logePrice / Math.LN10 - logMin) / logRange) * drawH;
 
+  // además de recortar cerca de los bordes, se descartan marcas que queden muy pegadas a la
+  // anterior (el patrón "1-2-5" en un rango tan ancho a veces deja dos números casi encimados)
+  let lastTickY = -Infinity;
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    if(y <= marginTop + 10 || y >= marginTop + drawH - 14) return false;
+    if(Math.abs(y - lastTickY) < 24) return false;
+    lastTickY = y;
+    return true;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
@@ -11538,14 +11625,36 @@ function renderRainbowChart(){
   `;
 
   wrap.innerHTML = `
-    <svg class="fng-chart-svg" id="rainbowChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-      ${bandsHtml}
-      ${yGridHtml}
-      <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
-      ${xLabelsHtml}
-      ${todayMarkerHtml}
-    </svg>
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="rainbowChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${bandsHtml}
+        ${yGridHtml}
+        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="rainbowHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="rainbowHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="rainbowHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="rainbowHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="rainbowHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="rainbowTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
   `;
+
+  const rbSvg = document.getElementById('rainbowChartSvg');
+  wireChartHover({
+    svg: rbSvg, catcherId: 'rainbowHoverCatcher', lineId: 'rainbowHoverLine', dotId: 'rainbowHoverDot',
+    dateLabelId: 'rainbowHoverDateLabel', dateBgId: 'rainbowHoverDateBg', tooltipId: 'rainbowTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].c),
+    tooltipHtml: i => {
+      const idxInCenter = Math.round((points[i].t - startMs) / spanMs * SAMPLES);
+      const centerLog = centerLogAt[Math.min(SAMPLES, Math.max(0, idxInCenter))];
+      const band = rainbowBandForResidual(Math.log(points[i].c) - centerLog);
+      return `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:${band.color}">${band.label}</span>`;
+    },
+  });
 
   legendEl.innerHTML = RAINBOW_BANDS.map(b =>
     `<span class="perk-chip"><span class="perk-chip-dot" style="background:${b.color}"></span>${b.label}</span>`
@@ -11685,16 +11794,33 @@ function renderPiCycleChart(){
   `;
 
   wrap.innerHTML = `
-    <svg class="fng-chart-svg" id="picycleChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-      ${yGridHtml}
-      ${crossHtml}
-      <path d="${priceLine}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${sma350Line}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${sma111Line}" fill="none" stroke="#38bdf8" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
-      ${xLabelsHtml}
-      ${todayMarkerHtml}
-    </svg>
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="picycleChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${crossHtml}
+        <path d="${priceLine}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${sma350Line}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${sma111Line}" fill="none" stroke="#38bdf8" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="picycleHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="picycleHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="picycleHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="picycleHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="picycleHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="picycleTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
   `;
+
+  const pcSvg = document.getElementById('picycleChartSvg');
+  wireChartHover({
+    svg: pcSvg, catcherId: 'picycleHoverCatcher', lineId: 'picycleHoverLine', dotId: 'picycleHoverDot',
+    dateLabelId: 'picycleHoverDateLabel', dateBgId: 'picycleHoverDateBg', tooltipId: 'picycleTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].c),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#38bdf8">SMA111 ${fmtHalvingPrice(sma111[i])}</span><br><span style="color:#f97316">SMA350×2 ${fmtHalvingPrice(sma350x2[i])}</span>`,
+  });
 
   legendEl.innerHTML = `
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#38bdf8"></span>SMA 111 días</span>
