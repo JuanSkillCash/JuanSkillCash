@@ -1160,6 +1160,24 @@ img[src=""]{display:none}
   .hero-mascot-text{padding:0}
   .hero-mascot-desc{margin-left:auto;margin-right:auto}
 }
+
+/* Regla global (pedida por Juan): todo el sitio usa Space Grotesk — la misma tipografía redonda
+   y fácil de leer del menú lateral — excepto el logo/marca de SkillCash y el título grande de
+   cada herramienta, que se quedan en Poppins (con "Tools" en Caveat, como ya estaba). Se usa
+   !important porque hay decenas de declaraciones de otras fuentes repartidas por todo el
+   archivo, varias puestas inline en HTML generado por JS — así se cubren todas de una sola vez.
+   Cualquier herramienta nueva hereda esto automáticamente, no hace falta agregar nada. */
+body, body *{ font-family:'Space Grotesk', sans-serif !important; }
+.sb-logo-text,
+.main-head h1, .main-head h1 *,
+.calc-eyebrow, .calc-eyebrow *,
+.calc-title, .calc-title *,
+.hero-mascot-title, .hero-mascot-title *
+{ font-family:'Poppins', sans-serif !important; }
+.sb-logo-tools,
+.main-head h1 em,
+.hero-mascot-title .ht-tools
+{ font-family:'Caveat', cursive !important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
