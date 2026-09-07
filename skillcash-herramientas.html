@@ -11893,9 +11893,9 @@ function renderPiCycleChart(){
       <svg class="fng-chart-svg" id="picycleChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${yGridHtml}
         ${crossHtml}
-        <path d="${priceLine}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${sma350Line}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 0.8 : 1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${sma111Line}" fill="none" stroke="#38bdf8" stroke-width="${isMobileChart ? 0.8 : 1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${sma111Line}" fill="none" stroke="#a855f7" stroke-width="${isMobileChart ? 0.8 : 1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="picycleHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
@@ -11914,13 +11914,13 @@ function renderPiCycleChart(){
     dateLabelId: 'picycleHoverDateLabel', dateBgId: 'picycleHoverDateBg', tooltipId: 'picycleTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#38bdf8">SMA111 ${fmtHalvingPrice(sma111[i])}</span><br><span style="color:#f97316">SMA350×2 ${fmtHalvingPrice(sma350x2[i])}</span>`,
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#a855f7">SMA111 ${fmtHalvingPrice(sma111[i])}</span><br><span style="color:#f97316">SMA350×2 ${fmtHalvingPrice(sma350x2[i])}</span>`,
   });
 
   legendEl.innerHTML = `
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#38bdf8"></span>SMA 111 días</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#a855f7"></span>SMA 111 días</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#f97316"></span>SMA 350 días × 2</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,255,255,.6)"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#ef4444"></span>Cruce = techo histórico</span>
   `;
 
