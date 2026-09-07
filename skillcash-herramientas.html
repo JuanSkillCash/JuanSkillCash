@@ -11473,30 +11473,31 @@ const RAINBOW_GENESIS_MS = new Date('2009-01-03T00:00:00Z').getTime();
 // históricos quedan por debajo de la franja azul y ~11% de los máximos por encima de la roja,
 // que es justo el comportamiento real (el precio casi siempre cabe dentro, pero en una caída o
 // subida extrema de verdad se sale del todo, como en la referencia)
-// colores tomados del gráfico de referencia (lookintobitcoin.com) — sólidos, sin degradado ni
-// transparencia
+// colores exactos entregados por el usuario (tomados del gráfico de referencia), sólidos, sin
+// degradado ni transparencia
 const RAINBOW_BANDS = [
-  { max: -0.77, color: '#1d6fc4', label: 'Liquidación total' },
-  { max: -0.55, color: '#23a199', label: 'Compra fuerte' },
-  { max: -0.33, color: '#3fa34d', label: 'Acumular' },
-  { max: -0.11, color: '#8cc63f', label: 'Todavía barato' },
-  { max: 0.11, color: '#e8d93a', label: 'Zona neutral' },
-  { max: 0.33, color: '#f2a93c', label: '¿Burbuja?' },
-  { max: 0.55, color: '#ee7c2e', label: 'Se calienta' },
-  { max: 0.77, color: '#e1512a', label: 'Zona de venta' },
-  { max: Infinity, color: '#b32c22', label: 'Burbuja máxima' }
+  { max: -0.77, color: '#698ed0', label: 'Liquidación total' },
+  { max: -0.55, color: '#66a3a9', label: 'Compra fuerte' },
+  { max: -0.33, color: '#73c589', label: 'Acumular' },
+  { max: -0.11, color: '#b9da8d', label: 'Todavía barato' },
+  { max: 0.11, color: '#ffed91', label: 'Zona neutral' },
+  { max: 0.33, color: '#f7bc6b', label: '¿Burbuja?' },
+  { max: 0.55, color: '#ef8a46', label: 'Se calienta' },
+  { max: 0.77, color: '#db5430', label: 'Zona de venta' },
+  { max: Infinity, color: '#c71c1a', label: 'Burbuja máxima' }
 ];
+// la curva central es una regresión FIJA (calculada una sola vez sobre el histórico real de
+// 2009-2021, ln(precio) vs ln(días desde el génesis) — no se recalcula con cada carga de la
+// página. Esto es a propósito e igual a como funciona el gráfico de referencia real: su fórmula
+// se calibró hace años y no se auto-ajusta. Si en cambio la curva se recalculara con los datos
+// más recientes cada vez (como hacía antes), la línea de tendencia "perseguiría" cualquier
+// desaceleración del precio y el precio actual nunca podría salirse de la franja — que es
+// exactamente el problema reportado (nuestro gráfico nunca mostraba el precio saliéndose,
+// mientras que en todos los gráficos de referencia sí se sale en las caídas fuertes)
+const RAINBOW_FIT_A = -39.08706982830375;
+const RAINBOW_FIT_B = 5.839319885614483;
 function rainbowFit(points){
-  let n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
-  points.forEach(p => {
-    const day = (p.t - RAINBOW_GENESIS_MS) / 86400000;
-    if(day <= 0) return;
-    const x = Math.log(day), y = Math.log(p.c);
-    n++; sx += x; sy += y; sxx += x * x; sxy += x * y;
-  });
-  const b = (n * sxy - sx * sy) / (n * sxx - sx * sx);
-  const a = (sy - b * sx) / n;
-  return { a, b };
+  return { a: RAINBOW_FIT_A, b: RAINBOW_FIT_B };
 }
 function rainbowFitLogPrice(fit, t){
   const day = (t - RAINBOW_GENESIS_MS) / 86400000;
