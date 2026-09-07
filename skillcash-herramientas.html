@@ -328,10 +328,15 @@ button{font-family:inherit;color:inherit}
 .indic-guide-card{
   border-radius:14px;padding:18px;border:1px solid rgba(59,130,246,.22);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
+  text-align:left;width:100%;display:block;font-family:inherit;
 }
+.indic-guide-card-link{cursor:pointer;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+.indic-guide-card-link:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.5)}
 .indic-guide-icon{font-size:24px;margin-bottom:8px}
 .indic-guide-card-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin-bottom:6px}
 .indic-guide-card-text{font-size:12.5px;color:var(--muted2);line-height:1.55}
+.indic-guide-card-link-hint{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:#60a5fa;text-align:right;margin-top:10px}
+.indic-guide-card-soon{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
@@ -1158,7 +1163,7 @@ img[src=""]{display:none}
     <nav class="sb-nav">
       <div class="sb-cat-label" data-category="indicadores">Indicadores de Mercado</div>
       <button class="sb-item" data-indic-jump="guia">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Guía de esta sección</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
@@ -1171,6 +1176,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
+      <button class="sb-item" data-cat-home="portafolio">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="quiz">
         <span class="sb-item-icon">🎯</span><span class="sb-item-label">Perfil de riesgo</span>
       </button>
@@ -1182,6 +1190,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="trading">Trading y Futuros</div>
+      <button class="sb-item" data-cat-home="trading">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="calculadora">
         <span class="sb-item-icon">🧮</span><span class="sb-item-label">Calculadora</span>
       </button>
@@ -1196,6 +1207,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="inversion">Inversión y Acumulación</div>
+      <button class="sb-item" data-cat-home="inversion">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="rentabilidad">
         <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
       </button>
@@ -1213,6 +1227,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="seguridad">Seguridad</div>
+      <button class="sb-item" data-cat-home="seguridad">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="checklist">
         <span class="sb-item-icon">🛡️</span><span class="sb-item-label">Checklist de seguridad</span>
       </button>
@@ -1227,6 +1244,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="aprender">Aprender</div>
+      <button class="sb-item" data-cat-home="aprender">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="glosario">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario Cripto</span>
       </button>
@@ -1235,6 +1255,9 @@ img[src=""]{display:none}
       </button>
 
       <div class="sb-cat-label" data-category="utilidades">Utilidades</div>
+      <button class="sb-item" data-cat-home="utilidades">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+      </button>
       <button class="sb-item" data-tool="unitconverter">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">Conversor de unidades</span>
       </button>
@@ -1252,7 +1275,7 @@ img[src=""]{display:none}
       </button>
       <div class="indic-cat-label" style="margin-top:10px">Indicadores de Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="guia">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Guía de esta sección</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
@@ -1612,30 +1635,41 @@ img[src=""]{display:none}
             <p class="indic-guide-text">Aquí vas a encontrar señales para entender en qué momento del mercado estamos — organizadas por pestañas para que sea rápido encontrar la que buscas. Esto va a ir creciendo con el tiempo. Por ahora, así está organizado:</p>
           </div>
           <div class="indic-guide-grid">
-            <div class="indic-guide-card">
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
               <div class="indic-guide-icon">⏳</div>
               <div class="indic-guide-card-title">Ciclos</div>
               <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
-            </div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
+              <div class="indic-guide-icon">😐</div>
+              <div class="indic-guide-card-title">Sentimiento</div>
+              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
+              <div class="indic-guide-icon">🔮</div>
+              <div class="indic-guide-card-title">Predicciones</div>
+              <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <div class="indic-guide-card">
               <div class="indic-guide-icon">⛏️</div>
               <div class="indic-guide-card-title">Minería</div>
               <div class="indic-guide-card-text">Salud de la red: cuánto cuesta minar, y si los mineros están acumulando o vendiendo.</div>
+              <div class="indic-guide-card-soon">Próximamente</div>
             </div>
             <div class="indic-guide-card">
               <div class="indic-guide-icon">🏛️</div>
               <div class="indic-guide-card-title">Macro</div>
               <div class="indic-guide-card-text">El contexto económico global que mueve el apetito por riesgo: tasas, liquidez, calendario de la Fed.</div>
-            </div>
-            <div class="indic-guide-card">
-              <div class="indic-guide-icon">😐</div>
-              <div class="indic-guide-card-title">Sentimiento</div>
-              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
+              <div class="indic-guide-card-soon">Próximamente</div>
             </div>
             <div class="indic-guide-card">
               <div class="indic-guide-icon">⛓️</div>
               <div class="indic-guide-card-title">On-Chain</div>
               <div class="indic-guide-card-text">Qué están haciendo realmente las billeteras on-chain, más allá del precio.</div>
+              <div class="indic-guide-card-soon">Próximamente</div>
             </div>
           </div>
         </div>
@@ -4221,11 +4255,13 @@ function renderCatPillTabs(cat){
       onClick: () => jumpToIndicator(btn.dataset.indicJump),
     }));
   } else if(cat && cat !== 'partners'){
-    items = [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
-      label: card.querySelector('h3').textContent,
-      tool: card.dataset.tool,
-      onClick: () => card.click(),
-    }));
+    items = [{ label: 'Panorama', catHome: cat, onClick: () => showCategoryGrid(cat) }].concat(
+      [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
+        label: card.querySelector('h3').textContent,
+        tool: card.dataset.tool,
+        onClick: () => card.click(),
+      }))
+    );
   }
   if(items.length === 0){ catPillTabsWrap.style.display = 'none'; return; }
   catPillTabsWrap.style.display = '';
@@ -4236,6 +4272,7 @@ function renderCatPillTabs(cat){
     btn.textContent = it.label;
     if(it.tool) btn.dataset.tool = it.tool;
     if(it.indicJump) btn.dataset.indicJump = it.indicJump;
+    if(it.catHome) btn.dataset.catHome = it.catHome;
     btn.addEventListener('click', it.onClick);
     catPillTabs.appendChild(btn);
   });
@@ -4264,6 +4301,11 @@ function showCategoryDetail(cat){
   filterSidebarNav(cat);
   if(enteringFromOverview) renderCatPillTabs(cat);
   if(enteringFromOverview && cat === 'indicadores') jumpToIndicator('guia');
+  if(enteringFromOverview && cat !== 'indicadores'){
+    document.querySelectorAll('[data-cat-home]').forEach(item => {
+      item.classList.toggle('active', item.dataset.catHome === cat);
+    });
+  }
   if(enteringFromOverview && !closingFromPopstate){
     history.pushState({ skillcashDepth: 'category' }, '', location.href);
   }
@@ -4298,6 +4340,9 @@ document.querySelectorAll('.sb-nav [data-indic-jump]').forEach(btn => {
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sbBackdrop').classList.remove('show');
   });
+});
+document.querySelectorAll('.indic-guide-card-link[data-indic-jump]').forEach(btn => {
+  btn.addEventListener('click', () => jumpToIndicator(btn.dataset.indicJump));
 });
 function goToMainMenu(e){
   e.preventDefault();
@@ -5131,6 +5176,28 @@ document.querySelectorAll('[data-tool]').forEach(el => {
       pill.classList.toggle('active', active);
       if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     });
+    document.querySelectorAll('[data-cat-home]').forEach(item => item.classList.remove('active'));
+  });
+});
+
+// "Panorama": vuelve a la portada de la categoría (grilla + intro) sin salir de ella —
+// antes no había forma de regresar ahí una vez abrías una herramienta, solo saltar a otra
+// herramienta o salir por completo con "Volver a categorías"
+function showCategoryGrid(cat){
+  closeAnyOpenToolInline();
+  document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
+  document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => pill.classList.remove('active'));
+  document.querySelectorAll('[data-cat-home]').forEach(item => {
+    item.classList.toggle('active', item.dataset.catHome === cat);
+  });
+  const grid = document.querySelector('.tool-section[data-category="' + cat + '"] .tool-grid');
+  if(grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+document.querySelectorAll('[data-cat-home]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    showCategoryGrid(btn.dataset.catHome);
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sbBackdrop').classList.remove('show');
   });
 });
 
