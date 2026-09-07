@@ -11582,12 +11582,15 @@ function renderRainbowChart(){
   const centerLogAt = sampleTs.map(t => rainbowFitLogPrice(fit, t));
   const lastCenterLog = centerLogAt[centerLogAt.length - 1];
 
+  // el eje se calibra sobre el precio real (mínimo/máximo histórico) con un colchón fijo y
+  // modesto en log10 — no sobre la curva de tendencia de hoy — para que el precio SÍ pueda verse
+  // saliendo por completo de la franja de colores en una caída o subida extrema, tal como pasa
+  // en el gráfico de referencia (lookintobitcoin.com), en vez de que el eje siempre se agrande
+  // para "tragarse" toda la banda de colores por dentro
   const prices = points.map(p => p.c);
-  let minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
-  minPrice = Math.min(minPrice, Math.exp(lastCenterLog - 2.0));
-  // el margen de arriba es angosto a propósito: solo lo justo para insinuar la banda roja
-  // ("Burbuja máxima"), sin que domine visualmente un espacio que el precio nunca ha tocado
-  maxPrice = Math.max(maxPrice, Math.exp(lastCenterLog + 1.75));
+  const dataMinPrice = Math.min(...prices), dataMaxPrice = Math.max(...prices);
+  const minPrice = dataMinPrice / Math.pow(10, 0.55);
+  const maxPrice = dataMaxPrice * Math.pow(10, 0.9);
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
@@ -11625,11 +11628,17 @@ function renderRainbowChart(){
   // absolutos (a partir del rango del eje) y se volvían a sumar sobre la curva, lo que en fechas
   // viejas (curva central muy baja) podía invertir la banda: un polígono que se cruza a sí mismo,
   // que se veía como una franja gruesa y de color raro
-  const lowClip = -2.3, highClip = 2.3;
+  // las bandas de los extremos ("Liquidación total" y "Burbuja máxima") representan "todo lo que
+  // esté más allá de X" — no un nivel fijo como las demás — así que se dibujan más anchas Y más
+  // tenues que las del medio, igual que en el gráfico de referencia; como el eje ya no se infla
+  // para contenerlas por completo, una parte de esa franja ancha queda naturalmente cortada por
+  // el borde del gráfico en vez de dominar el espacio visible
+  const lowClip = -2.9, highClip = 2.9;
   const boundaries = [lowClip, ...boundaryOffsets, highClip];
   let bandsHtml = '';
   for(let bi = 0; bi < RAINBOW_BANDS.length; bi++){
     const loOff = boundaries[bi], hiOff = boundaries[bi + 1];
+    const isOuterBand = bi === 0 || bi === RAINBOW_BANDS.length - 1;
     let d = '';
     for(let i = 0; i <= SAMPLES; i++){
       d += (i === 0 ? 'M' : 'L') + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + hiOff).toFixed(1) + ' ';
@@ -11637,7 +11646,7 @@ function renderRainbowChart(){
     for(let i = SAMPLES; i >= 0; i--){
       d += 'L' + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + loOff).toFixed(1) + ' ';
     }
-    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}"/>`;
+    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}" opacity="${isOuterBand ? '.5' : '1'}"/>`;
   }
 
   let pathD = '';
