@@ -1061,6 +1061,10 @@ img[src=""]{display:none}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
 .chart-breakout{margin:0 -52px;padding:0 8px}
 @media(max-width:900px){ .chart-breakout{margin:0 -38px;padding:0 4px} }
+.tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 20px}
+.tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
+.tf-pill:hover{border-color:var(--red);color:var(--white)}
+.tf-pill.active{background:var(--red);border-color:var(--red);color:#fff}
 .chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .chart-stats-grid .res-card{min-width:0}
 .chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -1989,34 +1993,40 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Coinbase Premium Index</h2>
-                <p class="calc-sub">Diferencia entre el precio de Bitcoin en Coinbase (EE.UU.) y en Binance (global), en vivo. Un premium positivo suele indicar más compra institucional/estadounidense; uno negativo, más presión de venta o compra fuera de EE.UU.</p>
+                <p class="calc-sub">Diferencia histórica entre el precio de Bitcoin en Coinbase (EE.UU.) y en Binance (global). Un premium positivo suele indicar más compra institucional/estadounidense; uno negativo, más presión de venta o compra fuera de EE.UU.</p>
               </div>
 
-              <div id="cbpLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Consultando precios en vivo…</div>
-              <div id="cbpError" class="calc-disclaimer" style="display:none">⚠️ No se pudo consultar Coinbase o Binance ahora mismo. Intenta de nuevo en un momento.</div>
+              <div class="tf-pill-row" id="cbpTfRow">
+                <button type="button" class="tf-pill" data-tf="1m">1m</button>
+                <button type="button" class="tf-pill" data-tf="5m">5m</button>
+                <button type="button" class="tf-pill active" data-tf="1h">1h</button>
+                <button type="button" class="tf-pill" data-tf="4h">4h</button>
+                <button type="button" class="tf-pill" data-tf="1d">1d</button>
+              </div>
 
-              <div id="cbpContent" style="display:none">
-                <div class="calc-inputs" style="text-align:center">
-                  <div class="be-savings-label" style="text-align:center">PREMIUM AHORA MISMO</div>
-                  <div class="fng-big-value" id="cbpValue" style="margin-top:6px">—</div>
-                  <div class="fng-big-class" id="cbpClass">—</div>
-                  <div class="be-note" id="cbpRecommendation" style="text-align:left;margin-top:18px"></div>
+              <div class="indic-chart-body" id="cbpChartBody">
+                <div class="indic-chart-soon" id="cbpLoading">
+                  <div class="indic-placeholder-icon">📊</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Consultando precios de Coinbase y Binance.</div>
                 </div>
+                <div class="indic-chart-soon" id="cbpError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="cbpChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
 
-                <div class="chart-stats-grid" style="margin-top:18px">
-                  <div class="res-card"><div class="r-label">Precio en Coinbase</div><div class="r-val" id="cbpCoinbasePrice">—</div></div>
-                  <div class="res-card"><div class="r-label">Precio en Binance</div><div class="r-val" id="cbpBinancePrice">—</div></div>
-                  <div class="res-card"><div class="r-label">Diferencia en USD</div><div class="r-val" id="cbpDiffUsd">—</div></div>
-                </div>
+              <div class="chart-stats-grid" id="cbpStats" style="display:none"></div>
 
-                <div style="text-align:center;margin-top:18px">
-                  <button type="button" class="a-btn" id="cbpRefreshBtn">🔄 Actualizar precios</button>
-                  <div style="font-size:11px;color:var(--muted);margin-top:8px" id="cbpUpdatedAt"></div>
-                </div>
+              <div style="text-align:center;margin-top:18px">
+                <button type="button" class="a-btn" id="cbpRefreshBtn">🔄 Actualizar</button>
+                <div style="font-size:11px;color:var(--muted);margin-top:8px" id="cbpUpdatedAt"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💱 El premium se calcula como <b>(precio Coinbase − precio Binance) / precio Binance</b>. Suele moverse en un rango muy pequeño (décimas de %) — variaciones grandes y sostenidas son las que de verdad importan, no un solo vistazo.<br>
+                💱 Cada barra es el premium <b>(precio Coinbase − precio Binance) / precio Binance</b> al cierre de esa vela, en la temporalidad elegida. Verde = premium positivo (Coinbase más caro), rojo = negativo. Suele moverse en un rango muy pequeño (décimas de %) — variaciones grandes y sostenidas son las que de verdad importan, no una sola barra.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -11559,6 +11569,36 @@ function wireChartHover(cfg){
     tooltip.style.display = 'none';
   });
 }
+/* ---- hover genérico para gráficos de barras (Coinbase Premium, Whale Bias): a diferencia de
+   wireChartHover no interpola entre puntos — resalta la barra más cercana al mouse ---- */
+function wireBarChartHover(cfg){
+  const catcher = document.getElementById(cfg.catcherId);
+  const hoverLine = document.getElementById(cfg.lineId);
+  const tooltip = document.getElementById(cfg.tooltipId);
+  if(!catcher) return;
+  function showAt(clientX){
+    const rect = cfg.svg.getBoundingClientRect();
+    const scaleX = cfg.totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    let idx = Math.floor((svgX - cfg.marginLeft) / (cfg.drawW / cfg.n));
+    idx = Math.max(0, Math.min(cfg.n - 1, idx));
+    const barCenterX = cfg.xFor(idx) + cfg.barW / 2;
+    hoverLine.setAttribute('x1', barCenterX.toFixed(1));
+    hoverLine.setAttribute('x2', barCenterX.toFixed(1));
+    hoverLine.style.display = 'block';
+    tooltip.innerHTML = cfg.tooltipHtml(idx);
+    tooltip.style.display = 'block';
+    const px = (barCenterX / cfg.totalW) * rect.width;
+    tooltip.style.left = Math.min(Math.max(px, 70), rect.width - 70) + 'px';
+    tooltip.style.top = '4px';
+  }
+  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
+  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+  catcher.addEventListener('mouseleave', () => {
+    hoverLine.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+}
 function renderRainbowChart(){
   const loadingEl = document.getElementById('rainbowLoading');
   const errorEl = document.getElementById('rainbowError');
@@ -11914,57 +11954,162 @@ function fmtUsdBig(v){
   if(v >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
   return '$' + Math.round(v);
 }
+/* ---- Coinbase Premium Index: gráfico de barras histórico (no un solo número), con
+   temporalidades seleccionables. El premium en cada vela es la diferencia porcentual entre el
+   cierre en Coinbase y el cierre en Binance para ese mismo momento — se necesita histórico real
+   de velas de ambos exchanges, no solo el precio actual ---- */
+const CBP_TF = {
+  '1m': { ms: 60 * 1000, binanceInterval: '1m', cbGranularity: 60, bars: 180 },
+  '5m': { ms: 5 * 60 * 1000, binanceInterval: '5m', cbGranularity: 300, bars: 180 },
+  '1h': { ms: 60 * 60 * 1000, binanceInterval: '1h', cbGranularity: 3600, bars: 180 },
+  '4h': { ms: 4 * 60 * 60 * 1000, binanceInterval: '4h', cbGranularity: null, bars: 60 },
+  '1d': { ms: 24 * 60 * 60 * 1000, binanceInterval: '1d', cbGranularity: 86400, bars: 180 }
+};
+let cbpActiveTf = '1h';
+async function fetchBinanceKlines(interval, limit){
+  const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`);
+  if(!res.ok) throw new Error('binance klines failed');
+  const rows = await res.json();
+  return rows.map(r => ({ t: r[0], c: parseFloat(r[4]) }));
+}
+async function fetchCoinbaseCandles(granularitySec, limit){
+  const res = await fetch(`https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=${granularitySec}`);
+  if(!res.ok) throw new Error('coinbase candles failed');
+  const rows = await res.json();
+  return rows.map(r => ({ t: r[0] * 1000, c: r[4] })).sort((a, b) => a.t - b.t).slice(-limit);
+}
+async function loadCbpChartData(tfKey){
+  const tf = CBP_TF[tfKey];
+  const bnPromise = fetchBinanceKlines(tf.binanceInterval, tf.bars);
+  const cbPromise = tf.cbGranularity
+    ? fetchCoinbaseCandles(tf.cbGranularity, tf.bars)
+    : fetchCoinbaseCandles(3600, tf.bars * 4).then(hourly => {
+        const buckets = new Map();
+        hourly.forEach(p => {
+          const key = Math.floor(p.t / tf.ms) * tf.ms;
+          const existing = buckets.get(key);
+          if(!existing || p.t > existing.t) buckets.set(key, p);
+        });
+        return [...buckets.values()];
+      });
+  const [bnData, cbData] = await Promise.all([bnPromise, cbPromise]);
+  const cbByBucket = new Map(cbData.map(p => [Math.floor(p.t / tf.ms) * tf.ms, p.c]));
+  const merged = [];
+  bnData.forEach(p => {
+    const key = Math.floor(p.t / tf.ms) * tf.ms;
+    const cbClose = cbByBucket.get(key);
+    if(cbClose == null) return;
+    merged.push({ t: key, premiumPct: (cbClose - p.c) / p.c * 100, cbClose, bnClose: p.c });
+  });
+  return merged;
+}
+function renderCbpChart(data){
+  const wrap = document.getElementById('cbpChartWrap');
+  const statsEl = document.getElementById('cbpStats');
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 300 : 340;
+  const yFontSize = isMobileChart ? 9 : 11, xFontSize = isMobileChart ? 10 : 12;
+  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 14, marginBottom = isMobileChart ? 26 : 30;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.premiumPct)), 0.02) * 1.2;
+  const yFor = v => marginTop + drawH / 2 - (v / maxAbs) * (drawH / 2);
+  const zeroY = yFor(0);
+  const n = data.length;
+  const barGap = isMobileChart ? 1 : 2;
+  const barW = Math.max(1, drawW / n - barGap);
+  const xFor = i => marginLeft + (i * drawW) / n + barGap / 2;
+
+  const barsHtml = data.map((d, i) => {
+    const y = yFor(d.premiumPct);
+    const top = Math.min(y, zeroY);
+    const h = Math.max(Math.abs(zeroY - y), 0.5);
+    const color = d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f';
+    return `<rect x="${xFor(i).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${color}"/>`;
+  }).join('');
+
+  const yTickVals = [-maxAbs, -maxAbs / 2, 0, maxAbs / 2, maxAbs];
+  const yGridHtml = yTickVals.map(v => `
+    <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,${v === 0 ? .18 : .08})" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v.toFixed(2)}%</text>
+  `).join('');
+
+  const dateFmt = ms => {
+    const d = new Date(ms);
+    if(cbpActiveTf === '1d') return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  };
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${barsHtml}
+        <text x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${dateFmt(data[0].t)}</text>
+        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
+        <rect id="cbpHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent"/>
+        <line id="cbpHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>
+      </svg>
+      <div id="cbpTooltip" style="display:none;position:absolute;pointer-events:none;background:#0c1024;border:1px solid var(--border2);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)"></div>
+    </div>
+  `;
+  wrap.style.display = 'block';
+
+  wireBarChartHover({
+    svg: document.getElementById('cbpChartSvg'), catcherId: 'cbpHoverCatcher', lineId: 'cbpHoverLine',
+    tooltipId: 'cbpTooltip', marginLeft, drawW, totalW, n, xFor, barW,
+    tooltipHtml: i => {
+      const d = data[i];
+      const sign = d.premiumPct >= 0 ? '+' : '';
+      return `<b style="color:${d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${d.premiumPct.toFixed(3)}%</b><br>${fmtUsd2(d.cbClose)} vs ${fmtUsd2(d.bnClose)}<br><span style="color:#8890ac">${dateFmt(d.t)}</span>`;
+    }
+  });
+
+  const latest = data[n - 1];
+  const sign = latest.premiumPct >= 0 ? '+' : '';
+  statsEl.innerHTML = `
+    <div class="res-card"><div class="r-label">Último premium</div><div class="r-val" style="color:${latest.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${latest.premiumPct.toFixed(3)}%</div></div>
+    <div class="res-card"><div class="r-label">Precio en Coinbase</div><div class="r-val">${fmtUsd2(latest.cbClose)}</div></div>
+    <div class="res-card"><div class="r-label">Precio en Binance</div><div class="r-val">${fmtUsd2(latest.bnClose)}</div></div>
+  `;
+  statsEl.style.display = '';
+}
 async function loadCoinbasePremium(){
   const loadingEl = document.getElementById('cbpLoading');
   const errorEl = document.getElementById('cbpError');
-  const contentEl = document.getElementById('cbpContent');
+  const wrap = document.getElementById('cbpChartWrap');
+  const statsEl = document.getElementById('cbpStats');
   const btn = document.getElementById('cbpRefreshBtn');
   if(btn) btn.disabled = true;
-  if(contentEl.style.display !== 'block') loadingEl.style.display = 'block';
+  loadingEl.style.display = 'flex';
   errorEl.style.display = 'none';
+  wrap.style.display = 'none';
+  statsEl.style.display = 'none';
   try{
-    const [cbRes, bnRes] = await Promise.all([
-      fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot'),
-      fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'),
-    ]);
-    const cbData = await cbRes.json();
-    const bnData = await bnRes.json();
-    const cbPrice = parseFloat(cbData.data && cbData.data.amount);
-    const bnPrice = parseFloat(bnData.price);
-    if(!(cbPrice > 0) || !(bnPrice > 0)) throw new Error('precios inválidos');
-
-    const premiumPct = ((cbPrice - bnPrice) / bnPrice) * 100;
-    const diffUsd = cbPrice - bnPrice;
+    const data = await loadCbpChartData(cbpActiveTf);
+    if(!data || data.length < 5) throw new Error('sin datos suficientes');
     loadingEl.style.display = 'none';
-    contentEl.style.display = 'block';
-
-    const valueEl = document.getElementById('cbpValue');
-    const classEl = document.getElementById('cbpClass');
-    const recEl = document.getElementById('cbpRecommendation');
-    const sign = premiumPct >= 0 ? '+' : '';
-    valueEl.textContent = sign + premiumPct.toFixed(3) + '%';
-    valueEl.style.color = premiumPct >= 0 ? '#2ecc71' : '#ff2f4f';
-    if(premiumPct > 0.05){
-      classEl.textContent = 'Premium positivo';
-      recEl.textContent = 'Bitcoin se está pagando más caro en Coinbase que en Binance — típicamente asociado a más demanda institucional o estadounidense en este momento.';
-    } else if(premiumPct < -0.05){
-      classEl.textContent = 'Premium negativo (descuento)';
-      recEl.textContent = 'Bitcoin se está pagando más barato en Coinbase que en Binance — típicamente asociado a menos demanda de EE.UU. o más presión de venta ahí.';
-    } else {
-      classEl.textContent = 'Neutral';
-      recEl.textContent = 'El precio entre ambos exchanges está prácticamente alineado — no hay una señal clara de premium ni de descuento en este momento.';
-    }
-    document.getElementById('cbpCoinbasePrice').textContent = fmtUsd2(cbPrice);
-    document.getElementById('cbpBinancePrice').textContent = fmtUsd2(bnPrice);
-    document.getElementById('cbpDiffUsd').textContent = (diffUsd >= 0 ? '+' : '−') + fmtUsd2(Math.abs(diffUsd));
+    renderCbpChart(data);
     document.getElementById('cbpUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch(err){
     loadingEl.style.display = 'none';
-    contentEl.style.display = 'none';
-    errorEl.style.display = 'block';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+    errorEl.style.display = 'flex';
   }
   if(btn) btn.disabled = false;
 }
+document.querySelectorAll('#cbpTfRow .tf-pill').forEach(b => {
+  b.addEventListener('click', () => {
+    if(b.classList.contains('active')) return;
+    document.querySelectorAll('#cbpTfRow .tf-pill').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    cbpActiveTf = b.dataset.tf;
+    loadCoinbasePremium();
+  });
+});
 loadCoinbasePremium();
 document.getElementById('cbpRefreshBtn').addEventListener('click', loadCoinbasePremium);
 
