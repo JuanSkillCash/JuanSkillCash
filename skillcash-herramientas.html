@@ -1680,24 +1680,6 @@ img[src=""]{display:none}
               <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <div class="indic-guide-card">
-              <div class="indic-guide-icon">⛏️</div>
-              <div class="indic-guide-card-title">Minería</div>
-              <div class="indic-guide-card-text">Salud de la red: cuánto cuesta minar, y si los mineros están acumulando o vendiendo.</div>
-              <div class="indic-guide-card-soon">Próximamente</div>
-            </div>
-            <div class="indic-guide-card">
-              <div class="indic-guide-icon">🏛️</div>
-              <div class="indic-guide-card-title">Macro</div>
-              <div class="indic-guide-card-text">El contexto económico global que mueve el apetito por riesgo: tasas, liquidez, calendario de la Fed.</div>
-              <div class="indic-guide-card-soon">Próximamente</div>
-            </div>
-            <div class="indic-guide-card">
-              <div class="indic-guide-icon">⛓️</div>
-              <div class="indic-guide-card-title">On-Chain</div>
-              <div class="indic-guide-card-text">Qué están haciendo realmente las billeteras on-chain, más allá del precio.</div>
-              <div class="indic-guide-card-soon">Próximamente</div>
-            </div>
           </div>
         </div>
 
@@ -11650,13 +11632,15 @@ setInterval(updateMarketSessions, 1000);
 <script>
 (function(){
   var coins = [
-    ['btc','BTC','Bitcoin'],['eth','ETH','Ethereum'],['usdt','USDT','Tether'],
-    ['bnb','BNB','BNB'],['sol','SOL','Solana'],['usdc','USDC','USD Coin'],
-    ['doge','DOGE','Dogecoin'],['ada','ADA','Cardano'],['trx','TRX','TRON'],
-    ['link','LINK','Chainlink'],['avax','AVAX','Avalanche'],['ton','TON','Toncoin'],
-    ['shib','SHIB','Shiba Inu'],['bch','BCH','Bitcoin Cash'],
-    ['ltc','LTC','Litecoin'],['uni','UNI','Uniswap'],['near','NEAR','NEAR Protocol'],
-    ['icp','ICP','Internet Computer'],['etc','ETC','Ethereum Classic']
+    ['btc','BTC','Bitcoin'],['eth','ETH','Ethereum'],['pepe','PEPE','Pepe'],
+    ['usdt','USDT','Tether'],['bnb','BNB','BNB'],['sol','SOL','Solana'],
+    ['popcat','POPCAT','Popcat'],['usdc','USDC','USD Coin'],['doge','DOGE','Dogecoin'],
+    ['ada','ADA','Cardano'],['brett','BRETT','Brett'],['trx','TRX','TRON'],
+    ['link','LINK','Chainlink'],['avax','AVAX','Avalanche'],['ponke','PONKE','Ponke'],
+    ['ton','TON','Toncoin'],['shib','SHIB','Shiba Inu'],['bch','BCH','Bitcoin Cash'],
+    ['hype','HYPE','Hyperliquid'],['ltc','LTC','Litecoin'],['uni','UNI','Uniswap'],
+    ['near','NEAR','NEAR Protocol'],['jup','JUP','Jupiter'],['icp','ICP','Internet Computer'],
+    ['etc','ETC','Ethereum Classic'],['1inch','1INCH','1inch Network'],['retardio','RETARDIO','Retardio']
   ];
   function itemHtml(c){
     return '<span class="ticker-item"><img src="https://assets.coincap.io/assets/icons/'+c[0]+'@2x.png" alt="" onerror="this.style.display=\'none\'"><b>'+c[1]+'</b> '+c[2]+'</span><span class="ticker-sep">•</span>';
