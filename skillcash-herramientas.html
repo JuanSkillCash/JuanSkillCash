@@ -4770,6 +4770,7 @@ function renderCatPillTabs(cat){
 function showCategoryDetail(cat){
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   closeAnyOpenToolInline();
+  setCatLabelToolOpen(false);
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
   document.getElementById('marketDashboardBlock').style.display = 'none';
@@ -4797,6 +4798,7 @@ function showCategoryDetail(cat){
 function showCategoryOverview(){
   const wasInCategory = categoryDetailView.style.display === 'block';
   closeAnyOpenToolInline();
+  setCatLabelToolOpen(false);
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
