@@ -4542,6 +4542,11 @@ function closeAnyOpenToolInline(){
   toolDetailSlot.style.display = 'none';
   const grid = document.querySelector('.tool-section[data-category="' + prevCategory + '"] .tool-grid');
   if(grid) grid.style.display = '';
+  document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
+  document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => pill.classList.remove('active'));
+  document.querySelectorAll('[data-cat-home]').forEach(item => {
+    item.classList.toggle('active', item.dataset.catHome === prevCategory);
+  });
 }
 function openModalGeneric(overlay, panel, focusTarget){
   lastFocusedEl = document.activeElement;
@@ -5164,8 +5169,11 @@ document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
   card.appendChild(actions);
 });
 
-/* ---- marcar en el menú lateral y en las pastillas de celular cuál herramienta está abierta ahora mismo ---- */
-document.querySelectorAll('[data-tool]').forEach(el => {
+/* ---- marcar en el menú lateral y en las pastillas de celular cuál herramienta está abierta ahora mismo ----
+   ojo: el selector debe ser específico (no '[data-tool]' a secas) porque el .modal-overlay de cada
+   herramienta también trae data-tool, y un click en su botón de cerrar burbujea hasta el overlay y
+   volvería a marcar esa herramienta como activa justo después de cerrarla */
+document.querySelectorAll('.sb-item[data-tool], .tool-card[data-tool]').forEach(el => {
   el.addEventListener('click', () => {
     const tool = el.dataset.tool;
     document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
