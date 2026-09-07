@@ -351,6 +351,16 @@ button{font-family:inherit;color:inherit}
     linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
     rgba(255,255,255,.02);
 }
+/* el gráfico real (#halvingChartWrap) es más ancho que .indic-chart-body por el
+   "breakout" — sin esto, el fondo de cuadrícula se quedaba angosto y se veía un corte
+   justo donde el gráfico ya se salía de esa franja */
+#halvingChartWrap{
+  border-radius:12px;
+  background:
+    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 15px,
+    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
+    rgba(255,255,255,.02);
+}
 /* antes .indic-chart-body los centraba con flex; ahora se centran solos para que ese
    contenedor pueda quedar en flujo normal y el gráfico real (adentro) sí pueda "romper"
    el margen hacia los lados sin que el flex se lo impida */
