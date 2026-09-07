@@ -1318,6 +1318,9 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a9 9 0 0118 0"/><path d="M6.5 17a5.5 5.5 0 0111 0"/></svg></span><span class="sb-item-label">Rainbow Chart</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Pi Cycle Top</span>
+      </button>
     </nav>
 
     <div class="sb-bottom">
@@ -1863,6 +1866,42 @@ img[src=""]{display:none}
               <div class="calc-disclaimer" style="margin-top:18px">
                 🌈 <b>Cada banda es una franja de precio</b>, calculada ajustando una curva de tendencia (regresión logarítmica) sobre todo el historial de Bitcoin — no es una señal de compra/venta, es una forma visual de ver qué tan "estirado" está el precio respecto a su tendencia.<br>
                 📐 <b>El eje vertical usa escala logarítmica</b>, igual que en Ciclos de Halving, para poder comparar precios muy distintos en la misma gráfica.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="picycle" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Pi Cycle Top de Bitcoin</h2>
+                <p class="calc-sub">Compara dos promedios móviles del precio: cuando el de 111 días cruza por encima del de 350 días × 2, históricamente ha marcado el techo del ciclo — casi al día, en 2013, 2017 y 2021.</p>
+              </div>
+
+              <div class="indic-chart-body" id="picycleChartBody">
+                <div class="indic-chart-soon" id="picycleLoading">
+                  <div class="indic-placeholder-icon">📐</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando los promedios móviles sobre el precio diario de Bitcoin.</div>
+                </div>
+                <div class="indic-chart-soon" id="picycleError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="picycleChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="picycleLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="picycleStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📐 <b>SMA 111</b> es el precio promedio de los últimos 111 días; <b>SMA 350×2</b> es el promedio de los últimos 350 días, multiplicado por dos. Cuando la línea de 111 días cruza por encima de la de 350×2, se marca como techo histórico.<br>
+                🔻 Este indicador está documentado principalmente para marcar <b>techos</b> del ciclo — no existe una versión igual de estandarizada para marcar suelos, así que no se muestra una señal de suelo aquí para no inventar algo sin respaldo histórico real.
               </div>
             </div>
           </div>
@@ -4456,13 +4495,13 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Pi Cycle Top' }],
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
@@ -11373,6 +11412,162 @@ async function loadRainbowDetail(){
 loadRainbowDetail();
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="rainbow"]').style.display !== 'none') renderRainbowChart();
+});
+
+/* ---- Pi Cycle Top: cruce del promedio móvil de 111 días contra el de 350 días × 2,
+   sobre el mismo historial de precio de BTC que ya usan Ciclos de Halving y Rainbow Chart ---- */
+function movingAverageSeries(points, windowDays){
+  const windowMs = windowDays * 86400000;
+  const result = new Array(points.length);
+  let startIdx = 0, sum = 0, count = 0;
+  for(let i = 0; i < points.length; i++){
+    sum += points[i].c; count++;
+    while(points[i].t - points[startIdx].t > windowMs){
+      sum -= points[startIdx].c; count--; startIdx++;
+    }
+    result[i] = sum / count;
+  }
+  return result;
+}
+function renderPiCycleChart(){
+  const loadingEl = document.getElementById('picycleLoading');
+  const errorEl = document.getElementById('picycleError');
+  const wrap = document.getElementById('picycleChartWrap');
+  const legendEl = document.getElementById('picycleLegend');
+  const statsEl = document.getElementById('picycleStats');
+  const allPoints = halvingBtcHistory;
+  const validStartIdx = allPoints ? allPoints.findIndex(p => p.t - allPoints[0].t >= 350 * 86400000) : -1;
+  if(!allPoints || validStartIdx < 0){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const sma111Full = movingAverageSeries(allPoints, 111);
+  const sma350x2Full = movingAverageSeries(allPoints, 350).map(v => v * 2);
+  const points = allPoints.slice(validStartIdx);
+  const sma111 = sma111Full.slice(validStartIdx);
+  const sma350x2 = sma350x2Full.slice(validStartIdx);
+
+  const crossings = [];
+  for(let i = 1; i < points.length; i++){
+    if(sma111[i - 1] < sma350x2[i - 1] && sma111[i] >= sma350x2[i]){
+      crossings.push({ t: points[i].t, price: points[i].c });
+    }
+  }
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const allVals = points.map(p => p.c).concat(sma111).concat(sma350x2);
+  const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 34, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  function pathFor(getY){
+    let d = '';
+    points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${getY(i).toFixed(1)} `; });
+    return d.trim();
+  }
+  const priceLine = pathFor(i => yFor(points[i].c));
+  const sma111Line = pathFor(i => yFor(sma111[i]));
+  const sma350Line = pathFor(i => yFor(sma350x2[i]));
+
+  // cuando dos cruces caen muy cerca en el tiempo (ej. dos tapas del mismo ciclo alcista), se
+  // omite el texto del segundo para que no se encimen las etiquetas — la línea sí se dibuja siempre
+  let lastLabelPx = -Infinity;
+  const crossHtml = crossings.map(c => {
+    const pxNum = xFor(c.t);
+    const px = pxNum.toFixed(1);
+    const showLabel = pxNum - lastLabelPx > 50;
+    if(showLabel) lastLabelPx = pxNum;
+    const label = new Date(c.t).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+    return `
+      <line x1="${px}" y1="${marginTop}" x2="${px}" y2="${marginTop + drawH}" stroke="rgba(239,68,68,.55)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      ${showLabel ? `<text x="${px}" y="${marginTop - 12}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#ef4444" font-family="'Space Mono',monospace">TOPE ${label}</text>` : ''}
+    `;
+  }).join('');
+
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <svg class="fng-chart-svg" id="picycleChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      ${yGridHtml}
+      ${crossHtml}
+      <path d="${priceLine}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${sma350Line}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${sma111Line}" fill="none" stroke="#38bdf8" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
+      ${xLabelsHtml}
+      ${todayMarkerHtml}
+    </svg>
+  `;
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#38bdf8"></span>SMA 111 días</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f97316"></span>SMA 350 días × 2</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,255,255,.6)"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#ef4444"></span>Cruce = techo histórico</span>
+  `;
+
+  const lastSma111 = sma111[sma111.length - 1], lastSma350x2 = sma350x2[sma350x2.length - 1];
+  const closeness = Math.min(100, Math.max(0, (lastSma111 / lastSma350x2) * 100));
+  const lastCross = crossings.length ? crossings[crossings.length - 1] : null;
+  statsEl.innerHTML = `
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Qué tan cerca de un cruce (techo)</div><div class="r-val" style="color:${closeness >= 90 ? '#ef4444' : closeness >= 70 ? '#f97316' : '#22c55e'}">${closeness.toFixed(0)}%</div></div>
+    <div class="res-card"><div class="r-label">SMA 111 días</div><div class="r-val">${fmtHalvingPrice(lastSma111)}</div></div>
+    <div class="res-card"><div class="r-label">SMA 350 días × 2</div><div class="r-val">${fmtHalvingPrice(lastSma350x2)}</div></div>
+    <div class="res-card"><div class="r-label">Última señal de techo</div><div class="r-val">${lastCross ? new Date(lastCross.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin datos suficientes'}</div></div>
+  `;
+}
+async function loadPiCycleDetail(){
+  try{
+    await fetchHalvingHistory();
+  } catch(err){ /* renderPiCycleChart muestra el estado de error si no hay datos */ }
+  renderPiCycleChart();
+}
+loadPiCycleDetail();
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="picycle"]').style.display !== 'none') renderPiCycleChart();
 });
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
