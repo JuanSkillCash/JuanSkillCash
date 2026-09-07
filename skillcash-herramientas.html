@@ -11466,15 +11466,19 @@ loadHalvingDetail();
 /* ---- Rainbow Chart: franjas de precio calculadas sobre una regresión logarítmica
    (precio vs. días desde el génesis de Bitcoin) del mismo historial que usa Ciclos de Halving ---- */
 const RAINBOW_GENESIS_MS = new Date('2009-01-03T00:00:00Z').getTime();
+// fronteras calibradas contra los percentiles reales de qué tan lejos se ha movido el precio de
+// BTC respecto a su tendencia (2009-2021, antes de que este archivo de prueba empezara a tener
+// datos de relleno) — no son números inventados a ojo, por eso una caída o subida real puede
+// (y debe) salirse de la franja de colores en vez de quedar siempre atrapada por dentro
 const RAINBOW_BANDS = [
-  { max: -1.6, color: '#1e3a8a', label: 'Liquidación total' },
-  { max: -1.1, color: '#2563eb', label: 'Compra fuerte' },
+  { max: -0.9, color: '#1e3a8a', label: 'Liquidación total' },
+  { max: -0.77, color: '#2563eb', label: 'Compra fuerte' },
   { max: -0.6, color: '#0ea5e9', label: 'Acumular' },
-  { max: -0.2, color: '#14b8a6', label: 'Todavía barato' },
-  { max: 0.2, color: '#22c55e', label: 'Zona neutral' },
-  { max: 0.6, color: '#eab308', label: '¿Burbuja?' },
-  { max: 1.1, color: '#f97316', label: 'Se calienta' },
-  { max: 1.6, color: '#ef4444', label: 'Zona de venta' },
+  { max: -0.4, color: '#14b8a6', label: 'Todavía barato' },
+  { max: 0.1, color: '#22c55e', label: 'Zona neutral' },
+  { max: 0.4, color: '#eab308', label: '¿Burbuja?' },
+  { max: 0.85, color: '#f97316', label: 'Se calienta' },
+  { max: 1.5, color: '#ef4444', label: 'Zona de venta' },
   { max: Infinity, color: '#b91c1c', label: 'Burbuja máxima' }
 ];
 function rainbowFit(points){
@@ -11628,17 +11632,14 @@ function renderRainbowChart(){
   // absolutos (a partir del rango del eje) y se volvían a sumar sobre la curva, lo que en fechas
   // viejas (curva central muy baja) podía invertir la banda: un polígono que se cruza a sí mismo,
   // que se veía como una franja gruesa y de color raro
-  // las bandas de los extremos ("Liquidación total" y "Burbuja máxima") representan "todo lo que
-  // esté más allá de X" — no un nivel fijo como las demás — así que se dibujan más anchas Y más
-  // tenues que las del medio, igual que en el gráfico de referencia; como el eje ya no se infla
-  // para contenerlas por completo, una parte de esa franja ancha queda naturalmente cortada por
-  // el borde del gráfico en vez de dominar el espacio visible
-  const lowClip = -2.9, highClip = 2.9;
+  // más allá de la última franja con nombre, el color se sigue viendo pero ya no tiene una
+  // etiqueta — es solo el margen justo para que el precio pueda salirse del todo del gráfico en
+  // una subida o caída extrema, en vez de quedar siempre atrapado por dentro
+  const lowClip = -1.9, highClip = 1.9;
   const boundaries = [lowClip, ...boundaryOffsets, highClip];
   let bandsHtml = '';
   for(let bi = 0; bi < RAINBOW_BANDS.length; bi++){
     const loOff = boundaries[bi], hiOff = boundaries[bi + 1];
-    const isOuterBand = bi === 0 || bi === RAINBOW_BANDS.length - 1;
     let d = '';
     for(let i = 0; i <= SAMPLES; i++){
       d += (i === 0 ? 'M' : 'L') + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + hiOff).toFixed(1) + ' ';
@@ -11646,7 +11647,7 @@ function renderRainbowChart(){
     for(let i = SAMPLES; i >= 0; i--){
       d += 'L' + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + loOff).toFixed(1) + ' ';
     }
-    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}" opacity="${isOuterBand ? '.5' : '1'}"/>`;
+    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}"/>`;
   }
 
   let pathD = '';
