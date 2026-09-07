@@ -141,6 +141,7 @@ button{font-family:inherit;color:inherit}
 .tool-card-actions::after{content:'›';color:var(--muted);font-size:20px}
 
 .sb-cat-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--white);padding:14px 10px 6px;white-space:nowrap;text-transform:none;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.sb-cat-label.tool-open,#indicNavTitle.tool-open{color:var(--red)}
 .sb-cat-label::after{content:'';margin-left:auto;width:6px;height:6px;border-right:1.5px solid var(--white);border-bottom:1.5px solid var(--white);transform:rotate(45deg);transition:transform var(--dur-base) var(--ease-out);flex-shrink:0}
 .sb-cat-label.collapsed::after{transform:rotate(-45deg)}
 .cat-icon{display:inline-flex;flex-shrink:0;opacity:.85}
@@ -1392,7 +1393,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item" id="indicMobileBackBtn">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></span><span class="sb-item-label">Volver a categorías</span>
       </button>
-      <div class="indic-cat-label" style="margin-top:10px">Indicadores de Mercado</div>
+      <div class="indic-cat-label" id="indicNavTitle" style="margin-top:10px">Indicadores de Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="guia">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
@@ -4872,6 +4873,7 @@ function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
   });
+  setCatLabelToolOpen(id !== 'guia');
   if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
   else if(id === 'whalebias') startIndicAutoRefresh(() => loadWhaleBias(true), WB_TF[wbActiveTf].bucketMs);
   else stopIndicAutoRefresh();
@@ -5041,6 +5043,15 @@ function getFocusable(container){
 }
 let closingFromPopstate = false;
 let suppressNextPopstate = false;
+// el título de categoría en el sidebar ("Indicadores de Mercado", "Portafolio", etc.) se pinta de
+// rojo de marca solo mientras hay una herramienta puntual abierta — no en el panorama/grid de esa
+// categoría. Solo una etiqueta está visible a la vez (el sidebar ya filtra por categoría activa),
+// así que basta con alternar la clase en todas.
+function setCatLabelToolOpen(open){
+  document.querySelectorAll('.sb-cat-label').forEach(el => el.classList.toggle('tool-open', open));
+  const indicTitle = document.getElementById('indicNavTitle');
+  if(indicTitle) indicTitle.classList.toggle('tool-open', open);
+}
 const toolDetailSlot = document.getElementById('toolDetailSlot');
 const TOOL_CATEGORY = {};
 document.querySelectorAll('.tool-section[data-category] .tool-card[data-tool]').forEach(card => {
@@ -5061,6 +5072,7 @@ function closeAnyOpenToolInline(){
   const prevCategory = wrap.dataset.category;
   wrap.remove();
   toolDetailSlot.style.display = 'none';
+  setCatLabelToolOpen(false);
   const grid = document.querySelector('.tool-section[data-category="' + prevCategory + '"] .tool-grid');
   if(grid) grid.style.display = '';
   document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
@@ -5086,6 +5098,7 @@ function openModalGeneric(overlay, panel, focusTarget){
     toolDetailSlot.appendChild(wrap);
     overlay.classList.add('inline-mode');
     toolDetailSlot.style.display = 'block';
+    setCatLabelToolOpen(true);
     if(hadPreviousTool){
       history.replaceState({ skillcashModal: true }, '', location.href);
     } else {
