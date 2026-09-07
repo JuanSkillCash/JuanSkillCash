@@ -1311,6 +1311,9 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whalebias">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c2-5 6-7 10-7 5 0 8 3 8 6s-2 5-6 5c-1 0-1.5-.5-1.5-1.5 0-.5 1-1 1-2 0-1-1-1.5-2-1.5-2 0-3 1.5-3 3.5 0 3 2.5 4.5 5.5 4.5"/><circle cx="17" cy="10" r=".8" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Whale Bias</span>
+      </button>
       <div class="indic-cat-label">Ciclos</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Ciclos de Halving</span>
@@ -1986,6 +1989,49 @@ img[src=""]{display:none}
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🏢 Datos reportados públicamente por cada empresa (balances trimestrales, compras anunciadas) y agregados por CoinGecko — pueden tener algo de rezago frente a compras muy recientes.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="whalebias" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Whale Bias — Funding Rate</h2>
+                <p class="calc-sub">La tasa de funding de BTC-PERP en Hyperliquid, en vivo — un proxy real de hacia dónde está inclinado el posicionamiento de los traders grandes: positivo, más apalancados en largo; negativo, más en corto.</p>
+              </div>
+
+              <div id="wbLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Consultando Hyperliquid…</div>
+              <div id="wbError" class="calc-disclaimer" style="display:none">⚠️ No se pudo consultar Hyperliquid ahora mismo. Intenta de nuevo en un momento.</div>
+
+              <div id="wbContent" style="display:none">
+                <div class="calc-inputs" style="text-align:center">
+                  <div class="be-savings-label" style="text-align:center">FUNDING ANUALIZADO (BTC-PERP)</div>
+                  <div class="fng-big-value" id="wbValue" style="margin-top:6px">—</div>
+                  <div class="fng-big-class" id="wbClass">—</div>
+                  <div class="be-note" id="wbRecommendation" style="text-align:left;margin-top:18px"></div>
+                </div>
+
+                <div class="chart-stats-grid" style="margin-top:18px">
+                  <div class="res-card"><div class="r-label">Funding por hora</div><div class="r-val" id="wbHourly">—</div></div>
+                  <div class="res-card"><div class="r-label">Precio mark BTC-PERP</div><div class="r-val" id="wbMarkPx">—</div></div>
+                  <div class="res-card"><div class="r-label">Interés abierto (OI)</div><div class="r-val" id="wbOi">—</div></div>
+                </div>
+
+                <div style="text-align:center;margin-top:18px">
+                  <button type="button" class="a-btn" id="wbRefreshBtn">🔄 Actualizar</button>
+                  <div style="font-size:11px;color:var(--muted);margin-top:8px" id="wbUpdatedAt"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🐋 El funding rate es lo que pagan los traders apalancados en largo o en corto para mantener el precio del contrato perpetuo cerca del precio real de Bitcoin. No existe una API pública que aísle solo "ballenas" — el funding rate es la forma más real y verificable de ver hacia dónde está inclinado el posicionamiento agregado, y Hyperliquid es conocido por mover tickets grandes.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -4583,11 +4629,11 @@ const INDIC_GROUPS = {
   ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Pi Cycle Top' }],
   mineria: [],
   macro: [],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Whale Bias' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium Index' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
@@ -11768,6 +11814,71 @@ async function loadCorporateTreasuries(){
   }
 }
 loadCorporateTreasuries();
+
+/* ---- Whale Bias: funding rate de BTC-PERP en Hyperliquid (API pública, sin llave) como proxy
+   del sesgo de posicionamiento agregado de los traders apalancados más grandes.
+   OJO: esta API no se pudo probar contra el servidor real desde este entorno (sin acceso a
+   internet) — el parseo es defensivo (revisa que existan los campos esperados) para que, si la
+   forma real de la respuesta difiere, caiga al estado de error en vez de mostrar datos incorrectos. ---- */
+async function loadWhaleBias(){
+  const loadingEl = document.getElementById('wbLoading');
+  const errorEl = document.getElementById('wbError');
+  const contentEl = document.getElementById('wbContent');
+  const btn = document.getElementById('wbRefreshBtn');
+  if(btn) btn.disabled = true;
+  if(contentEl.style.display !== 'block') loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  try{
+    const res = await fetch('https://api.hyperliquid.xyz/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
+    });
+    const data = await res.json();
+    const meta = data[0], ctxs = data[1];
+    const universe = meta && meta.universe;
+    if(!Array.isArray(universe) || !Array.isArray(ctxs)) throw new Error('forma de respuesta inesperada');
+    const idx = universe.findIndex(a => a.name === 'BTC');
+    const ctx = idx >= 0 ? ctxs[idx] : null;
+    const funding = ctx ? parseFloat(ctx.funding) : NaN;
+    const markPx = ctx ? parseFloat(ctx.markPx) : NaN;
+    const oiCoins = ctx ? parseFloat(ctx.openInterest) : NaN;
+    if(isNaN(funding) || isNaN(markPx)) throw new Error('campos faltantes');
+
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'block';
+
+    const annualizedPct = funding * 24 * 365 * 100;
+    const hourlyPct = funding * 100;
+    const valueEl = document.getElementById('wbValue');
+    const classEl = document.getElementById('wbClass');
+    const recEl = document.getElementById('wbRecommendation');
+    const sign = annualizedPct >= 0 ? '+' : '';
+    valueEl.textContent = sign + annualizedPct.toFixed(2) + '%';
+    valueEl.style.color = annualizedPct >= 0 ? '#2ecc71' : '#ff2f4f';
+    if(annualizedPct > 5){
+      classEl.textContent = 'Sesgo alcista (largos pagan)';
+      recEl.textContent = 'Hay más presión compradora apalancada que vendedora — los que están en largo le están pagando a los que están en corto para mantener sus posiciones.';
+    } else if(annualizedPct < -5){
+      classEl.textContent = 'Sesgo bajista (cortos pagan)';
+      recEl.textContent = 'Hay más presión vendedora apalancada que compradora — los que están en corto le están pagando a los que están en largo.';
+    } else {
+      classEl.textContent = 'Neutral';
+      recEl.textContent = 'El funding está cerca de cero — no hay un sesgo fuerte de posicionamiento apalancado en ninguna dirección ahora mismo.';
+    }
+    document.getElementById('wbHourly').textContent = (hourlyPct >= 0 ? '+' : '') + hourlyPct.toFixed(4) + '%';
+    document.getElementById('wbMarkPx').textContent = fmtUsd2(markPx);
+    document.getElementById('wbOi').textContent = !isNaN(oiCoins) ? fmtUsdBig(oiCoins * markPx) : '—';
+    document.getElementById('wbUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch(err){
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+  if(btn) btn.disabled = false;
+}
+loadWhaleBias();
+document.getElementById('wbRefreshBtn').addEventListener('click', loadWhaleBias);
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
