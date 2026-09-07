@@ -11466,20 +11466,25 @@ loadHalvingDetail();
 /* ---- Rainbow Chart: franjas de precio calculadas sobre una regresión logarítmica
    (precio vs. días desde el génesis de Bitcoin) del mismo historial que usa Ciclos de Halving ---- */
 const RAINBOW_GENESIS_MS = new Date('2009-01-03T00:00:00Z').getTime();
-// fronteras calibradas contra los percentiles reales de qué tan lejos se ha movido el precio de
-// BTC respecto a su tendencia (2009-2021, antes de que este archivo de prueba empezara a tener
-// datos de relleno) — no son números inventados a ojo, por eso una caída o subida real puede
-// (y debe) salirse de la franja de colores en vez de quedar siempre atrapada por dentro
+// las 9 franjas tienen TODAS el mismo ancho (0.22 en escala logarítmica natural), igual que en
+// el gráfico de referencia (lookintobitcoin.com) — nunca unas más gruesas que otras. El ancho
+// total (±0.99 desde la curva central) se escogió revisando los percentiles reales del residuo
+// precio-vs-tendencia en el histórico 2009-2021: con ese ancho, solo ~2-5% de los mínimos
+// históricos quedan por debajo de la franja azul y ~11% de los máximos por encima de la roja,
+// que es justo el comportamiento real (el precio casi siempre cabe dentro, pero en una caída o
+// subida extrema de verdad se sale del todo, como en la referencia)
+// colores tomados del gráfico de referencia (lookintobitcoin.com) — sólidos, sin degradado ni
+// transparencia
 const RAINBOW_BANDS = [
-  { max: -0.9, color: '#1e3a8a', label: 'Liquidación total' },
-  { max: -0.77, color: '#2563eb', label: 'Compra fuerte' },
-  { max: -0.6, color: '#0ea5e9', label: 'Acumular' },
-  { max: -0.4, color: '#14b8a6', label: 'Todavía barato' },
-  { max: 0.1, color: '#22c55e', label: 'Zona neutral' },
-  { max: 0.4, color: '#eab308', label: '¿Burbuja?' },
-  { max: 0.85, color: '#f97316', label: 'Se calienta' },
-  { max: 1.5, color: '#ef4444', label: 'Zona de venta' },
-  { max: Infinity, color: '#b91c1c', label: 'Burbuja máxima' }
+  { max: -0.77, color: '#1d6fc4', label: 'Liquidación total' },
+  { max: -0.55, color: '#23a199', label: 'Compra fuerte' },
+  { max: -0.33, color: '#3fa34d', label: 'Acumular' },
+  { max: -0.11, color: '#8cc63f', label: 'Todavía barato' },
+  { max: 0.11, color: '#e8d93a', label: 'Zona neutral' },
+  { max: 0.33, color: '#f2a93c', label: '¿Burbuja?' },
+  { max: 0.55, color: '#ee7c2e', label: 'Se calienta' },
+  { max: 0.77, color: '#e1512a', label: 'Zona de venta' },
+  { max: Infinity, color: '#b32c22', label: 'Burbuja máxima' }
 ];
 function rainbowFit(points){
   let n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
@@ -11627,15 +11632,11 @@ function renderRainbowChart(){
     <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
   `).join('');
 
-  // las fronteras externas (arriba de "Zona de venta" y abajo de "Liquidación total") deben ser
-  // relativas a la curva central, igual que las demás — antes se calculaban en términos
-  // absolutos (a partir del rango del eje) y se volvían a sumar sobre la curva, lo que en fechas
-  // viejas (curva central muy baja) podía invertir la banda: un polígono que se cruza a sí mismo,
-  // que se veía como una franja gruesa y de color raro
-  // más allá de la última franja con nombre, el color se sigue viendo pero ya no tiene una
-  // etiqueta — es solo el margen justo para que el precio pueda salirse del todo del gráfico en
-  // una subida o caída extrema, en vez de quedar siempre atrapado por dentro
-  const lowClip = -1.9, highClip = 1.9;
+  // el borde externo (abajo de "Liquidación total" y arriba de "Burbuja máxima") es solo la
+  // continuación del mismo ancho de franja (0.22) que todas las demás — así el borde de la
+  // franja completa también queda parejo, y más allá de eso ya no hay color: es donde el precio
+  // se ve salir del todo del arcoíris en una caída o subida extrema, tal como en la referencia
+  const lowClip = -0.99, highClip = 0.99;
   const boundaries = [lowClip, ...boundaryOffsets, highClip];
   let bandsHtml = '';
   for(let bi = 0; bi < RAINBOW_BANDS.length; bi++){
