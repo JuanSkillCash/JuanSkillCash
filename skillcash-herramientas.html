@@ -11650,18 +11650,30 @@ setInterval(updateMarketSessions, 1000);
     var html = coins.map(itemHtml).join('');
     track.innerHTML = html + html;
     // los íconos se traen de CoinGecko (mismo catálogo que ya usa el resto del sitio) en
-    // vez de coincap.io, que no tiene bien las monedas meme nuevas ni el logo actual de 1inch
-    var ids = coins.map(function(c){ return c[3]; }).join(',');
-    if(typeof cgUrl === 'function'){
+    // vez de coincap.io, que no tiene bien las monedas meme nuevas ni el logo actual de 1inch.
+    // se cachean en localStorage para siempre, así este navegador solo pide la lista UNA vez
+    // en total (no en cada carga de página) — si algún ícono cambia, hay que borrar la llave
+    // 'skc_ticker_icons_v1' de localStorage (o subir la versión del nombre) para forzar un refresh
+    var CACHE_KEY = 'skc_ticker_icons_v1';
+    function applyIcons(imgById){
+      track.querySelectorAll('img[data-cid]').forEach(function(img){
+        var url = imgById[img.dataset.cid];
+        if(url) img.src = url;
+      });
+    }
+    var cached = null;
+    try{ cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch(e){}
+    if(cached){
+      applyIcons(cached);
+    } else if(typeof cgUrl === 'function'){
+      var ids = coins.map(function(c){ return c[3]; }).join(',');
       fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + encodeURIComponent(ids)))
         .then(function(r){ return r.json(); })
         .then(function(list){
           var imgById = {};
           (list || []).forEach(function(c){ imgById[c.id] = c.image; });
-          track.querySelectorAll('img[data-cid]').forEach(function(img){
-            var url = imgById[img.dataset.cid];
-            if(url) img.src = url;
-          });
+          applyIcons(imgById);
+          try{ localStorage.setItem(CACHE_KEY, JSON.stringify(imgById)); } catch(e){}
         })
         .catch(function(){});
     }
