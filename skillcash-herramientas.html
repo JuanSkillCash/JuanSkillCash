@@ -1321,6 +1321,10 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Pi Cycle Top</span>
       </button>
+      <div class="indic-cat-label">Mercado</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium Index</span>
+      </button>
     </nav>
 
     <div class="sb-bottom">
@@ -1902,6 +1906,49 @@ img[src=""]{display:none}
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>SMA 111</b> es el precio promedio de los últimos 111 días; <b>SMA 350×2</b> es el promedio de los últimos 350 días, multiplicado por dos. Cuando la línea de 111 días cruza por encima de la de 350×2, se marca como techo histórico.<br>
                 🔻 Este indicador está documentado principalmente para marcar <b>techos</b> del ciclo — no existe una versión igual de estandarizada para marcar suelos, así que no se muestra una señal de suelo aquí para no inventar algo sin respaldo histórico real.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="cbpremium" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Coinbase Premium Index</h2>
+                <p class="calc-sub">Diferencia entre el precio de Bitcoin en Coinbase (EE.UU.) y en Binance (global), en vivo. Un premium positivo suele indicar más compra institucional/estadounidense; uno negativo, más presión de venta o compra fuera de EE.UU.</p>
+              </div>
+
+              <div id="cbpLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Consultando precios en vivo…</div>
+              <div id="cbpError" class="calc-disclaimer" style="display:none">⚠️ No se pudo consultar Coinbase o Binance ahora mismo. Intenta de nuevo en un momento.</div>
+
+              <div id="cbpContent" style="display:none">
+                <div class="calc-inputs" style="text-align:center">
+                  <div class="be-savings-label" style="text-align:center">PREMIUM AHORA MISMO</div>
+                  <div class="fng-big-value" id="cbpValue" style="margin-top:6px">—</div>
+                  <div class="fng-big-class" id="cbpClass">—</div>
+                  <div class="be-note" id="cbpRecommendation" style="text-align:left;margin-top:18px"></div>
+                </div>
+
+                <div class="chart-stats-grid" style="margin-top:18px">
+                  <div class="res-card"><div class="r-label">Precio en Coinbase</div><div class="r-val" id="cbpCoinbasePrice">—</div></div>
+                  <div class="res-card"><div class="r-label">Precio en Binance</div><div class="r-val" id="cbpBinancePrice">—</div></div>
+                  <div class="res-card"><div class="r-label">Diferencia en USD</div><div class="r-val" id="cbpDiffUsd">—</div></div>
+                </div>
+
+                <div style="text-align:center;margin-top:18px">
+                  <button type="button" class="a-btn" id="cbpRefreshBtn">🔄 Actualizar precios</button>
+                  <div style="font-size:11px;color:var(--muted);margin-top:8px" id="cbpUpdatedAt"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                💱 El premium se calcula como <b>(precio Coinbase − precio Binance) / precio Binance</b>. Suele moverse en un rango muy pequeño (décimas de %) — variaciones grandes y sostenidas son las que de verdad importan, no un solo vistazo.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -4499,9 +4546,10 @@ const INDIC_GROUPS = {
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
+  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium Index' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
@@ -11569,6 +11617,65 @@ loadPiCycleDetail();
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="picycle"]').style.display !== 'none') renderPiCycleChart();
 });
+
+/* ---- Coinbase Premium Index: diferencia en vivo entre el precio de BTC en Coinbase y en
+   Binance, dos APIs públicas de exchanges reales que no necesitan llave ---- */
+function fmtUsd2(v){
+  return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+async function loadCoinbasePremium(){
+  const loadingEl = document.getElementById('cbpLoading');
+  const errorEl = document.getElementById('cbpError');
+  const contentEl = document.getElementById('cbpContent');
+  const btn = document.getElementById('cbpRefreshBtn');
+  if(btn) btn.disabled = true;
+  if(contentEl.style.display !== 'block') loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  try{
+    const [cbRes, bnRes] = await Promise.all([
+      fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot'),
+      fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'),
+    ]);
+    const cbData = await cbRes.json();
+    const bnData = await bnRes.json();
+    const cbPrice = parseFloat(cbData.data && cbData.data.amount);
+    const bnPrice = parseFloat(bnData.price);
+    if(!(cbPrice > 0) || !(bnPrice > 0)) throw new Error('precios inválidos');
+
+    const premiumPct = ((cbPrice - bnPrice) / bnPrice) * 100;
+    const diffUsd = cbPrice - bnPrice;
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'block';
+
+    const valueEl = document.getElementById('cbpValue');
+    const classEl = document.getElementById('cbpClass');
+    const recEl = document.getElementById('cbpRecommendation');
+    const sign = premiumPct >= 0 ? '+' : '';
+    valueEl.textContent = sign + premiumPct.toFixed(3) + '%';
+    valueEl.style.color = premiumPct >= 0 ? '#2ecc71' : '#ff2f4f';
+    if(premiumPct > 0.05){
+      classEl.textContent = 'Premium positivo';
+      recEl.textContent = 'Bitcoin se está pagando más caro en Coinbase que en Binance — típicamente asociado a más demanda institucional o estadounidense en este momento.';
+    } else if(premiumPct < -0.05){
+      classEl.textContent = 'Premium negativo (descuento)';
+      recEl.textContent = 'Bitcoin se está pagando más barato en Coinbase que en Binance — típicamente asociado a menos demanda de EE.UU. o más presión de venta ahí.';
+    } else {
+      classEl.textContent = 'Neutral';
+      recEl.textContent = 'El precio entre ambos exchanges está prácticamente alineado — no hay una señal clara de premium ni de descuento en este momento.';
+    }
+    document.getElementById('cbpCoinbasePrice').textContent = fmtUsd2(cbPrice);
+    document.getElementById('cbpBinancePrice').textContent = fmtUsd2(bnPrice);
+    document.getElementById('cbpDiffUsd').textContent = (diffUsd >= 0 ? '+' : '−') + fmtUsd2(Math.abs(diffUsd));
+    document.getElementById('cbpUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch(err){
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+  if(btn) btn.disabled = false;
+}
+loadCoinbasePremium();
+document.getElementById('cbpRefreshBtn').addEventListener('click', loadCoinbasePremium);
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
