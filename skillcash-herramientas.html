@@ -1018,8 +1018,8 @@ img[src=""]{display:none}
 .fng-legend-lines i{width:14px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0}
 .fng-share-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
-.fng-chart-breakout{margin:0 -32px;padding:0 8px}
-@media(max-width:900px){ .fng-chart-breakout{margin:0 -38px;padding:0 4px} }
+.chart-breakout{margin:0 -32px;padding:0 8px}
+@media(max-width:900px){ .chart-breakout{margin:0 -38px;padding:0 4px} }
 .chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .chart-stats-grid .res-card{min-width:0}
 .chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -1691,7 +1691,7 @@ img[src=""]{display:none}
                           <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
                         </div>
                       </div>
-                      <div id="fngChartWrap" class="fng-chart-breakout"></div>
+                      <div id="fngChartWrap" class="chart-breakout"></div>
 
                       <div class="chart-stats-grid">
                         <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
@@ -1749,6 +1749,12 @@ img[src=""]{display:none}
                 <button type="button" class="indic-chart-btn" data-cycle="all">Todo el historial</button>
               </div>
 
+              <div class="dom-card" id="halvingMobileCountdown" style="display:none;margin-bottom:16px;background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(59,130,246,.12), transparent 65%), #080c20;border-color:rgba(59,130,246,.3)">
+                <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:#60a5fa"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo halving (estimado)</div>
+                <div class="dom-card-value halving-countdown-value" style="font-size:19px">—</div>
+                <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
+              </div>
+
               <div class="indic-chart-body" id="halvingChartBody">
                 <div class="indic-chart-soon" id="halvingLoading">
                   <div class="indic-placeholder-icon">⏳</div>
@@ -1760,7 +1766,7 @@ img[src=""]{display:none}
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
-                <div id="halvingChartWrap" style="display:none;width:100%"></div>
+                <div id="halvingChartWrap" class="chart-breakout" style="display:none;width:100%"></div>
               </div>
               <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
 
@@ -10582,6 +10588,7 @@ function renderHalvingChart(cycleIndex){
   const errorEl = document.getElementById('halvingError');
   const wrap = document.getElementById('halvingChartWrap');
   const statsEl = document.getElementById('halvingStats');
+  document.getElementById('halvingMobileCountdown').style.display = 'none';
 
   if(halvingLoadFailed){
     loadingEl.style.display = 'none';
@@ -10632,8 +10639,12 @@ function renderHalvingChart(cycleIndex){
 
   const isMobileChart = window.innerWidth <= 640;
   // en el ciclo en curso se reserva una franja extra arriba para el countdown del próximo
-  // halving, integrado directo en el gráfico (no tiene sentido en un ciclo ya cerrado)
-  const extraTop = isOngoing ? (isMobileChart ? 66 : 80) : 0;
+  // halving, integrado directo en el gráfico (no tiene sentido en un ciclo ya cerrado) —
+  // en celular el gráfico ya es chico, así que el countdown se saca aparte, arriba del todo,
+  // en vez de robarle espacio a la línea de precio
+  const showCountdownInChart = isOngoing && !isMobileChart;
+  const showCountdownOutside = isOngoing && isMobileChart;
+  const extraTop = showCountdownInChart ? 80 : 0;
   const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 12 : 13;
@@ -10686,10 +10697,11 @@ function renderHalvingChart(cycleIndex){
     `;
   }
 
-  // countdown al próximo halving, integrado como una franja translúcida arriba a la izquierda
-  // del gráfico (solo tiene sentido en el ciclo en curso)
+  // countdown al próximo halving: en escritorio se integra como una franja translúcida arriba
+  // a la izquierda del gráfico; en celular el gráfico es muy chico para eso, así que se muestra
+  // aparte, en el bloque fijo entre las pestañas y el gráfico (solo tiene sentido en el ciclo en curso)
   let countdownOverlayHtml = '';
-  if(isOngoing){
+  if(showCountdownInChart){
     const leftPct = (marginLeft / totalW * 100).toFixed(2);
     const topPct = (10 / totalH * 100).toFixed(2);
     countdownOverlayHtml = `
@@ -10700,6 +10712,8 @@ function renderHalvingChart(cycleIndex){
       </div>
     `;
   }
+  const mobileCountdownEl = document.getElementById('halvingMobileCountdown');
+  mobileCountdownEl.style.display = showCountdownOutside ? 'block' : 'none';
 
   wrap.innerHTML = `
     <div style="position:relative">
@@ -10809,9 +10823,11 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const spanMs = (axisEndMs - startMs) || 1;
 
   const isMobileChart = window.innerWidth <= 640;
-  // se reserva una franja extra arriba para el countdown del próximo halving, integrado
-  // directo en el gráfico
-  const extraTop = isMobileChart ? 66 : 80;
+  // en escritorio se reserva una franja extra arriba para el countdown, integrado directo en
+  // el gráfico; en celular se muestra aparte (ver más abajo) para no robarle espacio a la línea
+  const showCountdownInChart = !isMobileChart;
+  const showCountdownOutside = isMobileChart;
+  const extraTop = showCountdownInChart ? 80 : 0;
   const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
@@ -10883,15 +10899,20 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
     <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
 
-  const leftPct = (marginLeft / totalW * 100).toFixed(2);
-  const topPct = (10 / totalH * 100).toFixed(2);
-  const countdownOverlayHtml = `
-    <div class="halving-chart-countdown" style="left:${leftPct}%;top:${topPct}%">
-      <div class="halving-chart-countdown-label">⏳ Próximo halving (estimado)</div>
-      <div class="halving-chart-countdown-value halving-countdown-value">—</div>
-      <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
-    </div>
-  `;
+  let countdownOverlayHtml = '';
+  if(showCountdownInChart){
+    const leftPct = (marginLeft / totalW * 100).toFixed(2);
+    const topPct = (10 / totalH * 100).toFixed(2);
+    countdownOverlayHtml = `
+      <div class="halving-chart-countdown" style="left:${leftPct}%;top:${topPct}%">
+        <div class="halving-chart-countdown-label">⏳ Próximo halving (estimado)</div>
+        <div class="halving-chart-countdown-value halving-countdown-value">—</div>
+        <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
+      </div>
+    `;
+  }
+  const mobileCountdownEl = document.getElementById('halvingMobileCountdown');
+  mobileCountdownEl.style.display = showCountdownOutside ? 'block' : 'none';
 
   wrap.innerHTML = `
     <div style="position:relative">
