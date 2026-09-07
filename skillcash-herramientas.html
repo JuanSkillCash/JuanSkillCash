@@ -634,6 +634,9 @@ button{font-family:inherit;color:inherit}
 
 .calc-disclaimer{font-size:12px;color:var(--muted);line-height:1.8;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:15px 16px;margin-bottom:8px}
 .calc-disclaimer strong{color:var(--muted2)}
+.indic-beta-warning{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:600;color:#ffd98a;line-height:1.6;background:rgba(240,178,61,.12);border:1.5px solid rgba(240,178,61,.5);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.indic-beta-warning .indic-beta-warning-icon{font-size:20px;line-height:1;flex-shrink:0}
+.indic-beta-warning b{color:#fff}
 
 /* SCROLL HINT (mejora 3) */
 .scroll-fade{position:sticky;bottom:0;left:0;right:0;height:44px;margin:0 -32px -1px;background:linear-gradient(to bottom,transparent,var(--bg2) 78%);pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;opacity:1;transition:opacity .25s ease;z-index:4}
@@ -1287,7 +1290,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
       <button class="sb-item" data-indic-jump="pisomercado">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Piso de Mercado</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Señal de Piso</span>
       </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium</span>
@@ -1418,8 +1421,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
+      <div class="indic-cat-label">Personales</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Piso de Mercado</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Señal de Piso</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1763,6 +1767,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
         <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
+        <button type="button" class="indic-tab" data-group="personal">Personales</button>
       </div>
 
       <div class="indic-subtabs" id="indicSubTabs"></div>
@@ -1812,8 +1817,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
               <div class="indic-guide-icon">⚓</div>
-              <div class="indic-guide-card-title">Piso de Mercado</div>
-              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: históricamente marca mínimos.</div>
+              <div class="indic-guide-card-title">Señal de Piso</div>
+              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
@@ -2135,8 +2140,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Piso de Mercado de Bitcoin</h2>
-                <p class="calc-sub">Indicador personal: cuando la banda inferior del Canal de Keltner (semanal) cae por debajo del Costo de Producción estimado de Bitcoin, históricamente ha marcado un piso de mercado.</p>
+                <h2 class="calc-title">Señal de Piso de Bitcoin</h2>
+                <p class="calc-sub">Indicador personal: cuando la banda inferior del Canal de Keltner (semanal) cae por debajo del Costo de Producción estimado de Bitcoin, esto ha coincidido históricamente con pisos de mercado — no es una garantía, factores externos pueden hacer que no se cumpla.</p>
+              </div>
+
+              <div class="indic-beta-warning">
+                <span class="indic-beta-warning-icon">⚠️</span>
+                <span><b>Herramienta en fase de pruebas.</b> Los datos del Costo de Producción son un estimado propio con fuentes públicas, no totalmente exactos ni verificados — no los tomes como una cifra oficial. Úsala solo como referencia educativa, nunca como asesoría financiera.</span>
               </div>
 
               <div class="indic-chart-body" id="mfloorChartBody">
@@ -4887,14 +4897,15 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'pisomercado', label: 'Piso de Mercado' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }],
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
-  onchain: []
+  onchain: [],
+  personal: [{ id: 'pisomercado', label: 'Señal de Piso' }]
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -12416,7 +12427,7 @@ function renderMarketFloorChart(){
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Keltner inferior (semanal)</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#a855f7"></span>Costo de Producción</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Cruce = piso de mercado</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Cruce = señal de piso</span>
   `;
 
   const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
