@@ -345,14 +345,16 @@ button{font-family:inherit;color:inherit}
 .indic-chart-btn:hover{color:var(--white)}
 .indic-chart-btn.active{background:rgba(59,130,246,.16);border-color:rgba(59,130,246,.5);color:#60a5fa}
 .indic-chart-body{
-  position:relative;min-height:260px;border-radius:12px;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
+  position:relative;min-height:260px;border-radius:12px;
   background:
     linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 15px,
     linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
     rgba(255,255,255,.02);
 }
-.indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px}
+/* antes .indic-chart-body los centraba con flex; ahora se centran solos para que ese
+   contenedor pueda quedar en flujo normal y el gráfico real (adentro) sí pueda "romper"
+   el margen hacia los lados sin que el flex se lo impida */
+.indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px;max-width:400px;margin:0 auto}
 
 /* ---- panel de categorías (portada de herramientas) ---- */
 .cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
@@ -1018,7 +1020,7 @@ img[src=""]{display:none}
 .fng-legend-lines i{width:14px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0}
 .fng-share-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
-.chart-breakout{margin:0 -32px;padding:0 8px}
+.chart-breakout{margin:0 -52px;padding:0 8px}
 @media(max-width:900px){ .chart-breakout{margin:0 -38px;padding:0 4px} }
 .chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .chart-stats-grid .res-card{min-width:0}
@@ -1766,7 +1768,7 @@ img[src=""]{display:none}
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
-                <div id="halvingChartWrap" class="chart-breakout" style="display:none;width:100%"></div>
+                <div id="halvingChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
               <div class="chart-stats-grid" id="halvingStats" style="display:none"></div>
 
