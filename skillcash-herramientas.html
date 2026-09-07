@@ -1220,6 +1220,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
+      <button class="sb-item" data-indic-jump="whalebias">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c2-5 6-7 10-7 5 0 8 3 8 6s-2 5-6 5c-1 0-1.5-.5-1.5-1.5 0-.5 1-1 1-2 0-1-1-1.5-2-1.5-2 0-3 1.5-3 3.5 0 3 2.5 4.5 5.5 4.5"/><circle cx="17" cy="10" r=".8" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Whale Bias</span>
+      </button>
       <button class="sb-item" data-indic-jump="halving">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
@@ -1228,9 +1231,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Pi Cycle Top</span>
-      </button>
-      <button class="sb-item" data-indic-jump="whalebias">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c2-5 6-7 10-7 5 0 8 3 8 6s-2 5-6 5c-1 0-1.5-.5-1.5-1.5 0-.5 1-1 1-2 0-1-1-1.5-2-1.5-2 0-3 1.5-3 3.5 0 3 2.5 4.5 5.5 4.5"/><circle cx="17" cy="10" r=".8" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Whale Bias</span>
       </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium Index</span>
@@ -1715,10 +1715,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <p class="indic-guide-text">Aquí vas a encontrar señales para entender en qué momento del mercado estamos — organizadas por pestañas para que sea rápido encontrar la que buscas. Esto va a ir creciendo con el tiempo. Por ahora, así está organizado:</p>
           </div>
           <div class="indic-guide-grid">
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
-              <div class="indic-guide-icon">⏳</div>
-              <div class="indic-guide-card-title">Ciclos</div>
-              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
+              <div class="indic-guide-icon">🔮</div>
+              <div class="indic-guide-card-title">Predicciones</div>
+              <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
@@ -1727,10 +1727,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
-              <div class="indic-guide-icon">🔮</div>
-              <div class="indic-guide-card-title">Predicciones</div>
-              <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
+              <div class="indic-guide-icon">🐋</div>
+              <div class="indic-guide-card-title">Whale Bias</div>
+              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
+              <div class="indic-guide-icon">⏳</div>
+              <div class="indic-guide-card-title">Ciclos</div>
+              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
@@ -1755,12 +1761,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">🏢</div>
               <div class="indic-guide-card-title">Balances Corporativos</div>
               <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
-              <div class="indic-guide-icon">🐋</div>
-              <div class="indic-guide-card-title">Whale Bias</div>
-              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
           </div>
