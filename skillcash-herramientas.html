@@ -1325,6 +1325,9 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium Index</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuries">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg></span><span class="sb-item-label">Balances Corporativos</span>
+      </button>
     </nav>
 
     <div class="sb-bottom">
@@ -1948,6 +1951,41 @@ img[src=""]{display:none}
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 💱 El premium se calcula como <b>(precio Coinbase − precio Binance) / precio Binance</b>. Suele moverse en un rango muy pequeño (décimas de %) — variaciones grandes y sostenidas son las que de verdad importan, no un solo vistazo.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="treasuries" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Bitcoin en Balances Corporativos</h2>
+                <p class="calc-sub">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas (como MicroStrategy/Strategy o Tesla) — dato en vivo de CoinGecko.</p>
+              </div>
+
+              <div id="treasLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando datos…</div>
+              <div id="treasError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar la lista de empresas ahora mismo. Intenta de nuevo en un momento.</div>
+
+              <div id="treasContent" style="display:none">
+                <div class="chart-stats-grid">
+                  <div class="res-card"><div class="r-label">BTC total en manos corporativas</div><div class="r-val" id="treasTotalBtc">—</div></div>
+                  <div class="res-card"><div class="r-label">Valor en USD (hoy)</div><div class="r-val" id="treasTotalUsd">—</div></div>
+                  <div class="res-card"><div class="r-label">% de todo el Bitcoin que existe</div><div class="r-val" id="treasDominance">—</div></div>
+                  <div class="res-card"><div class="r-label">Empresas reportando</div><div class="r-val" id="treasCount">—</div></div>
+                </div>
+
+                <div class="be-section-label" style="margin:22px 0 12px">🏢 Top empresas por BTC acumulado</div>
+                <div id="treasList"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🏢 Datos reportados públicamente por cada empresa (balances trimestrales, compras anunciadas) y agregados por CoinGecko — pueden tener algo de rezago frente a compras muy recientes.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -4546,10 +4584,10 @@ const INDIC_GROUPS = {
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
-  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium Index' }],
+  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium Index' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
@@ -11623,6 +11661,15 @@ window.addEventListener('resize', () => {
 function fmtUsd2(v){
   return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+// fmtHalvingPrice no cubre miles de millones (piensa en precio de un solo BTC) — este sí, para
+// totales grandes como el valor en USD de todo el Bitcoin en manos corporativas
+function fmtUsdBig(v){
+  if(v >= 1e12) return '$' + (v / 1e12).toFixed(2) + 'T';
+  if(v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+  if(v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+  if(v >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
+  return '$' + Math.round(v);
+}
 async function loadCoinbasePremium(){
   const loadingEl = document.getElementById('cbpLoading');
   const errorEl = document.getElementById('cbpError');
@@ -11676,6 +11723,51 @@ async function loadCoinbasePremium(){
 }
 loadCoinbasePremium();
 document.getElementById('cbpRefreshBtn').addEventListener('click', loadCoinbasePremium);
+
+/* ---- Bitcoin en Balances Corporativos: endpoint público de CoinGecko con las empresas que
+   reportan tenencias de BTC en su balance ---- */
+async function loadCorporateTreasuries(){
+  const loadingEl = document.getElementById('treasLoading');
+  const errorEl = document.getElementById('treasError');
+  const contentEl = document.getElementById('treasContent');
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/companies/public_treasury/bitcoin'));
+    const data = await res.json();
+    const companies = (data.companies || []).slice().sort((a, b) => b.total_holdings - a.total_holdings);
+    if(!companies.length) throw new Error('sin empresas');
+
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'block';
+
+    document.getElementById('treasTotalBtc').textContent = Math.round(data.total_holdings).toLocaleString('es-ES') + ' BTC';
+    document.getElementById('treasTotalUsd').textContent = fmtUsdBig(data.total_value_usd);
+    document.getElementById('treasDominance').textContent = (data.market_cap_dominance != null ? data.market_cap_dominance.toFixed(2) : '—') + '%';
+    document.getElementById('treasCount').textContent = companies.length;
+
+    const listEl = document.getElementById('treasList');
+    listEl.innerHTML = companies.slice(0, 15).map((c, i) => {
+      const pct = data.total_holdings > 0 ? (c.total_holdings / data.total_holdings * 100) : 0;
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--border2)">
+          <div style="width:22px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);text-align:right">${i + 1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;color:var(--white);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted)">${c.symbol || ''}${c.country ? ' · ' + c.country : ''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-weight:800;color:var(--white);font-size:13.5px">${Math.round(c.total_holdings).toLocaleString('es-ES')} BTC</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#f0b23d">${pct.toFixed(2)}% del total</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(err){
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+}
+loadCorporateTreasuries();
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
