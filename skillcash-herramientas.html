@@ -352,7 +352,7 @@ button{font-family:inherit;color:inherit}
 }
 .pred-stub{
   width:100px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  gap:5px;padding:20px 8px 16px;position:relative;background:linear-gradient(165deg,#ff3f5c,var(--red));
+  gap:5px;padding:20px 8px 16px;position:relative;background:linear-gradient(165deg,#f4838d,#df5d6c);
   z-index:1;
 }
 .pred-stub::before,.pred-stub::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#080c20;right:-11px;z-index:2}
@@ -366,7 +366,7 @@ button{font-family:inherit;color:inherit}
   content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   width:22px;height:22px;border-radius:50%;background:#080c20;z-index:2;
 }
-.pred-logo{width:22px;height:22px;object-fit:contain;margin-bottom:2px;border-radius:50%;background:#fff;padding:2px}
+.pred-logo{width:40px;height:40px;object-fit:contain;margin-bottom:2px}
 .pred-ticket-no-label{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:2px}
 .pred-ticket-no{font-family:'Poppins',sans-serif;font-weight:800;font-size:15px;line-height:1.15;color:#fff;text-align:center}
 .pred-month{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:rgba(255,255,255,.85);text-transform:uppercase;margin-top:6px}
@@ -377,7 +377,7 @@ button{font-family:inherit;color:inherit}
   background-repeat:no-repeat;background-position:center;background-size:64px 16px;
 }
 .pred-body{flex:1;padding:20px 18px 16px;position:relative;min-width:0;display:flex;flex-direction:column;z-index:1}
-.pred-coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:#241b12;margin-bottom:7px;padding-right:70px}
+.pred-coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;line-height:1.3;color:#241b12;margin-bottom:7px;padding-right:70px;min-height:37px}
 .pred-text{font-size:13px;color:#4a3f2e;line-height:1.5;margin-bottom:10px}
 .pred-price{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:#241b12}
 .pred-note{
@@ -386,11 +386,11 @@ button{font-family:inherit;color:inherit}
 }
 .pred-note b{font-weight:800}
 .pred-note.fail{background:rgba(255,47,79,.12);color:#d2123a}
-.pred-note.open{background:rgba(139,90,20,.14);color:#6e4413}
+.pred-note.open{background:rgba(240,178,61,.22);color:#8a6100}
 .pred-note.win{background:rgba(15,163,74,.13);color:#0d7c3a}
 .pred-stamp{position:absolute;top:20px;right:18px;font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:6px;padding:3px 8px;transform:rotate(-8deg);opacity:.9;z-index:1}
 .pred-stamp.fail{color:#ff2f4f}
-.pred-stamp.open{color:#8b5a14}
+.pred-stamp.open{color:#d99a00}
 .pred-stamp.win{color:#0fa34a}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
@@ -1833,61 +1833,68 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <p class="calc-sub">Predicciones públicas sobre el precio de Bitcoin, con la fecha exacta en que las hice — y el resultado real, tal como salió. Nada se edita después del hecho: si falla, queda marcada como fallida.</p>
               </div>
 
-              <div class="pred-grid">
-                <div class="pred-ticket">
-                  <div class="pred-watermark">SkillCash</div>
-                  <div class="pred-stub">
-                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-ticket-no-label">N° de boleto</div>
-                    <div class="pred-ticket-no">2025-001</div>
-                    <div class="pred-month">ABR 2025</div>
-                    <div class="pred-barcode"></div>
-                    <div class="pred-stub-tear"></div>
-                  </div>
-                  <div class="pred-body">
-                    <span class="pred-stamp fail">Fallida</span>
-                    <div class="pred-coin">🟠 BTC — Máximo del ciclo</div>
-                    <div class="pred-text">BTC tocaría entre $130,000 y $140,000 en el máximo de este ciclo.</div>
-                    <div class="pred-price">$130K – $140K</div>
-                    <div class="pred-note fail">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a unos $5K de cumplirse.</div>
-                  </div>
-                </div>
+              <div class="tf-pill-row" id="predCoinFilter">
+                <button type="button" class="tf-pill active" data-coin="todas">Todas</button>
+                <button type="button" class="tf-pill" data-coin="BTC">BTC</button>
+              </div>
 
-                <div class="pred-ticket">
-                  <div class="pred-watermark">SkillCash</div>
-                  <div class="pred-stub">
-                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-ticket-no-label">N° de boleto</div>
-                    <div class="pred-ticket-no">2025-002</div>
-                    <div class="pred-month">FEB 2026</div>
-                    <div class="pred-barcode"></div>
-                    <div class="pred-stub-tear"></div>
+              <div class="chart-breakout">
+                <div class="pred-grid">
+                  <div class="pred-ticket" data-coin="BTC">
+                    <div class="pred-watermark">SKILLCASH</div>
+                    <div class="pred-stub">
+                      <img src="logo-skillcash-600.png" alt="" class="pred-logo">
+                      <div class="pred-ticket-no-label">N° de boleto</div>
+                      <div class="pred-ticket-no">2025-001</div>
+                      <div class="pred-month">ABR 2025</div>
+                      <div class="pred-barcode"></div>
+                      <div class="pred-stub-tear"></div>
+                    </div>
+                    <div class="pred-body">
+                      <span class="pred-stamp fail">Fallida</span>
+                      <div class="pred-coin">🟠 BTC — Máximo del ciclo</div>
+                      <div class="pred-text">BTC tocaría entre $130,000 y $140,000 en el máximo de este ciclo.</div>
+                      <div class="pred-price">$130K – $140K</div>
+                      <div class="pred-note fail">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a unos $5K de cumplirse.</div>
+                    </div>
                   </div>
-                  <div class="pred-body">
-                    <span class="pred-stamp open">Abierta</span>
-                    <div class="pred-coin">🟠 BTC — Mínimo 2026</div>
-                    <div class="pred-text">El mínimo de BTC en 2026 estará entre $55,000 y $60,000.</div>
-                    <div class="pred-price">$55K – $60K</div>
-                    <div class="pred-note open">Sigue abierta — el precio todavía podría volver a bajar dentro del año.</div>
-                  </div>
-                </div>
 
-                <div class="pred-ticket">
-                  <div class="pred-watermark">SkillCash</div>
-                  <div class="pred-stub">
-                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
-                    <div class="pred-ticket-no-label">N° de boleto</div>
-                    <div class="pred-ticket-no">2025-003</div>
-                    <div class="pred-month">AGO 2026</div>
-                    <div class="pred-barcode"></div>
-                    <div class="pred-stub-tear"></div>
+                  <div class="pred-ticket" data-coin="BTC">
+                    <div class="pred-watermark">SKILLCASH</div>
+                    <div class="pred-stub">
+                      <img src="logo-skillcash-600.png" alt="" class="pred-logo">
+                      <div class="pred-ticket-no-label">N° de boleto</div>
+                      <div class="pred-ticket-no">2026-001</div>
+                      <div class="pred-month">FEB 2026</div>
+                      <div class="pred-barcode"></div>
+                      <div class="pred-stub-tear"></div>
+                    </div>
+                    <div class="pred-body">
+                      <span class="pred-stamp open">Abierta</span>
+                      <div class="pred-coin">🟠 BTC — Mínimo 2026</div>
+                      <div class="pred-text">El mínimo de BTC en 2026 estará entre $55,000 y $60,000.</div>
+                      <div class="pred-price">$55K – $60K</div>
+                      <div class="pred-note open">Sigue abierta — el precio todavía podría volver a bajar dentro del año.</div>
+                    </div>
                   </div>
-                  <div class="pred-body">
-                    <span class="pred-stamp open">Abierta</span>
-                    <div class="pred-coin">🟠 BTC — Confirmación de mínimo</div>
-                    <div class="pred-text">El mínimo de ~$57,000 del 1 de julio de 2026 fue el piso de este ciclo.</div>
-                    <div class="pred-price">~$57K</div>
-                    <div class="pred-note open">Llamada hecha el 12 de agosto sobre el mínimo del 1 de julio — sigue abierta por si vuelve a bajar.</div>
+
+                  <div class="pred-ticket" data-coin="BTC">
+                    <div class="pred-watermark">SKILLCASH</div>
+                    <div class="pred-stub">
+                      <img src="logo-skillcash-600.png" alt="" class="pred-logo">
+                      <div class="pred-ticket-no-label">N° de boleto</div>
+                      <div class="pred-ticket-no">2026-002</div>
+                      <div class="pred-month">AGO 2026</div>
+                      <div class="pred-barcode"></div>
+                      <div class="pred-stub-tear"></div>
+                    </div>
+                    <div class="pred-body">
+                      <span class="pred-stamp open">Abierta</span>
+                      <div class="pred-coin">🟠 BTC — Confirmación de mínimo</div>
+                      <div class="pred-text">El mínimo de ~$57,000 del 1 de julio de 2026 fue el piso de este ciclo.</div>
+                      <div class="pred-price">~$57K</div>
+                      <div class="pred-note open">Llamada hecha el 12 de agosto sobre el mínimo del 1 de julio — sigue abierta por si vuelve a bajar.</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4838,6 +4845,17 @@ const INDIC_GROUPS = {
   onchain: []
 };
 const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#predCoinFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const coin = btn.dataset.coin;
+    document.querySelectorAll('.pred-ticket').forEach(t => {
+      t.style.display = (coin === 'todas' || t.dataset.coin === coin) ? '' : 'none';
+    });
+  });
+});
 // auto-refresco: solo el gráfico que está abierto en este momento tiene un temporizador activo —
 // cambiar a cualquier otra herramienta lo cancela. Cada vez que se (re)abre Coinbase Premium o
 // Whale Bias, o se cambia su temporalidad, el temporizador se reinicia para que dispare cada vez
