@@ -339,24 +339,39 @@ button{font-family:inherit;color:inherit}
 .indic-guide-card-soon{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
-.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.pred-ticket{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;box-shadow:0 16px 34px -22px rgba(0,0,0,.7)}
-.pred-stub{width:88px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:16px 6px;border-right:2px dashed var(--border2);position:relative}
+.pred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+@media(max-width:900px){ .pred-grid{grid-template-columns:1fr} }
+.pred-ticket{
+  display:flex;height:100%;background:#f3ead6;border:1px solid rgba(0,0,0,.14);border-radius:12px;
+  overflow:hidden;box-shadow:0 16px 34px -20px rgba(0,0,0,.6);
+}
+.pred-stub{
+  width:88px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:4px;padding:20px 6px 16px;border-right:2px dashed rgba(36,27,18,.3);position:relative;
+}
 .pred-stub::before,.pred-stub::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#080c20;right:-9px}
 .pred-stub::before{top:-8px}
 .pred-stub::after{bottom:-8px}
-.pred-month{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
-.pred-day{font-family:'Poppins',sans-serif;font-weight:800;font-size:23px;line-height:1;color:var(--white)}
-.pred-year{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)}
-.pred-body{flex:1;padding:16px 18px;position:relative;min-width:0}
-.pred-coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:var(--white);margin-bottom:7px;padding-right:70px}
-.pred-text{font-size:13px;color:var(--muted2);line-height:1.5;margin-bottom:10px}
-.pred-price{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:var(--white)}
-.pred-note{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5;padding-top:8px;border-top:1px solid var(--border)}
-.pred-stamp{position:absolute;top:16px;right:16px;font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:6px;padding:3px 8px;transform:rotate(-8deg);opacity:.92}
-.pred-stamp.fail{color:var(--red)}
-.pred-stamp.open{color:var(--gold)}
-.pred-stamp.win{color:var(--green)}
+.pred-logo{width:22px;height:22px;object-fit:contain;margin-bottom:3px;filter:sepia(.45) saturate(1.5) hue-rotate(-8deg) opacity(.88)}
+.pred-month{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:#7a6b52;text-transform:uppercase}
+.pred-day{font-family:'Poppins',sans-serif;font-weight:800;font-size:23px;line-height:1;color:#241b12}
+.pred-year{font-family:'Space Mono',monospace;font-size:10px;color:#7a6b52}
+.pred-body{flex:1;padding:20px 18px 16px;position:relative;min-width:0;display:flex;flex-direction:column}
+.pred-coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:#241b12;margin-bottom:7px;padding-right:70px}
+.pred-text{font-size:13px;color:#4a3f2e;line-height:1.5;margin-bottom:10px}
+.pred-price{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:#241b12}
+.pred-note{
+  font-size:12px;font-weight:600;color:#241b12;margin-top:auto;line-height:1.5;
+  padding:10px 12px;border-radius:8px;border-left:3px solid currentColor;
+}
+.pred-note b{font-weight:800}
+.pred-note.fail{background:rgba(200,30,58,.13);color:#8a1226}
+.pred-note.open{background:rgba(184,121,10,.15);color:#7a4e00}
+.pred-note.win{background:rgba(31,153,84,.14);color:#0e6b3a}
+.pred-stamp{position:absolute;top:20px;right:18px;font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:6px;padding:3px 8px;transform:rotate(-8deg);opacity:.88}
+.pred-stamp.fail{color:#c81e3a}
+.pred-stamp.open{color:#b8790a}
+.pred-stamp.win{color:#1f9954}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
@@ -1801,6 +1816,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="pred-grid">
                 <div class="pred-ticket">
                   <div class="pred-stub">
+                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
                     <div class="pred-month">ABR</div>
                     <div class="pred-day">—</div>
                     <div class="pred-year">2025</div>
@@ -1810,12 +1826,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                     <div class="pred-coin">🟠 BTC — Máximo del ciclo</div>
                     <div class="pred-text">BTC tocaría entre $130,000 y $140,000 en el máximo de este ciclo.</div>
                     <div class="pred-price">$130K – $140K</div>
-                    <div class="pred-note">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a unos $5K de cumplirse.</div>
+                    <div class="pred-note fail">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a unos $5K de cumplirse.</div>
                   </div>
                 </div>
 
                 <div class="pred-ticket">
                   <div class="pred-stub">
+                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
                     <div class="pred-month">FEB</div>
                     <div class="pred-day">24</div>
                     <div class="pred-year">2026</div>
@@ -1825,12 +1842,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                     <div class="pred-coin">🟠 BTC — Mínimo 2026</div>
                     <div class="pred-text">El mínimo de BTC en 2026 estará entre $55,000 y $60,000.</div>
                     <div class="pred-price">$55K – $60K</div>
-                    <div class="pred-note">Sigue abierta — el precio todavía podría volver a bajar dentro del año.</div>
+                    <div class="pred-note open">Sigue abierta — el precio todavía podría volver a bajar dentro del año.</div>
                   </div>
                 </div>
 
                 <div class="pred-ticket">
                   <div class="pred-stub">
+                    <img src="logo-skillcash-600.png" alt="" class="pred-logo">
                     <div class="pred-month">AGO</div>
                     <div class="pred-day">12</div>
                     <div class="pred-year">2026</div>
@@ -1840,7 +1858,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                     <div class="pred-coin">🟠 BTC — Confirmación de mínimo</div>
                     <div class="pred-text">El mínimo de ~$57,000 del 1 de julio de 2026 fue el piso de este ciclo.</div>
                     <div class="pred-price">~$57K</div>
-                    <div class="pred-note">Llamada hecha el 12 de agosto sobre el mínimo del 1 de julio — sigue abierta por si vuelve a bajar.</div>
+                    <div class="pred-note open">Llamada hecha el 12 de agosto sobre el mínimo del 1 de julio — sigue abierta por si vuelve a bajar.</div>
                   </div>
                 </div>
               </div>
