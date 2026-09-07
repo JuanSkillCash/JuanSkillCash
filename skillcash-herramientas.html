@@ -1997,8 +1997,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="tf-pill-row" id="cbpTfRow">
-                <button type="button" class="tf-pill" data-tf="1m">1m</button>
                 <button type="button" class="tf-pill" data-tf="5m">5m</button>
+                <button type="button" class="tf-pill" data-tf="15m">15m</button>
                 <button type="button" class="tf-pill active" data-tf="1h">1h</button>
                 <button type="button" class="tf-pill" data-tf="4h">4h</button>
                 <button type="button" class="tf-pill" data-tf="1d">1d</button>
@@ -4740,6 +4740,8 @@ function renderIndicSubtabs(group){
       wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       showIndicPanel(btn.dataset.indic);
+      if(btn.dataset.indic === 'cbpremium') ensureCbpLoaded();
+      if(btn.dataset.indic === 'whalebias') ensureWbLoaded();
     });
   });
   showIndicPanel(items[0].id);
@@ -4753,6 +4755,8 @@ function jumpToIndicator(id){
   renderIndicSubtabs(group);
   if(!standalone){
     showIndicPanel(id);
+    if(id === 'cbpremium') ensureCbpLoaded();
+    if(id === 'whalebias') ensureWbLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
@@ -11964,13 +11968,15 @@ function fmtUsdBig(v){
    cierre en Coinbase y el cierre en Binance para ese mismo momento — se necesita histórico real
    de velas de ambos exchanges, no solo el precio actual ---- */
 const CBP_TF = {
-  '1m': { ms: 60 * 1000, binanceInterval: '1m', cbGranularity: 60, bars: 180 },
   '5m': { ms: 5 * 60 * 1000, binanceInterval: '5m', cbGranularity: 300, bars: 180 },
+  '15m': { ms: 15 * 60 * 1000, binanceInterval: '15m', cbGranularity: 900, bars: 180 },
   '1h': { ms: 60 * 60 * 1000, binanceInterval: '1h', cbGranularity: 3600, bars: 180 },
   '4h': { ms: 4 * 60 * 60 * 1000, binanceInterval: '4h', cbGranularity: null, bars: 60 },
   '1d': { ms: 24 * 60 * 60 * 1000, binanceInterval: '1d', cbGranularity: 86400, bars: 180 }
 };
 let cbpActiveTf = '1h';
+let cbpLoadedOnce = false;
+function ensureCbpLoaded(){ if(!cbpLoadedOnce){ cbpLoadedOnce = true; loadCoinbasePremium(); } }
 async function fetchBinanceKlines(interval, limit){
   const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`);
   if(!res.ok) throw new Error('binance klines failed');
@@ -12115,7 +12121,9 @@ document.querySelectorAll('#cbpTfRow .tf-pill').forEach(b => {
     loadCoinbasePremium();
   });
 });
-loadCoinbasePremium();
+// se carga solo la primera vez que se abre esta herramienta (ver ensureCbpLoaded, llamado desde
+// jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa,
+// para no consumir la API de Binance/Coinbase de visitantes que nunca abren esta herramienta
 document.getElementById('cbpRefreshBtn').addEventListener('click', loadCoinbasePremium);
 
 /* ---- Bitcoin en Balances Corporativos: endpoint público de CoinGecko con las empresas que
@@ -12179,6 +12187,8 @@ const WB_TF = {
   '1d': { bucketMs: 24 * 60 * 60 * 1000, hours: 4320 }
 };
 let wbActiveTf = '1h';
+let wbLoadedOnce = false;
+function ensureWbLoaded(){ if(!wbLoadedOnce){ wbLoadedOnce = true; loadWhaleBias(); } }
 let wbLatestCtx = null;
 async function fetchFundingHistory(hours){
   const endTime = Date.now();
@@ -12337,7 +12347,8 @@ document.querySelectorAll('#wbTfRow .tf-pill').forEach(b => {
     loadWhaleBias();
   });
 });
-loadWhaleBias();
+// se carga solo la primera vez que se abre esta herramienta (ver ensureWbLoaded, llamado desde
+// jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa
 document.getElementById('wbRefreshBtn').addEventListener('click', loadWhaleBias);
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
