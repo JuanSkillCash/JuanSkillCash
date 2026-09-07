@@ -1315,6 +1315,9 @@ img[src=""]{display:none}
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a9 9 0 0118 0"/><path d="M6.5 17a5.5 5.5 0 0111 0"/></svg></span><span class="sb-item-label">Rainbow Chart</span>
+      </button>
     </nav>
 
     <div class="sb-bottom">
@@ -1824,6 +1827,42 @@ img[src=""]{display:none}
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>El eje vertical (precio) usa escala logarítmica</b>, no lineal — así se puede comparar un ciclo donde Bitcoin costaba $13 con uno donde costaba $100.000, sin que el primero se vea como una línea plana en cero.<br>
                 📅 <b>El eje horizontal</b> son días desde el halving de ese ciclo (no fechas de calendario) — el día 0 es siempre el halving, así los 4 ciclos arrancan en el mismo punto y se pueden comparar entre sí. En "Todo el historial" sí se usan fechas reales, con una línea vertical marcando cada halving.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="rainbow" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Rainbow Chart de Bitcoin</h2>
+                <p class="calc-sub">Una franja de colores calculada sobre el precio histórico de Bitcoin en escala logarítmica. Cada color representa qué tan lejos está el precio de su tendencia de largo plazo — de "muy barato" (azul) a "burbuja" (rojo).</p>
+              </div>
+
+              <div class="indic-chart-body" id="rainbowChartBody">
+                <div class="indic-chart-soon" id="rainbowLoading">
+                  <div class="indic-placeholder-icon">🌈</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin para calcular la curva de tendencia.</div>
+                </div>
+                <div class="indic-chart-soon" id="rainbowError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="rainbowChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="rainbowLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="rainbowStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🌈 <b>Cada banda es una franja de precio</b>, calculada ajustando una curva de tendencia (regresión logarítmica) sobre todo el historial de Bitcoin — no es una señal de compra/venta, es una forma visual de ver qué tan "estirado" está el precio respecto a su tendencia.<br>
+                📐 <b>El eje vertical usa escala logarítmica</b>, igual que en Ciclos de Halving, para poder comparar precios muy distintos en la misma gráfica.
               </div>
             </div>
           </div>
@@ -4417,13 +4456,13 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }],
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos' };
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
@@ -11167,6 +11206,174 @@ async function loadHalvingDetail(){
   renderHalvingChart(halvingActiveCycle);
 }
 loadHalvingDetail();
+
+/* ---- Rainbow Chart: franjas de precio calculadas sobre una regresión logarítmica
+   (precio vs. días desde el génesis de Bitcoin) del mismo historial que usa Ciclos de Halving ---- */
+const RAINBOW_GENESIS_MS = new Date('2009-01-03T00:00:00Z').getTime();
+const RAINBOW_BANDS = [
+  { max: -1.6, color: '#1e3a8a', label: 'Liquidación total' },
+  { max: -1.1, color: '#2563eb', label: 'Compra fuerte' },
+  { max: -0.6, color: '#0ea5e9', label: 'Acumular' },
+  { max: -0.2, color: '#14b8a6', label: 'Todavía barato' },
+  { max: 0.2, color: '#22c55e', label: 'Zona neutral' },
+  { max: 0.6, color: '#eab308', label: '¿Burbuja?' },
+  { max: 1.1, color: '#f97316', label: 'Se calienta' },
+  { max: 1.6, color: '#ef4444', label: 'Zona de venta' },
+  { max: Infinity, color: '#b91c1c', label: 'Burbuja máxima' }
+];
+function rainbowFit(points){
+  let n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
+  points.forEach(p => {
+    const day = (p.t - RAINBOW_GENESIS_MS) / 86400000;
+    if(day <= 0) return;
+    const x = Math.log(day), y = Math.log(p.c);
+    n++; sx += x; sy += y; sxx += x * x; sxy += x * y;
+  });
+  const b = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  const a = (sy - b * sx) / n;
+  return { a, b };
+}
+function rainbowFitLogPrice(fit, t){
+  const day = (t - RAINBOW_GENESIS_MS) / 86400000;
+  if(day <= 0) return null;
+  return fit.a + fit.b * Math.log(day);
+}
+function rainbowBandForResidual(res){
+  for(let i = 0; i < RAINBOW_BANDS.length; i++){
+    if(res <= RAINBOW_BANDS[i].max) return RAINBOW_BANDS[i];
+  }
+  return RAINBOW_BANDS[RAINBOW_BANDS.length - 1];
+}
+function renderRainbowChart(){
+  const loadingEl = document.getElementById('rainbowLoading');
+  const errorEl = document.getElementById('rainbowError');
+  const wrap = document.getElementById('rainbowChartWrap');
+  const legendEl = document.getElementById('rainbowLegend');
+  const statsEl = document.getElementById('rainbowStats');
+  const points = halvingBtcHistory;
+  if(!points || points.length < 30){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const fit = rainbowFit(points);
+  const startMs = points[0].t;
+  const endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+
+  const SAMPLES = 120;
+  const sampleTs = [];
+  for(let i = 0; i <= SAMPLES; i++) sampleTs.push(startMs + (spanMs * i) / SAMPLES);
+  const boundaryOffsets = RAINBOW_BANDS.slice(0, -1).map(b => b.max);
+  const centerLogAt = sampleTs.map(t => rainbowFitLogPrice(fit, t));
+  const lastCenterLog = centerLogAt[centerLogAt.length - 1];
+
+  const prices = points.map(p => p.c);
+  let minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+  minPrice = Math.min(minPrice, Math.exp(lastCenterLog - 2.0));
+  maxPrice = Math.max(maxPrice, Math.exp(lastCenterLog + 2.6));
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+  const yForLogE = logePrice => marginTop + drawH - ((logePrice / Math.LN10 - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  const lowClip = logMin * Math.LN10 - 1, highClip = logMax * Math.LN10 + 1;
+  const boundaries = [lowClip, ...boundaryOffsets, highClip];
+  let bandsHtml = '';
+  for(let bi = 0; bi < RAINBOW_BANDS.length; bi++){
+    const loOff = boundaries[bi], hiOff = boundaries[bi + 1];
+    let d = '';
+    for(let i = 0; i <= SAMPLES; i++){
+      d += (i === 0 ? 'M' : 'L') + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + hiOff).toFixed(1) + ' ';
+    }
+    for(let i = SAMPLES; i >= 0; i--){
+      d += 'L' + xFor(sampleTs[i]).toFixed(1) + ',' + yForLogE(centerLogAt[i] + loOff).toFixed(1) + ' ';
+    }
+    bandsHtml += `<path d="${d.trim()}Z" fill="${RAINBOW_BANDS[bi].color}" opacity=".62"/>`;
+  }
+
+  let pathD = '';
+  points.forEach((p, i) => {
+    pathD += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `;
+  });
+
+  const lastPoint = points[points.length - 1];
+  const lastPx = xFor(endMs), lastPy = yFor(lastPoint.c);
+  const lastResidual = Math.log(lastPoint.c) - lastCenterLog;
+  const currentBand = rainbowBandForResidual(lastResidual);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <svg class="fng-chart-svg" id="rainbowChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      ${bandsHtml}
+      ${yGridHtml}
+      <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.8 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>
+      ${xLabelsHtml}
+      ${todayMarkerHtml}
+    </svg>
+  `;
+
+  legendEl.innerHTML = RAINBOW_BANDS.map(b =>
+    `<span class="perk-chip"><span class="perk-chip-dot" style="background:${b.color}"></span>${b.label}</span>`
+  ).join('');
+
+  statsEl.innerHTML = `
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Zona actual</div><div class="r-val" style="color:${currentBand.color}">${currentBand.label}</div></div>
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(lastPoint.c)}</div></div>
+    <div class="res-card"><div class="r-label">Línea central (tendencia)</div><div class="r-val">${fmtHalvingPrice(Math.exp(lastCenterLog))}</div></div>
+  `;
+}
+async function loadRainbowDetail(){
+  try{
+    await fetchHalvingHistory();
+  } catch(err){ /* renderRainbowChart muestra el estado de error si no hay datos */ }
+  renderRainbowChart();
+}
+loadRainbowDetail();
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="rainbow"]').style.display !== 'none') renderRainbowChart();
+});
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
