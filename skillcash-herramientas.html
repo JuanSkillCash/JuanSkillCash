@@ -4712,10 +4712,25 @@ const INDIC_GROUPS = {
   onchain: []
 };
 const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+// auto-refresco: solo el gráfico que está abierto en este momento tiene un temporizador activo —
+// cambiar a cualquier otra herramienta lo cancela. Cada vez que se (re)abre Coinbase Premium o
+// Whale Bias, o se cambia su temporalidad, el temporizador se reinicia para que dispare cada vez
+// que pase esa misma duración (ej. cada 15 min si la temporalidad activa es "15m")
+let indicAutoRefreshTimer = null;
+function stopIndicAutoRefresh(){
+  if(indicAutoRefreshTimer){ clearInterval(indicAutoRefreshTimer); indicAutoRefreshTimer = null; }
+}
+function startIndicAutoRefresh(fn, intervalMs){
+  stopIndicAutoRefresh();
+  indicAutoRefreshTimer = setInterval(fn, intervalMs);
+}
 function showIndicPanel(id){
   document.querySelectorAll('#indicPanels .indic-panel').forEach(p => {
     p.style.display = p.dataset.indic === id ? 'block' : 'none';
   });
+  if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
+  else if(id === 'whalebias') startIndicAutoRefresh(() => loadWhaleBias(true), WB_TF[wbActiveTf].bucketMs);
+  else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
   if(group === 'guia' || group === 'predicciones'){
@@ -4742,6 +4757,10 @@ function renderIndicSubtabs(group){
       showIndicPanel(btn.dataset.indic);
       if(btn.dataset.indic === 'cbpremium') ensureCbpLoaded();
       if(btn.dataset.indic === 'whalebias') ensureWbLoaded();
+      if(btn.dataset.indic === 'halving') ensureHalvingLoaded();
+      if(btn.dataset.indic === 'rainbow') ensureRainbowLoaded();
+      if(btn.dataset.indic === 'picycle') ensurePicycleLoaded();
+      if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
     });
   });
   showIndicPanel(items[0].id);
@@ -4757,6 +4776,10 @@ function jumpToIndicator(id){
     showIndicPanel(id);
     if(id === 'cbpremium') ensureCbpLoaded();
     if(id === 'whalebias') ensureWbLoaded();
+    if(id === 'halving') ensureHalvingLoaded();
+    if(id === 'rainbow') ensureRainbowLoaded();
+    if(id === 'picycle') ensurePicycleLoaded();
+    if(id === 'treasuries') ensureTreasuriesLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
@@ -11480,7 +11503,13 @@ async function loadHalvingDetail(){
   }
   renderHalvingChart(halvingActiveCycle);
 }
-loadHalvingDetail();
+// carga perezosa: gráficos de historial largo (Ciclos, Rainbow, Pi Cycle, Balances Corporativos)
+// no cambian minuto a minuto, así que solo se piden datos la primera vez que se abre esa
+// herramienta puntual — no en cada carga de la página completa — y de ahí en adelante el botón
+// de actualizar (donde exista) es suficiente; no hace falta un refresco automático por
+// temporalidad como sí tiene sentido en Coinbase Premium/Whale Bias
+let halvingLoadedOnce = false;
+function ensureHalvingLoaded(){ if(!halvingLoadedOnce){ halvingLoadedOnce = true; loadHalvingDetail(); } }
 
 /* ---- Rainbow Chart: franjas de precio calculadas sobre una regresión logarítmica
    (precio vs. días desde el génesis de Bitcoin) del mismo historial que usa Ciclos de Halving ---- */
@@ -11771,7 +11800,8 @@ async function loadRainbowDetail(){
   } catch(err){ /* renderRainbowChart muestra el estado de error si no hay datos */ }
   renderRainbowChart();
 }
-loadRainbowDetail();
+let rainbowLoadedOnce = false;
+function ensureRainbowLoaded(){ if(!rainbowLoadedOnce){ rainbowLoadedOnce = true; loadRainbowDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="rainbow"]').style.display !== 'none') renderRainbowChart();
 });
@@ -11944,7 +11974,8 @@ async function loadPiCycleDetail(){
   } catch(err){ /* renderPiCycleChart muestra el estado de error si no hay datos */ }
   renderPiCycleChart();
 }
-loadPiCycleDetail();
+let picycleLoadedOnce = false;
+function ensurePicycleLoaded(){ if(!picycleLoadedOnce){ picycleLoadedOnce = true; loadPiCycleDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="picycle"]').style.display !== 'none') renderPiCycleChart();
 });
@@ -12087,17 +12118,22 @@ function renderCbpChart(data){
   `;
   statsEl.style.display = '';
 }
-async function loadCoinbasePremium(){
+async function loadCoinbasePremium(silent){
   const loadingEl = document.getElementById('cbpLoading');
   const errorEl = document.getElementById('cbpError');
   const wrap = document.getElementById('cbpChartWrap');
   const statsEl = document.getElementById('cbpStats');
   const btn = document.getElementById('cbpRefreshBtn');
   if(btn) btn.disabled = true;
-  loadingEl.style.display = 'flex';
-  errorEl.style.display = 'none';
-  wrap.style.display = 'none';
-  statsEl.style.display = 'none';
+  // en modo silencioso (auto-refresco de fondo) no se muestra el estado de carga ni se oculta el
+  // gráfico ya dibujado — solo se reemplaza cuando el dato nuevo esté listo, para no interrumpir
+  // a alguien que esté mirando o pasando el mouse por el gráfico
+  if(!silent){
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+  }
   try{
     const data = await loadCbpChartData(cbpActiveTf);
     if(!data || data.length < 5) throw new Error('sin datos suficientes');
@@ -12105,10 +12141,12 @@ async function loadCoinbasePremium(){
     renderCbpChart(data);
     document.getElementById('cbpUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch(err){
-    loadingEl.style.display = 'none';
-    wrap.style.display = 'none';
-    statsEl.style.display = 'none';
-    errorEl.style.display = 'flex';
+    if(!silent){
+      loadingEl.style.display = 'none';
+      wrap.style.display = 'none';
+      statsEl.style.display = 'none';
+      errorEl.style.display = 'flex';
+    }
   }
   if(btn) btn.disabled = false;
 }
@@ -12119,12 +12157,15 @@ document.querySelectorAll('#cbpTfRow .tf-pill').forEach(b => {
     b.classList.add('active');
     cbpActiveTf = b.dataset.tf;
     loadCoinbasePremium();
+    startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
   });
 });
 // se carga solo la primera vez que se abre esta herramienta (ver ensureCbpLoaded, llamado desde
 // jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa,
-// para no consumir la API de Binance/Coinbase de visitantes que nunca abren esta herramienta
-document.getElementById('cbpRefreshBtn').addEventListener('click', loadCoinbasePremium);
+// para no consumir la API de Binance/Coinbase de visitantes que nunca abren esta herramienta. De
+// ahí en adelante se actualiza sola según la temporalidad activa (cada 15 min si eliges "15m",
+// etc.) mientras esta herramienta siga abierta — ver startIndicAutoRefresh en showIndicPanel
+document.getElementById('cbpRefreshBtn').addEventListener('click', () => loadCoinbasePremium());
 
 /* ---- Bitcoin en Balances Corporativos: endpoint público de CoinGecko con las empresas que
    reportan tenencias de BTC en su balance ---- */
@@ -12169,7 +12210,8 @@ async function loadCorporateTreasuries(){
     errorEl.style.display = 'block';
   }
 }
-loadCorporateTreasuries();
+let treasuriesLoadedOnce = false;
+function ensureTreasuriesLoaded(){ if(!treasuriesLoadedOnce){ treasuriesLoadedOnce = true; loadCorporateTreasuries(); } }
 
 /* ---- Whale Bias: funding rate de BTC-PERP en Hyperliquid (API pública, sin llave) como proxy
    del sesgo de posicionamiento agregado de los traders apalancados más grandes.
@@ -12190,19 +12232,42 @@ let wbActiveTf = '1h';
 let wbLoadedOnce = false;
 function ensureWbLoaded(){ if(!wbLoadedOnce){ wbLoadedOnce = true; loadWhaleBias(); } }
 let wbLatestCtx = null;
+// Hyperliquid parece recortar la respuesta de fundingHistory cuando el rango pedido es muy
+// grande en una sola llamada (con 1d — 180 días — el historial se quedaba a mitad de camino en
+// vez de llegar hasta hoy). Se pide en trozos de máximo 30 días, EMPEZANDO por el más reciente
+// hacia atrás — así, aunque algún trozo viejo se recorte, los datos de hoy (los que de verdad
+// importan) siempre quedan pedidos primero
+const WB_CHUNK_HOURS = 720;
 async function fetchFundingHistory(hours){
   const endTime = Date.now();
-  const startTime = endTime - hours * 60 * 60 * 1000;
-  const res = await fetch('https://api.hyperliquid.xyz/info', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'fundingHistory', coin: 'BTC', startTime, endTime })
-  });
-  if(!res.ok) throw new Error('hyperliquid fundingHistory failed');
-  const rows = await res.json();
+  const chunkMs = WB_CHUNK_HOURS * 60 * 60 * 1000;
+  const totalMs = hours * 60 * 60 * 1000;
+  const chunkCount = Math.max(1, Math.ceil(totalMs / chunkMs));
+  const requests = [];
+  for(let i = 0; i < chunkCount; i++){
+    const e = endTime - i * chunkMs;
+    const s = Math.max(endTime - totalMs, e - chunkMs);
+    requests.push(fetch('https://api.hyperliquid.xyz/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'fundingHistory', coin: 'BTC', startTime: s, endTime: e })
+    }).then(res => {
+      if(!res.ok) throw new Error('hyperliquid fundingHistory failed');
+      return res.json();
+    }));
+  }
+  const chunks = await Promise.all(requests);
+  const rows = chunks.flat();
   if(!Array.isArray(rows)) throw new Error('forma de respuesta inesperada');
-  return rows.map(r => ({ t: r.time, funding: parseFloat(r.fundingRate) }))
-    .filter(r => !isNaN(r.funding) && !isNaN(r.t)).sort((a, b) => a.t - b.t);
+  const seen = new Set();
+  const merged = [];
+  rows.forEach(r => {
+    const t = r.time, funding = parseFloat(r.fundingRate);
+    if(isNaN(funding) || isNaN(t) || seen.has(t)) return;
+    seen.add(t);
+    merged.push({ t, funding });
+  });
+  return merged.sort((a, b) => a.t - b.t);
 }
 function aggregateFunding(rows, bucketMs){
   const buckets = new Map();
@@ -12306,17 +12371,19 @@ function renderWbChart(data){
   statsEl.innerHTML = cardsHtml;
   statsEl.style.display = '';
 }
-async function loadWhaleBias(){
+async function loadWhaleBias(silent){
   const loadingEl = document.getElementById('wbLoading');
   const errorEl = document.getElementById('wbError');
   const wrap = document.getElementById('wbChartWrap');
   const statsEl = document.getElementById('wbStats');
   const btn = document.getElementById('wbRefreshBtn');
   if(btn) btn.disabled = true;
-  loadingEl.style.display = 'flex';
-  errorEl.style.display = 'none';
-  wrap.style.display = 'none';
-  statsEl.style.display = 'none';
+  if(!silent){
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'none';
+    statsEl.style.display = 'none';
+  }
   try{
     const tf = WB_TF[wbActiveTf];
     const [rawHistory, ctx] = await Promise.all([
@@ -12331,10 +12398,12 @@ async function loadWhaleBias(){
     renderWbChart(data);
     document.getElementById('wbUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch(err){
-    loadingEl.style.display = 'none';
-    wrap.style.display = 'none';
-    statsEl.style.display = 'none';
-    errorEl.style.display = 'flex';
+    if(!silent){
+      loadingEl.style.display = 'none';
+      wrap.style.display = 'none';
+      statsEl.style.display = 'none';
+      errorEl.style.display = 'flex';
+    }
   }
   if(btn) btn.disabled = false;
 }
@@ -12345,11 +12414,14 @@ document.querySelectorAll('#wbTfRow .tf-pill').forEach(b => {
     b.classList.add('active');
     wbActiveTf = b.dataset.tf;
     loadWhaleBias();
+    startIndicAutoRefresh(() => loadWhaleBias(true), WB_TF[wbActiveTf].bucketMs);
   });
 });
 // se carga solo la primera vez que se abre esta herramienta (ver ensureWbLoaded, llamado desde
-// jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa
-document.getElementById('wbRefreshBtn').addEventListener('click', loadWhaleBias);
+// jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa.
+// De ahí en adelante se actualiza sola según la temporalidad activa mientras siga abierta — ver
+// startIndicAutoRefresh en showIndicPanel
+document.getElementById('wbRefreshBtn').addEventListener('click', () => loadWhaleBias());
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
