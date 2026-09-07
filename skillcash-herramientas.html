@@ -1286,6 +1286,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
+      <button class="sb-item" data-indic-jump="pisomercado">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Piso de Mercado</span>
+      </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium</span>
       </button>
@@ -1414,6 +1417,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Piso de Mercado</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1804,6 +1810,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
+              <div class="indic-guide-icon">⚓</div>
+              <div class="indic-guide-card-title">Piso de Mercado</div>
+              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: históricamente marca mínimos.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
               <div class="indic-guide-icon">♾️</div>
               <div class="indic-guide-card-title">Coinbase Premium</div>
@@ -2110,6 +2122,44 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>SMA 111</b> es el precio promedio de los últimos 111 días; <b>SMA 350×2</b> es el promedio de los últimos 350 días, multiplicado por dos. Cuando la línea de 111 días cruza por encima de la de 350×2, se marca como techo histórico.<br>
                 🔻 Este indicador está documentado principalmente para marcar <b>techos</b> del ciclo — no existe una versión igual de estandarizada para marcar suelos, así que no se muestra una señal de suelo aquí para no inventar algo sin respaldo histórico real.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="pisomercado" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Piso de Mercado de Bitcoin</h2>
+                <p class="calc-sub">Indicador personal: cuando la banda inferior del Canal de Keltner (semanal) cae por debajo del Costo de Producción estimado de Bitcoin, históricamente ha marcado un piso de mercado.</p>
+              </div>
+
+              <div class="indic-chart-body" id="mfloorChartBody">
+                <div class="indic-chart-soon" id="mfloorLoading">
+                  <div class="indic-placeholder-icon">⚓</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el Canal de Keltner semanal y el Costo de Producción sobre datos reales de Binance y blockchain.info.</div>
+                </div>
+                <div class="indic-chart-soon" id="mfloorError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="mfloorChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="mfloorLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="mfloorStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                ⚓ <b>Canal de Keltner</b> (20, mult. 2, EMA, ATR 10) sobre velas semanales reales de Binance — se muestra solo la banda inferior, igual a como está configurado en TradingView.<br>
+                ⛏️ <b>Costo de Producción</b> estimado con dificultad y comisiones reales de blockchain.info: dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, pero con datos públicos en vez de Glassnode/Coinmetrics (no accesibles aquí) y con su factor de escala recalibrado con el propio historial de precio, así que los números y las fechas exactas de cruce pueden variar del gráfico original en TradingView.<br>
+                🎯 Se marca solo el <b>primer cruce</b> de cada caída de la banda por debajo del costo — no cada cruce posterior dentro del mismo periodo bajista.<br>
+                <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -4837,14 +4887,14 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'pisomercado', label: 'Piso de Mercado' }],
   mineria: [],
   macro: [],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: []
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -4905,6 +4955,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'halving') ensureHalvingLoaded();
       if(btn.dataset.indic === 'rainbow') ensureRainbowLoaded();
       if(btn.dataset.indic === 'picycle') ensurePicycleLoaded();
+      if(btn.dataset.indic === 'pisomercado') ensureMfloorLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
     });
   });
@@ -4924,6 +4975,7 @@ function jumpToIndicator(id){
     if(id === 'halving') ensureHalvingLoaded();
     if(id === 'rainbow') ensureRainbowLoaded();
     if(id === 'picycle') ensurePicycleLoaded();
+    if(id === 'pisomercado') ensureMfloorLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
@@ -12126,6 +12178,267 @@ let picycleLoadedOnce = false;
 function ensurePicycleLoaded(){ if(!picycleLoadedOnce){ picycleLoadedOnce = true; loadPiCycleDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="picycle"]').style.display !== 'none') renderPiCycleChart();
+});
+
+/* ---- Piso de Mercado: cruce del Canal de Keltner (semanal, EMA20 ± 2×ATR10) contra un Costo
+   de Producción estimado de BTC — misma configuración e indicadores personales del usuario en
+   TradingView, aquí replicados con fuentes públicas y sin llave (Binance para las velas semanales
+   reales, blockchain.info para dificultad y comisiones). No se tiene acceso a Glassnode/Coinmetrics
+   (las fuentes originales del indicador de costo), así que los números pueden variar levemente de
+   su gráfico, aunque la metodología y los cruces deberían ubicarse en fechas muy similares ---- */
+function emaSeriesArr(values, length){
+  const alpha = 2 / (length + 1);
+  const out = new Array(values.length);
+  out[0] = values[0];
+  for(let i = 1; i < values.length; i++) out[i] = alpha * values[i] + (1 - alpha) * out[i - 1];
+  return out;
+}
+function rmaSeriesArr(values, length){
+  const alpha = 1 / length;
+  const out = new Array(values.length);
+  out[0] = values[0];
+  for(let i = 1; i < values.length; i++) out[i] = alpha * values[i] + (1 - alpha) * out[i - 1];
+  return out;
+}
+function smaTrailingArr(values, n){
+  const out = new Array(values.length).fill(null);
+  let sum = 0;
+  for(let i = 0; i < values.length; i++){
+    sum += values[i];
+    if(i >= n) sum -= values[i - n];
+    if(i >= n - 1) out[i] = sum / n;
+  }
+  return out;
+}
+function lastValueBefore(sortedSeries, targetMs){
+  if(!sortedSeries || !sortedSeries.length) return null;
+  let lo = 0, hi = sortedSeries.length - 1, ans = 0;
+  while(lo <= hi){
+    const mid = (lo + hi) >> 1;
+    if(sortedSeries[mid].t <= targetMs){ ans = mid; lo = mid + 1; } else hi = mid - 1;
+  }
+  return sortedSeries[ans].t <= targetMs ? sortedSeries[ans].v : sortedSeries[0].v;
+}
+function subsidyAtDate(ms){
+  const n = HALVING_CYCLES.filter(h => h.date.getTime() <= ms).length;
+  return 50 / Math.pow(2, n);
+}
+async function fetchWeeklyBtcOhlc(){
+  const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=1000');
+  const rows = await res.json();
+  return rows.map(r => ({ t: r[6], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }));
+}
+async function fetchBlockchainInfoChart(chartName){
+  const res = await fetch('https://api.blockchain.info/charts/' + chartName + '?timespan=all&format=json&cors=true');
+  const json = await res.json();
+  return (json.values || []).map(r => ({ t: r.x * 1000, v: r.y })).sort((a, b) => a.t - b.t);
+}
+// alpha=1/1800 del script original de TradingView está calibrado contra la escala interna de
+// Glassnode (GLASSNODE:BTC_DIFFICULTY), que no podemos reproducir con datos públicos — en vez de
+// usar ese valor literal (que con dificultad "cruda" de blockchain.info da un costo de solo unos
+// pocos dólares, nunca cerca del precio real), se recalibra ese factor de escala en tiempo real con
+// los mismos datos de esta gráfica: se toma un percentil bajo de (precio real / costo sin escalar)
+// en toda la historia, de forma que el costo de producción quede, por construcción, casi siempre
+// por debajo del precio — como un piso — y sólo lo alcance en el tramo más profundo de cada caída,
+// igual al comportamiento real que describe el indicador
+const MFLOOR_ALPHA_FALLBACK = 1 / 1800, MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_CALIB_PERCENTILE = 0.10;
+let marketFloorData = null;
+let marketFloorInFlight = null;
+async function loadMarketFloorData(){
+  if(marketFloorData) return marketFloorData;
+  if(marketFloorInFlight) return marketFloorInFlight;
+  marketFloorInFlight = (async () => {
+    const [weekly, difficulty, fees] = await Promise.all([
+      fetchWeeklyBtcOhlc(),
+      fetchBlockchainInfoChart('difficulty'),
+      fetchBlockchainInfoChart('transaction-fees'),
+    ]);
+    const dailyIssuance = fees.map(f => ({ t: f.t, v: subsidyAtDate(f.t) * MFLOOR_BLOCKS_PER_DAY + f.v }));
+
+    const closes = weekly.map(w => w.c);
+    const trueRanges = weekly.map((w, i) => i === 0 ? (w.h - w.l) : Math.max(w.h - w.l, Math.abs(w.h - weekly[i - 1].c), Math.abs(w.l - weekly[i - 1].c)));
+    const ema20 = emaSeriesArr(closes, 20);
+    const atr10 = rmaSeriesArr(trueRanges, 10);
+    const keltnerLower = ema20.map((v, i) => v - 2 * atr10[i]);
+
+    const weeklyDifficulty = weekly.map(w => lastValueBefore(difficulty, w.t));
+    const weeklyIssuance = weekly.map(w => lastValueBefore(dailyIssuance, w.t));
+    const difficultySma = smaTrailingArr(weeklyDifficulty, MFLOOR_SMOOTH_WEEKS);
+    const issuanceSma = smaTrailingArr(weeklyIssuance, MFLOOR_SMOOTH_WEEKS);
+    const rawCostUnscaled = difficultySma.map((d, i) => (d == null || issuanceSma[i] == null) ? null : Math.pow(d, MFLOOR_K) / issuanceSma[i]);
+
+    const ratios = [];
+    for(let i = 0; i < weekly.length; i++){
+      if(rawCostUnscaled[i] != null && weekly[i].c > 0) ratios.push(weekly[i].c / rawCostUnscaled[i]);
+    }
+    ratios.sort((a, b) => a - b);
+    const calibratedAlpha = ratios.length ? ratios[Math.floor(ratios.length * MFLOOR_CALIB_PERCENTILE)] : MFLOOR_ALPHA_FALLBACK;
+    const costSmooth = rawCostUnscaled.map(v => v == null ? null : v * calibratedAlpha);
+
+    const points = weekly.map((w, i) => ({ t: w.t, price: w.c, keltnerLower: keltnerLower[i], costSmooth: costSmooth[i] }));
+    marketFloorData = points;
+    marketFloorInFlight = null;
+    return points;
+  })();
+  return marketFloorInFlight;
+}
+function detectMarketFloorCrossings(points){
+  const crossings = [];
+  let prevBelow = null;
+  for(let i = 0; i < points.length; i++){
+    const p = points[i];
+    if(p.costSmooth == null) continue;
+    const below = p.keltnerLower < p.costSmooth;
+    if(prevBelow === false && below === true) crossings.push({ t: p.t, price: p.price });
+    prevBelow = below;
+  }
+  return crossings;
+}
+function renderMarketFloorChart(){
+  const loadingEl = document.getElementById('mfloorLoading');
+  const errorEl = document.getElementById('mfloorError');
+  const wrap = document.getElementById('mfloorChartWrap');
+  const legendEl = document.getElementById('mfloorLegend');
+  const statsEl = document.getElementById('mfloorStats');
+  const allPoints = marketFloorData;
+  const validStartIdx = allPoints ? allPoints.findIndex(p => p.costSmooth != null) : -1;
+  if(!allPoints || validStartIdx < 0){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const points = allPoints.slice(validStartIdx);
+  const crossings = detectMarketFloorCrossings(points);
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const allVals = points.map(p => p.price).concat(points.map(p => p.keltnerLower)).concat(points.map(p => p.costSmooth)).filter(v => v > 0);
+  const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 34, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  function pathFor(getY){
+    let d = '';
+    points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${getY(i).toFixed(1)} `; });
+    return d.trim();
+  }
+  const priceLine = pathFor(i => yFor(points[i].price));
+  const keltnerLine = pathFor(i => yFor(points[i].keltnerLower));
+  const costLine = pathFor(i => yFor(points[i].costSmooth));
+
+  let lastLabelPx = -Infinity;
+  const crossHtml = crossings.map(c => {
+    const pxNum = xFor(c.t);
+    const px = pxNum.toFixed(1);
+    const showLabel = pxNum - lastLabelPx > 50;
+    if(showLabel) lastLabelPx = pxNum;
+    const label = new Date(c.t).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+    return `
+      <line x1="${px}" y1="${marginTop}" x2="${px}" y2="${marginTop + drawH}" stroke="rgba(34,197,94,.55)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      ${showLabel ? `<text x="${px}" y="${marginTop - 12}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#22c55e" font-family="'Space Mono',monospace">PISO ${label}</text>` : ''}
+    `;
+  }).join('');
+
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].price);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="mfloorChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${crossHtml}
+        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${costLine}" fill="none" stroke="#a855f7" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${keltnerLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="mfloorHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="mfloorHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="mfloorHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="mfloorHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="mfloorHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="mfloorTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const mfSvg = document.getElementById('mfloorChartSvg');
+  wireChartHover({
+    svg: mfSvg, catcherId: 'mfloorHoverCatcher', lineId: 'mfloorHoverLine', dotId: 'mfloorHoverDot',
+    dateLabelId: 'mfloorHoverDateLabel', dateBgId: 'mfloorHoverDateBg', tooltipId: 'mfloorTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].price),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].price)}</b><br><span style="color:#f0b23d">Keltner inferior ${fmtHalvingPrice(points[i].keltnerLower)}</span><br><span style="color:#a855f7">Costo de producción ${fmtHalvingPrice(points[i].costSmooth)}</span>`,
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Keltner inferior (semanal)</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#a855f7"></span>Costo de Producción</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Cruce = piso de mercado</span>
+  `;
+
+  const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
+  const gapPct = ((lastKeltner - lastCost) / lastCost) * 100;
+  const lastCrossing = crossings.length ? crossings[crossings.length - 1] : null;
+  statsEl.innerHTML = `
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Distancia actual entre Keltner y Costo</div><div class="r-val" style="color:${gapPct <= 5 ? '#ef4444' : gapPct <= 20 ? '#f0b23d' : '#22c55e'}">${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}%</div></div>
+    <div class="res-card"><div class="r-label">Keltner inferior</div><div class="r-val">${fmtHalvingPrice(lastKeltner)}</div></div>
+    <div class="res-card"><div class="r-label">Costo de Producción</div><div class="r-val">${fmtHalvingPrice(lastCost)}</div></div>
+    <div class="res-card"><div class="r-label">Último piso marcado</div><div class="r-val">${lastCrossing ? new Date(lastCrossing.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin cruces aún'}</div></div>
+  `;
+}
+async function loadMarketFloorDetail(){
+  try{
+    await loadMarketFloorData();
+  } catch(err){ /* renderMarketFloorChart muestra el estado de error si no hay datos */ }
+  renderMarketFloorChart();
+}
+let mfloorLoadedOnce = false;
+function ensureMfloorLoaded(){ if(!mfloorLoadedOnce){ mfloorLoadedOnce = true; loadMarketFloorDetail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="pisomercado"]').style.display !== 'none') renderMarketFloorChart();
 });
 
 /* ---- Coinbase Premium Index: diferencia en vivo entre el precio de BTC en Coinbase y en
