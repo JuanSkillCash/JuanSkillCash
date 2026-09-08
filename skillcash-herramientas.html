@@ -393,12 +393,15 @@ button{font-family:inherit;color:inherit}
 .pred-stamp.fail{color:#ff2f4f}
 .pred-stamp.open{color:#d99a00}
 .pred-stamp.win{color:#0fa34a}
+.pred-result-stamp-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;z-index:5}
 .pred-result-stamp{
-  border:3px solid currentColor;border-radius:8px;text-align:center;
-  font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;letter-spacing:.1em;
-  text-transform:uppercase;padding:4px 0;opacity:.35;pointer-events:none;
-  margin:2px 0 10px;
+  width:115%;border:4px double currentColor;border-radius:3px;text-align:center;
+  font-family:'Arial Black','Arial Bold',Impact,sans-serif;font-weight:900;font-size:30px;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 2px;opacity:.62;transform:rotate(-11deg);
+  mix-blend-mode:multiply;filter:url(#predStampTexture);
 }
+.pred-result-stamp.fail{color:#d81b3a}
+.pred-result-stamp.win{color:#0d8a3e}
 .pred-result-stamp.fail{color:#ff2f4f}
 .pred-result-stamp.win{color:#0fa34a}
 .indic-chart-card{
@@ -1844,6 +1847,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <filter id="predStampTexture" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="6" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5"/>
+          </filter>
+        </svg>
         <div class="indic-panel" data-indic="predicciones" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
@@ -1879,7 +1888,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <div class="pred-coin">🟠 BTC — Máximo del ciclo</div>
                       <div class="pred-text">BTC tocaría entre $130,000 y $140,000 en el máximo de este ciclo.</div>
                       <div class="pred-price">$130K – $140K</div>
-                      <div class="pred-result-stamp fail">Fallido</div>
+                      <div class="pred-result-stamp-wrap"><div class="pred-result-stamp fail">Fallido</div></div>
                       <div class="pred-note fail">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a <b>$3,801</b> de cumplirse.</div>
                     </div>
                   </div>
@@ -1898,7 +1907,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <span class="pred-stamp fail">Fallida</span>
                       <div class="pred-coin">🟠 BTC — Lectura alcista</div>
                       <div class="pred-text">Entre nov 2025 y ene 2026, con BTC en $90,000, pensé que el mercado todavía seguía para arriba.</div>
-                      <div class="pred-result-stamp fail">Fallido</div>
+                      <div class="pred-result-stamp-wrap"><div class="pred-result-stamp fail">Fallido</div></div>
                       <div class="pred-note fail">Resultado: BTC cayó a ~$60,000 en febrero de 2026 — la lectura no se cumplió.</div>
                     </div>
                   </div>
