@@ -2153,6 +2153,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <p class="calc-sub">Una franja de colores calculada sobre el precio histórico de Bitcoin en escala logarítmica. Cada color representa qué tan lejos está el precio de su tendencia de largo plazo — de "muy barato" (azul) a "burbuja" (rojo).</p>
               </div>
 
+              <div class="tf-pill-row" id="rainbowRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
               <div class="indic-chart-body" id="rainbowChartBody">
                 <div class="indic-chart-soon" id="rainbowLoading">
                   <div class="indic-placeholder-icon">🌈</div>
@@ -12069,14 +12076,16 @@ function wireBarChartHover(cfg){
     tooltip.style.display = 'none';
   });
 }
+const RAINBOW_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let rainbowActiveRange = 'todo';
 function renderRainbowChart(){
   const loadingEl = document.getElementById('rainbowLoading');
   const errorEl = document.getElementById('rainbowError');
   const wrap = document.getElementById('rainbowChartWrap');
   const legendEl = document.getElementById('rainbowLegend');
   const statsEl = document.getElementById('rainbowStats');
-  const points = halvingBtcHistory;
-  if(!points || points.length < 30){
+  const allPoints = halvingBtcHistory;
+  if(!allPoints || allPoints.length < 30){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
     wrap.style.display = 'none';
@@ -12090,7 +12099,14 @@ function renderRainbowChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const fit = rainbowFit(points);
+  // la curva de tendencia se ajusta siempre sobre la historia COMPLETA (igual que en el gráfico
+  // de referencia) — el filtro de rango solo hace zoom visual, no cambia la curva
+  const fit = rainbowFit(allPoints);
+  const fullEndMs = allPoints[allPoints.length - 1].t;
+  const rainbowRangeYears = RAINBOW_RANGE_YEARS[rainbowActiveRange];
+  const rainbowCutoffMs = rainbowRangeYears ? fullEndMs - rainbowRangeYears * 365 * 86400000 : allPoints[0].t;
+  const points = allPoints.filter(p => p.t >= rainbowCutoffMs);
+
   const startMs = points[0].t;
   const endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -13168,6 +13184,15 @@ document.querySelectorAll('#ema200RangeFilter .tf-pill').forEach(btn => {
     btn.classList.add('active');
     ema200ActiveRange = btn.dataset.range;
     renderEma200Chart();
+  });
+});
+document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    rainbowActiveRange = btn.dataset.range;
+    renderRainbowChart();
   });
 });
 
