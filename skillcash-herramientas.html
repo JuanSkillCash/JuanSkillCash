@@ -2305,11 +2305,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <p class="calc-sub">Indicador personal: la teoría de que el máximo del ciclo anterior tiende a volverse soporte cuando el precio vuelve a bajar hasta ahí en el siguiente mercado bajista. Se traza una línea desde cada techo de ciclo hasta el punto donde el precio la vuelve a tocar (o hasta hoy, si todavía no la ha tocado).</p>
               </div>
 
-              <div class="indic-beta-warning">
-                <span class="indic-beta-warning-icon">⚠️</span>
-                <span><b>Criterio personal, no un patrón garantizado.</b> Que se haya cumplido en ciclos pasados no significa que se vuelva a cumplir — únalo solo como referencia educativa.</span>
-              </div>
-
               <div class="tf-pill-row" id="ciclosoporteRangeFilter">
                 <button type="button" class="tf-pill active" data-range="todo">Todo</button>
                 <button type="button" class="tf-pill" data-range="10a">10 años</button>
@@ -12443,6 +12438,18 @@ function subsidyAtDate(ms){
   const n = HALVING_CYCLES.filter(h => h.date.getTime() <= ms).length;
   return 50 / Math.pow(2, n);
 }
+// reintenta una función asíncrona con espera creciente entre intentos — se usa en Pulso de Fondo
+// para que una falla puntual de Binance/Coin Metrics/blockchain.info no tumbe todo el gráfico
+async function withRetry(fn, attempts, baseDelayMs){
+  let lastErr = null;
+  for(let attempt = 0; attempt < attempts; attempt++){
+    try{
+      if(attempt > 0) await new Promise(r => setTimeout(r, baseDelayMs * attempt));
+      return await fn();
+    } catch(err){ lastErr = err; }
+  }
+  throw lastErr;
+}
 async function fetchWeeklyBtcOhlc(){
   const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=1000');
   const rows = await res.json();
@@ -12490,10 +12497,11 @@ async function loadMarketFloorData(){
   if(marketFloorInFlight) return marketFloorInFlight;
   marketFloorInFlight = (async () => {
     // Promise.allSettled (en vez de Promise.all) para que si Coin Metrics falla no se pierda ni
-    // se tenga que repetir la llamada a Binance, que ya se resolvió bien
+    // se tenga que repetir la llamada a Binance, que ya se resolvió bien — cada llamada además se
+    // reintenta un par de veces antes de darse por vencida, para no fallar por una falla puntual
     const [weeklySettled, cmSettled] = await Promise.allSettled([
-      fetchWeeklyBtcOhlc(),
-      fetchCoinMetricsDaily(['DiffMean', 'BlkCnt', 'FeeTotNtv']),
+      withRetry(fetchWeeklyBtcOhlc, 3, 600),
+      withRetry(() => fetchCoinMetricsDaily(['DiffMean', 'BlkCnt', 'FeeTotNtv']), 2, 500),
     ]);
     if(weeklySettled.status === 'rejected') throw weeklySettled.reason;
     const weekly = weeklySettled.value;
@@ -12508,7 +12516,10 @@ async function loadMarketFloorData(){
       // respaldo si Coin Metrics falla (CORS, caída del servicio, series vacías, etc.):
       // blockchain.info no tiene bloques minados por día como serie propia, así que ahí sí se
       // aproxima con el promedio de red (144/día, el objetivo de diseño de Bitcoin)
-      const [diffCi, feesCi] = await Promise.all([fetchBlockchainInfoChart('difficulty'), fetchBlockchainInfoChart('transaction-fees')]);
+      const [diffCi, feesCi] = await Promise.all([
+        withRetry(() => fetchBlockchainInfoChart('difficulty'), 3, 600),
+        withRetry(() => fetchBlockchainInfoChart('transaction-fees'), 3, 600),
+      ]);
       difficulty = diffCi;
       dailyFeesBtc = feesCi;
       dailyBlocks = null;
