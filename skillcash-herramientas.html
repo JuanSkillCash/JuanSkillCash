@@ -393,6 +393,11 @@ button{font-family:inherit;color:inherit}
 .pred-stamp.fail{color:#ff2f4f}
 .pred-stamp.open{color:#d99a00}
 .pred-stamp.win{color:#0fa34a}
+.pred-video-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pred-video-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#4a3f2e;text-transform:uppercase;letter-spacing:.04em;display:inline-flex;align-items:center;gap:4px}
+.pred-video-icons{display:flex;gap:6px}
+.pred-video-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(36,27,18,.08);color:#4a3f2e;flex-shrink:0;transition:background .15s,color .15s}
+.pred-video-icon:hover{background:var(--hover);color:#fff}
 .pred-result-stamp-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;z-index:5}
 .pred-result-stamp{
   width:115%;border:4px double currentColor;border-radius:3px;text-align:center;
@@ -1947,6 +1952,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <div class="pred-text">El mínimo de ~$57,000 del 1 de julio de 2026 fue el piso de este ciclo.</div>
                       <div class="pred-price">~$57K</div>
                       <div class="pred-note open">Llamada hecha el 12 de agosto sobre el mínimo del 1 de julio — sigue abierta por si vuelve a bajar.</div>
+                      <div class="pred-video-row">
+                        <span class="pred-video-label">🎬 Ver video →</span>
+                        <div class="pred-video-icons">
+                          <a href="#" target="_blank" rel="noopener" class="pred-video-icon" title="Ver en TikTok" style="--hover:#25F4EE"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg></a>
+                          <a href="#" target="_blank" rel="noopener" class="pred-video-icon" title="Ver en Instagram" style="--hover:#e0479e"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.7 0-3.1 0-4.1.1-1.1 0-1.8.2-2.4.4-.7.3-1.2.6-1.8 1.2-.6.6-.9 1.1-1.2 1.8-.2.6-.4 1.3-.4 2.4C2 8.9 2 9.3 2 12s0 3.1.1 4.1c0 1.1.2 1.8.4 2.4.3.7.6 1.2 1.2 1.8.6.6 1.1.9 1.8 1.2.6.2 1.3.4 2.4.4C8.9 22 9.3 22 12 22s3.1 0 4.1-.1c1.1 0 1.8-.2 2.4-.4.7-.3 1.2-.6 1.8-1.2.6-.6.9-1.1 1.2-1.8.2-.6.4-1.3.4-2.4.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c0-1.1-.2-1.8-.4-2.4-.3-.7-.6-1.2-1.2-1.8-.6-.6-1.1-.9-1.8-1.2-.6-.2-1.3-.4-2.4-.4C15.1 2 14.7 2 12 2zm0 1.8c2.6 0 2.9 0 4 .1.9 0 1.5.2 1.8.3.5.2.8.4 1.1.7.3.3.5.6.7 1.1.1.3.3.9.3 1.8.1 1.1.1 1.4.1 4s0 2.9-.1 4c0 .9-.2 1.5-.3 1.8-.2.5-.4.8-.7 1.1-.3.3-.6.5-1.1.7-.3.1-.9.3-1.8.3-1.1.1-1.4.1-4 .1s-2.9 0-4-.1c-.9 0-1.5-.2-1.8-.3-.5-.2-.8-.4-1.1-.7-.3-.3-.5-.6-.7-1.1-.1-.3-.3-.9-.3-1.8-.1-1.1-.1-1.4-.1-4s0-2.9.1-4c0-.9.2-1.5.3-1.8.2-.5.4-.8.7-1.1.3-.3.6-.5 1.1-.7.3-.1.9-.3 1.8-.3 1.1-.1 1.4-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg></a>
+                          <a href="#" target="_blank" rel="noopener" class="pred-video-icon" title="Ver en Facebook" style="--hover:#4267B2"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.1c0-5.5-4.5-10-10-10S2 6.6 2 12.1c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.9c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7c4.7-.8 8.4-4.9 8.4-9.9z"/></svg></a>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
