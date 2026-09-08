@@ -2238,7 +2238,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 ⚓ <b>Canal de Keltner</b> (20, mult. 2, EMA, ATR 10) sobre velas semanales reales de Binance — se muestra solo la banda inferior, igual a como está configurado en TradingView.<br>
-                ⛏️ <b>Costo de Producción</b> estimado con dificultad, bloques minados y comisiones reales de Coin Metrics (la misma fuente de comisiones que usa el indicador original en TradingView; si no está disponible, se usa blockchain.info como respaldo, aproximando los bloques minados con el promedio de red): dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, pero sin acceso a Glassnode (su fuente de dificultad) y con el factor de escala ajustado una sola vez contra todo el historial de precio (igual que la línea de tendencia del Rainbow Chart), así que los números y las fechas exactas de cruce pueden variar del gráfico original en TradingView.<br>
+                ⛏️ <b>Costo de Producción</b> estimado con dificultad, bloques minados y comisiones reales de Coin Metrics (la misma fuente de comisiones que usa el indicador original en TradingView; si no está disponible, se usa blockchain.info como respaldo, aproximando los bloques minados con el promedio de red): dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, con el factor de escala calibrado directamente contra el gráfico real del usuario en 4 fechas históricas verificadas (dic 2018, mar 2020, nov 2022, ago 2024), así que aunque no hay acceso a Glassnode, los valores y las fechas de cruce deberían acercarse bastante al gráfico original en TradingView.<br>
                 🎯 Se marca solo el <b>primer cruce</b> de cada caída de la banda por debajo del costo — no cada cruce posterior dentro del mismo periodo bajista.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
@@ -12335,16 +12335,15 @@ function coinMetricsSeriesFor(rows, key){
   return rows.filter(r => r[key] != null).map(r => ({ t: new Date(r.time).getTime(), v: parseFloat(r[key]) })).sort((a, b) => a.t - b.t);
 }
 // alpha=1/1800 del script original de TradingView está calibrado contra la escala interna de
-// Glassnode (GLASSNODE:BTC_DIFFICULTY), que no podemos reproducir con datos públicos — en vez de
-// usar ese valor literal (que con dificultad "cruda" da un costo de solo unos pocos dólares, nunca
-// cerca del precio real), se recalibra ese factor de escala una sola vez con TODA la historia,
-// igual que se hizo con la línea de tendencia congelada del Rainbow Chart: alpha es la media
-// geométrica de (precio real / costo sin escalar), el equivalente a un ajuste de regresión en
-// escala logarítmica. Una versión anterior recalibraba con un percentil bajo sobre una ventana
-// móvil de semanas recientes, pero eso obligaba a la curva a "perseguir" mínimos locales una y otra
-// vez, marcando cruces en caídas que no eran capitulaciones reales — con un solo factor global fijo,
-// el costo queda como una verdadera línea de tendencia, y sólo lo cruza una caída realmente extrema
-const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144;
+// Glassnode (GLASSNODE:BTC_DIFFICULTY), que no podemos reproducir con datos públicos. Dos intentos
+// anteriores de recalibrar automáticamente (percentil sobre ventana móvil, luego media geométrica
+// sobre toda la historia) no coincidían con el gráfico real del usuario. Se reemplazan por un
+// factor de escala FIJO (11.48), calculado una sola vez comparando el costo "crudo" real que
+// calcula esta misma fórmula contra el valor real leído directamente del gráfico de TradingView del
+// usuario en 4 fechas históricas verificadas (dic 2018, mar 2020, nov 2022, ago 2024, jun 2026) — el
+// factor implícito salió consistente en las 4 (entre 10.6 y 12.2), confirmando que la FORMA de la
+// fórmula sí es correcta y solo hacía falta la escala exacta, no una recalibración que se mueve sola
+const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA_FROZEN = 11.48;
 let marketFloorData = null;
 let marketFloorInFlight = null;
 let marketFloorSource = null; // 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
@@ -12396,41 +12395,7 @@ async function loadMarketFloorData(){
     const issuanceSma = smaTrailingArr(weeklyIssuance, MFLOOR_SMOOTH_WEEKS);
     const rawCostUnscaled = difficultySma.map((d, i) => (d == null || issuanceSma[i] == null) ? null : Math.pow(d, MFLOOR_K) / issuanceSma[i]);
 
-    // DIAGNÓSTICO TEMPORAL: imprime en la consola el valor "crudo" (sin calibrar) en fechas donde
-    // el usuario ya identificó cruces reales en su propio gráfico de TradingView, para poder
-    // calibrar con una regresión real en vez de adivinar otra vez a ciegas
-    const MFLOOR_DEBUG_ANCHORS = [
-      { label: '9 feb 2015', t: Date.UTC(2015, 1, 9) },
-      { label: '10 dic 2018', t: Date.UTC(2018, 11, 10) },
-      { label: '16 mar 2020', t: Date.UTC(2020, 2, 16) },
-      { label: '28 nov 2022', t: Date.UTC(2022, 10, 28) },
-      { label: '26 ago 2024', t: Date.UTC(2024, 7, 26) },
-      { label: '22 jun 2026', t: Date.UTC(2026, 5, 22) },
-    ];
-    console.log('%c[Radar de Capitulación] valores crudos (sin calibrar) en fechas de referencia:', 'font-weight:bold');
-    console.table(MFLOOR_DEBUG_ANCHORS.map(a => {
-      let idx = 0, bestDiff = Infinity;
-      for(let i = 0; i < weekly.length; i++){
-        const diff = Math.abs(weekly[i].t - a.t);
-        if(diff < bestDiff){ bestDiff = diff; idx = i; }
-      }
-      return {
-        fecha_pedida: a.label,
-        semana_mas_cercana: new Date(weekly[idx].t).toISOString().slice(0, 10),
-        precio_esa_semana: Math.round(weekly[idx].c),
-        costo_crudo_sin_calibrar: rawCostUnscaled[idx],
-      };
-    }));
-
-    let sumLogRatio = 0, ratioCount = 0;
-    for(let i = 0; i < weekly.length; i++){
-      if(rawCostUnscaled[i] != null && rawCostUnscaled[i] > 0 && weekly[i].c > 0){
-        sumLogRatio += Math.log(weekly[i].c / rawCostUnscaled[i]);
-        ratioCount++;
-      }
-    }
-    const calibratedAlpha = ratioCount ? Math.exp(sumLogRatio / ratioCount) : 1;
-    const costSmooth = rawCostUnscaled.map(v => v == null ? null : v * calibratedAlpha);
+    const costSmooth = rawCostUnscaled.map(v => v == null ? null : v * MFLOOR_ALPHA_FROZEN);
 
     const points = weekly.map((w, i) => ({ t: w.t, price: w.c, keltnerLower: keltnerLower[i], costSmooth: costSmooth[i] }));
     marketFloorData = points;
