@@ -2310,6 +2310,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <span><b>Criterio personal, no un patrón garantizado.</b> Que se haya cumplido en ciclos pasados no significa que se vuelva a cumplir — únalo solo como referencia educativa.</span>
               </div>
 
+              <div class="tf-pill-row" id="ciclosoporteRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
               <div class="indic-chart-body" id="ciclosoporteChartBody">
                 <div class="indic-chart-soon" id="ciclosoporteLoading">
                   <div class="indic-placeholder-icon">🪜</div>
@@ -11393,25 +11400,48 @@ async function fetchHalvingHistory(){
   // fallar la carga de todos, incluidas herramientas que no dependen de esto (ej. F&G)
   if(halvingHistoryInFlight) return halvingHistoryInFlight;
   halvingHistoryInFlight = (async () => {
-    const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
-    const json = await res.json();
-    const rows = json.values || [];
-    let points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
-    points.sort((a, b) => a.t - b.t);
-
-    // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
-    // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
-    // para que el precio y la fecha de "hoy" sean lo más recientes posibles
-    try{
-      const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
-      if(recent && recent.length){
-        const recentStart = recent[0][0];
-        points = points.filter(p => p.t < recentStart);
-        recent.forEach(([t, c]) => points.push({ t, c }));
+    // blockchain.info a veces no responde o tarda — se reintenta un par de veces (con espera
+    // creciente) antes de rendirse, en vez de fallar a la primera
+    let points = [];
+    let lastErr = null;
+    for(let attempt = 0; attempt < 3 && !points.length; attempt++){
+      try{
+        if(attempt > 0) await new Promise(r => setTimeout(r, 600 * attempt));
+        const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json&cors=true');
+        if(!res.ok) throw new Error('blockchain.info http ' + res.status);
+        const json = await res.json();
+        const rows = json.values || [];
+        points = rows.filter(r => r.y > 0).map(r => ({ t: r.x * 1000, c: r.y }));
         points.sort((a, b) => a.t - b.t);
+      } catch(err){ lastErr = err; }
+    }
+
+    if(!points.length){
+      // respaldo si blockchain.info no responde tras los reintentos: CoinGecko solo da el último
+      // año (su límite gratuito), no el historial completo — mejor que nada para herramientas que
+      // no necesitan varios años, aunque Ciclos de Halving/Rainbow/Techo Anterior sí lo necesitan
+      // y van a seguir sin poder mostrar nada hasta que blockchain.info vuelva a responder
+      const recent = await fetchBtcPriceHistory();
+      if(recent && recent.length){
+        points = recent.map(([t, c]) => ({ t, c }));
+      } else {
+        throw lastErr || new Error('no se pudo cargar el historial de precio');
       }
-    } catch(err){
-      // si falla, nos quedamos con el historial de blockchain.info tal cual
+    } else {
+      // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
+      // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
+      // para que el precio y la fecha de "hoy" sean lo más recientes posibles
+      try{
+        const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
+        if(recent && recent.length){
+          const recentStart = recent[0][0];
+          points = points.filter(p => p.t < recentStart);
+          recent.forEach(([t, c]) => points.push({ t, c }));
+          points.sort((a, b) => a.t - b.t);
+        }
+      } catch(err){
+        // si falla, nos quedamos con el historial de blockchain.info tal cual
+      }
     }
 
     halvingBtcHistory = points;
@@ -12848,24 +12878,31 @@ function computeCyclePeaks(points){
     }
     // si el "máximo" cae en los últimos ~90 días, el precio probablemente todavía sigue subiendo
     // dentro de ese mismo ciclo — no hay techo real todavía que trazar como soporte futuro
-    if(peakIdx >= 0 && lastT - points[peakIdx].t > 90 * 86400000) peaks.push({ cycleLabel: HALVING_CYCLES[c].label, peakT: points[peakIdx].t, peakPrice });
+    if(peakIdx >= 0 && lastT - points[peakIdx].t > 90 * 86400000){
+      // el "toque" que importa es cuando ese techo vuelve a actuar como soporte en el SIGUIENTE
+      // ciclo — no el cruce casi inmediato que pasa mientras el precio todavía va cayendo desde su
+      // propio techo. Por eso la búsqueda del toque arranca en el siguiente halving, no en peakT
+      peaks.push({ cycleLabel: HALVING_CYCLES[c].label, peakT: points[peakIdx].t, peakPrice, searchFromT: endT });
+    }
   }
   return peaks;
 }
 function findSupportTouch(points, peak){
   for(let i = 0; i < points.length; i++){
-    if(points[i].t > peak.peakT && points[i].c <= peak.peakPrice) return points[i].t;
+    if(points[i].t >= peak.searchFromT && points[i].c <= peak.peakPrice) return points[i].t;
   }
   return null;
 }
+const CICLOSOPORTE_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let ciclosoporteActiveRange = 'todo';
 function renderCicloSoporteChart(){
   const loadingEl = document.getElementById('ciclosoporteLoading');
   const errorEl = document.getElementById('ciclosoporteError');
   const wrap = document.getElementById('ciclosoporteChartWrap');
   const legendEl = document.getElementById('ciclosoporteLegend');
   const statsEl = document.getElementById('ciclosoporteStats');
-  const points = halvingBtcHistory;
-  if(!points || points.length < 30){
+  const allPoints = halvingBtcHistory;
+  if(!allPoints || allPoints.length < 30){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
     wrap.style.display = 'none';
@@ -12879,12 +12916,22 @@ function renderCicloSoporteChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const peaks = computeCyclePeaks(points).map(pk => ({ ...pk, touchT: findSupportTouch(points, pk) }));
+  // los techos y sus toques se calculan siempre sobre la historia COMPLETA (un techo de hace
+  // años puede seguir sin tocarse todavía), pero lo que se dibuja/escala se recorta al rango
+  // elegido — así el filtro solo hace zoom visual, no cambia el cálculo
+  const allPeaks = computeCyclePeaks(allPoints).map(pk => ({ ...pk, touchT: findSupportTouch(allPoints, pk) }));
+  const fullEndMs = allPoints[allPoints.length - 1].t;
+  const rangeYears = CICLOSOPORTE_RANGE_YEARS[ciclosoporteActiveRange];
+  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allPoints[0].t;
+  const points = allPoints.filter(p => p.t >= cutoffMs);
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
   const prices = points.map(p => p.c);
-  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices, ...peaks.map(pk => pk.peakPrice));
+  const onscreenPeaks = allPeaks.filter(pk => pk.peakT >= startMs && pk.peakT <= endMs);
+  const visiblePeaks = allPeaks.filter(pk => pk.peakT <= endMs && (pk.touchT || fullEndMs) >= startMs);
+  const minPrice = Math.min(...prices, ...onscreenPeaks.map(pk => pk.peakPrice));
+  const maxPrice = Math.max(...prices, ...onscreenPeaks.map(pk => pk.peakPrice));
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
@@ -12913,13 +12960,21 @@ function renderCicloSoporteChart(){
   let priceLine = '';
   points.forEach((p, i) => { priceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `; });
 
-  const peakLinesHtml = peaks.map(pk => {
-    const x1 = xFor(pk.peakT), x2 = xFor(pk.touchT || endMs), y = yFor(pk.peakPrice);
-    const color = pk.touchT ? '#f0b23d' : 'rgba(240,178,61,.4)';
+  // cuando dos techos quedan muy cerca en el tiempo (ej. el techo del ciclo actual justo antes de
+  // "hoy"), se omite el texto del segundo para que no se encimen las etiquetas — la línea sí se
+  // dibuja siempre. Si el techo queda antes del rango visible (con el filtro de años activo), la
+  // línea entra recortada desde el borde izquierdo, sin punto ni etiqueta propios
+  let lastLabelPx = -Infinity;
+  const peakLinesHtml = visiblePeaks.map(pk => {
+    const dotVisible = pk.peakT >= startMs;
+    const x1 = xFor(Math.max(pk.peakT, startMs)), x2 = xFor(Math.min(pk.touchT || fullEndMs, endMs)), y = yFor(pk.peakPrice);
+    const color = pk.touchT ? '#f0b23d' : 'rgba(240,178,61,.6)';
+    const showLabel = dotVisible && x1 - lastLabelPx > 55;
+    if(showLabel) lastLabelPx = x1;
     return `
-      <line x1="${x1.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}" stroke-width="1.5" stroke-dasharray="5,3"/>
-      <circle cx="${x1.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${color}"/>
-      <text x="${(x1 + 4).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="${xFontSize}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">Techo ${pk.cycleLabel}</text>
+      <line x1="${x1.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}" stroke-width="2" stroke-dasharray="6,3"/>
+      ${dotVisible ? `<circle cx="${x1.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${color}"/>` : ''}
+      ${showLabel ? `<text x="${Math.min(x1 + 4, totalW - marginRight - 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="${x1 > totalW - marginRight - 60 ? 'end' : 'start'}" font-size="${xFontSize}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">Techo ${pk.cycleLabel}</text>` : ''}
     `;
   }).join('');
 
@@ -12940,8 +12995,8 @@ function renderCicloSoporteChart(){
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ciclosoporteChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${yGridHtml}
-        ${peakLinesHtml}
         <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${peakLinesHtml}
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ciclosoporteHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
@@ -12969,7 +13024,7 @@ function renderCicloSoporteChart(){
     <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(240,178,61,.4)"></span>Techo de ciclo → aún sin tocar</span>
   `;
 
-  statsEl.innerHTML = peaks.map(pk => `
+  statsEl.innerHTML = allPeaks.map(pk => `
     <div class="res-card">
       <div class="r-label">Techo ${pk.cycleLabel}</div>
       <div class="r-val">${fmtHalvingPrice(pk.peakPrice)}</div>
@@ -12985,6 +13040,15 @@ let ciclosoporteLoadedOnce = false;
 function ensureCicloSoporteLoaded(){ if(!ciclosoporteLoadedOnce){ ciclosoporteLoadedOnce = true; loadCicloSoporteDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="ciclosoporte"]').style.display !== 'none') renderCicloSoporteChart();
+});
+document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    ciclosoporteActiveRange = btn.dataset.range;
+    renderCicloSoporteChart();
+  });
 });
 
 /* ---- Coinbase Premium Index: diferencia en vivo entre el precio de BTC en Coinbase y en
