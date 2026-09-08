@@ -393,6 +393,14 @@ button{font-family:inherit;color:inherit}
 .pred-stamp.fail{color:#ff2f4f}
 .pred-stamp.open{color:#d99a00}
 .pred-stamp.win{color:#0fa34a}
+.pred-result-stamp{
+  border:3px solid currentColor;border-radius:8px;text-align:center;
+  font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 0;opacity:.35;pointer-events:none;
+  margin:2px 0 10px;
+}
+.pred-result-stamp.fail{color:#ff2f4f}
+.pred-result-stamp.win{color:#0fa34a}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
   background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
@@ -1871,7 +1879,27 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <div class="pred-coin">🟠 BTC — Máximo del ciclo</div>
                       <div class="pred-text">BTC tocaría entre $130,000 y $140,000 en el máximo de este ciclo.</div>
                       <div class="pred-price">$130K – $140K</div>
+                      <div class="pred-result-stamp fail">Fallido</div>
                       <div class="pred-note fail">Resultado: el máximo real fue <b>$126,199</b> el 6 de octubre de 2025 — quedó a <b>$3,801</b> de cumplirse.</div>
+                    </div>
+                  </div>
+
+                  <div class="pred-ticket" data-coin="BTC">
+                    <div class="pred-watermark">SKILLCASH</div>
+                    <div class="pred-stub">
+                      <img src="logo-skillcash-600.png" alt="" class="pred-logo">
+                      <div class="pred-ticket-no-label">N° de boleto</div>
+                      <div class="pred-ticket-no">2025-002</div>
+                      <div class="pred-month">NOV 2025 – ENE 2026</div>
+                      <div class="pred-barcode"></div>
+                      <div class="pred-stub-tear"></div>
+                    </div>
+                    <div class="pred-body">
+                      <span class="pred-stamp fail">Fallida</span>
+                      <div class="pred-coin">🟠 BTC — Lectura alcista</div>
+                      <div class="pred-text">Entre nov 2025 y ene 2026, con BTC en $90,000, pensé que el mercado todavía seguía para arriba.</div>
+                      <div class="pred-result-stamp fail">Fallido</div>
+                      <div class="pred-note fail">Resultado: BTC cayó a ~$60,000 en febrero de 2026 — la lectura no se cumplió.</div>
                     </div>
                   </div>
 
