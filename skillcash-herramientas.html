@@ -2162,7 +2162,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
                 <div id="mfloorChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
-              <div class="partner-perks" id="mfloorLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="partner-perks" id="mfloorLegend" style="display:none;margin-bottom:8px"></div>
+              <div id="mfloorSourceNote" style="display:none;font-size:11.5px;color:var(--muted);margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="mfloorStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -12276,6 +12277,7 @@ function coinMetricsSeriesFor(rows, key){
 const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_CALIB_PERCENTILE = 0.10, MFLOOR_CALIB_WINDOW_WEEKS = 156;
 let marketFloorData = null;
 let marketFloorInFlight = null;
+let marketFloorSource = null; // 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
 async function loadMarketFloorData(){
   if(marketFloorData) return marketFloorData;
   if(marketFloorInFlight) return marketFloorInFlight;
@@ -12303,6 +12305,9 @@ async function loadMarketFloorData(){
       difficulty = diffCi;
       dailyFeesBtc = feesCi;
       dailyBlocks = null;
+      marketFloorSource = 'blockchain-fallback';
+    } else {
+      marketFloorSource = 'coinmetrics';
     }
     const dailyIssuance = dailyFeesBtc.map(f => {
       const blocksThatDay = dailyBlocks ? (lastValueBefore(dailyBlocks, f.t) || MFLOOR_BLOCKS_PER_DAY) : MFLOOR_BLOCKS_PER_DAY;
@@ -12368,6 +12373,7 @@ function renderMarketFloorChart(){
     errorEl.style.display = 'flex';
     wrap.style.display = 'none';
     legendEl.style.display = 'none';
+    document.getElementById('mfloorSourceNote').style.display = 'none';
     statsEl.style.display = 'none';
     return;
   }
@@ -12479,6 +12485,12 @@ function renderMarketFloorChart(){
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Cruce = capitulación detectada</span>
   `;
+
+  const sourceNoteEl = document.getElementById('mfloorSourceNote');
+  sourceNoteEl.style.display = 'block';
+  sourceNoteEl.innerHTML = marketFloorSource === 'coinmetrics'
+    ? '✅ Dificultad, bloques y comisiones cargados en vivo desde <b>Coin Metrics</b>.'
+    : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> como respaldo (bloques minados aproximados con el promedio de red).';
 
   const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
   const gapPct = ((lastKeltner - lastCost) / lastCost) * 100;
