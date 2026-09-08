@@ -2252,7 +2252,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="mfloorError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="mfloorErrorDetail">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="mfloorChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
@@ -12629,6 +12629,14 @@ function renderMarketFloorChart(){
     legendEl.style.display = 'none';
     document.getElementById('mfloorSourceNote').style.display = 'none';
     statsEl.style.display = 'none';
+    // detalle técnico visible para poder diagnosticar sin depender de que el usuario tenga acceso
+    // a las herramientas de desarrollador del navegador (sobre todo en celular)
+    const detailEl = document.getElementById('mfloorErrorDetail');
+    if(detailEl){
+      detailEl.textContent = mfloorLastError
+        ? 'Detalle técnico: ' + (mfloorLastError.message || String(mfloorLastError))
+        : (allPoints ? 'Detalle técnico: los datos llegaron pero muy incompletos (sin suficientes semanas para calcular).' : 'Revisa tu conexión e intenta de nuevo en unos segundos.');
+    }
     return;
   }
   loadingEl.style.display = 'none';
@@ -12756,10 +12764,12 @@ function renderMarketFloorChart(){
     <div class="res-card"><div class="r-label">Último piso marcado</div><div class="r-val">${lastCrossing ? new Date(lastCrossing.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin cruces aún'}</div></div>
   `;
 }
+let mfloorLastError = null;
 async function loadMarketFloorDetail(){
+  mfloorLastError = null;
   try{
     await loadMarketFloorData();
-  } catch(err){ /* renderMarketFloorChart muestra el estado de error si no hay datos */ }
+  } catch(err){ mfloorLastError = err; /* renderMarketFloorChart muestra el detalle si no hay datos */ }
   renderMarketFloorChart();
 }
 let mfloorLoadedOnce = false;
