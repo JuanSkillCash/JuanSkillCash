@@ -2167,7 +2167,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 ⚓ <b>Canal de Keltner</b> (20, mult. 2, EMA, ATR 10) sobre velas semanales reales de Binance — se muestra solo la banda inferior, igual a como está configurado en TradingView.<br>
-                ⛏️ <b>Costo de Producción</b> estimado con dificultad y comisiones reales de blockchain.info: dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, pero con datos públicos en vez de Glassnode/Coinmetrics (no accesibles aquí) y con su factor de escala recalibrado con el propio historial de precio, así que los números y las fechas exactas de cruce pueden variar del gráfico original en TradingView.<br>
+                ⛏️ <b>Costo de Producción</b> estimado con dificultad, bloques minados y comisiones reales de Coin Metrics (la misma fuente de comisiones que usa el indicador original en TradingView; si no está disponible, se usa blockchain.info como respaldo, aproximando los bloques minados con el promedio de red): dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, pero sin acceso a Glassnode (su fuente de dificultad) y con el factor de escala recalibrado con el propio historial de precio, así que los números y las fechas exactas de cruce pueden variar del gráfico original en TradingView.<br>
                 🎯 Se marca solo el <b>primer cruce</b> de cada caída de la banda por debajo del costo — no cada cruce posterior dentro del mismo periodo bajista.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
@@ -12244,6 +12244,25 @@ async function fetchBlockchainInfoChart(chartName){
   const json = await res.json();
   return (json.values || []).map(r => ({ t: r.x * 1000, v: r.y })).sort((a, b) => a.t - b.t);
 }
+// Coin Metrics tiene una API "Community" pública y sin llave — y es, además, una de las dos
+// fuentes reales que usa el script original de TradingView (COINMETRICS:BTC_FEEUSD), así que sus
+// comisiones y bloques minados diarios son más fieles que aproximarlos. Se pagina con
+// next_page_url por si la respuesta no cabe en una sola página
+async function fetchCoinMetricsDaily(metrics){
+  let url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&frequency=1d&page_size=10000&metrics=' + metrics.join(',');
+  const rows = [];
+  for(let page = 0; page < 5 && url; page++){
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('coinmetrics http ' + res.status);
+    const json = await res.json();
+    rows.push(...(json.data || []));
+    url = json.next_page_url || null;
+  }
+  return rows;
+}
+function coinMetricsSeriesFor(rows, key){
+  return rows.filter(r => r[key] != null).map(r => ({ t: new Date(r.time).getTime(), v: parseFloat(r[key]) })).sort((a, b) => a.t - b.t);
+}
 // alpha=1/1800 del script original de TradingView está calibrado contra la escala interna de
 // Glassnode (GLASSNODE:BTC_DIFFICULTY), que no podemos reproducir con datos públicos — en vez de
 // usar ese valor literal (que con dificultad "cruda" de blockchain.info da un costo de solo unos
@@ -12261,12 +12280,34 @@ async function loadMarketFloorData(){
   if(marketFloorData) return marketFloorData;
   if(marketFloorInFlight) return marketFloorInFlight;
   marketFloorInFlight = (async () => {
-    const [weekly, difficulty, fees] = await Promise.all([
+    // Promise.allSettled (en vez de Promise.all) para que si Coin Metrics falla no se pierda ni
+    // se tenga que repetir la llamada a Binance, que ya se resolvió bien
+    const [weeklySettled, cmSettled] = await Promise.allSettled([
       fetchWeeklyBtcOhlc(),
-      fetchBlockchainInfoChart('difficulty'),
-      fetchBlockchainInfoChart('transaction-fees'),
+      fetchCoinMetricsDaily(['DiffMean', 'BlkCnt', 'FeeTotNtv']),
     ]);
-    const dailyIssuance = fees.map(f => ({ t: f.t, v: subsidyAtDate(f.t) * MFLOOR_BLOCKS_PER_DAY + f.v }));
+    if(weeklySettled.status === 'rejected') throw weeklySettled.reason;
+    const weekly = weeklySettled.value;
+
+    let difficulty, dailyFeesBtc, dailyBlocks;
+    if(cmSettled.status === 'fulfilled'){
+      difficulty = coinMetricsSeriesFor(cmSettled.value, 'DiffMean');
+      dailyBlocks = coinMetricsSeriesFor(cmSettled.value, 'BlkCnt');
+      dailyFeesBtc = coinMetricsSeriesFor(cmSettled.value, 'FeeTotNtv');
+    }
+    if(!difficulty || !difficulty.length || !dailyBlocks.length || !dailyFeesBtc.length){
+      // respaldo si Coin Metrics falla (CORS, caída del servicio, series vacías, etc.):
+      // blockchain.info no tiene bloques minados por día como serie propia, así que ahí sí se
+      // aproxima con el promedio de red (144/día, el objetivo de diseño de Bitcoin)
+      const [diffCi, feesCi] = await Promise.all([fetchBlockchainInfoChart('difficulty'), fetchBlockchainInfoChart('transaction-fees')]);
+      difficulty = diffCi;
+      dailyFeesBtc = feesCi;
+      dailyBlocks = null;
+    }
+    const dailyIssuance = dailyFeesBtc.map(f => {
+      const blocksThatDay = dailyBlocks ? (lastValueBefore(dailyBlocks, f.t) || MFLOOR_BLOCKS_PER_DAY) : MFLOOR_BLOCKS_PER_DAY;
+      return { t: f.t, v: subsidyAtDate(f.t) * blocksThatDay + f.v };
+    });
 
     const closes = weekly.map(w => w.c);
     const trueRanges = weekly.map((w, i) => i === 0 ? (w.h - w.l) : Math.max(w.h - w.l, Math.abs(w.h - weekly[i - 1].c), Math.abs(w.l - weekly[i - 1].c)));
