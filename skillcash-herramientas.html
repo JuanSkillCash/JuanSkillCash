@@ -1303,6 +1303,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="pisomercado">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
       </button>
+      <button class="sb-item" data-indic-jump="ema200">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
+      </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium</span>
       </button>
@@ -1435,6 +1441,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="indic-cat-label">Personales</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1832,6 +1844,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
+              <div class="indic-guide-icon">📉</div>
+              <div class="indic-guide-card-title">Medias Móviles 200</div>
+              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
+              <div class="indic-guide-icon">🪜</div>
+              <div class="indic-guide-card-title">Techo Anterior</div>
+              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
               <div class="indic-guide-icon">♾️</div>
               <div class="indic-guide-card-title">Coinbase Premium</div>
@@ -2227,6 +2251,83 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 ⚓ <b>Canal de Keltner</b> (20, mult. 2, EMA, ATR 10) sobre velas semanales reales de Binance — se muestra solo la banda inferior, igual a como está configurado en TradingView.<br>
                 ⛏️ <b>Costo de Producción</b> estimado con dificultad, bloques minados y comisiones reales de Coin Metrics (la misma fuente de comisiones que usa el indicador original en TradingView; si no está disponible, se usa blockchain.info como respaldo, aproximando los bloques minados con el promedio de red): dificultad^0.45 / emisión diaria, suavizado a 13 semanas — misma fórmula y exponente del indicador original, con el factor de escala calibrado directamente contra el gráfico real del usuario en varias fechas históricas verificadas, así que aunque no hay acceso a Glassnode, los valores deberían acercarse bastante al gráfico original en TradingView.<br>
                 🎯 Los <b>pisos históricos</b> (hasta jun 2026) están fijados en las fechas exactas que el usuario verificó contra su propio gráfico real — la fórmula pública, sola, los ubicaba con semanas de diferencia. De ahí en adelante, cada cruce nuevo se detecta en vivo con la fórmula, como cualquier otro indicador del sitio.<br>
+                <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="ema200" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Medias Móviles 200 de Bitcoin</h2>
+                <p class="calc-sub">Precio diario de Bitcoin junto a sus dos medias móviles de 200 días más seguidas: la exponencial (EMA, reacciona más rápido) y la simple (SMA, más lenta) — muchos las usan como referencia de tendencia de largo plazo.</p>
+              </div>
+
+              <div class="indic-chart-body" id="ema200ChartBody">
+                <div class="indic-chart-soon" id="ema200Loading">
+                  <div class="indic-placeholder-icon">📉</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando la EMA 200 y la SMA 200 sobre el precio diario real de Bitcoin.</div>
+                </div>
+                <div class="indic-chart-soon" id="ema200Error" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="ema200ChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="ema200Legend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="ema200Stats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📉 EMA y SMA de <b>200 días</b> sobre el precio diario real de Bitcoin (mismo historial que usan Ciclos de Halving y Rainbow Chart).<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="ciclosoporte" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Techo Anterior como Soporte</h2>
+                <p class="calc-sub">Indicador personal: la teoría de que el máximo del ciclo anterior tiende a volverse soporte cuando el precio vuelve a bajar hasta ahí en el siguiente mercado bajista. Se traza una línea desde cada techo de ciclo hasta el punto donde el precio la vuelve a tocar (o hasta hoy, si todavía no la ha tocado).</p>
+              </div>
+
+              <div class="indic-beta-warning">
+                <span class="indic-beta-warning-icon">⚠️</span>
+                <span><b>Criterio personal, no un patrón garantizado.</b> Que se haya cumplido en ciclos pasados no significa que se vuelva a cumplir — únalo solo como referencia educativa.</span>
+              </div>
+
+              <div class="indic-chart-body" id="ciclosoporteChartBody">
+                <div class="indic-chart-soon" id="ciclosoporteLoading">
+                  <div class="indic-placeholder-icon">🪜</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Buscando el techo de cada ciclo y dónde el precio volvió a tocarlo.</div>
+                </div>
+                <div class="indic-chart-soon" id="ciclosoporteError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="ciclosoporteChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="ciclosoporteLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="ciclosoporteStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🪜 Por cada halving se busca el <b>precio máximo</b> alcanzado antes del siguiente halving (el techo de ese ciclo), y se traza una línea horizontal desde esa fecha hasta donde el precio la volvió a tocar por primera vez desde abajo.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -4961,9 +5062,9 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: [],
-  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }]
+  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }]
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -5025,6 +5126,8 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'rainbow') ensureRainbowLoaded();
       if(btn.dataset.indic === 'picycle') ensurePicycleLoaded();
       if(btn.dataset.indic === 'pisomercado') ensureMfloorLoaded();
+      if(btn.dataset.indic === 'ema200') ensureEma200Loaded();
+      if(btn.dataset.indic === 'ciclosoporte') ensureCicloSoporteLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
     });
   });
@@ -5045,6 +5148,8 @@ function jumpToIndicator(id){
     if(id === 'rainbow') ensureRainbowLoaded();
     if(id === 'picycle') ensurePicycleLoaded();
     if(id === 'pisomercado') ensureMfloorLoaded();
+    if(id === 'ema200') ensureEma200Loaded();
+    if(id === 'ciclosoporte') ensureCicloSoporteLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
@@ -12591,6 +12696,295 @@ let mfloorLoadedOnce = false;
 function ensureMfloorLoaded(){ if(!mfloorLoadedOnce){ mfloorLoadedOnce = true; loadMarketFloorDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="pisomercado"]').style.display !== 'none') renderMarketFloorChart();
+});
+
+/* ---- Medias Móviles 200: EMA y SMA de 200 días sobre el mismo historial diario de precio que ya
+   usan Ciclos de Halving, Rainbow Chart y Pi Cycle ---- */
+function renderEma200Chart(){
+  const loadingEl = document.getElementById('ema200Loading');
+  const errorEl = document.getElementById('ema200Error');
+  const wrap = document.getElementById('ema200ChartWrap');
+  const legendEl = document.getElementById('ema200Legend');
+  const statsEl = document.getElementById('ema200Stats');
+  const allPoints = halvingBtcHistory;
+  const closesFull = allPoints ? allPoints.map(p => p.c) : [];
+  const smaFull = allPoints ? smaTrailingArr(closesFull, 200) : [];
+  const validStartIdx = allPoints ? smaFull.findIndex(v => v != null) : -1;
+  if(!allPoints || validStartIdx < 0){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const emaFull = emaSeriesArr(closesFull, 200);
+  const points = allPoints.slice(validStartIdx);
+  const ema200 = emaFull.slice(validStartIdx);
+  const sma200 = smaFull.slice(validStartIdx);
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const allVals = points.map(p => p.c).concat(ema200).concat(sma200);
+  const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  function pathFor(getY){
+    let d = '';
+    points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${getY(i).toFixed(1)} `; });
+    return d.trim();
+  }
+  const priceLine = pathFor(i => yFor(points[i].c));
+  const emaLine = pathFor(i => yFor(ema200[i]));
+  const smaLine = pathFor(i => yFor(sma200[i]));
+
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="ema200ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        <path d="${smaLine}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${emaLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="ema200HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="ema200HoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="ema200HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="ema200HoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="ema200HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="ema200Tooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const e2Svg = document.getElementById('ema200ChartSvg');
+  wireChartHover({
+    svg: e2Svg, catcherId: 'ema200HoverCatcher', lineId: 'ema200HoverLine', dotId: 'ema200HoverDot',
+    dateLabelId: 'ema200HoverDateLabel', dateBgId: 'ema200HoverDateBg', tooltipId: 'ema200Tooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].c),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#22c55e">EMA200 ${fmtHalvingPrice(ema200[i])}</span><br><span style="color:#f97316">SMA200 ${fmtHalvingPrice(sma200[i])}</span>`,
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>EMA 200</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f97316"></span>SMA 200</span>
+  `;
+
+  const lastPrice = points[points.length - 1].c, lastEma = ema200[ema200.length - 1], lastSma = sma200[sma200.length - 1];
+  const aboveBoth = lastPrice > lastEma && lastPrice > lastSma;
+  const belowBoth = lastPrice < lastEma && lastPrice < lastSma;
+  statsEl.innerHTML = `
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Precio vs. medias 200</div><div class="r-val" style="color:${aboveBoth ? '#22c55e' : belowBoth ? '#ef4444' : '#f0b23d'}">${aboveBoth ? 'Por encima de ambas' : belowBoth ? 'Por debajo de ambas' : 'Entre las dos'}</div></div>
+    <div class="res-card"><div class="r-label">EMA 200</div><div class="r-val">${fmtHalvingPrice(lastEma)}</div></div>
+    <div class="res-card"><div class="r-label">SMA 200</div><div class="r-val">${fmtHalvingPrice(lastSma)}</div></div>
+  `;
+}
+async function loadEma200Detail(){
+  try{ await fetchHalvingHistory(); } catch(err){ /* renderEma200Chart muestra el estado de error si no hay datos */ }
+  renderEma200Chart();
+}
+let ema200LoadedOnce = false;
+function ensureEma200Loaded(){ if(!ema200LoadedOnce){ ema200LoadedOnce = true; loadEma200Detail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="ema200"]').style.display !== 'none') renderEma200Chart();
+});
+
+/* ---- Techo Anterior como Soporte: teoría personal de que el máximo de cada ciclo (el precio más
+   alto alcanzado entre un halving y el siguiente) se vuelve soporte cuando el precio lo vuelve a
+   tocar en el siguiente mercado bajista ---- */
+function computeCyclePeaks(points){
+  const boundaries = HALVING_CYCLES.map(h => h.date.getTime()).concat([Infinity]);
+  const lastT = points[points.length - 1].t;
+  const peaks = [];
+  for(let c = 0; c < HALVING_CYCLES.length; c++){
+    const startT = boundaries[c], endT = boundaries[c + 1];
+    let peakPrice = -Infinity, peakIdx = -1;
+    for(let i = 0; i < points.length; i++){
+      if(points[i].t >= startT && points[i].t < endT && points[i].c > peakPrice){ peakPrice = points[i].c; peakIdx = i; }
+    }
+    // si el "máximo" cae en los últimos ~90 días, el precio probablemente todavía sigue subiendo
+    // dentro de ese mismo ciclo — no hay techo real todavía que trazar como soporte futuro
+    if(peakIdx >= 0 && lastT - points[peakIdx].t > 90 * 86400000) peaks.push({ cycleLabel: HALVING_CYCLES[c].label, peakT: points[peakIdx].t, peakPrice });
+  }
+  return peaks;
+}
+function findSupportTouch(points, peak){
+  for(let i = 0; i < points.length; i++){
+    if(points[i].t > peak.peakT && points[i].c <= peak.peakPrice) return points[i].t;
+  }
+  return null;
+}
+function renderCicloSoporteChart(){
+  const loadingEl = document.getElementById('ciclosoporteLoading');
+  const errorEl = document.getElementById('ciclosoporteError');
+  const wrap = document.getElementById('ciclosoporteChartWrap');
+  const legendEl = document.getElementById('ciclosoporteLegend');
+  const statsEl = document.getElementById('ciclosoporteStats');
+  const points = halvingBtcHistory;
+  if(!points || points.length < 30){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const peaks = computeCyclePeaks(points).map(pk => ({ ...pk, touchT: findSupportTouch(points, pk) }));
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const prices = points.map(p => p.c);
+  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices, ...peaks.map(pk => pk.peakPrice));
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 34, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 10 && y < marginTop + drawH - 14;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  let priceLine = '';
+  points.forEach((p, i) => { priceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `; });
+
+  const peakLinesHtml = peaks.map(pk => {
+    const x1 = xFor(pk.peakT), x2 = xFor(pk.touchT || endMs), y = yFor(pk.peakPrice);
+    const color = pk.touchT ? '#f0b23d' : 'rgba(240,178,61,.4)';
+    return `
+      <line x1="${x1.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <circle cx="${x1.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${color}"/>
+      <text x="${(x1 + 4).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="${xFontSize}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">Techo ${pk.cycleLabel}</text>
+    `;
+  }).join('');
+
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="ciclosoporteChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${peakLinesHtml}
+        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="ciclosoporteHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="ciclosoporteHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="ciclosoporteHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="ciclosoporteHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="ciclosoporteHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="ciclosoporteTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const csSvg = document.getElementById('ciclosoporteChartSvg');
+  wireChartHover({
+    svg: csSvg, catcherId: 'ciclosoporteHoverCatcher', lineId: 'ciclosoporteHoverLine', dotId: 'ciclosoporteHoverDot',
+    dateLabelId: 'ciclosoporteHoverDateLabel', dateBgId: 'ciclosoporteHoverDateBg', tooltipId: 'ciclosoporteTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].c),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b>`,
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Techo de ciclo → soporte tocado</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(240,178,61,.4)"></span>Techo de ciclo → aún sin tocar</span>
+  `;
+
+  statsEl.innerHTML = peaks.map(pk => `
+    <div class="res-card">
+      <div class="r-label">Techo ${pk.cycleLabel}</div>
+      <div class="r-val">${fmtHalvingPrice(pk.peakPrice)}</div>
+      <div class="r-label" style="margin-top:4px">${pk.touchT ? 'Tocado: ' + new Date(pk.touchT).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) : 'Aún no se ha tocado'}</div>
+    </div>
+  `).join('');
+}
+async function loadCicloSoporteDetail(){
+  try{ await fetchHalvingHistory(); } catch(err){ /* renderCicloSoporteChart muestra el estado de error si no hay datos */ }
+  renderCicloSoporteChart();
+}
+let ciclosoporteLoadedOnce = false;
+function ensureCicloSoporteLoaded(){ if(!ciclosoporteLoadedOnce){ ciclosoporteLoadedOnce = true; loadCicloSoporteDetail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="ciclosoporte"]').style.display !== 'none') renderCicloSoporteChart();
 });
 
 /* ---- Coinbase Premium Index: diferencia en vivo entre el precio de BTC en Coinbase y en
