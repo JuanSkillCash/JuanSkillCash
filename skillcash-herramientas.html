@@ -12396,6 +12396,32 @@ async function loadMarketFloorData(){
     const issuanceSma = smaTrailingArr(weeklyIssuance, MFLOOR_SMOOTH_WEEKS);
     const rawCostUnscaled = difficultySma.map((d, i) => (d == null || issuanceSma[i] == null) ? null : Math.pow(d, MFLOOR_K) / issuanceSma[i]);
 
+    // DIAGNÓSTICO TEMPORAL: imprime en la consola el valor "crudo" (sin calibrar) en fechas donde
+    // el usuario ya identificó cruces reales en su propio gráfico de TradingView, para poder
+    // calibrar con una regresión real en vez de adivinar otra vez a ciegas
+    const MFLOOR_DEBUG_ANCHORS = [
+      { label: '9 feb 2015', t: Date.UTC(2015, 1, 9) },
+      { label: '10 dic 2018', t: Date.UTC(2018, 11, 10) },
+      { label: '16 mar 2020', t: Date.UTC(2020, 2, 16) },
+      { label: '28 nov 2022', t: Date.UTC(2022, 10, 28) },
+      { label: '26 ago 2024', t: Date.UTC(2024, 7, 26) },
+      { label: '22 jun 2026', t: Date.UTC(2026, 5, 22) },
+    ];
+    console.log('%c[Radar de Capitulación] valores crudos (sin calibrar) en fechas de referencia:', 'font-weight:bold');
+    console.table(MFLOOR_DEBUG_ANCHORS.map(a => {
+      let idx = 0, bestDiff = Infinity;
+      for(let i = 0; i < weekly.length; i++){
+        const diff = Math.abs(weekly[i].t - a.t);
+        if(diff < bestDiff){ bestDiff = diff; idx = i; }
+      }
+      return {
+        fecha_pedida: a.label,
+        semana_mas_cercana: new Date(weekly[idx].t).toISOString().slice(0, 10),
+        precio_esa_semana: Math.round(weekly[idx].c),
+        costo_crudo_sin_calibrar: rawCostUnscaled[idx],
+      };
+    }));
+
     let sumLogRatio = 0, ratioCount = 0;
     for(let i = 0; i < weekly.length; i++){
       if(rawCostUnscaled[i] != null && rawCostUnscaled[i] > 0 && weekly[i].c > 0){
