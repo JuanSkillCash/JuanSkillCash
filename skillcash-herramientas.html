@@ -2243,6 +2243,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <span><b>Herramienta en fase de pruebas.</b> Los datos del Costo de Producción son un estimado propio con fuentes públicas, no totalmente exactos ni verificados — no los tomes como una cifra oficial. Úsala solo como referencia educativa, nunca como asesoría financiera.</span>
               </div>
 
+              <div class="tf-pill-row" id="mfloorRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
               <div class="indic-chart-body" id="mfloorChartBody">
                 <div class="indic-chart-soon" id="mfloorLoading">
                   <div class="indic-placeholder-icon">⚓</div>
@@ -12505,6 +12512,8 @@ function coinMetricsSeriesFor(rows, key){
 // factor implícito salió consistente en las 4 (entre 10.6 y 12.2), confirmando que la FORMA de la
 // fórmula sí es correcta y solo hacía falta la escala exacta, no una recalibración que se mueve sola
 const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA_FROZEN = 11.48;
+const MFLOOR_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let mfloorActiveRange = 'todo';
 let marketFloorData = null;
 let marketFloorInFlight = null;
 let marketFloorSource = null; // 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
@@ -12648,8 +12657,14 @@ function renderMarketFloorChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const points = allPoints.slice(validStartIdx);
-  const crossings = detectMarketFloorCrossings(points);
+  // los cruces se calculan siempre sobre la historia COMPLETA (un piso de hace años sigue siendo
+  // válido aunque el filtro de rango no lo muestre) — el filtro solo hace zoom visual
+  const allPointsFull = allPoints.slice(validStartIdx);
+  const crossings = detectMarketFloorCrossings(allPointsFull);
+  const fullEndMs = allPointsFull[allPointsFull.length - 1].t;
+  const mfloorRangeYears = MFLOOR_RANGE_YEARS[mfloorActiveRange];
+  const mfloorCutoffMs = mfloorRangeYears ? fullEndMs - mfloorRangeYears * 365 * 86400000 : allPointsFull[0].t;
+  const points = allPointsFull.filter(p => p.t >= mfloorCutoffMs);
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -12690,7 +12705,7 @@ function renderMarketFloorChart(){
   const costLine = pathFor(i => yFor(points[i].costSmooth));
 
   let lastLabelPx = -Infinity;
-  const crossHtml = crossings.map(c => {
+  const crossHtml = crossings.filter(c => c.t >= startMs && c.t <= endMs).map(c => {
     const pxNum = xFor(c.t);
     const px = pxNum.toFixed(1);
     const showLabel = pxNum - lastLabelPx > 50;
@@ -13130,6 +13145,15 @@ document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(btn => {
     btn.classList.add('active');
     ciclosoporteActiveRange = btn.dataset.range;
     renderCicloSoporteChart();
+  });
+});
+document.querySelectorAll('#mfloorRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#mfloorRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mfloorActiveRange = btn.dataset.range;
+    renderMarketFloorChart();
   });
 });
 
