@@ -2209,6 +2209,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <p class="calc-sub">Compara dos promedios móviles del precio: cuando el de 111 días cruza por encima del de 350 días × 2, históricamente ha marcado el techo del ciclo — casi al día, en 2013, 2017 y 2021.</p>
               </div>
 
+              <div class="tf-pill-row" id="picycleRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
               <div class="indic-chart-body" id="picycleChartBody">
                 <div class="indic-chart-soon" id="picycleLoading">
                   <div class="indic-placeholder-icon">📐</div>
@@ -12282,6 +12289,8 @@ function movingAverageSeries(points, windowDays){
   }
   return result;
 }
+const PICYCLE_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let picycleActiveRange = 'todo';
 function renderPiCycleChart(){
   const loadingEl = document.getElementById('picycleLoading');
   const errorEl = document.getElementById('picycleError');
@@ -12306,16 +12315,27 @@ function renderPiCycleChart(){
 
   const sma111Full = movingAverageSeries(allPoints, 111);
   const sma350x2Full = movingAverageSeries(allPoints, 350).map(v => v * 2);
-  const points = allPoints.slice(validStartIdx);
-  const sma111 = sma111Full.slice(validStartIdx);
-  const sma350x2 = sma350x2Full.slice(validStartIdx);
+  const fullPoints = allPoints.slice(validStartIdx);
+  const sma111Trimmed = sma111Full.slice(validStartIdx);
+  const sma350x2Trimmed = sma350x2Full.slice(validStartIdx);
 
+  // los cruces se calculan siempre sobre la historia COMPLETA — el filtro de rango solo hace zoom
+  // visual, no cambia qué techos se detectan
   const crossings = [];
-  for(let i = 1; i < points.length; i++){
-    if(sma111[i - 1] < sma350x2[i - 1] && sma111[i] >= sma350x2[i]){
-      crossings.push({ t: points[i].t, price: points[i].c });
+  for(let i = 1; i < fullPoints.length; i++){
+    if(sma111Trimmed[i - 1] < sma350x2Trimmed[i - 1] && sma111Trimmed[i] >= sma350x2Trimmed[i]){
+      crossings.push({ t: fullPoints[i].t, price: fullPoints[i].c });
     }
   }
+
+  const fullEndMs = fullPoints[fullPoints.length - 1].t;
+  const picycleRangeYears = PICYCLE_RANGE_YEARS[picycleActiveRange];
+  const picycleCutoffMs = picycleRangeYears ? fullEndMs - picycleRangeYears * 365 * 86400000 : fullPoints[0].t;
+  let picycleFilterStartIdx = fullPoints.findIndex(p => p.t >= picycleCutoffMs);
+  if(picycleFilterStartIdx < 0) picycleFilterStartIdx = 0;
+  const points = fullPoints.slice(picycleFilterStartIdx);
+  const sma111 = sma111Trimmed.slice(picycleFilterStartIdx);
+  const sma350x2 = sma350x2Trimmed.slice(picycleFilterStartIdx);
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -12358,7 +12378,7 @@ function renderPiCycleChart(){
   // cuando dos cruces caen muy cerca en el tiempo (ej. dos tapas del mismo ciclo alcista), se
   // omite el texto del segundo para que no se encimen las etiquetas — la línea sí se dibuja siempre
   let lastLabelPx = -Infinity;
-  const crossHtml = crossings.map(c => {
+  const crossHtml = crossings.filter(c => c.t >= startMs && c.t <= endMs).map(c => {
     const pxNum = xFor(c.t);
     const px = pxNum.toFixed(1);
     const showLabel = pxNum - lastLabelPx > 50;
@@ -13206,6 +13226,15 @@ document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(btn => {
     btn.classList.add('active');
     rainbowActiveRange = btn.dataset.range;
     renderRainbowChart();
+  });
+});
+document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    picycleActiveRange = btn.dataset.range;
+    renderPiCycleChart();
   });
 });
 
