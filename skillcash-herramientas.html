@@ -11477,10 +11477,13 @@ function niceLogTicks(minV, maxV){
   const ticks = [];
   const lo = Math.floor(Math.log10(minV));
   const hi = Math.ceil(Math.log10(maxV));
-  // si el ciclo abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón 1-2-5 deja muy pocas
-  // marcas visibles — se usa uno más denso para que el eje no se quede casi vacío
+  // si el ciclo abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón de solo potencias de
+  // 10 deja muy pocas marcas visibles — se usa uno más denso para que el eje no se quede casi vacío.
+  // Para cualquier rango más amplio, usar multiplicadores como 2 o 5 dentro de cada década se ve
+  // "en pares" con huecos raros entre ellos (1→2/1→5 y 2→10/5→10 no son el mismo tramo en escala
+  // log) — con solo potencias de 10 las marcas quedan parejas de verdad
   const spanDecades = Math.log10(maxV) - Math.log10(minV);
-  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : spanDecades > 4 ? [1, 5] : [1, 2, 5];
+  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : [1];
   for(let p = lo; p <= hi; p++){
     multipliers.forEach(m => {
       const v = m * Math.pow(10, p);
@@ -12903,25 +12906,32 @@ window.addEventListener('resize', () => {
 /* ---- Techo Anterior como Soporte: teoría personal de que el máximo de cada ciclo (el precio más
    alto alcanzado entre un halving y el siguiente) se vuelve soporte cuando el precio lo vuelve a
    tocar en el siguiente mercado bajista ---- */
+// un "techo de ciclo" real no es simplemente el precio más alto dentro de una ventana de halving a
+// halving, ni el primer máximo que cae un % fijo desde su pico: en abril 2021 BTC también cayó
+// más de 50% (~$64.8K a ~$29.8K) antes de subir a un techo más alto en noviembre, y marzo 2024 fue
+// solo un repunte breve antes de seguir subiendo, sin una caída real — ningún algoritmo automático
+// distingue eso de forma confiable de un techo real (ni los traders profesionales, en el momento).
+// Por eso, igual que los pisos de Pulso de Fondo, estos techos están verificados manualmente contra
+// datos históricos reales en vez de calculados en vivo
+const CICLOSOPORTE_VERIFIED_PEAKS = [
+  { t: Date.UTC(2013, 10, 30), price: 1163 },
+  { t: Date.UTC(2017, 11, 17), price: 19783 },
+  { t: Date.UTC(2021, 10, 10), price: 68789 },
+  { t: Date.UTC(2025, 9, 6), price: 126210 },
+];
 function computeCyclePeaks(points){
-  const boundaries = HALVING_CYCLES.map(h => h.date.getTime()).concat([Infinity]);
-  const peaks = [];
-  // el ciclo actual (el último halving, sin uno siguiente todavía) no tiene un techo confirmado:
-  // el precio puede seguir subiendo y hacer un ATH más alto, así que no se marca como techo
-  for(let c = 0; c < HALVING_CYCLES.length - 1; c++){
-    const startT = boundaries[c], endT = boundaries[c + 1];
-    let peakPrice = -Infinity, peakIdx = -1;
+  const nearestPoint = t => {
+    let idx = 0, bestDiff = Infinity;
     for(let i = 0; i < points.length; i++){
-      if(points[i].t >= startT && points[i].t < endT && points[i].c > peakPrice){ peakPrice = points[i].c; peakIdx = i; }
+      const diff = Math.abs(points[i].t - t);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
     }
-    if(peakIdx >= 0){
-      // la etiqueta usa el año real en que se dio el ATH, no el año del halving que arrancó el
-      // ciclo (ej. el techo del ciclo que empezó con el halving de 2020 ocurrió en 2021)
-      const cycleLabel = String(new Date(points[peakIdx].t).getUTCFullYear());
-      peaks.push({ cycleLabel, peakT: points[peakIdx].t, peakPrice, searchFromT: endT });
-    }
-  }
-  return peaks;
+    return points[idx];
+  };
+  return CICLOSOPORTE_VERIFIED_PEAKS.map(pk => {
+    const np = nearestPoint(pk.t);
+    return { cycleLabel: String(new Date(pk.t).getUTCFullYear()), peakT: np.t, peakPrice: np.c, searchFromT: np.t };
+  });
 }
 function findSupportTouch(points, peak){
   // el "toque" real es cuando el precio, DESPUÉS de haber superado ese techo anterior (confirmando
@@ -13009,16 +13019,20 @@ function renderCicloSoporteChart(){
   let priceLine = '';
   points.forEach((p, i) => { priceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `; });
 
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
+
   // cuando dos techos quedan muy cerca en el tiempo (ej. el techo del ciclo actual justo antes de
   // "hoy"), se omite el texto del segundo para que no se encimen las etiquetas — la línea sí se
   // dibuja siempre. Si el techo queda antes del rango visible (con el filtro de años activo), la
-  // línea entra recortada desde el borde izquierdo, sin punto ni etiqueta propios
+  // línea entra recortada desde el borde izquierdo, sin punto ni etiqueta propios. Tampoco se
+  // muestra si cae encima de la etiqueta "HOY"
   let lastLabelPx = -Infinity;
   const peakLinesHtml = visiblePeaks.map(pk => {
     const dotVisible = pk.peakT >= startMs;
     const x1 = xFor(Math.max(pk.peakT, startMs)), x2 = xFor(Math.min(pk.touchT || fullEndMs, endMs)), y = yFor(pk.peakPrice);
     const color = pk.touchT ? '#f0b23d' : 'rgba(240,178,61,.6)';
-    const showLabel = dotVisible && x1 - lastLabelPx > 55;
+    const overlapsHoy = Math.abs(x1 - lastPx) < 90 && Math.abs(y - lastPy) < 20;
+    const showLabel = dotVisible && x1 - lastLabelPx > 55 && !overlapsHoy;
     if(showLabel) lastLabelPx = x1;
     return `
       <line x1="${x1.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}" stroke-width="1.25" stroke-dasharray="6,3"/>
@@ -13027,7 +13041,6 @@ function renderCicloSoporteChart(){
     `;
   }).join('');
 
-  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
