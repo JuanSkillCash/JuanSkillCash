@@ -12397,6 +12397,33 @@ async function loadMarketFloorData(){
 
     const costSmooth = rawCostUnscaled.map(v => v == null ? null : v * MFLOOR_ALPHA_FROZEN);
 
+    // DIAGNÓSTICO TEMPORAL: alrededor de cada fecha real donde el usuario confirmó un cruce en su
+    // propio gráfico, imprime semana por semana si keltnerLower ya está por debajo de costSmooth —
+    // así se ve la semana EXACTA en la que mi propio cálculo cruza, para medir el desfase real en
+    // vez de adivinar la dirección/magnitud a ciegas
+    const MFLOOR_DEBUG_ANCHORS2 = [
+      { label: '10 dic 2018', t: Date.UTC(2018, 11, 10) },
+      { label: '16 mar 2020', t: Date.UTC(2020, 2, 16) },
+      { label: '28 nov 2022', t: Date.UTC(2022, 10, 28) },
+      { label: '26 ago 2024', t: Date.UTC(2024, 7, 26) },
+      { label: '22 jun 2026', t: Date.UTC(2026, 5, 22) },
+    ];
+    MFLOOR_DEBUG_ANCHORS2.forEach(a => {
+      let idx = 0, bestDiff = Infinity;
+      for(let i = 0; i < weekly.length; i++){
+        const diff = Math.abs(weekly[i].t - a.t);
+        if(diff < bestDiff){ bestDiff = diff; idx = i; }
+      }
+      console.log('%c[Radar de Capitulación] ventana alrededor de ' + a.label, 'font-weight:bold');
+      console.table(Array.from({ length: 13 }, (_, k) => idx - 6 + k).filter(i => i >= 0 && i < weekly.length).map(i => ({
+        semana: new Date(weekly[i].t).toISOString().slice(0, 10),
+        es_la_fecha_real: i === idx ? '★ ' + a.label : '',
+        keltner_inferior: Math.round(keltnerLower[i]),
+        costo_calibrado: costSmooth[i] == null ? null : Math.round(costSmooth[i]),
+        cruzado: costSmooth[i] != null && keltnerLower[i] < costSmooth[i],
+      })));
+    });
+
     const points = weekly.map((w, i) => ({ t: w.t, price: w.c, keltnerLower: keltnerLower[i], costSmooth: costSmooth[i] }));
     marketFloorData = points;
     marketFloorInFlight = null;
