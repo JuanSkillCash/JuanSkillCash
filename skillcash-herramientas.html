@@ -11403,20 +11403,35 @@ let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo
 let halvingLoadFailed = false;
 let halvingHistoryInFlight = null;
 
-// Blockchain.com da el histórico diario completo de BTC (desde 2009) en una sola llamada, gratis,
-// sin API key, y con &cors=true pensado justo para poder llamarlo desde el navegador
+// Coin Metrics (misma fuente ya usada en Pulso de Fondo) es la fuente principal: gratis, sin
+// registro, y en la práctica más estable que blockchain.info para este mismo historial diario de
+// BTC. Si falla, se reintenta con blockchain.info (histórico completo desde 2009, gratis, sin
+// API key) y por último con CoinGecko (solo ~1 año, pero mejor que nada)
+async function fetchCoinMetricsPriceHistory(){
+  const rows = await fetchCoinMetricsDaily(['PriceUSD']);
+  return coinMetricsSeriesFor(rows, 'PriceUSD').map(r => ({ t: r.t, c: r.v }));
+}
 async function fetchHalvingHistory(){
   if(halvingBtcHistory) return halvingBtcHistory;
-  // Halving, Rainbow Chart y Pi Cycle piden este mismo historial casi al mismo tiempo al cargar
-  // la página — sin esto, cada uno dispara su propia llamada por separado (a blockchain.info Y a
-  // CoinGecko) en vez de compartir una sola, lo cual en una red de celular puede saturar y hacer
-  // fallar la carga de todos, incluidas herramientas que no dependen de esto (ej. F&G)
+  // Halving, Rainbow Chart, Pi Cycle, Medias Móviles 200 y Techo Anterior piden este mismo
+  // historial casi al mismo tiempo al cargar la página — sin esto, cada uno dispara su propia
+  // llamada por separado en vez de compartir una sola, lo cual en una red de celular puede
+  // saturar y hacer fallar la carga de todos, incluidas herramientas que no dependen de esto
   if(halvingHistoryInFlight) return halvingHistoryInFlight;
   halvingHistoryInFlight = (async () => {
-    // blockchain.info a veces no responde o tarda — se reintenta un par de veces (con espera
-    // creciente) antes de rendirse, en vez de fallar a la primera
     let points = [];
     let lastErr = null;
+
+    for(let attempt = 0; attempt < 2 && !points.length; attempt++){
+      try{
+        if(attempt > 0) await new Promise(r => setTimeout(r, 500));
+        const cm = await fetchCoinMetricsPriceHistory();
+        if(cm.length) points = cm;
+      } catch(err){ lastErr = err; }
+    }
+
+    // blockchain.info a veces no responde o tarda — se reintenta un par de veces (con espera
+    // creciente) antes de rendirse, en vez de fallar a la primera
     for(let attempt = 0; attempt < 3 && !points.length; attempt++){
       try{
         if(attempt > 0) await new Promise(r => setTimeout(r, 600 * attempt));
@@ -11441,9 +11456,10 @@ async function fetchHalvingHistory(){
         throw lastErr || new Error('no se pudo cargar el historial de precio');
       }
     } else {
-      // blockchain.info da todo el historial pero se actualiza con algo de rezago — se reemplaza
-      // el último año con los datos de CoinGecko (la misma fuente que ya usa el sitio, más al día)
-      // para que el precio y la fecha de "hoy" sean lo más recientes posibles
+      // la fuente que haya respondido (Coin Metrics o blockchain.info) da todo el historial pero se
+      // actualiza con algo de rezago — se reemplaza el último año con los datos de CoinGecko (la
+      // misma fuente que ya usa el sitio, más al día) para que el precio y la fecha de "hoy" sean
+      // lo más recientes posibles
       try{
         const recent = await fetchBtcPriceHistory(); // [[timestamp_ms, price], ...], últimos ~364 días
         if(recent && recent.length){
