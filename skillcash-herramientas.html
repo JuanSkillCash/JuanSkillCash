@@ -12932,29 +12932,26 @@ function computeCyclePeaks(points){
     }
     return best;
   };
-  return CICLOSOPORTE_VERIFIED_PEAKS.map(pk => {
+  const withPeaks = CICLOSOPORTE_VERIFIED_PEAKS.map(pk => {
     const np = localMaxNear(pk.t) || points[0];
-    return { cycleLabel: String(new Date(pk.t).getUTCFullYear()), peakT: np.t, peakPrice: np.c, searchFromT: np.t };
+    return { cycleLabel: String(new Date(pk.t).getUTCFullYear()), peakT: np.t, peakPrice: np.c };
   });
+  // el "toque" de un techo solo cuenta si pasa durante el mercado bajista real del ciclo SIGUIENTE
+  // (el que arranca en el próximo techo verificado) — no una caída menor dentro del mismo ciclo
+  // alcista en el que el precio ya había roto por encima (ej. el bajón de marzo 2024 no fue un
+  // mercado bajista real, solo un respiro antes de seguir subiendo a nuevos máximos)
+  return withPeaks.map((pk, i) => ({ ...pk, searchFromT: withPeaks[i + 1] ? withPeaks[i + 1].peakT : null }));
 }
 function findSupportTouch(points, peak){
-  // el "toque" real es cuando el precio, DESPUÉS de haber superado ese techo anterior (confirmando
-  // que ya se convirtió en soporte), vuelve a caer hasta ahí en una corrección — no el cruce
-  // trivial que pasa apenas empieza el siguiente ciclo, cuando el precio típicamente todavía está
-  // por debajo del techo anterior sin haberlo retado nunca. Tampoco debe contar el ruido normal de
-  // cualquier proceso de techo o de recuperación (cierres diarios que oscilan por encima y por
-  // debajo de un nivel durante días, antes de un movimiento real) — por eso se usa un promedio móvil
-  // de 14 días (no el cierre diario crudo) para decidir cruces, y además se exige que hayan pasado
-  // al menos 60 días desde el techo antes de que un cruce hacia arriba cuente como recuperación real
-  const SMOOTH_DAYS = 14, MIN_DAYS_BEFORE_BREAKOUT = 60 * 86400000;
+  // sin un techo siguiente confirmado todavía no hay un mercado bajista real de ese ciclo posterior
+  // donde buscar el toque
+  if(peak.searchFromT == null) return null;
+  // se usa un promedio móvil de 14 días (no el cierre diario crudo) para que el ruido normal de la
+  // caída no dé un "toque" un poco antes o después del cruce real
+  const SMOOTH_DAYS = 14;
   const smooth = smaTrailingArr(points.map(p => p.c), SMOOTH_DAYS);
-  let brokeAbove = false;
   for(let i = 0; i < points.length; i++){
-    if(smooth[i] == null || points[i].t < peak.searchFromT) continue;
-    if(!brokeAbove){
-      if(points[i].t - peak.peakT >= MIN_DAYS_BEFORE_BREAKOUT && smooth[i] > peak.peakPrice) brokeAbove = true;
-      continue;
-    }
+    if(points[i].t < peak.searchFromT || smooth[i] == null) continue;
     if(smooth[i] <= peak.peakPrice) return points[i].t;
   }
   return null;
