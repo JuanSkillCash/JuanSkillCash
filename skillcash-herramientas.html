@@ -12430,13 +12430,24 @@ function detectMarketFloorCrossings(points){
     .map(t => nearestPoint(t))
     .map(p => ({ t: p.t, price: p.price }));
 
+  // si el precio se recupera brevemente por encima del costo y vuelve a caer poco después, es la
+  // misma reversión del mismo piso — no un piso nuevo — así que se ignora cualquier cruce que
+  // caiga dentro de las MFLOOR_CROSSING_COOLDOWN_WEEKS semanas siguientes al último ya marcado
+  const MFLOOR_CROSSING_COOLDOWN_WEEKS = 26;
   const lastVerifiedT = MFLOOR_VERIFIED_CROSSINGS[MFLOOR_VERIFIED_CROSSINGS.length - 1];
   let prevBelow = null;
+  let lastCrossingT = lastVerifiedT;
   for(let i = 0; i < points.length; i++){
     const p = points[i];
     if(p.t <= lastVerifiedT || p.costSmooth == null) continue;
     const below = p.keltnerLower < p.costSmooth;
-    if(prevBelow === false && below === true) crossings.push({ t: p.t, price: p.price });
+    if(prevBelow === false && below === true){
+      const weeksSinceLast = (p.t - lastCrossingT) / (7 * 86400000);
+      if(weeksSinceLast >= MFLOOR_CROSSING_COOLDOWN_WEEKS){
+        crossings.push({ t: p.t, price: p.price });
+        lastCrossingT = p.t;
+      }
+    }
     prevBelow = below;
   }
   return crossings;
