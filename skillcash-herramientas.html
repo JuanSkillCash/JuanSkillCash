@@ -11563,13 +11563,14 @@ function niceLogTicks(minV, maxV){
   const ticks = [];
   const lo = Math.floor(Math.log10(minV));
   const hi = Math.ceil(Math.log10(maxV));
-  // si el ciclo abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón de solo potencias de
-  // 10 deja muy pocas marcas visibles — se usa uno más denso para que el eje no se quede casi vacío.
-  // Para cualquier rango más amplio, usar multiplicadores como 2 o 5 dentro de cada década se ve
-  // "en pares" con huecos raros entre ellos (1→2/1→5 y 2→10/5→10 no son el mismo tramo en escala
-  // log) — con solo potencias de 10 las marcas quedan parejas de verdad
+  // si el rango abarca menos de ~1.5 décadas (ej. el ciclo en curso), un patrón de solo potencias
+  // de 10 deja muy pocas marcas visibles — se usa uno más denso para que el eje no se quede casi
+  // vacío. Entre 1.5 y 4 décadas, 1-2-5 da unas 3 marcas por década sin verse "en pares" (el hueco
+  // 1→2/2→5/5→10 es bastante parejo). Pero en un rango MUY amplio (>4 décadas, ej. "Todo el
+  // historial" desde centavos hasta $100K+) usar 1-5 por década sí se ve en pares con huecos raros
+  // (1→5 y 5→10 no son el mismo tramo en escala log) — ahí es mejor usar solo potencias de 10
   const spanDecades = Math.log10(maxV) - Math.log10(minV);
-  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : [1];
+  const multipliers = spanDecades < 1.5 ? [1, 1.5, 2, 3, 5, 7] : spanDecades > 4 ? [1] : [1, 2, 5];
   for(let p = lo; p <= hi; p++){
     multipliers.forEach(m => {
       const v = m * Math.pow(10, p);
