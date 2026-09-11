@@ -1,0 +1,104 @@
+[
+  {
+    "file": "uniswap_v3_buy_usdg_to_token.json",
+    "wallet": "0x77616c6c65742d76332d627579657277616c6c65",
+    "description": "BUY limpio: USDG -> memecoin, Uniswap V3 (pool identificado por topic0 del evento Swap)",
+    "expected_action": "BUY",
+    "expected_protocol": "Uniswap V3 (o fork compatible)",
+    "token_registry": {
+      "0x746f6b656e2d75736467746f6b656e2d75736467": {
+        "symbol": "USDG",
+        "decimals": 18
+      },
+      "0x746f6b656e2d6d656d65746f6b656e2d6d656d65": {
+        "symbol": "MEME",
+        "decimals": 18
+      }
+    }
+  },
+  {
+    "file": "uniswap_v2_sell_token_to_weth.json",
+    "wallet": "0x77616c6c65742d76322d73656c6c657277616c6c",
+    "description": "SELL limpio: memecoin -> WETH, directo en un pool de Uniswap V2",
+    "expected_action": "SELL",
+    "expected_protocol": "Uniswap V2 (o fork compatible)",
+    "token_registry": {
+      "0x746f6b656e2d6d656d65746f6b656e2d6d656d65": {
+        "symbol": "MEME",
+        "decimals": 18
+      },
+      "0x746f6b656e2d77657468746f6b656e2d77657468": {
+        "symbol": "WETH",
+        "decimals": 18
+      }
+    }
+  },
+  {
+    "file": "buy_with_native_eth.json",
+    "wallet": "0x77616c6c65742d6574682d627579657277616c6c",
+    "description": "BUY limpio: ETH nativo (via tx.value) -> memecoin, Uniswap V3",
+    "expected_action": "BUY",
+    "expected_protocol": "Uniswap V3 (o fork compatible)",
+    "token_registry": {
+      "0x746f6b656e2d6d656d65746f6b656e2d6d656d65": {
+        "symbol": "MEME",
+        "decimals": 18
+      }
+    }
+  },
+  {
+    "file": "failed_tx.json",
+    "wallet": "0x77616c6c65742d76332d627579657277616c6c65",
+    "description": "Transaccion revertida on-chain (receipt.status=0x0)",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": null,
+    "token_registry": {}
+  },
+  {
+    "file": "simple_erc20_transfer.json",
+    "wallet": "0x77616c6c65742d7472616e7366657277616c6c65",
+    "description": "Transferencia ERC-20 simple, sin evento Swap - no es un swap",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": null,
+    "token_registry": {
+      "0x746f6b656e2d75736467746f6b656e2d75736467": {
+        "symbol": "USDG",
+        "decimals": 18
+      }
+    }
+  },
+  {
+    "file": "multihop_ambiguous.json",
+    "wallet": "0x77616c6c65742d6d756c7469686f7077616c6c65",
+    "description": "Ruta con residual: 1 salida + 2 entradas, ambiguo",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": "Uniswap V3 (o fork compatible)",
+    "token_registry": {
+      "0x746f6b656e2d75736467746f6b656e2d75736467": {
+        "symbol": "USDG",
+        "decimals": 18
+      },
+      "0x746f6b656e2d6d656d65746f6b656e2d6d656d65": {
+        "symbol": "MEME",
+        "decimals": 18
+      },
+      "0x746f6b656e2d7265736964746f6b656e2d726573": {
+        "symbol": "RESID",
+        "decimals": 18
+      }
+    }
+  },
+  {
+    "file": "erc4337_userop_buy.json",
+    "wallet": "0x77616c6c65742d757365726f7077616c6c65742d",
+    "description": "BUY via ERC-4337 UserOperation (EntryPoint v0.7); symbol del token de salida deliberadamente NO resoluble (prueba la penalizacion de confidence)",
+    "expected_action": "BUY",
+    "expected_protocol": "Uniswap V3 (o fork compatible)",
+    "token_registry": {
+      "0x746f6b656e2d75736467746f6b656e2d75736467": {
+        "symbol": "USDG",
+        "decimals": 18
+      }
+    }
+  }
+]

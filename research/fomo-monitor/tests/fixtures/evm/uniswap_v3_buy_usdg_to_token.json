@@ -1,0 +1,47 @@
+{
+  "tx": {
+    "hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+    "from": "0x77616c6c65742d76332d627579657277616c6c65",
+    "to": "0x726f757465722d756e6976657273616c726f7574",
+    "value": "0x0",
+    "blockNumber": "0x64",
+    "nonce": "0x1",
+    "input": "0xDemoCalldataNotDecodedByThisModule"
+  },
+  "receipt": {
+    "transactionHash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+    "status": "0x1",
+    "blockNumber": "0x64",
+    "logs": [
+      {
+        "address": "0x746f6b656e2d75736467746f6b656e2d75736467",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x00000000000000000000000077616c6c65742d76332d627579657277616c6c65",
+          "0x000000000000000000000000706f6f6c2d756e69737761702d7633706f6f6c2d"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+      },
+      {
+        "address": "0x746f6b656e2d6d656d65746f6b656e2d6d656d65",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000706f6f6c2d756e69737761702d7633706f6f6c2d",
+          "0x00000000000000000000000077616c6c65742d76332d627579657277616c6c65"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000034f086f3b33b68400000"
+      },
+      {
+        "address": "0x706f6f6c2d756e69737761702d7633706f6f6c2d",
+        "topics": [
+          "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+          "0x000000000000000000000000726f757465722d756e6976657273616c726f7574",
+          "0x00000000000000000000000077616c6c65742d76332d627579657277616c6c65"
+        ],
+        "data": "0xDemoUndecodedUniswapV3SwapEventData"
+      }
+    ]
+  },
+  "block_timestamp": "2026-08-10T10:00:00Z",
+  "_fixture_notes": "SINTETICO (ver README.md). Wallet gasta 100 USDG (18 decimales) para comprar 250000 unidades de un memecoin via un pool de Uniswap V3 (identificado por el topic0 del evento Swap emitido por el propio pool, direccion-agnostico). tx.value=0 porque el pago fue en USDG (ERC-20), no en ETH nativo. Resultado esperado: action=BUY, protocol='Uniswap V3 (o fork compatible)', confidence alta (~0.90)."
+}

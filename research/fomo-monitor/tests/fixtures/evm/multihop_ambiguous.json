@@ -1,0 +1,56 @@
+{
+  "tx": {
+    "hash": "0xf6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6",
+    "from": "0x77616c6c65742d6d756c7469686f7077616c6c65",
+    "to": "0x726f757465722d756e6976657273616c726f7574",
+    "value": "0x0",
+    "blockNumber": "0x69",
+    "nonce": "0x1",
+    "input": "0xDemoCalldataNotDecodedByThisModule"
+  },
+  "receipt": {
+    "transactionHash": "0xf6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6",
+    "status": "0x1",
+    "blockNumber": "0x69",
+    "logs": [
+      {
+        "address": "0x746f6b656e2d75736467746f6b656e2d75736467",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x00000000000000000000000077616c6c65742d6d756c7469686f7077616c6c65",
+          "0x000000000000000000000000706f6f6c2d756e69737761702d7633706f6f6c2d"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000ad78ebc5ac6200000"
+      },
+      {
+        "address": "0x746f6b656e2d6d656d65746f6b656e2d6d656d65",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000706f6f6c2d756e69737761702d7633706f6f6c2d",
+          "0x00000000000000000000000077616c6c65742d6d756c7469686f7077616c6c65"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000054b40b1f852bda000000"
+      },
+      {
+        "address": "0x746f6b656e2d7265736964746f6b656e2d726573",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000706f6f6c2d756e69737761702d7633706f6f6c2d",
+          "0x00000000000000000000000077616c6c65742d6d756c7469686f7077616c6c65"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000000027ca57357c000"
+      },
+      {
+        "address": "0x706f6f6c2d756e69737761702d7633706f6f6c2d",
+        "topics": [
+          "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+          "0x000000000000000000000000726f757465722d756e6976657273616c726f7574",
+          "0x00000000000000000000000077616c6c65742d6d756c7469686f7077616c6c65"
+        ],
+        "data": "0xDemoUndecodedMultiHopSwapEventData"
+      }
+    ]
+  },
+  "block_timestamp": "2026-08-10T15:00:00Z",
+  "_fixture_notes": "SINTETICO (ver README.md). La wallet gasta 200 USDG y recibe DOS tokens distintos (400000 del token 'objetivo' y un residual minusculo de 0.0007 de otro token intermedio, tipico de rounding en rutas multi-hop). 1 salida + 2 entradas = 3 patas netas. Resultado esperado: action=UNKNOWN, confidence=0.25, protocol='Uniswap V3 (o fork compatible)'."
+}
