@@ -13268,7 +13268,10 @@ function computeRsiSeries(closes, length){
     return 100 - 100 / (1 + avgGain[i] / avgLoss[i]);
   });
 }
-const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 30, RSI_COOLDOWN_MONTHS = 18;
+// el RSI mensual de BTC casi nunca cierra un mes por debajo de 30 — ni en las caídas más fuertes
+// (2018, 2022) — porque en una tendencia secular tan fuerte el "sobreventa" clásico de 30 casi
+// nunca se alcanza en este timeframe; un bear market real de BTC en mensual sí baja de 40
+const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 40, RSI_COOLDOWN_MONTHS = 18;
 const RSI_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let rsiActiveRange = 'todo';
 function renderRsiChart(){
