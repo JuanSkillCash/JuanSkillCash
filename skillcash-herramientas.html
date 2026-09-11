@@ -2426,7 +2426,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📶 <b>RSI (14)</b> calculado sobre el cierre de cada mes (no cada día) — es la misma configuración que en la referencia: un RSI de rango largo, más lento y menos ruidoso que el diario.<br>
-                🎯 Solo se marca el <b>primer cruce por encima de 50</b> después de un bear market real (el RSI tuvo que haber bajado de 30 antes, no un bajón leve) — históricamente eso ha coincidido con que el suelo del mercado ya se había formado poco antes. Si el mercado vuelve a bajar y a cruzar 50 varias veces seguidas, no se marca otra vez hasta que pasen al menos 18 meses desde el último cruce marcado.<br>
+                🎯 Solo se marca el <b>primer cruce por encima de 50</b> después de un bear market real (el RSI tuvo que haber bajado de 45 antes, no un bajón leve) — históricamente eso ha coincidido con que el suelo del mercado ya se había formado poco antes. Si el mercado vuelve a bajar y a cruzar 50 varias veces seguidas, no se marca otra vez hasta que pasen al menos 18 meses desde el último cruce marcado.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -13281,10 +13281,10 @@ function computeRsiSeries(closes, length){
     return 100 - 100 / (1 + avgGain[i] / avgLoss[i]);
   });
 }
-// el RSI mensual de BTC casi nunca cierra un mes por debajo de 30 — ni en las caídas más fuertes
-// (2018, 2022) — porque en una tendencia secular tan fuerte el "sobreventa" clásico de 30 casi
-// nunca se alcanza en este timeframe; un bear market real de BTC en mensual sí baja de 40
-const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 40, RSI_COOLDOWN_MONTHS = 18;
+// el RSI mensual real de este historial nunca bajó de ~40.5 (dic 2022, el peor bear market
+// registrado) — el "sobreventa" clásico de 30 casi nunca se alcanza en este timeframe con esta
+// fuente de datos, así que el umbral se fija con margen justo por encima de ese mínimo real
+const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 45, RSI_COOLDOWN_MONTHS = 18;
 const RSI_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let rsiActiveRange = 'todo';
 function renderRsiChart(){
@@ -13316,7 +13316,7 @@ function renderRsiChart(){
 
   // los cruces se calculan siempre sobre la historia COMPLETA — el filtro de rango solo hace
   // zoom visual, no cambia qué suelos se detectan. Solo cuenta como "suelo" el PRIMER cruce por
-  // encima de 50 después de un bear market real (el RSI tuvo que haber bajado de 30 antes, no
+  // encima de 50 después de un bear market real (el RSI tuvo que haber bajado de 45 antes, no
   // solo un bajón leve) — y aunque haya un bear market real, no se vuelve a marcar otro cruce
   // hasta que pasen al menos RSI_COOLDOWN_MONTHS desde el último ya marcado, para no contar como
   // "suelo nuevo" un mercado que baja y vuelve a cruzar 50 varias veces seguidas en poco tiempo
@@ -13451,15 +13451,10 @@ function renderRsiChart(){
 
   const lastRsi = rsi[rsi.length - 1];
   const lastCrossing = crossings.length ? crossings[crossings.length - 1] : null;
-  // dato de diagnóstico temporal: el mínimo real de RSI en toda la historia y cuándo ocurrió, para
-  // calibrar RSI_BEAR_LEVEL contra el dato real en vez de adivinar a ciegas
-  let minRsi = Infinity, minRsiT = null;
-  rsiTrimmed.forEach((v, i) => { if(v < minRsi){ minRsi = v; minRsiT = fullPoints[i].t; } });
   statsEl.innerHTML = `
     <div class="res-card" style="grid-column:1/-1"><div class="r-label">RSI mensual actual</div><div class="r-val" style="color:${lastRsi >= RSI_CROSS_LEVEL ? '#22c55e' : lastRsi <= 30 ? '#ef4444' : '#f0b23d'}">${lastRsi.toFixed(1)}</div></div>
     <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(points[points.length - 1].c)}</div></div>
     <div class="res-card"><div class="r-label">Último suelo marcado</div><div class="r-val">${lastCrossing ? new Date(lastCrossing.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin cruces aún'}</div></div>
-    <div class="res-card"><div class="r-label">[Diagnóstico] RSI mínimo histórico</div><div class="r-val">${minRsi.toFixed(1)} (${minRsiT ? new Date(minRsiT).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) : '—'})</div></div>
   `;
 }
 async function loadRsiDetail(){
