@@ -1314,6 +1314,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="ciclosoporte">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
       </button>
+      <button class="sb-item" data-indic-jump="rsimensual">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
+      </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium</span>
       </button>
@@ -1452,6 +1455,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1859,6 +1865,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">🪜</div>
               <div class="indic-guide-card-title">Techo Anterior</div>
               <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimensual">
+              <div class="indic-guide-icon">📶</div>
+              <div class="indic-guide-card-title">RSI Mensual</div>
+              <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
@@ -2371,6 +2383,50 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🪜 Por cada halving se busca el <b>precio máximo</b> alcanzado antes del siguiente halving (el techo de ese ciclo), y se traza una línea horizontal desde esa fecha hasta donde el precio la volvió a tocar por primera vez desde abajo.<br>
+                <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="rsimensual" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">RSI Mensual de Bitcoin</h2>
+                <p class="calc-sub">Indicador personal: cuando el RSI (14) calculado sobre velas mensuales vuelve a superar la zona de 50-55 después de haber estado por debajo, históricamente el suelo del mercado ya se había formado unas velas antes.</p>
+              </div>
+
+              <div class="tf-pill-row" id="rsiRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
+              <div class="indic-chart-body" id="rsiChartBody">
+                <div class="indic-chart-soon" id="rsiLoading">
+                  <div class="indic-placeholder-icon">📶</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el RSI mensual sobre el precio real de Bitcoin.</div>
+                </div>
+                <div class="indic-chart-soon" id="rsiError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="rsiChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="rsiLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="rsiStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📶 <b>RSI (14)</b> calculado sobre el cierre de cada mes (no cada día) — es la misma configuración que en la referencia: un RSI de rango largo, más lento y menos ruidoso que el diario.<br>
+                🎯 Se marca cada vez que el RSI, viniendo de abajo, vuelve a <b>cruzar por encima de 50</b> — históricamente eso ha coincidido con que el suelo del mercado ya se había formado poco antes.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -5105,9 +5161,9 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas (Whale Bias)' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: [],
-  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }]
+  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }]
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', rsimensual: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -5171,6 +5227,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'pisomercado') ensureMfloorLoaded();
       if(btn.dataset.indic === 'ema200') ensureEma200Loaded();
       if(btn.dataset.indic === 'ciclosoporte') ensureCicloSoporteLoaded();
+      if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
     });
   });
@@ -5193,6 +5250,7 @@ function jumpToIndicator(id){
     if(id === 'pisomercado') ensureMfloorLoaded();
     if(id === 'ema200') ensureEma200Loaded();
     if(id === 'ciclosoporte') ensureCicloSoporteLoaded();
+    if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
@@ -13191,6 +13249,216 @@ let ciclosoporteLoadedOnce = false;
 function ensureCicloSoporteLoaded(){ if(!ciclosoporteLoadedOnce){ ciclosoporteLoadedOnce = true; loadCicloSoporteDetail(); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="ciclosoporte"]').style.display !== 'none') renderCicloSoporteChart();
+});
+
+/* ---- RSI Mensual: RSI(14) sobre el cierre de cada mes del mismo historial diario de precio que
+   ya usan Halving/Rainbow/Pi Cycle/EMA200/Techo Anterior — se marca cada vez que, viniendo de
+   abajo, vuelve a cruzar por encima de 50 ---- */
+function toMonthlyCloses(dailyPoints){
+  const monthly = [];
+  let lastKey = null, lastPoint = null;
+  for(const p of dailyPoints){
+    const d = new Date(p.t);
+    const key = d.getUTCFullYear() * 12 + d.getUTCMonth();
+    if(lastKey !== null && key !== lastKey) monthly.push(lastPoint);
+    lastKey = key;
+    lastPoint = p;
+  }
+  if(lastPoint) monthly.push(lastPoint); // el mes en curso, con el último precio disponible hasta hoy
+  return monthly;
+}
+function computeRsiSeries(closes, length){
+  const gains = [0], losses = [0];
+  for(let i = 1; i < closes.length; i++){
+    const diff = closes[i] - closes[i - 1];
+    gains.push(Math.max(diff, 0));
+    losses.push(Math.max(-diff, 0));
+  }
+  const avgGain = rmaSeriesArr(gains, length);
+  const avgLoss = rmaSeriesArr(losses, length);
+  return closes.map((_, i) => {
+    if(avgLoss[i] === 0) return avgGain[i] === 0 ? 50 : 100;
+    return 100 - 100 / (1 + avgGain[i] / avgLoss[i]);
+  });
+}
+const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50;
+const RSI_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let rsiActiveRange = 'todo';
+function renderRsiChart(){
+  const loadingEl = document.getElementById('rsiLoading');
+  const errorEl = document.getElementById('rsiError');
+  const wrap = document.getElementById('rsiChartWrap');
+  const legendEl = document.getElementById('rsiLegend');
+  const statsEl = document.getElementById('rsiStats');
+  const dailyPoints = halvingBtcHistory;
+  const monthlyFull = dailyPoints ? toMonthlyCloses(dailyPoints) : [];
+  const rsiFull = monthlyFull.length ? computeRsiSeries(monthlyFull.map(p => p.c), RSI_LENGTH) : [];
+  const validStartIdx = rsiFull.length ? RSI_LENGTH : -1;
+  if(!dailyPoints || monthlyFull.length < validStartIdx + 2){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const fullPoints = monthlyFull.slice(validStartIdx);
+  const rsiTrimmed = rsiFull.slice(validStartIdx);
+
+  // los cruces se calculan siempre sobre la historia COMPLETA — el filtro de rango solo hace
+  // zoom visual, no cambia qué suelos se detectan
+  const crossings = [];
+  for(let i = 1; i < fullPoints.length; i++){
+    if(rsiTrimmed[i - 1] < RSI_CROSS_LEVEL && rsiTrimmed[i] >= RSI_CROSS_LEVEL){
+      crossings.push({ t: fullPoints[i].t, price: fullPoints[i].c, rsi: rsiTrimmed[i] });
+    }
+  }
+
+  const fullEndMs = fullPoints[fullPoints.length - 1].t;
+  const rsiRangeYears = RSI_RANGE_YEARS[rsiActiveRange];
+  const rsiCutoffMs = rsiRangeYears ? fullEndMs - rsiRangeYears * 365 * 86400000 : fullPoints[0].t;
+  let rsiFilterStartIdx = fullPoints.findIndex(p => p.t >= rsiCutoffMs);
+  if(rsiFilterStartIdx < 0) rsiFilterStartIdx = 0;
+  const points = fullPoints.slice(rsiFilterStartIdx);
+  const rsi = rsiTrimmed.slice(rsiFilterStartIdx);
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const prices = points.map(p => p.c);
+  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 440 : 480;
+  const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const panelGap = 18;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawHTotal = totalH - marginTop - marginBottom - panelGap;
+  const priceH = Math.round(drawHTotal * 0.58);
+  const rsiH = drawHTotal - priceH;
+  const priceTop = marginTop, priceBottom = marginTop + priceH;
+  const rsiTop = priceBottom + panelGap, rsiBottom = rsiTop + rsiH;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
+  const yForRsi = v => rsiBottom - (v / 100) * rsiH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yForPrice(t);
+    return y > priceTop + 8 && y < priceBottom - 10;
+  });
+  const priceGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+  const rsiGridHtml = [30, 50, 70].map(v => `
+    <line x1="${marginLeft}" y1="${yForRsi(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForRsi(v).toFixed(1)}" stroke="${v === 50 ? 'rgba(240,178,61,.35)' : 'rgba(255,255,255,.08)'}" stroke-width="1" ${v === 50 ? 'stroke-dasharray="4,3"' : ''}/>
+    <text x="${marginLeft - 8}" y="${(yForRsi(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v}</text>
+  `).join('');
+
+  function pathFor(getY){
+    let d = '';
+    points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${getY(i).toFixed(1)} `; });
+    return d.trim();
+  }
+  const priceLine = pathFor(i => yForPrice(points[i].c));
+  const rsiLine = pathFor(i => yForRsi(rsi[i]));
+
+  let lastLabelPx = -Infinity;
+  const crossHtml = crossings.filter(c => c.t >= startMs && c.t <= endMs).map(c => {
+    const pxNum = xFor(c.t);
+    const px = pxNum.toFixed(1);
+    const showLabel = pxNum - lastLabelPx > 55;
+    if(showLabel) lastLabelPx = pxNum;
+    const label = new Date(c.t).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+    return `
+      <line x1="${px}" y1="${priceTop}" x2="${px}" y2="${rsiBottom}" stroke="rgba(34,197,94,.55)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      ${showLabel ? `<text x="${px}" y="${priceTop - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#22c55e" font-family="'Space Mono',monospace">SUELO ${label}</text>` : ''}
+    `;
+  }).join('');
+
+  const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].c);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${rsiBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="rsiChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${priceGridHtml}
+        ${rsiGridHtml}
+        ${crossHtml}
+        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${rsiLine}" fill="none" stroke="#60a5fa" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="rsiHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${rsiBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="rsiHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="rsiHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="rsiHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="rsiHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${rsiBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="rsiTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const rsiSvg = document.getElementById('rsiChartSvg');
+  wireChartHover({
+    svg: rsiSvg, catcherId: 'rsiHoverCatcher', lineId: 'rsiHoverLine', dotId: 'rsiHoverDot',
+    dateLabelId: 'rsiHoverDateLabel', dateBgId: 'rsiHoverDateBg', tooltipId: 'rsiTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yForPrice(points[i].c),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#60a5fa">RSI ${rsi[i].toFixed(1)}</span>`,
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#60a5fa"></span>RSI (14) mensual</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Cruce sobre 50 = suelo detectado</span>
+  `;
+
+  const lastRsi = rsi[rsi.length - 1];
+  const lastCrossing = crossings.length ? crossings[crossings.length - 1] : null;
+  statsEl.innerHTML = `
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">RSI mensual actual</div><div class="r-val" style="color:${lastRsi >= RSI_CROSS_LEVEL ? '#22c55e' : lastRsi <= 30 ? '#ef4444' : '#f0b23d'}">${lastRsi.toFixed(1)}</div></div>
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(points[points.length - 1].c)}</div></div>
+    <div class="res-card"><div class="r-label">Último suelo marcado</div><div class="r-val">${lastCrossing ? new Date(lastCrossing.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin cruces aún'}</div></div>
+  `;
+}
+async function loadRsiDetail(){
+  try{ await fetchHalvingHistory(); } catch(err){ /* renderRsiChart muestra el estado de error si no hay datos */ }
+  renderRsiChart();
+}
+let rsiLoadedOnce = false;
+function ensureRsiLoaded(){ if(!rsiLoadedOnce){ rsiLoadedOnce = true; loadRsiDetail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="rsimensual"]').style.display !== 'none') renderRsiChart();
+});
+document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    rsiActiveRange = btn.dataset.range;
+    renderRsiChart();
+  });
 });
 document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
