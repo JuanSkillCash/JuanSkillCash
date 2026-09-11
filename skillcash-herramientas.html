@@ -12756,8 +12756,12 @@ function renderMarketFloorChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const allVals = points.map(p => p.price).concat(points.map(p => p.keltnerLower)).concat(points.map(p => p.costSmooth)).filter(v => v > 0);
-  const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
+  // el eje se escala solo con el PRECIO real — el Keltner y el Costo de Producción son estimados
+  // derivados que, si tienen algún valor inestable (ej. semanas muy tempranas de datos poco
+  // confiables), pueden estirar el rango del eje muchísimo y aplastar el precio real casi hasta
+  // desaparecer. Sus líneas se dibujan igual, solo que no deciden el zoom del gráfico
+  const prices = points.map(p => p.price).filter(v => v > 0);
+  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
@@ -12773,6 +12777,10 @@ function renderMarketFloorChart(){
   const logRange = (logMax - logMin) || 1;
   const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
   const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+  // Keltner/Costo se dibujan con esta variante recortada al panel — si su valor se sale del rango
+  // de precio real (por una semana con un estimado inestable), la línea se queda pegada al borde
+  // en vez de estirar el gráfico entero
+  const yForClamped = p => Math.min(marginTop + drawH, Math.max(marginTop, yFor(p)));
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
@@ -12789,8 +12797,8 @@ function renderMarketFloorChart(){
     return d.trim();
   }
   const priceLine = pathFor(i => yFor(points[i].price));
-  const keltnerLine = pathFor(i => yFor(points[i].keltnerLower));
-  const costLine = pathFor(i => yFor(points[i].costSmooth));
+  const keltnerLine = pathFor(i => yForClamped(points[i].keltnerLower));
+  const costLine = pathFor(i => yForClamped(points[i].costSmooth));
 
   let lastLabelPx = -Infinity;
   const crossHtml = crossings.filter(c => c.t >= startMs && c.t <= endMs).map(c => {
