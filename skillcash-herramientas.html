@@ -13438,10 +13438,15 @@ function renderRsiChart(){
 
   const lastRsi = rsi[rsi.length - 1];
   const lastCrossing = crossings.length ? crossings[crossings.length - 1] : null;
+  // dato de diagnóstico temporal: el mínimo real de RSI en toda la historia y cuándo ocurrió, para
+  // calibrar RSI_BEAR_LEVEL contra el dato real en vez de adivinar a ciegas
+  let minRsi = Infinity, minRsiT = null;
+  rsiTrimmed.forEach((v, i) => { if(v < minRsi){ minRsi = v; minRsiT = fullPoints[i].t; } });
   statsEl.innerHTML = `
     <div class="res-card" style="grid-column:1/-1"><div class="r-label">RSI mensual actual</div><div class="r-val" style="color:${lastRsi >= RSI_CROSS_LEVEL ? '#22c55e' : lastRsi <= 30 ? '#ef4444' : '#f0b23d'}">${lastRsi.toFixed(1)}</div></div>
     <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(points[points.length - 1].c)}</div></div>
     <div class="res-card"><div class="r-label">Último suelo marcado</div><div class="r-val">${lastCrossing ? new Date(lastCrossing.t).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : 'Sin cruces aún'}</div></div>
+    <div class="res-card"><div class="r-label">[Diagnóstico] RSI mínimo histórico</div><div class="r-val">${minRsi.toFixed(1)} (${minRsiT ? new Date(minRsiT).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) : '—'})</div></div>
   `;
 }
 async function loadRsiDetail(){
