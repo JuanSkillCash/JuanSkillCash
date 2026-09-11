@@ -1,0 +1,62 @@
+{
+  "slot": 300126000,
+  "blockTime": 1786050000,
+  "transaction": {
+    "signatures": [
+      "DemoSig6MultihopResidualAmbiguousxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash6xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletMultihopGGGGGGGGGGGGGGGGGGGGGGGGG", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletMultihopTargetAtaHHHHHHHHHHHHHHHHH", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletMultihopResidualAtaIIIIIIIIIIIIIII", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoPumpFunNewCoinMintLLLLLLLLLLLLLLLLLLLLL", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoResidualHopTokenMintMMMMMMMMMMMMMMMMMMM", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+          "accounts": ["DemoWalletMultihopGGGGGGGGGGGGGGGGGGGGGGGGG"],
+          "data": "DemoBase58UndecodedJupiterMultiHopRouteInstructionData"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [3000000000, 0, 0, 1000000, 1000000, 1000000, 5000000, 5000000, 1000000, 1000000],
+    "postBalances": [2499995000, 0, 0, 1000000, 1000000, 1000000, 5000000, 5000000, 1000000, 1000000],
+    "preTokenBalances": [],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoPumpFunNewCoinMintLLLLLLLLLLLLLLLLLLLLL",
+        "owner": "DemoWalletMultihopGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "uiTokenAmount": {"amount": "2000000000000", "decimals": 6, "uiAmount": 2000000.0, "uiAmountString": "2000000"}
+      },
+      {
+        "accountIndex": 2,
+        "mint": "DemoResidualHopTokenMintMMMMMMMMMMMMMMMMMMM",
+        "owner": "DemoWalletMultihopGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "uiTokenAmount": {"amount": "1500000", "decimals": 9, "uiAmount": 0.0015, "uiAmountString": "0.0015"}
+      }
+    ],
+    "innerInstructions": [
+      {
+        "index": 0,
+        "instructions": [
+          {"programIdIndex": 6, "accounts": [1], "data": "DemoBase58RaydiumHop", "stackHeight": 2},
+          {"programIdIndex": 7, "accounts": [1, 2], "data": "DemoBase58OrcaHop", "stackHeight": 2}
+        ]
+      }
+    ]
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Ruta Jupiter con dos hops (Raydium + Orca); ademas del token 'objetivo' recibido, queda un residual minusculo de un token intermedio (tipico de rutas con slippage/rounding). La wallet gasto SOL (1 pata) y recibio DOS tokens distintos (2 patas) => 3 patas netas en total. Resultado esperado: action=UNKNOWN (no se adivina cual de los dos tokens recibidos es 'la compra principal'), confidence=0.25, protocol=Jupiter Aggregator v6 (se reporta igual, aunque la accion quede en UNKNOWN, para que quede constancia de que si se identifico el venue)."
+}

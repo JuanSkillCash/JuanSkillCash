@@ -1,0 +1,51 @@
+[
+  {
+    "file": "jupiter_buy_sol_to_token.json",
+    "wallet": "DemoWalletJupiterBuyerAAAAAAAAAAAAAAAAAAAAA",
+    "description": "BUY limpio: SOL -> memecoin, ruta Jupiter v6 -> Raydium AMM v4 (inner instruction)",
+    "expected_action": "BUY",
+    "expected_protocol": "Jupiter Aggregator v6"
+  },
+  {
+    "file": "raydium_sell_token_to_usdc.json",
+    "wallet": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB",
+    "description": "SELL limpio: memecoin -> USDC, directo en Raydium AMM v4 (sin agregador)",
+    "expected_action": "SELL",
+    "expected_protocol": "Raydium AMM v4"
+  },
+  {
+    "file": "orca_swap_token_to_token.json",
+    "wallet": "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC",
+    "description": "SWAP token-a-token (ninguna pata es SOL/USDC/USDT), Orca Whirlpool",
+    "expected_action": "SWAP",
+    "expected_protocol": "Orca Whirlpool"
+  },
+  {
+    "file": "failed_transaction.json",
+    "wallet": "DemoWalletFailedTxDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "description": "Transaccion revertida on-chain (meta.err != null) - no debe interpretarse como operacion",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": null
+  },
+  {
+    "file": "simple_sol_transfer.json",
+    "wallet": "DemoWalletSimpleTransferEEEEEEEEEEEEEEEEEEE",
+    "description": "Transferencia nativa de SOL, sin tokens ni programa de DEX - no es un swap",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": null
+  },
+  {
+    "file": "multihop_ambiguous.json",
+    "wallet": "DemoWalletMultihopGGGGGGGGGGGGGGGGGGGGGGGGG",
+    "description": "Ruta Jupiter multi-hop con residual: 3 patas de activos netas, ambiguo",
+    "expected_action": "UNKNOWN",
+    "expected_protocol": "Jupiter Aggregator v6"
+  },
+  {
+    "file": "pumpfun_buy_sol_to_newcoin.json",
+    "wallet": "DemoWalletPumpFunBuyerFFFFFFFFFFFFFFFFFFFFF",
+    "description": "BUY limpio: SOL -> token recien lanzado, bonding curve de Pump.fun",
+    "expected_action": "BUY",
+    "expected_protocol": "Pump.fun (bonding curve)"
+  }
+]

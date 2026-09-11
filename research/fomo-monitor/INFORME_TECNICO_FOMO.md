@@ -249,3 +249,85 @@ Ver `research/fomo-monitor/prototype/`. Es un monitor **local, de solo lectura**
 - **No pude ejecutarlo en vivo dentro de este sandbox** (sin salida de red a `api.mainnet-beta.solana.com`). Está escrito para correr en un entorno con acceso normal a Internet; el README del prototipo explica cómo probarlo y qué esperar.
 
 Este prototipo es intencionalmente genérico (monitoreo on-chain de una wallet dada) porque es la única pieza de la cadena de valor que pude **fundamentar con una fuente pública, oficial y estable** (la propia documentación de Solana), sin inventar ni asumir ningún endpoint de FOMO.
+
+---
+
+# PARTE II — FASE 2: de "transacción detectada" a "operación interpretada"
+
+**Fecha:** 2026-09-11 (misma sesión, continuación de la Fase 1)
+**Alcance:** igual que la Fase 1 — solo lectura, sin ejecutar operaciones, sin conectar wallets privadas, sin claves privadas, sin tocar FOMO, sin scraping, sin evadir protecciones. Todo lo nuevo se conecta **únicamente** al mismo RPC público oficial de Solana ya usado en la Fase 1.
+
+## 12. Qué hace falta para interpretar correctamente una transacción de Solana
+
+Antes de escribir código se investigó (vía búsqueda web, citando fuente oficial en cada caso) el esquema exacto de `getTransaction` y por qué **no se puede** decodificar una operación de swap leyendo directamente la instrucción:
+
+- `getTransaction` con `encoding=jsonParsed` solo decodifica ("parsea") instrucciones de programas **nativos/conocidos por el nodo RPC** (System Program, SPL Token, Associated Token Account, ComputeBudget, etc.). Para programas custom como Jupiter, Raydium u Orca, la instrucción vuelve en forma **"partially decoded"**: `{accounts, data (base58 sin decodificar), programId}` — sin campos como `amountIn`/`amountOut`. Confirmado en [`solana.com/docs/rpc/json-structures`](https://solana.com/docs/rpc/json-structures) y en el issue público [`solana-labs/solana#31701`](https://github.com/solana-labs/solana/issues/31701).
+- Por eso la única forma **agnóstica al protocolo** de saber qué entró y qué salió de una wallet es comparar `meta.preTokenBalances`/`meta.postTokenBalances` (tokens SPL, con `accountIndex`, `mint`, `owner`, `uiTokenAmount`) y `meta.preBalances`/`meta.postBalances` (SOL, en lamports) — documentado en [`solana.com/docs/rpc/http/gettransaction`](https://solana.com/docs/rpc/http/gettransaction). Es exactamente el enfoque que pidió el encargo ("compara los balances antes y después... determine qué activo salió y cuál entró"), y es también, según lo que indexan sus propias páginas, el mismo enfoque que usan los terceros mencionados en la Fase 1 (`fomoapi.io`, FomoScan): leer blockchain, no decodificar instrucciones de cada DEX.
+- El `programId` de las instrucciones (de nivel superior y de `meta.innerInstructions`, cuando el swap real ocurre vía CPI dentro de un agregador) **sí** sirve para identificar el protocolo/DEX usado — pero solo para eso, nunca para inferir montos.
+- Las transacciones **versionadas** (v0, con Address Lookup Tables) pueden referenciar cuentas que no están en `accountKeys` y que hay que resolver con `meta.loadedAddresses.writable`/`.readonly` — documentado en la misma página de RPC JSON Structures, y se requiere `maxSupportedTransactionVersion: 0` en la llamada o el nodo rechaza la respuesta. Esto es relevante porque **Jupiter usa ALT con frecuencia** en producción.
+
+Todos los IDs de programa y de mint usados en el código (`KNOWN_PROGRAMS`, `QUOTE_ASSETS`, `INFRA_PROGRAMS`) están citados individualmente junto a su constante en `prototype/transaction_parser.py`, con la fuente donde se confirmaron (Solscan, Solana Explorer, docs.raydium.io, docs.orca.so, github.com/pump-fun/pump-public-docs, etc.). **No se verificaron por consulta RPC directa** en este sandbox (misma limitación de red que la Fase 1) — deben revalidarse contra un explorador antes de confiar en ellos en producción.
+
+## 13. Diseño implementado (`prototype/transaction_parser.py`)
+
+- **Estructura normalizada `TradeEvent`**: exactamente los 12 campos pedidos (`wallet`, `signature`, `timestamp`, `action`, `token_in`, `token_in_amount`, `token_out`, `token_out_amount`, `estimated_price`, `estimated_usd_value`, `protocol`, `confidence`) más algunos campos adicionales claramente marcados como extensión (`token_in_symbol`/`token_out_symbol`, `price_unit` — en qué unidad está expresado `estimated_price`, crítico porque no siempre es USD —, `notes` con la explicación legible de la clasificación, y `programs_seen` con los program IDs detectados).
+- **Comparación de balances, no de instrucciones**: `_token_deltas_for_owner` reconstruye cuánto ganó/perdió la wallet de cada mint SPL sumando todas sus cuentas de token; `_sol_delta_lamports` hace lo mismo para SOL nativo, **restando el efecto de la fee de red** cuando la wallet es quien paga (invariante documentada: el fee payer es siempre `accountKeys[0]`).
+- **Filtro de "ruido de rent"**: abrir una Associated Token Account nueva cuesta un rent-exempt mínimo (típicamente ~0.002 SOL) que aparece como una salida de SOL sin ser parte real del precio del swap. Se implementó como heurística explícita (`RENT_NOISE_LAMPORTS_THRESHOLD`, documentada como heurística ajustable, no como constante de protocolo) que solo descarta la pata de SOL cuando es pequeña **y** ya hay otra pata de token que explica la operación.
+- **Clasificación BUY/SELL/SWAP/UNKNOWN** basada en cuántos activos cambiaron netamente:
+  - Exactamente 1 salida + 1 entrada, y una de las dos es un "quote asset" (SOL/USDC/USDT) y la otra no → **BUY** (si lo gastado es el quote) o **SELL** (si lo gastado es el no-quote).
+  - Exactamente 1 salida + 1 entrada, pero ambas son quote assets (ej. SOL↔USDC) o ninguna lo es (ej. tokenA↔tokenB) → **SWAP** (no se fuerza un BUY/SELL arbitrario).
+  - Solo 1 activo cambió (0 salidas+1 entrada o viceversa) → **UNKNOWN**: parece transferencia simple, no swap.
+  - Más de 2 activos cambiaron netamente (rutas multi-hop con residuales) → **UNKNOWN**: no se adivina cuál par es "la operación principal".
+  - `meta.err != null` (transacción revertida on-chain) → **UNKNOWN**, confidence 0.0.
+  - Ningún cambio relevante → **UNKNOWN**, confidence 0.0.
+- **Detección de protocolo**: se recolectan todos los `programId` (nivel superior + `innerInstructions`, resolviendo tanto `programId` ya resuelto como `programIdIndex` numérico — ambas formas están documentadas y ambas aparecen en la práctica) excluyendo programas de infraestructura (System, Token, ATA, ComputeBudget), y se hace match contra un registro (`KNOWN_PROGRAMS`) que cubre Jupiter v6, Raydium (AMM v4, CLMM, CPMM), Orca Whirlpool, Pump.fun (bonding curve + PumpSwap) y Meteora DLMM, priorizando el agregador (Jupiter) sobre el AMM interno cuando aparecen ambos.
+- **`confidence`**: arranca en 0.95 (BUY/SELL limpio) u 0.80 (SWAP limpio), y se penaliza -0.30 si no se reconoció ningún programa de la lista (la clasificación sigue siendo válida por balances, pero no se pudo confirmar el venue) y -0.05 si hubo que descartar una pata de SOL ambigua por la heurística de rent. Los casos UNKNOWN llevan confidence 0.0–0.25 según el motivo (ver `notes` de cada evento).
+- **Precio y USD**: `estimated_price` se expresa siempre "por unidad del token no-quote", en la unidad indicada por `price_unit` (USDC, USDT, SOL, o un ratio tokenA/tokenB) — **no es automáticamente USD**. `estimated_usd_value` solo se calcula cuando una de las dos patas es un stablecoin (aproximación ~1:1, ignora depeg) o cuando el llamador provee explícitamente un `sol_usd_price` externo; si no, queda en `None` en vez de inventarse. Este es el límite real de este módulo — ver punto 16.
+
+## 14. Tests con "transacciones históricas reales" — y por qué no lo son del todo
+
+El encargo pidió usar transacciones reales cuando fuera posible. **No fue posible descargar ninguna transacción real** en este sandbox por la misma razón que en la Fase 1: no hay salida de red hacia `api.mainnet-beta.solana.com` (verificado de nuevo: mismo bloqueo `403` del proxy de egress). En su lugar, `tests/fixtures/` contiene 7 transacciones **sintéticas construidas a mano siguiendo el esquema oficial documentado** (citado arriba), cubriendo: BUY limpio vía Jupiter→Raydium, SELL limpio directo en Raydium, SWAP token-a-token en Orca, transacción fallida, transferencia simple (no-swap), ruta multi-hop ambigua, y compra en bonding curve de Pump.fun. `tests/fixtures/README.md` explica esto con total transparencia, cita las fuentes de cada dirección de programa/mint usada, e incluye instrucciones exactas (`curl` a `getTransaction`) para que, en un entorno con red normal, se reemplacen por transacciones reales y se valide el parser contra ellas — señalando explícitamente el punto más frágil (el orden de resolución de cuentas en transacciones versionadas con Address Lookup Tables) como lo primero a verificar con una transacción real de Jupiter.
+
+Los 24 tests (`tests/test_transaction_parser.py`, `python -m unittest discover -s tests -v`) corren 100% offline contra esos fixtures y pasan.
+
+## 15. Respuestas directas a lo que se preguntó al final del encargo
+
+### 1. ¿Qué tan confiable es detectar BUY/SELL?
+
+**Muy confiable quirúrgicamente, cuando la operación es "de dos patas" (un activo sale, otro entra) y el programa involucrado está en el registro conocido**: la comparación de balances no puede mentir sobre qué mint entró y cuál salió (a diferencia de intentar decodificar instrucciones), así que ese núcleo es sólido. Con esas condiciones, `confidence` ≈ 0.95. Baja a ≈ 0.65 si el swap es limpio pero el programa no está en `KNOWN_PROGRAMS` (sigue siendo BUY/SELL correcto, solo no se puede nombrar el venue). Se degrada intencionalmente a UNKNOWN (no a un BUY/SELL adivinado) en: transacciones fallidas, transferencias de una sola pata, y rutas con más de dos activos netos — ahí la confiabilidad real es "no lo sé", y el módulo lo dice en vez de fingir certeza.
+
+### 2. ¿Qué DEX/protocolos podemos identificar?
+
+Con las fuentes citadas: **Jupiter Aggregator v6** (dos deployments), **Raydium** (AMM v4, CLMM, CPMM), **Orca Whirlpool**, **Pump.fun** (bonding curve y PumpSwap post-graduación) y **Meteora DLMM**. Cualquier otro programa (Phoenix, Lifinity, Meteora DBC, pools nuevos, versiones futuras) simplemente no se nombra — la operación se sigue clasificando bien por balances, pero `protocol=None` y `confidence` baja.
+
+### 3. ¿Qué casos todavía no podemos interpretar?
+
+- Rutas multi-hop con residuales (3+ activos netos) — por diseño, no se adivina cuál es "la operación principal".
+- Transferencias simples, airdrops, o pagos que no son swaps (una sola pata) — correctamente NO se marcan como BUY/SELL.
+- Transacciones versionadas con Address Lookup Tables — la lógica de resolución de cuentas está implementada según la convención documentada, pero **no verificada contra una transacción real** (ver limitación de red); es el punto más frágil.
+- Programas de DEX no incluidos en `KNOWN_PROGRAMS` (el registro es una lista fija, no se actualiza sola).
+- Swaps "parciales" donde la wallet observada no es la firmante (ej. una PDA/vault de un vault de yield) — el parser busca la wallet en `accountKeys`, pero no sigue relaciones indirectas de custodia.
+- Cualquier cosa que dependa del *contenido* de la instrucción (por ejemplo, distinguir un swap "normal" de un arbitraje interno o de una liquidación) — eso requeriría el IDL específico de cada programa, deliberadamente fuera de alcance porque no es necesario para BUY/SELL/SWAP/UNKNOWN.
+
+### 4. ¿Qué información falta para calcular correctamente el precio?
+
+Dos cosas concretas:
+- **Un oráculo de precio SOL/USD** (y, en general, de cualquier token que no sea stablecoin) para las operaciones cuya contrapartida es SOL nativo — hoy `estimated_usd_value` se deja en `None` salvo que el llamador provea `sol_usd_price` manualmente. El módulo ya tiene el punto de extensión (`sol_usd_price` como parámetro, documentado como "plug-in" para una fase futura) pero **no** consulta ningún proveedor externo por sí mismo — eso sería añadir una dependencia/fuente de datos nueva que no estaba en el alcance de esta fase.
+- **Precios de tokens no-quote** cuando el swap es token-a-token puro (ej. Orca `TokenA↔TokenB`): sin un oráculo externo (Pyth, Birdeye, CoinGecko, o el propio libro de pools on-chain) no hay forma de expresar esa operación en USD, solo el ratio entre los dos tokens (`price_unit` lo deja explícito).
+
+### 5. ¿Qué necesitaríamos para monitorear 100, 500 o 1.000 wallets simultáneamente?
+
+El diseño actual (una suscripción `logsSubscribe` por wallet sobre una única conexión WebSocket, más una llamada `getTransaction` por firma detectada) **no escala** a esos volúmenes contra el RPC público gratuito de Solana:
+- `api.mainnet-beta.solana.com` tiene rate limits no pensados para esto (compartido con toda la red pública) y puede cerrar/limitar conexiones con muchas suscripciones simultáneas.
+- Con 500-1000 wallets activas, el volumen de `getTransaction` (una por cada firma detectada, y las wallets activas de FOMO operan frecuentemente) puede fácilmente superar cualquier límite gratuito.
+- Necesitaríamos: (a) un **proveedor de RPC dedicado** con plan pago (Helius, QuickNode, Triton, etc.) con mayor rate limit y, preferiblemente, **gRPC/Geyser streaming** en vez de WebSocket JSON-RPC clásico (mucho más eficiente para volumen alto); (b) **batching** de `getTransaction` (`getTransactions` en lote donde el proveedor lo soporte, o pipelining de llamadas); (c) una **cola de procesamiento** (ej. un worker pool) para separar "recibir firma" de "interpretar transacción", con reintentos y backoff; (d) opcionalmente, en vez de seguir una lista de wallets tipo `logsSubscribe`, suscribirse a nivel de **programa** (ej. todas las transacciones de Jupiter/Raydium/Orca) y filtrar por la lista de wallets de interés en el propio proceso — esto es lo que hacen en la práctica indexadores como los que vimos en la Fase 1 (`fomoapi.io`, Solana Tracker), y es la única forma realista de llegar a cientos/miles de wallets sin miles de suscripciones individuales; (e) una base de datos para persistir el estado (última firma procesada por wallet, deduplicación, histórico) — hoy todo vive solo en memoria del proceso.
+
+### 6. ¿Qué debería ser la FASE 3 del proyecto?
+
+Con lo construido en Fases 1 y 2, una Fase 3 razonable (siempre en modo de solo lectura, sin tocar FOMO ni ejecutar nada) sería:
+1. **Escalar el monitoreo** siguiendo el punto 5: proveedor RPC dedicado, suscripción a nivel de programa + filtro propio, cola de procesamiento, persistencia.
+2. **Cerrar el círculo de identificación de traders**: integrar (bajo criterio y riesgo propio del usuario, con due diligence de sus Términos) una fuente de mapeo *handle de FOMO → wallet* (de las descritas en la Fase 1), para poder alimentar la lista de wallets a monitorear con "traders de FOMO reales" en vez de direcciones puestas a mano.
+3. **Integrar un oráculo de precio** (Pyth, Birdeye, o similar) para completar `estimated_usd_value` en los casos hoy `None` — esto es un consumo de datos públicos adicional, no toca FOMO.
+4. **Persistencia y analítica histórica**: guardar los `TradeEvent` generados (base de datos), y sobre eso sí poder calcular métricas propias (PnL realizado, win rate, volumen) de cada wallet observada, de forma 100% independiente e igual de verificable que la de los terceros vistos en la Fase 1 — sin depender de ellos.
+5. **Alertas reales** (no solo consola): Telegram/Discord/email cuando una wallet seguida genera un evento BUY/SELL con confidence alta.
+6. Seguir **sin** avanzar hacia ejecución/copy-trading automático hasta que el usuario decida explícitamente abrir esa fase — y, cuando la abra, hacerlo contra una API oficial de un exchange/DEX elegido por el usuario con sus propias credenciales, nunca contra la cuenta de FOMO (ver Fase 1, sección 10.5).

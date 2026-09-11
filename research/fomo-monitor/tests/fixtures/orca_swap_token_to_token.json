@@ -1,0 +1,66 @@
+{
+  "slot": 300124500,
+  "blockTime": 1786020000,
+  "transaction": {
+    "signatures": [
+      "DemoSig3OrcaSwapTOKENAtoTOKENBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletOrcaSwapperTokenAAtaDDDDDDDDDDDDDD", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletOrcaSwapperTokenBAtaEEEEEEEEEEEEEE", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoTokenAMintJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoTokenBMintKKKKKKKKKKKKKKKKKKKKKKKKKKKKK", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoOrcaWhirlpoolAccountFFFFFFFFFFFFFFFFFFF", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+          "accounts": [
+            "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC",
+            "DemoOrcaWhirlpoolAccountFFFFFFFFFFFFFFFFFFF",
+            "DemoWalletOrcaSwapperTokenAAtaDDDDDDDDDDDDDD",
+            "DemoWalletOrcaSwapperTokenBAtaEEEEEEEEEEEEEE"
+          ],
+          "data": "DemoBase58UndecodedOrcaWhirlpoolSwapInstructionData"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [1000000000, 1000000, 0, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "postBalances": [999995000, 1000000, 0, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoTokenAMintJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+        "owner": "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC",
+        "uiTokenAmount": {"amount": "200000000000", "decimals": 9, "uiAmount": 200.0, "uiAmountString": "200"}
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoTokenAMintJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+        "owner": "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC",
+        "uiTokenAmount": {"amount": "0", "decimals": 9, "uiAmount": 0.0, "uiAmountString": "0"}
+      },
+      {
+        "accountIndex": 2,
+        "mint": "DemoTokenBMintKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+        "owner": "DemoWalletOrcaSwapperCCCCCCCCCCCCCCCCCCCCCC",
+        "uiTokenAmount": {"amount": "50000000000", "decimals": 9, "uiAmount": 50.0, "uiAmountString": "50"}
+      }
+    ],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Swap directo TokenA -> TokenB en un pool de Orca Whirlpool; ninguno de los dos mints es un 'quote asset' conocido (no es SOL/USDC/USDT), asi que no hay forma no arbitraria de decidir cual es 'lo comprado'. Resultado esperado: action=SWAP (no BUY/SELL), token_in=TokenA(200), token_out=TokenB(50), protocol=Orca Whirlpool, confidence ~0.80, estimated_usd_value=None (ninguna pata es stablecoin ni SOL)."
+}

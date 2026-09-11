@@ -1,0 +1,79 @@
+{
+  "slot": 300123456,
+  "blockTime": 1786000000,
+  "transaction": {
+    "signatures": [
+      "DemoSig1JupiterBuySOLtoTOKENxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletJupiterBuyerAAAAAAAAAAAAAAAAAAAAA", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletJupiterBuyerTokenAtaBBBBBBBBBBBBBB", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoRaydiumPoolAccountCCCCCCCCCCCCCCCCCCCCCC", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "ComputeBudget111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "ComputeBudget111111111111111111111111111111",
+          "parsed": {"type": "setComputeUnitLimit", "info": {"units": 400000}}
+        },
+        {
+          "programId": "ComputeBudget111111111111111111111111111111",
+          "parsed": {"type": "setComputeUnitPrice", "info": {"microLamports": 5000}}
+        },
+        {
+          "programId": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+          "accounts": [
+            "DemoWalletJupiterBuyerAAAAAAAAAAAAAAAAAAAAA",
+            "DemoWalletJupiterBuyerTokenAtaBBBBBBBBBBBBBB",
+            "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH",
+            "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+            "DemoRaydiumPoolAccountCCCCCCCCCCCCCCCCCCCCCC"
+          ],
+          "data": "DemoBase58UndecodedJupiterRouteInstructionData"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [5000000000, 0, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000, 1000000],
+    "postBalances": [3497955720, 0, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH",
+        "owner": "DemoWalletJupiterBuyerAAAAAAAAAAAAAAAAAAAAA",
+        "uiTokenAmount": {
+          "amount": "1000000000000",
+          "decimals": 6,
+          "uiAmount": 1000000.0,
+          "uiAmountString": "1000000"
+        }
+      }
+    ],
+    "innerInstructions": [
+      {
+        "index": 2,
+        "instructions": [
+          {
+            "programIdIndex": 4,
+            "accounts": [5, 1],
+            "data": "DemoBase58UndecodedRaydiumSwapInstructionData",
+            "stackHeight": 2
+          }
+        ]
+      }
+    ]
+  },
+  "_fixture_notes": "SINTETICO (no descargado en vivo, ver tests/fixtures/README.md). Simula: wallet gasta 1.5 SOL + fee (5000 lamports) + rent de una nueva ATA (2039280 lamports) para comprar 1,000,000 unidades de un memecoin de 6 decimales, ruta Jupiter v6 -> Raydium AMM v4 (inner instruction). preBalances[0]=5000000000, postBalances[0]=3497955720 => raw_delta=-1502044280; +fee(5000, por ser fee payer, idx0) => sol_delta=-1502039280 lamports = -1.50203928 SOL. Ese total (swap + rent de la nueva ATA, ambos bundled en el mismo delta nativo) SI supera el umbral de ruido (RENT_NOISE_LAMPORTS_THRESHOLD=3000000), por lo que se cuenta como pata real del swap, no se descarta -- el filtro de ruido solo aplica cuando el delta de SOL es pequeño Y ademas hay otra pata de token (caso tipico: abrir/cerrar una ATA sin que eso sea el swap en si)."
+}

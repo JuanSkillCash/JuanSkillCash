@@ -1,0 +1,40 @@
+{
+  "slot": 300125500,
+  "blockTime": 1786040000,
+  "transaction": {
+    "signatures": [
+      "DemoSig5SimpleSOLTransferNotASwapxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash5xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletSimpleTransferEEEEEEEEEEEEEEEEEEE", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletSimpleTransferRecipientFFFFFFFFFFF", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "11111111111111111111111111111111",
+          "parsed": {
+            "type": "transfer",
+            "info": {
+              "source": "DemoWalletSimpleTransferEEEEEEEEEEEEEEEEEEE",
+              "destination": "DemoWalletSimpleTransferRecipientFFFFFFFFFFF",
+              "lamports": 100000000
+            }
+          }
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [500000000, 0, 1000000],
+    "postBalances": [399995000, 100000000, 1000000],
+    "preTokenBalances": [],
+    "postTokenBalances": [],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Transferencia nativa simple de 0.1 SOL (System Program 'transfer'), sin ningun token SPL involucrado y sin ningun programa de DEX. Unica pata: SOL. Resultado esperado: action=UNKNOWN (no es un swap de dos patas, es una transferencia), confidence=0.15, protocol=None (System Program esta en INFRA_PROGRAMS, no se reporta como 'protocolo')."
+}

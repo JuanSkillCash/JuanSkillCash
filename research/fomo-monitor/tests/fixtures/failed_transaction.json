@@ -1,0 +1,35 @@
+{
+  "slot": 300125000,
+  "blockTime": 1786030000,
+  "transaction": {
+    "signatures": [
+      "DemoSig4FailedJupiterSwapSlippagexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletFailedTxDDDDDDDDDDDDDDDDDDDDDDDDD", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+          "accounts": ["DemoWalletFailedTxDDDDDDDDDDDDDDDDDDDDDDDDD"],
+          "data": "DemoBase58UndecodedJupiterRouteInstructionDataThatFailed"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": {"InstructionError": [0, {"Custom": 6001}]},
+    "fee": 5000,
+    "preBalances": [1000000000, 1000000, 1000000, 1000000],
+    "postBalances": [999995000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [],
+    "postTokenBalances": [],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). La transaccion revirtio on-chain (meta.err != null, tipico error de slippage/'Custom: 6001' en programas de swap). Solo se cobro la fee de red (5000 lamports); no hubo cambios de tokens. Resultado esperado: action=UNKNOWN, confidence=0.0, notes explicando que la tx fallo."
+}

@@ -1,0 +1,75 @@
+{
+  "slot": 300123999,
+  "blockTime": 1786010000,
+  "transaction": {
+    "signatures": [
+      "DemoSig2RaydiumSellTOKENtoUSDCxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletRaydiumSellerMemeAtaCCCCCCCCCCCCCC", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletRaydiumSellerUsdcAtaDDDDDDDDDDDDDD", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoMemecoinMintTwoIIIIIIIIIIIIIIIIIIIIIIII", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoRaydiumPoolAccountTwoEEEEEEEEEEEEEEEEEEE", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "ComputeBudget111111111111111111111111111111",
+          "parsed": {"type": "setComputeUnitLimit", "info": {"units": 200000}}
+        },
+        {
+          "programId": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+          "accounts": [
+            "DemoRaydiumPoolAccountTwoEEEEEEEEEEEEEEEEEEE",
+            "DemoWalletRaydiumSellerMemeAtaCCCCCCCCCCCCCC",
+            "DemoWalletRaydiumSellerUsdcAtaDDDDDDDDDDDDDD",
+            "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB"
+          ],
+          "data": "DemoBase58UndecodedRaydiumDirectSwapInstructionData"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [2000000000, 1000000, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "postBalances": [1999995000, 1000000, 1000000, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoMemecoinMintTwoIIIIIIIIIIIIIIIIIIIIIIII",
+        "owner": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB",
+        "uiTokenAmount": {"amount": "500000000000", "decimals": 6, "uiAmount": 500000.0, "uiAmountString": "500000"}
+      },
+      {
+        "accountIndex": 2,
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "owner": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB",
+        "uiTokenAmount": {"amount": "1000000", "decimals": 6, "uiAmount": 1.0, "uiAmountString": "1"}
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoMemecoinMintTwoIIIIIIIIIIIIIIIIIIIIIIII",
+        "owner": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB",
+        "uiTokenAmount": {"amount": "0", "decimals": 6, "uiAmount": 0.0, "uiAmountString": "0"}
+      },
+      {
+        "accountIndex": 2,
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "owner": "DemoWalletRaydiumSellerBBBBBBBBBBBBBBBBBBBB",
+        "uiTokenAmount": {"amount": "76000000", "decimals": 6, "uiAmount": 76.0, "uiAmountString": "76"}
+      }
+    ],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Wallet vende 500000 unidades de un memecoin (6 decimales) directamente en un pool de Raydium AMM v4 (sin Jupiter de por medio) y recibe 75 USDC netos (76.0 post - 1.0 pre ya en la cuenta). SOL de la wallet solo baja por la fee (5000 lamports); como idx0 es fee payer, sol_delta neto = 0 tras sumar la fee de vuelta, asi que SOL no cuenta como pata del swap. Resultado esperado: action=SELL, token_in=memecoin(500000), token_out=USDC(75.0), protocol=Raydium AMM v4, confidence alta (~0.95)."
+}

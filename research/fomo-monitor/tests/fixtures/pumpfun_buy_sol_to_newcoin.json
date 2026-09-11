@@ -1,0 +1,51 @@
+{
+  "slot": 300126500,
+  "blockTime": 1786060000,
+  "transaction": {
+    "signatures": [
+      "DemoSig7PumpFunBondingCurveBuyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletPumpFunBuyerFFFFFFFFFFFFFFFFFFFFF", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletPumpFunBuyerNewCoinAtaGGGGGGGGGGGG", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoPumpFunFreshLaunchMintNNNNNNNNNNNNNNNNN", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "DemoPumpFunBondingCurvePDAHHHHHHHHHHHHHHHHH", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "accounts": [
+            "DemoWalletPumpFunBuyerFFFFFFFFFFFFFFFFFFFFF",
+            "DemoPumpFunBondingCurvePDAHHHHHHHHHHHHHHHHH",
+            "DemoWalletPumpFunBuyerNewCoinAtaGGGGGGGGGGGG",
+            "DemoPumpFunFreshLaunchMintNNNNNNNNNNNNNNNNN"
+          ],
+          "data": "DemoBase58UndecodedPumpFunBuyInstructionData"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [1000000000, 0, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "postBalances": [697955720, 0, 1000000, 1000000, 5000000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoPumpFunFreshLaunchMintNNNNNNNNNNNNNNNNN",
+        "owner": "DemoWalletPumpFunBuyerFFFFFFFFFFFFFFFFFFFFF",
+        "uiTokenAmount": {"amount": "5000000000000", "decimals": 6, "uiAmount": 5000000.0, "uiAmountString": "5000000"}
+      }
+    ],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Compra directa en la bonding curve de Pump.fun: la wallet gasta 0.3 SOL (+ fee + rent de nueva ATA, todo bundled en el delta nativo, igual que en el fixture de Jupiter) y recibe 5,000,000 unidades de un token recien lanzado. Un solo programa involucrado (sin agregador). Resultado esperado: action=BUY, protocol='Pump.fun (bonding curve)', confidence ~0.95."
+}
