@@ -2413,7 +2413,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📶 <b>RSI (14)</b> calculado sobre el cierre de cada mes (no cada día) — es la misma configuración que en la referencia: un RSI de rango largo, más lento y menos ruidoso que el diario.<br>
-                🎯 Se marca cada vez que el RSI, viniendo de abajo, vuelve a <b>cruzar por encima de 50</b> — históricamente eso ha coincidido con que el suelo del mercado ya se había formado poco antes.<br>
+                🎯 Solo se marca el <b>primer cruce por encima de 50</b> después de un bear market real (el RSI tuvo que haber bajado de 30 antes, no un bajón leve) — históricamente eso ha coincidido con que el suelo del mercado ya se había formado poco antes. Si el mercado vuelve a bajar y a cruzar 50 varias veces seguidas, no se marca otra vez hasta que pasen al menos 18 meses desde el último cruce marcado.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -13268,7 +13268,7 @@ function computeRsiSeries(closes, length){
     return 100 - 100 / (1 + avgGain[i] / avgLoss[i]);
   });
 }
-const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50;
+const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 30, RSI_COOLDOWN_MONTHS = 18;
 const RSI_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let rsiActiveRange = 'todo';
 function renderRsiChart(){
@@ -13299,11 +13299,23 @@ function renderRsiChart(){
   const rsiTrimmed = rsiFull.slice(validStartIdx);
 
   // los cruces se calculan siempre sobre la historia COMPLETA — el filtro de rango solo hace
-  // zoom visual, no cambia qué suelos se detectan
+  // zoom visual, no cambia qué suelos se detectan. Solo cuenta como "suelo" el PRIMER cruce por
+  // encima de 50 después de un bear market real (el RSI tuvo que haber bajado de 30 antes, no
+  // solo un bajón leve) — y aunque haya un bear market real, no se vuelve a marcar otro cruce
+  // hasta que pasen al menos RSI_COOLDOWN_MONTHS desde el último ya marcado, para no contar como
+  // "suelo nuevo" un mercado que baja y vuelve a cruzar 50 varias veces seguidas en poco tiempo
   const crossings = [];
+  let sawBearSinceLastCross = false;
+  let lastCrossT = -Infinity;
   for(let i = 1; i < fullPoints.length; i++){
-    if(rsiTrimmed[i - 1] < RSI_CROSS_LEVEL && rsiTrimmed[i] >= RSI_CROSS_LEVEL){
-      crossings.push({ t: fullPoints[i].t, price: fullPoints[i].c, rsi: rsiTrimmed[i] });
+    if(rsiTrimmed[i] < RSI_BEAR_LEVEL) sawBearSinceLastCross = true;
+    if(rsiTrimmed[i - 1] < RSI_CROSS_LEVEL && rsiTrimmed[i] >= RSI_CROSS_LEVEL && sawBearSinceLastCross){
+      const monthsSinceLast = (fullPoints[i].t - lastCrossT) / (30.44 * 86400000);
+      if(monthsSinceLast >= RSI_COOLDOWN_MONTHS){
+        crossings.push({ t: fullPoints[i].t, price: fullPoints[i].c, rsi: rsiTrimmed[i] });
+        lastCrossT = fullPoints[i].t;
+        sawBearSinceLastCross = false;
+      }
     }
   }
 
