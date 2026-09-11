@@ -11661,7 +11661,7 @@ function renderHalvingChart(cycleIndex){
   // con la línea del halving/años de abajo ni se corten arriba
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
@@ -11842,7 +11842,7 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
@@ -12214,7 +12214,7 @@ function renderRainbowChart(){
   let lastTickY = -Infinity;
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    if(y <= marginTop + 10 || y >= marginTop + drawH - 14) return false;
+    if(y <= marginTop + 2 || y >= marginTop + drawH - 4) return false;
     if(Math.abs(y - lastTickY) < 24) return false;
     lastTickY = y;
     return true;
@@ -12404,7 +12404,7 @@ function renderPiCycleChart(){
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
@@ -12784,7 +12784,7 @@ function renderMarketFloorChart(){
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
@@ -12956,7 +12956,7 @@ function renderEma200Chart(){
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
-    return y > marginTop + 10 && y < marginTop + drawH - 14;
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
