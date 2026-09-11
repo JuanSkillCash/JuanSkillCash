@@ -18,6 +18,8 @@ TRANSFER_TOPIC0 = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df52
 UNIV3_SWAP_TOPIC0 = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
 UNIV2_SWAP_TOPIC0 = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 ENTRYPOINT_V07 = "0x0000000071727de22e5e9d8baf0edac6f37da032"
+# Approval(address indexed owner, address indexed spender, uint256 value) -- confirmado via busqueda web.
+APPROVAL_TOPIC0 = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
 
 
 def addr(seed: str) -> str:
@@ -44,6 +46,7 @@ WALLET_TRANSFER = addr("wallet-transfer")
 WALLET_TRANSFER_DEST = addr("wallet-transfer-dest")
 WALLET_MULTIHOP = addr("wallet-multihop")
 WALLET_USEROP = addr("wallet-userop")
+WALLET_APPROVE = addr("wallet-approve")
 
 USDG = addr("token-usdg")
 WETH = addr("token-weth")
@@ -238,6 +241,26 @@ write_fixture(
     "protocol='Uniswap V3 (o fork compatible)', notes menciona 'EntryPoint v0.7'.",
 )
 
+# 8) ERC-20 Approve (allowance) SIN transferencia -- PASO 6 robustez Fase 4:
+# el sistema no debe confundir un approve() con una compra/venta.
+tx_hash = "0x" + "a8" * 32
+tx = make_tx(tx_hash, WALLET_APPROVE, USDG, 0, "0x6b")
+receipt = make_receipt(tx_hash, "0x1", "0x6b", [
+    {
+        "address": USDG,
+        "topics": [APPROVAL_TOPIC0, topic_from_address(WALLET_APPROVE), topic_from_address(ROUTER)],
+        "data": amount_topic_data(RAW["userop_usdg_60"]),
+    },
+])
+write_fixture(
+    "erc20_approve_no_transfer.json", tx, receipt, "2026-08-10T17:00:00Z",
+    "SINTETICO (ver README.md). La wallet aprueba (Approval, no Transfer) que el router "
+    "pueda gastar hasta 60 USDG en su nombre -- tipico paso previo a un swap ERC-20, pero "
+    "ningun token cambia de dueño todavia. El topic0 de Approval no coincide con "
+    "TRANSFER_EVENT_TOPIC0, asi que _decode_transfer_log lo ignora por completo. "
+    "Resultado esperado: action=UNKNOWN (sin cambios de balance), confidence=0.0.",
+)
+
 manifest = [
     {
         "file": "uniswap_v3_buy_usdg_to_token.json",
@@ -299,6 +322,14 @@ manifest = [
         "expected_protocol": "Uniswap V3 (o fork compatible)",
         "token_registry": {USDG: {"symbol": "USDG", "decimals": 18}},
     },
+    {
+        "file": "erc20_approve_no_transfer.json",
+        "wallet": WALLET_APPROVE,
+        "description": "Approval (allowance) sin Transfer -- no debe confundirse con una compra/venta",
+        "expected_action": "UNKNOWN",
+        "expected_protocol": None,
+        "token_registry": {USDG: {"symbol": "USDG", "decimals": 18}},
+    },
 ]
 (HERE / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 print("wrote manifest.json")
@@ -309,6 +340,7 @@ for name, value in [
     ("WALLET_V3_BUYER", WALLET_V3_BUYER), ("WALLET_V2_SELLER", WALLET_V2_SELLER),
     ("WALLET_ETH_BUYER", WALLET_ETH_BUYER), ("WALLET_TRANSFER", WALLET_TRANSFER),
     ("WALLET_MULTIHOP", WALLET_MULTIHOP), ("WALLET_USEROP", WALLET_USEROP),
+    ("WALLET_APPROVE", WALLET_APPROVE),
     ("USDG", USDG), ("WETH", WETH), ("MEME", MEME), ("RESID", RESID),
     ("POOL_V3", POOL_V3), ("PAIR_V2", PAIR_V2), ("ROUTER", ROUTER),
 ]:

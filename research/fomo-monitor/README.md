@@ -28,16 +28,24 @@ research/fomo-monitor/
 │   │   ├── solana_adapter.py     # Fase 3: envuelve wallet_monitor.py con interfaz uniforme
 │   │   └── robinhood_adapter.py  # Fase 3: polling eth_getLogs (+ eth_subscribe opcional)
 │   └── README.md                 # detalle de la Fase 1
+├── validate/                     # Fase 4: scripts para validar con datos REALES (requieren Internet)
+│   ├── fetch_and_validate_solana.py
+│   ├── fetch_and_validate_robinhood.py
+│   ├── measure_latency.py
+│   └── README.md
 ├── tests/
 │   ├── test_transaction_parser.py  # Fase 2 (Solana)
 │   ├── test_evm_parser.py          # Fase 3 (Robinhood Chain)
 │   ├── test_chain_adapters.py      # Fase 3 (integración, mockeada)
+│   ├── test_validate_scripts.py    # Fase 4 (scripts de validate/, RPC mockeado)
+│   ├── test_robustness_paso6.py    # Fase 4 (approve/Approval no confundido con trade)
 │   └── fixtures/
 │       ├── ...                     # transacciones de ejemplo de Solana (sintéticas)
 │       └── evm/                    # transacciones de ejemplo EVM (sintéticas)
 ├── README.md                     # este archivo
 ├── INFORME_TECNICO_FOMO.md       # informe técnico Fase 1 + Fase 2 (FOMO, Solana)
-└── INFORME_MULTICHAIN.md         # informe técnico Fase 3 (Robinhood Chain, arquitectura multichain)
+├── INFORME_MULTICHAIN.md         # informe técnico Fase 3 (Robinhood Chain, arquitectura multichain)
+└── FASE_4_VALIDACION_REAL.md     # informe Fase 4 (validación con datos reales: qué se pudo y qué no)
 ```
 
 ## Fase 1 — Monitor on-chain de Solana (`wallet_monitor.py`)
@@ -115,15 +123,37 @@ FOMO across chains, diferencias Solana vs. Robinhood Chain, limitaciones,
 costos aproximados, escalabilidad (100–5.000 wallets) y la recomendación de
 prioridad final.
 
+## Fase 4 — Validación con datos reales (`validate/`)
+
+Scripts listos para correr **con Internet real** (este sandbox no la tiene,
+ver `FASE_4_VALIDACION_REAL.md` sección 0): traen transacciones reales de
+una wallet (Solana vía `getSignaturesForAddress`+`getTransaction`,
+Robinhood Chain vía `eth_getLogs`+`eth_getTransactionByHash`+`eth_getTransactionReceipt`),
+las corren por los parsers sin modificarlos, y muestran **RAW vs PARSER**
+lado a lado. Incluye también `measure_latency.py` (mide en vivo cuánto
+tarda el sistema entre confirmación on-chain y interpretación completa).
+
+```bash
+python validate/fetch_and_validate_solana.py <WALLET_SOLANA> --limit 5
+python validate/fetch_and_validate_robinhood.py <WALLET_0x...> --limit 5
+python validate/measure_latency.py solana <WALLET_SOLANA>
+```
+
+Ver `validate/README.md` (cómo correrlos, cómo conseguir una wallet real de
+un trader de FOMO de forma legítima) y `FASE_4_VALIDACION_REAL.md` (qué se
+pudo y qué no se pudo validar en este sandbox, y por qué).
+
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-**46 tests, 100% offline** (24 Solana + 20 EVM + 2 de integración de chain
-adapters), contra fixtures sintéticos documentados en `tests/fixtures/README.md`
-y `tests/fixtures/evm/README.md` — ambos explican por qué son sintéticos y
+**53 tests, 100% offline** (24 Solana + 20 EVM + 2 de integración de chain
+adapters + 4 de los scripts de `validate/` con RPC mockeado + 3 de
+robustez Fase 4 — aprobación/allowance en ambas chains), contra fixtures
+sintéticos documentados en `tests/fixtures/README.md` y
+`tests/fixtures/evm/README.md` — ambos explican por qué son sintéticos y
 cómo reemplazarlos por transacciones reales en un entorno con red.
 
 ## Limitaciones conocidas

@@ -1,0 +1,57 @@
+{
+  "slot": 300127000,
+  "blockTime": 1786070000,
+  "transaction": {
+    "signatures": [
+      "DemoSig8SPLTokenApproveDelegateNoTransferxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    "message": {
+      "recentBlockhash": "DemoBlockhash8xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "accountKeys": [
+        {"pubkey": "DemoWalletApproverHHHHHHHHHHHHHHHHHHHHHHHHH", "signer": true, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoWalletApproverTokenAtaIIIIIIIIIIIIIIIIII", "signer": false, "writable": true, "source": "transaction"},
+        {"pubkey": "DemoDelegateProgramOrRouterJJJJJJJJJJJJJJJJJ", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", "signer": false, "writable": false, "source": "transaction"},
+        {"pubkey": "11111111111111111111111111111111", "signer": false, "writable": false, "source": "transaction"}
+      ],
+      "instructions": [
+        {
+          "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "parsed": {
+            "type": "approve",
+            "info": {
+              "source": "DemoWalletApproverTokenAtaIIIIIIIIIIIIIIIIII",
+              "delegate": "DemoDelegateProgramOrRouterJJJJJJJJJJJJJJJJJ",
+              "owner": "DemoWalletApproverHHHHHHHHHHHHHHHHHHHHHHHHH",
+              "amount": "500000000"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "meta": {
+    "err": null,
+    "fee": 5000,
+    "preBalances": [2000000000, 1000000, 1000000, 1000000, 1000000],
+    "postBalances": [1999995000, 1000000, 1000000, 1000000, 1000000],
+    "preTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH",
+        "owner": "DemoWalletApproverHHHHHHHHHHHHHHHHHHHHHHHHH",
+        "uiTokenAmount": {"amount": "500000000", "decimals": 6, "uiAmount": 500.0, "uiAmountString": "500"}
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "DemoMemecoinMintOneHHHHHHHHHHHHHHHHHHHHHHHH",
+        "owner": "DemoWalletApproverHHHHHHHHHHHHHHHHHHHHHHHHH",
+        "uiTokenAmount": {"amount": "500000000", "decimals": 6, "uiAmount": 500.0, "uiAmountString": "500"}
+      }
+    ],
+    "innerInstructions": []
+  },
+  "_fixture_notes": "SINTETICO (ver tests/fixtures/README.md). Instruccion 'approve' del SPL Token Program: la wallet delega autoridad de gasto sobre 500 tokens a otra cuenta (tipico antes de interactuar con un router/vault), pero NINGUN token cambia de dueño todavia -- preTokenBalances y postTokenBalances son identicos (500 antes, 500 despues). SOL solo baja por la fee (5000 lamports), que se anula al sumarla de vuelta por ser fee payer. PASO 6 (robustez) de la Fase 4: el sistema NO debe confundir esto con una compra o venta. Resultado esperado: action=UNKNOWN, confidence=0.0, notes='Sin cambios de balance relevantes para esta wallet (mas alla de la fee de red).'"
+}
