@@ -153,6 +153,7 @@ button{font-family:inherit;color:inherit}
 .sb-nav{display:flex;flex-direction:column;gap:4px;padding:0 10px}
 .indic-mobile-nav{display:none;flex-direction:column;gap:4px;padding:0 10px}
 .indic-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.indic-cat-label-personal{color:var(--red)}
 .sidebar.indic-active .sb-search-wrap,
 .sidebar.indic-active .sb-section-label,
 .sidebar.indic-active .sb-nav{display:none}
@@ -333,11 +334,32 @@ button{font-family:inherit;color:inherit}
 }
 .indic-guide-card-link{cursor:pointer;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
 .indic-guide-card-link:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.5)}
-.indic-guide-icon{font-size:24px;margin-bottom:8px}
+.indic-guide-icon{margin-bottom:10px;color:#60a5fa;display:flex;align-items:center}
+.indic-guide-icon svg{display:block}
 .indic-guide-card-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin-bottom:6px}
 .indic-guide-card-text{font-size:12.5px;color:var(--muted2);line-height:1.55}
 .indic-guide-card-link-hint{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:#60a5fa;text-align:right;margin-top:10px}
 .indic-guide-card-soon{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+/* sección "Indicadores Personales" — acento rojo (la marca) para que se note de inmediato que
+   estos NO son los mismos indicadores genéricos que cualquier otro sitio cripto tiene */
+.indic-guide-divider{
+  grid-column:1/-1;font-family:'Poppins',sans-serif;font-weight:800;font-size:13.5px;
+  color:var(--white);padding:4px 0 2px;margin-top:2px;
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
+}
+.indic-guide-divider:first-child{margin-top:0}
+.indic-guide-divider-sub{font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:11.5px;color:var(--muted2)}
+.indic-guide-divider-personal{color:var(--red)}
+.indic-guide-divider-lock{font-size:12px}
+.indic-guide-card-personal{position:relative;border-color:rgba(255,47,79,.3);background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(255,47,79,.12),transparent 65%),#080c20}
+.indic-guide-card-personal:hover{border-color:rgba(255,47,79,.6)}
+.indic-guide-icon-personal{color:var(--red)}
+.indic-guide-card-personal .indic-guide-card-link-hint{color:var(--red)}
+.indic-guide-card-badge{
+  position:absolute;top:14px;right:14px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--red);border:1px solid rgba(255,47,79,.4);
+  border-radius:20px;padding:3px 8px;background:rgba(255,47,79,.08);
+}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
 .pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
@@ -1193,7 +1215,7 @@ img[src=""]{display:none}
   position:relative;display:flex;align-items:center;gap:24px;
   padding:0 8px 4px;margin-bottom:6px;overflow:visible;
 }
-.hero-mascot-imgwrap{position:relative;flex-shrink:0;width:320px;line-height:0}
+.hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
 .hero-mascot-imgwrap img,.hero-mascot-tint{
   -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
   mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
@@ -1208,7 +1230,7 @@ img[src=""]{display:none}
 @keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
 .hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
-.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(36px,6.8vw,88px);color:var(--white)}
+.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(30px,5vw,62px);color:var(--white)}
 .hero-mascot-title .ht-cash{color:var(--red)}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
 .hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
@@ -1230,7 +1252,7 @@ img[src=""]{display:none}
 @media(prefers-reduced-motion:reduce){.crypto-ticker-track{animation:none}}
 @media(max-width:860px){
   .hero-mascot{flex-direction:column;align-items:center;text-align:center;padding:0 20px 4px;gap:4px}
-  .hero-mascot-imgwrap{width:210px}
+  .hero-mascot-imgwrap{width:170px}
   .hero-mascot-text{padding:0}
   .hero-mascot-desc{margin-left:auto;margin-right:auto}
 }
@@ -1285,6 +1307,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
+      <button class="sb-item" data-indic-jump="pisomercado">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ema200">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
+      </button>
+      <button class="sb-item" data-indic-jump="rsimensual">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
+      </button>
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
@@ -1299,18 +1333,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
-      </button>
-      <button class="sb-item" data-indic-jump="pisomercado">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ema200">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
-      </button>
-      <button class="sb-item" data-indic-jump="rsimensual">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
       </button>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></span><span class="sb-item-label">Coinbase Premium</span>
@@ -1424,6 +1446,19 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
+      <div class="indic-cat-label indic-cat-label-personal">🔒 Personales</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1440,19 +1475,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Techo Pi Cycle</span>
-      </button>
-      <div class="indic-cat-label">Personales</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></span><span class="sb-item-label">Pulso de Fondo</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></span><span class="sb-item-label">Techo Anterior</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></span><span class="sb-item-label">RSI Mensual</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1791,12 +1813,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="indic-tabs" id="indicGroupTabs">
         <button type="button" class="indic-tab active" data-group="guia">Guía</button>
         <button type="button" class="indic-tab" data-group="predicciones">Predicciones</button>
+        <button type="button" class="indic-tab" data-group="personal">🔒 Personales</button>
         <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
         <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
-        <button type="button" class="indic-tab" data-group="personal">Personales</button>
       </div>
 
       <div class="indic-subtabs" id="indicSubTabs"></div>
@@ -1809,73 +1831,84 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="indic-guide-grid">
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
-              <div class="indic-guide-icon">🔮</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div>
               <div class="indic-guide-card-title">Predicciones</div>
               <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+
+            <div class="indic-guide-divider indic-guide-divider-personal">
+              <span class="indic-guide-divider-lock">🔒</span> Indicadores Personales de SkillCash
+              <span class="indic-guide-divider-sub">Los que yo mismo programo y uso — no los vas a encontrar en otro sitio</span>
+            </div>
+            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="pisomercado">
+              <span class="indic-guide-card-badge">Exclusivo</span>
+              <div class="indic-guide-icon indic-guide-icon-personal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7"/><path d="M5 15a7 7 0 0014 0"/></svg></div>
+              <div class="indic-guide-card-title">Pulso de Fondo</div>
+              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="ema200">
+              <span class="indic-guide-card-badge">Exclusivo</span>
+              <div class="indic-guide-icon indic-guide-icon-personal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-6 4 3 5-8 5 5"/></svg></div>
+              <div class="indic-guide-card-title">Medias Móviles 200</div>
+              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="ciclosoporte">
+              <span class="indic-guide-card-badge">Exclusivo</span>
+              <div class="indic-guide-icon indic-guide-icon-personal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 12h14M3 18h8"/></svg></div>
+              <div class="indic-guide-card-title">Techo Anterior</div>
+              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="rsimensual">
+              <span class="indic-guide-card-badge">Exclusivo</span>
+              <div class="indic-guide-icon indic-guide-icon-personal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 4 4 2-3"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2,2" stroke-width="1.2"/></svg></div>
+              <div class="indic-guide-card-title">RSI Mensual</div>
+              <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">Indicadores de Mercado</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
-              <div class="indic-guide-icon">😐</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></div>
               <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
               <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
-              <div class="indic-guide-icon">🐋</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c2-5 6-7 10-7 5 0 8 3 8 6s-2 5-6 5c-1 0-1.5-.5-1.5-1.5 0-.5 1-1 1-2 0-1-1-1.5-2-1.5-2 0-3 1.5-3 3.5 0 3 2.5 4.5 5.5 4.5"/><circle cx="17" cy="10" r=".8" fill="currentColor" stroke="none"/></svg></div>
               <div class="indic-guide-card-title">Sesgo de Ballenas (Whale Bias)</div>
               <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
-              <div class="indic-guide-icon">⏳</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div>
               <div class="indic-guide-card-title">Ciclos de Halving</div>
               <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
-              <div class="indic-guide-icon">🌈</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a9 9 0 0118 0"/><path d="M6.5 17a5.5 5.5 0 0111 0"/></svg></div>
               <div class="indic-guide-card-title">Rainbow Chart</div>
               <div class="indic-guide-card-text">Franjas de color sobre el precio histórico de BTC: de "muy barato" a "burbuja".</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="picycle">
-              <div class="indic-guide-icon">📐</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c4-9 6-13 8-13s4 4 8 13"/><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
               <div class="indic-guide-card-title">Techo Pi Cycle</div>
               <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
-              <div class="indic-guide-icon">⚓</div>
-              <div class="indic-guide-card-title">Pulso de Fondo</div>
-              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
-              <div class="indic-guide-icon">📉</div>
-              <div class="indic-guide-card-title">Medias Móviles 200</div>
-              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
-              <div class="indic-guide-icon">🪜</div>
-              <div class="indic-guide-card-title">Techo Anterior</div>
-              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimensual">
-              <div class="indic-guide-icon">📶</div>
-              <div class="indic-guide-card-title">RSI Mensual</div>
-              <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
-              <div class="indic-guide-icon">♾️</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="4.5"/><circle cx="17" cy="12" r="4.5"/></svg></div>
               <div class="indic-guide-card-title">Coinbase Premium</div>
               <div class="indic-guide-card-text">Diferencia en vivo entre el precio de BTC en Coinbase y en Binance.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="treasuries">
-              <div class="indic-guide-icon">🏢</div>
+              <div class="indic-guide-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg></div>
               <div class="indic-guide-card-title">Balances Corporativos</div>
               <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
