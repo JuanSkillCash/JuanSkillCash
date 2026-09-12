@@ -1,0 +1,19 @@
+[Unit]
+Description=FOMO multichain live monitor (solo lectura - Solana + Robinhood Chain)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Ajustar si tu usuario o la ruta del proyecto en la VM son distintos:
+User=ubuntu
+WorkingDirectory=/home/ubuntu/JuanSkillCash/research/fomo-monitor
+ExecStart=/usr/bin/python3 live_monitor.py wallets.txt
+Restart=on-failure
+RestartSec=10
+# Salida a journalctl (ver con: journalctl -u live-monitor -f)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

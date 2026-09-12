@@ -143,6 +143,28 @@ Ver `validate/README.md` (cómo correrlos, cómo conseguir una wallet real de
 un trader de FOMO de forma legítima) y `FASE_4_VALIDACION_REAL.md` (qué se
 pudo y qué no se pudo validar en este sandbox, y por qué).
 
+## Prueba live final (`live_monitor.py`)
+
+Punto de entrada único para dejar el sistema corriendo esperando
+operaciones reales de varias wallets a la vez (Solana + Robinhood Chain):
+
+```bash
+python live_monitor.py wallets.txt
+```
+
+`wallets.txt` es un archivo de texto simple (`CHAIN,DIRECCION` por línea,
+ver el propio archivo). Solo detecta operaciones **nuevas** desde que
+arranca (no descarga historial), imprime cada una en consola con todos los
+campos (blockchain, wallet, acción, tokens, cantidad, precio, USD,
+protocolo, timestamp, tx hash, confidence) y las guarda en
+`detected_trades.jsonl`.
+
+**¿No tenés una máquina para dejarlo corriendo 24/7?** Ver
+`deploy/ORACLE_CLOUD_SETUP.md` — guía paso a paso para desplegarlo gratis
+(nivel "Always Free", no vence) en una VM de Oracle Cloud, con un servicio
+`systemd` (`deploy/live-monitor.service`) para que siga corriendo aunque
+cierres la sesión SSH o se reinicie la VM.
+
 ## Tests
 
 ```bash
