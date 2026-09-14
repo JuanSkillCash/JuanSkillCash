@@ -14618,14 +14618,19 @@ async function saveDomArchive(id, caps){
 // se muestra en la tarjeta grande a la cifra real, mientras la LÍNEA del gráfico (que sí necesita
 // historia día por día) sigue siendo la aproximación de la canasta, ya declarada como tal
 let domGlobalPctCache = null;
+let domGlobalPctFetchedAt = 0;
+const DOM_GLOBAL_PCT_TTL_MS = 2 * 60 * 1000; // 2 min — si el usuario deja la pestaña abierta y va
+// revisando varios gráficos uno por uno, el número no se queda pegado en el instante en que abrió
+// la página; se refresca cada par de minutos para que siga siendo el actual de verdad
 async function fetchGlobalDominancePct(){
-  if(domGlobalPctCache !== null) return domGlobalPctCache;
+  if(domGlobalPctCache !== null && (Date.now() - domGlobalPctFetchedAt) < DOM_GLOBAL_PCT_TTL_MS) return domGlobalPctCache;
   try{
     const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/global'));
     const json = res.ok ? await res.json() : null;
     const pct = json && json.data && json.data.market_cap_percentage;
     domGlobalPctCache = (pct && typeof pct === 'object') ? pct : false;
-  } catch(err){ domGlobalPctCache = false; }
+    domGlobalPctFetchedAt = Date.now();
+  } catch(err){ domGlobalPctCache = false; domGlobalPctFetchedAt = Date.now(); }
   return domGlobalPctCache;
 }
 async function fetchDominanceData(){
