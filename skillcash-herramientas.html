@@ -461,6 +461,17 @@ button{font-family:inherit;color:inherit}
 
 /* ---- anillo circular (dombtc/domusdt/domall: reemplaza el gráfico histórico que ya no
    tienen — muestra dónde cae el dato real de hoy frente a las zonas de compra/venta) ---- */
+/* ---- nota "copiá este ticker en TradingView" ---- */
+.tv-ticker-note{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-top:18px}
+.tv-ticker-note-text{flex:1 1 220px;font-size:12.5px;line-height:1.5;color:var(--muted2)}
+.tv-ticker-note-text b{color:var(--white)}
+.tv-ticker-code-row{display:flex;align-items:center;gap:8px;flex:1 1 100%}
+.tv-ticker-code{flex:1;font-family:'Space Mono',monospace;font-size:11.5px;color:#60a5fa;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.tv-ticker-copy{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;border:1px solid var(--border2);color:var(--muted2);background:none;cursor:pointer;transition:border-color .2s,color .2s,background .2s;flex-shrink:0}
+.tv-ticker-copy:hover{border-color:var(--red)}
+.tv-ticker-copy.copied{border-color:var(--green);background:rgba(46,204,113,.1);color:var(--green)}
+@media(max-width:520px){ .tv-ticker-code-row{flex-direction:column;align-items:stretch} .tv-ticker-code{white-space:normal;word-break:break-all} }
+
 .indic-gauge-row{display:flex;align-items:center;gap:32px;flex-wrap:wrap}
 .indic-gauge-row .chart-stats-grid{flex:1 1 220px;margin-top:0}
 .indic-ring-wrap{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;padding:20px 0 8px;margin:0 auto}
@@ -2688,6 +2699,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="partner-perks" id="domratioLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="domratioStats" style="display:none"></div>
 
+              <div class="tv-ticker-note">
+                <div class="tv-ticker-note-text">📺 ¿Querés ver este mismo gráfico de rotación con <b>todo</b> el historial en TradingView? Copiá y pegá este ticker en su buscador:</div>
+                <div class="tv-ticker-code-row">
+                  <code class="tv-ticker-code" id="domratioTvTicker">CRYPTOCAP:ETH.D/CRYPTOCAP:BTC.D</code>
+                  <button class="tv-ticker-copy" id="domratioTvCopyBtn" onclick="copyTvTicker('domratioTvTicker','domratioTvCopyBtn')">Copiar</button>
+                </div>
+              </div>
+
               <div class="calc-disclaimer" style="margin-top:18px">
                 🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 🟢🔴 Las bandas de "comprar/vender ETH" son umbrales fijos (50-55% y 10-16%), tomados del rango histórico completo del ratio (2018 en adelante) — no del rango más corto de datos que tenemos cargado aquí. Cuando ETH ya corrió mucho frente a BTC (cerca del 50-55%) históricamente ha sido buen momento para rotar de vuelta a BTC; cuando está barato frente a BTC (cerca del 10-16%), lo contrario. No es garantía de nada.<br>
@@ -2746,6 +2765,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   </div>
                 </div>
                 <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
+              </div>
+
+              <div class="tv-ticker-note">
+                <div class="tv-ticker-note-text">📺 ¿Querés ver el gráfico de esta suma con <b>todo</b> el historial en TradingView? Copiá y pegá este ticker en su buscador:</div>
+                <div class="tv-ticker-code-row">
+                  <code class="tv-ticker-code" id="domallTvTicker">CRYPTOCAP:BTC.D+CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D</code>
+                  <button class="tv-ticker-copy" id="domallTvCopyBtn" onclick="copyTvTicker('domallTvTicker','domallTvCopyBtn')">Copiar</button>
+                </div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -14782,6 +14809,16 @@ function renderDomLiveStat(key){
 async function loadDomLiveDetail(key){
   try{ await fetchGlobalDominancePct(); } catch(err){ /* renderDomLiveStat muestra el estado de error si no hay datos */ }
   renderDomLiveStat(key);
+}
+function copyTvTicker(codeId, btnId){
+  const text = document.getElementById(codeId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1800);
+  });
 }
 let domActiveRanges = { domratio: 'todo' };
 function renderDomChart(key){
