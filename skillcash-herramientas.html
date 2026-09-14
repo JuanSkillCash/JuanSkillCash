@@ -1060,23 +1060,33 @@ img[src=""]{display:none}
 .asset-filter-select{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--white);font-size:12.5px;font-family:'Space Grotesk',sans-serif;outline:none}
 .asset-filter-select:focus{border-color:var(--red)}
 
-.pie-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin:16px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.pie-chart{width:110px;height:110px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.06);position:relative}
+.pie-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin:16px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative}
+.pie-chart{width:110px;height:110px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.06);position:relative;cursor:pointer}
 .pie-chart::after{content:'';position:absolute;inset:20px;border-radius:50%;background:var(--surface)}
 .pie-legend{flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px}
-.pie-legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2)}
+.pie-legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2);cursor:pointer;border-radius:6px;padding:2px 4px;margin:-2px -4px;transition:background .15s}
+.pie-legend-row:hover{background:rgba(255,255,255,.05)}
 .pie-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .pie-legend-row b{color:var(--white);margin-left:auto;font-family:'Space Mono',monospace}
 
 /* Diversificación por sector (portafolio) */
-.sector-section{margin:16px 0;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.sector-section{margin:16px 0;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative}
 .sector-section-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .sector-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin-bottom:12px;background:rgba(255,255,255,.06)}
-.sector-bar-seg{height:100%;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.sector-bar-seg{height:100%;transition:width .5s cubic-bezier(.16,1,.3,1);cursor:pointer}
 .sector-legend{display:flex;flex-wrap:wrap;gap:12px 20px}
-.sector-legend-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted2)}
+.sector-legend-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted2);cursor:pointer;border-radius:6px;padding:2px 4px;margin:-2px -4px;transition:background .15s}
+.sector-legend-row:hover{background:rgba(255,255,255,.05)}
 .sector-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .sector-legend-row b{color:var(--white);font-family:'Space Mono',monospace}
+
+/* Tooltip compartido: torta del portafolio + barra de sectores */
+.pf-tooltip{position:absolute;z-index:30;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;box-shadow:0 14px 34px rgba(0,0,0,.5);pointer-events:none;max-width:230px;display:none}
+.pf-tooltip.show{display:block}
+.pf-tooltip-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:12.5px;color:var(--white);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.pf-tooltip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pf-tooltip-row{display:flex;justify-content:space-between;gap:14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);padding:1.5px 0}
+.pf-tooltip-row b{color:var(--white)}
 
 /* NOTA PERSONAL — BITUNIX */
 :root{ --bitunix-green:#bffa2c; }
@@ -7939,6 +7949,22 @@ function renderPortfolioItems(){
   renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue);
 }
 
+function showPfTooltip(tooltipEl, containerEl, html, clientX, clientY){
+  tooltipEl.innerHTML = html;
+  tooltipEl.classList.add('show');
+  const containerRect = containerEl.getBoundingClientRect();
+  let left = clientX - containerRect.left + 14;
+  let top = clientY - containerRect.top + 14;
+  const tw = tooltipEl.offsetWidth, th = tooltipEl.offsetHeight;
+  if(left + tw > containerRect.width) left = clientX - containerRect.left - tw - 14;
+  if(top + th > containerRect.height) top = clientY - containerRect.top - th - 14;
+  if(left < 4) left = 4;
+  if(top < 4) top = 4;
+  tooltipEl.style.left = left + 'px';
+  tooltipEl.style.top = top + 'px';
+}
+function hidePfTooltip(tooltipEl){ tooltipEl.classList.remove('show'); }
+
 function renderPieChart(){
   const section = document.getElementById('pieChartSection');
   if(!selectedPortfolio || portfolioItems.length === 0){ section.innerHTML = ''; return; }
@@ -7962,24 +7988,75 @@ function renderPieChart(){
   if(total <= 0){ section.innerHTML = ''; return; }
 
   let acc = 0;
-  const stops = entries.map((e, idx) => {
-    const start = (acc / total) * 100;
+  const slices = entries.map((e, idx) => {
+    const startPct = (acc / total) * 100;
     acc += e.value;
-    const end = (acc / total) * 100;
-    return colors[idx % colors.length] + ' ' + start + '% ' + end + '%';
-  }).join(', ');
-
-  const legend = entries.map((e, idx) => {
+    const endPct = (acc / total) * 100;
     const pct = (e.value / total) * 100;
-    return '<div class="pie-legend-row"><span class="pie-legend-dot" style="background:' + colors[idx % colors.length] + '"></span>' + e.name + ' (' + e.symbol.toUpperCase() + ')<b>' + numES(pct, 1) + '%</b></div>';
+    return { name: e.name, symbol: e.symbol, value: e.value, pct, startPct, endPct, color: colors[idx % colors.length] };
+  });
+
+  const stops = slices.map(s => s.color + ' ' + s.startPct + '% ' + s.endPct + '%').join(', ');
+  const legend = slices.map((s, idx) => {
+    return '<div class="pie-legend-row" data-slice-idx="' + idx + '"><span class="pie-legend-dot" style="background:' + s.color + '"></span>' + escapeHtml(s.name) + ' (' + escapeHtml(s.symbol.toUpperCase()) + ')<b>' + numES(s.pct, 1) + '%</b></div>';
   }).join('');
 
   section.innerHTML =
-    '<div class="pie-section">' +
-      '<div class="pie-chart" style="background:conic-gradient(' + stops + ')"></div>' +
+    '<div class="pie-section" id="pieSectionBox">' +
+      '<div class="pie-chart" id="pieChartCanvas" style="background:conic-gradient(' + stops + ')"></div>' +
       '<div class="pie-legend">' + legend + '</div>' +
+      '<div class="pf-tooltip" id="pieTooltip"></div>' +
     '</div>';
+
+  const box = document.getElementById('pieSectionBox');
+  const canvas = document.getElementById('pieChartCanvas');
+  const tooltip = document.getElementById('pieTooltip');
+
+  function tooltipHtmlFor(s){
+    return '<div class="pf-tooltip-title"><span class="pf-tooltip-dot" style="background:' + s.color + '"></span>' + escapeHtml(s.name) + ' (' + escapeHtml(s.symbol.toUpperCase()) + ')</div>' +
+      '<div class="pf-tooltip-row"><span>% del portafolio</span><b>' + numES(s.pct, 1) + '%</b></div>' +
+      (isPlan ? '' : '<div class="pf-tooltip-row"><span>Valor</span><b>$' + s.value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</b></div>');
+  }
+
+  function sliceAtClientPoint(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    const dx = clientX - cx, dy = clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const outerR = rect.width / 2;
+    const innerR = outerR * (35 / 55); // el hueco de la dona (::after inset:20px sobre una caja de 110px) deja un radio interno de 35 dentro de un radio externo de 55
+    if(dist > outerR || dist < innerR) return null;
+    let angleDeg = Math.atan2(dx, -dy) * 180 / Math.PI; // 0° arriba (12 en punto), aumenta en sentido horario — igual que conic-gradient
+    if(angleDeg < 0) angleDeg += 360;
+    const pct = (angleDeg / 360) * 100;
+    return slices.find(s => pct >= s.startPct && pct < s.endPct) || null;
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    const s = sliceAtClientPoint(e.clientX, e.clientY);
+    if(!s){ hidePfTooltip(tooltip); return; }
+    showPfTooltip(tooltip, box, tooltipHtmlFor(s), e.clientX, e.clientY);
+  });
+  canvas.addEventListener('mouseleave', () => hidePfTooltip(tooltip));
+  canvas.addEventListener('click', (e) => {
+    const s = sliceAtClientPoint(e.clientX, e.clientY);
+    if(!s){ hidePfTooltip(tooltip); return; }
+    showPfTooltip(tooltip, box, tooltipHtmlFor(s), e.clientX, e.clientY);
+  });
+
+  box.querySelectorAll('.pie-legend-row').forEach(row => {
+    const s = slices[parseInt(row.dataset.sliceIdx, 10)];
+    row.addEventListener('mouseenter', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(s), e.clientX, e.clientY));
+    row.addEventListener('mousemove', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(s), e.clientX, e.clientY));
+    row.addEventListener('mouseleave', () => hidePfTooltip(tooltip));
+    row.addEventListener('click', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(s), e.clientX, e.clientY));
+  });
+
+  if(pieOutsideClickHandler) document.removeEventListener('click', pieOutsideClickHandler);
+  pieOutsideClickHandler = (e) => { if(!box.contains(e.target)) hidePfTooltip(tooltip); };
+  document.addEventListener('click', pieOutsideClickHandler);
 }
+let pieOutsideClickHandler = null;
 
 /* ---- diversificación por sector (L1, DeFi, Stablecoin, Memecoin, Tradicional, Otras) ---- */
 const SECTOR_MAP = {
@@ -8028,19 +8105,24 @@ function renderSectorBreakdown(){
   if(!selectedPortfolio || portfolioItems.length === 0){ section.innerHTML = ''; return; }
   const isPlan = selectedPortfolio.mode === 'plan';
 
-  const sectorTotals = {};
+  // primero se agrupa por moneda (un activo puede tener varios movimientos/compras) y luego esos
+  // grupos se suman por sector, para poder mostrar en el tooltip qué monedas exactas componen cada
+  // segmento de la barra sin listar la misma moneda repetida
+  const coinGroups = {};
   portfolioItems.forEach(item => {
-    const sector = classifySector(item.asset_id);
-    let value;
+    if(!coinGroups[item.asset_id]) coinGroups[item.asset_id] = { name: item.asset_name, symbol: item.asset_symbol, value: 0, sector: classifySector(item.asset_id) };
     if(isPlan){
-      value = Number(item.target_pct) || 0;
+      coinGroups[item.asset_id].value += Number(item.target_pct) || 0;
     } else {
       const priceData = livePricesCache[item.asset_id];
       const currentPrice = priceData && typeof priceData.usd === 'number' ? priceData.usd : Number(item.buy_price);
-      value = Number(item.quantity) * currentPrice;
+      coinGroups[item.asset_id].value += Number(item.quantity) * currentPrice;
     }
-    sectorTotals[sector] = (sectorTotals[sector] || 0) + value;
   });
+  const coins = Object.values(coinGroups);
+
+  const sectorTotals = {};
+  coins.forEach(c => { sectorTotals[c.sector] = (sectorTotals[c.sector] || 0) + c.value; });
 
   const total = Object.values(sectorTotals).reduce((s, v) => s + v, 0);
   if(total <= 0){ section.innerHTML = ''; return; }
@@ -8051,21 +8133,49 @@ function renderSectorBreakdown(){
 
   const bar = present.map(s => {
     const pct = (sectorTotals[s] / total) * 100;
-    return '<div class="sector-bar-seg" style="width:' + pct + '%;background:' + SECTOR_INFO[s].color + '"></div>';
+    return '<div class="sector-bar-seg" data-sector="' + s + '" style="width:' + pct + '%;background:' + SECTOR_INFO[s].color + '"></div>';
   }).join('');
 
   const legend = present.map(s => {
     const pct = (sectorTotals[s] / total) * 100;
-    return '<div class="sector-legend-row"><span class="sector-legend-dot" style="background:' + SECTOR_INFO[s].color + '"></span>' + SECTOR_INFO[s].label + '<b>' + numES(pct, 1) + '%</b></div>';
+    return '<div class="sector-legend-row" data-sector="' + s + '"><span class="sector-legend-dot" style="background:' + SECTOR_INFO[s].color + '"></span>' + SECTOR_INFO[s].label + '<b>' + numES(pct, 1) + '%</b></div>';
   }).join('');
 
   section.innerHTML =
-    '<div class="sector-section">' +
+    '<div class="sector-section" id="sectorSectionBox">' +
       '<div class="sector-section-title">🗂️ Diversificación por sector</div>' +
       '<div class="sector-bar">' + bar + '</div>' +
       '<div class="sector-legend">' + legend + '</div>' +
+      '<div class="pf-tooltip" id="sectorTooltip"></div>' +
     '</div>';
+
+  const box = document.getElementById('sectorSectionBox');
+  const tooltip = document.getElementById('sectorTooltip');
+
+  function tooltipHtmlFor(sectorKey){
+    const info = SECTOR_INFO[sectorKey];
+    const sectorTotal = sectorTotals[sectorKey];
+    const sectorCoins = coins.filter(c => c.sector === sectorKey).sort((a, b) => b.value - a.value);
+    const rows = sectorCoins.map(c => {
+      const coinPct = (c.value / sectorTotal) * 100;
+      return '<div class="pf-tooltip-row"><span>' + escapeHtml(c.name) + ' (' + escapeHtml(c.symbol.toUpperCase()) + ')</span><b>' + numES(coinPct, 1) + '%</b></div>';
+    }).join('');
+    return '<div class="pf-tooltip-title">' + info.label + '<span style="margin-left:auto;color:var(--muted2);font-weight:400">' + numES((sectorTotal / total) * 100, 1) + '%</span></div>' + rows;
+  }
+
+  box.querySelectorAll('.sector-bar-seg, .sector-legend-row').forEach(el => {
+    const sectorKey = el.dataset.sector;
+    el.addEventListener('mouseenter', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(sectorKey), e.clientX, e.clientY));
+    el.addEventListener('mousemove', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(sectorKey), e.clientX, e.clientY));
+    el.addEventListener('mouseleave', () => hidePfTooltip(tooltip));
+    el.addEventListener('click', (e) => showPfTooltip(tooltip, box, tooltipHtmlFor(sectorKey), e.clientX, e.clientY));
+  });
+
+  if(sectorOutsideClickHandler) document.removeEventListener('click', sectorOutsideClickHandler);
+  sectorOutsideClickHandler = (e) => { if(!box.contains(e.target)) hidePfTooltip(tooltip); };
+  document.addEventListener('click', sectorOutsideClickHandler);
 }
+let sectorOutsideClickHandler = null;
 
 async function updatePortfolioItemPct(id, newValue){
   const pct = parseFloat(String(newValue).replace(',', '.'));
@@ -14399,8 +14509,36 @@ let domRowsInFlight = null;
 // cargado, un solo 429 justo en bitcoin tumbaba los 4 gráficos a la vez — de ahí que "ninguno
 // servía". Ahora se piden de a 3 a la vez (con una pausa entre tandas) y cada una se reintenta
 // sola si falla, en vez de rendirse a la primera
+
+// la API key demo de CoinGecko es UNA sola, compartida por todos los visitantes del sitio (está
+// escrita en el JS del cliente) — su cuota es baja, así que si el sitio tiene algo de tráfico se
+// puede agotar y entonces TODOS los visitantes ven fallar los 4 gráficos de dominancia a la vez,
+// sin importar cuántas veces se reintente. Para no depender de pedir esto de cero en cada visita,
+// se guarda el resultado en localStorage: si ya hay un dato de menos de 6h no se vuelve a pedir
+// (baja muchísimo cuántas veces se golpea esa cuota compartida), y si el pedido en vivo falla del
+// todo, se usa ese dato guardado aunque esté viejo — un gráfico con datos de ayer es mejor que un
+// error en rojo
+const DOM_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+function domCacheKey(id){ return 'sc_dom_mcap_' + id; }
+function readDomCache(id){
+  try{
+    const raw = localStorage.getItem(domCacheKey(id));
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.caps) || !parsed.caps.length || !parsed.fetchedAt) return null;
+    return parsed;
+  } catch(err){ return null; }
+}
+function writeDomCache(id, caps){
+  try{ localStorage.setItem(domCacheKey(id), JSON.stringify({ caps, fetchedAt: Date.now() })); }
+  catch(err){ /* localStorage lleno o bloqueado (modo incógnito, etc.) — no es crítico, sigue funcionando sin caché */ }
+}
 async function fetchOneCoinMarketCaps(id, attempt){
   attempt = attempt || 0;
+  if(attempt === 0){
+    const cached = readDomCache(id);
+    if(cached && (Date.now() - cached.fetchedAt < DOM_CACHE_TTL_MS)) return { id, caps: cached.caps };
+  }
   // fetch() no tiene timeout por defecto en el navegador — si la petición se queda colgada (no
   // responde ni con error), nunca se dispara el catch de abajo y todo el Promise.all de
   // fetchDominanceData se queda esperando para siempre ("Cargando..." infinito). El AbortController
@@ -14408,13 +14546,25 @@ async function fetchOneCoinMarketCaps(id, attempt){
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 9000);
   try{
-    const res = await fetch(cgUrl(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`), { signal: controller.signal });
+    const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`;
+    let res = await fetch(cgUrl(url), { signal: controller.signal });
+    // si la key demo compartida (usada por todos los visitantes) ya se quedó sin cuota o quedó
+    // inválida (401/403), o se pegó el límite por minuto (429), se reintenta sin key — la API
+    // pública de CoinGecko también responde sin key (con un límite más bajo), así que a veces
+    // destraba aunque la key esté muerta
+    if(res.status === 401 || res.status === 403 || res.status === 429){
+      res = await fetch(url, { signal: controller.signal });
+    }
     const json = res.ok ? await res.json() : null;
-    if(json && Array.isArray(json.market_caps) && json.market_caps.length) return { id, caps: json.market_caps };
+    if(json && Array.isArray(json.market_caps) && json.market_caps.length){
+      writeDomCache(id, json.market_caps);
+      return { id, caps: json.market_caps };
+    }
     throw new Error('respuesta vacía o ' + res.status);
   } catch(err){
     if(attempt < 2){ await new Promise(r => setTimeout(r, 700 * (attempt + 1))); return fetchOneCoinMarketCaps(id, attempt + 1); }
-    return { id, caps: [] };
+    const stale = readDomCache(id);
+    return { id, caps: stale ? stale.caps : [] };
   } finally{
     clearTimeout(timeoutId);
   }
@@ -14534,7 +14684,14 @@ function renderDomChart(key){
   const stepNorm = rawStep / stepMag;
   const niceStep = (stepNorm < 1.5 ? 1 : stepNorm < 3 ? 2 : stepNorm < 7 ? 5 : 10) * stepMag;
   const yTicks = [];
-  for(let v = Math.ceil(yMin / niceStep) * niceStep; v <= yMax; v += niceStep) yTicks.push(v);
+  // con una serie casi plana (p.ej. un solo día de datos, o de caché) el rango yMax-yMin puede
+  // quedar tan chico que el error de punto flotante hace que niceStep salga absurdamente diminuto
+  // frente a la magnitud de los valores — sin este límite el for de abajo podía intentar empujar
+  // millones de ticks y tronar con "RangeError: Invalid array length"
+  if(niceStep > 0 && isFinite(niceStep)){
+    let guard = 0;
+    for(let v = Math.ceil(yMin / niceStep) * niceStep; v <= yMax && guard < 40; v += niceStep, guard++) yTicks.push(v);
+  }
   const yGridHtml = yTicks.map(v => `
     <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
     <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v.toFixed(niceStep < 1 ? 1 : 0)}%</text>
