@@ -14896,12 +14896,12 @@ function renderDomChart(key){
     statsEl.innerHTML = def.series.map(s => `<div class="res-card"><div class="r-label">${s.label} (aprox.)</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>`).join('');
   } else {
     const s = def.series[0];
-    const allVals = seriesAll.map(p => p[s.key]);
     const label = s.label + (def.exact ? ' actual' : ' actual (aprox.)');
+    // sin "máximo/mínimo histórico": con menos de un año de datos cargados, esas etiquetas
+    // afirmaban un extremo que en realidad no conocemos — solo es el máximo/mínimo de la ventana
+    // corta que sí tenemos, no el histórico real (que si se llegó a ver con las bandas fijas)
     statsEl.innerHTML = `
-      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Máximo histórico (aprox.)</div><div class="r-val">${Math.max(...allVals).toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Mínimo histórico (aprox.)</div><div class="r-val">${Math.min(...allVals).toFixed(1)}%</div></div>
+      <div class="res-card" style="grid-column:1/-1"><div class="r-label">${label}</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>
     `;
   }
 }
