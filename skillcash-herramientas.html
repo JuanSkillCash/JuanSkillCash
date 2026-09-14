@@ -913,6 +913,7 @@ img[src=""]{display:none}
 .avg-sim-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--white);font-size:13.5px;font-family:'Space Grotesk',sans-serif;outline:none;margin-bottom:11px}
 .avg-sim-select:focus{border-color:var(--gold)}
 .avg-sim-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.avg-sim-label{display:block;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .avg-sim-fields input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--white);font-size:13.5px;outline:none}
 .avg-sim-fields input:focus{border-color:var(--gold)}
 .avg-sim-current{font-size:12px;color:var(--muted2);margin-bottom:12px;line-height:1.6}
@@ -5139,6 +5140,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
 
       <div id="assetDetailSummary"></div>
+
+      <div class="calc-actions" style="margin-top:14px">
+        <button class="a-btn" id="openAddMovBtn" type="button">➕ Agregar nueva compra</button>
+      </div>
+      <div id="addMovBox"></div>
+
       <div id="assetDetailMovements"></div>
 
       <div class="calc-actions" style="margin-top:18px">
@@ -7982,9 +7989,11 @@ const assetDetailPanel = assetDetailModal.querySelector('.modal-panel');
 const closeAssetDetail = document.getElementById('closeAssetDetail');
 let currentDetailAssetId = null;
 let editingMovementId = null;
+let addMovOpen = false;
 
 function openAssetDetailModal(assetId){
   currentDetailAssetId = assetId;
+  addMovOpen = false;
   // Intercambio visual directo (sin pasar por closeModalGeneric/openModalGeneric) para no
   // disparar dos veces la navegación de historial (history.back + pushState) casi al mismo
   // tiempo, lo que producía una condición de carrera y cerraba el modal recién abierto.
@@ -7998,11 +8007,70 @@ function closeAssetDetailModal(){
   assetDetailModal.classList.remove('open');
   currentDetailAssetId = null;
   editingMovementId = null;
+  addMovOpen = false;
   portfolioModal.classList.add('open');
   activeModalPanel = portfolioPanel;
 }
 closeAssetDetail.addEventListener('click', closeAssetDetailModal);
 assetDetailModal.addEventListener('click', (e) => { if(e.target === assetDetailModal) closeAssetDetailModal(); });
+
+document.getElementById('openAddMovBtn').addEventListener('click', () => {
+  addMovOpen = !addMovOpen;
+  renderAddMovBox();
+});
+function renderAddMovBox(){
+  const box = document.getElementById('addMovBox');
+  if(!addMovOpen){ box.innerHTML = ''; return; }
+  const today = new Date().toISOString().slice(0, 10);
+  box.innerHTML = `
+    <div class="pending-item">
+      <div class="pending-item-fields">
+        <input type="number" id="addMovQty" placeholder="Cantidad" step="any">
+        <input type="number" id="addMovPrice" placeholder="Precio de compra (USD)" step="any">
+      </div>
+      <div class="pending-item-fields single">
+        <input type="date" id="addMovDate" value="${today}" max="${today}">
+      </div>
+      <div class="pending-item-actions">
+        <button class="pending-confirm" id="addMovConfirmBtn" type="button">Agregar compra</button>
+        <button class="pending-cancel" id="addMovCancelBtn" type="button">Cancelar</button>
+      </div>
+    </div>`;
+  document.getElementById('addMovCancelBtn').addEventListener('click', () => { addMovOpen = false; renderAddMovBox(); });
+  document.getElementById('addMovConfirmBtn').addEventListener('click', confirmAddMovement);
+}
+async function confirmAddMovement(){
+  if(!currentDetailAssetId || !selectedPortfolio) return;
+  const first = portfolioItems.find(i => i.asset_id === currentDetailAssetId);
+  if(!first) return;
+  const qty = parseFloat(document.getElementById('addMovQty').value);
+  const buyPrice = parseFloat(document.getElementById('addMovPrice').value);
+  const dateVal = document.getElementById('addMovDate').value;
+  if(!(qty > 0) || !(buyPrice > 0)){ alert('Ingresa cantidad y precio de compra válidos.'); return; }
+  const btn = document.getElementById('addMovConfirmBtn');
+  btn.disabled = true;
+  try{
+    const { error } = await sbClient.from('portfolio_items').insert({
+      portfolio_id: selectedPortfolio.id,
+      asset_id: first.asset_id,
+      asset_name: first.asset_name,
+      asset_symbol: first.asset_symbol,
+      asset_thumb: first.asset_thumb,
+      quantity: qty,
+      buy_price: buyPrice,
+      purchased_at: dateVal || new Date().toISOString().slice(0, 10),
+    });
+    if(error) throw error;
+    addMovOpen = false;
+    renderAddMovBox();
+    await loadPortfolioItems();
+    renderAssetDetail();
+  } catch(err){
+    alert('No se pudo agregar: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
 
 function renderAssetDetail(){
   if(!currentDetailAssetId) return;
@@ -8175,8 +8243,14 @@ function renderAvgSimBox(){
       <select class="avg-sim-select" id="avgSimAsset">${optionsHtml}</select>
       <div class="avg-sim-current" id="avgSimCurrent"></div>
       <div class="avg-sim-fields">
-        <input type="number" id="avgSimQty" placeholder="Cantidad a comprar" step="any">
-        <input type="number" id="avgSimPrice" placeholder="Precio de compra (USD)" step="any">
+        <div>
+          <label class="avg-sim-label" for="avgSimQty" id="avgSimQtyLabel">Cantidad que vas a comprar</label>
+          <input type="number" id="avgSimQty" placeholder="Ej: 0.05" step="any">
+        </div>
+        <div>
+          <label class="avg-sim-label" for="avgSimPrice" id="avgSimPriceLabel">Precio de compra por unidad (USD)</label>
+          <input type="number" id="avgSimPrice" placeholder="Ej: 65,000" step="any">
+        </div>
       </div>
       <div class="avg-sim-actions">
         <button class="a-btn" id="avgSimCalcBtn" type="button">Calcular nuevo costo promedio</button>
@@ -8190,6 +8264,8 @@ function renderAvgSimBox(){
     document.getElementById('avgSimCurrent').innerHTML =
       'Ahora tienes <b>' + formatPrice(g.qty) + '</b> ' + g.symbol.toUpperCase() +
       ' con un costo promedio de <b>$' + g.avgCost.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:8}) + '</b>.';
+    document.getElementById('avgSimQtyLabel').textContent = 'Cantidad de ' + g.symbol.toUpperCase() + ' que vas a comprar';
+    document.getElementById('avgSimPriceLabel').textContent = 'Precio de compra por ' + g.symbol.toUpperCase() + ' (USD)';
     document.getElementById('avgSimResult').classList.remove('show');
     const priceInput = document.getElementById('avgSimPrice');
     const liveData = livePricesCache[select.value];
