@@ -7175,6 +7175,16 @@ sbClient.auth.getSession().then(({ data }) => {
 });
 
 /* ---- portafolios ---- */
+// "Failed to fetch" es un error de RED puro (sin conexión, o algo bloqueando la petición, como
+// un adblocker) — el navegador ni siquiera llegó a recibir respuesta del servidor. Mostrar ese
+// texto en inglés tal cual no le dice nada al usuario sobre qué hacer, así que se traduce a un
+// mensaje accionable en vez de solo mostrar el error crudo
+function friendlyErrMsg(err){
+  if(err && err.message === 'Failed to fetch'){
+    return 'No hay conexión a internet en este momento (o algo la está bloqueando, como un adblocker o modo avión). Revisa tu conexión e intenta de nuevo.';
+  }
+  return (err && err.message) ? err.message : 'Ocurrió un error inesperado. Intenta de nuevo.';
+}
 let portfolios = [];
 let selectedPortfolio = null;
 let portfolioItems = [];
@@ -7263,7 +7273,7 @@ document.getElementById('createPortfolioBtn').addEventListener('click', async ()
     await loadPortfolios();
     selectPortfolio(data);
   } catch(err){
-    alert('No se pudo crear el portafolio: ' + err.message);
+    alert('No se pudo crear el portafolio: ' + friendlyErrMsg(err));
   } finally {
     btn.disabled = false;
   }
@@ -7304,7 +7314,7 @@ document.getElementById('renamePortfolioBtn').addEventListener('click', () => {
     nameEl.style.display = '';
     if(!newName || newName === currentName) return;
     const { error } = await sbClient.from('portfolios').update({ name: newName }).eq('id', selectedPortfolio.id);
-    if(error){ alert('No se pudo renombrar: ' + error.message); return; }
+    if(error){ alert('No se pudo renombrar: ' + friendlyErrMsg(error)); return; }
     selectedPortfolio.name = newName;
     nameEl.textContent = newName + (selectedPortfolio.mode === 'plan' ? ' · Plan (%)' : ' · Holdings');
     await loadPortfolios();
@@ -7357,7 +7367,7 @@ document.getElementById('deletePortfolioBtn').addEventListener('click', async ()
   if(!selectedPortfolio) return;
   if(!confirm('¿Eliminar "' + selectedPortfolio.name + '" y todos sus activos? Esta acción no se puede deshacer.')) return;
   const { error } = await sbClient.from('portfolios').delete().eq('id', selectedPortfolio.id);
-  if(error){ alert('No se pudo eliminar: ' + error.message); return; }
+  if(error){ alert('No se pudo eliminar: ' + friendlyErrMsg(error)); return; }
   selectedPortfolio = null;
   portfolioDetail.style.display = 'none';
   await loadPortfolios();
@@ -7580,7 +7590,7 @@ async function confirmAddItem(){
     renderPendingItem();
     await loadPortfolioItems();
   } catch(err){
-    alert('No se pudo agregar: ' + err.message);
+    alert('No se pudo agregar: ' + friendlyErrMsg(err));
   } finally {
     btn.disabled = false;
   }
@@ -7943,7 +7953,7 @@ async function updatePortfolioItemPct(id, newValue){
   const pct = parseFloat(String(newValue).replace(',', '.'));
   if(!isFinite(pct) || pct < 0){ await loadPortfolioItems(); return; } // valor inválido, se restaura el que había
   const { error } = await sbClient.from('portfolio_items').update({ target_pct: pct }).eq('id', id);
-  if(error){ alert('No se pudo actualizar el %: ' + error.message); return; }
+  if(error){ alert('No se pudo actualizar el %: ' + friendlyErrMsg(error)); return; }
   await loadPortfolioItems();
 }
 
@@ -7957,7 +7967,7 @@ async function updatePortfolioMovement(id, qtyRaw, priceRaw, dateRaw){
   const payload = { quantity: qty, buy_price: price };
   if(dateRaw) payload.purchased_at = dateRaw;
   const { error } = await sbClient.from('portfolio_items').update(payload).eq('id', id);
-  if(error){ alert('No se pudo actualizar la compra: ' + error.message); return; }
+  if(error){ alert('No se pudo actualizar la compra: ' + friendlyErrMsg(error)); return; }
   editingMovementId = null;
   await loadPortfolioItems();
   if(currentDetailAssetId) renderAssetDetail();
@@ -7965,7 +7975,7 @@ async function updatePortfolioMovement(id, qtyRaw, priceRaw, dateRaw){
 
 async function deletePortfolioItem(id){
   const { error } = await sbClient.from('portfolio_items').delete().eq('id', id);
-  if(error){ alert('No se pudo eliminar: ' + error.message); return; }
+  if(error){ alert('No se pudo eliminar: ' + friendlyErrMsg(error)); return; }
   await loadPortfolioItems();
 }
 
@@ -8053,7 +8063,7 @@ async function confirmAddMovement(){
     await loadPortfolioItems();
     renderAssetDetail();
   } catch(err){
-    alert('No se pudo agregar: ' + err.message);
+    alert('No se pudo agregar: ' + friendlyErrMsg(err));
   } finally {
     btn.disabled = false;
   }
