@@ -2007,7 +2007,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
               <div class="indic-guide-icon">🥧</div>
               <div class="indic-guide-card-title">Dominancia BTC+ETH+USDT+USDC</div>
-              <div class="indic-guide-card-text">La dominancia de las 4 monedas juntas, cada una en su propia línea, para compararlas.</div>
+              <div class="indic-guide-card-text">La suma de la dominancia de las 4 monedas juntas — qué % del mercado controlan entre todas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
@@ -2692,7 +2692,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Dominancia BTC+ETH+USDT+USDC</h2>
-                <p class="calc-sub">La dominancia de estas 4 monedas, cada una en su propia línea, para comparar cómo se mueven entre sí. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes — la tendencia es correcta, pero el número puede quedar un poco por encima del real.</p>
+                <p class="calc-sub">La suma de la dominancia de estas 4 monedas juntas: qué % del mercado controlan entre todas. El número actual está anclado al % real de CoinGecko; el historial del gráfico es una <b>aproximación</b> (CoinGecko no da gratis el market cap histórico de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes — la tendencia es correcta, pero puede quedar un poco por encima del real).</p>
               </div>
 
               <div class="indic-chart-body" id="domallChartBody">
@@ -2713,7 +2713,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🥧 Aproximado (ver nota arriba) — cada línea es (market cap de la moneda) ÷ (suma de las ~15 monedas más grandes). El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
+                🥧 El número actual es la suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D); el historial del gráfico es aproximado — (suma del market cap de las 4 monedas) ÷ (suma de las ~15 monedas más grandes). El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14598,6 +14598,23 @@ async function saveDomArchive(id, caps){
     archive.set(id, archived);
   } catch(err){ /* guardar el archivo es "mejor esfuerzo" — si falla, el gráfico sigue igual con solo los datos en vivo */ }
 }
+// la dominancia calculada contra la canasta de 10 monedas SIEMPRE va a quedar un poco (o no tan
+// poco) por encima de la real, porque el denominador le falta todo lo demás que existe en cripto —
+// /global de CoinGecko sí da el % de dominancia real (calculado por ellos con el mercado completo),
+// pero SOLO para el momento actual, no histórico — así que se usa para anclar el número "actual" que
+// se muestra en la tarjeta grande a la cifra real, mientras la LÍNEA del gráfico (que sí necesita
+// historia día por día) sigue siendo la aproximación de la canasta, ya declarada como tal
+let domGlobalPctCache = null;
+async function fetchGlobalDominancePct(){
+  if(domGlobalPctCache !== null) return domGlobalPctCache;
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/global'));
+    const json = res.ok ? await res.json() : null;
+    const pct = json && json.data && json.data.market_cap_percentage;
+    domGlobalPctCache = (pct && typeof pct === 'object') ? pct : false;
+  } catch(err){ domGlobalPctCache = false; }
+  return domGlobalPctCache;
+}
 async function fetchDominanceData(){
   if(domRows) return domRows;
   if(domRowsInFlight) return domRowsInFlight;
@@ -14652,21 +14669,21 @@ const DOM_CHART_DEFS = {
   },
   domall: {
     needs: ['bitcoin', 'ethereum', 'tether', 'usd-coin'], exact: false,
-    series: [
-      { key: 'btc', color: '#f0b23d', label: 'BTC' }, { key: 'eth', color: '#60a5fa', label: 'ETH' },
-      { key: 'usdt', color: '#22c55e', label: 'USDT' }, { key: 'usdc', color: '#a855f7', label: 'USDC' },
-    ],
-    compute: r => ({ btc: (r.caps.bitcoin / r.total) * 100, eth: (r.caps.ethereum / r.total) * 100, usdt: (r.caps.tether / r.total) * 100, usdc: (r.caps['usd-coin'] / r.total) * 100 }),
+    series: [{ key: 'v', color: '#f0b23d', label: 'BTC+ETH+USDT+USDC' }],
+    compute: r => ({ v: ((r.caps.bitcoin + r.caps.ethereum + r.caps.tether + r.caps['usd-coin']) / r.total) * 100 }),
+    globalPctKeys: ['btc', 'eth', 'usdt', 'usdc'],
   },
   dombtc: {
     needs: ['bitcoin'], exact: false,
     series: [{ key: 'v', color: '#f0b23d', label: 'Dominancia BTC' }],
     compute: r => ({ v: (r.caps.bitcoin / r.total) * 100 }),
+    globalPctKeys: ['btc'],
   },
   domusdt: {
     needs: ['bitcoin', 'tether'], exact: false,
     series: [{ key: 'v', color: '#22c55e', label: 'Dominancia USDT' }],
     compute: r => ({ v: (r.caps.tether / r.total) * 100 }),
+    globalPctKeys: ['usdt'],
   },
 };
 let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
@@ -14791,16 +14808,28 @@ function renderDomChart(key){
   } else {
     const s = def.series[0];
     const allVals = seriesAll.map(p => p[s.key]);
-    const label = s.label + (def.exact ? ' actual' : ' actual (aprox.)');
+    // el número "actual" se ancla al % real de CoinGecko (/global, mercado completo) cuando está
+    // disponible, en vez de la aproximación de la canasta de 10 monedas — la canasta SIEMPRE se
+    // queda corta de denominador, así que la aproximación por sí sola queda inflada frente a lo
+    // que se ve en TradingView/CoinMarketCap. El historial del gráfico (línea) sigue siendo la
+    // aproximación, porque /global no da datos históricos gratis
+    let globalReal = null;
+    if(domGlobalPctCache && def.globalPctKeys){
+      const vals = def.globalPctKeys.map(k => parseFloat(domGlobalPctCache[k]));
+      if(vals.every(v => isFinite(v) && v > 0)) globalReal = vals.reduce((a, b) => a + b, 0);
+    }
+    const actualVal = globalReal != null ? globalReal : lastP[s.key];
+    const label = s.label + (def.exact ? ' actual' : globalReal != null ? ' actual' : ' actual (aprox.)');
     statsEl.innerHTML = `
-      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Máximo histórico</div><div class="r-val">${Math.max(...allVals).toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Mínimo histórico</div><div class="r-val">${Math.min(...allVals).toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${actualVal.toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">Máximo histórico (aprox.)</div><div class="r-val">${Math.max(...allVals).toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">Mínimo histórico (aprox.)</div><div class="r-val">${Math.min(...allVals).toFixed(1)}%</div></div>
     `;
   }
 }
 async function loadDomChartDetail(key){
   try{ await fetchDominanceData(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
+  try{ await fetchGlobalDominancePct(); } catch(err){ /* si falla, la tarjeta usa la aproximación de la canasta */ }
   renderDomChart(key);
 }
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false };
