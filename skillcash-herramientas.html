@@ -2693,29 +2693,26 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Dominancia BTC+ETH+USDT+USDC</h2>
-                <p class="calc-sub">La suma de la dominancia de estas 4 monedas juntas: qué % del mercado controlan entre todas. El número actual está anclado al % real de CoinGecko; el historial del gráfico es una <b>aproximación</b> (CoinGecko no da gratis el market cap histórico de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes — la tendencia es correcta, pero puede quedar un poco por encima del real).</p>
+                <p class="calc-sub">La suma de la dominancia de estas 4 monedas juntas: qué % del mercado controlan entre todas — dato real de CoinGecko, calculado con el mercado completo, no una aproximación.</p>
               </div>
 
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                  <div class="indic-placeholder-title">Cargando dato en vivo…</div>
+                  <div class="indic-placeholder-text">Consultando el % real de dominancia en CoinGecko.</div>
                 </div>
                 <div class="indic-chart-soon" id="domallError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="domallErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="domallChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
-              <div class="partner-perks" id="domallLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🥧 El número actual es la suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D); el historial del gráfico es aproximado — (suma del market cap de las 4 monedas) ÷ (suma de las ~15 monedas más grandes). El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
-                🟢🔴 Las bandas de "zona de compra/venta" están cerca del máximo/mínimo histórico de esta métrica (no son un umbral fijo) — cuando BTC+ETH+USDT+USDC pesan mucho, el capital está concentrado ahí y las altcoins suelen estar castigadas; cuando pesan poco, las altcoins ya se comieron esa porción del mercado. No es garantía de nada.<br>
+                🥧 Suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D), calculada por ellos con el mercado completo — no es una aproximación nuestra.<br>
+                ⚠️ No mostramos el historial de este número: CoinGecko no da gratis el market cap total histórico de TODO el mercado, y la aproximación que usábamos antes (contra una canasta de ~15 monedas) daba niveles que la dominancia real nunca tuvo — preferimos mostrar solo el dato de hoy, que sí es exacto, en vez de un gráfico que podía verse mal.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2731,28 +2728,26 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Dominancia BTC</h2>
-                <p class="calc-sub">Qué tanto pesa Bitcoin solo frente al resto del mercado. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes.</p>
+                <p class="calc-sub">Qué tanto pesa Bitcoin solo frente al resto del mercado — dato real de CoinGecko, calculado con el mercado completo, no una aproximación.</p>
               </div>
 
               <div class="indic-chart-body" id="dombtcChartBody">
                 <div class="indic-chart-soon" id="dombtcLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                  <div class="indic-placeholder-title">Cargando dato en vivo…</div>
+                  <div class="indic-placeholder-text">Consultando el % real de dominancia en CoinGecko.</div>
                 </div>
                 <div class="indic-chart-soon" id="dombtcError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="dombtcErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="dombtcChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
-              <div class="partner-perks" id="dombtcLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="dombtcStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                ₿ Aproximado (ver nota arriba) — market cap de BTC ÷ suma de las ~15 monedas más grandes. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
+                ₿ Dato real de CoinGecko (BTC.D), calculado por ellos con el mercado completo — no es una aproximación nuestra.<br>
+                ⚠️ No mostramos el historial de este número: CoinGecko no da gratis el market cap total histórico de TODO el mercado, y la aproximación que usábamos antes (contra una canasta de ~15 monedas) daba niveles que la dominancia real nunca tuvo — preferimos mostrar solo el dato de hoy, que sí es exacto, en vez de un gráfico que podía verse mal.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2768,28 +2763,26 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Dominancia USDT</h2>
-                <p class="calc-sub">Qué tanto pesa Tether solo frente al resto del mercado. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes.</p>
+                <p class="calc-sub">Qué tanto pesa Tether solo frente al resto del mercado — dato real de CoinGecko, calculado con el mercado completo, no una aproximación.</p>
               </div>
 
               <div class="indic-chart-body" id="domusdtChartBody">
                 <div class="indic-chart-soon" id="domusdtLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                  <div class="indic-placeholder-title">Cargando dato en vivo…</div>
+                  <div class="indic-placeholder-text">Consultando el % real de dominancia en CoinGecko.</div>
                 </div>
                 <div class="indic-chart-soon" id="domusdtError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="domusdtErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="domusdtChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
-              <div class="partner-perks" id="domusdtLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="domusdtStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💵 Aproximado (ver nota arriba) — market cap de USDT ÷ suma de las ~15 monedas más grandes. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
+                💵 Dato real de CoinGecko (USDT.D), calculado por ellos con el mercado completo — no es una aproximación nuestra.<br>
+                ⚠️ No mostramos el historial de este número: CoinGecko no da gratis el market cap total histórico de TODO el mercado, y la aproximación que usábamos antes (contra una canasta de ~15 monedas) daba niveles que la dominancia real nunca tuvo — preferimos mostrar solo el dato de hoy, que sí es exacto, en vez de un gráfico que podía verse mal.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2832,7 +2825,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
-                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo, y un mínimo cuando sube 50%+ sin volver a caer debajo — así una corrección normal dentro del mismo ciclo no se marca por error como el fin del ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado "¿? días" es el ciclo actual: como todavía no se revirtió 50%, no se sabe cuándo va a terminar.<br>
+                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado con "+" es el ciclo actual, todavía en curso: son los días que ya pasaron desde el último giro confirmado, pero como este tramo todavía no se revirtió del todo, no se sabe cuándo va a terminar de verdad.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14464,13 +14457,15 @@ document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(btn => {
 
 /* ---- Dominancia de mercado: qué % representa cada moneda dentro del total cripto ----
    CoinGecko no da gratis el market cap TOTAL histórico de todo el mercado (ese endpoint es de
-   plan pago/Enterprise) — así que se aproxima sumando el market cap histórico de una canasta
-   amplia de ~15 monedas grandes como "el mercado". La dominancia individual (BTC/ETH/USDT) y la
-   combinada (BTC+ETH+USDT+USDC) quedan como APROXIMACIÓN: el denominador real es más grande que
-   esta canasta, así que el % mostrado tiende a quedar un poco por ENCIMA del real. La rotación
-   ETH/BTC en cambio es EXACTA — al ser una división entre dos monedas, el "total" se cancela solo
-   y no importa qué tan completa sea la canasta */
-const DOM_BASKET = ['bitcoin', 'ethereum', 'tether', 'ripple', 'binancecoin', 'solana', 'usd-coin', 'dogecoin', 'cardano', 'tron'];
+   plan pago/Enterprise). Se probó aproximar sumando el market cap histórico de una canasta de
+   ~10-15 monedas grandes como "el mercado", pero esa aproximación mostraba niveles que la
+   dominancia real nunca tuvo (reportado por el usuario con capturas de TradingView) — así que
+   para Dominancia BTC, Dominancia USDT y BTC+ETH+USDT+USDC ya NO se muestra ningún historial
+   aproximado, solo el % real de HOY que da CoinGecko (vía /global, exacto, mercado completo).
+   La Rotación ETH.D/BTC.D es la única que SÍ mantiene su gráfico histórico completo, porque es
+   EXACTA — al ser una división entre dos monedas, el "total" del mercado se cancela solo y no
+   importa qué tan completa sea la canasta; por eso solo necesita bitcoin y ethereum */
+const DOM_BASKET = ['bitcoin', 'ethereum'];
 let domRows = null; // [{t, caps:{coinId:mcap}, total}], ascendente por día
 let domRowsInFlight = null;
 // el plan gratis de CoinGecko tiene un límite de peticiones por minuto bastante bajo — pedir las
@@ -14678,31 +14673,47 @@ const DOM_CHART_DEFS = {
     // BTC); cerca del mínimo, ETH está barato frente a BTC (zona de comprar) — pedido explícito
     zones: { topLabel: 'Vender ETH', topColor: '#ff2f4f', bottomLabel: 'Comprar ETH', bottomColor: '#22c55e' },
   },
-  domall: {
-    needs: ['bitcoin', 'ethereum', 'tether', 'usd-coin'], exact: false,
-    series: [{ key: 'v', color: '#f0b23d', label: 'BTC+ETH+USDT+USDC' }],
-    compute: r => ({ v: ((r.caps.bitcoin + r.caps.ethereum + r.caps.tether + r.caps['usd-coin']) / r.total) * 100 }),
-    globalPctKeys: ['btc', 'eth', 'usdt', 'usdc'],
-    // cuando BTC+ETH+USDT+USDC juntos pesan cerca de su máximo histórico, el capital está
-    // concentrado en las mayores + estables y las altcoins suelen estar castigadas (zona de
-    // compra para altcoins); cerca de su mínimo histórico, las altcoins ya se comieron esa
-    // porción del mercado (zona de venta/toma de ganancias) — pedido explícito del usuario
-    zones: { topLabel: 'Zona de compra', topColor: '#22c55e', bottomLabel: 'Zona de venta', bottomColor: '#ff2f4f' },
-  },
-  dombtc: {
-    needs: ['bitcoin'], exact: false,
-    series: [{ key: 'v', color: '#f0b23d', label: 'Dominancia BTC' }],
-    compute: r => ({ v: (r.caps.bitcoin / r.total) * 100 }),
-    globalPctKeys: ['btc'],
-  },
-  domusdt: {
-    needs: ['bitcoin', 'tether'], exact: false,
-    series: [{ key: 'v', color: '#22c55e', label: 'Dominancia USDT' }],
-    compute: r => ({ v: (r.caps.tether / r.total) * 100 }),
-    globalPctKeys: ['usdt'],
-  },
 };
-let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
+// Dominancia BTC, Dominancia USDT y BTC+ETH+USDT+USDC ya no tienen gráfico histórico (ver nota
+// arriba de DOM_BASKET) — solo muestran el % real de hoy vía /global. DOM_LIVE_DEFS declara qué
+// clave(s) de /global necesita cada una y si además desglosa por moneda (BTC+ETH+USDT+USDC sí)
+const DOM_LIVE_DEFS = {
+  dombtc: { label: 'Dominancia BTC', keys: ['btc'] },
+  domusdt: { label: 'Dominancia USDT', keys: ['usdt'] },
+  domall: { label: 'BTC+ETH+USDT+USDC', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true },
+};
+const DOM_LIVE_LABELS = { btc: 'BTC', eth: 'ETH', usdt: 'USDT', usdc: 'USDC' };
+function renderDomLiveStat(key){
+  const def = DOM_LIVE_DEFS[key];
+  const bodyEl = document.getElementById(key + 'ChartBody');
+  const loadingEl = document.getElementById(key + 'Loading');
+  const errorEl = document.getElementById(key + 'Error');
+  const statsEl = document.getElementById(key + 'Stats');
+  const pct = domGlobalPctCache;
+  const vals = pct ? def.keys.map(k => parseFloat(pct[k])) : [];
+  if(!pct || !vals.every(v => isFinite(v) && v > 0)){
+    bodyEl.style.display = '';
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    statsEl.style.display = 'none';
+    return;
+  }
+  // ya no queda ningún gráfico en este contenedor (solo mostraba loading/error) — colapsarlo del
+  // todo para no dejar un hueco vacío de 260px (el min-height que se usaba para el gráfico viejo)
+  bodyEl.style.display = 'none';
+  statsEl.style.display = '';
+  const total = vals.reduce((a, b) => a + b, 0);
+  let html = `<div class="res-card" style="grid-column:1/-1"><div class="r-label">${def.label} — dato real de hoy</div><div class="r-val" style="font-size:32px">${total.toFixed(1)}%</div></div>`;
+  if(def.breakdown){
+    html += def.keys.map((k, i) => `<div class="res-card"><div class="r-label">${DOM_LIVE_LABELS[k]}</div><div class="r-val">${vals[i].toFixed(1)}%</div></div>`).join('');
+  }
+  statsEl.innerHTML = html;
+}
+async function loadDomLiveDetail(key){
+  try{ await fetchGlobalDominancePct(); } catch(err){ /* renderDomLiveStat muestra el estado de error si no hay datos */ }
+  renderDomLiveStat(key);
+}
+let domActiveRanges = { domratio: 'todo' };
 function renderDomChart(key){
   const def = DOM_CHART_DEFS[key];
   const loadingEl = document.getElementById(key + 'Loading');
@@ -14777,12 +14788,15 @@ function renderDomChart(key){
   `).join('');
 
   // bandas de "zona de compra/venta" cerca de los extremos históricos de la propia serie (no un
-  // umbral fijo), con degradado — más intensas hacia afuera, se difuminan hacia el centro
+  // umbral fijo), con degradado — más intensas hacia afuera, se difuminan hacia el centro. Siempre
+  // visibles (independientemente de dónde esté el precio actual), con el % exacto de cada borde
+  // marcado, para poder ver qué tan lejos está el precio de hoy de cada zona
   let zonesHtml = '';
   if(def.zones){
     const zoneSpan = (maxV - minV) || 1;
     const topZoneEdge = maxV - zoneSpan * 0.15;
     const bottomZoneEdge = minV + zoneSpan * 0.15;
+    const fmtZonePct = v => v.toFixed(niceStep < 1 ? 1 : 0) + '%';
     const topY1 = yFor(maxV), topY2 = yFor(topZoneEdge);
     const bottomY1 = yFor(bottomZoneEdge), bottomY2 = yFor(minV);
     zonesHtml = `
@@ -14798,8 +14812,12 @@ function renderDomChart(key){
       </defs>
       <rect x="${marginLeft}" y="${topY1.toFixed(1)}" width="${drawW}" height="${(topY2 - topY1).toFixed(1)}" fill="url(#${key}TopZoneGrad)"/>
       <rect x="${marginLeft}" y="${bottomY1.toFixed(1)}" width="${drawW}" height="${(bottomY2 - bottomY1).toFixed(1)}" fill="url(#${key}BottomZoneGrad)"/>
+      <line x1="${marginLeft}" y1="${topY2.toFixed(1)}" x2="${totalW - marginRight}" y2="${topY2.toFixed(1)}" stroke="${def.zones.topColor}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
+      <line x1="${marginLeft}" y1="${bottomY1.toFixed(1)}" x2="${totalW - marginRight}" y2="${bottomY1.toFixed(1)}" stroke="${def.zones.bottomColor}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
       <text x="${marginLeft + 10}" y="${(topY1 + 15).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.topColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.topLabel}</text>
+      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(topY2 - 4).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.topColor}" font-family="'Space Mono',monospace">desde ${fmtZonePct(topZoneEdge)}</text>
       <text x="${marginLeft + 10}" y="${(bottomY2 - 7).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.bottomColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.bottomLabel}</text>
+      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(bottomY1 + 12).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.bottomColor}" font-family="'Space Mono',monospace">hasta ${fmtZonePct(bottomZoneEdge)}</text>
     `;
   }
 
@@ -14852,20 +14870,9 @@ function renderDomChart(key){
   } else {
     const s = def.series[0];
     const allVals = seriesAll.map(p => p[s.key]);
-    // el número "actual" se ancla al % real de CoinGecko (/global, mercado completo) cuando está
-    // disponible, en vez de la aproximación de la canasta de 10 monedas — la canasta SIEMPRE se
-    // queda corta de denominador, así que la aproximación por sí sola queda inflada frente a lo
-    // que se ve en TradingView/CoinMarketCap. El historial del gráfico (línea) sigue siendo la
-    // aproximación, porque /global no da datos históricos gratis
-    let globalReal = null;
-    if(domGlobalPctCache && def.globalPctKeys){
-      const vals = def.globalPctKeys.map(k => parseFloat(domGlobalPctCache[k]));
-      if(vals.every(v => isFinite(v) && v > 0)) globalReal = vals.reduce((a, b) => a + b, 0);
-    }
-    const actualVal = globalReal != null ? globalReal : lastP[s.key];
-    const label = s.label + (def.exact ? ' actual' : globalReal != null ? ' actual' : ' actual (aprox.)');
+    const label = s.label + (def.exact ? ' actual' : ' actual (aprox.)');
     statsEl.innerHTML = `
-      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${actualVal.toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>
       <div class="res-card"><div class="r-label">Máximo histórico (aprox.)</div><div class="r-val">${Math.max(...allVals).toFixed(1)}%</div></div>
       <div class="res-card"><div class="r-label">Mínimo histórico (aprox.)</div><div class="r-val">${Math.min(...allVals).toFixed(1)}%</div></div>
     `;
@@ -14873,29 +14880,15 @@ function renderDomChart(key){
 }
 async function loadDomChartDetail(key){
   try{ await fetchDominanceData(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
-  try{ await fetchGlobalDominancePct(); } catch(err){ /* si falla, la tarjeta usa la aproximación de la canasta */ }
   renderDomChart(key);
 }
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false };
 function ensureDomRatioLoaded(){ if(!domLoadedOnce.domratio){ domLoadedOnce.domratio = true; loadDomChartDetail('domratio'); } }
-function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomChartDetail('domall'); } }
-function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomChartDetail('dombtc'); } }
-function ensureDomUsdtLoaded(){ if(!domLoadedOnce.domusdt){ domLoadedOnce.domusdt = true; loadDomChartDetail('domusdt'); } }
+function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomLiveDetail('domall'); } }
+function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomLiveDetail('dombtc'); } }
+function ensureDomUsdtLoaded(){ if(!domLoadedOnce.domusdt){ domLoadedOnce.domusdt = true; loadDomLiveDetail('domusdt'); } }
 window.addEventListener('resize', () => {
-  ['domratio', 'domall', 'dombtc', 'domusdt'].forEach(key => {
-    if(document.querySelector('.indic-panel[data-indic="' + key + '"]').style.display !== 'none') renderDomChart(key);
-  });
-});
-['domratio', 'domall', 'dombtc', 'domusdt'].forEach(key => {
-  document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if(btn.classList.contains('active')) return;
-      document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      domActiveRanges[key] = btn.dataset.range;
-      renderDomChart(key);
-    });
-  });
+  if(document.querySelector('.indic-panel[data-indic="domratio"]').style.display !== 'none') renderDomChart('domratio');
 });
 
 /* ---- BTC en onzas de oro: 1 BTC ÷ precio del oro (XAU/USD) — ambos precios reales, sin
@@ -14939,17 +14932,19 @@ function fmtOz(v){
   return v.toLocaleString('en-US', { minimumFractionDigits: v < 1 ? 3 : 2, maximumFractionDigits: v < 1 ? 3 : 2 }) + ' oz';
 }
 // detector de máximos/mínimos de CICLO (tipo ZigZag): sigue el extremo candidato mientras el
-// precio se mueva en esa dirección, y solo lo confirma como máximo/mínimo de ciclo cuando el
-// precio se revierte al menos "thresholdPct" desde ese candidato — así un repunte o caída menor
-// dentro de la misma tendencia no cuenta como el máximo/mínimo, solo el extremo real antes de una
-// reversión grande y sostenida. Se usa 50% (no el 30% mencionado como ejemplo) porque BTC/XAU
-// tiene correcciones intermedias de 30-40% DENTRO de un mismo ciclo (ej. mayo 2021) que un umbral
-// más bajo marcaría como "fin de ciclo" por error — 50% sí aísla solo los giros grandes de verdad
-function detectCyclePeaksTroughs(points, thresholdPct){
+// precio se mueva en esa dirección, y solo lo confirma como máximo/mínimo de ciclo cuando (a) el
+// precio se revierte al menos "thresholdPct" desde ese candidato Y (b) desde el giro confirmado
+// anterior ya pasaron al menos "minDays" — así un repunte o caída fuerte pero rápida (semanas o
+// pocos meses) no cuenta como un ciclo, solo un giro grande Y sostenido en el tiempo. Con solo el
+// umbral de precio, en datos reales de BTC/XAU salían demasiados giros (hay correcciones de 50%+
+// que se resuelven en semanas) — el filtro de tiempo mínimo es el que de verdad aísla los ciclos
+function detectCyclePeaksTroughs(points, thresholdPct, minDays){
   if(!points || points.length < 2) return [];
+  const minMs = (minDays || 0) * 86400000;
   const events = [];
   let mode = null; // 'seekingPeak' | 'seekingTrough'
   let candidate = points[0];
+  let legStartT = points[0].t;
   for(let i = 1; i < points.length; i++){
     const p = points[i];
     if(mode === null){
@@ -14959,22 +14954,28 @@ function detectCyclePeaksTroughs(points, thresholdPct){
     }
     if(mode === 'seekingPeak'){
       if(p.ratio >= candidate.ratio){ candidate = p; }
-      else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct){
+      // el tiempo mínimo se mide hasta "p" (el punto que estamos evaluando ahora), no hasta
+      // "candidate" (la fecha del extremo, que deja de avanzar en cuanto el precio empieza a
+      // revertirse) — si se comparara contra candidate.t, una vez el candidato deja de
+      // actualizarse la condición de tiempo quedaría fija para siempre y nunca podría cumplirse
+      else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
         events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak' });
         mode = 'seekingTrough';
+        legStartT = candidate.t;
         candidate = p;
       }
     } else {
       if(p.ratio <= candidate.ratio){ candidate = p; }
-      else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct){
+      else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
         events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough' });
         mode = 'seekingPeak';
+        legStartT = candidate.t;
         candidate = p;
       }
     }
   }
   // el extremo que se estaba siguiendo al llegar al final de los datos todavía no se revirtió lo
-  // suficiente para confirmarse — es el ciclo en curso, cuyo final real todavía no se conoce
+  // suficiente (o no pasó suficiente tiempo) para confirmarse — es el ciclo en curso
   if(mode) events.push({ t: candidate.t, ratio: candidate.ratio, type: mode === 'seekingPeak' ? 'peak' : 'trough', unconfirmed: true });
   return events;
 }
@@ -15041,16 +15042,19 @@ function renderBtcXauChart(){
 
   // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible),
   // marcando cuántos días exactos duró cada tramo de caída (pico -> valle, rojo) y de expansión
-  // (valle -> pico, verde) — el último tramo, si el ciclo actual todavía no se revirtió del todo,
-  // se muestra como "??? días" porque de verdad no se sabe cuándo va a terminar
-  const cycleEvents = detectCyclePeaksTroughs(allPoints, 0.5);
+  // (valle -> pico, verde). Se exige que el giro esté separado del anterior por al menos 2 años
+  // (730 días) además de la caída/subida del 50% — así se filtran giros rápidos que no son un
+  // ciclo de verdad, solo ruido de corto plazo
+  const cycleEvents = detectCyclePeaksTroughs(allPoints, 0.5, 730);
   const cycleSegments = [];
   for(let i = 0; i < cycleEvents.length - 1; i++){
     const a = cycleEvents[i], b = cycleEvents[i + 1];
     if(b.t < startMs || a.t > endMs) continue; // fuera del rango visible actual (Todo/5a/2a)
     cycleSegments.push({
       fromT: a.t, toT: b.t, fromType: a.type,
-      days: b.unconfirmed ? null : Math.round((b.t - a.t) / 86400000),
+      // en el tramo en curso (unconfirmed) igual se sabe la fecha real del último extremo
+      // marcado, así que se muestran los días transcurridos hasta ahí en vez de un "¿?" vacío
+      days: Math.round((b.t - a.t) / 86400000),
       unconfirmed: !!b.unconfirmed,
     });
   }
@@ -15063,7 +15067,7 @@ function renderBtcXauChart(){
     const rowY = seg.fromType === 'trough' ? expansionRowY : declineRowY;
     const color = seg.fromType === 'trough' ? '#22c55e' : '#ff2f4f';
     const x1 = clampX(seg.fromT), x2 = clampX(seg.toT);
-    const label = seg.unconfirmed ? '¿? días' : (seg.days + ' días');
+    const label = seg.days + (seg.unconfirmed ? '+ días' : ' días');
     const midX = (x1 + x2) / 2;
     return `
       <line x1="${x1.toFixed(1)}" y1="${rowY}" x2="${x2.toFixed(1)}" y2="${rowY}" stroke="${color}" stroke-width="1.5" ${seg.unconfirmed ? 'stroke-dasharray="4,3"' : ''}/>
