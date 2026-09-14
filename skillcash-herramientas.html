@@ -2832,6 +2832,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
+                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo, y un mínimo cuando sube 50%+ sin volver a caer debajo — así una corrección normal dentro del mismo ciclo no se marca por error como el fin del ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado "¿? días" es el ciclo actual: como todavía no se revirtió 50%, no se sabe cuándo va a terminar.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14937,6 +14938,46 @@ function buildBtcXauRows(){
 function fmtOz(v){
   return v.toLocaleString('en-US', { minimumFractionDigits: v < 1 ? 3 : 2, maximumFractionDigits: v < 1 ? 3 : 2 }) + ' oz';
 }
+// detector de máximos/mínimos de CICLO (tipo ZigZag): sigue el extremo candidato mientras el
+// precio se mueva en esa dirección, y solo lo confirma como máximo/mínimo de ciclo cuando el
+// precio se revierte al menos "thresholdPct" desde ese candidato — así un repunte o caída menor
+// dentro de la misma tendencia no cuenta como el máximo/mínimo, solo el extremo real antes de una
+// reversión grande y sostenida. Se usa 50% (no el 30% mencionado como ejemplo) porque BTC/XAU
+// tiene correcciones intermedias de 30-40% DENTRO de un mismo ciclo (ej. mayo 2021) que un umbral
+// más bajo marcaría como "fin de ciclo" por error — 50% sí aísla solo los giros grandes de verdad
+function detectCyclePeaksTroughs(points, thresholdPct){
+  if(!points || points.length < 2) return [];
+  const events = [];
+  let mode = null; // 'seekingPeak' | 'seekingTrough'
+  let candidate = points[0];
+  for(let i = 1; i < points.length; i++){
+    const p = points[i];
+    if(mode === null){
+      if(p.ratio > candidate.ratio){ mode = 'seekingPeak'; candidate = p; }
+      else if(p.ratio < candidate.ratio){ mode = 'seekingTrough'; candidate = p; }
+      continue;
+    }
+    if(mode === 'seekingPeak'){
+      if(p.ratio >= candidate.ratio){ candidate = p; }
+      else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct){
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak' });
+        mode = 'seekingTrough';
+        candidate = p;
+      }
+    } else {
+      if(p.ratio <= candidate.ratio){ candidate = p; }
+      else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct){
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough' });
+        mode = 'seekingPeak';
+        candidate = p;
+      }
+    }
+  }
+  // el extremo que se estaba siguiendo al llegar al final de los datos todavía no se revirtió lo
+  // suficiente para confirmarse — es el ciclo en curso, cuyo final real todavía no se conoce
+  if(mode) events.push({ t: candidate.t, ratio: candidate.ratio, type: mode === 'seekingPeak' ? 'peak' : 'trough', unconfirmed: true });
+  return events;
+}
 const BTCXAU_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2 };
 let btcxauActiveRange = 'todo';
 function renderBtcXauChart(){
@@ -14976,7 +15017,8 @@ function renderBtcXauChart(){
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
   const marginRight = isMobileChart ? 8 : 14;
-  const marginTop = 20, marginBottom = isMobileChart ? 30 : 34;
+  // 2 filas extra arriba del gráfico para las flechas de "días de expansión/caída" de ciclo
+  const marginTop = isMobileChart ? 54 : 60, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
 
@@ -14997,6 +15039,40 @@ function renderBtcXauChart(){
   let ratioLine = '';
   points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.ratio).toFixed(1)} `; });
 
+  // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible),
+  // marcando cuántos días exactos duró cada tramo de caída (pico -> valle, rojo) y de expansión
+  // (valle -> pico, verde) — el último tramo, si el ciclo actual todavía no se revirtió del todo,
+  // se muestra como "??? días" porque de verdad no se sabe cuándo va a terminar
+  const cycleEvents = detectCyclePeaksTroughs(allPoints, 0.5);
+  const cycleSegments = [];
+  for(let i = 0; i < cycleEvents.length - 1; i++){
+    const a = cycleEvents[i], b = cycleEvents[i + 1];
+    if(b.t < startMs || a.t > endMs) continue; // fuera del rango visible actual (Todo/5a/2a)
+    cycleSegments.push({
+      fromT: a.t, toT: b.t, fromType: a.type,
+      days: b.unconfirmed ? null : Math.round((b.t - a.t) / 86400000),
+      unconfirmed: !!b.unconfirmed,
+    });
+  }
+  const clampX = t => Math.max(marginLeft, Math.min(totalW - marginRight, xFor(t)));
+  const cycleMarkersHtml = cycleEvents.filter(e => e.t >= startMs && e.t <= endMs).map(e => `
+    <circle cx="${xFor(e.t).toFixed(1)}" cy="${yFor(e.ratio).toFixed(1)}" r="4.5" fill="${e.type === 'peak' ? '#ff2f4f' : '#22c55e'}" stroke="#0a0a12" stroke-width="1.5"/>
+  `).join('');
+  const expansionRowY = isMobileChart ? 16 : 18, declineRowY = isMobileChart ? 36 : 40;
+  const cycleArrowsHtml = cycleSegments.map(seg => {
+    const rowY = seg.fromType === 'trough' ? expansionRowY : declineRowY;
+    const color = seg.fromType === 'trough' ? '#22c55e' : '#ff2f4f';
+    const x1 = clampX(seg.fromT), x2 = clampX(seg.toT);
+    const label = seg.unconfirmed ? '¿? días' : (seg.days + ' días');
+    const midX = (x1 + x2) / 2;
+    return `
+      <line x1="${x1.toFixed(1)}" y1="${rowY}" x2="${x2.toFixed(1)}" y2="${rowY}" stroke="${color}" stroke-width="1.5" ${seg.unconfirmed ? 'stroke-dasharray="4,3"' : ''}/>
+      <path d="M${(x2 - 5).toFixed(1)},${rowY - 3} L${x2.toFixed(1)},${rowY} L${(x2 - 5).toFixed(1)},${rowY + 3}" fill="none" stroke="${color}" stroke-width="1.5"/>
+      <rect x="${(midX - 22).toFixed(1)}" y="${rowY - 9}" width="44" height="13" fill="#0a0a12"/>
+      <text x="${midX.toFixed(1)}" y="${rowY + 1}" text-anchor="middle" font-size="${isMobileChart ? 9 : 10}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">${label}</text>
+    `;
+  }).join('');
+
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].ratio);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
@@ -15015,8 +15091,10 @@ function renderBtcXauChart(){
       <svg class="fng-chart-svg" id="btcxauChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${yGridHtml}
         <path d="${ratioLine.trim()}" fill="none" stroke="#fbbf24" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        ${cycleMarkersHtml}
         ${xLabelsHtml}
         ${todayMarkerHtml}
+        ${cycleArrowsHtml}
         <line id="btcxauHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
         <circle id="btcxauHoverDot" r="6" fill="#fff" style="display:none"/>
         <rect id="btcxauHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
@@ -15036,7 +15114,9 @@ function renderBtcXauChart(){
     tooltipHtml: i => `<b>${fmtOz(points[i].ratio)}</b>`,
   });
 
-  legendEl.innerHTML = '<span class="perk-chip"><span class="perk-chip-dot" style="background:#fbbf24"></span>1 BTC en onzas de oro</span>';
+  legendEl.innerHTML = '<span class="perk-chip"><span class="perk-chip-dot" style="background:#fbbf24"></span>1 BTC en onzas de oro</span>' +
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#ff2f4f"></span>Máximo de ciclo</span>' +
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Mínimo de ciclo</span>';
 
   const allRatios = allPoints.map(p => p.ratio);
   const maxAll = Math.max(...allRatios), minAll = Math.min(...allRatios);
