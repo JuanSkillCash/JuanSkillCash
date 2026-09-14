@@ -13961,20 +13961,38 @@ document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(btn => {
    esta canasta, así que el % mostrado tiende a quedar un poco por ENCIMA del real. La rotación
    ETH/BTC en cambio es EXACTA — al ser una división entre dos monedas, el "total" se cancela solo
    y no importa qué tan completa sea la canasta */
-const DOM_BASKET = ['bitcoin', 'ethereum', 'tether', 'ripple', 'binancecoin', 'solana', 'usd-coin', 'dogecoin', 'cardano', 'tron', 'avalanche-2', 'chainlink', 'the-open-network', 'shiba-inu', 'polkadot'];
+const DOM_BASKET = ['bitcoin', 'ethereum', 'tether', 'ripple', 'binancecoin', 'solana', 'usd-coin', 'dogecoin', 'cardano', 'tron'];
 let domRows = null; // [{t, caps:{coinId:mcap}, total}], ascendente por día
 let domRowsInFlight = null;
+// el plan gratis de CoinGecko tiene un límite de peticiones por minuto bastante bajo — pedir las
+// ~15 monedas de la canasta TODAS al mismo tiempo (como se hacía antes) disparaba varios "429
+// Too Many Requests" de una, y como TODOS los gráficos de dominancia necesitan que bitcoin sí haya
+// cargado, un solo 429 justo en bitcoin tumbaba los 4 gráficos a la vez — de ahí que "ninguno
+// servía". Ahora se piden de a 3 a la vez (con una pausa entre tandas) y cada una se reintenta
+// sola si falla, en vez de rendirse a la primera
+async function fetchOneCoinMarketCaps(id, attempt){
+  attempt = attempt || 0;
+  try{
+    const res = await fetch(cgUrl(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`));
+    const json = res.ok ? await res.json() : null;
+    if(json && Array.isArray(json.market_caps) && json.market_caps.length) return { id, caps: json.market_caps };
+    throw new Error('respuesta vacía o ' + res.status);
+  } catch(err){
+    if(attempt < 2){ await new Promise(r => setTimeout(r, 700 * (attempt + 1))); return fetchOneCoinMarketCaps(id, attempt + 1); }
+    return { id, caps: [] };
+  }
+}
 async function fetchDominanceData(){
   if(domRows) return domRows;
   if(domRowsInFlight) return domRowsInFlight;
   domRowsInFlight = (async () => {
-    const results = await Promise.all(DOM_BASKET.map(async id => {
-      try{
-        const res = await fetch(cgUrl(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`));
-        const json = await res.json();
-        return { id, caps: Array.isArray(json.market_caps) ? json.market_caps : [] };
-      } catch(err){ return { id, caps: [] }; }
-    }));
+    const results = [];
+    const BATCH_SIZE = 3;
+    for(let i = 0; i < DOM_BASKET.length; i += BATCH_SIZE){
+      const batch = DOM_BASKET.slice(i, i + BATCH_SIZE);
+      results.push(...await Promise.all(batch.map(id => fetchOneCoinMarketCaps(id))));
+      if(i + BATCH_SIZE < DOM_BASKET.length) await new Promise(r => setTimeout(r, 400));
+    }
     const dayMap = new Map();
     results.forEach(({ id, caps }) => {
       caps.forEach(([t, v]) => {
