@@ -2677,7 +2677,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
-                🟢🔴 Las bandas de "comprar/vender ETH" están cerca del mínimo/máximo histórico de este mismo ratio (no son un umbral fijo) — cuando ETH ya corrió mucho frente a BTC históricamente ha sido buen momento para rotar de vuelta a BTC, y viceversa. No es garantía de nada.<br>
+                🟢🔴 Las bandas de "comprar/vender ETH" son umbrales fijos (50-55% y 10-16%), tomados del rango histórico completo del ratio (2018 en adelante) — no del rango más corto de datos que tenemos cargado aquí. Cuando ETH ya corrió mucho frente a BTC (cerca del 50-55%) históricamente ha sido buen momento para rotar de vuelta a BTC; cuando está barato frente a BTC (cerca del 10-16%), lo contrario. No es garantía de nada.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14669,9 +14669,11 @@ const DOM_CHART_DEFS = {
     needs: ['bitcoin', 'ethereum'], exact: true,
     series: [{ key: 'v', color: '#60a5fa', label: 'ETH.D / BTC.D' }],
     compute: r => ({ v: (r.caps.ethereum / r.caps.bitcoin) * 100 }),
-    // cerca del máximo histórico, ETH ya corrió mucho frente a BTC (zona de rotar de vuelta a
-    // BTC); cerca del mínimo, ETH está barato frente a BTC (zona de comprar) — pedido explícito
-    zones: { topLabel: 'Vender ETH', topColor: '#ff2f4f', bottomLabel: 'Comprar ETH', bottomColor: '#22c55e' },
+    // umbrales FIJOS (no calculados de nuestros propios datos, que solo cubren ~12 meses) —
+    // tomados del historial completo 2018-2026 de TradingView (CRYPTOCAP:ETH.D/BTC.D), que sí
+    // tiene el rango real completo: cerca de 50-55% ETH ya corrió demasiado frente a BTC
+    // (rotar de vuelta a BTC), cerca de 10-16% ETH está barato frente a BTC (comprar)
+    zones: { topLabel: 'Vender ETH', topColor: '#ff2f4f', topFrom: 50, topTo: 55, bottomLabel: 'Comprar ETH', bottomColor: '#22c55e', bottomFrom: 10, bottomTo: 16 },
   },
 };
 // Dominancia BTC, Dominancia USDT y BTC+ETH+USDT+USDC ya no tienen gráfico histórico (ver nota
@@ -14752,7 +14754,15 @@ function renderDomChart(key){
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
   const values = points.flatMap(p => def.series.map(s => p[s.key]));
-  const minV = Math.min(...values), maxV = Math.max(...values);
+  let minV = Math.min(...values), maxV = Math.max(...values);
+  // si las bandas de zona tienen umbrales FIJOS (no calculados de nuestros propios datos, que
+  // solo cubren ~12 meses), el eje Y tiene que estirarse para incluirlas aunque el precio actual
+  // esté lejos — si no, la zona simplemente no se ve, o peor, el eje se auto-ajusta tan apretado
+  // a los datos recientes que una banda lejana parece estar "cerca" cuando no lo está
+  if(def.zones){
+    if(def.zones.topTo != null) maxV = Math.max(maxV, def.zones.topTo);
+    if(def.zones.bottomFrom != null) minV = Math.min(minV, def.zones.bottomFrom);
+  }
   const pad = (maxV - minV) * 0.12 || 1;
   const yMin = Math.max(0, minV - pad), yMax = maxV + pad;
 
@@ -14793,12 +14803,16 @@ function renderDomChart(key){
   // marcado, para poder ver qué tan lejos está el precio de hoy de cada zona
   let zonesHtml = '';
   if(def.zones){
+    // umbrales fijos si el def los trae (ver DOM_CHART_DEFS) — si no, se calculan del propio
+    // rango de datos (top/bottom 15%) como respaldo
     const zoneSpan = (maxV - minV) || 1;
-    const topZoneEdge = maxV - zoneSpan * 0.15;
-    const bottomZoneEdge = minV + zoneSpan * 0.15;
+    const topEdgeFrom = def.zones.topFrom != null ? def.zones.topFrom : (maxV - zoneSpan * 0.15);
+    const topEdgeTo = def.zones.topTo != null ? def.zones.topTo : maxV;
+    const bottomEdgeFrom = def.zones.bottomFrom != null ? def.zones.bottomFrom : minV;
+    const bottomEdgeTo = def.zones.bottomTo != null ? def.zones.bottomTo : (minV + zoneSpan * 0.15);
     const fmtZonePct = v => v.toFixed(niceStep < 1 ? 1 : 0) + '%';
-    const topY1 = yFor(maxV), topY2 = yFor(topZoneEdge);
-    const bottomY1 = yFor(bottomZoneEdge), bottomY2 = yFor(minV);
+    const topY1 = yFor(topEdgeTo), topY2 = yFor(topEdgeFrom);
+    const bottomY1 = yFor(bottomEdgeTo), bottomY2 = yFor(bottomEdgeFrom);
     zonesHtml = `
       <defs>
         <linearGradient id="${key}TopZoneGrad" x1="0" y1="0" x2="0" y2="1">
@@ -14815,9 +14829,9 @@ function renderDomChart(key){
       <line x1="${marginLeft}" y1="${topY2.toFixed(1)}" x2="${totalW - marginRight}" y2="${topY2.toFixed(1)}" stroke="${def.zones.topColor}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
       <line x1="${marginLeft}" y1="${bottomY1.toFixed(1)}" x2="${totalW - marginRight}" y2="${bottomY1.toFixed(1)}" stroke="${def.zones.bottomColor}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
       <text x="${marginLeft + 10}" y="${(topY1 + 15).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.topColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.topLabel}</text>
-      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(topY2 - 4).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.topColor}" font-family="'Space Mono',monospace">desde ${fmtZonePct(topZoneEdge)}</text>
+      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(topY2 - 4).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.topColor}" font-family="'Space Mono',monospace">${fmtZonePct(topEdgeFrom)}–${fmtZonePct(topEdgeTo)}</text>
       <text x="${marginLeft + 10}" y="${(bottomY2 - 7).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.bottomColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.bottomLabel}</text>
-      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(bottomY1 + 12).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.bottomColor}" font-family="'Space Mono',monospace">hasta ${fmtZonePct(bottomZoneEdge)}</text>
+      <text x="${(totalW - marginRight - 6).toFixed(1)}" y="${(bottomY1 + 12).toFixed(1)}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="${def.zones.bottomColor}" font-family="'Space Mono',monospace">${fmtZonePct(bottomEdgeFrom)}–${fmtZonePct(bottomEdgeTo)}</text>
     `;
   }
 
