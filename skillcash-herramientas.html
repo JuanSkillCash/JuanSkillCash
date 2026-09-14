@@ -323,6 +323,11 @@ button{font-family:inherit;color:inherit}
 .indic-placeholder-icon{font-size:32px;margin-bottom:2px}
 .indic-placeholder-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
 .indic-placeholder-text{font-size:13px;color:var(--muted2);max-width:420px;line-height:1.55}
+.indic-loading-logo{width:44px;height:44px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 2px}
+.indic-loading-logo::before{content:'';position:absolute;inset:-7px;border-radius:50%;background:radial-gradient(circle,rgba(240,178,61,.4),transparent 70%);animation:indicLoadingPulse 1.6s ease-in-out infinite}
+.indic-loading-logo img{width:32px;height:32px;border-radius:50%;position:relative;z-index:1;animation:indicLoadingBob 1.6s ease-in-out infinite}
+@keyframes indicLoadingPulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:.85;transform:scale(1.2)}}
+@keyframes indicLoadingBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .indic-guide-intro{margin-bottom:20px}
 .indic-guide-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
 .indic-guide-text{font-size:13.5px;color:var(--muted2);line-height:1.65;max-width:640px}
@@ -915,6 +920,7 @@ img[src=""]{display:none}
 .ts-result-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .2s}
 .ts-result-row:hover{border-color:var(--red)}
 .ts-result-icon{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--card)}
+.ts-result-icon-fallback{display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;color:var(--muted2)}
 .ts-result-name{font-weight:700;font-size:13.5px;color:var(--white)}
 .ts-result-sub{font-size:11.5px;color:var(--muted2);font-family:'Space Mono',monospace}
 .ts-result-liq{margin-left:auto;text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted2)}
@@ -1936,7 +1942,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcxau">
+            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="btcxau">
               <div class="indic-guide-icon">🥇</div>
               <div class="indic-guide-card-title">BTC/XAU</div>
               <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin. No es un indicador propio, pero lo sigo de cerca.</div>
@@ -2271,7 +2277,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="halvingChartBody">
                 <div class="indic-chart-soon" id="halvingLoading">
-                  <div class="indic-placeholder-icon">⏳</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin desde 2010 para alinear cada ciclo de halving.</div>
                 </div>
@@ -2313,7 +2319,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="rainbowChartBody">
                 <div class="indic-chart-soon" id="rainbowLoading">
-                  <div class="indic-placeholder-icon">🌈</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin para calcular la curva de tendencia.</div>
                 </div>
@@ -2356,7 +2362,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="picycleChartBody">
                 <div class="indic-chart-soon" id="picycleLoading">
-                  <div class="indic-placeholder-icon">📐</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando los promedios móviles sobre el precio diario de Bitcoin.</div>
                 </div>
@@ -2404,7 +2410,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="mfloorChartBody">
                 <div class="indic-chart-soon" id="mfloorLoading">
-                  <div class="indic-placeholder-icon">⚓</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el Canal de Keltner semanal y el Costo de Producción sobre datos reales de Binance y blockchain.info.</div>
                 </div>
@@ -2450,7 +2456,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="ema200ChartBody">
                 <div class="indic-chart-soon" id="ema200Loading">
-                  <div class="indic-placeholder-icon">📉</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando la EMA 200 y la SMA 200 sobre el precio diario real de Bitcoin.</div>
                 </div>
@@ -2493,7 +2499,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="ciclosoporteChartBody">
                 <div class="indic-chart-soon" id="ciclosoporteLoading">
-                  <div class="indic-placeholder-icon">🪜</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Buscando el techo de cada ciclo y dónde el precio volvió a tocarlo.</div>
                 </div>
@@ -2536,7 +2542,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="rsiChartBody">
                 <div class="indic-chart-soon" id="rsiLoading">
-                  <div class="indic-placeholder-icon">📶</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el RSI mensual sobre el precio real de Bitcoin.</div>
                 </div>
@@ -2581,7 +2587,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="cbpChartBody">
                 <div class="indic-chart-soon" id="cbpLoading">
-                  <div class="indic-placeholder-icon">📊</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Consultando precios de Coinbase y Binance.</div>
                 </div>
@@ -2663,7 +2669,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="domratioChartBody">
                 <div class="indic-chart-soon" id="domratioLoading">
-                  <div class="indic-placeholder-icon">🔄</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el market cap histórico de BTC y ETH.</div>
                 </div>
@@ -2705,7 +2711,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
-                  <div class="indic-placeholder-icon">🥧</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
                 </div>
@@ -2747,7 +2753,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="dombtcChartBody">
                 <div class="indic-chart-soon" id="dombtcLoading">
-                  <div class="indic-placeholder-icon">₿</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
                 </div>
@@ -2789,7 +2795,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="domusdtChartBody">
                 <div class="indic-chart-soon" id="domusdtLoading">
-                  <div class="indic-placeholder-icon">💵</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
                 </div>
@@ -2831,7 +2837,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="btcxauChartBody">
                 <div class="indic-chart-soon" id="btcxauLoading">
-                  <div class="indic-placeholder-icon">🥇</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el precio histórico del oro y de Bitcoin.</div>
                 </div>
@@ -2873,7 +2879,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="indic-chart-body" id="wbChartBody">
                 <div class="indic-chart-soon" id="wbLoading">
-                  <div class="indic-placeholder-icon">🐋</div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Consultando el historial de financiamiento en Hyperliquid.</div>
                 </div>
@@ -8737,10 +8743,18 @@ async function tsSearch(query){
       const row = document.createElement('div');
       row.className = 'ts-result-row';
       const liqUsd = p.liquidity && p.liquidity.usd;
-      const img = document.createElement('img');
-      img.className = 'ts-result-icon';
-      img.src = (p.info && p.info.imageUrl) || '';
-      img.onerror = () => { img.style.visibility = 'hidden'; };
+      const imgUrl = p.info && p.info.imageUrl;
+      let img = null;
+      if(imgUrl){
+        img = document.createElement('img');
+        img.className = 'ts-result-icon';
+        img.src = imgUrl;
+        img.onerror = () => { img.style.visibility = 'hidden'; };
+      } else {
+        img = document.createElement('div');
+        img.className = 'ts-result-icon ts-result-icon-fallback';
+        img.textContent = ((p.baseToken.symbol || p.baseToken.name || '?')[0] || '?').toUpperCase();
+      }
       const info = document.createElement('div');
       info.innerHTML =
         '<div class="ts-result-name">' + escapeHtml(p.baseToken.name || p.baseToken.symbol) + ' (' + escapeHtml((p.baseToken.symbol || '').toUpperCase()) + ')</div>' +
@@ -8796,7 +8810,10 @@ async function fetchTsUnlocks(name, symbol){
     const list = Array.isArray(tsEmissionsListCache) ? tsEmissionsListCache : [];
     const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const nameN = norm(name), symN = norm(symbol);
-    const match = list.find(p => norm(p.name) === nameN || norm(p.gecko_id) === symN || norm(p.tokenName) === nameN);
+    const match = list.find(p => {
+      const candidates = [p.name, p.gecko_id, p.tokenName, p.token, p.symbol, p.ticker].map(norm).filter(Boolean);
+      return candidates.includes(nameN) || (symN.length > 1 && candidates.includes(symN));
+    });
     if(!match || !match.name) return null;
     const slug = match.name.toLowerCase().trim().replace(/\s+/g, '-');
     const res2 = await fetch('https://api.llama.fi/emissions/' + encodeURIComponent(slug));
@@ -8842,6 +8859,13 @@ function buildTsSecurityFlags(security){
     if(on(d.transfer_fee_upgradable)) flags.push({ level: 'warn', text: 'La comisión de transferencia se puede <b>cambiar después</b> sin avisar.' });
     if(on(d.balance_mutable_authority)) flags.push({ level: 'fail', text: 'Alguien puede <b>modificar tu saldo</b> directamente.' });
     if(on(d.closable)) flags.push({ level: 'warn', text: 'La cuenta del token se puede <b>cerrar</b> por una autoridad externa.' });
+    if(on(d.metadata_mutable)) flags.push({ level: 'warn', text: 'El nombre/imagen del token se pueden <b>cambiar después</b> de creado.' });
+    if(on(d.transfer_hook_upgradable)) flags.push({ level: 'warn', text: 'Tiene un <b>transfer hook</b> (lógica extra en cada transferencia) que se puede modificar.' });
+    if(on(d.non_transferable)) flags.push({ level: 'fail', text: 'Este token está marcado como <b>no transferible</b> — podrías no poder venderlo.' });
+    if(d.trusted_token === '1' || d.trusted_token === 1) flags.push({ level: 'ok', text: 'Está en la <b>lista de confianza</b> de GoPlus.' });
+    const top10Rate = parseFloat(d.top10_holder_rate);
+    if(top10Rate > 0) flags.push({ level: top10Rate > 0.5 ? 'fail' : top10Rate > 0.25 ? 'warn' : 'ok', text: 'Los <b>10 wallets más grandes</b> tienen el <b>' + (top10Rate * 100).toFixed(1) + '%</b> del suministro.' });
+    if(d.holders && Array.isArray(d.holders) && d.holders.length) flags.push({ level: d.holders.length < 100 ? 'warn' : 'ok', text: '<b>' + d.holders.length + '</b> holders (wallets dueñas de la moneda) registrados.' });
     return flags;
   }
   if(d.is_honeypot === '1') flags.push({ level: 'fail', text: '🚨 <b>Honeypot detectado</b>: se puede comprar pero no se puede vender.' });
@@ -8864,6 +8888,11 @@ function buildTsSecurityFlags(security){
   if(d.transfer_pausable === '1') flags.push({ level: 'warn', text: 'Las transferencias se pueden <b>pausar</b> por completo.' });
   if(d.trading_cooldown === '1') flags.push({ level: 'warn', text: 'Tiene <b>cooldown</b> obligatorio entre transacciones.' });
   if(d.slippage_modifiable === '1') flags.push({ level: 'warn', text: 'El slippage/impuestos se pueden <b>modificar</b> después de desplegado.' });
+  if(d.is_anti_whale === '1' && d.anti_whale_modifiable === '1') flags.push({ level: 'warn', text: 'Tiene límites <b>anti-ballena</b> (máx. de compra/venta) que se pueden cambiar después.' });
+  if(d.external_call === '1') flags.push({ level: 'warn', text: 'El contrato hace <b>llamadas externas</b> a otros contratos — más superficie de riesgo.' });
+  if(d.is_true_token === '0') flags.push({ level: 'fail', text: 'GoPlus marca este contrato como una posible <b>copia/falsificación</b> de otro token conocido.' });
+  if(d.trust_list === '1') flags.push({ level: 'ok', text: 'Está en la <b>lista de confianza</b> de GoPlus.' });
+  if(d.fake_token && (d.fake_token.value === 1 || d.fake_token.value === '1')) flags.push({ level: 'fail', text: 'Marcado como <b>token falso</b> que imita a otro proyecto conocido.' });
 
   if(Array.isArray(d.lp_holders) && d.lp_holders.length){
     const lpLocked = d.lp_holders.some(h => h.is_locked === 1 || h.is_locked === '1');
@@ -8892,7 +8921,7 @@ function renderTsReport(d){
   const flags = buildTsSecurityFlags(security);
   const ok = flags.filter(f => f.level === 'ok').length;
   const header = document.getElementById('tsHeader');
-  const imgSrc = pair.info && pair.info.imageUrl;
+  const imgSrc = (pair.info && pair.info.imageUrl) || (cgData && cgData.image && (cgData.image.small || cgData.image.thumb));
   header.innerHTML =
     (imgSrc ? '<img src="' + escapeHtml(imgSrc) + '" onerror="this.style.display=\'none\'">' : '') +
     '<div><div class="ts-header-name">' + escapeHtml(pair.baseToken.name) + ' (' + escapeHtml(pair.baseToken.symbol.toUpperCase()) + ')</div>' +
@@ -8959,6 +8988,13 @@ async function tsSelectPair(pair){
 document.getElementById('tsSearchBtn').addEventListener('click', () => tsSearch(document.getElementById('tsSearchInput').value));
 document.getElementById('tsSearchInput').addEventListener('keydown', (e) => {
   if(e.key === 'Enter') tsSearch(document.getElementById('tsSearchInput').value);
+});
+let tsSearchDebounce = null;
+document.getElementById('tsSearchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim();
+  clearTimeout(tsSearchDebounce);
+  if(q.length < 2){ document.getElementById('tsSearchResults').innerHTML = ''; return; }
+  tsSearchDebounce = setTimeout(() => tsSearch(q), 320);
 });
 
 /* ========= COMPARADOR DE WALLETS ========= */
@@ -14365,14 +14401,22 @@ let domRowsInFlight = null;
 // sola si falla, en vez de rendirse a la primera
 async function fetchOneCoinMarketCaps(id, attempt){
   attempt = attempt || 0;
+  // fetch() no tiene timeout por defecto en el navegador — si la petición se queda colgada (no
+  // responde ni con error), nunca se dispara el catch de abajo y todo el Promise.all de
+  // fetchDominanceData se queda esperando para siempre ("Cargando..." infinito). El AbortController
+  // fuerza que una petición colgada se trate como fallida a los 9s, para que sí entre a reintentar
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 9000);
   try{
-    const res = await fetch(cgUrl(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`));
+    const res = await fetch(cgUrl(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`), { signal: controller.signal });
     const json = res.ok ? await res.json() : null;
     if(json && Array.isArray(json.market_caps) && json.market_caps.length) return { id, caps: json.market_caps };
     throw new Error('respuesta vacía o ' + res.status);
   } catch(err){
     if(attempt < 2){ await new Promise(r => setTimeout(r, 700 * (attempt + 1))); return fetchOneCoinMarketCaps(id, attempt + 1); }
     return { id, caps: [] };
+  } finally{
+    clearTimeout(timeoutId);
   }
 }
 async function fetchDominanceData(){
@@ -14585,7 +14629,14 @@ window.addEventListener('resize', () => {
 let goldHistory = null; // [{t, c}] ascendente
 async function fetchGoldHistory(){
   if(goldHistory) return goldHistory;
-  const res = await fetch(tdUrl('https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1day&outputsize=5000'));
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 9000);
+  let res;
+  try{
+    res = await fetch(tdUrl('https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1day&outputsize=5000'), { signal: controller.signal });
+  } finally{
+    clearTimeout(timeoutId);
+  }
   const json = await res.json();
   if(!Array.isArray(json.values) || !json.values.length) throw new Error('sin datos de oro');
   goldHistory = json.values
