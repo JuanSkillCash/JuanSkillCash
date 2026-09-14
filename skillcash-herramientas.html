@@ -459,6 +459,18 @@ button{font-family:inherit;color:inherit}
    el margen hacia los lados sin que el flex se lo impida */
 .indic-chart-soon{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px;max-width:400px;margin:60px auto;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02)}
 
+/* ---- anillo circular (dombtc/domusdt/domall: reemplaza el gráfico histórico que ya no
+   tienen — muestra dónde cae el dato real de hoy frente a las zonas de compra/venta) ---- */
+.indic-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:28px 0 8px;margin:0 auto}
+.indic-ring-inner{position:relative;width:100%;max-width:220px}
+.indic-ring-svg{width:100%;display:block}
+.indic-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.indic-ring-pct{font-family:'Space Mono',monospace;font-weight:700;font-size:30px;color:var(--white)}
+.indic-ring-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.indic-ring-legend{display:flex;gap:18px;margin-top:6px}
+.indic-ring-legend-item{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2)}
+.indic-ring-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
 /* ---- panel de categorías (portada de herramientas) ---- */
 .cat-overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:900px){ .cat-overview-grid{grid-template-columns:1fr 1fr} }
@@ -2706,6 +2718,19 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+              </div>
+              <div class="indic-ring-wrap" id="domallGauge" style="display:none">
+                <div class="indic-ring-inner">
+                  <svg viewBox="0 0 200 200" id="domallGaugeSvg" class="indic-ring-svg"></svg>
+                  <div class="indic-ring-center">
+                    <span class="indic-ring-pct" id="domallGaugePct"></span>
+                    <span class="indic-ring-tag">hoy</span>
+                  </div>
+                </div>
+                <div class="indic-ring-legend">
+                  <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 61–63%</div>
+                  <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--green)"></span>Compra 81–83%</div>
                 </div>
               </div>
               <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
@@ -14682,15 +14707,48 @@ const DOM_CHART_DEFS = {
 const DOM_LIVE_DEFS = {
   dombtc: { label: 'Dominancia BTC', keys: ['btc'] },
   domusdt: { label: 'Dominancia USDT', keys: ['usdt'] },
-  domall: { label: 'BTC+ETH+USDT+USDC', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true },
+  // gauge: umbrales fijos que el usuario dio para el anillo (venta 61-63%, compra 81-83%),
+  // con min/max con margen extra para que el anillo se vea "lejos" cuando de verdad lo está
+  domall: { label: 'BTC+ETH+USDT+USDC', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true,
+    gauge: { min: 55, max: 90, sellFrom: 61, sellTo: 63, buyFrom: 81, buyTo: 83 } },
 };
 const DOM_LIVE_LABELS = { btc: 'BTC', eth: 'ETH', usdt: 'USDT', usdc: 'USDC' };
+
+// anillo circular (arco de 280°, con un hueco de 80° abajo) — usado por DOM_LIVE_DEFS.domall.gauge
+function domRingAngle(v, g){
+  const p = Math.max(0, Math.min(100, (v - g.min) / (g.max - g.min) * 100));
+  return 130 + (p / 100) * 280;
+}
+function domRingPoint(v, g, cx, cy, radius){
+  const a = domRingAngle(v, g) * Math.PI / 180;
+  return { x: cx + radius * Math.cos(a), y: cy + radius * Math.sin(a) };
+}
+function domRingArcPath(vFrom, vTo, g, cx, cy, radius){
+  const p1 = domRingPoint(vFrom, g, cx, cy, radius), p2 = domRingPoint(vTo, g, cx, cy, radius);
+  const large = (domRingAngle(vTo, g) - domRingAngle(vFrom, g)) > 180 ? 1 : 0;
+  return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 ${large} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+}
+function renderDomRingGauge(key, g, value){
+  const gaugeEl = document.getElementById(key + 'Gauge');
+  if(!gaugeEl) return;
+  gaugeEl.style.display = 'flex';
+  const cx = 100, cy = 100, r = 82;
+  const dot = domRingPoint(value, g, cx, cy, r);
+  document.getElementById(key + 'GaugeSvg').innerHTML = `
+    <path d="${domRingArcPath(g.min, g.max, g, cx, cy, r)}" fill="none" stroke="var(--border2)" stroke-width="16" stroke-linecap="round"/>
+    <path d="${domRingArcPath(g.sellFrom, g.sellTo, g, cx, cy, r)}" fill="none" stroke="var(--red)" stroke-width="16" stroke-linecap="round"/>
+    <path d="${domRingArcPath(g.buyFrom, g.buyTo, g, cx, cy, r)}" fill="none" stroke="var(--green)" stroke-width="16" stroke-linecap="round"/>
+    <circle cx="${dot.x.toFixed(2)}" cy="${dot.y.toFixed(2)}" r="8" fill="var(--white)" stroke="var(--card)" stroke-width="3"/>
+  `;
+  document.getElementById(key + 'GaugePct').textContent = value.toFixed(1) + '%';
+}
 function renderDomLiveStat(key){
   const def = DOM_LIVE_DEFS[key];
   const bodyEl = document.getElementById(key + 'ChartBody');
   const loadingEl = document.getElementById(key + 'Loading');
   const errorEl = document.getElementById(key + 'Error');
   const statsEl = document.getElementById(key + 'Stats');
+  const gaugeEl = document.getElementById(key + 'Gauge');
   const pct = domGlobalPctCache;
   const vals = pct ? def.keys.map(k => parseFloat(pct[k])) : [];
   if(!pct || !vals.every(v => isFinite(v) && v > 0)){
@@ -14698,6 +14756,7 @@ function renderDomLiveStat(key){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
     statsEl.style.display = 'none';
+    if(gaugeEl) gaugeEl.style.display = 'none';
     return;
   }
   // ya no queda ningún gráfico en este contenedor (solo mostraba loading/error) — colapsarlo del
@@ -14705,6 +14764,7 @@ function renderDomLiveStat(key){
   bodyEl.style.display = 'none';
   statsEl.style.display = '';
   const total = vals.reduce((a, b) => a + b, 0);
+  if(def.gauge) renderDomRingGauge(key, def.gauge, total);
   let html = `<div class="res-card" style="grid-column:1/-1"><div class="r-label">${def.label} — dato real de hoy</div><div class="r-val" style="font-size:32px">${total.toFixed(1)}%</div></div>`;
   if(def.breakdown){
     html += def.keys.map((k, i) => `<div class="res-card"><div class="r-label">${DOM_LIVE_LABELS[k]}</div><div class="r-val">${vals[i].toFixed(1)}%</div></div>`).join('');
