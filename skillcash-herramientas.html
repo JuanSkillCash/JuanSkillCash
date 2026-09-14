@@ -2690,6 +2690,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
+                🟢🔴 Las bandas de "comprar/vender ETH" están cerca del mínimo/máximo histórico de este mismo ratio (no son un umbral fijo) — cuando ETH ya corrió mucho frente a BTC históricamente ha sido buen momento para rotar de vuelta a BTC, y viceversa. No es garantía de nada.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2727,6 +2728,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥧 El número actual es la suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D); el historial del gráfico es aproximado — (suma del market cap de las 4 monedas) ÷ (suma de las ~15 monedas más grandes). El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
+                🟢🔴 Las bandas de "zona de compra/venta" están cerca del máximo/mínimo histórico de esta métrica (no son un umbral fijo) — cuando BTC+ETH+USDT+USDC pesan mucho, el capital está concentrado ahí y las altcoins suelen estar castigadas; cuando pesan poco, las altcoins ya se comieron esa porción del mercado. No es garantía de nada.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14684,12 +14686,20 @@ const DOM_CHART_DEFS = {
     needs: ['bitcoin', 'ethereum'], exact: true,
     series: [{ key: 'v', color: '#60a5fa', label: 'ETH.D / BTC.D' }],
     compute: r => ({ v: (r.caps.ethereum / r.caps.bitcoin) * 100 }),
+    // cerca del máximo histórico, ETH ya corrió mucho frente a BTC (zona de rotar de vuelta a
+    // BTC); cerca del mínimo, ETH está barato frente a BTC (zona de comprar) — pedido explícito
+    zones: { topLabel: 'Vender ETH', topColor: '#ff2f4f', bottomLabel: 'Comprar ETH', bottomColor: '#22c55e' },
   },
   domall: {
     needs: ['bitcoin', 'ethereum', 'tether', 'usd-coin'], exact: false,
     series: [{ key: 'v', color: '#f0b23d', label: 'BTC+ETH+USDT+USDC' }],
     compute: r => ({ v: ((r.caps.bitcoin + r.caps.ethereum + r.caps.tether + r.caps['usd-coin']) / r.total) * 100 }),
     globalPctKeys: ['btc', 'eth', 'usdt', 'usdc'],
+    // cuando BTC+ETH+USDT+USDC juntos pesan cerca de su máximo histórico, el capital está
+    // concentrado en las mayores + estables y las altcoins suelen estar castigadas (zona de
+    // compra para altcoins); cerca de su mínimo histórico, las altcoins ya se comieron esa
+    // porción del mercado (zona de venta/toma de ganancias) — pedido explícito del usuario
+    zones: { topLabel: 'Zona de compra', topColor: '#22c55e', bottomLabel: 'Zona de venta', bottomColor: '#ff2f4f' },
   },
   dombtc: {
     needs: ['bitcoin'], exact: false,
@@ -14778,6 +14788,33 @@ function renderDomChart(key){
     <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v.toFixed(niceStep < 1 ? 1 : 0)}%</text>
   `).join('');
 
+  // bandas de "zona de compra/venta" cerca de los extremos históricos de la propia serie (no un
+  // umbral fijo), con degradado — más intensas hacia afuera, se difuminan hacia el centro
+  let zonesHtml = '';
+  if(def.zones){
+    const zoneSpan = (maxV - minV) || 1;
+    const topZoneEdge = maxV - zoneSpan * 0.15;
+    const bottomZoneEdge = minV + zoneSpan * 0.15;
+    const topY1 = yFor(maxV), topY2 = yFor(topZoneEdge);
+    const bottomY1 = yFor(bottomZoneEdge), bottomY2 = yFor(minV);
+    zonesHtml = `
+      <defs>
+        <linearGradient id="${key}TopZoneGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${def.zones.topColor}" stop-opacity="0.32"/>
+          <stop offset="100%" stop-color="${def.zones.topColor}" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="${key}BottomZoneGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${def.zones.bottomColor}" stop-opacity="0.05"/>
+          <stop offset="100%" stop-color="${def.zones.bottomColor}" stop-opacity="0.32"/>
+        </linearGradient>
+      </defs>
+      <rect x="${marginLeft}" y="${topY1.toFixed(1)}" width="${drawW}" height="${(topY2 - topY1).toFixed(1)}" fill="url(#${key}TopZoneGrad)"/>
+      <rect x="${marginLeft}" y="${bottomY1.toFixed(1)}" width="${drawW}" height="${(bottomY2 - bottomY1).toFixed(1)}" fill="url(#${key}BottomZoneGrad)"/>
+      <text x="${marginLeft + 10}" y="${(topY1 + 15).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.topColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.topLabel}</text>
+      <text x="${marginLeft + 10}" y="${(bottomY2 - 7).toFixed(1)}" font-size="${xFontSize}" font-weight="800" fill="${def.zones.bottomColor}" font-family="'Space Grotesk',sans-serif" style="text-transform:uppercase;letter-spacing:.03em">${def.zones.bottomLabel}</text>
+    `;
+  }
+
   function pathFor(getV){
     let d = '';
     points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(getV(p)).toFixed(1)} `; });
@@ -14797,6 +14834,7 @@ function renderDomChart(key){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${zonesHtml}
         ${yGridHtml}
         ${linesHtml}
         ${xLabelsHtml}
