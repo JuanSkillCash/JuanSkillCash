@@ -466,8 +466,14 @@ button{font-family:inherit;color:inherit}
 
 /* ---- anillo circular (dombtc/domusdt/domall: reemplaza el gráfico histórico que ya no
    tienen — muestra dónde cae el dato real de hoy frente a las zonas de compra/venta) ---- */
-.indic-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0 8px;margin:0 auto}
-.indic-ring-legend{display:flex;gap:18px;margin-top:10px}
+.indic-gauge-row{display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.indic-gauge-row .chart-stats-grid{flex:1 1 220px;margin-top:0}
+.indic-ring-wrap{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;padding:20px 0 8px;margin:0 auto}
+.indic-ring-legend{display:flex;gap:18px;margin-top:10px;white-space:nowrap}
+@media(max-width:640px){
+  .indic-gauge-row{justify-content:center}
+  .indic-gauge-row .chart-stats-grid{flex-basis:100%}
+}
 .indic-ring-legend-item{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2)}
 .indic-ring-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
@@ -2728,30 +2734,32 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
               </div>
-              <div class="indic-ring-wrap" id="domallGauge" style="display:none">
-                <div class="be-savings-label" style="text-align:center">DATO DE HOY</div>
-                <div class="fng-big-gauge">
-                  <svg viewBox="0 0 200 110" width="100%">
-                    <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#domallGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
-                    <defs>
-                      <linearGradient id="domallGaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#ff2f4f"/>
-                        <stop offset="50%" stop-color="#f0b23d"/>
-                        <stop offset="100%" stop-color="#2ecc71"/>
-                      </linearGradient>
-                    </defs>
-                    <line id="domallGaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
-                    <circle cx="100" cy="100" r="5" fill="#fff"/>
-                  </svg>
+              <div class="indic-gauge-row">
+                <div class="indic-ring-wrap" id="domallGauge" style="display:none">
+                  <div class="be-savings-label" style="text-align:center">DATO DE HOY</div>
+                  <div class="fng-big-gauge">
+                    <svg viewBox="0 0 200 110" width="100%">
+                      <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#domallGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
+                      <defs>
+                        <linearGradient id="domallGaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stop-color="#ff2f4f"/>
+                          <stop offset="50%" stop-color="#f0b23d"/>
+                          <stop offset="100%" stop-color="#2ecc71"/>
+                        </linearGradient>
+                      </defs>
+                      <line id="domallGaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                      <circle cx="100" cy="100" r="5" fill="#fff"/>
+                    </svg>
+                  </div>
+                  <div class="fng-big-value" id="domallGaugeValue">—</div>
+                  <div class="fng-big-class" id="domallGaugeClass">—</div>
+                  <div class="indic-ring-legend">
+                    <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 61–63%</div>
+                    <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--green)"></span>Compra 81–83%</div>
+                  </div>
                 </div>
-                <div class="fng-big-value" id="domallGaugeValue">—</div>
-                <div class="fng-big-class" id="domallGaugeClass">—</div>
-                <div class="indic-ring-legend">
-                  <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 61–63%</div>
-                  <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--green)"></span>Compra 81–83%</div>
-                </div>
+                <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
               </div>
-              <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥧 Suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D), calculada por ellos con el mercado completo — no es una aproximación nuestra.<br>
