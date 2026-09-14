@@ -2674,6 +2674,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="domratioErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
                 <div id="domratioChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
@@ -2716,6 +2717,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="domallErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
                 <div id="domallChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
@@ -2758,6 +2760,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="dombtcErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
                 <div id="dombtcChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
@@ -2800,6 +2803,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="domusdtErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
                 <div id="domusdtChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
@@ -14520,6 +14524,12 @@ function writeDomCache(id, caps){
   try{ localStorage.setItem(domCacheKey(id), JSON.stringify({ caps, fetchedAt: Date.now() })); }
   catch(err){ /* localStorage lleno o bloqueado (modo incógnito, etc.) — no es crítico, sigue funcionando sin caché */ }
 }
+// diagnóstico visible del último error real por moneda — cada vez que el sitio reporta "sigue sin
+// funcionar" no hay forma de ver EN VIVO qué está fallando en el navegador del usuario (este entorno
+// de desarrollo no tiene salida a internet para probarlo directamente), así que en vez de seguir
+// adivinando se guarda el motivo real (código HTTP, o el mensaje del error de red/CORS/timeout) para
+// mostrarlo en el estado de error del gráfico y así saber exactamente qué está pasando
+let domLastDiagnostics = {};
 async function fetchOneCoinMarketCaps(id, attempt){
   attempt = attempt || 0;
   if(attempt === 0){
@@ -14534,7 +14544,14 @@ async function fetchOneCoinMarketCaps(id, attempt){
   const timeoutId = setTimeout(() => controller.abort(), 9000);
   try{
     const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=max`;
-    let res = await fetch(cgUrl(url), { signal: controller.signal });
+    let res;
+    try{
+      res = await fetch(cgUrl(url), { signal: controller.signal });
+    } catch(networkErr){
+      // la petición ni siquiera llegó a tener respuesta (bloqueo de red/CORS, sin internet, o el
+      // timeout de 9s de arriba) — se intenta una vez más sin key antes de rendirse en este intento
+      res = await fetch(url, { signal: controller.signal });
+    }
     // si la key demo compartida (usada por todos los visitantes) ya se quedó sin cuota o quedó
     // inválida (401/403), o se pegó el límite por minuto (429), se reintenta sin key — la API
     // pública de CoinGecko también responde sin key (con un límite más bajo), así que a veces
@@ -14545,11 +14562,13 @@ async function fetchOneCoinMarketCaps(id, attempt){
     const json = res.ok ? await res.json() : null;
     if(json && Array.isArray(json.market_caps) && json.market_caps.length){
       writeDomCache(id, json.market_caps);
+      delete domLastDiagnostics[id];
       return { id, caps: json.market_caps };
     }
-    throw new Error('respuesta vacía o ' + res.status);
+    throw new Error('HTTP ' + res.status);
   } catch(err){
     if(attempt < 2){ await new Promise(r => setTimeout(r, 700 * (attempt + 1))); return fetchOneCoinMarketCaps(id, attempt + 1); }
+    domLastDiagnostics[id] = (err && err.name === 'AbortError') ? 'tardó más de 9s (timeout)' : ((err && err.message) || 'error desconocido');
     const stale = readDomCache(id);
     return { id, caps: stale ? stale.caps : [] };
   } finally{
@@ -14628,6 +14647,13 @@ function renderDomChart(key){
   const rows = domRows;
   const seriesAll = rows ? rows.filter(r => def.needs.every(id => r.caps[id] > 0)).map(r => ({ t: r.t, ...def.compute(r) })) : [];
   if(!rows || seriesAll.length < 10){
+    const detailEl = document.getElementById(key + 'ErrorDetail');
+    if(detailEl){
+      const failedIds = def.needs.filter(id => domLastDiagnostics[id]);
+      detailEl.textContent = failedIds.length
+        ? 'Detalle: ' + failedIds.map(id => id + ' → ' + domLastDiagnostics[id]).join(' · ')
+        : '';
+    }
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
     wrap.style.display = 'none';
