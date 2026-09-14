@@ -1322,6 +1322,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
+      <button class="sb-item" data-indic-jump="btcxau">
+        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
+      </button>
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
@@ -1343,11 +1346,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
       </button>
-      <button class="sb-item" data-indic-jump="dominancia">
-        <span class="sb-item-icon">🥧</span><span class="sb-item-label">Dominancia de Mercado</span>
+      <button class="sb-item" data-indic-jump="domratio">
+        <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcxau">
-        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC en Onzas de Oro</span>
+      <button class="sb-item" data-indic-jump="domall">
+        <span class="sb-item-icon">🥧</span><span class="sb-item-label">Dominancia BTC+ETH+USDT+USDC</span>
+      </button>
+      <button class="sb-item" data-indic-jump="dombtc">
+        <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
+      </button>
+      <button class="sb-item" data-indic-jump="domusdt">
+        <span class="sb-item-icon">💵</span><span class="sb-item-label">Dominancia USDT</span>
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
@@ -1468,6 +1477,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
+        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1493,11 +1505,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dominancia">
-        <span class="sb-item-icon">🥧</span><span class="sb-item-label">Dominancia de Mercado</span>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domratio">
+        <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
-        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC en Onzas de Oro</span>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domall">
+        <span class="sb-item-icon">🥧</span><span class="sb-item-label">Dominancia BTC+ETH+USDT+USDC</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dombtc">
+        <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domusdt">
+        <span class="sb-item-icon">💵</span><span class="sb-item-label">Dominancia USDT</span>
       </button>
     </nav>
 
@@ -1886,6 +1904,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcxau">
+              <div class="indic-guide-icon">🥇</div>
+              <div class="indic-guide-card-title">BTC/XAU</div>
+              <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin. No es un indicador propio, pero lo sigo de cerca.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
 
             <div class="indic-guide-divider">Indicadores de Mercado</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
@@ -1930,16 +1954,29 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dominancia">
-              <div class="indic-guide-icon">🥧</div>
-              <div class="indic-guide-card-title">Dominancia de Mercado</div>
-              <div class="indic-guide-card-text">Qué tanto pesa BTC, ETH y USDT frente al resto del mercado, y la rotación entre ETH y BTC.</div>
+            <div class="indic-guide-divider">Dominancia</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domratio">
+              <div class="indic-guide-icon">🔄</div>
+              <div class="indic-guide-card-title">Rotación ETH.D/BTC.D</div>
+              <div class="indic-guide-card-text">Dominancia de ETH dividida entre la de BTC — hacia dónde está rotando el capital.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcxau">
-              <div class="indic-guide-icon">🥇</div>
-              <div class="indic-guide-card-title">BTC en Onzas de Oro</div>
-              <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin — Bitcoin frente al activo de reserva de valor clásico.</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
+              <div class="indic-guide-icon">🥧</div>
+              <div class="indic-guide-card-title">Dominancia BTC+ETH+USDT+USDC</div>
+              <div class="indic-guide-card-text">La dominancia de las 4 monedas juntas, cada una en su propia línea, para compararlas.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
+              <div class="indic-guide-icon">₿</div>
+              <div class="indic-guide-card-title">Dominancia BTC</div>
+              <div class="indic-guide-card-text">Qué tanto pesa Bitcoin solo frente al resto del mercado.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domusdt">
+              <div class="indic-guide-icon">💵</div>
+              <div class="indic-guide-card-title">Dominancia USDT</div>
+              <div class="indic-guide-card-text">Qué tanto pesa Tether solo frente al resto del mercado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
           </div>
@@ -2574,7 +2611,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
-        <div class="indic-panel" data-indic="dominancia" style="display:none">
+        <div class="indic-panel" data-indic="domratio" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
               <div class="calc-head">
@@ -2582,39 +2619,160 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Dominancia de Mercado</h2>
-                <p class="calc-sub">Qué tanto pesa cada moneda dentro del mercado cripto. La rotación ETH/BTC es un dato exacto (es una simple división entre dos market caps reales). La dominancia individual y la combinada son una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes — la tendencia es correcta, pero el número puede quedar un poco por debajo del que ves en TradingView.</p>
+                <h2 class="calc-title">Rotación ETH.D/BTC.D</h2>
+                <p class="calc-sub">Dominancia de ETH dividida entre la dominancia de BTC — hacia dónde está rotando el capital entre las dos monedas más grandes. Dato <b>exacto</b>: al ser una división entre dos market caps reales, no importa qué tan grande sea "el total del mercado".</p>
               </div>
 
-              <div class="tf-pill-row" id="domModeFilter">
-                <button type="button" class="tf-pill active" data-mode="indiv">BTC / ETH / USDT</button>
-                <button type="button" class="tf-pill" data-mode="ratio">Rotación ETH/BTC</button>
-                <button type="button" class="tf-pill" data-mode="combo">BTC+ETH+USDT+USDC</button>
-              </div>
-              <div class="tf-pill-row" id="domRangeFilter">
+              <div class="tf-pill-row" id="domratioRangeFilter">
                 <button type="button" class="tf-pill active" data-range="todo">Todo</button>
                 <button type="button" class="tf-pill" data-range="2a">2 años</button>
                 <button type="button" class="tf-pill" data-range="1a">1 año</button>
               </div>
 
-              <div class="indic-chart-body" id="domChartBody">
-                <div class="indic-chart-soon" id="domLoading">
-                  <div class="indic-placeholder-icon">🥧</div>
+              <div class="indic-chart-body" id="domratioChartBody">
+                <div class="indic-chart-soon" id="domratioLoading">
+                  <div class="indic-placeholder-icon">🔄</div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                  <div class="indic-placeholder-text">Descargando el market cap histórico de BTC y ETH.</div>
                 </div>
-                <div class="indic-chart-soon" id="domError" style="display:none">
+                <div class="indic-chart-soon" id="domratioError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
-                <div id="domChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="domratioChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
-              <div class="partner-perks" id="domLegend" style="display:none;margin-bottom:18px"></div>
-              <div class="chart-stats-grid" id="domStats" style="display:none"></div>
+              <div class="partner-perks" id="domratioLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="domratioStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🥧 "BTC / ETH / USDT" y "BTC+ETH+USDT+USDC" son aproximados (ver nota arriba). "Rotación ETH/BTC" es exacto: market cap de ETH ÷ market cap de BTC, sin necesitar el total del mercado.<br>
+                🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="domall" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Dominancia BTC+ETH+USDT+USDC</h2>
+                <p class="calc-sub">La dominancia de estas 4 monedas, cada una en su propia línea, para comparar cómo se mueven entre sí. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes — la tendencia es correcta, pero el número puede quedar un poco por encima del real.</p>
+              </div>
+
+              <div class="tf-pill-row" id="domallRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+                <button type="button" class="tf-pill" data-range="1a">1 año</button>
+              </div>
+
+              <div class="indic-chart-body" id="domallChartBody">
+                <div class="indic-chart-soon" id="domallLoading">
+                  <div class="indic-placeholder-icon">🥧</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                </div>
+                <div class="indic-chart-soon" id="domallError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="domallChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="domallLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🥧 Aproximado (ver nota arriba) — cada línea es (market cap de la moneda) ÷ (suma de las ~15 monedas más grandes).<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="dombtc" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Dominancia BTC</h2>
+                <p class="calc-sub">Qué tanto pesa Bitcoin solo frente al resto del mercado. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes.</p>
+              </div>
+
+              <div class="tf-pill-row" id="dombtcRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+                <button type="button" class="tf-pill" data-range="1a">1 año</button>
+              </div>
+
+              <div class="indic-chart-body" id="dombtcChartBody">
+                <div class="indic-chart-soon" id="dombtcLoading">
+                  <div class="indic-placeholder-icon">₿</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                </div>
+                <div class="indic-chart-soon" id="dombtcError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="dombtcChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="dombtcLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="dombtcStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                ₿ Aproximado (ver nota arriba) — market cap de BTC ÷ suma de las ~15 monedas más grandes.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="domusdt" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Dominancia USDT</h2>
+                <p class="calc-sub">Qué tanto pesa Tether solo frente al resto del mercado. Es una <b>aproximación</b>: CoinGecko no da gratis el market cap total de TODO el mercado, así que se calcula contra la suma de las ~15 monedas más grandes.</p>
+              </div>
+
+              <div class="tf-pill-row" id="domusdtRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+                <button type="button" class="tf-pill" data-range="1a">1 año</button>
+              </div>
+
+              <div class="indic-chart-body" id="domusdtChartBody">
+                <div class="indic-chart-soon" id="domusdtLoading">
+                  <div class="indic-placeholder-icon">💵</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Descargando el market cap histórico de las principales monedas.</div>
+                </div>
+                <div class="indic-chart-soon" id="domusdtError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="domusdtChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+              <div class="partner-perks" id="domusdtLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="domusdtStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                💵 Aproximado (ver nota arriba) — market cap de USDT ÷ suma de las ~15 monedas más grandes.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2629,8 +2787,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Bitcoin en Onzas de Oro</h2>
-                <p class="calc-sub">Cuántas onzas de oro compra 1 Bitcoin — precio real de BTC dividido entre el precio real del oro (XAU/USD), ambos históricos. Sin aproximaciones: es una división directa entre dos precios de mercado.</p>
+                <h2 class="calc-title">BTC/XAU</h2>
+                <p class="calc-sub">Cuántas onzas de oro (XAU) compra 1 Bitcoin — precio real de BTC dividido entre el precio real del oro, ambos históricos. Sin aproximaciones: es una división directa entre dos precios de mercado.</p>
               </div>
 
               <div class="tf-pill-row" id="btcxauRangeFilter">
@@ -5307,10 +5465,10 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas (Whale Bias)' }],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
   onchain: [],
-  dominancia: [{ id: 'dominancia', label: 'Dominancia de Mercado' }, { id: 'btcxau', label: 'BTC en Onzas de Oro' }],
-  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }]
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'BTC+ETH+USDT+USDC' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }],
+  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'btcxau', label: 'BTC/XAU' }]
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', rsimensual: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento', dominancia: 'dominancia', btcxau: 'dominancia' };
+const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', rsimensual: 'personal', btcxau: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -5376,8 +5534,11 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'ciclosoporte') ensureCicloSoporteLoaded();
       if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
-      if(btn.dataset.indic === 'dominancia') ensureDominanceLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
+      if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
+      if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
+      if(btn.dataset.indic === 'dombtc') ensureDomBtcLoaded();
+      if(btn.dataset.indic === 'domusdt') ensureDomUsdtLoaded();
     });
   });
   showIndicPanel(items[0].id);
@@ -5401,8 +5562,11 @@ function jumpToIndicator(id){
     if(id === 'ciclosoporte') ensureCicloSoporteLoaded();
     if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
-    if(id === 'dominancia') ensureDominanceLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
+    if(id === 'domratio') ensureDomRatioLoaded();
+    if(id === 'domall') ensureDomAllLoaded();
+    if(id === 'dombtc') ensureDomBtcLoaded();
+    if(id === 'domusdt') ensureDomUsdtLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
@@ -13747,25 +13911,44 @@ async function fetchDominanceData(){
   return domRowsInFlight;
 }
 const DOM_RANGE_YEARS = { todo: null, '2a': 2, '1a': 1 };
-const DOM_MODE_NEEDS = { indiv: ['bitcoin', 'ethereum', 'tether'], ratio: ['bitcoin', 'ethereum'], combo: ['bitcoin', 'ethereum', 'tether', 'usd-coin'] };
-let domActiveMode = 'indiv';
-let domActiveRange = 'todo';
-function domSeriesForMode(rows, mode){
-  const need = DOM_MODE_NEEDS[mode];
-  return rows.filter(r => need.every(id => r.caps[id] > 0)).map(r => {
-    if(mode === 'ratio') return { t: r.t, v: (r.caps.ethereum / r.caps.bitcoin) * 100 };
-    if(mode === 'combo') return { t: r.t, v: ((r.caps.bitcoin + r.caps.ethereum + r.caps.tether + r.caps['usd-coin']) / r.total) * 100 };
-    return { t: r.t, btc: (r.caps.bitcoin / r.total) * 100, eth: (r.caps.ethereum / r.total) * 100, usdt: (r.caps.tether / r.total) * 100 };
-  });
-}
-function renderDominanceChart(){
-  const loadingEl = document.getElementById('domLoading');
-  const errorEl = document.getElementById('domError');
-  const wrap = document.getElementById('domChartWrap');
-  const legendEl = document.getElementById('domLegend');
-  const statsEl = document.getElementById('domStats');
+// cada gráfico de dominancia declara qué monedas de la canasta necesita tener presentes ese día
+// (para no arrancar la serie en 0 antes de que esa moneda existiera), qué líneas dibuja y cómo
+// calcular el valor de cada una a partir de la fila de ese día
+const DOM_CHART_DEFS = {
+  domratio: {
+    needs: ['bitcoin', 'ethereum'], exact: true,
+    series: [{ key: 'v', color: '#60a5fa', label: 'ETH.D / BTC.D' }],
+    compute: r => ({ v: (r.caps.ethereum / r.caps.bitcoin) * 100 }),
+  },
+  domall: {
+    needs: ['bitcoin', 'ethereum', 'tether', 'usd-coin'], exact: false,
+    series: [
+      { key: 'btc', color: '#f0b23d', label: 'BTC' }, { key: 'eth', color: '#60a5fa', label: 'ETH' },
+      { key: 'usdt', color: '#22c55e', label: 'USDT' }, { key: 'usdc', color: '#a855f7', label: 'USDC' },
+    ],
+    compute: r => ({ btc: (r.caps.bitcoin / r.total) * 100, eth: (r.caps.ethereum / r.total) * 100, usdt: (r.caps.tether / r.total) * 100, usdc: (r.caps['usd-coin'] / r.total) * 100 }),
+  },
+  dombtc: {
+    needs: ['bitcoin'], exact: false,
+    series: [{ key: 'v', color: '#f0b23d', label: 'Dominancia BTC' }],
+    compute: r => ({ v: (r.caps.bitcoin / r.total) * 100 }),
+  },
+  domusdt: {
+    needs: ['bitcoin', 'tether'], exact: false,
+    series: [{ key: 'v', color: '#22c55e', label: 'Dominancia USDT' }],
+    compute: r => ({ v: (r.caps.tether / r.total) * 100 }),
+  },
+};
+let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
+function renderDomChart(key){
+  const def = DOM_CHART_DEFS[key];
+  const loadingEl = document.getElementById(key + 'Loading');
+  const errorEl = document.getElementById(key + 'Error');
+  const wrap = document.getElementById(key + 'ChartWrap');
+  const legendEl = document.getElementById(key + 'Legend');
+  const statsEl = document.getElementById(key + 'Stats');
   const rows = domRows;
-  const seriesAll = rows ? domSeriesForMode(rows, domActiveMode) : [];
+  const seriesAll = rows ? rows.filter(r => def.needs.every(id => r.caps[id] > 0)).map(r => ({ t: r.t, ...def.compute(r) })) : [];
   if(!rows || seriesAll.length < 10){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
@@ -13781,14 +13964,13 @@ function renderDominanceChart(){
   statsEl.style.display = '';
 
   const fullEndMs = seriesAll[seriesAll.length - 1].t;
-  const rangeYears = DOM_RANGE_YEARS[domActiveRange];
+  const rangeYears = DOM_RANGE_YEARS[domActiveRanges[key]];
   const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : seriesAll[0].t;
   const points = seriesAll.filter(p => p.t >= cutoffMs);
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const isIndiv = domActiveMode === 'indiv';
-  const values = isIndiv ? points.flatMap(p => [p.btc, p.eth, p.usdt]) : points.map(p => p.v);
+  const values = points.flatMap(p => def.series.map(s => p[s.key]));
   const minV = Math.min(...values), maxV = Math.max(...values);
   const pad = (maxV - minV) * 0.12 || 1;
   const yMin = Math.max(0, minV - pad), yMax = maxV + pad;
@@ -13822,12 +14004,7 @@ function renderDominanceChart(){
     points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(getV(p)).toFixed(1)} `; });
     return d.trim();
   }
-
-  const linesHtml = isIndiv ? `
-      <path d="${pathFor(p => p.btc)}" fill="none" stroke="#f0b23d" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${pathFor(p => p.eth)}" fill="none" stroke="#60a5fa" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${pathFor(p => p.usdt)}" fill="none" stroke="#22c55e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-    ` : `<path d="${pathFor(p => p.v)}" fill="none" stroke="${domActiveMode === 'ratio' ? '#60a5fa' : '#ff2f4f'}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key])}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
 
   const lastP = points[points.length - 1];
   const lastPx = xFor(endMs);
@@ -13840,82 +14017,67 @@ function renderDominanceChart(){
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="domChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${yGridHtml}
         ${linesHtml}
         ${xLabelsHtml}
-        <line id="domHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="domHoverDot" r="6" fill="#fff" style="display:none"/>
-        <rect id="domHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="domHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="domHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="${key}HoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="${key}HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="${key}HoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="${key}HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
-      <div id="domTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+      <div id="${key}Tooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
-  const domSvg = document.getElementById('domChartSvg');
+  const domSvg = document.getElementById(key + 'ChartSvg');
   wireChartHover({
-    svg: domSvg, catcherId: 'domHoverCatcher', lineId: 'domHoverLine', dotId: 'domHoverDot',
-    dateLabelId: 'domHoverDateLabel', dateBgId: 'domHoverDateBg', tooltipId: 'domTooltip',
+    svg: domSvg, catcherId: key + 'HoverCatcher', lineId: key + 'HoverLine', dotId: key + 'HoverDot',
+    dateLabelId: key + 'HoverDateLabel', dateBgId: key + 'HoverDateBg', tooltipId: key + 'Tooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yFor(isIndiv ? points[i].btc : points[i].v),
-    tooltipHtml: i => {
-      const p = points[i];
-      if(isIndiv) return `<b>BTC ${p.btc.toFixed(1)}%</b><br>ETH ${p.eth.toFixed(1)}%<br>USDT ${p.usdt.toFixed(1)}%`;
-      return `<b>${p.v.toFixed(1)}%</b>`;
-    },
+    yForIdx: i => yFor(points[i][def.series[0].key]),
+    tooltipHtml: i => def.series.map(s => `<b>${s.label}: ${points[i][s.key].toFixed(1)}%</b>`).join('<br>'),
   });
 
-  const modeLegends = {
-    indiv: '<span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>BTC</span><span class="perk-chip"><span class="perk-chip-dot" style="background:#60a5fa"></span>ETH</span><span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>USDT</span>',
-    ratio: '<span class="perk-chip"><span class="perk-chip-dot" style="background:#60a5fa"></span>ETH ÷ BTC (market cap) — exacto</span>',
-    combo: '<span class="perk-chip"><span class="perk-chip-dot" style="background:#ff2f4f"></span>BTC + ETH + USDT + USDC — aproximado</span>',
-  };
-  legendEl.innerHTML = modeLegends[domActiveMode];
+  legendEl.innerHTML = def.series.map(s => `<span class="perk-chip"><span class="perk-chip-dot" style="background:${s.color}"></span>${s.label}${def.exact ? ' — exacto' : ''}</span>`).join('');
 
-  if(isIndiv){
-    statsEl.innerHTML = `
-      <div class="res-card"><div class="r-label">BTC dominancia (aprox.)</div><div class="r-val">${lastP.btc.toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">ETH dominancia (aprox.)</div><div class="r-val">${lastP.eth.toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">USDT dominancia (aprox.)</div><div class="r-val">${lastP.usdt.toFixed(1)}%</div></div>
-    `;
+  if(def.series.length > 1){
+    statsEl.innerHTML = def.series.map(s => `<div class="res-card"><div class="r-label">${s.label} (aprox.)</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>`).join('');
   } else {
-    const allVals = seriesAll.map(p => p.v);
-    const maxAll = Math.max(...allVals), minAll = Math.min(...allVals);
-    const label = domActiveMode === 'ratio' ? 'Rotación ETH/BTC actual' : 'Dominancia combinada actual (aprox.)';
+    const s = def.series[0];
+    const allVals = seriesAll.map(p => p[s.key]);
+    const label = s.label + (def.exact ? ' actual' : ' actual (aprox.)');
     statsEl.innerHTML = `
-      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${lastP.v.toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Máximo histórico</div><div class="r-val">${maxAll.toFixed(1)}%</div></div>
-      <div class="res-card"><div class="r-label">Mínimo histórico</div><div class="r-val">${minAll.toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">${label}</div><div class="r-val">${lastP[s.key].toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">Máximo histórico</div><div class="r-val">${Math.max(...allVals).toFixed(1)}%</div></div>
+      <div class="res-card"><div class="r-label">Mínimo histórico</div><div class="r-val">${Math.min(...allVals).toFixed(1)}%</div></div>
     `;
   }
 }
-async function loadDominanceDetail(){
-  try{ await fetchDominanceData(); } catch(err){ /* renderDominanceChart muestra el estado de error si no hay datos */ }
-  renderDominanceChart();
+async function loadDomChartDetail(key){
+  try{ await fetchDominanceData(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
+  renderDomChart(key);
 }
-let domLoadedOnce = false;
-function ensureDominanceLoaded(){ if(!domLoadedOnce){ domLoadedOnce = true; loadDominanceDetail(); } }
+const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false };
+function ensureDomRatioLoaded(){ if(!domLoadedOnce.domratio){ domLoadedOnce.domratio = true; loadDomChartDetail('domratio'); } }
+function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomChartDetail('domall'); } }
+function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomChartDetail('dombtc'); } }
+function ensureDomUsdtLoaded(){ if(!domLoadedOnce.domusdt){ domLoadedOnce.domusdt = true; loadDomChartDetail('domusdt'); } }
 window.addEventListener('resize', () => {
-  if(document.querySelector('.indic-panel[data-indic="dominancia"]').style.display !== 'none') renderDominanceChart();
-});
-document.querySelectorAll('#domModeFilter .tf-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.classList.contains('active')) return;
-    document.querySelectorAll('#domModeFilter .tf-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    domActiveMode = btn.dataset.mode;
-    renderDominanceChart();
+  ['domratio', 'domall', 'dombtc', 'domusdt'].forEach(key => {
+    if(document.querySelector('.indic-panel[data-indic="' + key + '"]').style.display !== 'none') renderDomChart(key);
   });
 });
-document.querySelectorAll('#domRangeFilter .tf-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.classList.contains('active')) return;
-    document.querySelectorAll('#domRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    domActiveRange = btn.dataset.range;
-    renderDominanceChart();
+['domratio', 'domall', 'dombtc', 'domusdt'].forEach(key => {
+  document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.classList.contains('active')) return;
+      document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      domActiveRanges[key] = btn.dataset.range;
+      renderDomChart(key);
+    });
   });
 });
 
