@@ -902,6 +902,34 @@ img[src=""]{display:none}
 .checklist-item.checked .checklist-item-text{color:var(--white)}
 .checklist-item-text strong{color:inherit}
 
+/* ===== ANALIZADOR DE TOKEN ===== */
+.ts-search-row{display:flex;gap:10px;margin-bottom:10px}
+.ts-search-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--white);font-size:14px;outline:none;font-family:'Space Grotesk',sans-serif}
+.ts-search-row input:focus{border-color:var(--red)}
+.ts-search-results{margin-bottom:16px}
+.ts-result-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .2s}
+.ts-result-row:hover{border-color:var(--red)}
+.ts-result-icon{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--card)}
+.ts-result-name{font-weight:700;font-size:13.5px;color:var(--white)}
+.ts-result-sub{font-size:11.5px;color:var(--muted2);font-family:'Space Mono',monospace}
+.ts-result-liq{margin-left:auto;text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted2)}
+.ts-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.ts-header img{width:44px;height:44px;border-radius:50%}
+.ts-header-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white)}
+.ts-header-sub{font-size:12px;color:var(--muted2);font-family:'Space Mono',monospace}
+.ts-score-badge{margin-left:auto;text-align:center;font-family:'Space Mono',monospace;flex-shrink:0}
+.ts-score-num{font-size:26px;font-weight:800;line-height:1}
+.ts-score-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ts-flag-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;font-size:13px}
+.ts-flag-icon{flex-shrink:0;font-size:14px;line-height:1.4}
+.ts-flag-text{color:var(--muted2);line-height:1.5}
+.ts-flag-text b{color:var(--white)}
+.ts-flag-row.ts-fail{border-color:rgba(255,47,79,.3);background:rgba(255,47,79,.05)}
+.ts-flag-row.ts-warn{border-color:rgba(240,178,61,.3);background:rgba(240,178,61,.05)}
+.ts-flag-row.ts-ok{border-color:rgba(46,204,113,.25)}
+.ts-source-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 8px}
+.ts-unavailable{font-size:12.5px;color:var(--muted);font-style:italic;padding:8px 0}
+
 /* ===== SIMULADOR DE PORTAFOLIO ===== */
 .avg-sim-box{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:16px 18px;margin-bottom:14px}
 .avg-sim-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
@@ -1421,6 +1449,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-tool="inheritance">
         <span class="sb-item-icon">👨‍👩‍👧</span><span class="sb-item-label">Herencia digital</span>
+      </button>
+      <button class="sb-item" data-tool="tokenscanner">
+        <span class="sb-item-icon">🔎</span><span class="sb-item-label">Analizador de Token</span>
       </button>
 
       <div class="sb-cat-label" data-category="aprender">Aprender</div>
@@ -3002,6 +3033,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="tool-icon">👨‍👩‍👧</div>
           <h3>Herencia Digital</h3>
           <p>Qué le dejarías a tu familia si te pasa algo — cómo dejarles acceso sin comprometer tu seguridad hoy.</p>
+          <span class="tool-status open">Disponible</span>
+        </button>
+
+        <button class="tool-card" id="openTokenScannerCard" data-tool="tokenscanner">
+          <div class="tool-icon">🔎</div>
+          <h3>Analizador de Token</h3>
+          <p>Busca cualquier token y revisa seguridad del contrato, liquidez, impuestos de compra/venta y desbloqueos pendientes.</p>
           <span class="tool-status open">Disponible</span>
         </button>
       </div>
@@ -4969,6 +5007,60 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
     </div>
   
+      <div class="tool-footer-links">
+        <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
+        <span>·</span>
+        <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
+        <span>·</span>
+        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener">Todas mis redes</a>
+      </div>
+</div>
+</div>
+
+<!-- ===== MODAL: ANALIZADOR DE TOKEN ===== -->
+<div class="modal-overlay" id="tokenScannerModal" data-tool="tokenscanner">
+  <button class="modal-close" id="closeTokenScanner" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="tokenScannerTitleEl">
+
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="tokenScannerTitleEl">Analizador de Token</h2>
+        <p class="calc-sub">Busca cualquier token por nombre, símbolo o dirección de contrato — seguridad, liquidez, impuestos, sector y desbloqueos pendientes, todo con datos reales y su fuente.</p>
+      </div>
+
+      <div class="ts-search-row">
+        <input type="text" id="tsSearchInput" placeholder="Ej: PEPE, Shiba Inu, o pega una dirección de contrato...">
+        <button class="a-btn" id="tsSearchBtn" type="button">🔎 Buscar</button>
+      </div>
+      <div class="ts-search-results" id="tsSearchResults"></div>
+
+      <div id="tsReportLoading" style="display:none;text-align:center;padding:30px 0;color:var(--muted)">Analizando token…</div>
+      <div id="tsReportError" class="calc-disclaimer" style="display:none">⚠️ No se pudo analizar este token. Intenta de nuevo en un momento.</div>
+
+      <div id="tsReport" style="display:none">
+        <div class="ts-header" id="tsHeader"></div>
+        <div class="summary-title">🛡️ Seguridad del contrato</div>
+        <div id="tsSecurityBody"></div>
+        <div class="summary-title" style="margin-top:20px">💧 Liquidez y mercado</div>
+        <div class="summary-grid" id="tsMarketGrid"></div>
+        <div class="summary-title" style="margin-top:20px">🏷️ Sector y ranking</div>
+        <div id="tsSectorBody"></div>
+        <div class="summary-title" style="margin-top:20px">🔓 Desbloqueos de tokens</div>
+        <div id="tsUnlocksBody"></div>
+        <div class="summary-title" style="margin-top:20px">📊 Open interest</div>
+        <div id="tsOiBody"></div>
+      </div>
+
+      <div class="calc-disclaimer" style="margin-top:18px">
+        🔎 Fuentes: seguridad del contrato vía <b>GoPlus Security</b>, liquidez y mercado vía <b>DexScreener</b>, sector/ranking vía <b>CoinGecko</b>, desbloqueos de tokens vía <b>DefiLlama</b> (solo si el token está en su base de datos), open interest vía <b>Hyperliquid</b> (solo si el token cotiza ahí en perpetuos). Cuando un dato no está disponible se muestra así explícitamente — nunca se inventa un número.<br>
+        <strong>Herramienta educativa. No es asesoría financiera ni garantiza que un token sea seguro — siempre haz tu propia investigación (DYOR).</strong>
+      </div>
+    </div>
+
       <div class="tool-footer-links">
         <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
         <span>·</span>
@@ -7886,9 +7978,16 @@ const SECTOR_MAP = {
   uniswap: 'defi', aave: 'defi', 'curve-dao-token': 'defi', maker: 'defi',
   'compound-governance-token': 'defi', 'havven': 'defi', 'lido-dao': 'defi',
   'pancakeswap-token': 'defi', 'the-graph': 'defi', chainlink: 'defi', 'injective-protocol': 'defi',
-  // Memecoins
+  'jupiter-exchange-solana': 'defi', 'raydium': 'defi', 'orca': 'defi', '1inch': 'defi', 'sushi': 'defi',
+  'dodo': 'defi', 'gmx': 'defi', 'dydx': 'defi', 'jito-governance-token': 'defi',
+  // Memecoins — esta lista se va a quedar corta siempre (nace una memecoin nueva todos los días),
+  // así que si falta alguna, se agrega apenas se reporte
   dogecoin: 'meme', 'shiba-inu': 'meme', pepe: 'meme', floki: 'meme', bonk: 'meme',
-  'dogwifcoin': 'meme', 'book-of-meme': 'meme'
+  'dogwifcoin': 'meme', 'book-of-meme': 'meme', popcat: 'meme', 'based-brett': 'meme',
+  ponke: 'meme', retardio: 'meme', 'mog-coin': 'meme', 'cat-in-a-dogs-world': 'meme',
+  'peanut-the-squirrel': 'meme', 'gigachad-2': 'meme', 'myro': 'meme', 'wen-4': 'meme',
+  'act-i-the-ai-prophecy': 'meme', 'fartcoin': 'meme', 'goatseus-maximus': 'meme',
+  'ai-companions': 'meme', 'spx6900': 'meme', 'turbo': 'meme', 'brett-2': 'meme'
 };
 const SECTOR_INFO = {
   l1: { label: '⛓️ Layer 1', color: '#4a9eff' },
@@ -8553,6 +8652,300 @@ document.getElementById('inheritanceResetBtn').addEventListener('click', () => {
   if(!confirm('¿Reiniciar todo tu progreso de esta guía? Esta acción no se puede deshacer.')) return;
   saveInheritanceState({});
   renderInheritance();
+});
+
+/* ========= ANALIZADOR DE TOKEN =========
+   Combina varias fuentes gratuitas y sin llave, cada una con su propio try/catch — si una falla
+   o el token no está en esa base de datos, esa sección dice "no disponible" en vez de romper
+   todo el reporte o inventar un número:
+   - GoPlus Security: seguridad del contrato (honeypot, impuestos, mint, ownership, liquidez bloqueada)
+   - DexScreener: búsqueda del token + liquidez/volumen/precio en vivo
+   - CoinGecko (por dirección de contrato): sector/categoría + ranking, si el token está listado
+   - DefiLlama (emissions): calendario de desbloqueos de tokens, cuando existe para ese proyecto
+   - Hyperliquid: open interest actual, solo si el token cotiza ahí en perpetuos */
+const tokenScannerModal = document.getElementById('tokenScannerModal');
+const tokenScannerPanel = tokenScannerModal.querySelector('.modal-panel');
+const openTokenScannerCard = document.getElementById('openTokenScannerCard');
+const sbTokenScannerItem = document.querySelector('.sb-item[data-tool="tokenscanner"]');
+const closeTokenScanner = document.getElementById('closeTokenScanner');
+
+function openTokenScannerModal(){ openModalGeneric(tokenScannerModal, tokenScannerPanel, closeTokenScanner); }
+function closeTokenScannerModal(){ closeModalGeneric(tokenScannerModal); }
+openTokenScannerCard.addEventListener('click', openTokenScannerModal);
+sbTokenScannerItem.addEventListener('click', openTokenScannerModal);
+closeTokenScanner.addEventListener('click', closeTokenScannerModal);
+tokenScannerModal.addEventListener('click', (e) => { if(e.target === tokenScannerModal) closeTokenScannerModal(); });
+
+const TS_CHAIN_MAP = {
+  ethereum: { goplus: '1', cg: 'ethereum', label: 'Ethereum' },
+  bsc: { goplus: '56', cg: 'binance-smart-chain', label: 'BNB Chain' },
+  polygon: { goplus: '137', cg: 'polygon-pos', label: 'Polygon' },
+  arbitrum: { goplus: '42161', cg: 'arbitrum-one', label: 'Arbitrum' },
+  optimism: { goplus: '10', cg: 'optimistic-ethereum', label: 'Optimism' },
+  base: { goplus: '8453', cg: 'base', label: 'Base' },
+  avalanche: { goplus: '43114', cg: 'avalanche', label: 'Avalanche' },
+  fantom: { goplus: '250', cg: 'fantom', label: 'Fantom' },
+  solana: { goplus: 'solana', cg: 'solana', label: 'Solana' },
+};
+
+let tsSearchAbort = null;
+function tsFmtAddr(addr){ return addr.length > 12 ? addr.slice(0, 6) + '…' + addr.slice(-4) : addr; }
+
+async function tsSearch(query){
+  const resultsEl = document.getElementById('tsSearchResults');
+  const q = query.trim();
+  if(!q){ resultsEl.innerHTML = ''; return; }
+  if(tsSearchAbort) tsSearchAbort.abort();
+  tsSearchAbort = new AbortController();
+  resultsEl.innerHTML = '<div class="ts-unavailable">Buscando…</div>';
+  try{
+    const res = await fetch('https://api.dexscreener.com/latest/dex/search?q=' + encodeURIComponent(q), { signal: tsSearchAbort.signal });
+    const data = await res.json();
+    const pairs = Array.isArray(data.pairs) ? data.pairs : [];
+    if(!pairs.length){
+      resultsEl.innerHTML = '<div class="ts-unavailable">No se encontraron resultados. Prueba con el símbolo exacto o pega la dirección del contrato.</div>';
+      return;
+    }
+    // un mismo token puede tener varios pares (distintos DEX/pools) — nos quedamos con el de
+    // mayor liquidez de cada token para no repetirlo varias veces en la lista
+    const byToken = new Map();
+    pairs.forEach(p => {
+      if(!p.baseToken || !p.baseToken.address) return;
+      const key = p.chainId + ':' + p.baseToken.address.toLowerCase();
+      const liq = (p.liquidity && p.liquidity.usd) || 0;
+      const prevLiq = byToken.has(key) ? ((byToken.get(key).liquidity && byToken.get(key).liquidity.usd) || 0) : -1;
+      if(liq > prevLiq) byToken.set(key, p);
+    });
+    const top = [...byToken.values()]
+      .sort((a, b) => ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0))
+      .slice(0, 8);
+    resultsEl.innerHTML = '';
+    top.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'ts-result-row';
+      const liqUsd = p.liquidity && p.liquidity.usd;
+      const img = document.createElement('img');
+      img.className = 'ts-result-icon';
+      img.src = (p.info && p.info.imageUrl) || '';
+      img.onerror = () => { img.style.visibility = 'hidden'; };
+      const info = document.createElement('div');
+      info.innerHTML =
+        '<div class="ts-result-name">' + escapeHtml(p.baseToken.name || p.baseToken.symbol) + ' (' + escapeHtml((p.baseToken.symbol || '').toUpperCase()) + ')</div>' +
+        '<div class="ts-result-sub">' + escapeHtml(p.chainId) + ' · ' + escapeHtml(p.dexId || '') + '</div>';
+      const liqEl = document.createElement('div');
+      liqEl.className = 'ts-result-liq';
+      liqEl.textContent = liqUsd ? fmtUsdBig(liqUsd) + ' liq.' : 'sin liquidez';
+      row.append(img, info, liqEl);
+      row.addEventListener('click', () => tsSelectPair(p));
+      resultsEl.appendChild(row);
+    });
+  } catch(err){
+    if(err.name === 'AbortError') return;
+    resultsEl.innerHTML = '<div class="ts-unavailable">' + friendlyErrMsg(err) + '</div>';
+  }
+}
+
+async function fetchGoPlusSecurity(chainInfo, address){
+  try{
+    const url = chainInfo.goplus === 'solana'
+      ? 'https://api.gopluslabs.io/api/v1/solana/token_security?contract_addresses=' + encodeURIComponent(address)
+      : 'https://api.gopluslabs.io/api/v1/token_security/' + chainInfo.goplus + '?contract_addresses=' + encodeURIComponent(address);
+    const res = await fetch(url);
+    const json = await res.json();
+    if(!json || json.code !== 1 || !json.result) return null;
+    const key = Object.keys(json.result)[0];
+    return key ? { data: json.result[key], isSolana: chainInfo.goplus === 'solana' } : null;
+  } catch(err){ return null; }
+}
+
+async function fetchTsCoinGecko(chainInfo, address){
+  if(!chainInfo) return null;
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/' + chainInfo.cg + '/contract/' + address));
+    if(!res.ok) return null;
+    const json = await res.json();
+    return (json && !json.error) ? json : null;
+  } catch(err){ return null; }
+}
+
+// mejor esfuerzo: DefiLlama no tiene un buscador directo "dame el proyecto de esta dirección", así
+// que se busca por nombre en su lista de proyectos con calendario de emisiones. Si no aparece (la
+// gran mayoría de memecoins no tienen vesting — nacen con el 100% ya circulando), se marca como no
+// disponible en vez de forzar una coincidencia dudosa
+let tsEmissionsListCache = null;
+async function fetchTsUnlocks(name, symbol){
+  try{
+    if(!tsEmissionsListCache){
+      const res = await fetch('https://api.llama.fi/emissions');
+      if(!res.ok) return null;
+      tsEmissionsListCache = await res.json();
+    }
+    const list = Array.isArray(tsEmissionsListCache) ? tsEmissionsListCache : [];
+    const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const nameN = norm(name), symN = norm(symbol);
+    const match = list.find(p => norm(p.name) === nameN || norm(p.gecko_id) === symN || norm(p.tokenName) === nameN);
+    if(!match || !match.name) return null;
+    const slug = match.name.toLowerCase().trim().replace(/\s+/g, '-');
+    const res2 = await fetch('https://api.llama.fi/emissions/' + encodeURIComponent(slug));
+    if(!res2.ok) return null;
+    const detail = await res2.json();
+    return (detail && (detail.events || detail.data)) ? detail : null;
+  } catch(err){ return null; }
+}
+
+async function fetchTsHyperliquidOi(symbol){
+  if(!symbol) return null;
+  try{
+    const res = await fetch('https://api.hyperliquid.xyz/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const meta = data[0], ctxs = data[1];
+    if(!meta || !Array.isArray(meta.universe) || !Array.isArray(ctxs)) return null;
+    const idx = meta.universe.findIndex(a => a.name && a.name.toUpperCase() === symbol.toUpperCase());
+    if(idx < 0) return null;
+    const ctx = ctxs[idx];
+    const oiCoins = parseFloat(ctx.openInterest), markPx = parseFloat(ctx.markPx), funding = parseFloat(ctx.funding);
+    if(!(oiCoins >= 0) || !(markPx > 0)) return null;
+    return { oiUsd: oiCoins * markPx, funding };
+  } catch(err){ return null; }
+}
+
+function tsPct(v){ return (parseFloat(v) * 100).toFixed(1) + '%'; }
+
+function buildTsSecurityFlags(security){
+  if(!security || !security.data) return [];
+  const d = security.data;
+  const flags = [];
+  if(security.isSolana){
+    const on = f => f && (f.status === '1' || f === '1' || f === true);
+    if(on(d.mintable)) flags.push({ level: 'fail', text: 'El creador <b>todavía puede crear más tokens</b> (mint activo) — puede diluir tu inversión.' });
+    else flags.push({ level: 'ok', text: 'La función de crear más tokens (mint) está <b>desactivada</b>.' });
+    if(on(d.freezable)) flags.push({ level: 'fail', text: 'El creador puede <b>congelar tu wallet</b> y bloquear que vendas.' });
+    else flags.push({ level: 'ok', text: 'Nadie puede congelar tus tokens.' });
+    if(on(d.transfer_fee_upgradable)) flags.push({ level: 'warn', text: 'La comisión de transferencia se puede <b>cambiar después</b> sin avisar.' });
+    if(on(d.balance_mutable_authority)) flags.push({ level: 'fail', text: 'Alguien puede <b>modificar tu saldo</b> directamente.' });
+    if(on(d.closable)) flags.push({ level: 'warn', text: 'La cuenta del token se puede <b>cerrar</b> por una autoridad externa.' });
+    return flags;
+  }
+  if(d.is_honeypot === '1') flags.push({ level: 'fail', text: '🚨 <b>Honeypot detectado</b>: se puede comprar pero no se puede vender.' });
+  else flags.push({ level: 'ok', text: 'No se detectó honeypot — sí se puede vender.' });
+
+  const buyTax = parseFloat(d.buy_tax || 0), sellTax = parseFloat(d.sell_tax || 0);
+  if(buyTax > 0.1 || sellTax > 0.1) flags.push({ level: (buyTax > 0.3 || sellTax > 0.3) ? 'fail' : 'warn', text: 'Impuesto de <b>compra ' + tsPct(buyTax) + '</b> / <b>venta ' + tsPct(sellTax) + '</b> — más alto de lo normal.' });
+  else flags.push({ level: 'ok', text: 'Impuesto de compra ' + tsPct(buyTax) + ' / venta ' + tsPct(sellTax) + '.' });
+
+  if(d.cannot_sell_all === '1') flags.push({ level: 'fail', text: 'No se puede vender el <b>100%</b> del balance de una sola vez.' });
+  if(d.is_open_source === '0') flags.push({ level: 'warn', text: 'El código del contrato <b>no es público</b> — no se puede auditar directamente.' });
+  else if(d.is_open_source === '1') flags.push({ level: 'ok', text: 'Código del contrato verificado/público.' });
+  if(d.is_proxy === '1') flags.push({ level: 'warn', text: 'Es un contrato <b>proxy</b> — la lógica se puede cambiar después de desplegado.' });
+  if(d.is_mintable === '1') flags.push({ level: 'warn', text: 'El owner puede <b>crear más tokens</b> (mint) — riesgo de dilución.' });
+  if(d.can_take_back_ownership === '1') flags.push({ level: 'fail', text: 'El owner puede <b>recuperar el control</b> aunque diga que lo renunció.' });
+  if(d.owner_change_balance === '1') flags.push({ level: 'fail', text: 'El owner puede <b>modificar saldos</b> directamente.' });
+  if(d.hidden_owner === '1') flags.push({ level: 'fail', text: 'El dueño real del contrato está <b>oculto</b>.' });
+  if(d.selfdestruct === '1') flags.push({ level: 'fail', text: 'El contrato tiene una función de <b>autodestrucción</b>.' });
+  if(d.is_blacklisted === '1') flags.push({ level: 'warn', text: 'Tiene función para <b>poner wallets en lista negra</b> e impedirles vender.' });
+  if(d.transfer_pausable === '1') flags.push({ level: 'warn', text: 'Las transferencias se pueden <b>pausar</b> por completo.' });
+  if(d.trading_cooldown === '1') flags.push({ level: 'warn', text: 'Tiene <b>cooldown</b> obligatorio entre transacciones.' });
+  if(d.slippage_modifiable === '1') flags.push({ level: 'warn', text: 'El slippage/impuestos se pueden <b>modificar</b> después de desplegado.' });
+
+  if(Array.isArray(d.lp_holders) && d.lp_holders.length){
+    const lpLocked = d.lp_holders.some(h => h.is_locked === 1 || h.is_locked === '1');
+    flags.push(lpLocked
+      ? { level: 'ok', text: 'Parte de la liquidez está <b>bloqueada o quemada</b>.' }
+      : { level: 'warn', text: 'No se detectó liquidez bloqueada — el creador podría <b>retirarla</b> cuando quiera.' });
+  }
+  if(d.holder_count) flags.push({ level: parseInt(d.holder_count, 10) < 100 ? 'warn' : 'ok', text: '<b>' + d.holder_count + '</b> holders (wallets dueñas de la moneda) registrados.' });
+  if(Array.isArray(d.holders) && d.holders.length){
+    const top10 = d.holders.slice(0, 10).reduce((s, h) => s + parseFloat(h.percent || 0), 0) * 100;
+    if(top10 > 0) flags.push({ level: top10 > 50 ? 'fail' : top10 > 25 ? 'warn' : 'ok', text: 'Los <b>10 wallets más grandes</b> tienen el <b>' + top10.toFixed(1) + '%</b> del suministro.' });
+  }
+  return flags;
+}
+
+function tsFlagsHtml(flags){
+  return flags.map(f =>
+    '<div class="ts-flag-row ts-' + f.level + '"><span class="ts-flag-icon">' +
+    (f.level === 'ok' ? '✅' : f.level === 'warn' ? '⚠️' : '❌') +
+    '</span><span class="ts-flag-text">' + f.text + '</span></div>'
+  ).join('');
+}
+
+function renderTsReport(d){
+  const { pair, security, cgData, unlocks, oi, chainLabel } = d;
+  const flags = buildTsSecurityFlags(security);
+  const ok = flags.filter(f => f.level === 'ok').length;
+  const header = document.getElementById('tsHeader');
+  const imgSrc = pair.info && pair.info.imageUrl;
+  header.innerHTML =
+    (imgSrc ? '<img src="' + escapeHtml(imgSrc) + '" onerror="this.style.display=\'none\'">' : '') +
+    '<div><div class="ts-header-name">' + escapeHtml(pair.baseToken.name) + ' (' + escapeHtml(pair.baseToken.symbol.toUpperCase()) + ')</div>' +
+    '<div class="ts-header-sub">' + escapeHtml(chainLabel) + ' · ' + escapeHtml(tsFmtAddr(pair.baseToken.address)) + '</div></div>' +
+    (flags.length ? '<div class="ts-score-badge"><div class="ts-score-num" style="color:' + (ok === flags.length ? '#22c55e' : ok >= flags.length * 0.6 ? '#f0b23d' : '#ff2f4f') + '">' + ok + '/' + flags.length + '</div><div class="ts-score-label">chequeos OK</div></div>' : '');
+
+  document.getElementById('tsSecurityBody').innerHTML = flags.length ? tsFlagsHtml(flags) :
+    '<div class="ts-unavailable">No se pudo obtener el análisis de seguridad del contrato para esta cadena (GoPlus Security no tiene datos para este token, o la cadena no está soportada).</div>';
+
+  const liq = pair.liquidity && pair.liquidity.usd;
+  const vol24 = pair.volume && pair.volume.h24;
+  const priceChange24 = pair.priceChange && pair.priceChange.h24;
+  const createdAt = pair.pairCreatedAt ? new Date(pair.pairCreatedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+  document.getElementById('tsMarketGrid').innerHTML =
+    '<div class="sum-row"><span class="s-label">Precio actual</span><span class="s-val">$' + (pair.priceUsd ? Number(pair.priceUsd).toLocaleString('en-US', { maximumFractionDigits: 10 }) : '—') + '</span></div>' +
+    '<div class="sum-row"><span class="s-label">Liquidez en el pool</span><span class="s-val">' + (liq ? fmtUsdBig(liq) : 'No disponible') + '</span></div>' +
+    '<div class="sum-row"><span class="s-label">Volumen 24h</span><span class="s-val">' + (vol24 ? fmtUsdBig(vol24) : 'No disponible') + '</span></div>' +
+    '<div class="sum-row"><span class="s-label">Cambio 24h</span><span class="s-val" style="color:' + (priceChange24 >= 0 ? 'var(--green)' : 'var(--red)') + '">' + (priceChange24 != null ? (priceChange24 >= 0 ? '+' : '') + priceChange24.toFixed(2) + '%' : 'No disponible') + '</span></div>' +
+    '<div class="sum-row"><span class="s-label">FDV (valuación totalmente diluida)</span><span class="s-val">' + (pair.fdv ? fmtUsdBig(pair.fdv) : 'No disponible') + '</span></div>' +
+    '<div class="sum-row"><span class="s-label">Edad del par</span><span class="s-val">' + (createdAt || 'No disponible') + '</span></div>';
+
+  const categories = cgData && Array.isArray(cgData.categories) ? cgData.categories.filter(Boolean) : [];
+  document.getElementById('tsSectorBody').innerHTML = cgData
+    ? '<div class="summary-grid"><div class="sum-row"><span class="s-label">Sector / categoría</span><span class="s-val">' + (categories.length ? escapeHtml(categories.join(', ')) : 'No clasificado') + '</span></div>' +
+      '<div class="sum-row"><span class="s-label">Ranking por market cap</span><span class="s-val">' + (cgData.market_cap_rank ? '#' + cgData.market_cap_rank : 'No disponible') + '</span></div></div>'
+    : '<div class="ts-unavailable">Este token no está listado en CoinGecko (o no encontramos la dirección exacta), así que no hay sector ni ranking disponible.</div>';
+
+  document.getElementById('tsUnlocksBody').innerHTML = unlocks
+    ? '<div class="ts-unavailable">Encontramos un calendario de desbloqueos para este proyecto en DefiLlama — revísalo en <a href="https://defillama.com/unlocks" target="_blank" rel="noopener">defillama.com/unlocks</a> buscando "' + escapeHtml(pair.baseToken.name) + '" para ver las fechas exactas.</div>'
+    : '<div class="ts-unavailable">No encontramos un calendario de desbloqueos para este token (o no aplica — muchas memecoins nacen con el 100% del suministro ya circulando, sin desbloqueos programados).</div>';
+
+  document.getElementById('tsOiBody').innerHTML = oi
+    ? '<div class="summary-grid"><div class="sum-row"><span class="s-label">Open interest (Hyperliquid)</span><span class="s-val">' + fmtUsdBig(oi.oiUsd) + '</span></div>' +
+      '<div class="sum-row"><span class="s-label">Funding rate actual</span><span class="s-val">' + (oi.funding * 100).toFixed(4) + '%</span></div></div>'
+    : '<div class="ts-unavailable">' + escapeHtml((pair.baseToken.symbol || '').toUpperCase()) + ' no cotiza en futuros perpetuos de Hyperliquid, así que no hay open interest disponible.</div>';
+}
+
+async function tsSelectPair(pair){
+  document.getElementById('tsSearchResults').innerHTML = '';
+  document.getElementById('tsSearchInput').value = (pair.baseToken.name || pair.baseToken.symbol) + ' (' + pair.baseToken.symbol.toUpperCase() + ')';
+  document.getElementById('tsReport').style.display = 'none';
+  document.getElementById('tsReportError').style.display = 'none';
+  document.getElementById('tsReportLoading').style.display = 'block';
+
+  const chainInfo = TS_CHAIN_MAP[pair.chainId] || null;
+  const address = pair.baseToken.address;
+
+  try{
+    const [security, cgData, unlocks, oi] = await Promise.all([
+      chainInfo ? fetchGoPlusSecurity(chainInfo, address) : Promise.resolve(null),
+      fetchTsCoinGecko(chainInfo, address),
+      fetchTsUnlocks(pair.baseToken.name, pair.baseToken.symbol),
+      fetchTsHyperliquidOi(pair.baseToken.symbol),
+    ]);
+    document.getElementById('tsReportLoading').style.display = 'none';
+    document.getElementById('tsReport').style.display = 'block';
+    renderTsReport({ pair, security, cgData, unlocks, oi, chainLabel: chainInfo ? chainInfo.label : pair.chainId });
+  } catch(err){
+    document.getElementById('tsReportLoading').style.display = 'none';
+    document.getElementById('tsReportError').style.display = 'block';
+  }
+}
+
+document.getElementById('tsSearchBtn').addEventListener('click', () => tsSearch(document.getElementById('tsSearchInput').value));
+document.getElementById('tsSearchInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') tsSearch(document.getElementById('tsSearchInput').value);
 });
 
 /* ========= COMPARADOR DE WALLETS ========= */
