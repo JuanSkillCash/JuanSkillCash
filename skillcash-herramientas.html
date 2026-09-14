@@ -2676,7 +2676,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="domratioStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko. Muestra los <b>últimos 12 meses</b> — el plan gratis de CoinGecko no da historial más largo que eso.<br>
+                🔄 Market cap de ETH ÷ market cap de BTC, con datos reales de CoinGecko. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2713,7 +2713,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="domallStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🥧 Aproximado (ver nota arriba) — cada línea es (market cap de la moneda) ÷ (suma de las ~15 monedas más grandes). Muestra los <b>últimos 12 meses</b> — el plan gratis de CoinGecko no da historial más largo que eso.<br>
+                🥧 Aproximado (ver nota arriba) — cada línea es (market cap de la moneda) ÷ (suma de las ~15 monedas más grandes). El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2750,7 +2750,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="dombtcStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                ₿ Aproximado (ver nota arriba) — market cap de BTC ÷ suma de las ~15 monedas más grandes. Muestra los <b>últimos 12 meses</b> — el plan gratis de CoinGecko no da historial más largo que eso.<br>
+                ₿ Aproximado (ver nota arriba) — market cap de BTC ÷ suma de las ~15 monedas más grandes. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -2787,7 +2787,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="domusdtStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💵 Aproximado (ver nota arriba) — market cap de USDT ÷ suma de las ~15 monedas más grandes. Muestra los <b>últimos 12 meses</b> — el plan gratis de CoinGecko no da historial más largo que eso.<br>
+                💵 Aproximado (ver nota arriba) — market cap de USDT ÷ suma de las ~15 monedas más grandes. El plan gratis de CoinGecko solo da 12 meses hacia atrás, pero el sitio va guardando cada día que pasa — con el tiempo el historial disponible aquí va a ser cada vez más largo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -14556,10 +14556,53 @@ async function fetchOneCoinMarketCaps(id, attempt){
     clearTimeout(timeoutId);
   }
 }
+// el plan gratis de CoinGecko solo da los últimos 365 días — para no quedar pegados en 1 año de
+// historial para siempre, cada visitante que carga los gráficos de dominancia guarda en Supabase
+// (tabla dom_mcap_history, pública, solo-inserción) los días que todavía no estuvieran guardados.
+// Con el tiempo el archivo va creciendo por su cuenta más allá de los 365 días que da CoinGecko —
+// "primero que guarda, guarda": no hay política de UPDATE/DELETE, así que un día ya guardado no se
+// puede pisar ni borrar después, lo que limita el daño de un dato malo de algún visitante
+let domArchiveCache = null;
+async function fetchDomArchive(){
+  if(domArchiveCache) return domArchiveCache;
+  const map = new Map();
+  DOM_BASKET.forEach(id => map.set(id, new Map()));
+  try{
+    const { data, error } = await sbClient.from('dom_mcap_history').select('coin_id,day,market_cap');
+    if(!error && Array.isArray(data)){
+      data.forEach(row => {
+        if(!map.has(row.coin_id)) return;
+        const dayKey = new Date(row.day + 'T00:00:00Z').getTime();
+        map.get(row.coin_id).set(dayKey, Number(row.market_cap));
+      });
+    }
+  } catch(err){ /* si Supabase no responde, simplemente no hay historial extra — no rompe el gráfico */ }
+  domArchiveCache = map;
+  return map;
+}
+async function saveDomArchive(id, caps){
+  try{
+    const archive = await fetchDomArchive();
+    const archived = archive.get(id) || new Map();
+    const todayKey = Math.floor(Date.now() / 86400000) * 86400000;
+    const rows = [];
+    caps.forEach(([t, v]) => {
+      if(!(v > 0)) return;
+      const dayKey = Math.floor(t / 86400000) * 86400000;
+      if(dayKey >= todayKey || archived.has(dayKey)) return; // el día de hoy no está "cerrado" todavía, y lo ya guardado no hace falta reenviarlo
+      rows.push({ coin_id: id, day: new Date(dayKey).toISOString().slice(0, 10), market_cap: v });
+    });
+    if(!rows.length) return;
+    const { error } = await sbClient.from('dom_mcap_history').upsert(rows, { onConflict: 'coin_id,day', ignoreDuplicates: true });
+    if(!error) rows.forEach(r => archived.set(new Date(r.day + 'T00:00:00Z').getTime(), r.market_cap));
+    archive.set(id, archived);
+  } catch(err){ /* guardar el archivo es "mejor esfuerzo" — si falla, el gráfico sigue igual con solo los datos en vivo */ }
+}
 async function fetchDominanceData(){
   if(domRows) return domRows;
   if(domRowsInFlight) return domRowsInFlight;
   domRowsInFlight = (async () => {
+    const archive = await fetchDomArchive();
     const results = [];
     const BATCH_SIZE = 3;
     for(let i = 0; i < DOM_BASKET.length; i += BATCH_SIZE){
@@ -14568,6 +14611,14 @@ async function fetchDominanceData(){
       if(i + BATCH_SIZE < DOM_BASKET.length) await new Promise(r => setTimeout(r, 400));
     }
     const dayMap = new Map();
+    // primero lo que ya teníamos guardado de visitas anteriores (puede ser más viejo de lo que
+    // CoinGecko da gratis), y encima lo que llegó en vivo ahora — si hay traslape, gana lo en vivo
+    archive.forEach((coinMap, id) => {
+      coinMap.forEach((v, dayKey) => {
+        if(!dayMap.has(dayKey)) dayMap.set(dayKey, {});
+        dayMap.get(dayKey)[id] = v;
+      });
+    });
     results.forEach(({ id, caps }) => {
       caps.forEach(([t, v]) => {
         if(!(v > 0)) return;
@@ -14575,6 +14626,7 @@ async function fetchDominanceData(){
         if(!dayMap.has(dayKey)) dayMap.set(dayKey, {});
         dayMap.get(dayKey)[id] = v;
       });
+      saveDomArchive(id, caps); // en segundo plano, no bloquea el render
     });
     const days = [...dayMap.keys()].sort((a, b) => a - b);
     const rows = days.map(t => {
