@@ -462,8 +462,6 @@ button{font-family:inherit;color:inherit}
 /* ---- anillo circular (dombtc/domusdt/domall: reemplaza el gráfico histórico que ya no
    tienen — muestra dónde cae el dato real de hoy frente a las zonas de compra/venta) ---- */
 .indic-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0 8px;margin:0 auto}
-.indic-ring-inner{position:relative;width:100%;max-width:260px}
-.indic-ring-svg{width:100%;display:block}
 .indic-ring-legend{display:flex;gap:18px;margin-top:10px}
 .indic-ring-legend-item{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2)}
 .indic-ring-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -2718,9 +2716,23 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
               </div>
               <div class="indic-ring-wrap" id="domallGauge" style="display:none">
-                <div class="indic-ring-inner">
-                  <svg viewBox="0 0 200 190" id="domallGaugeSvg" class="indic-ring-svg"></svg>
+                <div class="be-savings-label" style="text-align:center">DATO DE HOY</div>
+                <div class="fng-big-gauge">
+                  <svg viewBox="0 0 200 110" width="100%">
+                    <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#domallGaugeGrad)" stroke-width="16" stroke-linecap="round"/>
+                    <defs>
+                      <linearGradient id="domallGaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#ff2f4f"/>
+                        <stop offset="50%" stop-color="#f0b23d"/>
+                        <stop offset="100%" stop-color="#2ecc71"/>
+                      </linearGradient>
+                    </defs>
+                    <line id="domallGaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                    <circle cx="100" cy="100" r="5" fill="#fff"/>
+                  </svg>
                 </div>
+                <div class="fng-big-value" id="domallGaugeValue">—</div>
+                <div class="fng-big-class" id="domallGaugeClass">—</div>
                 <div class="indic-ring-legend">
                   <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 61–63%</div>
                   <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--green)"></span>Compra 81–83%</div>
@@ -14707,54 +14719,28 @@ const DOM_LIVE_DEFS = {
 };
 const DOM_LIVE_LABELS = { btc: 'BTC', eth: 'ETH', usdt: 'USDT', usdc: 'USDC' };
 
-// anillo circular (arco de 280°, con un hueco de 80° abajo) — usado por DOM_LIVE_DEFS.domall.gauge
-function domRingAngle(v, g){
-  const p = Math.max(0, Math.min(100, (v - g.min) / (g.max - g.min) * 100));
-  return 130 + (p / 100) * 280;
+// mismo estilo de medidor que el Índice de Miedo y Codicia (arco con degradé + aguja blanca) —
+// usado por DOM_LIVE_DEFS.domall.gauge, para que se vea igual al resto del sitio
+function domGaugeColorClass(v, g){
+  if(v <= g.sellTo) return 'fng-red';
+  if(v >= g.buyFrom) return 'fng-green';
+  return 'fng-gold';
 }
-function domRingPoint(v, g, cx, cy, radius){
-  const a = domRingAngle(v, g) * Math.PI / 180;
-  return { x: cx + radius * Math.cos(a), y: cy + radius * Math.sin(a) };
+function domGaugeZoneLabel(v, g){
+  if(v <= g.sellTo) return 'Zona de venta';
+  if(v >= g.buyFrom) return 'Zona de compra';
+  return 'Neutral';
 }
-function domRingArcPath(vFrom, vTo, g, cx, cy, radius){
-  const p1 = domRingPoint(vFrom, g, cx, cy, radius), p2 = domRingPoint(vTo, g, cx, cy, radius);
-  const large = (domRingAngle(vTo, g) - domRingAngle(vFrom, g)) > 180 ? 1 : 0;
-  return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 ${large} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-}
-// dibuja el dial como un tacómetro real: rayitas + números alrededor, aguja desde el centro,
-// buje central y una pantallita digital con el % en el hueco de abajo (igual que un tacómetro
-// físico con display de RPM)
 function renderDomRingGauge(key, g, value){
   const gaugeEl = document.getElementById(key + 'Gauge');
   if(!gaugeEl) return;
   gaugeEl.style.display = 'flex';
-  const cx = 100, cy = 96, r = 72;
-  const tickStep = 5;
-  let ticksHtml = '';
-  for(let v = g.min; v <= g.max + 0.001; v += 1){
-    const isMajor = Math.round(v) % tickStep === 0;
-    const inner = r - (isMajor ? 13 : 7);
-    const p1 = domRingPoint(v, g, cx, cy, r - 1);
-    const p2 = domRingPoint(v, g, cx, cy, inner);
-    ticksHtml += `<line x1="${p1.x.toFixed(2)}" y1="${p1.y.toFixed(2)}" x2="${p2.x.toFixed(2)}" y2="${p2.y.toFixed(2)}" stroke="${isMajor ? 'var(--muted2)' : 'var(--border2)'}" stroke-width="${isMajor ? 2 : 1}" stroke-linecap="round"/>`;
-    if(isMajor){
-      const lp = domRingPoint(v, g, cx, cy, r + 13);
-      ticksHtml += `<text x="${lp.x.toFixed(2)}" y="${(lp.y + 3).toFixed(2)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--muted)" font-family="'Space Mono',monospace">${Math.round(v)}</text>`;
-    }
-  }
-  const needleTip = domRingPoint(value, g, cx, cy, r - 20);
-  const needleBack = domRingPoint(value, g, cx, cy, -10);
-  document.getElementById(key + 'GaugeSvg').innerHTML = `
-    <circle cx="${cx}" cy="${cy}" r="${r + 5}" fill="var(--surface)" stroke="var(--border2)" stroke-width="1.5"/>
-    <path d="${domRingArcPath(g.sellFrom, g.sellTo, g, cx, cy, r + 4)}" fill="none" stroke="var(--red)" stroke-width="5" stroke-linecap="round"/>
-    <path d="${domRingArcPath(g.buyFrom, g.buyTo, g, cx, cy, r + 4)}" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round"/>
-    ${ticksHtml}
-    <line x1="${needleBack.x.toFixed(2)}" y1="${needleBack.y.toFixed(2)}" x2="${needleTip.x.toFixed(2)}" y2="${needleTip.y.toFixed(2)}" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="${cx}" cy="${cy}" r="8" fill="var(--card)" stroke="var(--muted2)" stroke-width="2"/>
-    <circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--muted2)"/>
-    <rect x="${cx - 34}" y="${cy + 42}" width="68" height="26" rx="7" fill="var(--card)" stroke="var(--border2)"/>
-    <text x="${cx}" y="${cy + 60}" text-anchor="middle" font-size="15" font-weight="700" fill="var(--white)" font-family="'Space Mono',monospace">${value.toFixed(1)}%</text>
-  `;
+  const pct = Math.max(0, Math.min(100, (value - g.min) / (g.max - g.min) * 100));
+  document.getElementById(key + 'GaugeNeedle').style.transform = 'rotate(' + (pct / 100 * 180 - 90) + 'deg)';
+  const valueEl = document.getElementById(key + 'GaugeValue');
+  valueEl.textContent = value.toFixed(1) + '%';
+  valueEl.className = 'fng-big-value ' + domGaugeColorClass(value, g);
+  document.getElementById(key + 'GaugeClass').textContent = domGaugeZoneLabel(value, g);
 }
 function renderDomLiveStat(key){
   const def = DOM_LIVE_DEFS[key];
