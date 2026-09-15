@@ -22,12 +22,13 @@ Deno.serve(async (_req) => {
     const global = await cgFetch("/global");
     const total = global.data.total_market_cap.usd;
 
-    // BTC, ETH y USDC por id exacto (no por posición) para que no falle si el orden cambia
+    // BTC, ETH, USDT y USDC por id exacto (no por posición) para que no falle si el orden cambia
     const pinned = await cgFetch(
-      "/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,usd-coin&order=market_cap_desc&sparkline=false",
+      "/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,usd-coin&order=market_cap_desc&sparkline=false",
     );
     const btcRow = pinned.find((c: any) => c.id === "bitcoin");
     const ethRow = pinned.find((c: any) => c.id === "ethereum");
+    const usdtRow = pinned.find((c: any) => c.id === "tether");
     const usdcRow = pinned.find((c: any) => c.id === "usd-coin");
     if (!btcRow || !ethRow) throw new Error("CoinGecko no devolvió bitcoin/ethereum");
 
@@ -39,12 +40,14 @@ Deno.serve(async (_req) => {
 
     const btc = btcRow.market_cap;
     const eth = ethRow.market_cap;
+    const usdt = usdtRow ? usdtRow.market_cap : null;
     const usdc = usdcRow ? usdcRow.market_cap : null;
     const total2 = total - btc;
     const total3 = total2 - eth;
     const others = total - top10Sum;
     const btcD = (btc / total) * 100;
     const ethD = (eth / total) * 100;
+    const usdtD = usdt != null ? (usdt / total) * 100 : null;
     const usdcD = usdc != null ? (usdc / total) * 100 : null;
 
     // se corre a las 23:55 UTC — la foto de ese momento se guarda como el cierre del día en curso
@@ -59,6 +62,7 @@ Deno.serve(async (_req) => {
       { index_name: "BTC.D", day, value: btcD, source: "coingecko" },
       { index_name: "ETH.D", day, value: ethD, source: "coingecko" },
     ];
+    if (usdtD != null) rows.push({ index_name: "USDT.D", day, value: usdtD, source: "coingecko" });
     if (usdcD != null) rows.push({ index_name: "USDC.D", day, value: usdcD, source: "coingecko" });
 
     const { error } = await supabase
