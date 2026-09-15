@@ -5511,7 +5511,9 @@ function filterSidebarNav(cat){
   document.querySelectorAll('.sb-cat-label').forEach(label => {
     const items = [];
     let el = label.nextElementSibling;
-    while(el && el.classList.contains('sb-item')){ items.push(el); el = el.nextElementSibling; }
+    // recorre tanto .sb-item como los sub-encabezados .indic-cat-label (ej. "Piso de Mercado"
+    // dentro de Indicadores) — solo se detiene al llegar al siguiente .sb-cat-label real
+    while(el && !el.classList.contains('sb-cat-label')){ items.push(el); el = el.nextElementSibling; }
     if(cat === null){
       label.style.display = '';
       label.classList.add('collapsed');
@@ -5575,6 +5577,7 @@ function showCategoryDetail(cat){
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'block';
   document.getElementById('marketDashboardBlock').style.display = 'none';
+  document.getElementById('favoritesSection').style.display = 'none';
   const hero = document.querySelector('.hero-mascot');
   const ticker = document.querySelector('.crypto-ticker');
   if(hero) hero.style.display = 'none';
@@ -5603,6 +5606,7 @@ function showCategoryOverview(){
   categoryDetailView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
+  document.getElementById('favoritesSection').style.display = '';
   const hero = document.querySelector('.hero-mascot');
   const ticker = document.querySelector('.crypto-ticker');
   if(hero) hero.style.display = '';
@@ -6619,7 +6623,7 @@ renderFavoritesSection();
 document.querySelectorAll('.sb-cat-label').forEach(label => {
   label.classList.add('collapsed'); // empiezan plegadas
   let el = label.nextElementSibling;
-  while(el && el.classList.contains('sb-item')){
+  while(el && !el.classList.contains('sb-cat-label')){
     el.style.display = 'none';
     el = el.nextElementSibling;
   }
@@ -6627,7 +6631,7 @@ document.querySelectorAll('.sb-cat-label').forEach(label => {
     const collapsing = !label.classList.contains('collapsed');
     label.classList.toggle('collapsed', collapsing);
     let sib = label.nextElementSibling;
-    while(sib && sib.classList.contains('sb-item')){
+    while(sib && !sib.classList.contains('sb-cat-label')){
       sib.style.display = collapsing ? 'none' : '';
       sib = sib.nextElementSibling;
     }
@@ -6641,13 +6645,23 @@ sbSearchInput.addEventListener('input', () => {
   let currentLabel = null;
   let currentCollapsed = false;
   let labelHasVisibleItem = false;
+  let currentSubLabel = null;
+  let subLabelHasVisibleItem = false;
 
   Array.from(nav.children).forEach(el => {
     if(el.classList.contains('sb-cat-label')){
+      if(currentSubLabel) currentSubLabel.style.display = subLabelHasVisibleItem ? '' : 'none';
+      currentSubLabel = null;
       if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
       currentLabel = el;
       currentCollapsed = el.classList.contains('collapsed');
       labelHasVisibleItem = false;
+    } else if(el.classList.contains('indic-cat-label')){
+      // sub-encabezado dentro de Indicadores (ej. "Piso de Mercado") — se oculta/muestra
+      // según si alguno de los items que le siguen coincide con la búsqueda
+      if(currentSubLabel) currentSubLabel.style.display = subLabelHasVisibleItem ? '' : 'none';
+      currentSubLabel = el;
+      subLabelHasVisibleItem = false;
     } else if(el.classList.contains('sb-item')){
       const label = el.querySelector('.sb-item-label');
       const text = label ? label.textContent.toLowerCase() : '';
@@ -6655,9 +6669,10 @@ sbSearchInput.addEventListener('input', () => {
       // si la categoría está plegada y no hay búsqueda activa, se queda oculta
       const shouldShow = match && !(currentCollapsed && query === '');
       el.style.display = shouldShow ? '' : 'none';
-      if(shouldShow) labelHasVisibleItem = true;
+      if(shouldShow){ labelHasVisibleItem = true; subLabelHasVisibleItem = true; }
     }
   });
+  if(currentSubLabel) currentSubLabel.style.display = subLabelHasVisibleItem ? '' : 'none';
   if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
 });
 
