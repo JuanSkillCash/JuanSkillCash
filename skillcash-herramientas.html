@@ -13452,6 +13452,26 @@ window.addEventListener('resize', () => {
    una fórmula FIJA en función del tiempo desde el lanzamiento de ETH (no una regresión ajustada
    a los datos), dibujada sobre el precio diario histórico completo de ETH. CryptoCompare da el
    historial gratis (a diferencia de CoinGecko, que topa el plan free en 365 días) */
+// fmtHalvingPrice (la que usan Rainbow/Halving/Pi Cycle) redondea a miles enteros — bien para
+// BTC, que se mueve entre centavos y $100K+, pero en el rango donde vive casi todo este gráfico
+// ($300-$5K) esa granularidad hace que precios bien distintos (ej. $1500 y $2000) se muestren
+// igual ("$2K"), lo que se ve como una marca de eje duplicada y un tooltip que parece "pegado"
+function fmtEthAxisPrice(v){
+  if(v >= 1000000) return '$' + (v / 1000000).toFixed(2) + 'M';
+  if(v >= 1000){
+    let s = (v / 1000).toFixed(v >= 10000 ? 1 : 2);
+    s = s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+    return '$' + s + 'K';
+  }
+  if(v >= 1) return '$' + Math.round(v);
+  return '$' + v.toFixed(v >= 0.01 ? 4 : 6);
+}
+// el tooltip del hover siempre muestra el precio exacto (sin abreviar a K) para que se note el
+// cambio real al mover el mouse, en vez de quedarse "pegado" en la misma etiqueta redondeada
+function fmtEthExactPrice(v){
+  if(v >= 1) return '$' + v.toLocaleString('en-US', { maximumFractionDigits: v >= 1000 ? 0 : 2 });
+  return '$' + v.toFixed(v >= 0.01 ? 4 : 6);
+}
 const ETH_LOGREG_PARAMS = { basePrice: 0.16, baseCoeff: 1.7, growthCoeff: 3.22, mainMult: 1.0, upperMult: 1.35, lowerMult: 0.7, offset: 0 };
 const ETH_LOGREG_START_MS = Date.UTC(2014, 11, 3); // 3 dic 2014 — misma fecha de inicio que trae el script original
 function ethLogRegPrice(tMs){
@@ -13555,10 +13575,18 @@ function renderEthLogRegChart(){
     lastTickY = y;
     return true;
   });
-  const yGridHtml = yTicks.map(t => `
+  // etiqueta repetida = insurance extra: si dos marcas consecutivas igual quedan con el mismo
+  // texto formateado (raro con el nuevo formateador, pero por si acaso), se descarta la segunda
+  let lastTickLabel = null;
+  const yGridHtml = yTicks.map(t => {
+    const label = fmtEthAxisPrice(t);
+    if(label === lastTickLabel) return '';
+    lastTickLabel = label;
+    return `
     <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
-  `).join('');
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>
+  `;
+  }).join('');
 
   const pathFor = arr => {
     let d = '';
@@ -13612,14 +13640,14 @@ function renderEthLogRegChart(){
     dateLabelId: 'ethlogregHoverDateLabel', dateBgId: 'ethlogregHoverDateBg', tooltipId: 'ethlogregTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USD</span>`,
+    tooltipHtml: i => `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USD</span>`,
   });
 
   statsEl.innerHTML = `
-    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(lastPoint.c)}</div></div>
-    <div class="res-card"><div class="r-label" style="color:#ff2f4f">Banda superior</div><div class="r-val">${fmtHalvingPrice(lastUpper)}</div></div>
-    <div class="res-card"><div class="r-label" style="color:#60a5fa">Banda central</div><div class="r-val">${fmtHalvingPrice(lastMain)}</div></div>
-    <div class="res-card"><div class="r-label" style="color:#2ecc71">Banda inferior</div><div class="r-val">${fmtHalvingPrice(lastLower)}</div></div>
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtEthExactPrice(lastPoint.c)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#ff2f4f">Banda superior</div><div class="r-val">${fmtEthExactPrice(lastUpper)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#60a5fa">Banda central</div><div class="r-val">${fmtEthExactPrice(lastMain)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#2ecc71">Banda inferior</div><div class="r-val">${fmtEthExactPrice(lastLower)}</div></div>
   `;
 }
 async function loadEthLogRegDetail(){
