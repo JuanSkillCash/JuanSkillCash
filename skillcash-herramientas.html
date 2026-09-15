@@ -137,6 +137,36 @@ button{font-family:inherit;color:inherit}
 .sb-item .fav-star{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
 .sb-item .fav-star:hover{transform:translateY(-50%) scale(1.15)}
 .sidebar.collapsed .sb-item .fav-star{display:none}
+
+/* ---- indicadores "curados" por Juan: borde dorado giratorio + cinta + punto en vivo ---- */
+@property --curated-spin{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+@keyframes curated-spin{ to{ --curated-spin:360deg; } }
+@keyframes curated-pulse{
+  0%{box-shadow:0 0 0 0 rgba(240,178,61,.55)}
+  70%{box-shadow:0 0 0 6px rgba(240,178,61,0)}
+  100%{box-shadow:0 0 0 0 rgba(240,178,61,0)}
+}
+.sb-item.curated,
+.sb-item.curated.active{
+  border:1px solid transparent;
+  overflow:hidden;
+  background:
+    linear-gradient(var(--card),var(--card)) padding-box,
+    conic-gradient(from var(--curated-spin,0deg), var(--gold), transparent 30%, transparent 70%, var(--gold)) border-box;
+  animation:curated-spin 3.5s linear infinite;
+}
+.curated-ribbon{
+  position:absolute;top:6px;right:-22px;width:80px;text-align:center;
+  transform:rotate(40deg);background:var(--gold);color:var(--bg);
+  font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.04em;padding:1.5px 0;
+  pointer-events:none;
+}
+.curated-live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;
+  margin:0 20px 0 auto;box-shadow:0 0 0 0 rgba(240,178,61,.6);animation:curated-pulse 2s ease-out infinite;
+}
+.sidebar.collapsed .curated-ribbon,
+.sidebar.collapsed .curated-live-dot{display:none}
 .tool-card-actions{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:2px}
 .tool-card-actions::after{content:'›';color:var(--muted);font-size:20px}
 
@@ -153,7 +183,6 @@ button{font-family:inherit;color:inherit}
 .sb-nav{display:flex;flex-direction:column;gap:4px;padding:0 10px}
 .indic-mobile-nav{display:none;flex-direction:column;gap:4px;padding:0 10px}
 .indic-cat-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:14px 10px 6px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.indic-cat-label-personal{color:var(--red)}
 .sidebar.indic-active .sb-search-wrap,
 .sidebar.indic-active .sb-section-label,
 .sidebar.indic-active .sb-nav{display:none}
@@ -344,25 +373,12 @@ button{font-family:inherit;color:inherit}
 .indic-guide-card-text{font-size:12.5px;color:var(--muted2);line-height:1.55}
 .indic-guide-card-link-hint{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:#60a5fa;text-align:right;margin-top:10px}
 .indic-guide-card-soon{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
-/* sección "Indicadores Personales" — acento rojo (la marca) para que se note de inmediato que
-   estos NO son los mismos indicadores genéricos que cualquier otro sitio cripto tiene */
 .indic-guide-divider{
   grid-column:1/-1;font-family:'Poppins',sans-serif;font-weight:800;font-size:13.5px;
   color:var(--white);padding:4px 0 2px;margin-top:2px;
   display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
 }
 .indic-guide-divider:first-child{margin-top:0}
-.indic-guide-divider-sub{font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:11.5px;color:var(--muted2)}
-.indic-guide-divider-personal{color:var(--red)}
-.indic-guide-divider-lock{font-size:12px}
-.indic-guide-card-personal{position:relative;border-color:rgba(255,47,79,.3);background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(255,47,79,.12),transparent 65%),#080c20}
-.indic-guide-card-personal:hover{border-color:rgba(255,47,79,.6)}
-.indic-guide-card-personal .indic-guide-card-link-hint{color:var(--red)}
-.indic-guide-card-badge{
-  position:absolute;top:14px;right:14px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;
-  letter-spacing:.04em;text-transform:uppercase;color:var(--red);border:1px solid rgba(255,47,79,.4);
-  border-radius:20px;padding:3px 8px;background:rgba(255,47,79,.08);
-}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
 .pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
@@ -1379,29 +1395,19 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
+      <div class="indic-cat-label">🔻 Piso de Mercado</div>
       <button class="sb-item" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
       </button>
       <button class="sb-item" data-indic-jump="ema200">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
       </button>
+      <div class="indic-cat-label">🔺 Techo de Mercado</div>
       <button class="sb-item" data-indic-jump="ciclosoporte">
         <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
       </button>
       <button class="sb-item" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
-      </button>
-      <button class="sb-item" data-indic-jump="btcxau">
-        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
-      </button>
-      <button class="sb-item" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
-      </button>
-      <button class="sb-item" data-indic-jump="whalebias">
-        <span class="sb-item-icon">🐋</span><span class="sb-item-label">Sesgo de Ballenas (Whale Bias)</span>
-      </button>
-      <button class="sb-item" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
       <button class="sb-item" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
@@ -1409,12 +1415,28 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="picycle">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
+      <div class="indic-cat-label">Sentimiento</div>
+      <button class="sb-item" data-indic-jump="fng">
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+      </button>
+      <button class="sb-item" data-indic-jump="whalebias">
+        <span class="sb-item-icon">🐋</span><span class="sb-item-label">Sesgo de Ballenas (Whale Bias)</span>
+      </button>
+      <div class="indic-cat-label">Ciclos</div>
+      <button class="sb-item" data-indic-jump="halving">
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+      </button>
+      <div class="indic-cat-label">Mercado</div>
       <button class="sb-item" data-indic-jump="cbpremium">
         <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button class="sb-item" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
       </button>
+      <button class="sb-item" data-indic-jump="btcxau">
+        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
+      </button>
+      <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item" data-indic-jump="domratio">
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
@@ -1536,21 +1558,25 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label indic-cat-label-personal">🔒 Personales</div>
+      <div class="indic-cat-label">🔻 Piso de Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
       </button>
+      <div class="indic-cat-label">🔺 Techo de Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
         <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
-        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
+        <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
@@ -1563,18 +1589,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
-        <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
-      </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
         <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
+        <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domratio">
@@ -1919,11 +1942,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="indic-tabs" id="indicGroupTabs">
         <button type="button" class="indic-tab active" data-group="guia">Guía</button>
         <button type="button" class="indic-tab" data-group="predicciones">Predicciones</button>
-        <button type="button" class="indic-tab" data-group="personal">🔒 Personales</button>
+        <button type="button" class="indic-tab" data-group="piso">🔻 Piso de Mercado</button>
+        <button type="button" class="indic-tab" data-group="techo">🔺 Techo de Mercado</button>
+        <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
-        <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
+        <button type="button" class="indic-tab" data-group="mercado">Mercado</button>
         <button type="button" class="indic-tab" data-group="dominancia">Dominancia</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
       </div>
@@ -1935,6 +1960,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="indic-guide-intro">
             <div class="indic-guide-title">Bienvenido a Indicadores de Mercado</div>
             <p class="indic-guide-text">Aquí vas a encontrar señales para entender en qué momento del mercado estamos — organizadas por pestañas para que sea rápido encontrar la que buscas. Esto va a ir creciendo con el tiempo. Por ahora, así está organizado:</p>
+            <p class="indic-guide-text">Un ejemplo de cómo se usan juntos: si el <b>RSI Mensual</b> está en zona alta, el <b>Pi Cycle</b> está por cruzar y el <b>Rainbow Chart</b> ya está en la banda roja, esas tres señales de techo prendidas al mismo tiempo históricamente han coincidido con la zona de techo de ciclo — no significa "vendé ya", pero sí que conviene estar más atento. Al revés, con señales de piso encendidas juntas, ha coincidido con zonas de acumulación.</p>
           </div>
           <div class="indic-guide-grid">
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
@@ -1944,62 +1970,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
-            <div class="indic-guide-divider indic-guide-divider-personal">
-              <span class="indic-guide-divider-lock">🔒</span> Indicadores Personales de SkillCash
-              <span class="indic-guide-divider-sub">Los que yo mismo sigo y reviso — los seguimos afinando para que den señales cada vez más exactas, todavía en desarrollo</span>
-            </div>
-            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="pisomercado">
-              <span class="indic-guide-card-badge">Exclusivo</span>
+            <div class="indic-guide-divider">🔻 Piso de Mercado</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
               <div class="indic-guide-icon">⚓</div>
               <div class="indic-guide-card-title">Pulso de Fondo</div>
               <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="ema200">
-              <span class="indic-guide-card-badge">Exclusivo</span>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
               <div class="indic-guide-icon">📉</div>
               <div class="indic-guide-card-title">Medias Móviles 200</div>
               <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="ciclosoporte">
-              <span class="indic-guide-card-badge">Exclusivo</span>
+
+            <div class="indic-guide-divider">🔺 Techo de Mercado</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
               <div class="indic-guide-icon">🪜</div>
               <div class="indic-guide-card-title">Techo Anterior</div>
               <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="rsimensual">
-              <span class="indic-guide-card-badge">Exclusivo</span>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimensual">
               <div class="indic-guide-icon">📶</div>
               <div class="indic-guide-card-title">RSI Mensual</div>
               <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link indic-guide-card-personal" data-indic-jump="btcxau">
-              <div class="indic-guide-icon">🥇</div>
-              <div class="indic-guide-card-title">BTC/XAU</div>
-              <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin. No es un indicador propio, pero lo sigo de cerca.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Indicadores de Mercado</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
-              <div class="indic-guide-icon">😐</div>
-              <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
-              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
-              <div class="indic-guide-icon">🐋</div>
-              <div class="indic-guide-card-title">Sesgo de Ballenas (Whale Bias)</div>
-              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
-              <div class="indic-guide-icon">⏳</div>
-              <div class="indic-guide-card-title">Ciclos de Halving</div>
-              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
@@ -2014,6 +2009,30 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+
+            <div class="indic-guide-divider">Sentimiento</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
+              <div class="indic-guide-icon">😐</div>
+              <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
+              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
+              <div class="indic-guide-icon">🐋</div>
+              <div class="indic-guide-card-title">Sesgo de Ballenas (Whale Bias)</div>
+              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">Ciclos</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
+              <div class="indic-guide-icon">⏳</div>
+              <div class="indic-guide-card-title">Ciclos de Halving</div>
+              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">Mercado</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
               <div class="indic-guide-icon">♾️</div>
               <div class="indic-guide-card-title">Coinbase Premium</div>
@@ -2026,6 +2045,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcxau">
+              <div class="indic-guide-icon">🥇</div>
+              <div class="indic-guide-card-title">BTC/XAU</div>
+              <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
             <div class="indic-guide-divider">Dominancia</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domratio">
               <div class="indic-guide-icon">🔄</div>
@@ -5615,16 +5641,17 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }],
+  piso: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }],
+  techo: [{ id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas (Whale Bias)' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }],
   mineria: [],
   macro: [],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas (Whale Bias)' }],
-  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }],
+  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
   onchain: [],
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'BTC+ETH+USDT+USDC' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }],
-  personal: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'btcxau', label: 'BTC/XAU' }]
 };
-const INDIC_ID_TO_GROUP = { fng: 'sentimiento', halving: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', pisomercado: 'personal', ema200: 'personal', ciclosoporte: 'personal', rsimensual: 'personal', btcxau: 'personal', cbpremium: 'mercado', treasuries: 'mercado', whalebias: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
+const INDIC_ID_TO_GROUP = { pisomercado: 'piso', ema200: 'piso', ciclosoporte: 'techo', rsimensual: 'techo', rainbow: 'techo', picycle: 'techo', fng: 'sentimiento', whalebias: 'sentimiento', halving: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -6491,6 +6518,12 @@ document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
   actions.appendChild(createFavStar(card.dataset.tool));
   card.appendChild(actions);
 });
+// cada indicador (dentro de la herramienta "Indicadores de Mercado") también se puede marcar
+// como favorito por separado, con la misma estrellita — usa su propio id (ej. 'domall') como
+// clave, que no choca con ningún data-tool porque son namespaces separados
+document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
+  item.appendChild(createFavStar(item.dataset.indicJump));
+});
 
 /* ---- marcar en el menú lateral y en las pastillas de celular cuál herramienta está abierta ahora mismo ----
    ojo: el selector debe ser específico (no '[data-tool]' a secas) porque el .modal-overlay de cada
@@ -6542,11 +6575,16 @@ function renderFavoritesSection(){
   grid.className = 'tool-grid';
 
   favs.forEach(tool => {
+    // un favorito puede ser una herramienta completa (.tool-card) o un indicador individual
+    // (.indic-guide-card, dentro de la herramienta "Indicadores de Mercado") — cada uno tiene
+    // su propia tarjeta de origen de la que se clonan ícono/título/texto
     const original = document.querySelector('.tool-card[data-tool="' + tool + '"]');
-    if(!original) return;
-    const icon = original.querySelector('.tool-icon');
-    const title = original.querySelector('h3');
-    const desc = original.querySelector('p');
+    const guideCard = original ? null : document.querySelector('.indic-guide-card[data-indic-jump="' + tool + '"]');
+    const source = original || guideCard;
+    if(!source) return;
+    const icon = source.querySelector(original ? '.tool-icon' : '.indic-guide-icon');
+    const title = source.querySelector(original ? 'h3' : '.indic-guide-card-title');
+    const desc = source.querySelector(original ? 'p' : '.indic-guide-card-text');
     if(!icon || !title || !desc) return;
 
     const clone = document.createElement('button');
@@ -6560,7 +6598,10 @@ function renderFavoritesSection(){
     actions.className = 'tool-card-actions';
     actions.appendChild(createFavStar(tool));
     clone.appendChild(actions);
-    clone.addEventListener('click', () => original.click());
+    clone.addEventListener('click', () => {
+      if(original) original.click();
+      else { showCategoryDetail('indicadores'); jumpToIndicator(tool); }
+    });
     grid.appendChild(clone);
   });
 
