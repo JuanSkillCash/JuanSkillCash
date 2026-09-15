@@ -2507,7 +2507,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 📍 Cada línea roja es un <b>VWAP anclado</b> (igual al indicador de TradingView): desde su fecha de anclaje, acumula precio típico (máximo+mínimo+cierre ÷ 3) ponderado por el volumen real de cada vela, dividido entre el volumen acumulado — el precio promedio real que pagó quien fue comprando desde ese día. Antes de la fecha de anclaje, la línea no existe todavía.<br>
                 🔴 Rojo intenso: anclado el <b>10 de enero de 2018</b>. Rojo claro: anclado el <b>15 de diciembre de 2018</b>.<br>
-                📊 El eje vertical usa escala logarítmica, igual que el resto de gráficos de precio del sitio.<br>
+                📊 El eje vertical usa escala <b>lineal</b> (no logarítmica como el resto de gráficos del sitio) desde $0 — así el tramo reciente, que es el que importa para el VWAP, se ve grande y claro; lo viejo y barato de 2015-2017 se ve como una rayita pegada abajo, que es justamente cómo se ve en TradingView.<br>
+                🧹 A los días con un salto de volumen anómalo (errores o cambios en las fuentes de datos) se les recorta el peso para que no tuerzan la curva con un escalón artificial — un VWAP acumulado de verdad nunca da saltos bruscos.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -13755,19 +13756,52 @@ const ETH_VWAP_ANCHORS = [
   { id: 'a1', label: '10 ene 2018', ms: Date.UTC(2018, 0, 10), color: '#ff2f4f' },
   { id: 'a2', label: '15 dic 2018', ms: Date.UTC(2018, 11, 15), color: '#ff6b81' },
 ];
-function computeAnchoredVwap(points, anchorMs){
+// el volumen histórico gratis de ETH (CryptoCompare) trae días sueltos con saltos de escala —
+// exchanges que entran/salen de su agregado, errores de reporte — y como el VWAP pondera cada
+// día por su volumen, un solo día así puede torcer la curva entera con un "escalón" que un VWAP
+// acumulado de verdad nunca tiene (matemáticamente se vuelve MÁS resistente al cambio con el
+// tiempo, nunca da saltos). Se recorta cualquier día cuyo volumen se dispare muy por encima de
+// la mediana de sus ~60 días vecinos, para que ese día pese como un día "normal" de esa época en
+// vez de dominar el acumulado
+function clipVolumeOutliers(points, windowDays, capMult){
+  const n = points.length;
+  const vols = points.map(p => p.v > 0 ? p.v : 0);
+  const half = Math.floor(windowDays / 2);
+  const out = new Array(n);
+  for(let i = 0; i < n; i++){
+    const lo = Math.max(0, i - half), hi = Math.min(n, i + half + 1);
+    const windowVals = vols.slice(lo, hi).filter(v => v > 0).sort((a, b) => a - b);
+    const median = windowVals.length ? windowVals[Math.floor(windowVals.length / 2)] : 0;
+    const cap = median * capMult;
+    out[i] = (cap > 0 && vols[i] > cap) ? cap : vols[i];
+  }
+  return out;
+}
+function computeAnchoredVwap(points, anchorMs, vols){
   const out = new Array(points.length).fill(null);
   let cumPV = 0, cumV = 0;
   for(let i = 0; i < points.length; i++){
     const p = points[i];
     if(p.t < anchorMs) continue;
     const typical = (p.h + p.l + p.c) / 3;
-    const vol = p.v > 0 ? p.v : 0;
+    const vol = vols[i] > 0 ? vols[i] : 0;
     cumPV += typical * vol;
     cumV += vol;
     out[i] = cumV > 0 ? cumPV / cumV : typical;
   }
   return out;
+}
+// marcas "1-2-5" en escala LINEAL (no log) para el eje del VWAP anclado
+function niceLinearTicks(minV, maxV){
+  const range = (maxV - minV) || 1;
+  const roughStep = range / 6;
+  const mag = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const norm = roughStep / mag;
+  const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+  const ticks = [];
+  let guard = 0;
+  for(let v = Math.ceil(minV / step) * step; v <= maxV && guard < 40; v += step, guard++) ticks.push(v);
+  return ticks;
 }
 const ETH_VWAP_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ethVwapActiveRange = 'todo';
@@ -13791,7 +13825,8 @@ function renderEthVwapChart(){
 
   // el VWAP se calcula SIEMPRE sobre el historial completo (desde su fecha de anclaje real) —
   // el filtro de rango solo hace zoom visual, igual que en Bandas Log de ETH
-  const vwapByAnchor = ETH_VWAP_ANCHORS.map(a => ({ ...a, series: computeAnchoredVwap(allPoints, a.ms) }));
+  const cleanVols = clipVolumeOutliers(allPoints, 60, 6);
+  const vwapByAnchor = ETH_VWAP_ANCHORS.map(a => ({ ...a, series: computeAnchoredVwap(allPoints, a.ms, cleanVols) }));
 
   const fullEndMs = allPoints[allPoints.length - 1].t;
   const rangeYears = ETH_VWAP_RANGE_YEARS[ethVwapActiveRange];
@@ -13808,9 +13843,14 @@ function renderEthVwapChart(){
   const prices = points.map(p => p.c);
   const vwapVals = vwapSeries.flatMap(a => a.series.filter(v => v != null));
   const allVals = [...prices, ...vwapVals].filter(v => v > 0 && isFinite(v));
-  const dataMinPrice = Math.min(...allVals), dataMaxPrice = Math.max(...allVals);
-  const minPrice = dataMinPrice / Math.pow(10, 0.12);
-  const maxPrice = dataMaxPrice * Math.pow(10, 0.12);
+  const dataMaxPrice = Math.max(...allVals);
+  // escala LINEAL (no logarítmica) arrancando en 0 — igual que el VWAP anclado real de
+  // TradingView. Con log, los primeros años de ETH (centavos) ocupan tanto espacio visual como
+  // los últimos años (miles de dólares), lo que hace que el tramo reciente —el que de verdad
+  // importa para ver el VWAP— se vea aplastado. Con escala lineal desde 0, lo viejo y barato
+  // correctamente se ve como una rayita pegada al piso, y el tramo reciente se ve grande y claro
+  const minPrice = 0;
+  const maxPrice = dataMaxPrice * 1.08;
 
   const isMobileChart = window.innerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 420 : 440;
@@ -13822,13 +13862,12 @@ function renderEthVwapChart(){
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
 
-  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
-  const logRange = (logMax - logMin) || 1;
+  const priceRange = (maxPrice - minPrice) || 1;
   const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
-  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+  const yFor = p => marginTop + drawH - ((p - minPrice) / priceRange) * drawH;
 
   let lastTickY = -Infinity;
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+  const yTicks = niceLinearTicks(minPrice, maxPrice).filter(t => {
     const y = yFor(t);
     if(y <= marginTop + 2 || y >= marginTop + drawH - 4) return false;
     if(Math.abs(y - lastTickY) < 12) return false;
