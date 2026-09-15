@@ -2466,7 +2466,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">VWAP Anclado de Ethereum</h2>
-                <p class="calc-sub">Precio completo de ETH desde su lanzamiento, con dos líneas de VWAP (precio promedio real ponderado por volumen) ancladas el 10 de enero de 2018 y el 15 de diciembre de 2018.</p>
+                <p class="calc-sub">Precio de ETH/USDT en Binance desde el 17 de agosto de 2017 (cuando Binance empezó a listar el par), con dos líneas de VWAP (precio promedio real ponderado por volumen) ancladas el 10 de enero de 2018 y el 15 de diciembre de 2018.</p>
               </div>
 
               <div class="tf-pill-row" id="ethvwapRangeFilter">
@@ -2480,7 +2480,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="ethvwapLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Trayendo el precio y volumen diario completo de ETH desde su lanzamiento.</div>
+                  <div class="indic-placeholder-text">Trayendo el precio y volumen diario de ETH/USDT en Binance desde agosto de 2017.</div>
                 </div>
                 <div class="indic-chart-soon" id="ethvwapError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -2494,7 +2494,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 📍 Cada línea roja es un <b>VWAP anclado</b> (igual al indicador de TradingView): desde su fecha de anclaje, acumula precio típico (máximo+mínimo+cierre ÷ 3) ponderado por el volumen real de cada vela, dividido entre el volumen acumulado — el precio promedio real que pagó quien fue comprando desde ese día. Antes de la fecha de anclaje, la línea no existe todavía.<br>
                 🔴 Rojo intenso: anclado el <b>10 de enero de 2018</b>. Rojo claro: anclado el <b>15 de diciembre de 2018</b>.<br>
-                📊 El eje vertical usa escala <b>lineal</b> (no logarítmica como el resto de gráficos del sitio) desde $0 — así el tramo reciente, que es el que importa para el VWAP, se ve grande y claro; lo viejo y barato de 2015-2017 se ve como una rayita pegada abajo, que es justamente cómo se ve en TradingView.<br>
+                💱 Datos de <b>Binance, par ETH/USDT</b> (no un promedio de varias exchanges) — arranca el 17 de agosto de 2017 porque ahí fue que Binance empezó a listar ese par, no hay nada de antes.<br>
+                📊 El eje vertical usa escala <b>lineal</b> (no logarítmica como el resto de gráficos del sitio) desde $0, igual que en TradingView.<br>
                 🧹 A los días con un salto de volumen anómalo (errores o cambios en las fuentes de datos) se les recorta el peso para que no tuerzan la curva con un escalón artificial — un VWAP acumulado de verdad nunca da saltos bruscos.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
@@ -13737,12 +13738,39 @@ window.addEventListener('resize', () => {
 });
 
 /* ---- VWAP Anclado de ETH: dos líneas de VWAP (precio promedio ponderado por volumen desde un
-   punto fijo) ancladas por el usuario en fechas concretas, sobre el mismo historial diario
-   completo de ETH — igual que el "Anchored VWAP" de TradingView ---- */
+   punto fijo) ancladas por el usuario en fechas concretas — igual que el "Anchored VWAP" de
+   TradingView. A diferencia de Bandas Log de ETH (que usa el agregado CCCAGG de varias
+   exchanges desde 2015), este gráfico pide el historial de UN SOLO exchange (Binance, par
+   ETH/USDT) — el mismo par que el usuario compara contra TradingView — y arranca el 17 de
+   agosto de 2017, que es cuando Binance empezó a listar ese par (no hay nada antes ahí) */
+const ETH_VWAP_DATA_START_MS = Date.UTC(2017, 7, 17);
 const ETH_VWAP_ANCHORS = [
   { id: 'a1', label: '10 ene 2018', ms: Date.UTC(2018, 0, 10), color: '#ff2f4f' },
   { id: 'a2', label: '15 dic 2018', ms: Date.UTC(2018, 11, 15), color: '#ff6b81' },
 ];
+let ethVwapHistory = null;
+async function fetchEthVwapHistory(){
+  const points = [];
+  let toTs = Math.floor(Date.now() / 1000);
+  for(let i = 0; i < 4; i++){
+    const url = ccUrl('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=USDT&e=Binance&limit=2000&toTs=' + toTs);
+    const res = await fetch(url);
+    const data = await res.json();
+    const batch = data && data.Data && data.Data.Data;
+    if(!batch || batch.length === 0) break;
+    const valid = batch.filter(d => d.close > 0 && d.time * 1000 >= ETH_VWAP_DATA_START_MS);
+    points.unshift(...valid.map(d => ({ t: d.time * 1000, o: d.open, h: d.high, l: d.low, c: d.close, v: d.volumefrom || 0 })));
+    const earliest = batch[0].time;
+    if(batch.length < 2000 || earliest * 1000 <= ETH_VWAP_DATA_START_MS) break;
+    toTs = earliest - 86400;
+  }
+  const seen = new Set();
+  ethVwapHistory = points.filter(p => {
+    if(seen.has(p.t)) return false;
+    seen.add(p.t);
+    return true;
+  }).sort((a, b) => a.t - b.t);
+}
 // el volumen histórico gratis de ETH (CryptoCompare) trae días sueltos con saltos de escala —
 // exchanges que entran/salen de su agregado, errores de reporte — y como el VWAP pondera cada
 // día por su volumen, un solo día así puede torcer la curva entera con un "escalón" que un VWAP
@@ -13797,7 +13825,7 @@ function renderEthVwapChart(){
   const errorEl = document.getElementById('ethvwapError');
   const wrap = document.getElementById('ethvwapChartWrap');
   const statsEl = document.getElementById('ethvwapStats');
-  const allPoints = ethLogRegHistory;
+  const allPoints = ethVwapHistory;
   if(!allPoints || allPoints.length < 30){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
@@ -13927,7 +13955,7 @@ function renderEthVwapChart(){
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
     tooltipHtml: i => {
-      let html = `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USD</span>`;
+      let html = `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USDT · Binance</span>`;
       vwapSeries.forEach(a => {
         const v = a.series[i];
         if(v != null) html += `<br><span style="color:${a.color}">VWAP ${a.label}: ${fmtEthExactPrice(v)}</span>`;
@@ -13944,7 +13972,7 @@ function renderEthVwapChart(){
   statsEl.innerHTML = statsHtml;
 }
 async function loadEthVwapDetail(){
-  try{ await ensureEthDailyHistoryLoaded(); } catch(err){ /* renderEthVwapChart muestra el estado de error si no hay datos */ }
+  try{ await fetchEthVwapHistory(); } catch(err){ /* renderEthVwapChart muestra el estado de error si no hay datos */ }
   renderEthVwapChart();
 }
 let ethVwapLoadedOnce = false;
