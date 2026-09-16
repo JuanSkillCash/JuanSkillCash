@@ -14080,7 +14080,11 @@ function renderEthVwapChart(){
       started = true;
     });
     if(!d) return '';
-    return `<path d="${d.trim()}" fill="none" stroke="${a.color}" stroke-width="1.8" stroke-linecap="round"/>`;
+    // grosor de línea escalado igual que la línea de precio: sin esto, en el viewBox angosto de
+    // celular (420 vs 1100) el mismo stroke-width de escritorio se ve proporcionalmente mucho más
+    // grueso y las dos líneas de VWAP (anclajes cercanos entre sí en el tiempo) terminan pegadas,
+    // viéndose como una sola banda en vez de dos líneas distinguibles
+    return `<path d="${d.trim()}" fill="none" stroke="${a.color}" stroke-width="${isMobileChart ? 1.1 : 1.8}" stroke-linecap="round"/>`;
   }).join('');
 
   const lastPoint = points[points.length - 1];
@@ -14403,9 +14407,35 @@ async function withRetry(fn, attempts, baseDelayMs){
   throw lastErr;
 }
 async function fetchWeeklyBtcOhlc(){
-  const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=1000');
-  const rows = await res.json();
-  return rows.map(r => ({ t: r[6], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }));
+  try{
+    const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=1000');
+    const rows = await res.json();
+    if(!Array.isArray(rows)) throw new Error('binance http ' + res.status + ' (' + (rows && rows.msg || 'sin datos') + ')');
+    return rows.map(r => ({ t: r[6], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }));
+  } catch(err){
+    // Binance bloquea el acceso desde ciertos países/operadores móviles (a veces distinto de la
+    // red wifi del mismo usuario) y devuelve un objeto de error en vez de un arreglo de velas — sin
+    // este respaldo, Pulso de Fondo se quedaba sin poder cargar nunca en esas redes mientras el
+    // resto del sitio (que usa Coin Metrics/blockchain.info) sí cargaba con normalidad. Se cae al
+    // mismo historial diario de precio que ya usa Ciclos de Halving, aproximando las velas
+    // semanales con los cierres diarios (sin máximo/mínimo intradía real, pero suficiente para el
+    // Canal de Keltner)
+    const daily = await fetchHalvingHistory();
+    if(!daily || !daily.length) throw err;
+    return buildWeeklyOhlcFromDailyCloses(daily);
+  }
+}
+function buildWeeklyOhlcFromDailyCloses(daily){
+  const buckets = new Map();
+  daily.forEach(p => {
+    const key = isoWeekKeyMs(p.t);
+    if(!buckets.has(key)) buckets.set(key, { t: key, o: p.c, h: p.c, l: p.c, c: p.c });
+    const b = buckets.get(key);
+    b.h = Math.max(b.h, p.c);
+    b.l = Math.min(b.l, p.c);
+    b.c = p.c;
+  });
+  return [...buckets.values()].sort((a, b) => a.t - b.t);
 }
 async function fetchBlockchainInfoChart(chartName){
   const res = await fetch('https://api.blockchain.info/charts/' + chartName + '?timespan=all&format=json&cors=true');
