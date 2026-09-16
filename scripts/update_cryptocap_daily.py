@@ -40,6 +40,7 @@ SYMBOLS = [
     "OTHERS",
     "BTC",
     "ETH",
+    "NEAR",
     "BTC.D",
     "ETH.D",
     "USDC.D",

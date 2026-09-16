@@ -16137,40 +16137,11 @@ async function fetchEthVsAltRealHistory(){
   }
   return ethVsAltRealPromise;
 }
-// precio diario real de NEAR (CryptoCompare CCCAGG) — NEAR no es un índice CRYPTOCAP, así que
-// para "Valoración Relativa NEAR vs Altcoins" se usa su precio spot en vez de un market cap archivado
-let nearPriceHistory = null, nearPriceLoadPromise = null;
-async function fetchNearPriceHistory(){
-  if(nearPriceHistory) return nearPriceHistory;
-  if(!nearPriceLoadPromise){
-    nearPriceLoadPromise = (async () => {
-      const points = [];
-      let toTs = Math.floor(Date.now() / 1000);
-      for(let i = 0; i < 4; i++){
-        const url = ccUrl('https://min-api.cryptocompare.com/data/v2/histoday?fsym=NEAR&tsym=USD&limit=2000&toTs=' + toTs);
-        const res = await fetch(url);
-        const data = await res.json();
-        const batch = data && data.Data && data.Data.Data;
-        if(!batch || batch.length === 0) break;
-        const valid = batch.filter(d => d.close > 0);
-        points.unshift(...valid.map(d => ({ t: d.time * 1000, c: d.close })));
-        const earliest = batch[0].time;
-        if(batch.length < 2000) break;
-        toTs = earliest - 86400;
-      }
-      const seen = new Set();
-      nearPriceHistory = points.filter(p => {
-        if(seen.has(p.t)) return false;
-        seen.add(p.t);
-        return true;
-      }).sort((a, b) => a.t - b.t);
-      return nearPriceHistory;
-    })();
-  }
-  return nearPriceLoadPromise;
-}
-// Valoración Relativa NEAR vs Altcoins: (TOTAL3 − USDT) ÷ NEAR, la misma idea que ethVsAlt pero con el
-// precio spot de NEAR en el denominador en vez del market cap de ETH
+// Valoración Relativa NEAR vs Altcoins: (TOTAL3 − USDT) ÷ NEAR — igual que la de ETH, dividiendo
+// por el market cap de NEAR (no su precio: dividir una cifra en dólares del tamaño de todo el
+// mercado de altcoins entre un precio de unos pocos dólares da un número absurdamente grande y
+// sin sentido — el market cap de NEAR está en la misma unidad que el resto, así que el ratio da
+// una escala normal, igual a la que se ve en un gráfico real)
 let nearVsAltRealSeries = null, nearVsAltRealPromise = null;
 async function fetchNearVsAltRealHistory(){
   if(nearVsAltRealSeries) return nearVsAltRealSeries;
@@ -16179,13 +16150,13 @@ async function fetchNearVsAltRealHistory(){
       fetchCryptocapSeries('CRYPTOCAP:TOTAL3'),
       fetchCryptocapSeries('CRYPTOCAP:TOTAL'),
       fetchCryptocapSeries('CRYPTOCAP:USDT.D'),
-      fetchNearPriceHistory(),
-    ]).then(([total3, total, usdtD, near]) => {
-      nearVsAltRealSeries = alignSeriesByDay([total3, total, usdtD, near])
+      fetchCryptocapSeries('CRYPTOCAP:NEAR'),
+    ]).then(([total3, total, usdtD, nearCap]) => {
+      nearVsAltRealSeries = alignSeriesByDay([total3, total, usdtD, nearCap])
         .map(r => {
-          const [t3, tot, usdtPct, nearPrice] = r.vals;
+          const [t3, tot, usdtPct, near] = r.vals;
           const usdt = (usdtPct / 100) * tot;
-          return nearPrice > 0 ? { t: r.t, v: (t3 - usdt) / nearPrice } : null;
+          return near > 0 ? { t: r.t, v: (t3 - usdt) / near } : null;
         })
         .filter(Boolean);
       return nearVsAltRealSeries;
