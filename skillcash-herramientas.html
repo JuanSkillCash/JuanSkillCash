@@ -1451,7 +1451,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
       <button class="sb-item" data-indic-jump="domall">
-        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Marea de Altcoins</span>
+        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión Cripto</span>
       </button>
       <button class="sb-item" data-indic-jump="dombtc">
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
@@ -1622,7 +1622,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domall">
-        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Marea de Altcoins</span>
+        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión Cripto</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dombtc">
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
@@ -2093,9 +2093,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
-              <div class="indic-guide-icon">🌊</div>
-              <div class="indic-guide-card-title">Marea de Altcoins</div>
-              <div class="indic-guide-card-text">La suma de la dominancia de BTC+ETH+USDT+USDC — cuando sube, las altcoins se ahogan; cuando baja, suben con la marea.</div>
+              <div class="indic-guide-icon">🗜️</div>
+              <div class="indic-guide-card-title">Descompresión Cripto</div>
+              <div class="indic-guide-card-text">La suma de la dominancia de BTC+ETH+USDT+USDC — cuando sube, las altcoins quedan comprimidas; cuando baja, se descomprimen y suben.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
@@ -2921,7 +2921,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Marea de Altcoins</h2>
+                <h2 class="calc-title">Descompresión Cripto</h2>
               </div>
 
               <div class="tf-pill-row" id="domallRangeFilter">
@@ -5826,7 +5826,7 @@ const INDIC_GROUPS = {
   macro: [],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
   onchain: [],
-  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Marea de Altcoins' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }],
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }],
 };
 const INDIC_ID_TO_GROUP = { pisomercado: 'pisotecho', ema200: 'pisotecho', ciclosoporte: 'pisotecho', rsimensual: 'pisotecho', rainbow: 'pisotecho', picycle: 'pisotecho', ethlogreg: 'pisotecho', ethvwap: 'pisotecho', total2others: 'pisotecho', fng: 'sentimiento', whalebias: 'sentimiento', halving: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
@@ -15344,7 +15344,7 @@ const DOM_LIVE_DEFS = {
   domusdt: { label: 'Dominancia USDT', keys: ['usdt'] },
   // gauge: umbrales fijos que el usuario dio para el anillo (venta 61-63%, compra 81-83%),
   // con min/max con margen extra para que el anillo se vea "lejos" cuando de verdad lo está
-  domall: { label: 'Marea de Altcoins', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true,
+  domall: { label: 'Descompresión Cripto', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true,
     gauge: { min: 55, max: 90, sellFrom: 63, sellTo: 65, buyFrom: 81, buyTo: 83 } },
 };
 const DOM_LIVE_LABELS = { btc: 'BTC', eth: 'ETH', usdt: 'USDT', usdc: 'USDC' };
