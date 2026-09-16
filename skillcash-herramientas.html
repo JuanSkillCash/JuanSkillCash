@@ -2572,6 +2572,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="total2ChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="total2DateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="total2Legend" style="display:none;margin:12px 0"></div>
               <div class="chart-stats-grid" id="total2Stats" style="display:none"></div>
@@ -2616,6 +2617,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="othersChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="othersDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="othersLegend" style="display:none;margin:12px 0"></div>
               <div class="chart-stats-grid" id="othersStats" style="display:none"></div>
@@ -15927,6 +15929,8 @@ async function fetchMcapEmaHistory(key){
 }
 const MCAP_EMA_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 const mcapEmaActiveRanges = { total2: 'todo', others: 'todo' };
+const mcapEmaCustomRanges = {}; // { [key]: {fromMs, toMs} } — arrastrar el slider gana sobre los botones fijos
+const mcapEmaSliders = {};
 function renderMcapEmaChart(key){
   const loadingEl = document.getElementById(key + 'Loading');
   const errorEl = document.getElementById(key + 'Error');
@@ -15949,10 +15953,27 @@ function renderMcapEmaChart(key){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const fullEndMs = allWeeks[allWeeks.length - 1];
-  const rangeYears = MCAP_EMA_RANGE_YEARS[mcapEmaActiveRanges[key]];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allWeeks[0];
-  const weeks = allWeeks.filter(t => t >= cutoffMs);
+  const fullStartMs = allWeeks[0], fullEndMs = allWeeks[allWeeks.length - 1];
+  let fromMs, toMs;
+  if(mcapEmaCustomRanges[key]){
+    fromMs = mcapEmaCustomRanges[key].fromMs;
+    toMs = mcapEmaCustomRanges[key].toMs;
+  } else {
+    const rangeYears = MCAP_EMA_RANGE_YEARS[mcapEmaActiveRanges[key]];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const weeks = allWeeks.filter(t => t >= fromMs && t <= toMs);
+  if(!weeks.length) return;
+
+  if(mcapEmaSliders[key]) mcapEmaSliders[key].setRange(fromMs, toMs);
+  else{
+    mcapEmaSliders[key] = createDateRangeSlider(key + 'DateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      mcapEmaCustomRanges[key] = { fromMs: f, toMs: t };
+      document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderMcapEmaChart(key);
+    });
+  }
 
   const startMs = weeks[0], endMs = weeks[weeks.length - 1];
   const spanMs = (endMs - startMs) || 1;
@@ -16065,6 +16086,7 @@ window.addEventListener('resize', () => {
       document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       mcapEmaActiveRanges[key] = btn.dataset.range;
+      delete mcapEmaCustomRanges[key];
       renderMcapEmaChart(key);
     });
   });
