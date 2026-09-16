@@ -12790,6 +12790,30 @@ function fngRecommendationText(val){
 
 let fngCachedData = null; // guarda los 370 días ya traídos, para no pedirle de nuevo a la API al cambiar de rango
 
+// histórico del CMC Fear and Greed Index (CoinMarketCap), respaldado día a día en Supabase por
+// update_cmc_fng_daily.py — no se puede pedir directo desde el navegador porque la API de CMC
+// exige una llave secreta. Se usa para "pisar" con el valor de CMC (el más reconocido) los días
+// que ya tiene calculados; los días más viejos que CMC no cubre siguen viniendo de alternative.me
+let cmcFngHistoryCache = null;
+async function fetchCmcFngHistory(){
+  if(cmcFngHistoryCache) return cmcFngHistoryCache;
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await sbClient
+      .from('cmc_fng_history')
+      .select('day,value,value_classification')
+      .order('day', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  cmcFngHistoryCache = rows;
+  return rows;
+}
+
 function fngZoneColor(v){
   if(v <= 24) return '#ff2f4f';
   if(v <= 44) return '#f0793d';
@@ -12997,8 +13021,26 @@ async function loadFngDetail(){
     // febrero de 2018, así que esto trae todos los días desde entonces en una sola petición
     const res = await fetch('https://api.alternative.me/fng/?limit=0');
     const json = await res.json();
-    const data = json.data;
-    if(!data || !data.length) throw new Error('sin datos');
+    const altData = json.data;
+    if(!altData || !altData.length) throw new Error('sin datos');
+
+    // se pisa con el valor de CoinMarketCap los días que ya tiene calculados en Supabase — si
+    // por lo que sea no se puede cargar (aún no hay respaldo, falla la conexión), se sigue
+    // mostrando alternative.me solo, como venía funcionando antes
+    let data = altData;
+    try{
+      const cmcRows = await fetchCmcFngHistory();
+      if(cmcRows.length){
+        const cmcByDay = new Map(cmcRows.map(r => [r.day, r]));
+        data = altData.map(entry => {
+          const day = new Date(parseInt(entry.timestamp, 10) * 1000).toISOString().slice(0, 10);
+          const cmc = cmcByDay.get(day);
+          if(!cmc) return entry;
+          return { timestamp: entry.timestamp, value: String(cmc.value), value_classification: cmc.value_classification };
+        });
+      }
+    } catch(e){ console.error('No se pudo cargar el histórico de CoinMarketCap:', e); }
+
     fngCachedData = data;
 
     // viene del más nuevo al más viejo
@@ -17188,12 +17230,27 @@ async function loadFearGreedIndex(){
   const classEl2 = document.getElementById('fngClass2');
   const markerEl2 = document.getElementById('fngMarker2');
   try{
-    const res = await fetch('https://api.alternative.me/fng/?limit=1');
-    const json = await res.json();
-    const entry = json.data && json.data[0];
-    if(!entry) throw new Error('sin datos');
-    const val = parseInt(entry.value, 10);
-    const classEs = FNG_LABELS_ES[entry.value_classification] || entry.value_classification;
+    // se prefiere el valor de CoinMarketCap (el más reconocido) ya respaldado en Supabase para
+    // hoy — si el robot diario todavía no ha corrido hoy, se cae de vuelta a alternative.me
+    let val, classEs;
+    const todayUtc = new Date().toISOString().slice(0, 10);
+    let cmcToday = null;
+    try{
+      const { data } = await sbClient.from('cmc_fng_history').select('value,value_classification').eq('day', todayUtc).maybeSingle();
+      cmcToday = data;
+    } catch(e){ /* sigue con alternative.me si falla */ }
+
+    if(cmcToday){
+      val = parseInt(cmcToday.value, 10);
+      classEs = FNG_LABELS_ES[cmcToday.value_classification] || cmcToday.value_classification;
+    } else {
+      const res = await fetch('https://api.alternative.me/fng/?limit=1');
+      const json = await res.json();
+      const entry = json.data && json.data[0];
+      if(!entry) throw new Error('sin datos');
+      val = parseInt(entry.value, 10);
+      classEs = FNG_LABELS_ES[entry.value_classification] || entry.value_classification;
+    }
     valueEl.classList.remove('skeleton');
     animateNumber(valueEl, val, { prefix: fngEmoji(val) + ' ', decimals: 0 });
     valueEl.classList.remove('fng-red', 'fng-gold', 'fng-green');

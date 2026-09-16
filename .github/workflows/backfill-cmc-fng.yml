@@ -1,0 +1,32 @@
+name: Respaldar historico completo de Miedo y Codicia de CoinMarketCap (una sola vez)
+
+# Se dispara solo a mano, desde la pestana "Actions" de GitHub -> elegir este
+# workflow -> boton "Run workflow". No corre solo ni tiene horario - es un
+# respaldo unico para traer TODO el historico disponible del CMC Fear and
+# Greed Index de una vez (el robot diario ya lo mantiene al dia despues de
+# esto, con margen de los ultimos 10 dias en cada corrida).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests
+
+      - name: Descargar y subir historico completo del CMC Fear and Greed Index
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python scripts/backfill_cmc_fng.py
