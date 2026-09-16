@@ -1,0 +1,31 @@
+name: Respaldar historico completo de NEAR (una sola vez)
+
+# Se dispara solo a mano, desde la pestana "Actions" de GitHub -> elegir este
+# workflow -> boton "Run workflow". No corre solo ni tiene horario - es un
+# respaldo unico para traer TODO el historico de CRYPTOCAP:NEAR de una vez
+# (el robot diario ya lo mantiene al dia desde que se agrego a su lista, pero
+# solo trae los ultimos 15 dias en cada corrida, no el historico completo).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas
+
+      - name: Descargar y subir historico completo de CRYPTOCAP:NEAR
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/backfill_cryptocap_near.py
