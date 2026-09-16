@@ -1250,6 +1250,7 @@ img[src=""]{display:none}
 /* control deslizante de rango de fechas (doble manija) — complementa a los botones tf-pill,
    para elegir un rango exacto arrastrando en vez de solo los rangos fijos */
 .date-range-slider{margin:6px 0 20px;padding:0 4px}
+.drs-hint{font-size:11px;color:var(--muted2);margin-bottom:10px}
 .drs-track{position:relative;height:5px;border-radius:99px;background:var(--border2)}
 .drs-range{position:absolute;top:0;height:100%;border-radius:99px;background:var(--red)}
 .drs-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transform:translate(-50%,-50%);cursor:grab;touch-action:none}
@@ -1405,21 +1406,28 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label">🔻🔺 Piso y Techo</div>
+      <div class="indic-cat-label">⏳ Ciclos de Mercado</div>
+      <button class="sb-item" data-indic-jump="halving">
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+      </button>
       <button class="sb-item" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ema200">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
       </button>
       <button class="sb-item" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
+      <button class="sb-item" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
+      </button>
       <button class="sb-item" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
+      </button>
+      <button class="sb-item" data-indic-jump="picycle">
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
+      </button>
+      <div class="indic-cat-label">📊 Medias Móviles y Bandas</div>
+      <button class="sb-item" data-indic-jump="ema200">
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
       </button>
       <button class="sb-item" data-indic-jump="ethlogreg">
         <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
@@ -1433,19 +1441,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="others">
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
-      <button class="sb-item" data-indic-jump="picycle">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
-      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
-      </button>
-      <button class="sb-item" data-indic-jump="whalebias">
-        <span class="sb-item-icon">🐋</span><span class="sb-item-label">Sesgo de Ballenas (Whale Bias)</span>
-      </button>
-      <div class="indic-cat-label">Ciclos</div>
-      <button class="sb-item" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button class="sb-item" data-indic-jump="cbpremium">
@@ -1579,21 +1577,28 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label">🔻🔺 Piso y Techo</div>
+      <div class="indic-cat-label">⏳ Ciclos de Mercado</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
+        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
+      </button>
+      <div class="indic-cat-label">📊 Medias Móviles y Bandas</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
         <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
@@ -1607,19 +1612,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="others">
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="picycle">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
-      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whalebias">
-        <span class="sb-item-icon">🐋</span><span class="sb-item-label">Sesgo de Ballenas (Whale Bias)</span>
-      </button>
-      <div class="indic-cat-label">Ciclos</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
       <div class="indic-cat-label">Mercado</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1974,9 +1969,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="indic-tabs" id="indicGroupTabs">
         <button type="button" class="indic-tab active" data-group="guia">Guía</button>
         <button type="button" class="indic-tab" data-group="predicciones">Predicciones</button>
-        <button type="button" class="indic-tab" data-group="pisotecho">🔻🔺 Piso y Techo</button>
+        <button type="button" class="indic-tab" data-group="ciclos">⏳ Ciclos de Mercado</button>
+        <button type="button" class="indic-tab" data-group="tendencia">📊 Medias Móviles y Bandas</button>
         <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
-        <button type="button" class="indic-tab" data-group="ciclos">Ciclos</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
         <button type="button" class="indic-tab" data-group="mercado">Mercado</button>
@@ -2001,23 +1996,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
-            <div class="indic-guide-divider">🔻🔺 Piso y Techo</div>
+            <div class="indic-guide-divider">⏳ Ciclos de Mercado</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
+              <div class="indic-guide-icon">⏳</div>
+              <div class="indic-guide-card-title">Ciclos de Halving</div>
+              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
               <div class="indic-guide-icon">⚓</div>
               <div class="indic-guide-card-title">Pulso de Fondo</div>
               <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
-              <div class="indic-guide-icon">📉</div>
-              <div class="indic-guide-card-title">Medias Móviles 200</div>
-              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
-              <div class="indic-guide-icon">🪜</div>
-              <div class="indic-guide-card-title">Techo Anterior</div>
-              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimensual">
@@ -2026,10 +2015,30 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
+              <div class="indic-guide-icon">🪜</div>
+              <div class="indic-guide-card-title">Techo Anterior</div>
+              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
               <div class="indic-guide-icon">🌈</div>
               <div class="indic-guide-card-title">Rainbow Chart</div>
               <div class="indic-guide-card-text">Franjas de color sobre el precio histórico de BTC: de "muy barato" a "burbuja".</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="picycle">
+              <div class="indic-guide-icon">📐</div>
+              <div class="indic-guide-card-title">Techo Pi Cycle</div>
+              <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">📊 Medias Móviles y Bandas</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
+              <div class="indic-guide-icon">📉</div>
+              <div class="indic-guide-card-title">Medias Móviles 200</div>
+              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethlogreg">
@@ -2056,32 +2065,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="picycle">
-              <div class="indic-guide-icon">📐</div>
-              <div class="indic-guide-card-title">Techo Pi Cycle</div>
-              <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
 
             <div class="indic-guide-divider">Sentimiento</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
               <div class="indic-guide-icon">😐</div>
               <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
               <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="whalebias">
-              <div class="indic-guide-icon">🐋</div>
-              <div class="indic-guide-card-title">Sesgo de Ballenas (Whale Bias)</div>
-              <div class="indic-guide-card-text">Hacia dónde está inclinado el posicionamiento apalancado en Hyperliquid.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Ciclos</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
-              <div class="indic-guide-icon">⏳</div>
-              <div class="indic-guide-card-title">Ciclos de Halving</div>
-              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3175,53 +3164,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
                 🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado con "+" es el ciclo actual, todavía en curso: son los días que ya pasaron desde el último giro confirmado, pero como este tramo todavía no se revirtió del todo, no se sabe cuándo va a terminar de verdad.<br>
-                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="indic-panel" data-indic="whalebias" style="display:none">
-          <div class="indic-chart-card">
-            <div class="calc">
-              <div class="calc-head">
-                <div class="calc-eyebrow">
-                  <img src="logo-skillcash-600.png" alt="SkillCash">
-                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-                </div>
-                <h2 class="calc-title">Sesgo de Ballenas (Whale Bias) — Tasa de Financiamiento</h2>
-              </div>
-
-              <div class="tf-pill-row" id="wbTfRow">
-                <button type="button" class="tf-pill active" data-tf="1h">1h</button>
-                <button type="button" class="tf-pill" data-tf="4h">4h</button>
-                <button type="button" class="tf-pill" data-tf="1d">1d</button>
-              </div>
-
-              <div class="indic-chart-body" id="wbChartBody">
-                <div class="indic-chart-soon" id="wbLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Consultando el historial de financiamiento en Hyperliquid.</div>
-                </div>
-                <div class="indic-chart-soon" id="wbError" style="display:none">
-                  <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                </div>
-                <div id="wbChartWrap" class="chart-breakout" style="display:none"></div>
-              </div>
-
-              <div class="chart-stats-grid" id="wbStats" style="display:none"></div>
-
-              <div style="text-align:center;margin-top:18px">
-                <button type="button" class="a-btn" id="wbRefreshBtn">🔄 Actualizar</button>
-                <div style="font-size:11px;color:var(--muted);margin-top:8px" id="wbUpdatedAt"></div>
-              </div>
-
-              <div class="calc-disclaimer" style="margin-top:18px">
-                🐋 La tasa de financiamiento es lo que pagan los traders apalancados en largo o en corto para mantener el precio del contrato perpetuo cerca del precio real de Bitcoin — cada barra es el promedio anualizado de esa temporalidad. No existe una API pública que aísle solo "ballenas"; el financiamiento es la forma más real y verificable de ver hacia dónde está inclinado el posicionamiento agregado, y Hyperliquid es conocido por mover tickets grandes.<br>
-                ⏱️ El financiamiento en Hyperliquid se liquida cada hora — por eso no hay temporalidades de minutos aquí: no existen datos reales a esa resolución.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -5889,16 +5831,16 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  pisotecho: [{ id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'whalebias', label: 'Sesgo de Ballenas (Whale Bias)' }],
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }],
+  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }],
+  tendencia: [{ id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
   onchain: [],
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }],
 };
-const INDIC_ID_TO_GROUP = { pisomercado: 'pisotecho', ema200: 'pisotecho', ciclosoporte: 'pisotecho', rsimensual: 'pisotecho', rainbow: 'pisotecho', picycle: 'pisotecho', ethlogreg: 'pisotecho', ethvwap: 'pisotecho', total2: 'pisotecho', others: 'pisotecho', fng: 'sentimiento', whalebias: 'sentimiento', halving: 'ciclos', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
+const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -5911,8 +5853,8 @@ document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   });
 });
 // auto-refresco: solo el gráfico que está abierto en este momento tiene un temporizador activo —
-// cambiar a cualquier otra herramienta lo cancela. Cada vez que se (re)abre Coinbase Premium o
-// Whale Bias, o se cambia su temporalidad, el temporizador se reinicia para que dispare cada vez
+// cambiar a cualquier otra herramienta lo cancela. Cada vez que se (re)abre Coinbase Premium,
+// o se cambia su temporalidad, el temporizador se reinicia para que dispare cada vez
 // que pase esa misma duración (ej. cada 15 min si la temporalidad activa es "15m")
 let indicAutoRefreshTimer = null;
 function stopIndicAutoRefresh(){
@@ -5928,7 +5870,6 @@ function showIndicPanel(id){
   });
   setCatLabelToolOpen(id !== 'guia');
   if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
-  else if(id === 'whalebias') startIndicAutoRefresh(() => loadWhaleBias(true), WB_TF[wbActiveTf].bucketMs);
   else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
@@ -5955,7 +5896,6 @@ function renderIndicSubtabs(group){
       btn.classList.add('active');
       showIndicPanel(btn.dataset.indic);
       if(btn.dataset.indic === 'cbpremium') ensureCbpLoaded();
-      if(btn.dataset.indic === 'whalebias') ensureWbLoaded();
       if(btn.dataset.indic === 'halving') ensureHalvingLoaded();
       if(btn.dataset.indic === 'rainbow') ensureRainbowLoaded();
       if(btn.dataset.indic === 'ethlogreg') ensureEthLogRegLoaded();
@@ -5987,7 +5927,6 @@ function jumpToIndicator(id){
   if(!standalone){
     showIndicPanel(id);
     if(id === 'cbpremium') ensureCbpLoaded();
-    if(id === 'whalebias') ensureWbLoaded();
     if(id === 'halving') ensureHalvingLoaded();
     if(id === 'rainbow') ensureRainbowLoaded();
     if(id === 'ethlogreg') ensureEthLogRegLoaded();
@@ -12526,6 +12465,7 @@ function createDateRangeSlider(containerId, minMs, maxMs, fromMs, toMs, onChange
   const container = document.getElementById(containerId);
   if(!container) return null;
   container.innerHTML = `
+    <div class="drs-hint">🖱️ Arrastra para elegir el rango exacto</div>
     <div class="drs-track">
       <div class="drs-range"></div>
       <div class="drs-thumb" data-thumb="from"></div>
@@ -13429,7 +13369,7 @@ async function loadHalvingDetail(){
 // no cambian minuto a minuto, así que solo se piden datos la primera vez que se abre esa
 // herramienta puntual — no en cada carga de la página completa — y de ahí en adelante el botón
 // de actualizar (donde exista) es suficiente; no hace falta un refresco automático por
-// temporalidad como sí tiene sentido en Coinbase Premium/Whale Bias
+// temporalidad como sí tiene sentido en Coinbase Premium
 let halvingLoadedOnce = false;
 function ensureHalvingLoaded(){ if(!halvingLoadedOnce){ halvingLoadedOnce = true; loadHalvingDetail(); } }
 
@@ -13529,7 +13469,7 @@ function wireChartHover(cfg){
     tooltip.style.display = 'none';
   });
 }
-/* ---- hover genérico para gráficos de barras (Coinbase Premium, Whale Bias): a diferencia de
+/* ---- hover genérico para gráficos de barras (Coinbase Premium): a diferencia de
    wireChartHover no interpola entre puntos — resalta la barra más cercana al mouse ---- */
 function wireBarChartHover(cfg){
   const catcher = document.getElementById(cfg.catcherId);
@@ -15668,6 +15608,8 @@ async function loadDomLiveDetail(key){
   renderDomLiveStat(key);
 }
 let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
+let domCustomRanges = {}; // { [key]: {fromMs, toMs} } — arrastrar el slider gana sobre los botones fijos
+let domSliders = {};
 function renderDomChart(key){
   const def = DOM_CHART_DEFS[key];
   const loadingEl = document.getElementById(key + 'Loading');
@@ -15692,10 +15634,27 @@ function renderDomChart(key){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const fullEndMs = seriesAll[seriesAll.length - 1].t;
-  const rangeYears = DOM_RANGE_YEARS[domActiveRanges[key]];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : seriesAll[0].t;
-  const points = seriesAll.filter(p => p.t >= cutoffMs);
+  const fullStartMs = seriesAll[0].t, fullEndMs = seriesAll[seriesAll.length - 1].t;
+  let fromMs, toMs;
+  if(domCustomRanges[key]){
+    fromMs = domCustomRanges[key].fromMs;
+    toMs = domCustomRanges[key].toMs;
+  } else {
+    const rangeYears = DOM_RANGE_YEARS[domActiveRanges[key]];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const points = seriesAll.filter(p => p.t >= fromMs && p.t <= toMs);
+  if(!points.length) return;
+
+  if(domSliders[key]) domSliders[key].setRange(fromMs, toMs);
+  else{
+    domSliders[key] = createDateRangeSlider(key + 'DateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      domCustomRanges[key] = { fromMs: f, toMs: t };
+      document.querySelectorAll('#' + key + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderDomChart(key);
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -16567,216 +16526,6 @@ async function loadCorporateTreasuries(){
 }
 let treasuriesLoadedOnce = false;
 function ensureTreasuriesLoaded(){ if(!treasuriesLoadedOnce){ treasuriesLoadedOnce = true; loadCorporateTreasuries(); } }
-
-/* ---- Whale Bias: funding rate de BTC-PERP en Hyperliquid (API pública, sin llave) como proxy
-   del sesgo de posicionamiento agregado de los traders apalancados más grandes.
-   OJO: esta API no se pudo probar contra el servidor real desde este entorno (sin acceso a
-   internet) — el parseo es defensivo (revisa que existan los campos esperados) para que, si la
-   forma real de la respuesta difiere, caiga al estado de error en vez de mostrar datos incorrectos. ---- */
-/* ---- Whale Bias: gráfico de barras histórico del funding rate anualizado de BTC-PERP en
-   Hyperliquid. El funding se liquida cada hora ahí — esa es la resolución real más fina que
-   existe, así que no se ofrecen temporalidades de minutos (no hay datos reales que mostrar a esa
-   resolución, y no vamos a inventarlos); 4h/1d son el promedio de las horas dentro de cada
-   bucket, anualizado igual que el valor de 1h ---- */
-const WB_TF = {
-  '1h': { bucketMs: 60 * 60 * 1000, hours: 180 },
-  '4h': { bucketMs: 4 * 60 * 60 * 1000, hours: 240 },
-  '1d': { bucketMs: 24 * 60 * 60 * 1000, hours: 4320 }
-};
-let wbActiveTf = '1h';
-let wbLoadedOnce = false;
-function ensureWbLoaded(){ if(!wbLoadedOnce){ wbLoadedOnce = true; loadWhaleBias(); } }
-let wbLatestCtx = null;
-// Hyperliquid parece recortar la respuesta de fundingHistory cuando el rango pedido es muy
-// grande en una sola llamada (con 1d — 180 días — el historial se quedaba a mitad de camino en
-// vez de llegar hasta hoy). Se pide en trozos de máximo 30 días, EMPEZANDO por el más reciente
-// hacia atrás — así, aunque algún trozo viejo se recorte, los datos de hoy (los que de verdad
-// importan) siempre quedan pedidos primero
-const WB_CHUNK_HOURS = 720;
-async function fetchFundingHistory(hours){
-  const endTime = Date.now();
-  const chunkMs = WB_CHUNK_HOURS * 60 * 60 * 1000;
-  const totalMs = hours * 60 * 60 * 1000;
-  const chunkCount = Math.max(1, Math.ceil(totalMs / chunkMs));
-  const requests = [];
-  for(let i = 0; i < chunkCount; i++){
-    const e = endTime - i * chunkMs;
-    const s = Math.max(endTime - totalMs, e - chunkMs);
-    requests.push(fetch('https://api.hyperliquid.xyz/info', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'fundingHistory', coin: 'BTC', startTime: s, endTime: e })
-    }).then(res => {
-      if(!res.ok) throw new Error('hyperliquid fundingHistory failed');
-      return res.json();
-    }));
-  }
-  const chunks = await Promise.all(requests);
-  const rows = chunks.flat();
-  if(!Array.isArray(rows)) throw new Error('forma de respuesta inesperada');
-  const seen = new Set();
-  const merged = [];
-  rows.forEach(r => {
-    const t = r.time, funding = parseFloat(r.fundingRate);
-    if(isNaN(funding) || isNaN(t) || seen.has(t)) return;
-    seen.add(t);
-    merged.push({ t, funding });
-  });
-  return merged.sort((a, b) => a.t - b.t);
-}
-function aggregateFunding(rows, bucketMs){
-  const buckets = new Map();
-  rows.forEach(r => {
-    const key = Math.floor(r.t / bucketMs) * bucketMs;
-    if(!buckets.has(key)) buckets.set(key, []);
-    buckets.get(key).push(r.funding);
-  });
-  return [...buckets.entries()]
-    .map(([t, arr]) => ({ t, annualizedPct: (arr.reduce((a, b) => a + b, 0) / arr.length) * 24 * 365 * 100 }))
-    .sort((a, b) => a.t - b.t);
-}
-async function fetchHyperliquidCtx(){
-  const res = await fetch('https://api.hyperliquid.xyz/info', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'metaAndAssetCtxs' })
-  });
-  if(!res.ok) throw new Error('hyperliquid metaAndAssetCtxs failed');
-  const data = await res.json();
-  const meta = data[0], ctxs = data[1];
-  const universe = meta && meta.universe;
-  if(!Array.isArray(universe) || !Array.isArray(ctxs)) throw new Error('forma de respuesta inesperada');
-  const idx = universe.findIndex(a => a.name === 'BTC');
-  const ctx = idx >= 0 ? ctxs[idx] : null;
-  const markPx = ctx ? parseFloat(ctx.markPx) : NaN;
-  const oiCoins = ctx ? parseFloat(ctx.openInterest) : NaN;
-  return { markPx, oiCoins };
-}
-function renderWbChart(data){
-  const wrap = document.getElementById('wbChartWrap');
-  const statsEl = document.getElementById('wbStats');
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 300 : 340;
-  const yFontSize = isMobileChart ? 9 : 11, xFontSize = isMobileChart ? 10 : 12;
-  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
-  const marginTop = 14, marginBottom = isMobileChart ? 26 : 30;
-  const drawW = totalW - marginLeft - marginRight;
-  const drawH = totalH - marginTop - marginBottom;
-
-  const maxAbs = Math.max(...data.map(d => Math.abs(d.annualizedPct)), 1) * 1.2;
-  const yFor = v => marginTop + drawH / 2 - (v / maxAbs) * (drawH / 2);
-  const zeroY = yFor(0);
-  const n = data.length;
-  const barGap = isMobileChart ? 1 : 2;
-  const barW = Math.max(1, drawW / n - barGap);
-  const xFor = i => marginLeft + (i * drawW) / n + barGap / 2;
-
-  const barsHtml = data.map((d, i) => {
-    const y = yFor(d.annualizedPct);
-    const top = Math.min(y, zeroY);
-    const h = Math.max(Math.abs(zeroY - y), 0.5);
-    const color = d.annualizedPct >= 0 ? '#2ecc71' : '#ff2f4f';
-    return `<rect x="${xFor(i).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${color}"/>`;
-  }).join('');
-
-  const yTickVals = [-maxAbs, -maxAbs / 2, 0, maxAbs / 2, maxAbs];
-  const yGridHtml = yTickVals.map(v => `
-    <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,${v === 0 ? .18 : .08})" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v.toFixed(1)}%</text>
-  `).join('');
-
-  const dateFmt = ms => {
-    const d = new Date(ms);
-    if(wbActiveTf === '1d') return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    return d.toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  };
-
-  wrap.innerHTML = `
-    <div style="position:relative">
-      <svg id="wbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-        ${yGridHtml}
-        ${barsHtml}
-        <text x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${dateFmt(data[0].t)}</text>
-        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
-        <rect id="wbHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent"/>
-        <line id="wbHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>
-      </svg>
-      <div id="wbTooltip" style="display:none;position:absolute;pointer-events:none;background:#0c1024;border:1px solid var(--border2);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)"></div>
-    </div>
-  `;
-  wrap.style.display = 'block';
-
-  wireBarChartHover({
-    svg: document.getElementById('wbChartSvg'), catcherId: 'wbHoverCatcher', lineId: 'wbHoverLine',
-    tooltipId: 'wbTooltip', marginLeft, drawW, totalW, n, xFor, barW,
-    tooltipHtml: i => {
-      const d = data[i];
-      const sign = d.annualizedPct >= 0 ? '+' : '';
-      return `<b style="color:${d.annualizedPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${d.annualizedPct.toFixed(2)}% anual</b><br><span style="color:#8890ac">${dateFmt(d.t)}</span>`;
-    }
-  });
-
-  const latest = data[n - 1];
-  const sign = latest.annualizedPct >= 0 ? '+' : '';
-  let cardsHtml = `<div class="res-card"><div class="r-label">Último financiamiento anualizado</div><div class="r-val" style="color:${latest.annualizedPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${latest.annualizedPct.toFixed(2)}%</div></div>`;
-  if(wbLatestCtx && !isNaN(wbLatestCtx.markPx)){
-    cardsHtml += `<div class="res-card"><div class="r-label">Precio mark BTC-PERP</div><div class="r-val">${fmtUsd2(wbLatestCtx.markPx)}</div></div>`;
-    if(!isNaN(wbLatestCtx.oiCoins)) cardsHtml += `<div class="res-card"><div class="r-label">Interés abierto (OI)</div><div class="r-val">${fmtUsdBig(wbLatestCtx.oiCoins * wbLatestCtx.markPx)}</div></div>`;
-  }
-  statsEl.innerHTML = cardsHtml;
-  statsEl.style.display = '';
-}
-async function loadWhaleBias(silent){
-  const loadingEl = document.getElementById('wbLoading');
-  const errorEl = document.getElementById('wbError');
-  const wrap = document.getElementById('wbChartWrap');
-  const statsEl = document.getElementById('wbStats');
-  const btn = document.getElementById('wbRefreshBtn');
-  if(btn) btn.disabled = true;
-  if(!silent){
-    loadingEl.style.display = 'flex';
-    errorEl.style.display = 'none';
-    wrap.style.display = 'none';
-    statsEl.style.display = 'none';
-  }
-  try{
-    const tf = WB_TF[wbActiveTf];
-    const [rawHistory, ctx] = await Promise.all([
-      fetchFundingHistory(tf.hours),
-      fetchHyperliquidCtx().catch(() => null)
-    ]);
-    wbLatestCtx = ctx;
-    if(!rawHistory || rawHistory.length < 3) throw new Error('sin datos suficientes');
-    const data = aggregateFunding(rawHistory, tf.bucketMs);
-    if(!data || data.length < 3) throw new Error('sin datos suficientes tras agregar');
-    loadingEl.style.display = 'none';
-    renderWbChart(data);
-    document.getElementById('wbUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  } catch(err){
-    if(!silent){
-      loadingEl.style.display = 'none';
-      wrap.style.display = 'none';
-      statsEl.style.display = 'none';
-      errorEl.style.display = 'flex';
-    }
-  }
-  if(btn) btn.disabled = false;
-}
-document.querySelectorAll('#wbTfRow .tf-pill').forEach(b => {
-  b.addEventListener('click', () => {
-    if(b.classList.contains('active')) return;
-    document.querySelectorAll('#wbTfRow .tf-pill').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    wbActiveTf = b.dataset.tf;
-    loadWhaleBias();
-    startIndicAutoRefresh(() => loadWhaleBias(true), WB_TF[wbActiveTf].bucketMs);
-  });
-});
-// se carga solo la primera vez que se abre esta herramienta (ver ensureWbLoaded, llamado desde
-// jumpToIndicator y desde el click de las sub-pestañas) — no en cada carga de la página completa.
-// De ahí en adelante se actualiza sola según la temporalidad activa mientras siga abierta — ver
-// startIndicAutoRefresh en showIndicPanel
-document.getElementById('wbRefreshBtn').addEventListener('click', () => loadWhaleBias());
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
