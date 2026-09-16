@@ -13041,6 +13041,19 @@ async function loadFngDetail(){
       }
     } catch(e){ console.error('No se pudo cargar el histórico de CoinMarketCap:', e); }
 
+    // el día de hoy todavía no existe en el histórico CERRADO de CMC (recién queda listo cuando
+    // termina el día) — se pisa aparte con el valor EN VIVO (mismo que usa el widget de portada),
+    // para que el número grande y la punta del gráfico coincidan con lo que se ve ahora mismo en CMC
+    try{
+      const { data: cmcLatest } = await sbClient.from('cmc_fng_latest').select('value,value_classification').eq('id', 1).maybeSingle();
+      if(cmcLatest && data.length){
+        data = [
+          { timestamp: data[0].timestamp, value: String(cmcLatest.value), value_classification: cmcLatest.value_classification },
+          ...data.slice(1),
+        ];
+      }
+    } catch(e){ console.error('No se pudo cargar el valor en vivo de CoinMarketCap:', e); }
+
     fngCachedData = data;
 
     // viene del más nuevo al más viejo
