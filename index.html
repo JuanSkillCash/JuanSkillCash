@@ -1909,16 +1909,35 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-sub">4 HERRAMIENTAS</div>
         <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
-            <defs><linearGradient id="catg1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ff8a3d" stop-opacity=".45"/>
-              <stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
-            </linearGradient></defs>
-            <polygon points="0,55 30,48 60,58 90,40 120,45 150,25 180,32 210,18 240,28 270,12 300,20 300,78 0,78" fill="url(#catg1)"/>
-            <line x1="0" y1="66" x2="300" y2="66" stroke="#ff4d4d" stroke-width="1.5" stroke-dasharray="5,4" opacity=".7"/>
-            <polyline points="0,55 30,48 60,58 90,40 120,45 150,25 180,32 210,18 240,28 270,12 300,20" fill="none" stroke="#ff8a3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M283 57 L293 70 L273 70 Z" fill="#ff4d4d" opacity=".9" stroke="#1a0000" stroke-width=".5"/>
-            <text x="283" y="67.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" font-weight="800" fill="#1a0000">!</text>
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="tradeProfit" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4ade80" stop-opacity=".3"/>
+                <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="tradeLoss" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff4d4d" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#ff4d4d" stop-opacity=".32"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="300" height="34" fill="url(#tradeProfit)"/>
+            <rect x="0" y="34" width="300" height="34" fill="url(#tradeLoss)"/>
+            <line x1="0" y1="34" x2="300" y2="34" stroke="#eaf1ff" stroke-width="1.3" stroke-dasharray="3,3" opacity=".55"/>
+            <line x1="0" y1="62" x2="300" y2="62" stroke="#ff4d4d" stroke-width="1.6" stroke-dasharray="5,4" opacity=".85"/>
+            <polyline points="10,40 40,30 70,44 100,20 130,28 160,10 190,18 220,6 250,16 280,4" fill="none" stroke="#ff8a3d" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="280" cy="4" r="4" fill="#ffb37a"/>
+            <g transform="translate(4,26)">
+              <rect width="54" height="14" rx="7" fill="rgba(255,255,255,.14)"/>
+              <text x="27" y="10.3" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7.5" font-weight="700" fill="#eaf1ff">ENTRADA</text>
+            </g>
+            <g transform="translate(4,54)">
+              <rect width="76" height="14" rx="7" fill="rgba(255,77,77,.28)" stroke="#ff4d4d" stroke-width="1"/>
+              <text x="38" y="10.3" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7.5" font-weight="700" fill="#ffb3b3">LIQUIDACIÓN</text>
+            </g>
+            <g transform="translate(256,52)">
+              <rect width="40" height="16" rx="8" fill="rgba(255,138,61,.28)" stroke="#ff8a3d" stroke-width="1"/>
+              <text x="20" y="11.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="8.5" font-weight="800" fill="#ffd8b3">10x</text>
+            </g>
           </svg>
         </div>
         <div class="cat-overview-desc">Calcula tu precio de liquidación, break-even, comisiones y ganancia real — todo antes de arriesgar tu dinero en una posición apalancada.</div>
@@ -1933,16 +1952,22 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
         <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
-            <rect x="20" y="54" width="24" height="20" rx="3" fill="#a855f7" opacity=".55"/>
-            <rect x="58" y="42" width="24" height="32" rx="3" fill="#a855f7" opacity=".65"/>
-            <rect x="96" y="46" width="24" height="28" rx="3" fill="#a855f7" opacity=".6"/>
-            <rect x="134" y="30" width="24" height="44" rx="3" fill="#c084fc" opacity=".75"/>
-            <rect x="172" y="36" width="24" height="38" rx="3" fill="#c084fc" opacity=".7"/>
-            <rect x="210" y="16" width="24" height="58" rx="3" fill="#d8b4fe"/>
-            <rect x="248" y="8" width="24" height="66" rx="3" fill="#e9d5ff"/>
-            <polyline points="32,54 70,42 108,46 146,30 184,36 222,16 260,8" fill="none" stroke="#f3e8ff" stroke-width="2" opacity=".9" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="260" cy="8" r="3.5" fill="#f3e8ff"/>
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="invGrowth" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#c084fc" stop-opacity=".5"/>
+                <stop offset="100%" stop-color="#c084fc" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M10,68 C60,66 110,58 150,42 C190,26 230,14 282,10 L282,78 L10,78 Z" fill="url(#invGrowth)"/>
+            <path d="M10,68 C60,66 110,58 150,42 C190,26 230,14 282,10" fill="none" stroke="#c084fc" stroke-width="2.8" stroke-linecap="round"/>
+            <circle cx="10" cy="68" r="4" fill="#e9d5ff"/>
+            <circle cx="90" cy="52" r="5.5" fill="#a855f7" stroke="#e9d5ff" stroke-width="1.2"/>
+            <text x="90" y="55" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7" font-weight="800" fill="#f3e8ff">$</text>
+            <circle cx="180" cy="24" r="6.5" fill="#a855f7" stroke="#e9d5ff" stroke-width="1.2"/>
+            <text x="180" y="27.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="8" font-weight="800" fill="#f3e8ff">$</text>
+            <line x1="282" y1="10" x2="282" y2="0" stroke="#e9d5ff" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M282,0 L282,9 L293,4.5 Z" fill="#e9d5ff"/>
           </svg>
         </div>
         <div class="cat-overview-desc">Simula tus compras periódicas, calcula tu rentabilidad real, compara capitalizaciones de mercado, y descubre cuándo podrías vivir de tus inversiones.</div>
@@ -1956,15 +1981,39 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="120" height="72" viewBox="0 0 120 72">
-            <path d="M60 6 L88 16 V36 C88 52 76 63 60 67 C44 63 32 52 32 36 V16 Z" fill="rgba(124,127,245,.1)" stroke="#7c7ff5" stroke-width="2.2" stroke-linejoin="round"/>
-            <path d="M46 28l3.5 3.5L57 24" fill="none" stroke="#a5a8f7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="61" y1="27" x2="79" y2="27" stroke="#a5a8f7" stroke-width="1.8" opacity=".65" stroke-linecap="round"/>
-            <path d="M46 40l3.5 3.5L57 36" fill="none" stroke="#a5a8f7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="61" y1="39" x2="79" y2="39" stroke="#a5a8f7" stroke-width="1.8" opacity=".65" stroke-linecap="round"/>
-            <path d="M46 52l3.5 3.5L57 48" fill="none" stroke="#a5a8f7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
-            <line x1="61" y1="51" x2="73" y2="51" stroke="#a5a8f7" stroke-width="1.8" opacity=".5" stroke-linecap="round"/>
+        <div class="cat-overview-preview">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <radialGradient id="shieldGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#7c7ff5" stop-opacity=".55"/>
+                <stop offset="55%" stop-color="#7c7ff5" stop-opacity=".15"/>
+                <stop offset="100%" stop-color="#7c7ff5" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="150" cy="42" r="62" fill="url(#shieldGlow)"/>
+            <line x1="16" y1="12" x2="98" y2="26" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
+            <line x1="284" y1="12" x2="202" y2="26" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
+            <line x1="16" y1="70" x2="98" y2="58" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
+            <line x1="284" y1="70" x2="202" y2="58" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
+            <g fill="#ff4d4d" opacity=".9">
+              <path d="M16 6l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
+              <path d="M284 6l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
+              <path d="M16 64l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
+              <path d="M284 64l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
+            </g>
+            <g stroke="#c7c9fb" stroke-width="1.4" stroke-linecap="round" opacity=".9">
+              <path d="M98 20v12M92 26h12M94 22l8 8M102 22l-8 8"/>
+              <path d="M202 20v12M196 26h12M198 22l8 8M206 22l-8 8"/>
+              <path d="M98 52v12M92 58h12M94 54l8 8M102 54l-8 8"/>
+              <path d="M202 52v12M196 58h12M198 54l8 8M206 54l-8 8"/>
+            </g>
+            <path d="M150 10 L182 22 V44 C182 60 168 70 150 74 C132 70 118 60 118 44 V22 Z" fill="rgba(124,127,245,.18)" stroke="#7c7ff5" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M132 30l3.2 3.2L142 27" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="146" y1="29.5" x2="168" y2="29.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
+            <path d="M132 42l3.2 3.2L142 39" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="146" y1="41.5" x2="168" y2="41.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
+            <path d="M132 54l3.2 3.2L142 51" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+            <line x1="146" y1="53.5" x2="164" y2="53.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".5" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="cat-overview-desc">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
