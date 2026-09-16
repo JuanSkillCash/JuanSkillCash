@@ -1,4 +1,4 @@
-name: Actualizar CRYPTOCAP diario en Supabase
+name: Actualizar historicos diarios en Supabase
 
 on:
   schedule:
@@ -26,8 +26,14 @@ jobs:
         run: |
           pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas
 
-      - name: Descargar y subir datos del dia
+      - name: Descargar y subir datos del dia (CRYPTOCAP)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_cryptocap_daily.py
+
+      - name: Respaldar historico de Miedo y Codicia
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_fng_daily.py
