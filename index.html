@@ -226,6 +226,10 @@ button{font-family:inherit;color:inherit}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
+.dom-card.btc{cursor:pointer}
+.dom-card.usdt{cursor:pointer}
+.dom-card.btc:hover .dom-card-click-hint{color:var(--gold)}
+.dom-card.usdt:hover .dom-card-click-hint{color:var(--green)}
 .halving-chart-countdown{
   position:absolute;background:rgba(8,12,32,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:8px 12px;
@@ -1762,18 +1766,20 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="fng-click-hint">Ver detalle →</div>
       </div>
 
-      <div class="dom-card btc">
+      <div class="dom-card btc" id="btcDomCard">
         <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:var(--gold)"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg>Dominancia BTC</div>
         <div class="dom-card-value skeleton" id="btcDomValue"></div>
         <div class="dom-card-bar"><div class="dom-card-bar-fill" id="btcDomBar" style="width:0%"></div></div>
         <div class="dom-card-sub" id="btcDomSub">Cargando…</div>
+        <div class="dom-card-click-hint">Ver detalle →</div>
       </div>
 
-      <div class="dom-card usdt">
+      <div class="dom-card usdt" id="usdtDomCard">
         <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:var(--green)"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg>Dominancia USDT</div>
         <div class="dom-card-value skeleton" id="usdtDomValue"></div>
         <div class="dom-card-bar"><div class="dom-card-bar-fill" id="usdtDomBar" style="width:0%"></div></div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
+        <div class="dom-card-click-hint">Ver detalle →</div>
       </div>
 
       <div class="dom-card halving" id="halvingSectionBox">
@@ -17420,6 +17426,14 @@ setInterval(updateHalvingCountdown, 1000);
 document.getElementById('halvingSectionBox').addEventListener('click', () => {
   showCategoryDetail('indicadores');
   jumpToIndicator('halving');
+});
+document.getElementById('btcDomCard').addEventListener('click', () => {
+  showCategoryDetail('indicadores');
+  jumpToIndicator('dombtc');
+});
+document.getElementById('usdtDomCard').addEventListener('click', () => {
+  showCategoryDetail('indicadores');
+  jumpToIndicator('domusdt');
 });
 
 /* ---- reloj de sesiones de mercado (sin API, matemática de horarios) ---- */
