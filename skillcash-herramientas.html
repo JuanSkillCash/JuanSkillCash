@@ -12620,39 +12620,21 @@ function fngZoneColor(v){
   return '#2ecc71';
 }
 
-let btcPriceCache = null; // {timestamp_ms: price} — se trae una sola vez, junto con el índice
-
-let btcPriceCacheInFlight = null;
-async function fetchBtcPriceHistory(){
-  if(btcPriceCache) return btcPriceCache;
-  // varias herramientas (F&G, Halving, Rainbow, Pi Cycle...) pueden pedir esto casi al mismo
-  // tiempo al cargar la página — sin esto, cada una dispara su propia llamada a CoinGecko en
-  // vez de compartir una sola, lo cual en una red lenta puede saturar y hacer fallar todo
-  if(btcPriceCacheInFlight) return btcPriceCacheInFlight;
-  btcPriceCacheInFlight = (async () => {
-    try{
-      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily'));
-      const json = await res.json();
-      btcPriceCache = json.prices || []; // [[timestamp_ms, price], ...]
-    } catch(err){
-      btcPriceCache = [];
-    }
-    btcPriceCacheInFlight = null;
-    return btcPriceCache;
-  })();
-  return btcPriceCacheInFlight;
-}
-
+// el precio de fondo de BTC usa el mismo histórico diario COMPLETO y real (Coin Metrics /
+// blockchain.info, sin límite de 1 año) que ya usan Halving/Rainbow/Pi Cycle/EMA200 — antes se
+// pedía aparte a CoinGecko con un tope de 364 días, por lo que en los rangos "5A"/"Todo" del
+// índice (que ahora sí llegan hasta 2018) el precio de BTC solo alcanzaba a verse en un pedacito
+// reciente del gráfico
 function closestBtcPrice(targetMs){
-  if(!btcPriceCache || !btcPriceCache.length) return null;
-  let best = btcPriceCache[0];
-  let bestDiff = Math.abs(best[0] - targetMs);
-  for(const p of btcPriceCache){
-    const diff = Math.abs(p[0] - targetMs);
+  if(!halvingBtcHistory || !halvingBtcHistory.length) return null;
+  let best = halvingBtcHistory[0];
+  let bestDiff = Math.abs(best.t - targetMs);
+  for(const p of halvingBtcHistory){
+    const diff = Math.abs(p.t - targetMs);
     if(diff < bestDiff){ best = p; bestDiff = diff; }
   }
   // si el más cercano queda a más de 2 días, mejor no mostrar nada que mostrar algo engañoso
-  return bestDiff <= 2 * 86400000 ? best[1] : null;
+  return bestDiff <= 2 * 86400000 ? best.c : null;
 }
 
 function renderFngChart(fromMs, toMs){
@@ -12723,7 +12705,7 @@ function renderFngChart(fromMs, toMs){
       if(v === null) return;
       btcPoints += `${xFor(i).toFixed(1)},${btcYFor(v).toFixed(1)} `;
     });
-    btcHtml = `<polyline points="${btcPoints.trim()}" fill="none" stroke="#8890ac" stroke-width="2.2" stroke-dasharray="5,4" opacity=".8"/>`;
+    btcHtml = `<polyline points="${btcPoints.trim()}" fill="none" stroke="#f2f3f8" stroke-width="2.6" stroke-dasharray="5,4" opacity=".95"/>`;
     const fmtUsd = v => v >= 1000 ? Math.round(v / 1000) + 'K' : Math.round(v);
     btcAxisHtml = [btcMin, (btcMin + btcMax) / 2, btcMax].map(v => `
       <text x="${totalW - marginRight + 8}" y="${(btcYFor(v) + 6).toFixed(1)}" font-size="${btcFontSize}" fill="#a8afc4" font-family="'Space Mono',monospace">$${fmtUsd(v)}</text>
@@ -12762,7 +12744,7 @@ function renderFngChart(fromMs, toMs){
       </div>
       <div class="fng-legend-lines">
         <span><i style="background:#f0b23d"></i>Índice de Miedo y Codicia (el color cambia según la zona)</span>
-        ${hasBtc ? '<span><i style="background:#8890ac;border-radius:0;height:2px"></i>Precio de Bitcoin (referencia, eje derecho)</span>' : ''}
+        ${hasBtc ? '<span><i style="background:#f2f3f8;border-radius:0;height:2px"></i>Precio de Bitcoin (referencia, eje derecho)</span>' : ''}
       </div>
     </div>
   `;
@@ -12865,8 +12847,9 @@ async function loadFngDetail(){
     document.getElementById('fngYearLow').textContent = fngEmoji(yearLow) + ' ' + yearLow;
     document.getElementById('fngYearAvg').textContent = Math.round(yearAvg);
 
-    // traemos también el precio de Bitcoin (en paralelo no hace falta, ya tenemos el índice)
-    await fetchBtcPriceHistory();
+    // traemos también el precio de Bitcoin (en paralelo no hace falta, ya tenemos el índice) —
+    // mismo histórico real y completo que usan Halving/Rainbow/Pi Cycle, sin límite de 1 año
+    await fetchHalvingHistory();
 
     // por defecto se dibuja con todo el histórico (el botón "Todo" ya está activo desde el HTML)
     const { minMs, maxMs } = fngFullRangeMs();
