@@ -2443,6 +2443,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="rainbowChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="rainbowDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="rainbowLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="rainbowStats" style="display:none"></div>
@@ -2485,6 +2486,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="ethlogregChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ethlogregDateSlider" class="date-range-slider"></div>
               </div>
               <div class="chart-stats-grid" id="ethlogregStats" style="display:none"></div>
 
@@ -2527,6 +2529,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="ethvwapChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ethvwapDateSlider" class="date-range-slider"></div>
               </div>
               <div class="chart-stats-grid" id="ethvwapStats" style="display:none"></div>
 
@@ -2662,6 +2665,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="picycleChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="picycleDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="picycleLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="picycleStats" style="display:none"></div>
@@ -2709,6 +2713,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text" id="mfloorErrorDetail">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="mfloorChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="mfloorDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="mfloorLegend" style="display:none;margin-bottom:8px"></div>
               <div id="mfloorSourceNote" style="display:none;font-size:11.5px;color:var(--muted);margin-bottom:18px"></div>
@@ -2754,6 +2759,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="ema200ChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ema200DateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="ema200Legend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="ema200Stats" style="display:none"></div>
@@ -2796,6 +2802,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="ciclosoporteChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ciclosoporteDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="ciclosoporteLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="ciclosoporteStats" style="display:none"></div>
@@ -2838,6 +2845,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="rsiChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="rsimensualDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="rsiLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="rsiStats" style="display:none"></div>
@@ -3163,6 +3171,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
                 <div id="btcxauChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="btcxauDateSlider" class="date-range-slider"></div>
               </div>
               <div class="partner-perks" id="btcxauLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="btcxauStats" style="display:none"></div>
@@ -13507,6 +13516,8 @@ function wireBarChartHover(cfg){
 }
 const RAINBOW_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let rainbowActiveRange = 'todo';
+let rainbowCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let rainbowSlider = null;
 function renderRainbowChart(){
   const loadingEl = document.getElementById('rainbowLoading');
   const errorEl = document.getElementById('rainbowError');
@@ -13531,10 +13542,27 @@ function renderRainbowChart(){
   // la curva de tendencia se ajusta siempre sobre la historia COMPLETA (igual que en el gráfico
   // de referencia) — el filtro de rango solo hace zoom visual, no cambia la curva
   const fit = rainbowFit(allPoints);
-  const fullEndMs = allPoints[allPoints.length - 1].t;
-  const rainbowRangeYears = RAINBOW_RANGE_YEARS[rainbowActiveRange];
-  const rainbowCutoffMs = rainbowRangeYears ? fullEndMs - rainbowRangeYears * 365 * 86400000 : allPoints[0].t;
-  const points = allPoints.filter(p => p.t >= rainbowCutoffMs);
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let rainbowFromMs, rainbowToMs;
+  if(rainbowCustomRange){
+    rainbowFromMs = rainbowCustomRange.fromMs;
+    rainbowToMs = rainbowCustomRange.toMs;
+  } else {
+    const rainbowRangeYears = RAINBOW_RANGE_YEARS[rainbowActiveRange];
+    rainbowFromMs = rainbowRangeYears ? fullEndMs - rainbowRangeYears * 365 * 86400000 : fullStartMs;
+    rainbowToMs = fullEndMs;
+  }
+  const points = allPoints.filter(p => p.t >= rainbowFromMs && p.t <= rainbowToMs);
+  if(!points.length) return;
+
+  if(rainbowSlider) rainbowSlider.setRange(rainbowFromMs, rainbowToMs);
+  else{
+    rainbowSlider = createDateRangeSlider('rainbowDateSlider', fullStartMs, fullEndMs, rainbowFromMs, rainbowToMs, (f, t) => {
+      rainbowCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderRainbowChart();
+    });
+  }
 
   const startMs = points[0].t;
   const endMs = points[points.length - 1].t;
@@ -13757,6 +13785,8 @@ function ensureEthDailyHistoryLoaded(){
 }
 const ETH_LOGREG_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ethLogRegActiveRange = 'todo';
+let ethLogRegCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let ethLogRegSlider = null;
 function renderEthLogRegChart(){
   const loadingEl = document.getElementById('ethlogregLoading');
   const errorEl = document.getElementById('ethlogregError');
@@ -13775,10 +13805,27 @@ function renderEthLogRegChart(){
   wrap.style.display = 'block';
   statsEl.style.display = '';
 
-  const fullEndMs = allPoints[allPoints.length - 1].t;
-  const rangeYears = ETH_LOGREG_RANGE_YEARS[ethLogRegActiveRange];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allPoints[0].t;
-  const points = allPoints.filter(p => p.t >= cutoffMs);
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let fromMs, toMs;
+  if(ethLogRegCustomRange){
+    fromMs = ethLogRegCustomRange.fromMs;
+    toMs = ethLogRegCustomRange.toMs;
+  } else {
+    const rangeYears = ETH_LOGREG_RANGE_YEARS[ethLogRegActiveRange];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const points = allPoints.filter(p => p.t >= fromMs && p.t <= toMs);
+  if(!points.length) return;
+
+  if(ethLogRegSlider) ethLogRegSlider.setRange(fromMs, toMs);
+  else{
+    ethLogRegSlider = createDateRangeSlider('ethlogregDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      ethLogRegCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#ethlogregRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderEthLogRegChart();
+    });
+  }
 
   const startMs = points[0].t;
   const endMs = points[points.length - 1].t;
@@ -13992,6 +14039,8 @@ function niceLinearTicks(minV, maxV){
 }
 const ETH_VWAP_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ethVwapActiveRange = 'todo';
+let ethVwapCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let ethVwapSlider = null;
 function renderEthVwapChart(){
   const loadingEl = document.getElementById('ethvwapLoading');
   const errorEl = document.getElementById('ethvwapError');
@@ -14015,13 +14064,32 @@ function renderEthVwapChart(){
   const cleanVols = clipVolumeOutliers(allPoints, 60, 6);
   const vwapByAnchor = ETH_VWAP_ANCHORS.map(a => ({ ...a, series: computeAnchoredVwap(allPoints, a.ms, cleanVols) }));
 
-  const fullEndMs = allPoints[allPoints.length - 1].t;
-  const rangeYears = ETH_VWAP_RANGE_YEARS[ethVwapActiveRange];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allPoints[0].t;
-  let cutoffIdx = 0;
-  while(cutoffIdx < allPoints.length && allPoints[cutoffIdx].t < cutoffMs) cutoffIdx++;
-  const points = allPoints.slice(cutoffIdx);
-  const vwapSeries = vwapByAnchor.map(a => ({ ...a, series: a.series.slice(cutoffIdx) }));
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let fromMs, toMs;
+  if(ethVwapCustomRange){
+    fromMs = ethVwapCustomRange.fromMs;
+    toMs = ethVwapCustomRange.toMs;
+  } else {
+    const rangeYears = ETH_VWAP_RANGE_YEARS[ethVwapActiveRange];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  let fromIdx = 0;
+  while(fromIdx < allPoints.length && allPoints[fromIdx].t < fromMs) fromIdx++;
+  let toIdx = allPoints.length - 1;
+  while(toIdx >= 0 && allPoints[toIdx].t > toMs) toIdx--;
+  const points = allPoints.slice(fromIdx, toIdx + 1);
+  if(!points.length) return;
+  const vwapSeries = vwapByAnchor.map(a => ({ ...a, series: a.series.slice(fromIdx, toIdx + 1) }));
+
+  if(ethVwapSlider) ethVwapSlider.setRange(fromMs, toMs);
+  else{
+    ethVwapSlider = createDateRangeSlider('ethvwapDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      ethVwapCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#ethvwapRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderEthVwapChart();
+    });
+  }
 
   const startMs = points[0].t;
   const endMs = points[points.length - 1].t;
@@ -14174,6 +14242,8 @@ function movingAverageSeries(points, windowDays){
 }
 const PICYCLE_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let picycleActiveRange = 'todo';
+let picycleCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let picycleSlider = null;
 function renderPiCycleChart(){
   const loadingEl = document.getElementById('picycleLoading');
   const errorEl = document.getElementById('picycleError');
@@ -14224,14 +14294,33 @@ function renderPiCycleChart(){
     }
   });
 
-  const fullEndMs = fullPoints[fullPoints.length - 1].t;
-  const picycleRangeYears = PICYCLE_RANGE_YEARS[picycleActiveRange];
-  const picycleCutoffMs = picycleRangeYears ? fullEndMs - picycleRangeYears * 365 * 86400000 : fullPoints[0].t;
-  let picycleFilterStartIdx = fullPoints.findIndex(p => p.t >= picycleCutoffMs);
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
+  let picycleFromMs, picycleToMs;
+  if(picycleCustomRange){
+    picycleFromMs = picycleCustomRange.fromMs;
+    picycleToMs = picycleCustomRange.toMs;
+  } else {
+    const picycleRangeYears = PICYCLE_RANGE_YEARS[picycleActiveRange];
+    picycleFromMs = picycleRangeYears ? fullEndMs - picycleRangeYears * 365 * 86400000 : fullStartMs;
+    picycleToMs = fullEndMs;
+  }
+  let picycleFilterStartIdx = fullPoints.findIndex(p => p.t >= picycleFromMs);
   if(picycleFilterStartIdx < 0) picycleFilterStartIdx = 0;
-  const points = fullPoints.slice(picycleFilterStartIdx);
-  const sma111 = sma111Trimmed.slice(picycleFilterStartIdx);
-  const sma350x2 = sma350x2Trimmed.slice(picycleFilterStartIdx);
+  let picycleFilterEndIdx = fullPoints.length - 1;
+  while(picycleFilterEndIdx >= 0 && fullPoints[picycleFilterEndIdx].t > picycleToMs) picycleFilterEndIdx--;
+  const points = fullPoints.slice(picycleFilterStartIdx, picycleFilterEndIdx + 1);
+  if(!points.length) return;
+  const sma111 = sma111Trimmed.slice(picycleFilterStartIdx, picycleFilterEndIdx + 1);
+  const sma350x2 = sma350x2Trimmed.slice(picycleFilterStartIdx, picycleFilterEndIdx + 1);
+
+  if(picycleSlider) picycleSlider.setRange(picycleFromMs, picycleToMs);
+  else{
+    picycleSlider = createDateRangeSlider('picycleDateSlider', fullStartMs, fullEndMs, picycleFromMs, picycleToMs, (f, t) => {
+      picycleCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderPiCycleChart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -14479,6 +14568,8 @@ function coinMetricsSeriesFor(rows, key){
 const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA_FROZEN = 11.48;
 const MFLOOR_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let mfloorActiveRange = 'todo';
+let mfloorCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let mfloorSlider = null;
 let marketFloorData = null;
 let marketFloorInFlight = null;
 let marketFloorSource = null; // 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
@@ -14626,10 +14717,27 @@ function renderMarketFloorChart(){
   // válido aunque el filtro de rango no lo muestre) — el filtro solo hace zoom visual
   const allPointsFull = allPoints.slice(validStartIdx);
   const crossings = detectMarketFloorCrossings(allPointsFull);
-  const fullEndMs = allPointsFull[allPointsFull.length - 1].t;
-  const mfloorRangeYears = MFLOOR_RANGE_YEARS[mfloorActiveRange];
-  const mfloorCutoffMs = mfloorRangeYears ? fullEndMs - mfloorRangeYears * 365 * 86400000 : allPointsFull[0].t;
-  const points = allPointsFull.filter(p => p.t >= mfloorCutoffMs);
+  const fullStartMs = allPointsFull[0].t, fullEndMs = allPointsFull[allPointsFull.length - 1].t;
+  let mfloorFromMs, mfloorToMs;
+  if(mfloorCustomRange){
+    mfloorFromMs = mfloorCustomRange.fromMs;
+    mfloorToMs = mfloorCustomRange.toMs;
+  } else {
+    const mfloorRangeYears = MFLOOR_RANGE_YEARS[mfloorActiveRange];
+    mfloorFromMs = mfloorRangeYears ? fullEndMs - mfloorRangeYears * 365 * 86400000 : fullStartMs;
+    mfloorToMs = fullEndMs;
+  }
+  const points = allPointsFull.filter(p => p.t >= mfloorFromMs && p.t <= mfloorToMs);
+  if(!points.length) return;
+
+  if(mfloorSlider) mfloorSlider.setRange(mfloorFromMs, mfloorToMs);
+  else{
+    mfloorSlider = createDateRangeSlider('mfloorDateSlider', fullStartMs, fullEndMs, mfloorFromMs, mfloorToMs, (f, t) => {
+      mfloorCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#mfloorRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderMarketFloorChart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -14773,6 +14881,8 @@ window.addEventListener('resize', () => {
    usan Ciclos de Halving, Rainbow Chart y Pi Cycle ---- */
 const EMA200_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ema200ActiveRange = 'todo';
+let ema200CustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let ema200Slider = null;
 function renderEma200Chart(){
   const loadingEl = document.getElementById('ema200Loading');
   const errorEl = document.getElementById('ema200Error');
@@ -14802,14 +14912,33 @@ function renderEma200Chart(){
   const emaTrimmed = emaFull.slice(validStartIdx);
   const smaTrimmed = smaFull.slice(validStartIdx);
 
-  const fullEndMs = fullPoints[fullPoints.length - 1].t;
-  const ema200RangeYears = EMA200_RANGE_YEARS[ema200ActiveRange];
-  const ema200CutoffMs = ema200RangeYears ? fullEndMs - ema200RangeYears * 365 * 86400000 : fullPoints[0].t;
-  let filterStartIdx = fullPoints.findIndex(p => p.t >= ema200CutoffMs);
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
+  let ema200FromMs, ema200ToMs;
+  if(ema200CustomRange){
+    ema200FromMs = ema200CustomRange.fromMs;
+    ema200ToMs = ema200CustomRange.toMs;
+  } else {
+    const ema200RangeYears = EMA200_RANGE_YEARS[ema200ActiveRange];
+    ema200FromMs = ema200RangeYears ? fullEndMs - ema200RangeYears * 365 * 86400000 : fullStartMs;
+    ema200ToMs = fullEndMs;
+  }
+  let filterStartIdx = fullPoints.findIndex(p => p.t >= ema200FromMs);
   if(filterStartIdx < 0) filterStartIdx = 0;
-  const points = fullPoints.slice(filterStartIdx);
-  const ema200 = emaTrimmed.slice(filterStartIdx);
-  const sma200 = smaTrimmed.slice(filterStartIdx);
+  let filterEndIdx = fullPoints.length - 1;
+  while(filterEndIdx >= 0 && fullPoints[filterEndIdx].t > ema200ToMs) filterEndIdx--;
+  const points = fullPoints.slice(filterStartIdx, filterEndIdx + 1);
+  if(!points.length) return;
+  const ema200 = emaTrimmed.slice(filterStartIdx, filterEndIdx + 1);
+  const sma200 = smaTrimmed.slice(filterStartIdx, filterEndIdx + 1);
+
+  if(ema200Slider) ema200Slider.setRange(ema200FromMs, ema200ToMs);
+  else{
+    ema200Slider = createDateRangeSlider('ema200DateSlider', fullStartMs, fullEndMs, ema200FromMs, ema200ToMs, (f, t) => {
+      ema200CustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#ema200RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderEma200Chart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -14970,6 +15099,8 @@ function findSupportTouch(points, peak){
 }
 const CICLOSOPORTE_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ciclosoporteActiveRange = 'todo';
+let ciclosoporteCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let ciclosoporteSlider = null;
 function renderCicloSoporteChart(){
   const loadingEl = document.getElementById('ciclosoporteLoading');
   const errorEl = document.getElementById('ciclosoporteError');
@@ -14995,10 +15126,27 @@ function renderCicloSoporteChart(){
   // años puede seguir sin tocarse todavía), pero lo que se dibuja/escala se recorta al rango
   // elegido — así el filtro solo hace zoom visual, no cambia el cálculo
   const allPeaks = computeCyclePeaks(allPoints).map(pk => ({ ...pk, touchT: findSupportTouch(allPoints, pk) }));
-  const fullEndMs = allPoints[allPoints.length - 1].t;
-  const rangeYears = CICLOSOPORTE_RANGE_YEARS[ciclosoporteActiveRange];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allPoints[0].t;
-  const points = allPoints.filter(p => p.t >= cutoffMs);
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let ciclosoporteFromMs, ciclosoporteToMs;
+  if(ciclosoporteCustomRange){
+    ciclosoporteFromMs = ciclosoporteCustomRange.fromMs;
+    ciclosoporteToMs = ciclosoporteCustomRange.toMs;
+  } else {
+    const rangeYears = CICLOSOPORTE_RANGE_YEARS[ciclosoporteActiveRange];
+    ciclosoporteFromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    ciclosoporteToMs = fullEndMs;
+  }
+  const points = allPoints.filter(p => p.t >= ciclosoporteFromMs && p.t <= ciclosoporteToMs);
+  if(!points.length) return;
+
+  if(ciclosoporteSlider) ciclosoporteSlider.setRange(ciclosoporteFromMs, ciclosoporteToMs);
+  else{
+    ciclosoporteSlider = createDateRangeSlider('ciclosoporteDateSlider', fullStartMs, fullEndMs, ciclosoporteFromMs, ciclosoporteToMs, (f, t) => {
+      ciclosoporteCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderCicloSoporteChart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -15159,6 +15307,8 @@ function computeRsiSeries(closes, length){
 const RSI_LENGTH = 14, RSI_CROSS_LEVEL = 50, RSI_BEAR_LEVEL = 45, RSI_COOLDOWN_MONTHS = 18;
 const RSI_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let rsiActiveRange = 'todo';
+let rsiCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let rsiSlider = null;
 function renderRsiChart(){
   const loadingEl = document.getElementById('rsiLoading');
   const errorEl = document.getElementById('rsiError');
@@ -15207,13 +15357,32 @@ function renderRsiChart(){
     }
   }
 
-  const fullEndMs = fullPoints[fullPoints.length - 1].t;
-  const rsiRangeYears = RSI_RANGE_YEARS[rsiActiveRange];
-  const rsiCutoffMs = rsiRangeYears ? fullEndMs - rsiRangeYears * 365 * 86400000 : fullPoints[0].t;
-  let rsiFilterStartIdx = fullPoints.findIndex(p => p.t >= rsiCutoffMs);
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
+  let rsiFromMs, rsiToMs;
+  if(rsiCustomRange){
+    rsiFromMs = rsiCustomRange.fromMs;
+    rsiToMs = rsiCustomRange.toMs;
+  } else {
+    const rsiRangeYears = RSI_RANGE_YEARS[rsiActiveRange];
+    rsiFromMs = rsiRangeYears ? fullEndMs - rsiRangeYears * 365 * 86400000 : fullStartMs;
+    rsiToMs = fullEndMs;
+  }
+  let rsiFilterStartIdx = fullPoints.findIndex(p => p.t >= rsiFromMs);
   if(rsiFilterStartIdx < 0) rsiFilterStartIdx = 0;
-  const points = fullPoints.slice(rsiFilterStartIdx);
-  const rsi = rsiTrimmed.slice(rsiFilterStartIdx);
+  let rsiFilterEndIdx = fullPoints.length - 1;
+  while(rsiFilterEndIdx >= 0 && fullPoints[rsiFilterEndIdx].t > rsiToMs) rsiFilterEndIdx--;
+  const points = fullPoints.slice(rsiFilterStartIdx, rsiFilterEndIdx + 1);
+  if(!points.length) return;
+  const rsi = rsiTrimmed.slice(rsiFilterStartIdx, rsiFilterEndIdx + 1);
+
+  if(rsiSlider) rsiSlider.setRange(rsiFromMs, rsiToMs);
+  else{
+    rsiSlider = createDateRangeSlider('rsimensualDateSlider', fullStartMs, fullEndMs, rsiFromMs, rsiToMs, (f, t) => {
+      rsiCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderRsiChart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -15361,6 +15530,7 @@ document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     rsiActiveRange = btn.dataset.range;
+    rsiCustomRange = null;
     renderRsiChart();
   });
 });
@@ -15370,6 +15540,7 @@ document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#ciclosoporteRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     ciclosoporteActiveRange = btn.dataset.range;
+    ciclosoporteCustomRange = null;
     renderCicloSoporteChart();
   });
 });
@@ -15379,6 +15550,7 @@ document.querySelectorAll('#mfloorRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#mfloorRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     mfloorActiveRange = btn.dataset.range;
+    mfloorCustomRange = null;
     renderMarketFloorChart();
   });
 });
@@ -15388,6 +15560,7 @@ document.querySelectorAll('#ema200RangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#ema200RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     ema200ActiveRange = btn.dataset.range;
+    ema200CustomRange = null;
     renderEma200Chart();
   });
 });
@@ -15397,6 +15570,7 @@ document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#rainbowRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     rainbowActiveRange = btn.dataset.range;
+    rainbowCustomRange = null;
     renderRainbowChart();
   });
 });
@@ -15406,6 +15580,7 @@ document.querySelectorAll('#ethlogregRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#ethlogregRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     ethLogRegActiveRange = btn.dataset.range;
+    ethLogRegCustomRange = null;
     renderEthLogRegChart();
   });
 });
@@ -15415,6 +15590,7 @@ document.querySelectorAll('#ethvwapRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#ethvwapRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     ethVwapActiveRange = btn.dataset.range;
+    ethVwapCustomRange = null;
     renderEthVwapChart();
   });
 });
@@ -15424,6 +15600,7 @@ document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#picycleRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     picycleActiveRange = btn.dataset.range;
+    picycleCustomRange = null;
     renderPiCycleChart();
   });
 });
@@ -16182,6 +16359,8 @@ function detectCyclePeaksTroughs(points, thresholdPct, minDays){
 }
 const BTCXAU_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2 };
 let btcxauActiveRange = 'todo';
+let btcxauCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
+let btcxauSlider = null;
 function renderBtcXauChart(){
   const loadingEl = document.getElementById('btcxauLoading');
   const errorEl = document.getElementById('btcxauError');
@@ -16203,10 +16382,27 @@ function renderBtcXauChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const fullEndMs = allPoints[allPoints.length - 1].t;
-  const rangeYears = BTCXAU_RANGE_YEARS[btcxauActiveRange];
-  const cutoffMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : allPoints[0].t;
-  const points = allPoints.filter(p => p.t >= cutoffMs);
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let btcxauFromMs, btcxauToMs;
+  if(btcxauCustomRange){
+    btcxauFromMs = btcxauCustomRange.fromMs;
+    btcxauToMs = btcxauCustomRange.toMs;
+  } else {
+    const rangeYears = BTCXAU_RANGE_YEARS[btcxauActiveRange];
+    btcxauFromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    btcxauToMs = fullEndMs;
+  }
+  const points = allPoints.filter(p => p.t >= btcxauFromMs && p.t <= btcxauToMs);
+  if(!points.length) return;
+
+  if(btcxauSlider) btcxauSlider.setRange(btcxauFromMs, btcxauToMs);
+  else{
+    btcxauSlider = createDateRangeSlider('btcxauDateSlider', fullStartMs, fullEndMs, btcxauFromMs, btcxauToMs, (f, t) => {
+      btcxauCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#btcxauRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderBtcXauChart();
+    });
+  }
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
@@ -16349,6 +16545,7 @@ document.querySelectorAll('#btcxauRangeFilter .tf-pill').forEach(btn => {
     document.querySelectorAll('#btcxauRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     btcxauActiveRange = btn.dataset.range;
+    btcxauCustomRange = null;
     renderBtcXauChart();
   });
 });
