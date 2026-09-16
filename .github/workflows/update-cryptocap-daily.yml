@@ -9,6 +9,12 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      # tvDatafeed convierte las fechas usando la hora local de la maquina
+      # que corre el script (no fuerza UTC internamente) - fijar TZ=UTC aqui
+      # asegura que las velas queden siempre con la fecha/hora correcta,
+      # sin depender de que el runner de GitHub siga usando UTC por defecto
+      TZ: UTC
     steps:
       - uses: actions/checkout@v4
 
