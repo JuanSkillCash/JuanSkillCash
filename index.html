@@ -1484,9 +1484,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="ethvsalt">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
       </button>
-      <button class="sb-item" data-indic-jump="nearvsalt">
-        <span class="sb-item-icon">🧮</span><span class="sb-item-label">Valoración Relativa NEAR vs Altcoins</span>
-      </button>
 
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
       <button class="sb-item" data-cat-home="portafolio">
@@ -1669,9 +1666,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvsalt">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="nearvsalt">
-        <span class="sb-item-icon">🧮</span><span class="sb-item-label">Valoración Relativa NEAR vs Altcoins</span>
       </button>
     </nav>
 
@@ -2177,12 +2171,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">⚖️</div>
               <div class="indic-guide-card-title">Valoración Relativa ETH vs Altcoins</div>
               <div class="indic-guide-card-text">Compara el tamaño de las altcoins contra Ethereum — te dice si conviene estar en ETH o rotar a las altcoins.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="nearvsalt">
-              <div class="indic-guide-icon">🧮</div>
-              <div class="indic-guide-card-title">Valoración Relativa NEAR vs Altcoins</div>
-              <div class="indic-guide-card-text">La misma idea que Valoración Relativa ETH vs Altcoins, pero comparando contra NEAR.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
           </div>
@@ -3359,44 +3347,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
-        <div class="indic-panel" data-indic="nearvsalt" style="display:none">
-          <div class="indic-chart-card">
-            <div class="calc">
-              <div class="calc-head">
-                <div class="calc-eyebrow">
-                  <img src="logo-skillcash-600.png" alt="SkillCash">
-                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-                </div>
-                <h2 class="calc-title">Valoración Relativa NEAR vs Altcoins</h2>
-              </div>
-
-              <div class="indic-chart-body" id="nearvsaltChartBody">
-                <div class="indic-chart-soon" id="nearvsaltLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Descargando el histórico de TOTAL3, TOTAL, USDT.D y NEAR.</div>
-                </div>
-                <div class="indic-chart-soon" id="nearvsaltError" style="display:none">
-                  <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="nearvsaltErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
-                </div>
-                <div id="nearvsaltChartWrap" class="chart-breakout" style="display:none"></div>
-                <div id="nearvsaltDateSlider" class="date-range-slider"></div>
-              </div>
-              <div class="partner-perks" id="nearvsaltLegend" style="display:none;margin-bottom:18px"></div>
-              <div class="chart-stats-grid" id="nearvsaltStats" style="display:none"></div>
-
-              <div class="calc-disclaimer" style="margin-top:18px">
-                🧮 La misma idea que "Valoración Relativa ETH vs Altcoins", pero te dice si conviene estar dentro de NEAR o rotar hacia las altcoins.<br>
-                🟢 Alto = NEAR barato frente a las altcoins (acumular NEAR). 🔴 Bajo = NEAR caro frente a las altcoins (rotar a altcoins).<br>
-                🟢🔴 Aquí las bandas se calculan sobre el propio rango histórico de NEAR — todavía no hay umbrales fijos verificados contra un gráfico real para esta moneda.<br>
-                <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="indic-panel" data-indic="btcxau" style="display:none">
           <div class="indic-chart-card">
@@ -6113,9 +6063,9 @@ const INDIC_GROUPS = {
   macro: [],
   mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
   onchain: [],
-  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'nearvsalt', label: 'Valoración Relativa NEAR vs Altcoins' }],
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia', nearvsalt: 'dominancia' };
+const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia' };
 document.querySelectorAll('#predCoinFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     if(btn.classList.contains('active')) return;
@@ -6192,7 +6142,6 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'ethbtc') ensureEthBtcLoaded();
       if(btn.dataset.indic === 'altfever') ensureAltFeverLoaded();
       if(btn.dataset.indic === 'ethvsalt') ensureEthVsAltLoaded();
-      if(btn.dataset.indic === 'nearvsalt') ensureNearVsAltLoaded();
     });
   });
   showIndicPanel(items[0].id);
@@ -6233,7 +6182,6 @@ function jumpToIndicator(id){
     if(id === 'ethbtc') ensureEthBtcLoaded();
     if(id === 'altfever') ensureAltFeverLoaded();
     if(id === 'ethvsalt') ensureEthVsAltLoaded();
-    if(id === 'nearvsalt') ensureNearVsAltLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
@@ -15953,14 +15901,6 @@ const DOM_CHART_DEFS = {
     // (ETH caro frente a las altcoins — rotar a altcoins), en varias ocasiones distintas
     zones: { topLabel: 'ETH Barato — Acumular ETH', topColor: '#22c55e', topFrom: 3.2, topTo: 3.35, bottomLabel: 'ETH Caro — Rotar a Altcoins', bottomColor: '#ff2f4f', bottomFrom: 1.0, bottomTo: 1.1 },
   },
-  nearvsalt: {
-    loadFn: () => fetchNearVsAltRealHistory(), realSeries: () => nearVsAltRealSeries, exact: true, fmtVal: fmtRatioAxis,
-    series: [{ key: 'v', color: '#00ec97', label: 'NEAR vs Altcoins' }],
-    // a diferencia de ethvsalt, todavía no hay umbrales fijos verificados a mano contra un
-    // gráfico real para NEAR — sin topFrom/topTo/bottomFrom/bottomTo, renderDomChart calcula la
-    // zona como el 15% superior/inferior del propio rango de datos cargado (ver más abajo)
-    zones: { topLabel: 'NEAR Barato — Acumular NEAR', topColor: '#22c55e', bottomLabel: 'NEAR Caro — Rotar a Altcoins', bottomColor: '#ff2f4f' },
-  },
 };
 // dombtc/domusdt/domall SIGUEN mostrando además el % real de HOY vía /global (más preciso que el
 // último día cargado en cryptocap_history, que puede ir hasta un día atrás) — DOM_LIVE_DEFS declara
@@ -16142,33 +16082,6 @@ async function fetchEthVsAltRealHistory(){
     });
   }
   return ethVsAltRealPromise;
-}
-// Valoración Relativa NEAR vs Altcoins: (TOTAL3 − USDT) ÷ NEAR — igual que la de ETH, dividiendo
-// por el market cap de NEAR (no su precio: dividir una cifra en dólares del tamaño de todo el
-// mercado de altcoins entre un precio de unos pocos dólares da un número absurdamente grande y
-// sin sentido — el market cap de NEAR está en la misma unidad que el resto, así que el ratio da
-// una escala normal, igual a la que se ve en un gráfico real)
-let nearVsAltRealSeries = null, nearVsAltRealPromise = null;
-async function fetchNearVsAltRealHistory(){
-  if(nearVsAltRealSeries) return nearVsAltRealSeries;
-  if(!nearVsAltRealPromise){
-    nearVsAltRealPromise = Promise.all([
-      fetchCryptocapSeries('CRYPTOCAP:TOTAL3'),
-      fetchCryptocapSeries('CRYPTOCAP:TOTAL'),
-      fetchCryptocapSeries('CRYPTOCAP:USDT.D'),
-      fetchCryptocapSeries('CRYPTOCAP:NEAR'),
-    ]).then(([total3, total, usdtD, nearCap]) => {
-      nearVsAltRealSeries = alignSeriesByDay([total3, total, usdtD, nearCap])
-        .map(r => {
-          const [t3, tot, usdtPct, near] = r.vals;
-          const usdt = (usdtPct / 100) * tot;
-          return near > 0 ? { t: r.t, v: (t3 - usdt) / near } : null;
-        })
-        .filter(Boolean);
-      return nearVsAltRealSeries;
-    });
-  }
-  return nearVsAltRealPromise;
 }
 // Rotación ETH.D/BTC.D: división exacta entre las dos series reales, día por día (solo en los
 // días donde ambas ya existían)
@@ -16449,7 +16362,7 @@ async function loadDomChartDetail(key){
   try{ await def.loadFn(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
   renderDomChart(key);
 }
-const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false, nearvsalt: false };
+const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false };
 function ensureDomRatioLoaded(){ if(!domLoadedOnce.domratio){ domLoadedOnce.domratio = true; loadDomChartDetail('domratio'); } }
 function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomLiveDetail('domall'); loadDomChartDetail('domall'); } }
 function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomLiveDetail('dombtc'); loadDomChartDetail('dombtc'); } }
@@ -16458,7 +16371,6 @@ function ensureOthersBtcLoaded(){ if(!domLoadedOnce.othersbtc){ domLoadedOnce.ot
 function ensureEthBtcLoaded(){ if(!domLoadedOnce.ethbtc){ domLoadedOnce.ethbtc = true; loadDomChartDetail('ethbtc'); } }
 function ensureAltFeverLoaded(){ if(!domLoadedOnce.altfever){ domLoadedOnce.altfever = true; loadDomChartDetail('altfever'); } }
 function ensureEthVsAltLoaded(){ if(!domLoadedOnce.ethvsalt){ domLoadedOnce.ethvsalt = true; loadDomChartDetail('ethvsalt'); } }
-function ensureNearVsAltLoaded(){ if(!domLoadedOnce.nearvsalt){ domLoadedOnce.nearvsalt = true; loadDomChartDetail('nearvsalt'); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="domratio"]').style.display !== 'none') renderDomChart('domratio');
   if(document.querySelector('.indic-panel[data-indic="domall"]').style.display !== 'none') renderDomChart('domall');
@@ -16468,7 +16380,6 @@ window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="ethbtc"]').style.display !== 'none') renderDomChart('ethbtc');
   if(document.querySelector('.indic-panel[data-indic="altfever"]').style.display !== 'none') renderDomChart('altfever');
   if(document.querySelector('.indic-panel[data-indic="ethvsalt"]').style.display !== 'none') renderDomChart('ethvsalt');
-  if(document.querySelector('.indic-panel[data-indic="nearvsalt"]').style.display !== 'none') renderDomChart('nearvsalt');
 });
 document.querySelectorAll('#domallRangeFilter .tf-pill').forEach(btn => {
   btn.addEventListener('click', () => {
