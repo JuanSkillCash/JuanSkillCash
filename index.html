@@ -17230,19 +17230,19 @@ async function loadFearGreedIndex(){
   const classEl2 = document.getElementById('fngClass2');
   const markerEl2 = document.getElementById('fngMarker2');
   try{
-    // se prefiere el valor de CoinMarketCap (el más reconocido) ya respaldado en Supabase para
-    // hoy — si el robot diario todavía no ha corrido hoy, se cae de vuelta a alternative.me
+    // se prefiere el valor EN VIVO de CoinMarketCap (el más reconocido), respaldado en Supabase
+    // cada hora por update_cmc_fng_latest.py — si por lo que sea no hay dato ahí todavía, se cae
+    // de vuelta a alternative.me, como venía funcionando antes
     let val, classEs;
-    const todayUtc = new Date().toISOString().slice(0, 10);
-    let cmcToday = null;
+    let cmcLatest = null;
     try{
-      const { data } = await sbClient.from('cmc_fng_history').select('value,value_classification').eq('day', todayUtc).maybeSingle();
-      cmcToday = data;
+      const { data } = await sbClient.from('cmc_fng_latest').select('value,value_classification').eq('id', 1).maybeSingle();
+      cmcLatest = data;
     } catch(e){ /* sigue con alternative.me si falla */ }
 
-    if(cmcToday){
-      val = parseInt(cmcToday.value, 10);
-      classEs = FNG_LABELS_ES[cmcToday.value_classification] || cmcToday.value_classification;
+    if(cmcLatest){
+      val = parseInt(cmcLatest.value, 10);
+      classEs = FNG_LABELS_ES[cmcLatest.value_classification] || cmcLatest.value_classification;
     } else {
       const res = await fetch('https://api.alternative.me/fng/?limit=1');
       const json = await res.json();
@@ -17277,7 +17277,7 @@ async function loadFearGreedIndex(){
   }
 }
 loadFearGreedIndex();
-setInterval(loadFearGreedIndex, 86400000); // se refresca solo cada 24 horas — el índice en sí solo se calcula una vez al día
+setInterval(loadFearGreedIndex, 3600000); // se refresca cada hora — así de seguido se actualiza el valor en vivo de CMC en Supabase
 
 /* ---- dominancia BTC / USDT ---- */
 let lastDominanceUpdate = null; // guarda cuándo llegó el último dato exitoso, para el relojito

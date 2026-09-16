@@ -1,0 +1,30 @@
+name: Actualizar valor en vivo de CMC Miedo y Codicia
+
+# Corre cada hora (a diferencia del robot diario, que solo respalda el valor ya CERRADO del
+# dia) para que el widget del dashboard muestre algo cercano al numero "en vivo" que se ve
+# ahora mismo en CoinMarketCap, no solo el del dia anterior.
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests
+
+      - name: Descargar y subir valor en vivo de CMC Miedo y Codicia
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python scripts/update_cmc_fng_latest.py
