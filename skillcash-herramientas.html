@@ -2164,7 +2164,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altfever">
               <div class="indic-guide-icon">🔥</div>
               <div class="indic-guide-card-title">Euforia de Altcoins</div>
-              <div class="indic-guide-card-text">OTHERS ÷ (TOTAL3 − OTHERS) — cuando las altcoins pequeñas corren más que las grandes, históricamente coincide con techos del mercado.</div>
+              <div class="indic-guide-card-text">Cuando las altcoins pequeñas corren más fuerte que las grandes, históricamente coincide con techos del mercado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvsalt">
@@ -3306,7 +3306,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="altfeverStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🔥 OTHERS ÷ (TOTAL3 − OTHERS): compara el tamaño del mercado de las altcoins "de cola larga" contra el de las altcoins grandes. Cuando sube, el dinero está entrando más fuerte a las altcoins pequeñas que a las grandes — históricamente eso ha coincidido con techos del mercado de altcoins.<br>
+                🔥 Compara qué tan fuerte están corriendo las altcoins pequeñas frente a las grandes. Cuando sube, el dinero está entrando más fuerte a las altcoins pequeñas que a las grandes — históricamente eso ha coincidido con techos del mercado de altcoins.<br>
                 🟢🔴 Las bandas de comprar/vender son umbrales fijos, tomados del rango histórico completo del ratio.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
               </div>
@@ -15932,7 +15932,7 @@ const DOM_CHART_DEFS = {
   },
   altfever: {
     loadFn: () => fetchAltFeverRealHistory(), realSeries: () => altFeverRealSeries, exact: true, fmtVal: fmtRatioAxis,
-    series: [{ key: 'v', color: '#f0b23d', label: 'OTHERS / (TOTAL3 − OTHERS)' }],
+    series: [{ key: 'v', color: '#f0b23d', label: 'Euforia de Altcoins' }],
     // umbrales FIJOS tomados del histórico real 2018-2026 de TradingView (CRYPTOCAP:OTHERS/
     // (CRYPTOCAP:TOTAL3-CRYPTOCAP:OTHERS)): los techos del ratio se han repetido cerca de
     // 0.65-0.9 (ahí las altcoins de cola larga ya corrieron mucho — vender), y los suelos cerca
