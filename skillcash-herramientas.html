@@ -1247,6 +1247,14 @@ img[src=""]{display:none}
 .tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
 .tf-pill:hover{border-color:var(--red);color:var(--white)}
 .tf-pill.active{background:var(--red);border-color:var(--red);color:#fff}
+/* control deslizante de rango de fechas (doble manija) — complementa a los botones tf-pill,
+   para elegir un rango exacto arrastrando en vez de solo los rangos fijos */
+.date-range-slider{margin:6px 0 20px;padding:0 4px}
+.drs-track{position:relative;height:5px;border-radius:99px;background:var(--border2)}
+.drs-range{position:absolute;top:0;height:100%;border-radius:99px;background:var(--red)}
+.drs-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transform:translate(-50%,-50%);cursor:grab;touch-action:none}
+.drs-thumb:active{cursor:grabbing}
+.drs-labels{display:flex;justify-content:space-between;margin-top:10px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--muted2)}
 .chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .chart-stats-grid .res-card{min-width:0}
 .chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
@@ -2330,6 +2338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                         </div>
                       </div>
                       <div id="fngChartWrap" class="chart-breakout"></div>
+                      <div id="fngDateSlider" class="date-range-slider"></div>
 
                       <div class="chart-stats-grid">
                         <div class="res-card"><div class="r-label">Ayer</div><div class="r-val" id="fngYesterday">—</div></div>
@@ -12509,6 +12518,81 @@ function fngColorClass(val){
   return 'fng-green';
 }
 
+/* ---- control deslizante de rango de fechas (doble manija), pensado para reutilizarse en
+   cualquier gráfico del sitio: dos manijas arrastrables sobre una barra, mapeadas linealmente
+   entre la fecha más vieja y la más nueva de los datos ya cargados. onChange(fromMs, toMs) se
+   llama en vivo mientras se arrastra (no solo al soltar), para que el gráfico se sienta fluido ---- */
+function createDateRangeSlider(containerId, minMs, maxMs, fromMs, toMs, onChange){
+  const container = document.getElementById(containerId);
+  if(!container) return null;
+  container.innerHTML = `
+    <div class="drs-track">
+      <div class="drs-range"></div>
+      <div class="drs-thumb" data-thumb="from"></div>
+      <div class="drs-thumb" data-thumb="to"></div>
+    </div>
+    <div class="drs-labels">
+      <span data-label="from"></span>
+      <span data-label="to"></span>
+    </div>
+  `;
+  const track = container.querySelector('.drs-track');
+  const rangeEl = container.querySelector('.drs-range');
+  const fromThumb = container.querySelector('[data-thumb="from"]');
+  const toThumb = container.querySelector('[data-thumb="to"]');
+  const fromLabel = container.querySelector('[data-label="from"]');
+  const toLabel = container.querySelector('[data-label="to"]');
+  const span = (maxMs - minMs) || 1;
+  const MIN_GAP_MS = 86400000; // no se deja cerrar el rango a menos de 1 día
+  let curFrom = fromMs, curTo = toMs;
+
+  const fmtDate = ms => new Date(ms).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const pctFor = ms => Math.max(0, Math.min(100, ((ms - minMs) / span) * 100));
+  function paint(){
+    const fromPct = pctFor(curFrom), toPct = pctFor(curTo);
+    fromThumb.style.left = fromPct + '%';
+    toThumb.style.left = toPct + '%';
+    rangeEl.style.left = fromPct + '%';
+    rangeEl.style.width = (toPct - fromPct) + '%';
+    fromLabel.textContent = fmtDate(curFrom);
+    toLabel.textContent = fmtDate(curTo);
+  }
+  paint();
+
+  function msFromClientX(clientX){
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / (rect.width || 1)));
+    return Math.round(minMs + pct * span);
+  }
+  function startDrag(thumbKey){
+    function move(clientX){
+      const ms = msFromClientX(clientX);
+      if(thumbKey === 'from') curFrom = Math.max(minMs, Math.min(ms, curTo - MIN_GAP_MS));
+      else curTo = Math.min(maxMs, Math.max(ms, curFrom + MIN_GAP_MS));
+      paint();
+      onChange(curFrom, curTo);
+    }
+    function onMouseMove(e){ move(e.clientX); }
+    function onTouchMove(e){ if(e.touches[0]) move(e.touches[0].clientX); }
+    function stop(){
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', stop);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', stop);
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', stop);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', stop);
+  }
+  fromThumb.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag('from'); });
+  fromThumb.addEventListener('touchstart', () => startDrag('from'), { passive: true });
+  toThumb.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag('to'); });
+  toThumb.addEventListener('touchstart', () => startDrag('to'), { passive: true });
+
+  return { setRange(f, t){ curFrom = f; curTo = t; paint(); } };
+}
+
 /* ---- panel de detalle del índice, con historial real (gratis, vía alternative.me) ---- */
 function fngRecommendationText(val){
   if(val <= 24){
@@ -12571,10 +12655,13 @@ function closestBtcPrice(targetMs){
   return bestDiff <= 2 * 86400000 ? best[1] : null;
 }
 
-function renderFngChart(days){
+function renderFngChart(fromMs, toMs){
   if(!fngCachedData) return;
-  const sliceCount = Math.min(days, fngCachedData.length);
-  const slice = fngCachedData.slice(0, sliceCount).slice().reverse(); // de más viejo a más nuevo, para dibujar izquierda→derecha
+  const slice = fngCachedData.filter(d => {
+    const ms = parseInt(d.timestamp, 10) * 1000;
+    return ms >= fromMs && ms <= toMs;
+  }).slice().reverse(); // de más viejo a más nuevo, para dibujar izquierda→derecha
+  if(!slice.length) return;
   const values = slice.map(d => parseInt(d.value, 10));
   const timestampsMs = slice.map(d => parseInt(d.timestamp, 10) * 1000);
   const dates = timestampsMs.map(ms => new Date(ms));
@@ -12722,11 +12809,21 @@ function renderFngChart(days){
   });
 }
 
+let fngSlider = null;
+function fngFullRangeMs(){
+  const maxMs = parseInt(fngCachedData[0].timestamp, 10) * 1000; // más nuevo primero
+  const minMs = parseInt(fngCachedData[fngCachedData.length - 1].timestamp, 10) * 1000;
+  return { minMs, maxMs };
+}
 document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderFngChart(parseInt(btn.dataset.range, 10));
+    const days = parseInt(btn.dataset.range, 10);
+    const { minMs, maxMs } = fngFullRangeMs();
+    const fromMs = Math.max(minMs, maxMs - days * 86400000);
+    renderFngChart(fromMs, maxMs);
+    if(fngSlider) fngSlider.setRange(fromMs, maxMs);
   });
 });
 
@@ -12772,7 +12869,13 @@ async function loadFngDetail(){
     await fetchBtcPriceHistory();
 
     // por defecto se dibuja con todo el histórico (el botón "Todo" ya está activo desde el HTML)
-    renderFngChart(999999);
+    const { minMs, maxMs } = fngFullRangeMs();
+    renderFngChart(minMs, maxMs);
+    fngSlider = createDateRangeSlider('fngDateSlider', minMs, maxMs, minMs, maxMs, (fromMs, toMs) => {
+      // arrastrar el slider deja de coincidir con ningún botón fijo — se desactivan todos
+      document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(b => b.classList.remove('active'));
+      renderFngChart(fromMs, toMs);
+    });
 
     document.getElementById('fngDetailLoading').style.display = 'none';
     document.getElementById('fngDetailContent').style.display = 'block';
