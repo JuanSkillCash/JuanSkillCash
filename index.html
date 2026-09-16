@@ -1826,6 +1826,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-sub">23 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="idxAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#60a5fa" stop-opacity=".4"/>
+                <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M15,28 C40,16 65,36 90,24 C115,12 140,32 165,18 C190,6 215,26 240,12 C258,4 272,10 285,6 L285,78 L15,78 Z" fill="url(#idxAreaGrad)"/>
             <line x1="30" y1="10" x2="30" y2="62" stroke="#3b82f6" stroke-width="1.5"/>
             <rect x="23" y="22" width="14" height="22" fill="#3b82f6"/>
             <line x1="72" y1="18" x2="72" y2="58" stroke="#60a5fa" stroke-width="1.5"/>
@@ -1840,8 +1847,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <rect x="233" y="16" width="14" height="16" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
             <line x1="276" y1="18" x2="276" y2="56" stroke="#3b82f6" stroke-width="1.5"/>
             <rect x="269" y="28" width="14" height="20" fill="#3b82f6"/>
-            <path d="M15,28 C40,16 65,36 90,24 C115,12 140,32 165,18 C190,6 215,26 240,12 C258,4 272,10 285,6" fill="none" stroke="#bfdbfe" stroke-width="1.8" opacity=".8" stroke-linecap="round"/>
-            <circle cx="285" cy="6" r="3.5" fill="#bfdbfe"/>
+            <path d="M15,28 C40,16 65,36 90,24 C115,12 140,32 165,18 C190,6 215,26 240,12 C258,4 272,10 285,6" fill="none" stroke="#bfdbfe" stroke-width="2.2" opacity=".95" stroke-linecap="round"/>
+            <circle cx="285" cy="6" r="8" fill="none" stroke="#bfdbfe" stroke-width="1.3" opacity=".45"/>
+            <circle cx="285" cy="6" r="4" fill="#bfdbfe"/>
+            <g transform="translate(214,4)">
+              <rect width="58" height="18" rx="9" fill="rgba(59,130,246,.22)" stroke="#60a5fa" stroke-width="1"/>
+              <path d="M9 12.5l4-6 4 6" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="21" y="13" font-family="'Space Mono',monospace" font-size="9.5" font-weight="700" fill="#eaf1ff">+12.4%</text>
+            </g>
           </svg>
         </div>
         <div class="cat-overview-desc">Ciclos de halving, dominancia, sentimiento y más señales de mercado en un solo lugar, organizadas por pestañas.</div>
@@ -1875,12 +1888,20 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-sub">BITUNIX Y MENTORÍA</div>
         <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="100" height="64" viewBox="0 0 100 64">
-            <path d="M37 36 L26 58 L37 53 L44 61 Z" fill="#f0b23d" opacity=".85"/>
-            <path d="M63 36 L74 58 L63 53 L56 61 Z" fill="#f0b23d" opacity=".85"/>
-            <circle cx="50" cy="27" r="23" fill="rgba(240,178,61,.1)" stroke="#f0b23d" stroke-width="2.2"/>
-            <circle cx="50" cy="27" r="16" fill="none" stroke="#f7d38a" stroke-width="1.5"/>
-            <path d="M41.5 27l5.5 5.5L59.5 20" fill="none" stroke="#f7d38a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="130" height="70" viewBox="0 0 130 70">
+            <line x1="27" y1="44" x2="45" y2="32" stroke="#f0b23d" stroke-width="1.5" stroke-dasharray="2.5,3" opacity=".65"/>
+            <line x1="103" y1="44" x2="85" y2="32" stroke="#f0b23d" stroke-width="1.5" stroke-dasharray="2.5,3" opacity=".65"/>
+            <circle cx="19" cy="50" r="12.5" fill="rgba(240,178,61,.1)" stroke="#f7d38a" stroke-width="1.6"/>
+            <path d="M14.5 50l2.6 2.6 5.4-5.6" fill="none" stroke="#f7d38a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="111" cy="50" r="12.5" fill="rgba(240,178,61,.1)" stroke="#f7d38a" stroke-width="1.6"/>
+            <path d="M106.5 50l2.6 2.6 5.4-5.6" fill="none" stroke="#f7d38a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M52 39 L41 61 L52 56 L59 64 Z" fill="#f0b23d" opacity=".85"/>
+            <path d="M78 39 L89 61 L78 56 L71 64 Z" fill="#f0b23d" opacity=".85"/>
+            <circle cx="65" cy="29" r="24" fill="rgba(240,178,61,.16)" stroke="#f0b23d" stroke-width="2.4"/>
+            <circle cx="65" cy="29" r="17" fill="none" stroke="#f7d38a" stroke-width="1.6"/>
+            <path d="M56 29l5.7 5.7L74.5 22" fill="none" stroke="#f7d38a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M23 12l1.7 4.3 4.3 1.7-4.3 1.7L23 24l-1.7-4.3-4.3-1.7 4.3-1.7z" fill="#f7d38a" opacity=".85"/>
+            <path d="M109 16l1.2 3.1 3.1 1.2-3.1 1.2-1.2 3.1-1.2-3.1-3.1-1.2 3.1-1.2z" fill="#f7d38a" opacity=".75"/>
           </svg>
         </div>
         <div class="cat-overview-desc">Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
