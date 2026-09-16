@@ -5933,6 +5933,11 @@ function renderIndicSubtabs(group){
   showIndicPanel(items[0].id);
 }
 function jumpToIndicator(id){
+  // entrar a un indicador siempre debe verse desde arriba — sin esto, un click hecho desde la
+  // Guía (que es una página larga) o desde Favoritos hereda el scroll que traía esa página y
+  // puede aterrizar a mitad del panel nuevo (más corto), mostrando solo las tarjetas/disclaimer
+  // del final en vez del título y el gráfico
+  categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const standalone = id === 'guia' || id === 'predicciones';
   const group = standalone ? id : (INDIC_ID_TO_GROUP[id] || 'guia');
   if(indicGroupTabs){
