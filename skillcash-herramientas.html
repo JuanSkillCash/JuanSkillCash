@@ -2879,21 +2879,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Combo de Dominancia (BTC+ETH+USDT+USDC)</h2>
-                <p class="calc-sub">La suma de la dominancia de estas 4 monedas juntas: qué % del mercado controlan entre todas — dato real de CoinGecko, calculado con el mercado completo, no una aproximación.</p>
+                <p class="calc-sub">La suma de la dominancia de estas 4 monedas juntas: qué % del mercado controlan entre todas — histórico real de TradingView (CRYPTOCAP), no una aproximación.</p>
+              </div>
+
+              <div class="tf-pill-row" id="domallRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
               </div>
 
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando dato en vivo…</div>
-                  <div class="indic-placeholder-text">Consultando el % real de dominancia en CoinGecko.</div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Trayendo el histórico real de BTC.D + ETH.D + USDT.D + USDC.D.</div>
                 </div>
                 <div class="indic-chart-soon" id="domallError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
+                <div id="domallChartWrap" class="chart-breakout" style="display:none"></div>
               </div>
+              <div class="partner-perks" id="domallLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="domallChartStats" style="display:none"></div>
               <div class="indic-gauge-row">
                 <div class="indic-ring-wrap" id="domallGauge" style="display:none">
                   <div class="be-savings-label" style="text-align:center">DATO DE HOY</div>
@@ -2914,7 +2924,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="fng-big-value" id="domallGaugeValue">—</div>
                   <div class="fng-big-class" id="domallGaugeClass">—</div>
                   <div class="indic-ring-legend">
-                    <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 61–63%</div>
+                    <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--red)"></span>Venta 63–65%</div>
                     <div class="indic-ring-legend-item"><span class="indic-ring-legend-dot" style="background:var(--green)"></span>Compra 81–83%</div>
                   </div>
                 </div>
@@ -2930,8 +2940,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🥧 Suma real de CoinGecko (BTC.D + ETH.D + USDT.D + USDC.D), calculada por ellos con el mercado completo — no es una aproximación nuestra.<br>
-                ⚠️ No mostramos el historial de este número: CoinGecko no da gratis el market cap total histórico de TODO el mercado, y la aproximación que usábamos antes (contra una canasta de ~15 monedas) daba niveles que la dominancia real nunca tuvo — preferimos mostrar solo el dato de hoy, que sí es exacto, en vez de un gráfico que podía verse mal.<br>
+                🥧 Línea del gráfico: suma real de TradingView (CRYPTOCAP:BTC.D + ETH.D + USDT.D + USDC.D), histórico diario completo — no una aproximación. El medidor de abajo muestra el % de HOY en vivo, calculado directo con CoinGecko.<br>
+                🟢 Zona verde (81–83%): <b>Comprar Altcoins</b> — cuando estas 4 juntas controlan tanto del mercado, el resto de las monedas (altcoins) está históricamente comprimido/barato frente a ellas.<br>
+                🔴 Zona roja (63–65%): <b>Vender Altcoins</b> — cuando estas 4 controlan tan poco del mercado, las altcoins ya corrieron mucho y concentran una parte inusualmente grande.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -15431,7 +15442,7 @@ async function fetchDominanceData(){
   })();
   return domRowsInFlight;
 }
-const DOM_RANGE_YEARS = { todo: null, '2a': 2, '1a': 1 };
+const DOM_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2, '1a': 1 };
 // cada gráfico de dominancia declara qué monedas de la canasta necesita tener presentes ese día
 // (para no arrancar la serie en 0 antes de que esa moneda existiera), qué líneas dibuja y cómo
 // calcular el valor de cada una a partir de la fila de ese día
@@ -15446,6 +15457,11 @@ const DOM_CHART_DEFS = {
     // (rotar de vuelta a BTC), cerca de 10-16% ETH está barato frente a BTC (comprar)
     zones: { topLabel: 'Vender ETH', topColor: '#ff2f4f', topFrom: 50, topTo: 55, bottomLabel: 'Comprar ETH', bottomColor: '#22c55e', bottomFrom: 10, bottomTo: 16 },
   },
+  domall: {
+    realSeries: () => domAllRealSeries, exact: true, statsId: 'domallChartStats',
+    series: [{ key: 'v', color: '#ffffff', label: 'BTC+ETH+USDT+USDC' }],
+    zones: { topLabel: 'Comprar Altcoins', topColor: '#22c55e', topFrom: 81, topTo: 83, bottomLabel: 'Vender Altcoins', bottomColor: '#ff2f4f', bottomFrom: 63, bottomTo: 65 },
+  },
 };
 // Dominancia BTC, Dominancia USDT y BTC+ETH+USDT+USDC ya no tienen gráfico histórico (ver nota
 // arriba de DOM_BASKET) — solo muestran el % real de hoy vía /global. DOM_LIVE_DEFS declara qué
@@ -15456,9 +15472,65 @@ const DOM_LIVE_DEFS = {
   // gauge: umbrales fijos que el usuario dio para el anillo (venta 61-63%, compra 81-83%),
   // con min/max con margen extra para que el anillo se vea "lejos" cuando de verdad lo está
   domall: { label: 'Combo de Dominancia', keys: ['btc', 'eth', 'usdt', 'usdc'], breakdown: true,
-    gauge: { min: 55, max: 90, sellFrom: 61, sellTo: 63, buyFrom: 81, buyTo: 83 } },
+    gauge: { min: 55, max: 90, sellFrom: 63, sellTo: 65, buyFrom: 81, buyTo: 83 } },
 };
 const DOM_LIVE_LABELS = { btc: 'BTC', eth: 'ETH', usdt: 'USDT', usdc: 'USDC' };
+
+// histórico REAL (no aproximado) de TradingView vía CRYPTOCAP, cargado antes a Supabase
+// (tabla cryptocap_history: symbol tipo "CRYPTOCAP:BTC.D", una fila por día, se actualiza sola
+// todos los días) — a diferencia de domRows (canasta CoinGecko limitada a ~12 meses), esto tiene
+// el historial completo desde que TradingView empezó a calcular cada símbolo
+let cryptocapSeriesCache = {};
+async function fetchCryptocapSeries(symbolFull){
+  if(cryptocapSeriesCache[symbolFull]) return cryptocapSeriesCache[symbolFull];
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await sbClient
+      .from('cryptocap_history')
+      .select('datetime,close')
+      .eq('symbol', symbolFull)
+      .order('datetime', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  const series = rows
+    .map(r => ({ t: Date.parse(r.datetime), c: Number(r.close) }))
+    .filter(r => isFinite(r.t) && isFinite(r.c));
+  cryptocapSeriesCache[symbolFull] = series;
+  return series;
+}
+let domAllRealSeries = null;
+let domAllRealFetchPromise = null;
+async function fetchDomAllRealHistory(){
+  if(domAllRealSeries) return domAllRealSeries;
+  if(!domAllRealFetchPromise){
+    domAllRealFetchPromise = Promise.all([
+      fetchCryptocapSeries('CRYPTOCAP:BTC.D'),
+      fetchCryptocapSeries('CRYPTOCAP:ETH.D'),
+      fetchCryptocapSeries('CRYPTOCAP:USDT.D'),
+      fetchCryptocapSeries('CRYPTOCAP:USDC.D'),
+    ]).then(([btcD, ethD, usdtD, usdcD]) => {
+      const dayKey = t => Math.floor(t / 86400000);
+      const maps = [btcD, ethD, usdtD, usdcD].map(series => {
+        const m = new Map();
+        series.forEach(p => m.set(dayKey(p.t), p.c));
+        return m;
+      });
+      // solo días donde las 4 monedas ya existían (USDC arrancó en 2018-12, es el más corto)
+      const commonDays = [...maps[0].keys()].filter(d => maps.every(m => m.has(d))).sort((a, b) => a - b);
+      domAllRealSeries = commonDays.map(d => ({
+        t: d * 86400000,
+        v: maps[0].get(d) + maps[1].get(d) + maps[2].get(d) + maps[3].get(d),
+      }));
+      return domAllRealSeries;
+    });
+  }
+  return domAllRealFetchPromise;
+}
 
 // mismo estilo de medidor que el Índice de Miedo y Codicia (arco con degradé + aguja blanca) —
 // usado por DOM_LIVE_DEFS.domall.gauge, para que se vea igual al resto del sitio
@@ -15500,9 +15572,10 @@ function renderDomLiveStat(key){
     if(gaugeEl) gaugeEl.style.display = 'none';
     return;
   }
-  // ya no queda ningún gráfico en este contenedor (solo mostraba loading/error) — colapsarlo del
-  // todo para no dejar un hueco vacío de 260px (el min-height que se usaba para el gráfico viejo)
-  bodyEl.style.display = 'none';
+  // si esta clave NO tiene un gráfico histórico real (DOM_CHART_DEFS), este contenedor solo
+  // mostraba loading/error — colapsarlo del todo para no dejar un hueco vacío de 260px. Si SÍ
+  // tiene gráfico (ej. domall), se deja visible: ese gráfico vive justo ahí
+  if(!DOM_CHART_DEFS[key]) bodyEl.style.display = 'none';
   statsEl.style.display = '';
   const total = vals.reduce((a, b) => a + b, 0);
   if(def.gauge) renderDomRingGauge(key, def.gauge, total);
@@ -15526,19 +15599,23 @@ function copyTvTicker(codeId, btnId){
     setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1800);
   });
 }
-let domActiveRanges = { domratio: 'todo' };
+let domActiveRanges = { domratio: 'todo', domall: 'todo' };
 function renderDomChart(key){
   const def = DOM_CHART_DEFS[key];
   const loadingEl = document.getElementById(key + 'Loading');
   const errorEl = document.getElementById(key + 'Error');
   const wrap = document.getElementById(key + 'ChartWrap');
   const legendEl = document.getElementById(key + 'Legend');
-  const statsEl = document.getElementById(key + 'Stats');
+  // domall usa un statsId propio: #domallStats ya lo ocupa el medidor en vivo (renderDomLiveStat)
+  // con el desglose BTC/ETH/USDT/USDC de HOY, y este gráfico necesita su propia tarjeta aparte
+  const statsEl = document.getElementById(def.statsId || (key + 'Stats'));
   const rows = domRows;
-  const seriesAll = rows ? rows.filter(r => def.needs.every(id => r.caps[id] > 0)).map(r => ({ t: r.t, ...def.compute(r) })) : [];
-  if(!rows || seriesAll.length < 10){
+  const seriesAll = def.realSeries
+    ? (def.realSeries() || [])
+    : (rows ? rows.filter(r => def.needs.every(id => r.caps[id] > 0)).map(r => ({ t: r.t, ...def.compute(r) })) : []);
+  if(seriesAll.length < 10){
     const detailEl = document.getElementById(key + 'ErrorDetail');
-    if(detailEl){
+    if(detailEl && def.needs){
       const failedIds = def.needs.filter(id => domLastDiagnostics[id]);
       detailEl.textContent = failedIds.length
         ? 'Detalle: ' + failedIds.map(id => id + ' → ' + domLastDiagnostics[id]).join(' · ')
@@ -15704,16 +15781,27 @@ function renderDomChart(key){
   }
 }
 async function loadDomChartDetail(key){
-  try{ await fetchDominanceData(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
+  const def = DOM_CHART_DEFS[key];
+  try{ await (def.realSeries ? fetchDomAllRealHistory() : fetchDominanceData()); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
   renderDomChart(key);
 }
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false };
 function ensureDomRatioLoaded(){ if(!domLoadedOnce.domratio){ domLoadedOnce.domratio = true; loadDomChartDetail('domratio'); } }
-function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomLiveDetail('domall'); } }
+function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomLiveDetail('domall'); loadDomChartDetail('domall'); } }
 function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomLiveDetail('dombtc'); } }
 function ensureDomUsdtLoaded(){ if(!domLoadedOnce.domusdt){ domLoadedOnce.domusdt = true; loadDomLiveDetail('domusdt'); } }
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="domratio"]').style.display !== 'none') renderDomChart('domratio');
+  if(document.querySelector('.indic-panel[data-indic="domall"]').style.display !== 'none') renderDomChart('domall');
+});
+document.querySelectorAll('#domallRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#domallRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    domActiveRanges.domall = btn.dataset.range;
+    renderDomChart('domall');
+  });
 });
 
 /* ---- BTC en onzas de oro: 1 BTC ÷ precio del oro (XAU/USD) — ambos precios reales, sin
