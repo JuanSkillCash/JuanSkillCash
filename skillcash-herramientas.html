@@ -2324,7 +2324,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                           <button class="mode-btn" data-range="7" style="padding:7px 10px;font-size:12px">7D</button>
                           <button class="mode-btn" data-range="30" style="padding:7px 10px;font-size:12px">30D</button>
                           <button class="mode-btn" data-range="90" style="padding:7px 10px;font-size:12px">90D</button>
-                          <button class="mode-btn active" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
+                          <button class="mode-btn" data-range="365" style="padding:7px 10px;font-size:12px">1A</button>
+                          <button class="mode-btn" data-range="1825" style="padding:7px 10px;font-size:12px">5A</button>
+                          <button class="mode-btn active" data-range="999999" style="padding:7px 10px;font-size:12px">Todo</button>
                         </div>
                       </div>
                       <div id="fngChartWrap" class="chart-breakout"></div>
@@ -12730,7 +12732,9 @@ async function loadFngDetail(){
   document.getElementById('fngDetailContent').style.display = 'none';
 
   try{
-    const res = await fetch('https://api.alternative.me/fng/?limit=370');
+    // limit=0 trae el histórico COMPLETO (gratis, sin límite de 1 año) — el índice arrancó el 1 de
+    // febrero de 2018, así que esto trae todos los días desde entonces en una sola petición
+    const res = await fetch('https://api.alternative.me/fng/?limit=0');
     const json = await res.json();
     const data = json.data;
     if(!data || !data.length) throw new Error('sin datos');
@@ -12741,7 +12745,8 @@ async function loadFngDetail(){
     const yesterday = data[1] ? parseInt(data[1].value, 10) : null;
     const weekAgo = data[7] ? parseInt(data[7].value, 10) : null;
     const monthAgo = data[30] ? parseInt(data[30].value, 10) : null;
-    const yearValues = data.map(d => parseInt(d.value, 10));
+    // "del año" = últimos 365 días exactos, no todo el histórico que ahora se trae completo
+    const yearValues = data.slice(0, 365).map(d => parseInt(d.value, 10));
     const yearHigh = Math.max(...yearValues);
     const yearLow = Math.min(...yearValues);
     const yearAvg = yearValues.reduce((s, v) => s + v, 0) / yearValues.length;
@@ -12762,8 +12767,8 @@ async function loadFngDetail(){
     // traemos también el precio de Bitcoin (en paralelo no hace falta, ya tenemos el índice)
     await fetchBtcPriceHistory();
 
-    // por defecto se dibuja con el rango de 1 año (el botón "1A" ya está activo desde el HTML)
-    renderFngChart(365);
+    // por defecto se dibuja con todo el histórico (el botón "Todo" ya está activo desde el HTML)
+    renderFngChart(999999);
 
     document.getElementById('fngDetailLoading').style.display = 'none';
     document.getElementById('fngDetailContent').style.display = 'block';
