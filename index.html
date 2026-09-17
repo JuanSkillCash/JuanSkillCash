@@ -6290,16 +6290,21 @@ const PRED_COIN_NAMES = {
 const predCoinSearchInput = document.getElementById('predCoinSearchInput');
 if(predCoinSearchInput){
   const predCoins = [...new Set([...document.querySelectorAll('.pred-ticket')].map(t => t.dataset.coin))].sort();
+  // una sola sugerencia por moneda ("SOL - Solana"), no una repetida por el ticker y otra por el
+  // nombre — pero buscar "sol" o "solana" por separado debe encontrarla igual (ver más abajo)
   document.getElementById('predCoinDatalist').innerHTML = predCoins.map(c => {
     const full = PRED_COIN_NAMES[c];
-    return `<option value="${c}">` + (full ? `<option value="${full}">` : '');
+    return `<option value="${c}${full ? ' - ' + full : ''}">`;
   }).join('');
   predCoinSearchInput.addEventListener('input', () => {
     const q = predCoinSearchInput.value.trim().toUpperCase();
     document.querySelectorAll('.pred-ticket').forEach(t => {
       const coin = t.dataset.coin;
       const full = (PRED_COIN_NAMES[coin] || '').toUpperCase();
-      t.style.display = (!q || coin.startsWith(q) || full.startsWith(q)) ? '' : 'none';
+      // startsWith cubre mientras se escribe letra por letra ("sol", "sola"...); includes cubre
+      // cuando ya se eligió la sugerencia completa "SOL - Solana" del desplegable
+      const match = !q || coin.startsWith(q) || full.startsWith(q) || q.includes(coin) || (full && q.includes(full));
+      t.style.display = match ? '' : 'none';
     });
   });
 }
