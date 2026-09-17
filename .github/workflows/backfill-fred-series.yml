@@ -1,0 +1,30 @@
+name: Respaldar historico completo de series macro de FRED (una sola vez)
+
+# Se dispara solo a mano, desde la pestana "Actions" de GitHub -> elegir este
+# workflow -> boton "Run workflow". Trae TODO el historico disponible de las
+# 10 series de FRED (CPI, Core CPI, nomina no agricola, desempleo, tasa de la
+# Fed, bono a 10 anos, PCE, PPI, M2, VIX) y de paso arma el historico completo
+# de decisiones del FOMC. El robot diario ya lo mantiene al dia despues de esto.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests
+
+      - name: Descargar y subir historico completo de FRED
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/backfill_fred_series.py

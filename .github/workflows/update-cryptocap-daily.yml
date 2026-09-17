@@ -44,3 +44,16 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: python scripts/update_cmc_fng_daily.py
+
+      - name: Actualizar series macro de FRED (CPI, desempleo, tasa de la Fed, etc.)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_fred_series_daily.py
+
+      - name: Actualizar DXY y PMI (TradingView)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_macro_tv_daily.py
