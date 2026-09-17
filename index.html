@@ -6278,16 +6278,28 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }],
 };
 const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia' };
+// nombre completo de cada ticker, para que el buscador entienda tanto "SOL" como "Solana" —
+// si algún día se agrega una moneda que no esté aquí, simplemente no tiene nombre largo propio
+// y el buscador sigue funcionando solo con el ticker (fallback más abajo)
+const PRED_COIN_NAMES = {
+  BTC: 'Bitcoin', ETH: 'Ethereum', SOL: 'Solana', XRP: 'Ripple',
+  NEAR: 'Near Protocol', RENDER: 'Render', DOGE: 'Dogecoin', LINK: 'Chainlink',
+};
 // la lista de monedas del buscador se arma sola a partir de las monedas que ya tienen algún
 // boleto en la página — nunca hay que tocar esto a mano al agregar una predicción nueva
 const predCoinSearchInput = document.getElementById('predCoinSearchInput');
 if(predCoinSearchInput){
   const predCoins = [...new Set([...document.querySelectorAll('.pred-ticket')].map(t => t.dataset.coin))].sort();
-  document.getElementById('predCoinDatalist').innerHTML = predCoins.map(c => `<option value="${c}">`).join('');
+  document.getElementById('predCoinDatalist').innerHTML = predCoins.map(c => {
+    const full = PRED_COIN_NAMES[c];
+    return `<option value="${c}">` + (full ? `<option value="${full}">` : '');
+  }).join('');
   predCoinSearchInput.addEventListener('input', () => {
     const q = predCoinSearchInput.value.trim().toUpperCase();
     document.querySelectorAll('.pred-ticket').forEach(t => {
-      t.style.display = (!q || t.dataset.coin.startsWith(q)) ? '' : 'none';
+      const coin = t.dataset.coin;
+      const full = (PRED_COIN_NAMES[coin] || '').toUpperCase();
+      t.style.display = (!q || coin.startsWith(q) || full.startsWith(q)) ? '' : 'none';
     });
   });
 }
