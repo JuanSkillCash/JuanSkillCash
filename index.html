@@ -1938,26 +1938,36 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <defs>
-              <linearGradient id="liqLadderGrad" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="tradeCandleGrad" x1="0" y1="0" x2="300" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#ff8a3d"/>
                 <stop offset="100%" stop-color="#ff4d4d"/>
               </linearGradient>
+              <linearGradient id="tradeDangerGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff4d4d" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#ff4d4d" stop-opacity=".25"/>
+              </linearGradient>
             </defs>
-            <line x1="60" y1="8" x2="60" y2="70" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
-            <g stroke="rgba(255,255,255,.28)" stroke-width="1.5">
-              <line x1="55" y1="8" x2="65" y2="8"/><line x1="55" y1="18" x2="65" y2="18"/><line x1="55" y1="28" x2="65" y2="28"/>
-              <line x1="55" y1="38" x2="65" y2="38"/><line x1="55" y1="48" x2="65" y2="48"/><line x1="55" y1="58" x2="65" y2="58"/><line x1="55" y1="70" x2="65" y2="70"/>
+            <rect x="0" y="57" width="300" height="21" fill="url(#tradeDangerGrad)"/>
+            <line x1="0" y1="57" x2="178" y2="57" stroke="#ff4d4d" stroke-width="1.6" stroke-dasharray="4,3.5"/>
+            <text x="16" y="7.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7.5" font-weight="700" fill="#ffb37a" opacity=".9">$43,250</text>
+            <g stroke="url(#tradeCandleGrad)" stroke-width="1.5" stroke-linecap="round">
+              <line x1="16" y1="10" x2="16" y2="24"/><line x1="37" y1="14" x2="37" y2="28"/>
+              <line x1="58" y1="18" x2="58" y2="33"/><line x1="79" y1="23" x2="79" y2="39"/>
+              <line x1="100" y1="28" x2="100" y2="45"/><line x1="121" y1="33" x2="121" y2="50"/>
+              <line x1="142" y1="38" x2="142" y2="55"/><line x1="163" y1="42" x2="163" y2="58"/>
             </g>
-            <line x1="60" y1="20" x2="60" y2="60" stroke="url(#liqLadderGrad)" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="60" cy="20" r="5.5" fill="#ffb37a" stroke="#08080b" stroke-width="1.5"/>
-            <text x="76" y="16" font-family="'Space Mono',monospace" font-size="8" font-weight="700" fill="#a8afc4" letter-spacing=".5">PRECIO ACTUAL</text>
-            <text x="76" y="27" font-family="'Poppins',sans-serif" font-size="13" font-weight="800" fill="#fff">$43,250</text>
-            <circle cx="60" cy="60" r="5.5" fill="#ff4d4d" stroke="#08080b" stroke-width="1.5"/>
-            <text x="76" y="56" font-family="'Space Mono',monospace" font-size="8" font-weight="700" fill="#ffb3b3" letter-spacing=".5">LIQUIDACIÓN</text>
-            <text x="76" y="67" font-family="'Poppins',sans-serif" font-size="13" font-weight="800" fill="#ff8a8a">$38,900</text>
-            <g transform="translate(228,34)">
-              <rect width="56" height="17" rx="8.5" fill="rgba(255,77,77,.18)" stroke="#ff4d4d" stroke-width="1"/>
-              <text x="28" y="12.3" text-anchor="middle" font-family="'Space Mono',monospace" font-size="8.5" font-weight="800" fill="#ffb3b3">-10.1%</text>
+            <g fill="url(#tradeCandleGrad)">
+              <rect x="13" y="13" width="6" height="8" rx="1.5"/><rect x="34" y="17" width="6" height="8" rx="1.5"/>
+              <rect x="55" y="21" width="6" height="9" rx="1.5"/><rect x="76" y="26" width="6" height="9" rx="1.5"/>
+              <rect x="97" y="32" width="6" height="9" rx="1.5"/><rect x="118" y="37" width="6" height="10" rx="1.5"/>
+              <rect x="139" y="42" width="6" height="10" rx="1.5"/><rect x="160" y="47" width="6" height="10" rx="1.5"/>
+            </g>
+            <circle cx="163" cy="57" r="7.5" fill="none" stroke="#ff4d4d" stroke-width="1.2" opacity=".5"/>
+            <circle cx="163" cy="57" r="4" fill="#ff4d4d"/>
+            <text x="240" y="41" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7.5" font-weight="700" fill="#ffb3b3" letter-spacing=".4">LIQUIDACIÓN · -10.1%</text>
+            <g transform="translate(184,47)">
+              <rect width="112" height="20" rx="10" fill="rgba(255,77,77,.18)" stroke="#ff4d4d" stroke-width="1"/>
+              <text x="56" y="14" text-anchor="middle" font-family="'Poppins',sans-serif" font-size="12.5" font-weight="800" fill="#ff8a8a">$38,900</text>
             </g>
           </svg>
         </div>
