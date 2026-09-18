@@ -14235,8 +14235,8 @@ window.addEventListener('resize', () => {
 /* ---- ETH Logarithmic Regression Bands: réplica exacta del indicador de Pine Script que trajo
    el usuario (mismos parámetros por defecto) — banda superior/central/inferior calculadas con
    una fórmula FIJA en función del tiempo desde el lanzamiento de ETH (no una regresión ajustada
-   a los datos), dibujada sobre el precio diario histórico completo de ETH. CryptoCompare da el
-   historial gratis (a diferencia de CoinGecko, que topa el plan free en 365 días) */
+   a los datos), dibujada sobre el precio diario histórico completo de ETH. Coin Metrics da el
+   historial gratis y completo (a diferencia de CoinGecko, que topa el plan free en 365 días) */
 // fmtHalvingPrice (la que usan Rainbow/Halving/Pi Cycle) redondea a miles enteros — bien para
 // BTC, que se mueve entre centavos y $100K+, pero en el rango donde vive casi todo este gráfico
 // ($300-$5K) esa granularidad hace que precios bien distintos (ej. $1500 y $2000) se muestren
@@ -14267,25 +14267,23 @@ function ethLogRegPrice(tMs){
   return Math.exp(lnReg);
 }
 let ethLogRegHistory = null;
-// historial diario COMPLETO de ETH (OHLC + volumen) — lo comparten Bandas Log de ETH (solo usa
-// .c) y VWAP Anclado de ETH (usa también .h/.l/.v para el cálculo real del VWAP), para no pedirle
-// esto mismo dos veces a CryptoCompare
+// historial diario de precio de ETH — lo comparten Bandas Log de ETH y ETH/BTC (ambos solo usan
+// .c). Fuente: Coin Metrics (misma API "Community" gratis y sin llave que ya usa Ciclos de
+// Halving para BTC), que cubre el histórico completo de ETH desde su lanzamiento
 async function fetchEthLogRegHistory(){
-  const points = [];
-  let toTs = Math.floor(Date.now() / 1000);
-  // CryptoCompare da máximo 2000 velas diarias por llamada — ETH tiene ~11 años de historia
-  // (nació mediados de 2015), así que con unas pocas llamadas hacia atrás alcanza de sobra
-  for(let i = 0; i < 4; i++){
-    const url = ccUrl('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=USD&limit=2000&toTs=' + toTs);
-    const res = await fetch(url);
-    const data = await res.json();
-    const batch = data && data.Data && data.Data.Data;
-    if(!batch || batch.length === 0) break;
-    const valid = batch.filter(d => d.close > 0);
-    points.unshift(...valid.map(d => ({ t: d.time * 1000, o: d.open, h: d.high, l: d.low, c: d.close, v: d.volumefrom || 0 })));
-    const earliest = batch[0].time;
-    if(batch.length < 2000 || earliest * 1000 <= ETH_LOGREG_START_MS) break;
-    toTs = earliest - 86400;
+  let points = [];
+  try{
+    const rows = await fetchCoinMetricsDaily(['PriceUSD'], 'eth');
+    points = coinMetricsSeriesFor(rows, 'PriceUSD').map(r => ({ t: r.t, o: r.v, h: r.v, l: r.v, c: r.v, v: 0 }));
+  } catch(err){ /* se intenta el respaldo abajo */ }
+  if(!points.length){
+    // respaldo si Coin Metrics no responde: histórico reciente de CoinGecko (mismo límite de
+    // ~1 año del plan gratis que ya asume el resto del sitio) — mejor que nada
+    try{
+      const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=364&interval=daily'));
+      const json = await res.json();
+      points = (json.prices || []).filter(p => p[1] > 0).map(p => ({ t: p[0], o: p[1], h: p[1], l: p[1], c: p[1], v: 0 }));
+    } catch(err){ /* sin respaldo disponible */ }
   }
   const seen = new Set();
   ethLogRegHistory = points.filter(p => {
@@ -14476,10 +14474,12 @@ window.addEventListener('resize', () => {
 
 /* ---- VWAP Anclado de ETH: dos líneas de VWAP (precio promedio ponderado por volumen desde un
    punto fijo) ancladas por el usuario en fechas concretas — igual que el "Anchored VWAP" de
-   TradingView. A diferencia de Bandas Log de ETH (que usa el agregado CCCAGG de varias
-   exchanges desde 2015), este gráfico pide el historial de UN SOLO exchange (Binance, par
-   ETH/USDT) — el mismo par que el usuario compara contra TradingView — y arranca el 17 de
-   agosto de 2017, que es cuando Binance empezó a listar ese par (no hay nada antes ahí) */
+   TradingView. A diferencia de Bandas Log de ETH (que usa el precio agregado de referencia desde
+   2015), este gráfico pide el historial de UN SOLO exchange (Binance, par ETH/USDT) — el mismo
+   par que el usuario compara contra TradingView — y arranca el 17 de agosto de 2017, que es
+   cuando Binance empezó a listar ese par (no hay nada antes ahí). Se pide directo a Binance (la
+   misma API que ya usa Pulso de Fondo para las velas semanales de BTC), en vez de a través de un
+   proxy de terceros */
 const ETH_VWAP_DATA_START_MS = Date.UTC(2017, 7, 17);
 const ETH_VWAP_ANCHORS = [
   { id: 'a1', label: '10 ene 2018', ms: Date.UTC(2018, 0, 10), color: '#ff2f4f' },
@@ -14488,18 +14488,19 @@ const ETH_VWAP_ANCHORS = [
 let ethVwapHistory = null;
 async function fetchEthVwapHistory(){
   const points = [];
-  let toTs = Math.floor(Date.now() / 1000);
-  for(let i = 0; i < 4; i++){
-    const url = ccUrl('https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=USDT&e=Binance&limit=2000&toTs=' + toTs);
+  let endTime = Date.now();
+  // Binance da máximo 1000 velas diarias por llamada — desde ago 2017 hasta hoy son ~3300 días,
+  // así que con unas pocas llamadas hacia atrás (usando endTime) alcanza de sobra
+  for(let i = 0; i < 6; i++){
+    const url = 'https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&limit=1000&endTime=' + endTime;
     const res = await fetch(url);
-    const data = await res.json();
-    const batch = data && data.Data && data.Data.Data;
-    if(!batch || batch.length === 0) break;
-    const valid = batch.filter(d => d.close > 0 && d.time * 1000 >= ETH_VWAP_DATA_START_MS);
-    points.unshift(...valid.map(d => ({ t: d.time * 1000, o: d.open, h: d.high, l: d.low, c: d.close, v: d.volumefrom || 0 })));
-    const earliest = batch[0].time;
-    if(batch.length < 2000 || earliest * 1000 <= ETH_VWAP_DATA_START_MS) break;
-    toTs = earliest - 86400;
+    const rows = await res.json();
+    if(!Array.isArray(rows) || rows.length === 0) break;
+    const valid = rows.filter(r => +r[4] > 0 && r[0] >= ETH_VWAP_DATA_START_MS);
+    points.unshift(...valid.map(r => ({ t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })));
+    const earliestOpen = rows[0][0];
+    if(rows.length < 1000 || earliestOpen <= ETH_VWAP_DATA_START_MS) break;
+    endTime = earliestOpen - 1;
   }
   const seen = new Set();
   ethVwapHistory = points.filter(p => {
@@ -14508,8 +14509,8 @@ async function fetchEthVwapHistory(){
     return true;
   }).sort((a, b) => a.t - b.t);
 }
-// el volumen histórico gratis de ETH (CryptoCompare) trae días sueltos con saltos de escala —
-// exchanges que entran/salen de su agregado, errores de reporte — y como el VWAP pondera cada
+// el volumen histórico de Binance trae días sueltos con saltos de escala — errores de reporte
+// puntuales — y como el VWAP pondera cada
 // día por su volumen, un solo día así puede torcer la curva entera con un "escalón" que un VWAP
 // acumulado de verdad nunca tiene (matemáticamente se vuelve MÁS resistente al cambio con el
 // tiempo, nunca da saltos). Se recorta cualquier día cuyo volumen se dispare muy por encima de
@@ -15059,8 +15060,8 @@ async function fetchBlockchainInfoChart(chartName){
 // fuentes reales que usa el script original de TradingView (COINMETRICS:BTC_FEEUSD), así que sus
 // comisiones y bloques minados diarios son más fieles que aproximarlos. Se pagina con
 // next_page_url por si la respuesta no cabe en una sola página
-async function fetchCoinMetricsDaily(metrics){
-  let url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&frequency=1d&page_size=10000&metrics=' + metrics.join(',');
+async function fetchCoinMetricsDaily(metrics, asset){
+  let url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=' + (asset || 'btc') + '&frequency=1d&page_size=10000&metrics=' + metrics.join(',');
   const rows = [];
   for(let page = 0; page < 5 && url; page++){
     const res = await fetch(url);
