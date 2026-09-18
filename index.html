@@ -17269,20 +17269,63 @@ function renderCbpChart(data){
   const wrap = document.getElementById('cbpChartWrap');
   const statsEl = document.getElementById('cbpStats');
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 300 : 340;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 420 : 480;
   const yFontSize = isMobileChart ? 9 : 11, xFontSize = isMobileChart ? 10 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 14, marginBottom = isMobileChart ? 26 : 30;
+  const panelGap = 20;
   const drawW = totalW - marginLeft - marginRight;
-  const drawH = totalH - marginTop - marginBottom;
+  const drawHTotal = totalH - marginTop - marginBottom - panelGap;
+  // arriba el precio de BTC (para ver el mismo momento en el tiempo que cada barra de abajo),
+  // abajo el premium — mismo reparto 63/37 que ya usa RSI Mensual para precio+indicador
+  const priceH = Math.round(drawHTotal * 0.63);
+  const premiumH = drawHTotal - priceH;
+  const priceTop = marginTop, priceBottom = marginTop + priceH;
+  const premiumTop = priceBottom + panelGap, premiumBottom = premiumTop + premiumH;
+  const dividerY = priceBottom + panelGap / 2;
 
-  const maxAbs = Math.max(...data.map(d => Math.abs(d.premiumPct)), 0.02) * 1.2;
-  const yFor = v => marginTop + drawH / 2 - (v / maxAbs) * (drawH / 2);
-  const zeroY = yFor(0);
   const n = data.length;
   const barGap = isMobileChart ? 1 : 2;
   const barW = Math.max(1, drawW / n - barGap);
   const xFor = i => marginLeft + (i * drawW) / n + barGap / 2;
+  const xForCenter = i => xFor(i) + barW / 2;
+
+  // precio de BTC: se usa el cierre de Binance que ya se trajo para calcular el premium de cada
+  // barra (mismo instante exacto, sin pedir otro historico aparte) — escala LOGARITMICA, la misma
+  // que ya usan Halving/RSI Mensual, para que la linea nunca se vea "rara" sin importar el rango
+  const prices = data.map(d => d.bnClose);
+  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
+  let priceYTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yForPrice(t);
+    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+  });
+  // el rango de Coinbase Premium suele ser de solo minutos/horas — demasiado angosto para que
+  // caiga alguna marca fija de niceLogTicks (pensada para años/décadas); si no dejó ninguna
+  // marca usable, se usan marcas "redondas" repartidas dentro del rango real visible
+  if(priceYTicks.length < 2) priceYTicks = niceLinearTicks(minPrice, maxPrice);
+  // fmtHalvingPrice redondea al millar más cercano — perfecto para años de historial, pero en un
+  // rango angosto (minutos/horas) varias marcas distintas terminan mostrando el mismo texto
+  // redondeado (ej. "$81K" repetido). Se calcula la precisión real a partir de la separación entre
+  // marcas: si esa separación ya es de miles, fmtHalvingPrice sigue sirviendo igual que siempre
+  const tickStep = priceYTicks.length > 1 ? Math.abs(priceYTicks[1] - priceYTicks[0]) : 0;
+  const fmtCbpPriceTick = v => {
+    if(tickStep === 0 || tickStep >= 1000) return fmtHalvingPrice(v);
+    if(tickStep >= 1) return '$' + Math.round(v).toLocaleString('en-US');
+    return '$' + v.toFixed(2);
+  };
+  const priceGridHtml = priceYTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtCbpPriceTick(t)}</text>
+  `).join('');
+  let priceLine = '';
+  data.forEach((d, i) => { priceLine += `${i === 0 ? 'M' : 'L'}${xForCenter(i).toFixed(1)},${yForPrice(d.bnClose).toFixed(1)} `; });
+
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.premiumPct)), 0.02) * 1.2;
+  const yFor = v => premiumTop + premiumH / 2 - (v / maxAbs) * (premiumH / 2);
+  const zeroY = yFor(0);
 
   const barsHtml = data.map((d, i) => {
     const y = yFor(d.premiumPct);
@@ -17307,12 +17350,15 @@ function renderCbpChart(data){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${priceGridHtml}
+        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.2}" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
         ${yGridHtml}
         ${barsHtml}
         <text x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${dateFmt(data[0].t)}</text>
         <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
         <rect id="cbpHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent"/>
-        <line id="cbpHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>
+        <line id="cbpHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${premiumBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>
       </svg>
       <div id="cbpTooltip" style="display:none;position:absolute;pointer-events:none;background:#0c1024;border:1px solid var(--border2);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)"></div>
     </div>
@@ -17325,7 +17371,7 @@ function renderCbpChart(data){
     tooltipHtml: i => {
       const d = data[i];
       const sign = d.premiumPct >= 0 ? '+' : '';
-      return `<b style="color:${d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${d.premiumPct.toFixed(3)}%</b><br>${fmtUsd2(d.cbClose)} vs ${fmtUsd2(d.bnClose)}<br><span style="color:#8890ac">${dateFmt(d.t)}</span>`;
+      return `₿ ${fmtUsd2(d.bnClose)}<br><b style="color:${d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${d.premiumPct.toFixed(3)}%</b> · ${fmtUsd2(d.cbClose)} vs ${fmtUsd2(d.bnClose)}<br><span style="color:#8890ac">${dateFmt(d.t)}</span>`;
     }
   });
 
