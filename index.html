@@ -16230,13 +16230,18 @@ async function fetchCryptocapSeries(symbolFull){
   if(cryptocapSeriesCache[symbolFull]) return cryptocapSeriesCache[symbolFull];
   const rows = [];
   const pageSize = 1000;
+  // los indicadores que combinan 2-4 símbolos (Euforia de Altcoins, Valoración Relativa,
+  // Descompresión Cripto) disparan varias páginas de varios símbolos en paralelo al cargar —
+  // una sola de esas peticiones fallando por un hipo momentáneo de Supabase tumba todo el
+  // Promise.all. Con reintentos, un fallo puntual en una sola página ya no arruina el indicador
+  // completo
   for(let from = 0; ; from += pageSize){
-    const { data, error } = await sbClient
+    const { data, error } = await withRetry(() => sbClient
       .from('cryptocap_history')
       .select('datetime,close')
       .eq('symbol', symbolFull)
       .order('datetime', { ascending: true })
-      .range(from, from + pageSize - 1);
+      .range(from, from + pageSize - 1), 3, 500);
     if(error) throw error;
     if(!data || data.length === 0) break;
     rows.push(...data);
@@ -16665,7 +16670,12 @@ function renderDomChart(key){
 }
 async function loadDomChartDetail(key){
   const def = DOM_CHART_DEFS[key];
-  try{ await def.loadFn(); } catch(err){ /* renderDomChart muestra el estado de error si no hay datos */ }
+  try{ await def.loadFn(); } catch(err){
+    // renderDomChart muestra el estado de error si no hay datos — esto solo deja el motivo real
+    // visible (si el indicador tiene ese elemento) para poder diagnosticar sin adivinar
+    const detailEl = document.getElementById(key + 'ErrorDetail');
+    if(detailEl) detailEl.textContent = err && err.message ? err.message : 'Error desconocido.';
+  }
   renderDomChart(key);
 }
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false };
