@@ -538,7 +538,9 @@ button{font-family:inherit;color:inherit}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
 .cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
 
+.dom-overlay-toggle-row{display:flex;flex-wrap:wrap;gap:6px 18px;margin:-6px 0 14px}
 .dom-overlay-toggle{display:flex;align-items:center;gap:8px;margin:-6px 0 14px;font-size:12.5px;color:var(--muted2);cursor:pointer;user-select:none;width:fit-content}
+.dom-overlay-toggle-row .dom-overlay-toggle{margin:0}
 .dom-overlay-toggle input{accent-color:var(--red);width:15px;height:15px;cursor:pointer}
 .dom-overlay-toggle:hover{color:var(--white)}
 
@@ -3286,6 +3288,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-range="2a">2 años</button>
               </div>
 
+              <label class="dom-overlay-toggle" style="margin:10px 0 -2px">
+                <input type="checkbox" id="domallOthersOverlayToggle" style="accent-color:#f0b23d">
+                Comparar con OTHERS (línea ámbar)
+              </label>
+
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
@@ -3517,7 +3524,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <label class="dom-overlay-toggle">
-                <input type="checkbox" id="altfeverOthersOverlayToggle">
+                <input type="checkbox" id="altfeverOthersOverlayToggle" style="accent-color:#fff">
                 Comparar con OTHERS (línea blanca)
               </label>
 
@@ -3559,10 +3566,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Valoración Relativa ETH vs Altcoins</h2>
               </div>
 
-              <label class="dom-overlay-toggle">
-                <input type="checkbox" id="ethvsaltEthOverlayToggle">
-                Comparar con ETH (línea blanca)
-              </label>
+              <div class="dom-overlay-toggle-row">
+                <label class="dom-overlay-toggle">
+                  <input type="checkbox" id="ethvsaltEthOverlayToggle" style="accent-color:#fff">
+                  Comparar con ETH (línea blanca)
+                </label>
+                <label class="dom-overlay-toggle">
+                  <input type="checkbox" id="ethvsaltOthersOverlayToggle" style="accent-color:#f0b23d">
+                  Comparar con OTHERS (línea ámbar)
+                </label>
+              </div>
 
               <div class="indic-chart-body" id="ethvsaltChartBody">
                 <div class="indic-chart-soon" id="ethvsaltLoading">
@@ -16269,6 +16282,10 @@ async function fetchCryptocapSeries(symbolFull){
 }
 let domAllRealSeries = null;
 let domAllRealFetchPromise = null;
+// serie cruda de OTHERS solo para el toggle opcional de superponerla sobre este gráfico — no hace
+// falta para el % de Descompresión en sí, así que se pide aparte, la primera vez que se activa la
+// casilla (no en cada carga del indicador)
+let domAllOthersRawSeries = null;
 async function fetchDomAllRealHistory(){
   if(domAllRealSeries) return domAllRealSeries;
   if(!domAllRealFetchPromise){
@@ -16391,9 +16408,9 @@ async function fetchAltFeverRealHistory(){
 // Valoración Relativa ETH vs Altcoins: (TOTAL3 − USDT) ÷ ETH — USDT no se archiva como cap directo, así
 // que se reconstruye desde USDT.D% × TOTAL (ambos sí archivados) del mismo día
 let ethVsAltRealSeries = null, ethVsAltRealPromise = null;
-// serie cruda de ETH (capitalización real, no el ratio) — se guarda aparte solo para el toggle
-// opcional de superponerla como referencia visual sobre el gráfico de Valoración Relativa
-let ethVsAltEthRawSeries = null;
+// series crudas (valor real, no el ratio) — se guardan aparte solo para los toggles opcionales de
+// superponerlas como referencia visual sobre el gráfico de Valoración Relativa
+let ethVsAltEthRawSeries = null, ethVsAltOthersRawSeries = null;
 async function fetchEthVsAltRealHistory(){
   if(ethVsAltRealSeries) return ethVsAltRealSeries;
   if(!ethVsAltRealPromise){
@@ -16402,8 +16419,10 @@ async function fetchEthVsAltRealHistory(){
       fetchCryptocapSeries('CRYPTOCAP:TOTAL'),
       fetchCryptocapSeries('CRYPTOCAP:USDT.D'),
       fetchCryptocapSeries('CRYPTOCAP:ETH'),
-    ]).then(([total3, total, usdtD, ethCap]) => {
+      fetchCryptocapSeries('CRYPTOCAP:OTHERS'),
+    ]).then(([total3, total, usdtD, ethCap, others]) => {
       ethVsAltEthRawSeries = ethCap.map(p => ({ t: p.t, v: p.c }));
+      ethVsAltOthersRawSeries = others.map(p => ({ t: p.t, v: p.c }));
       ethVsAltRealSeries = alignSeriesByDay([total3, total, usdtD, ethCap])
         .map(r => {
           const [t3, tot, usdtPct, eth] = r.vals;
@@ -16498,17 +16517,34 @@ async function loadDomLiveDetail(key){
   renderDomLiveStat(key);
 }
 let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
-// overlays opcionales (casilla "Comparar con X") — cada indicador que tenga uno declara aquí de
-// dónde sacar su serie cruda; el resto (normalizar a su propio rango, dibujar la línea blanca) es
-// compartido en renderDomChart, no hace falta repetirlo por indicador
+// overlays opcionales (casilla "Comparar con X") — cada indicador que tenga uno o más declara
+// aquí de dónde sacar su serie cruda y de qué color dibujarla; el resto (normalizar cada una a su
+// propio rango, dibujar la línea) es compartido en renderDomChart, no hace falta repetirlo
 const DOM_OVERLAY_DEFS = {
-  altfever: { toggleId: 'altfeverOthersOverlayToggle', rawSeries: () => altFeverOthersRawSeries, enabled: false },
-  ethvsalt: { toggleId: 'ethvsaltEthOverlayToggle', rawSeries: () => ethVsAltEthRawSeries, enabled: false },
+  altfever: [
+    { toggleId: 'altfeverOthersOverlayToggle', rawSeries: () => altFeverOthersRawSeries, color: '#fff', enabled: false },
+  ],
+  ethvsalt: [
+    { toggleId: 'ethvsaltEthOverlayToggle', rawSeries: () => ethVsAltEthRawSeries, color: '#fff', enabled: false },
+    { toggleId: 'ethvsaltOthersOverlayToggle', rawSeries: () => ethVsAltOthersRawSeries, color: '#f0b23d', enabled: false },
+  ],
+  // domall no necesita OTHERS para su propio %, así que este no viene precargado con el resto —
+  // ensureLoaded lo pide la primera vez que se activa la casilla (si otro indicador ya lo cacheó,
+  // fetchCryptocapSeries lo devuelve al toque sin pedirlo de nuevo)
+  domall: [
+    { toggleId: 'domallOthersOverlayToggle', rawSeries: () => domAllOthersRawSeries, color: '#f0b23d', enabled: false,
+      ensureLoaded: () => fetchCryptocapSeries('CRYPTOCAP:OTHERS').then(raw => { domAllOthersRawSeries = raw.map(p => ({ t: p.t, v: p.c })); }) },
+  ],
 };
-Object.entries(DOM_OVERLAY_DEFS).forEach(([key, overlayDef]) => {
-  document.getElementById(overlayDef.toggleId).addEventListener('change', e => {
-    overlayDef.enabled = e.target.checked;
-    renderDomChart(key);
+Object.entries(DOM_OVERLAY_DEFS).forEach(([key, overlayDefs]) => {
+  overlayDefs.forEach(overlayDef => {
+    document.getElementById(overlayDef.toggleId).addEventListener('change', async e => {
+      overlayDef.enabled = e.target.checked;
+      if(overlayDef.enabled && !overlayDef.rawSeries() && overlayDef.ensureLoaded){
+        try{ await overlayDef.ensureLoaded(); } catch(err){ /* si falla, el overlay simplemente no aparece */ }
+      }
+      renderDomChart(key);
+    });
   });
 });
 let domCustomRanges = {}; // { [key]: {fromMs, toMs} } — arrastrar el slider gana sobre los botones fijos
@@ -16658,22 +16694,19 @@ function renderDomChart(key){
   // ratio del indicador (dólares vs. ratio 0-1), así que se normaliza a su PROPIO mínimo/máximo
   // dentro del rango visible y se estira al mismo alto del gráfico principal (no comparte el eje Y
   // real, solo la forma/tendencia se puede comparar, no los valores exactos)
-  let overlayHtml = '';
-  const overlayDef = DOM_OVERLAY_DEFS[key];
-  const overlayRawSeries = overlayDef && overlayDef.enabled ? overlayDef.rawSeries() : null;
-  if(overlayRawSeries){
-    const overlayPoints = overlayRawSeries.filter(p => p.t >= startMs && p.t <= endMs);
-    if(overlayPoints.length > 1){
-      const overlayVals = overlayPoints.map(p => p.v);
-      const ovMin = Math.min(...overlayVals), ovMax = Math.max(...overlayVals);
-      const ovPad = (ovMax - ovMin) * 0.08 || 1;
-      const ovYMin = ovMin - ovPad, ovYMax = ovMax + ovPad;
-      const yForOverlay = v => marginTop + drawH - ((v - ovYMin) / (ovYMax - ovYMin || 1)) * drawH;
-      let d = '';
-      overlayPoints.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForOverlay(p.v).toFixed(1)} `; });
-      overlayHtml = `<path d="${d.trim()}" fill="none" stroke="#fff" stroke-width="1" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }
-  }
+  const overlayDefs = (DOM_OVERLAY_DEFS[key] || []).filter(o => o.enabled && o.rawSeries());
+  const overlayHtml = overlayDefs.map(overlayDef => {
+    const overlayPoints = overlayDef.rawSeries().filter(p => p.t >= startMs && p.t <= endMs);
+    if(overlayPoints.length < 2) return '';
+    const overlayVals = overlayPoints.map(p => p.v);
+    const ovMin = Math.min(...overlayVals), ovMax = Math.max(...overlayVals);
+    const ovPad = (ovMax - ovMin) * 0.08 || 1;
+    const ovYMin = ovMin - ovPad, ovYMax = ovMax + ovPad;
+    const yForOverlay = v => marginTop + drawH - ((v - ovYMin) / (ovYMax - ovYMin || 1)) * drawH;
+    let d = '';
+    overlayPoints.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForOverlay(p.v).toFixed(1)} `; });
+    return `<path d="${d.trim()}" fill="none" stroke="${overlayDef.color}" stroke-width="1" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
 
   const lastP = points[points.length - 1];
   const lastPx = xFor(endMs);
