@@ -538,12 +538,6 @@ button{font-family:inherit;color:inherit}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
 .cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
 
-.dom-overlay-toggle-row{display:flex;flex-wrap:wrap;gap:6px 18px;margin:-6px 0 14px}
-.dom-overlay-toggle{display:flex;align-items:center;gap:8px;margin:-6px 0 14px;font-size:12.5px;color:var(--muted2);cursor:pointer;user-select:none;width:fit-content}
-.dom-overlay-toggle-row .dom-overlay-toggle{margin:0}
-.dom-overlay-toggle input{accent-color:var(--red);width:15px;height:15px;cursor:pointer}
-.dom-overlay-toggle:hover{color:var(--white)}
-
 .cat-back-btn{
   display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--muted2);
   font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;cursor:pointer;margin-bottom:18px;
@@ -3288,11 +3282,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-range="2a">2 años</button>
               </div>
 
-              <label class="dom-overlay-toggle" style="margin:10px 0 -2px">
-                <input type="checkbox" id="domallOthersOverlayToggle" style="accent-color:#f0b23d">
-                Comparar con OTHERS (línea ámbar)
-              </label>
-
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
@@ -3523,11 +3512,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Euforia de Altcoins</h2>
               </div>
 
-              <label class="dom-overlay-toggle">
-                <input type="checkbox" id="altfeverOthersOverlayToggle" style="accent-color:#fff">
-                Comparar con OTHERS (línea blanca)
-              </label>
-
               <div class="indic-chart-body" id="altfeverChartBody">
                 <div class="indic-chart-soon" id="altfeverLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="logo-skillcash-600.png" alt=""></div>
@@ -3566,16 +3550,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Valoración Relativa ETH vs Altcoins</h2>
               </div>
 
-              <div class="dom-overlay-toggle-row">
-                <label class="dom-overlay-toggle">
-                  <input type="checkbox" id="ethvsaltEthOverlayToggle" style="accent-color:#fff">
-                  Comparar con ETH (línea blanca)
-                </label>
-                <label class="dom-overlay-toggle">
-                  <input type="checkbox" id="ethvsaltOthersOverlayToggle" style="accent-color:#f0b23d">
-                  Comparar con OTHERS (línea ámbar)
-                </label>
-              </div>
 
               <div class="indic-chart-body" id="ethvsaltChartBody">
                 <div class="indic-chart-soon" id="ethvsaltLoading">
@@ -16282,10 +16256,6 @@ async function fetchCryptocapSeries(symbolFull){
 }
 let domAllRealSeries = null;
 let domAllRealFetchPromise = null;
-// serie cruda de OTHERS solo para el toggle opcional de superponerla sobre este gráfico — no hace
-// falta para el % de Descompresión en sí, así que se pide aparte, la primera vez que se activa la
-// casilla (no en cada carga del indicador)
-let domAllOthersRawSeries = null;
 async function fetchDomAllRealHistory(){
   if(domAllRealSeries) return domAllRealSeries;
   if(!domAllRealFetchPromise){
@@ -16386,9 +16356,6 @@ async function fetchEthBtcRealHistory(){
 }
 // Euforia de Altcoins: OTHERS ÷ (TOTAL3 − OTHERS) — cola larga de altcoins vs. altcoins grandes
 let altFeverRealSeries = null, altFeverRealPromise = null;
-// serie cruda de OTHERS (valor real, no el ratio) — se guarda aparte solo para el toggle opcional
-// de superponerla como referencia visual sobre el gráfico de Euforia
-let altFeverOthersRawSeries = null;
 async function fetchAltFeverRealHistory(){
   if(altFeverRealSeries) return altFeverRealSeries;
   if(!altFeverRealPromise){
@@ -16396,7 +16363,6 @@ async function fetchAltFeverRealHistory(){
       fetchCryptocapSeries('CRYPTOCAP:OTHERS'),
       fetchCryptocapSeries('CRYPTOCAP:TOTAL3'),
     ]).then(([others, total3]) => {
-      altFeverOthersRawSeries = others.map(p => ({ t: p.t, v: p.c }));
       altFeverRealSeries = alignSeriesByDay([others, total3])
         .map(r => { const denom = r.vals[1] - r.vals[0]; return denom > 0 ? { t: r.t, v: r.vals[0] / denom } : null; })
         .filter(Boolean);
@@ -16408,9 +16374,6 @@ async function fetchAltFeverRealHistory(){
 // Valoración Relativa ETH vs Altcoins: (TOTAL3 − USDT) ÷ ETH — USDT no se archiva como cap directo, así
 // que se reconstruye desde USDT.D% × TOTAL (ambos sí archivados) del mismo día
 let ethVsAltRealSeries = null, ethVsAltRealPromise = null;
-// series crudas (valor real, no el ratio) — se guardan aparte solo para los toggles opcionales de
-// superponerlas como referencia visual sobre el gráfico de Valoración Relativa
-let ethVsAltEthRawSeries = null, ethVsAltOthersRawSeries = null;
 async function fetchEthVsAltRealHistory(){
   if(ethVsAltRealSeries) return ethVsAltRealSeries;
   if(!ethVsAltRealPromise){
@@ -16419,10 +16382,7 @@ async function fetchEthVsAltRealHistory(){
       fetchCryptocapSeries('CRYPTOCAP:TOTAL'),
       fetchCryptocapSeries('CRYPTOCAP:USDT.D'),
       fetchCryptocapSeries('CRYPTOCAP:ETH'),
-      fetchCryptocapSeries('CRYPTOCAP:OTHERS'),
-    ]).then(([total3, total, usdtD, ethCap, others]) => {
-      ethVsAltEthRawSeries = ethCap.map(p => ({ t: p.t, v: p.c }));
-      ethVsAltOthersRawSeries = others.map(p => ({ t: p.t, v: p.c }));
+    ]).then(([total3, total, usdtD, ethCap]) => {
       ethVsAltRealSeries = alignSeriesByDay([total3, total, usdtD, ethCap])
         .map(r => {
           const [t3, tot, usdtPct, eth] = r.vals;
@@ -16517,36 +16477,6 @@ async function loadDomLiveDetail(key){
   renderDomLiveStat(key);
 }
 let domActiveRanges = { domratio: 'todo', domall: 'todo', dombtc: 'todo', domusdt: 'todo' };
-// overlays opcionales (casilla "Comparar con X") — cada indicador que tenga uno o más declara
-// aquí de dónde sacar su serie cruda y de qué color dibujarla; el resto (normalizar cada una a su
-// propio rango, dibujar la línea) es compartido en renderDomChart, no hace falta repetirlo
-const DOM_OVERLAY_DEFS = {
-  altfever: [
-    { toggleId: 'altfeverOthersOverlayToggle', rawSeries: () => altFeverOthersRawSeries, color: '#fff', enabled: false },
-  ],
-  ethvsalt: [
-    { toggleId: 'ethvsaltEthOverlayToggle', rawSeries: () => ethVsAltEthRawSeries, color: '#fff', enabled: false },
-    { toggleId: 'ethvsaltOthersOverlayToggle', rawSeries: () => ethVsAltOthersRawSeries, color: '#f0b23d', enabled: false },
-  ],
-  // domall no necesita OTHERS para su propio %, así que este no viene precargado con el resto —
-  // ensureLoaded lo pide la primera vez que se activa la casilla (si otro indicador ya lo cacheó,
-  // fetchCryptocapSeries lo devuelve al toque sin pedirlo de nuevo)
-  domall: [
-    { toggleId: 'domallOthersOverlayToggle', rawSeries: () => domAllOthersRawSeries, color: '#f0b23d', enabled: false,
-      ensureLoaded: () => fetchCryptocapSeries('CRYPTOCAP:OTHERS').then(raw => { domAllOthersRawSeries = raw.map(p => ({ t: p.t, v: p.c })); }) },
-  ],
-};
-Object.entries(DOM_OVERLAY_DEFS).forEach(([key, overlayDefs]) => {
-  overlayDefs.forEach(overlayDef => {
-    document.getElementById(overlayDef.toggleId).addEventListener('change', async e => {
-      overlayDef.enabled = e.target.checked;
-      if(overlayDef.enabled && !overlayDef.rawSeries() && overlayDef.ensureLoaded){
-        try{ await overlayDef.ensureLoaded(); } catch(err){ /* si falla, el overlay simplemente no aparece */ }
-      }
-      renderDomChart(key);
-    });
-  });
-});
 let domCustomRanges = {}; // { [key]: {fromMs, toMs} } — arrastrar el slider gana sobre los botones fijos
 let domSliders = {};
 function renderDomChart(key){
@@ -16689,25 +16619,6 @@ function renderDomChart(key){
   }
   const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key])}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
 
-  // overlay opcional (casilla "Comparar con X"): superpone la serie cruda declarada en
-  // DOM_OVERLAY_DEFS como referencia visual — tiene una escala completamente distinta a la del
-  // ratio del indicador (dólares vs. ratio 0-1), así que se normaliza a su PROPIO mínimo/máximo
-  // dentro del rango visible y se estira al mismo alto del gráfico principal (no comparte el eje Y
-  // real, solo la forma/tendencia se puede comparar, no los valores exactos)
-  const overlayDefs = (DOM_OVERLAY_DEFS[key] || []).filter(o => o.enabled && o.rawSeries());
-  const overlayHtml = overlayDefs.map(overlayDef => {
-    const overlayPoints = overlayDef.rawSeries().filter(p => p.t >= startMs && p.t <= endMs);
-    if(overlayPoints.length < 2) return '';
-    const overlayVals = overlayPoints.map(p => p.v);
-    const ovMin = Math.min(...overlayVals), ovMax = Math.max(...overlayVals);
-    const ovPad = (ovMax - ovMin) * 0.08 || 1;
-    const ovYMin = ovMin - ovPad, ovYMax = ovMax + ovPad;
-    const yForOverlay = v => marginTop + drawH - ((v - ovYMin) / (ovYMax - ovYMin || 1)) * drawH;
-    let d = '';
-    overlayPoints.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForOverlay(p.v).toFixed(1)} `; });
-    return `<path d="${d.trim()}" fill="none" stroke="${overlayDef.color}" stroke-width="1" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  }).join('');
-
   const lastP = points[points.length - 1];
   const lastPx = xFor(endMs);
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
@@ -16723,7 +16634,6 @@ function renderDomChart(key){
         ${zonesHtml}
         ${yGridHtml}
         ${linesHtml}
-        ${overlayHtml}
         ${xLabelsHtml}
         <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
         <circle id="${key}HoverDot" r="6" fill="#fff" style="display:none"/>
