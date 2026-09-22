@@ -3854,44 +3854,41 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="partner-block-visual">
             <svg width="100%" height="160" viewBox="0 0 260 160" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <linearGradient id="bitunixCandleUp" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#e4ff8f"/>
-                  <stop offset="100%" stop-color="#8fc31f"/>
+                <linearGradient id="bxCoinTop1" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#eaffab"/><stop offset="100%" stop-color="#a8e030"/>
                 </linearGradient>
-                <linearGradient id="bitunixCandleDown" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#8aa83a"/>
-                  <stop offset="100%" stop-color="#5c7a1a"/>
+                <linearGradient id="bxCoinTop2" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#d9ff5c"/><stop offset="100%" stop-color="#8fc31f"/>
                 </linearGradient>
-                <linearGradient id="bitunixTrend" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#bffa2c" stop-opacity="0"/>
-                  <stop offset="100%" stop-color="#e4ff8f" stop-opacity=".9"/>
-                </linearGradient>
-                <radialGradient id="bitunixBadgeGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#bffa2c" stop-opacity=".38"/>
+                <radialGradient id="bxFloor" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#bffa2c" stop-opacity=".16"/>
                   <stop offset="100%" stop-color="#bffa2c" stop-opacity="0"/>
                 </radialGradient>
-                <linearGradient id="bitunixBadgeRing" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#eaffab"/>
-                  <stop offset="100%" stop-color="#8fc31f"/>
-                </linearGradient>
               </defs>
-              <g stroke="rgba(255,255,255,.06)" stroke-width="1">
-                <line x1="14" y1="65" x2="250" y2="65"/>
-                <line x1="14" y1="102" x2="250" y2="102"/>
+              <ellipse cx="118" cy="132" rx="92" ry="16" fill="url(#bxFloor)"/>
+              <!-- moneda suelta flotando, cayendo hacia la pila -->
+              <g transform="translate(196,34) rotate(-8)">
+                <ellipse cx="0" cy="7" rx="15" ry="6" fill="#3f5410" opacity=".5"/>
+                <ellipse cx="0" cy="0" rx="15" ry="6" fill="url(#bxCoinTop2)" stroke="#eaffab" stroke-width=".6"/>
+                <text x="0" y="2.6" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="7" fill="#1d2b0a">%</text>
               </g>
-              <line x1="14" y1="140" x2="250" y2="140" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
-              <path d="M35,106 L67,90 L99,112 L131,78 L163,92" fill="none" stroke="url(#bitunixTrend)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <g stroke-width="1.4">
-                <line x1="35" y1="72" x2="35" y2="112" stroke="#bffa2c"/><rect x="28" y="87" width="14" height="19" rx="3" fill="url(#bitunixCandleUp)"/>
-                <line x1="67" y1="52" x2="67" y2="98" stroke="#bffa2c"/><rect x="60" y="62" width="14" height="28" rx="3" fill="url(#bitunixCandleUp)"/>
-                <line x1="99" y1="82" x2="99" y2="118" stroke="#7a9a2a"/><rect x="92" y="96" width="14" height="16" rx="3" fill="url(#bitunixCandleDown)"/>
-                <line x1="131" y1="42" x2="131" y2="88" stroke="#bffa2c"/><rect x="124" y="48" width="14" height="30" rx="3" fill="url(#bitunixCandleUp)"/>
-                <line x1="163" y1="56" x2="163" y2="104" stroke="#bffa2c"/><rect x="156" y="66" width="14" height="26" rx="3" fill="url(#bitunixCandleUp)"/>
+              <g transform="translate(222,64) rotate(6)">
+                <ellipse cx="0" cy="6" rx="11" ry="4.5" fill="#3f5410" opacity=".4"/>
+                <ellipse cx="0" cy="0" rx="11" ry="4.5" fill="url(#bxCoinTop1)" opacity=".85"/>
               </g>
-              <circle cx="213" cy="42" r="40" fill="url(#bitunixBadgeGlow)"/>
-              <circle cx="213" cy="42" r="27" fill="#0d1206" stroke="url(#bitunixBadgeRing)" stroke-width="2"/>
-              <text x="213" y="39" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="15" fill="#eaffab">20%</text>
-              <text x="213" y="53" text-anchor="middle" font-family="Space Mono,monospace" font-size="7" fill="#bffa2c" letter-spacing="1.5">CASHBACK</text>
+              <!-- pila de monedas isométrica -->
+              <g>
+                <ellipse cx="90" cy="118" rx="48" ry="17" fill="#4c6516"/>
+                <rect x="42" y="104" width="96" height="14" fill="#5c7a1a"/>
+                <ellipse cx="90" cy="104" rx="48" ry="17" fill="#6f9422"/>
+                <rect x="42" y="89" width="96" height="15" fill="#729820"/>
+                <ellipse cx="90" cy="89" rx="48" ry="17" fill="#8fc31f"/>
+                <rect x="42" y="73" width="96" height="16" fill="#93c422"/>
+                <ellipse cx="90" cy="73" rx="48" ry="17" fill="url(#bxCoinTop2)"/>
+                <ellipse cx="90" cy="73" rx="34" ry="12" fill="none" stroke="#5c7a1a" stroke-width="1.6" opacity=".55"/>
+                <text x="90" y="79" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="19" fill="#1d2b0a">20%</text>
+              </g>
+              <text x="90" y="150" text-anchor="middle" font-family="Space Mono,monospace" font-size="8" letter-spacing="2.5" fill="#8fc31f">CASHBACK</text>
             </svg>
           </div>
         </div>
@@ -3920,40 +3917,36 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="partner-block-visual">
             <svg width="100%" height="160" viewBox="0 0 260 160" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <linearGradient id="mentBarGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#ff8a9c"/>
-                  <stop offset="100%" stop-color="#ff2f4f"/>
+                <linearGradient id="mnPageL" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ff5a72"/><stop offset="100%" stop-color="#ff2f4f"/>
                 </linearGradient>
-                <linearGradient id="mentTrend" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity="0"/>
-                  <stop offset="100%" stop-color="#ff8a9c" stop-opacity=".9"/>
+                <linearGradient id="mnPageR" x1="1" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ffb3bf"/><stop offset="100%" stop-color="#ff8a9c"/>
                 </linearGradient>
-                <radialGradient id="mentBadgeGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity=".4"/>
+                <radialGradient id="mnFloor" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity=".16"/>
                   <stop offset="100%" stop-color="#ff2f4f" stop-opacity="0"/>
                 </radialGradient>
-                <linearGradient id="mentBadgeRing" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#ffb3bf"/>
-                  <stop offset="100%" stop-color="#ff2f4f"/>
+                <linearGradient id="mnStarGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ffd3da"/>
                 </linearGradient>
               </defs>
-              <g stroke="rgba(255,255,255,.06)" stroke-width="1">
-                <line x1="14" y1="72" x2="200" y2="72"/>
-                <line x1="14" y1="106" x2="200" y2="106"/>
-              </g>
-              <line x1="14" y1="140" x2="246" y2="140" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+              <ellipse cx="128" cy="132" rx="96" ry="15" fill="url(#mnFloor)"/>
+              <!-- libro abierto isométrico -->
               <g>
-                <rect x="20" y="118" width="18" height="22" rx="4" fill="url(#mentBarGrad)" opacity=".32"/>
-                <rect x="52" y="106" width="18" height="34" rx="4" fill="url(#mentBarGrad)" opacity=".45"/>
-                <rect x="84" y="112" width="18" height="28" rx="4" fill="url(#mentBarGrad)" opacity=".4"/>
-                <rect x="116" y="88" width="18" height="52" rx="4" fill="url(#mentBarGrad)" opacity=".6"/>
-                <rect x="148" y="72" width="18" height="68" rx="4" fill="url(#mentBarGrad)" opacity=".78"/>
-                <rect x="180" y="50" width="18" height="90" rx="4" fill="url(#mentBarGrad)" opacity=".92"/>
+                <path d="M128,60 L52,84 L52,120 L128,100 Z" fill="url(#mnPageL)"/>
+                <path d="M128,60 L204,84 L204,120 L128,100 Z" fill="url(#mnPageR)"/>
+                <path d="M52,84 L128,60 L204,84 L128,72 Z" fill="#fff" opacity=".92"/>
+                <path d="M62,88 L118,72 M62,96 L118,80 M62,104 L118,88 M62,112 L112,96" stroke="#ffe1e6" stroke-width="1.6" opacity=".85" stroke-linecap="round"/>
+                <path d="M138,72 L194,88 M138,80 L194,96 M138,88 L194,104 M138,96 L188,112" stroke="#ffe1e6" stroke-width="1.6" opacity=".85" stroke-linecap="round"/>
+                <path d="M128,60 L128,100" stroke="#7a1a2a" stroke-width="1.5" opacity=".5"/>
               </g>
-              <path d="M29,118 L61,106 L93,112 L125,88 L157,72 L189,50" fill="none" stroke="url(#mentTrend)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="221" cy="28" r="34" fill="url(#mentBadgeGlow)"/>
-              <circle cx="221" cy="28" r="20" fill="#150a0e" stroke="url(#mentBadgeRing)" stroke-width="2.3"/>
-              <path d="M213 28l5.5 5.5 11-12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- estrella flotando arriba del libro: el logro al terminar -->
+              <g transform="translate(128,32)">
+                <circle r="20" fill="url(#mnFloor)"/>
+                <path d="M0,-13 L3.8,-4 L13.6,-3.3 L6.1,3 L8.4,12.5 L0,7.4 L-8.4,12.5 L-6.1,3 L-13.6,-3.3 L-3.8,-4 Z" fill="url(#mnStarGrad)"/>
+              </g>
+              <text x="128" y="150" text-anchor="middle" font-family="Space Mono,monospace" font-size="8" letter-spacing="2.5" fill="#ff8a9c">8 MÓDULOS</text>
             </svg>
           </div>
         </div>
