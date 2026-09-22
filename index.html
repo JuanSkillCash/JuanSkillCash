@@ -1275,6 +1275,20 @@ img[src=""]{display:none}
 .drs-labels{display:flex;justify-content:space-between;margin-top:10px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--muted2)}
 .chart-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:18px;text-align:left}
 .chart-stats-grid .res-card{min-width:0}
+.sb-item-alert-hit::after{content:'';position:absolute;top:9px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 6px rgba(255,47,79,.9)}
+.indic-alert-box{margin:18px 0;padding:14px 16px;border:1px solid var(--border2);border-radius:12px;background:rgba(255,255,255,.02)}
+.indic-alert-toggle{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:99px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--white);font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+.indic-alert-toggle.indic-alert-active{border-color:var(--gold);color:var(--gold);background:rgba(240,178,61,.08)}
+.indic-alert-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.indic-alert-form select,.indic-alert-form input{background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;color:var(--white);padding:8px 10px;font-size:13px;font-family:inherit}
+.indic-alert-form input{width:110px}
+.indic-alert-save{padding:8px 16px;border-radius:8px;border:none;background:var(--red);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+.indic-alert-clear{padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--muted);font-weight:600;font-size:12px;cursor:pointer;font-family:inherit}
+.indic-alert-banner{margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(240,178,61,.1);border:1px solid rgba(240,178,61,.4);color:#f7d38a;font-size:13px;font-weight:600}
+@media(max-width:640px){
+  .indic-alert-form{flex-direction:column;align-items:stretch}
+  .indic-alert-form input{width:100%}
+}
 .chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
 .chart-stats-grid .r-val{overflow-wrap:anywhere}
 @media(max-width:600px){
@@ -6402,6 +6416,7 @@ function showIndicPanel(id){
   setCatLabelToolOpen(id !== 'guia');
   if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
   else stopIndicAutoRefresh();
+  renderAlertBox(id);
 }
 function renderIndicSubtabs(group){
   if(group === 'guia' || group === 'predicciones'){
@@ -18091,6 +18106,138 @@ setInterval(updateMarketSessions, 1000);
     showAuthError('Google: ' + decodeURIComponent(errDesc.replace(/\+/g, ' ')));
   }
 })();
+
+/* ========= ALERTAS POR INDICADOR (todo en el navegador, sin backend) =========
+   Guarda un umbral por indicador en localStorage y lo revisa contra el valor que YA muestra
+   cada panel (el mismo número grande que ya calculó su propio gráfico) — no hace ninguna
+   llamada nueva a ninguna API. Limitación real, y a propósito: solo puede revisar un indicador
+   una vez que se cargó al menos una vez en esta sesión (abrirlo lo carga); no hay servidor
+   corriendo 24/7 que lo revise con la pestaña cerrada. */
+const INDIC_ALERT_CONFIG = {
+  halving:      { sel: '#halvingStats .r-val' },
+  pisomercado:  { sel: '#mfloorStats .r-val' },
+  rsimensual:   { sel: '#rsiStats .r-val' },
+  ciclosoporte: { sel: '#ciclosoporteStats .r-val' },
+  rainbow:      { sel: '#rainbowStats .r-val' },
+  picycle:      { sel: '#picycleStats .r-val' },
+  ema200:       { sel: '#ema200Stats .r-val' },
+  ethlogreg:    { sel: '#ethlogregStats .r-val' },
+  ethvwap:      { sel: '#ethvwapStats .r-val' },
+  total2:       { sel: '#total2Stats .r-val' },
+  others:       { sel: '#othersStats .r-val' },
+  fng:          { sel: '#fngDetailValue' },
+  cbpremium:    { sel: '#cbpStats .r-val' },
+  treasuries:   { sel: '#treasTotalBtc' },
+  btcxau:       { sel: '#btcxauStats .r-val' },
+  domratio:     { sel: '#domratioStats .r-val' },
+  domall:       { sel: '#domallStats .r-val' },
+  dombtc:       { sel: '#dombtcStats .r-val' },
+  domusdt:      { sel: '#domusdtStats .r-val' },
+  othersbtc:    { sel: '#othersbtcStats .r-val' },
+  ethbtc:       { sel: '#ethbtcStats .r-val' },
+  altfever:     { sel: '#altfeverStats .r-val' },
+  ethvsalt:     { sel: '#ethvsaltStats .r-val' },
+};
+function loadAlertsStore(){
+  try{ return JSON.parse(localStorage.getItem('skillcashAlerts') || '{}'); } catch(e){ return {}; }
+}
+function saveAlertsStore(store){
+  try{ localStorage.setItem('skillcashAlerts', JSON.stringify(store)); } catch(e){ /* modo privado / storage lleno: la alerta no persiste, pero no rompe nada */ }
+}
+// admite "$45,231.50" -> 45231.5, "63.2%" -> 63.2, "$45.2B" -> 45200000000 (sufijo pegado al
+// número, sin espacio — así "1,234,567 BTC" no confunde la "B" de BTC con "Billion")
+function parseIndicValue(text){
+  if(!text) return null;
+  const t = text.trim();
+  const m = t.match(/-?[\d,]+\.?\d*/);
+  if(!m) return null;
+  let num = parseFloat(m[0].replace(/,/g, ''));
+  if(!isFinite(num)) return null;
+  const rest = t.slice(m.index + m[0].length);
+  const suf = rest.match(/^([KMBT])(?![a-zA-Z])/);
+  if(suf) num *= { K: 1e3, M: 1e6, B: 1e9, T: 1e12 }[suf[1]];
+  return num;
+}
+function fmtAlertOp(op){ return op === 'gt' ? 'por arriba de' : 'por debajo de'; }
+function buildAlertBoxHtml(id){
+  return `
+    <div class="indic-alert-box" id="${id}AlertBox">
+      <button type="button" class="indic-alert-toggle">🔔 Avisarme</button>
+      <div class="indic-alert-form" style="display:none">
+        <select class="indic-alert-op">
+          <option value="gt">esté arriba de</option>
+          <option value="lt">esté abajo de</option>
+        </select>
+        <input type="number" class="indic-alert-val" step="any" placeholder="valor">
+        <button type="button" class="indic-alert-save">Guardar</button>
+        <button type="button" class="indic-alert-clear" style="display:none">Quitar alerta</button>
+      </div>
+      <div class="indic-alert-banner" style="display:none"></div>
+    </div>
+  `;
+}
+function renderAlertBox(id){
+  const cfgDef = INDIC_ALERT_CONFIG[id];
+  const box = document.getElementById(id + 'AlertBox');
+  if(!cfgDef || !box) return;
+  const toggleBtn = box.querySelector('.indic-alert-toggle');
+  const banner = box.querySelector('.indic-alert-banner');
+  const store = loadAlertsStore();
+  const cfg = store[id];
+  toggleBtn.classList.toggle('indic-alert-active', !!cfg);
+  toggleBtn.textContent = cfg ? `🔔 Alerta: ${fmtAlertOp(cfg.op)} ${cfg.value}` : '🔔 Avisarme';
+  const valEl = document.querySelector(cfgDef.sel);
+  const current = valEl ? parseIndicValue(valEl.textContent) : null;
+  const hit = !!(cfg && current != null && (cfg.op === 'gt' ? current > cfg.value : current < cfg.value));
+  banner.style.display = hit ? 'block' : 'none';
+  if(hit) banner.textContent = `🔔 Se cumplió tu alerta: el valor actual (${current.toLocaleString('es-ES', { maximumFractionDigits: 2 })}) está ${fmtAlertOp(cfg.op)} ${cfg.value}.`;
+  document.querySelectorAll('[data-indic-jump="' + id + '"]').forEach(btn => btn.classList.toggle('sb-item-alert-hit', hit));
+}
+function initIndicatorAlerts(){
+  Object.keys(INDIC_ALERT_CONFIG).forEach(id => {
+    const panel = document.querySelector('.indic-panel[data-indic="' + id + '"]');
+    if(!panel) return;
+    const disclaimer = panel.querySelector('.calc-disclaimer');
+    const insertTarget = disclaimer || panel.querySelector('.calc');
+    if(!insertTarget) return;
+    if(disclaimer) disclaimer.insertAdjacentHTML('beforebegin', buildAlertBoxHtml(id));
+    else insertTarget.insertAdjacentHTML('beforeend', buildAlertBoxHtml(id));
+    const box = document.getElementById(id + 'AlertBox');
+    if(!box) return;
+    const toggleBtn = box.querySelector('.indic-alert-toggle');
+    const form = box.querySelector('.indic-alert-form');
+    const opSel = box.querySelector('.indic-alert-op');
+    const valInput = box.querySelector('.indic-alert-val');
+    const saveBtn = box.querySelector('.indic-alert-save');
+    const clearBtn = box.querySelector('.indic-alert-clear');
+    const store = loadAlertsStore();
+    if(store[id]){ opSel.value = store[id].op; valInput.value = store[id].value; clearBtn.style.display = ''; }
+    toggleBtn.addEventListener('click', () => { form.style.display = form.style.display === 'none' ? 'flex' : 'none'; });
+    saveBtn.addEventListener('click', () => {
+      const value = parseFloat(valInput.value);
+      if(!isFinite(value)) return;
+      const s = loadAlertsStore();
+      s[id] = { op: opSel.value, value };
+      saveAlertsStore(s);
+      clearBtn.style.display = '';
+      form.style.display = 'none';
+      renderAlertBox(id);
+    });
+    clearBtn.addEventListener('click', () => {
+      const s = loadAlertsStore();
+      delete s[id];
+      saveAlertsStore(s);
+      valInput.value = '';
+      clearBtn.style.display = 'none';
+      renderAlertBox(id);
+    });
+    renderAlertBox(id);
+  });
+  // revisión periódica: cubre el caso de un indicador que ya estaba abierto cuando llegó su dato
+  // (fetch async) y el de cualquier indicador ya visitado mientras la pestaña sigue abierta
+  setInterval(() => { Object.keys(INDIC_ALERT_CONFIG).forEach(renderAlertBox); }, 5000);
+}
+initIndicatorAlerts();
 
 /* si alguien entra directo a una URL como /indicadores/dominancia-btc o
    /herramientas/trading/calculadora (link compartido, marcador, recarga de página), esto arma la
