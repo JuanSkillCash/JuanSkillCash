@@ -6336,8 +6336,8 @@ function setPageTitle(text){ document.title = text ? text + ' – SkillCash Tool
 // disco) tiran un SecurityError. Con este wrapper, si eso llega a pasar, la navegación (mostrar/
 // ocultar lo que corresponda) sigue funcionando igual — solo la URL de la barra de direcciones no
 // se actualiza, en vez de que toda la página se rompa
-function pushRoute(state, path){ try{ history.pushState(state, '', path); } catch(err){ /* ver comentario de arriba */ } }
-function replaceRoute(state, path){ try{ history.replaceState(state, '', path); } catch(err){ /* ver comentario de arriba */ } }
+function pushRoute(state, path){ if(suppressRouteWrites) return; try{ history.pushState(state, '', path); } catch(err){ /* ver comentario de arriba */ } }
+function replaceRoute(state, path){ if(suppressRouteWrites) return; try{ history.replaceState(state, '', path); } catch(err){ /* ver comentario de arriba */ } }
 // listas de etiquetas legibles para el <title> de cada vista — se arman solas a partir del HTML
 // que ya existe (el mismo texto que el usuario ya ve en cada tarjeta), no hay que escribirlas
 // de nuevo a mano ni mantenerlas sincronizadas
@@ -6691,18 +6691,59 @@ function closeModalGeneric(overlay){
     replaceRoute({ skillcashDepth: 'category' }, routePathForCategory(category));
   }
 }
+// mientras esto es true, showCategoryDetail/jumpToIndicator/openModalGeneric no tocan el
+// historial — se usa cuando YA estamos reaccionando a una navegación real (atrás/adelante del
+// navegador, o el ruteo inicial), donde la URL ya está donde tiene que estar y no hay que
+// apilar/reemplazar nada más
+let suppressRouteWrites = false;
+// arma la vista correspondiente a una ruta cualquiera — la usan tanto el arranque de la página
+// (link directo/recarga) como el botón atrás/adelante del navegador, así ninguno de los dos
+// tiene su propia copia de esta lógica
+function applyRoute(path){
+  path = path.replace(/\/+$/, '') || '/';
+  closeAnyOpenToolInline();
+  const segs = path.split('/').filter(Boolean);
+  if(segs[0] === 'indicadores'){
+    showCategoryDetail('indicadores');
+    const seg = segs[1];
+    const id = seg ? ((seg === 'guia' || seg === 'predicciones') ? seg : INDIC_SLUG_TO_ID[seg]) : 'guia';
+    if(id) jumpToIndicator(id);
+  } else if(segs[0] === 'herramientas' && segs[1] && document.querySelector('.tool-section[data-category="' + segs[1] + '"]')){
+    const cat = segs[1];
+    showCategoryDetail(cat);
+    const tool = segs[2];
+    if(tool){
+      const card = document.querySelector('.tool-section[data-category="' + cat + '"] .tool-card[data-tool="' + tool + '"]');
+      if(card) card.click();
+    } else {
+      // showCategoryDetail solo pone el título cuando "entra desde el overview" — si ya
+      // estábamos en esta categoría (con una herramienta abierta que closeAnyOpenToolInline
+      // recién cerró arriba), nadie más lo refresca
+      setPageTitle(CATEGORY_LABELS[cat]);
+    }
+  } else {
+    showCategoryOverview();
+  }
+}
 window.addEventListener('popstate', () => {
   if(suppressNextPopstate){ suppressNextPopstate = false; return; }
   closingFromPopstate = true;
+  // los modales que NO son una herramienta de categoría (login, detalle de un activo del
+  // portafolio, etc.) no tienen una URL propia — se cierran igual que como funcionaba antes de
+  // que existiera el ruteo, por la marca de profundidad en el historial, no por la ruta
   if(activeModalPanel){
     const overlay = activeModalPanel.closest('.modal-overlay');
-    if(overlay){
+    const isRoutableTool = overlay && TOOL_CATEGORY[overlay.dataset.tool];
+    if(overlay && !isRoutableTool){
       if(overlay.id === 'assetDetailModal') closeAssetDetailModal();
       else closeModalGeneric(overlay);
+      closingFromPopstate = false;
+      return;
     }
-  } else if(categoryDetailView.style.display === 'block'){
-    showCategoryOverview();
   }
+  suppressRouteWrites = true;
+  applyRoute(location.pathname);
+  suppressRouteWrites = false;
   closingFromPopstate = false;
 });
 document.addEventListener('keydown', (e) => {
@@ -18058,23 +18099,7 @@ setInterval(updateMarketSessions, 1000);
   const path = location.pathname.replace(/\/+$/, '') || '/';
   replaceRoute(null, '/');
   if(path === '/') return;
-  const segs = path.split('/').filter(Boolean);
-  if(segs[0] === 'indicadores'){
-    showCategoryDetail('indicadores');
-    const seg = segs[1];
-    if(seg){
-      const id = (seg === 'guia' || seg === 'predicciones') ? seg : INDIC_SLUG_TO_ID[seg];
-      if(id) jumpToIndicator(id);
-    }
-  } else if(segs[0] === 'herramientas' && segs[1] && document.querySelector('.tool-section[data-category="' + segs[1] + '"]')){
-    const cat = segs[1];
-    showCategoryDetail(cat);
-    const tool = segs[2];
-    if(tool){
-      const card = document.querySelector('.tool-section[data-category="' + cat + '"] .tool-card[data-tool="' + tool + '"]');
-      if(card) card.click();
-    }
-  }
+  applyRoute(path);
 })();
 </script>
 <script>
