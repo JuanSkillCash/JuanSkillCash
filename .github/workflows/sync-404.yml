@@ -1,0 +1,41 @@
+name: Sincronizar 404.html con index.html
+
+# GitHub Pages es hosting estático puro: cuando alguien entra directo a una URL como
+# /indicadores/dominancia-btc (un link compartido, un marcador, o F5 en esa página), no existe
+# ningún archivo real en esa ruta -- Pages responde con 404, pero ANTES revisa si existe un
+# archivo 404.html en la raíz y, si existe, sirve SU contenido en su lugar (el código de
+# respuesta sigue siendo 404 por detrás, pero el visitante nunca ve un error). Con 404.html
+# siendo una copia exacta de index.html, la app carga igual y el router (ver "applyInitialRoute"
+# en index.html) lee la URL real y muestra el indicador/herramienta correcto.
+#
+# Este workflow evita depender de acordarse de copiar el archivo a mano en cada cambio: cada vez
+# que index.html cambia en main, compara los dos archivos y, si quedaron distintos, actualiza
+# 404.html solo y lo sube en un commit aparte.
+
+on:
+  push:
+    branches: [main]
+    paths: ["index.html"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copiar index.html a 404.html si quedaron distintos
+        run: |
+          if ! cmp -s index.html 404.html; then
+            cp index.html 404.html
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add 404.html
+            git commit -m "Sincronizar 404.html con index.html [automático]"
+            git push
+          else
+            echo "404.html ya está al día, nada que hacer."
+          fi
