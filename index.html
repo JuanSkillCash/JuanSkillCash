@@ -542,15 +542,15 @@ button{font-family:inherit;color:inherit}
 
 .cat-overview-featured{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:900px){ .cat-overview-featured{grid-template-columns:1fr} }
-.cat-overview-card.big{padding:28px}
-.cat-overview-card.big .cat-overview-num{width:34px;height:34px;font-size:15px}
-.cat-overview-card.big .cat-overview-title{font-size:23px;gap:10px}
-.cat-overview-card.big .cat-overview-title svg{width:24px;height:24px}
-.cat-overview-card.big .cat-overview-tag{font-size:10px;padding:4px 12px}
-.cat-overview-card.big .cat-overview-sub{font-size:13px;padding-left:44px;margin:4px 0 16px}
-.cat-overview-card.big .cat-overview-preview{height:112px;margin-bottom:16px}
-.cat-overview-card.big .cat-overview-desc{font-size:14.5px;margin-bottom:18px}
-.cat-overview-card.big .cat-overview-btn{font-size:13.5px;padding:10px 18px}
+.cat-overview-card.big{padding:26px}
+.cat-overview-card.big .cat-overview-num{width:28px;height:28px;font-size:12.5px}
+.cat-overview-card.big .cat-overview-title{font-size:18px;gap:9px}
+.cat-overview-card.big .cat-overview-title svg{width:19px;height:19px}
+.cat-overview-card.big .cat-overview-tag{font-size:9px;padding:3px 10px}
+.cat-overview-card.big .cat-overview-sub{font-size:11.5px;padding-left:37px;margin:3px 0 15px}
+.cat-overview-card.big .cat-overview-preview{height:104px;margin-bottom:15px}
+.cat-overview-card.big .cat-overview-desc{font-size:13.5px;margin-bottom:17px}
+.cat-overview-card.big .cat-overview-btn{font-size:12.5px;padding:9px 16px}
 
 .cat-back-btn{
   display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--muted2);
@@ -1206,7 +1206,7 @@ img[src=""]{display:none}
 .partner-cta{display:inline-flex;align-items:center;gap:9px;font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:#050810;background:var(--pc,var(--white));padding:14px 26px;border-radius:12px;text-decoration:none;transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
 .partner-cta:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px var(--pt,rgba(0,0,0,.5))}
 .partner-cta-sub{font-size:11px;color:var(--muted);margin-top:11px}
-.partner-block-visual{display:flex;align-items:center;justify-content:center;min-height:200px;aspect-ratio:280/200;border-radius:16px;overflow:hidden}
+.partner-block-visual{display:flex;align-items:center;justify-content:center;min-height:160px;aspect-ratio:280/170;border-radius:16px;overflow:hidden}
 .partner-block-visual svg{width:100%;height:100%;display:block}
 .partner-block-pending{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--border2);border-radius:99px;padding:6px 14px;margin-left:auto}
 
@@ -1877,7 +1877,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <button type="button" class="cat-overview-card big" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">3</div>
+          <div class="cat-overview-num">2</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><circle cx="7" cy="10" r="5"/><circle cx="13" cy="10" r="5"/></svg><span>Partners</span></div>
           <div class="cat-overview-tag soon">ALIANZAS</div>
         </div>
@@ -1908,7 +1908,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <button type="button" class="cat-overview-card" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">2</div>
+          <div class="cat-overview-num">3</div>
           <div class="cat-overview-title">💼 Simulador de Portafolio</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -3870,57 +3870,42 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="partner-cta-sub">O usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte por tu cuenta.</div>
           </div>
           <div class="partner-block-visual">
-            <svg width="100%" height="100%" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid meet">
+            <svg width="100%" height="100%" viewBox="0 0 280 170" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <linearGradient id="bxCoinTop1" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#eaffab"/><stop offset="100%" stop-color="#a8e030"/>
-                </linearGradient>
-                <linearGradient id="bxCoinTop2" x1="0" y1="0" x2="1" y2="1">
+                <linearGradient id="bxBadge" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stop-color="#d9ff5c"/><stop offset="100%" stop-color="#8fc31f"/>
                 </linearGradient>
-                <radialGradient id="bxGlow" cx="50%" cy="42%" r="60%">
-                  <stop offset="0%" stop-color="#bffa2c" stop-opacity=".28"/>
-                  <stop offset="60%" stop-color="#bffa2c" stop-opacity=".07"/>
-                  <stop offset="100%" stop-color="#bffa2c" stop-opacity="0"/>
-                </radialGradient>
-                <radialGradient id="bxFloor" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#bffa2c" stop-opacity=".22"/>
+                <linearGradient id="bxBarA" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#bffa2c"/><stop offset="100%" stop-color="#6f9422"/>
+                </linearGradient>
+                <radialGradient id="bxGlow" cx="50%" cy="48%" r="55%">
+                  <stop offset="0%" stop-color="#bffa2c" stop-opacity=".16"/>
                   <stop offset="100%" stop-color="#bffa2c" stop-opacity="0"/>
                 </radialGradient>
               </defs>
-              <rect x="0" y="0" width="280" height="200" fill="url(#bxGlow)"/>
-              <!-- destellos -->
-              <path d="M40 24l2.4 6 6 2.4-6 2.4L40 41l-2.4-6-6-2.4 6-2.4z" fill="#eaffab" opacity=".8"/>
-              <path d="M244 30l1.8 4.6 4.6 1.8-4.6 1.8-1.8 4.6-1.8-4.6-4.6-1.8 4.6-1.8z" fill="#eaffab" opacity=".65"/>
-              <ellipse cx="140" cy="176" rx="118" ry="18" fill="url(#bxFloor)"/>
-              <!-- flecha de crecimiento detrás de la pila -->
-              <path d="M28 138 L70 118 L104 130 L150 84 L196 100 L232 60" fill="none" stroke="#8fc31f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
-              <path d="M212 60 L232 60 L232 80" fill="none" stroke="#8fc31f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
-              <!-- monedas sueltas grandes, cayendo hacia la pila -->
-              <g transform="translate(212,46) rotate(-8)">
-                <ellipse cx="0" cy="9" rx="21" ry="8.5" fill="#3f5410" opacity=".5"/>
-                <ellipse cx="0" cy="0" rx="21" ry="8.5" fill="url(#bxCoinTop2)" stroke="#eaffab" stroke-width=".8"/>
-                <text x="0" y="3.4" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="10" fill="#1d2b0a">%</text>
+              <ellipse cx="140" cy="82" rx="120" ry="60" fill="url(#bxGlow)"/>
+              <!-- mini franja de velas, como un ticket de trading -->
+              <g opacity=".8">
+                <rect x="34" y="104" width="10" height="18" rx="2" fill="url(#bxBarA)"/>
+                <rect x="52" y="94" width="10" height="28" rx="2" fill="url(#bxBarA)"/>
+                <rect x="70" y="84" width="10" height="38" rx="2" fill="url(#bxBarA)"/>
+                <rect x="88" y="72" width="10" height="50" rx="2" fill="url(#bxBarA)"/>
+                <rect x="182" y="72" width="10" height="50" rx="2" fill="url(#bxBarA)"/>
+                <rect x="200" y="84" width="10" height="38" rx="2" fill="url(#bxBarA)"/>
+                <rect x="218" y="94" width="10" height="28" rx="2" fill="url(#bxBarA)"/>
+                <rect x="236" y="104" width="10" height="18" rx="2" fill="url(#bxBarA)"/>
               </g>
-              <g transform="translate(246,88) rotate(6)">
-                <ellipse cx="0" cy="7.5" rx="15" ry="6.2" fill="#3f5410" opacity=".4"/>
-                <ellipse cx="0" cy="0" rx="15" ry="6.2" fill="url(#bxCoinTop1)" opacity=".9"/>
-              </g>
-              <!-- pila de monedas isométrica, más alta y más ancha -->
-              <g>
-                <ellipse cx="130" cy="158" rx="66" ry="22" fill="#40540f"/>
-                <rect x="64" y="138" width="132" height="20" fill="#4c6516"/>
-                <ellipse cx="130" cy="138" rx="66" ry="22" fill="#5c7a1a"/>
-                <rect x="64" y="118" width="132" height="20" fill="#6f9422"/>
-                <ellipse cx="130" cy="118" rx="66" ry="22" fill="#729820"/>
-                <rect x="64" y="98" width="132" height="20" fill="#7fac21"/>
-                <ellipse cx="130" cy="98" rx="66" ry="22" fill="#8fc31f"/>
-                <rect x="64" y="78" width="132" height="20" fill="#93c422"/>
-                <ellipse cx="130" cy="78" rx="66" ry="22" fill="url(#bxCoinTop2)"/>
-                <ellipse cx="130" cy="78" rx="47" ry="16" fill="none" stroke="#5c7a1a" stroke-width="2" opacity=".55"/>
-                <text x="130" y="86" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="27" fill="#1d2b0a">20%</text>
-              </g>
-              <text x="130" y="194" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" letter-spacing="3" fill="#c3f65e">CASHBACK EN COMISIONES</text>
+              <!-- destello -->
+              <path d="M232 34l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#eaffab" opacity=".8"/>
+              <!-- insignia circular "20%", como una medalla de cashback -->
+              <circle cx="140" cy="78" r="38" fill="#0b1206"/>
+              <circle cx="140" cy="78" r="38" fill="url(#bxBadge)" opacity=".92"/>
+              <circle cx="140" cy="78" r="28" fill="none" stroke="#3f5410" stroke-width="1.6" stroke-dasharray="3,4" opacity=".6"/>
+              <text x="140" y="86" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="900" font-size="21" fill="#1d2b0a">20%</text>
+              <!-- rayo: ejecución rápida -->
+              <path d="M52 132l11-16h-6l4-10-11 15h6z" fill="#8fc31f"/>
+              <text x="280" y="0" opacity="0"> </text>
+              <text x="140" y="152" text-anchor="middle" font-family="Space Mono,monospace" font-size="9.5" font-weight="700" letter-spacing="2.5" fill="#a8e030">CASHBACK EN COMISIONES</text>
             </svg>
           </div>
         </div>
@@ -3947,55 +3932,43 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="partner-cta-sub">Planes desde <strong style="color:var(--white)">$47</strong> — pago único, sin mensualidades.</div>
           </div>
           <div class="partner-block-visual">
-            <svg width="100%" height="100%" viewBox="0 0 280 200" preserveAspectRatio="xMidYMid meet">
+            <svg width="100%" height="100%" viewBox="0 0 280 170" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <linearGradient id="mnPageL" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#ff5a72"/><stop offset="100%" stop-color="#ff2f4f"/>
+                <linearGradient id="mnCardA" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ff5a72"/><stop offset="100%" stop-color="#c91f3b"/>
                 </linearGradient>
-                <linearGradient id="mnPageR" x1="1" y1="0" x2="0" y2="1">
+                <linearGradient id="mnCardB" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stop-color="#ffb3bf"/><stop offset="100%" stop-color="#ff8a9c"/>
                 </linearGradient>
-                <radialGradient id="mnGlow" cx="50%" cy="38%" r="62%">
-                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity=".26"/>
-                  <stop offset="60%" stop-color="#ff2f4f" stop-opacity=".07"/>
+                <radialGradient id="mnGlow" cx="50%" cy="55%" r="55%">
+                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity=".16"/>
                   <stop offset="100%" stop-color="#ff2f4f" stop-opacity="0"/>
                 </radialGradient>
-                <radialGradient id="mnFloor" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#ff2f4f" stop-opacity=".22"/>
-                  <stop offset="100%" stop-color="#ff2f4f" stop-opacity="0"/>
-                </radialGradient>
-                <linearGradient id="mnStarGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ffd3da"/>
-                </linearGradient>
               </defs>
-              <rect x="0" y="0" width="280" height="200" fill="url(#mnGlow)"/>
-              <ellipse cx="140" cy="176" rx="122" ry="18" fill="url(#mnFloor)"/>
-              <!-- escalera de 8 módulos ascendiendo hacia la estrella -->
-              <g fill="#ff8a9c" opacity=".45">
-                <rect x="30" y="152" width="20" height="14" rx="2"/>
-                <rect x="52" y="140" width="20" height="26" rx="2"/>
-                <rect x="74" y="128" width="20" height="38" rx="2"/>
-                <rect x="196" y="128" width="20" height="38" rx="2"/>
-                <rect x="218" y="140" width="20" height="26" rx="2"/>
-                <rect x="240" y="152" width="20" height="14" rx="2"/>
+              <ellipse cx="140" cy="98" rx="120" ry="58" fill="url(#mnGlow)"/>
+              <!-- destellos -->
+              <path d="M44 108l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffd3da" opacity=".7"/>
+              <path d="M236 112l1.8 4.4 4.4 1.8-4.4 1.8-1.8 4.4-1.8-4.4-4.4-1.8 4.4-1.8z" fill="#ffd3da" opacity=".6"/>
+              <!-- birrete de graduación, arriba del abanico -->
+              <g transform="translate(140,30)">
+                <ellipse cx="0" cy="15" rx="13" ry="4" fill="#7a1a2a"/>
+                <rect x="-13" y="-13" width="26" height="26" fill="#ff2f4f" transform="rotate(45)"/>
+                <circle cx="0" cy="0" r="3" fill="#ffd3da"/>
+                <path d="M18,0 Q29,11 26,27" fill="none" stroke="#ffd3da" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="26" cy="28" r="2.4" fill="#ffd3da"/>
               </g>
-              <!-- libro abierto isométrico, más grande -->
-              <g transform="translate(140,96) scale(1.32) translate(-140,-96)">
-                <path d="M140,68 L54,94 L54,132 L140,110 Z" fill="url(#mnPageL)"/>
-                <path d="M140,68 L226,94 L226,132 L140,110 Z" fill="url(#mnPageR)"/>
-                <path d="M54,94 L140,68 L226,94 L140,80 Z" fill="#fff" opacity=".94"/>
-                <path d="M65,98 L128,80 M65,107 L128,89 M65,116 L128,98 M65,125 L122,109" stroke="#ffe1e6" stroke-width="1.8" opacity=".85" stroke-linecap="round"/>
-                <path d="M152,80 L215,98 M152,89 L215,107 M152,98 L215,116 M152,107 L209,125" stroke="#ffe1e6" stroke-width="1.8" opacity=".85" stroke-linecap="round"/>
-                <path d="M140,68 L140,110" stroke="#7a1a2a" stroke-width="1.6" opacity=".5"/>
+              <!-- abanico de 7 tarjetas: los módulos de la mentoría -->
+              <g transform="translate(140,158) rotate(-21)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardA)" opacity=".5"/></g>
+              <g transform="translate(140,158) rotate(-14)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardB)" opacity=".62"/></g>
+              <g transform="translate(140,158) rotate(-7)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardA)" opacity=".8"/></g>
+              <g transform="translate(140,158) rotate(7)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardA)" opacity=".8"/></g>
+              <g transform="translate(140,158) rotate(14)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardB)" opacity=".62"/></g>
+              <g transform="translate(140,158) rotate(21)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardA)" opacity=".5"/></g>
+              <g transform="translate(140,158)">
+                <rect x="-11" y="-92" width="22" height="36" rx="5" fill="#fff"/>
+                <path d="M-3,-80 L-3,-64 L7,-72 Z" fill="#ff2f4f"/>
               </g>
-              <!-- estrella grande y brillante: el logro al terminar -->
-              <g transform="translate(140,34)">
-                <circle r="30" fill="url(#mnFloor)"/>
-                <path d="M0,-20 L5.8,-6 L20.8,-5 L9.3,4.6 L12.8,19 L0,11.3 L-12.8,19 L-9.3,4.6 L-20.8,-5 L-5.8,-6 Z" fill="url(#mnStarGrad)"/>
-                <path d="M-34,-4l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffd3da" opacity=".85"/>
-                <path d="M32,6l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#ffd3da" opacity=".7"/>
-              </g>
-              <text x="140" y="194" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" letter-spacing="3" fill="#ff8a9c">8 MÓDULOS · ACCESO VITALICIO</text>
+              <text x="140" y="152" text-anchor="middle" font-family="Space Mono,monospace" font-size="9.5" font-weight="700" letter-spacing="2.5" fill="#ff8a9c">8 MÓDULOS</text>
             </svg>
           </div>
         </div>
