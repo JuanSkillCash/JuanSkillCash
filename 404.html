@@ -1519,11 +1519,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="domusdt">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Dominancia USDT</span>
       </button>
-      <button class="sb-item" data-indic-jump="othersbtc">
-        <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
-      </button>
       <button class="sb-item" data-indic-jump="ethbtc">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">ETH/BTC</span>
+      </button>
+      <div class="indic-cat-label">🪙 Altcoins</div>
+      <button class="sb-item" data-indic-jump="othersbtc">
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
       </button>
       <button class="sb-item" data-indic-jump="altfever">
         <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de Altcoins</span>
@@ -1708,11 +1709,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domusdt">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Dominancia USDT</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="othersbtc">
-        <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
-      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethbtc">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">ETH/BTC</span>
+      </button>
+      <div class="indic-cat-label">🪙 Altcoins</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="othersbtc">
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="altfever">
         <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de Altcoins</span>
@@ -2176,6 +2178,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
         <button type="button" class="indic-tab" data-group="dominancia">Dominancia</button>
+        <button type="button" class="indic-tab" data-group="altcoins">🪙 Altcoins</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
       </div>
 
@@ -2319,16 +2322,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Qué tanto pesa Tether solo frente al resto del mercado.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="othersbtc">
-              <div class="indic-guide-icon">🪙</div>
-              <div class="indic-guide-card-title">OTHERS/BTC</div>
-              <div class="indic-guide-card-text">Cuánto vale el índice OTHERS (altcoins fuera del top 10) medido en Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethbtc">
               <div class="indic-guide-icon">🔁</div>
               <div class="indic-guide-card-title">ETH/BTC</div>
               <div class="indic-guide-card-text">Precio de Ethereum medido en Bitcoin.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">🪙 Altcoins</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="othersbtc">
+              <div class="indic-guide-icon">🪙</div>
+              <div class="indic-guide-card-title">OTHERS/BTC</div>
+              <div class="indic-guide-card-text">Cuánto vale el índice OTHERS (altcoins fuera del top 10) medido en Bitcoin.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altfever">
@@ -2341,6 +2346,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">⚖️</div>
               <div class="indic-guide-card-title">Valoración Relativa ETH vs Altcoins</div>
               <div class="indic-guide-card-text">Compara el tamaño de las altcoins contra Ethereum — te dice si conviene estar en ETH o rotar a las altcoins.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="total2">
+              <div class="indic-guide-icon">🥈</div>
+              <div class="indic-guide-card-title">TOTAL2 EMA200</div>
+              <div class="indic-guide-card-text">Capitalización de todo el mercado sin Bitcoin, con su media móvil de 200 semanas.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="others">
+              <div class="indic-guide-icon">🌱</div>
+              <div class="indic-guide-card-title">OTHERS EMA200</div>
+              <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
           </div>
@@ -6512,9 +6529,10 @@ const INDIC_GROUPS = {
   mineria: [],
   macro: [],
   onchain: [],
-  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
+  altcoins: [{ id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia', total2: 'dominancia', others: 'dominancia' };
+const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
