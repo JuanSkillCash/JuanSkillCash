@@ -1266,6 +1266,14 @@ img[src=""]{display:none}
 .tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
 .tf-pill:hover{border-color:var(--red);color:var(--white)}
 .tf-pill.active{background:var(--red);border-color:var(--red);color:#fff}
+.ls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.ls-exchange-card{border:1px solid var(--border2);border-radius:14px;padding:16px 18px}
+.ls-exchange-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:14.5px;color:var(--white);margin-bottom:12px}
+.ls-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+.ls-row:first-of-type{border-top:none;padding-top:0}
+.ls-row-label{font-size:12px;color:var(--muted2)}
+.ls-row-val{font-family:'Space Mono',monospace;font-weight:700;font-size:13px;white-space:nowrap}
+.ls-row-val.na{color:var(--muted);font-weight:400;font-size:10.5px}
 /* buscador de moneda para Predicciones — reemplaza la fila de pills cuando hay muchas monedas
    acumuladas y ya no cabían en una sola línea; deja escribir/autocompletar en vez de listar botones */
 .pred-coin-search{position:relative;max-width:280px;margin:4px 0 20px}
@@ -1486,6 +1494,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
+      <button class="sb-item" data-indic-jump="longshort">
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
+      </button>
       <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item" data-indic-jump="domratio">
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
@@ -1668,6 +1679,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="longshort">
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domratio">
@@ -2259,6 +2273,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">🥇</div>
               <div class="indic-guide-card-title">BTC/XAU</div>
               <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="longshort">
+              <div class="indic-guide-icon">⚖️</div>
+              <div class="indic-guide-card-title">Ratio Largo/Corto</div>
+              <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/OKX/Bybit — minoristas y las cuentas grandes.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3206,6 +3226,51 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 💱 Cada barra es el premium <b>(precio Coinbase − precio Binance) / precio Binance</b> al cierre de esa vela, en la temporalidad elegida. Verde = premium positivo (Coinbase más caro), rojo = negativo. Suele moverse en un rango muy pequeño (décimas de %) — variaciones grandes y sostenidas son las que de verdad importan, no una sola barra.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="longshort" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Ratio Largo/Corto (BTC)</h2>
+              </div>
+
+              <div class="tf-pill-row" id="lsTfRow">
+                <button type="button" class="tf-pill active" data-tf="1h">1h</button>
+                <button type="button" class="tf-pill" data-tf="4h">4h</button>
+                <button type="button" class="tf-pill" data-tf="1d">1d</button>
+              </div>
+
+              <div class="indic-chart-body" id="lsChartBody">
+                <div class="indic-chart-soon" id="lsLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando datos…</div>
+                  <div class="indic-placeholder-text">Consultando Binance, OKX y Bybit.</div>
+                </div>
+                <div class="indic-chart-soon" id="lsError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="lsGrid" class="ls-grid" style="display:none"></div>
+              </div>
+
+              <div style="text-align:center;margin-top:18px">
+                <button type="button" class="a-btn" id="lsRefreshBtn">🔄 Actualizar</button>
+                <div style="font-size:11px;color:var(--muted);margin-top:8px" id="lsUpdatedAt"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                ⚖️ Ratio = cuentas/posiciones en largo ÷ en corto, para BTC perpetuo. Mayor a 1 = hay más apostando a que sube; menor a 1 = más apostando a que baja. <b>Inversores minoristas</b> = todas las cuentas del exchange; <b>Cuentas Whale</b> = solo las cuentas más grandes (top traders); <b>Posiciones Whale</b> = lo mismo pero ponderado por el tamaño de cada posición, no por número de cuentas.<br>
+                🔎 Fuentes: APIs públicas de <b>Binance</b>, <b>OKX</b> y <b>Bybit</b> Futuros. Bybit no publica el desglose de cuentas/posiciones whale en su API pública — por eso esas dos filas salen como "no disponible" ahí, en vez de mostrarte un número inventado.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -6373,11 +6438,11 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [],
-  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
+  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
   onchain: [],
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia' };
+const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', longshort: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -6469,6 +6534,7 @@ function showIndicPanel(id){
   });
   setCatLabelToolOpen(id !== 'guia');
   if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
+  else if(id === 'longshort') startIndicAutoRefresh(() => loadLongShort(true), LS_TF[lsActiveTf].ms);
   else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
@@ -6508,6 +6574,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
+      if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
       if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
       if(btn.dataset.indic === 'dombtc') ensureDomBtcLoaded();
@@ -6548,6 +6615,7 @@ function jumpToIndicator(id){
     if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
+    if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
     if(id === 'domall') ensureDomAllLoaded();
     if(id === 'dombtc') ensureDomBtcLoaded();
@@ -17630,6 +17698,129 @@ document.querySelectorAll('#cbpTfRow .tf-pill').forEach(b => {
 // ahí en adelante se actualiza sola según la temporalidad activa (cada 15 min si eliges "15m",
 // etc.) mientras esta herramienta siga abierta — ver startIndicAutoRefresh en showIndicPanel
 document.getElementById('cbpRefreshBtn').addEventListener('click', () => loadCoinbasePremium());
+
+/* ---- Ratio Largo/Corto: 3 filas reales por exchange (minoristas, cuentas whale, posiciones
+   whale) desde las APIs públicas de Binance/OKX/Bybit Futuros — sin key, sin backend propio.
+   Cada fuente se pide por separado (Promise.allSettled) para que si una falla (ej. bloqueo CORS
+   de un exchange en particular) las otras dos sigan mostrando su dato real; nunca se inventa un
+   número para tapar el hueco, esa fila queda como "no disponible". Bybit no publica
+   públicamente el desglose whale-accounts/whale-positions, así que esas dos filas siempre
+   quedan así para ese exchange (no es un error de carga). */
+const LS_TF = {
+  '1h': { ms: 60 * 60 * 1000, binance: '1h', okx: '1H', bybit: '1h' },
+  '4h': { ms: 4 * 60 * 60 * 1000, binance: '4h', okx: '4H', bybit: '4h' },
+  '1d': { ms: 24 * 60 * 60 * 1000, binance: '1d', okx: '1D', bybit: '1d' },
+};
+let lsActiveTf = '1h';
+let lsLoadedOnce = false;
+function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); } }
+async function fetchBinanceLsRatio(endpoint, period){
+  const res = await fetch(`https://fapi.binance.com/futures/data/${endpoint}?symbol=BTCUSDT&period=${period}&limit=1`);
+  if(!res.ok) throw new Error('binance ls failed');
+  const rows = await res.json();
+  const last = rows[rows.length - 1];
+  if(!last) throw new Error('sin datos');
+  return parseFloat(last.longShortRatio);
+}
+async function fetchOkxLsRatio(endpoint, period){
+  const res = await fetch(`https://www.okx.com/api/v5/rubik/stat/contracts/${endpoint}?instId=BTC-USDT-SWAP&period=${period}&limit=1`);
+  if(!res.ok) throw new Error('okx ls failed');
+  const json = await res.json();
+  const rows = json && json.data;
+  if(!rows || !rows.length) throw new Error('sin datos');
+  return parseFloat(rows[0][1]);
+}
+async function fetchBybitLsRatio(period){
+  const res = await fetch(`https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=BTCUSDT&period=${period}&limit=1`);
+  if(!res.ok) throw new Error('bybit ls failed');
+  const json = await res.json();
+  const rows = json && json.result && json.result.list;
+  if(!rows || !rows.length) throw new Error('sin datos');
+  const buy = parseFloat(rows[0].buyRatio), sell = parseFloat(rows[0].sellRatio);
+  if(!sell) throw new Error('sin datos');
+  return buy / sell;
+}
+async function loadLongShortData(tfKey){
+  const tf = LS_TF[tfKey];
+  const settled = await Promise.allSettled([
+    fetchBinanceLsRatio('globalLongShortAccountRatio', tf.binance),
+    fetchBinanceLsRatio('topLongShortAccountRatio', tf.binance),
+    fetchBinanceLsRatio('topLongShortPositionRatio', tf.binance),
+    fetchOkxLsRatio('long-short-account-ratio-contract', tf.okx),
+    fetchOkxLsRatio('long-short-account-ratio-contract-top-trader', tf.okx),
+    fetchOkxLsRatio('long-short-position-ratio-contract-top-trader', tf.okx),
+    fetchBybitLsRatio(tf.bybit),
+  ]);
+  const val = r => (r.status === 'fulfilled' && isFinite(r.value)) ? r.value : null;
+  return {
+    binance: { retail: val(settled[0]), whaleAcc: val(settled[1]), whalePos: val(settled[2]) },
+    okx: { retail: val(settled[3]), whaleAcc: val(settled[4]), whalePos: val(settled[5]) },
+    bybit: { retail: val(settled[6]), whaleAcc: null, whalePos: null },
+  };
+}
+function fmtLsCell(v, naLabel){
+  if(v == null) return `<span class="ls-row-val na">${naLabel || 'No disponible'}</span>`;
+  const color = v >= 1 ? '#2ecc71' : '#ff2f4f';
+  const arrow = v >= 1 ? '▲' : '▼';
+  return `<span class="ls-row-val" style="color:${color}">${v.toFixed(2)} ${arrow}</span>`;
+}
+function renderLongShort(data){
+  const wrap = document.getElementById('lsGrid');
+  const exch = [
+    { key: 'binance', name: 'Binance' },
+    { key: 'okx', name: 'OKX' },
+    { key: 'bybit', name: 'Bybit' },
+  ];
+  wrap.innerHTML = exch.map(e => {
+    const d = data[e.key];
+    const naWhale = e.key === 'bybit' ? 'No público en Bybit' : 'No disponible';
+    return `<div class="ls-exchange-card">
+      <div class="ls-exchange-name">${e.name}</div>
+      <div class="ls-row"><div class="ls-row-label">Inversores minoristas</div>${fmtLsCell(d.retail)}</div>
+      <div class="ls-row"><div class="ls-row-label">Cuentas Whale</div>${fmtLsCell(d.whaleAcc, naWhale)}</div>
+      <div class="ls-row"><div class="ls-row-label">Posiciones Whale</div>${fmtLsCell(d.whalePos, naWhale)}</div>
+    </div>`;
+  }).join('');
+  wrap.style.display = 'grid';
+}
+async function loadLongShort(silent){
+  const loadingEl = document.getElementById('lsLoading');
+  const errorEl = document.getElementById('lsError');
+  const wrap = document.getElementById('lsGrid');
+  const btn = document.getElementById('lsRefreshBtn');
+  if(btn) btn.disabled = true;
+  if(!silent){
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'none';
+  }
+  try{
+    const data = await loadLongShortData(lsActiveTf);
+    const anyOk = ['binance', 'okx', 'bybit'].some(k => data[k].retail != null || data[k].whaleAcc != null || data[k].whalePos != null);
+    if(!anyOk) throw new Error('sin datos de ningún exchange');
+    loadingEl.style.display = 'none';
+    renderLongShort(data);
+    document.getElementById('lsUpdatedAt').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch(err){
+    if(!silent){
+      loadingEl.style.display = 'none';
+      wrap.style.display = 'none';
+      errorEl.style.display = 'flex';
+    }
+  }
+  if(btn) btn.disabled = false;
+}
+document.querySelectorAll('#lsTfRow .tf-pill').forEach(b => {
+  b.addEventListener('click', () => {
+    if(b.classList.contains('active')) return;
+    document.querySelectorAll('#lsTfRow .tf-pill').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    lsActiveTf = b.dataset.tf;
+    loadLongShort();
+    startIndicAutoRefresh(() => loadLongShort(true), LS_TF[lsActiveTf].ms);
+  });
+});
+document.getElementById('lsRefreshBtn').addEventListener('click', () => loadLongShort());
 
 /* ---- Bitcoin en Balances Corporativos: endpoint público de CoinGecko con las empresas que
    reportan tenencias de BTC en su balance ---- */
