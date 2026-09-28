@@ -7545,7 +7545,7 @@ document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
 // indicadores que Juan sigue y revisa personalmente — insignia combinada: borde dorado
 // giratorio + cinta "JUAN" + punto en vivo (sin estrella, para no confundirse con favoritos).
 // Va en las cajitas de la guía de Panorama, NO en el menú lateral (ese queda normal)
-const CURATED_INDICATORS = ['pisomercado', 'ciclosoporte', 'rsimensual', 'picycle', 'btcxau', 'domratio', 'domall', 'ethlogreg', 'ethvwap', 'total2', 'others', 'altfever'];
+const CURATED_INDICATORS = ['pisomercado', 'ciclosoporte', 'rsimensual', 'picycle', 'btcxau', 'domratio', 'domall', 'ethlogreg', 'ethvwap', 'total2', 'others', 'altfever', 'ma4y', 'ethvsalt'];
 document.querySelectorAll('.indic-guide-card[data-indic-jump]').forEach(card => {
   if(!CURATED_INDICATORS.includes(card.dataset.indicJump)) return;
   card.classList.add('curated');
