@@ -2278,7 +2278,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="longshort">
               <div class="indic-guide-icon">⚖️</div>
               <div class="indic-guide-card-title">Ratio Largo/Corto</div>
-              <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/OKX/Bybit — minoristas y las cuentas grandes.</div>
+              <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/Bybit — minoristas y las cuentas grandes.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3253,7 +3253,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="lsLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando datos…</div>
-                  <div class="indic-placeholder-text">Consultando Binance, OKX y Bybit.</div>
+                  <div class="indic-placeholder-text">Consultando Binance y Bybit.</div>
                 </div>
                 <div class="indic-chart-soon" id="lsError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -3270,7 +3270,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 ⚖️ Ratio = cuentas/posiciones en largo ÷ en corto, para BTC perpetuo. Mayor a 1 = hay más apostando a que sube; menor a 1 = más apostando a que baja. <b>Inversores minoristas</b> = todas las cuentas del exchange; <b>Cuentas Whale</b> = solo las cuentas más grandes (top traders); <b>Posiciones Whale</b> = lo mismo pero ponderado por el tamaño de cada posición, no por número de cuentas.<br>
-                🔎 Fuentes: APIs públicas de <b>Binance</b>, <b>OKX</b> y <b>Bybit</b> Futuros. Bybit no publica el desglose de cuentas/posiciones whale en su API pública — por eso esas dos filas salen como "no disponible" ahí, en vez de mostrarte un número inventado.<br>
+                🔎 Fuentes: APIs públicas de <b>Binance</b> y <b>Bybit</b> Futuros. OKX no está porque su API pública bloquea las llamadas hechas desde el navegador (CORS) — sin servidor propio no hay forma de traer ese dato. Bybit tampoco publica el desglose de cuentas/posiciones whale en su API pública — por eso esas dos filas salen como "no disponible" ahí, en vez de mostrarte un número inventado.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -17700,16 +17700,19 @@ document.querySelectorAll('#cbpTfRow .tf-pill').forEach(b => {
 document.getElementById('cbpRefreshBtn').addEventListener('click', () => loadCoinbasePremium());
 
 /* ---- Ratio Largo/Corto: 3 filas reales por exchange (minoristas, cuentas whale, posiciones
-   whale) desde las APIs públicas de Binance/OKX/Bybit Futuros — sin key, sin backend propio.
-   Cada fuente se pide por separado (Promise.allSettled) para que si una falla (ej. bloqueo CORS
-   de un exchange en particular) las otras dos sigan mostrando su dato real; nunca se inventa un
-   número para tapar el hueco, esa fila queda como "no disponible". Bybit no publica
-   públicamente el desglose whale-accounts/whale-positions, así que esas dos filas siempre
-   quedan así para ese exchange (no es un error de carga). */
+   whale) desde las APIs públicas de Binance/Bybit Futuros — sin key, sin backend propio.
+   OKX se intentó primero, pero su API pública bloquea CORS para cualquier sitio que la llame
+   desde el navegador (confirmado en consola: "No 'Access-Control-Allow-Origin' header") — sin
+   backend propio no hay forma de sortear eso, así que se quitó en vez de dejar una tarjeta que
+   siempre va a decir "no disponible". Cada fuente se pide por separado (Promise.allSettled)
+   para que si una falla la otra siga mostrando su dato real; nunca se inventa un número para
+   tapar el hueco, esa fila queda como "no disponible". Bybit no publica públicamente el
+   desglose whale-accounts/whale-positions, así que esas dos filas siempre quedan así para ese
+   exchange (no es un error de carga). */
 const LS_TF = {
-  '1h': { ms: 60 * 60 * 1000, binance: '1h', okx: '1H', bybit: '1h' },
-  '4h': { ms: 4 * 60 * 60 * 1000, binance: '4h', okx: '4H', bybit: '4h' },
-  '1d': { ms: 24 * 60 * 60 * 1000, binance: '1d', okx: '1D', bybit: '1d' },
+  '1h': { ms: 60 * 60 * 1000, binance: '1h', bybit: '1h' },
+  '4h': { ms: 4 * 60 * 60 * 1000, binance: '4h', bybit: '4h' },
+  '1d': { ms: 24 * 60 * 60 * 1000, binance: '1d', bybit: '1d' },
 };
 let lsActiveTf = '1h';
 let lsLoadedOnce = false;
@@ -17721,14 +17724,6 @@ async function fetchBinanceLsRatio(endpoint, period){
   const last = rows[rows.length - 1];
   if(!last) throw new Error('sin datos');
   return parseFloat(last.longShortRatio);
-}
-async function fetchOkxLsRatio(endpoint, period){
-  const res = await fetch(`https://www.okx.com/api/v5/rubik/stat/contracts/${endpoint}?instId=BTC-USDT-SWAP&period=${period}&limit=1`);
-  if(!res.ok) throw new Error('okx ls failed');
-  const json = await res.json();
-  const rows = json && json.data;
-  if(!rows || !rows.length) throw new Error('sin datos');
-  return parseFloat(rows[0][1]);
 }
 async function fetchBybitLsRatio(period){
   const res = await fetch(`https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=BTCUSDT&period=${period}&limit=1`);
@@ -17746,16 +17741,12 @@ async function loadLongShortData(tfKey){
     fetchBinanceLsRatio('globalLongShortAccountRatio', tf.binance),
     fetchBinanceLsRatio('topLongShortAccountRatio', tf.binance),
     fetchBinanceLsRatio('topLongShortPositionRatio', tf.binance),
-    fetchOkxLsRatio('long-short-account-ratio-contract', tf.okx),
-    fetchOkxLsRatio('long-short-account-ratio-contract-top-trader', tf.okx),
-    fetchOkxLsRatio('long-short-position-ratio-contract-top-trader', tf.okx),
     fetchBybitLsRatio(tf.bybit),
   ]);
   const val = r => (r.status === 'fulfilled' && isFinite(r.value)) ? r.value : null;
   return {
     binance: { retail: val(settled[0]), whaleAcc: val(settled[1]), whalePos: val(settled[2]) },
-    okx: { retail: val(settled[3]), whaleAcc: val(settled[4]), whalePos: val(settled[5]) },
-    bybit: { retail: val(settled[6]), whaleAcc: null, whalePos: null },
+    bybit: { retail: val(settled[3]), whaleAcc: null, whalePos: null },
   };
 }
 function fmtLsCell(v, naLabel){
@@ -17768,7 +17759,6 @@ function renderLongShort(data){
   const wrap = document.getElementById('lsGrid');
   const exch = [
     { key: 'binance', name: 'Binance' },
-    { key: 'okx', name: 'OKX' },
     { key: 'bybit', name: 'Bybit' },
   ];
   wrap.innerHTML = exch.map(e => {
@@ -17796,7 +17786,7 @@ async function loadLongShort(silent){
   }
   try{
     const data = await loadLongShortData(lsActiveTf);
-    const anyOk = ['binance', 'okx', 'bybit'].some(k => data[k].retail != null || data[k].whaleAcc != null || data[k].whalePos != null);
+    const anyOk = ['binance', 'bybit'].some(k => data[k].retail != null || data[k].whaleAcc != null || data[k].whalePos != null);
     if(!anyOk) throw new Error('sin datos de ningún exchange');
     loadingEl.style.display = 'none';
     renderLongShort(data);
