@@ -1286,6 +1286,17 @@ img[src=""]{display:none}
 .ls-vol-info{flex:1;min-width:0}
 .ls-vol-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.85);margin-bottom:5px}
 .ls-vol-amount{font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:#fff;display:flex;align-items:center;gap:6px}
+.ls-poll-card{border:1px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:24px}
+.ls-poll-body{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.ls-poll-buttons{flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px}
+.ls-poll-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:9px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--white);transition:border-color .15s ease,background .15s ease;width:100%;text-align:left}
+.ls-poll-btn:hover{border-color:var(--red)}
+.ls-poll-btn.voted{border-color:#4ade80;background:rgba(74,222,128,.08)}
+.ls-poll-btn .pct{font-family:'Space Mono',monospace;color:var(--muted2);font-weight:700}
+.ls-poll-chart{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.ls-poll-legend{display:flex;flex-direction:column;gap:7px}
+.ls-poll-legend-item{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted2)}
+.ls-poll-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 /* buscador de moneda para Predicciones — reemplaza la fila de pills cuando hay muchas monedas
    acumuladas y ya no cabían en una sola línea; deja escribir/autocompletar en vez de listar botones */
 .pred-coin-search{position:relative;max-width:280px;margin:4px 0 20px}
@@ -3325,6 +3336,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div id="lsVolError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el volumen ahora mismo.</div>
                 <div id="lsVolCards" class="ls-vol-cards" style="display:none"></div>
                 <div style="font-size:10.5px;color:var(--muted);margin-top:12px">Fuente: volumen real de <b>Binance Futuros</b> (BTCUSDT) en la vela más reciente de esa temporalidad — no es la suma de todos los exchanges del mercado.</div>
+              </div>
+
+              <div class="ls-poll-card">
+                <div class="ls-vol-title">¿Cómo te sientes ahora con BTC?</div>
+                <div class="ls-poll-body">
+                  <div class="ls-poll-buttons" id="lsPollButtons"></div>
+                  <div class="ls-poll-chart">
+                    <div id="lsPollDonutWrap"></div>
+                    <div class="ls-poll-legend" id="lsPollLegend"></div>
+                  </div>
+                </div>
+                <div style="font-size:10.5px;color:var(--muted);margin-top:12px" id="lsPollNote">Encuesta real de los visitantes de este sitio — un voto por navegador, puedes cambiarlo cuando quieras.</div>
               </div>
 
               <div class="tf-pill-row" id="lsTfRow">
@@ -17976,7 +17999,92 @@ const LS_TF = {
 };
 let lsActiveTf = '1h';
 let lsLoadedOnce = false;
-function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); } }
+function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); loadSentimentPoll(); } }
+/* ---- Encuesta real "¿Cómo te sientes con BTC?": votos reales de los visitantes de este
+   sitio guardados en Supabase (tabla btc_sentiment_votes) — un voto por navegador (voter_id en
+   localStorage, sin necesidad de cuenta), se puede cambiar después. Si la tabla todavía no
+   existe (falta correr el SQL de setup) se muestra un aviso, nunca porcentajes inventados. */
+const LS_SENTIMENT_OPTIONS = [
+  { id: 'muy_alcista', label: 'Muy alcista', color: '#0d9488' },
+  { id: 'alcista', label: 'Alcista', color: '#5eead4' },
+  { id: 'neutral', label: 'Neutral', color: '#6b7280' },
+  { id: 'bajista', label: 'Bajista', color: '#f87171' },
+  { id: 'muy_bajista', label: 'Muy bajista', color: '#dc2626' },
+];
+function getLsVoterId(){
+  let id = localStorage.getItem('lsSentimentVoterId');
+  if(!id){
+    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+    localStorage.setItem('lsSentimentVoterId', id);
+  }
+  return id;
+}
+function svgDonut(segments, size){
+  const r = size / 2 - 8;
+  const c = size / 2;
+  const circ = 2 * Math.PI * r;
+  let offset = 0;
+  const circles = segments.map(s => {
+    const len = (s.pct / 100) * circ;
+    const dashoffset = (-offset).toFixed(1);
+    offset += len;
+    return `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${s.color}" stroke-width="14" stroke-dasharray="${len.toFixed(1)} ${(circ - len).toFixed(1)}" stroke-dashoffset="${dashoffset}"/>`;
+  }).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg)">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14"/>
+    ${circles}
+  </svg>`;
+}
+async function loadSentimentPoll(){
+  const buttonsEl = document.getElementById('lsPollButtons');
+  const donutWrap = document.getElementById('lsPollDonutWrap');
+  const legendEl = document.getElementById('lsPollLegend');
+  const noteEl = document.getElementById('lsPollNote');
+  try{
+    const { data, error } = await sbClient.from('btc_sentiment_votes').select('choice, voter_id');
+    if(error) throw error;
+    const total = data.length;
+    const counts = {};
+    LS_SENTIMENT_OPTIONS.forEach(o => counts[o.id] = 0);
+    data.forEach(row => { if(counts[row.choice] != null) counts[row.choice]++; });
+    const myVoterId = getLsVoterId();
+    const myVote = data.find(row => row.voter_id === myVoterId);
+    const myChoice = myVote ? myVote.choice : null;
+
+    buttonsEl.innerHTML = LS_SENTIMENT_OPTIONS.map(o => {
+      const pct = total ? (counts[o.id] / total * 100) : 0;
+      return `<button type="button" class="ls-poll-btn${o.id === myChoice ? ' voted' : ''}" data-choice="${o.id}">
+        <span>${o.label}${o.id === myChoice ? ' ✓' : ''}</span>
+        <span class="pct">${pct.toFixed(0)}%</span>
+      </button>`;
+    }).join('');
+    buttonsEl.querySelectorAll('.ls-poll-btn').forEach(btn => {
+      btn.addEventListener('click', () => castSentimentVote(btn.dataset.choice));
+    });
+
+    const segments = LS_SENTIMENT_OPTIONS.map(o => ({ pct: total ? counts[o.id] / total * 100 : 0, color: o.color }));
+    donutWrap.innerHTML = svgDonut(segments, 110);
+    legendEl.innerHTML = LS_SENTIMENT_OPTIONS.map(o => `
+      <div class="ls-poll-legend-item"><span class="ls-poll-legend-dot" style="background:${o.color}"></span>${o.label} · ${(total ? (counts[o.id] / total * 100) : 0).toFixed(0)}%</div>
+    `).join('');
+    noteEl.textContent = total
+      ? `Encuesta real de los visitantes de este sitio (${total} voto${total === 1 ? '' : 's'}) — un voto por navegador, puedes cambiarlo cuando quieras.`
+      : 'Sé el primero en votar — un voto por navegador, puedes cambiarlo cuando quieras.';
+  } catch(err){
+    buttonsEl.innerHTML = '';
+    donutWrap.innerHTML = '';
+    legendEl.innerHTML = '';
+    noteEl.textContent = '⚠️ La encuesta todavía no está activada en este sitio.';
+  }
+}
+async function castSentimentVote(choice){
+  try{
+    const voterId = getLsVoterId();
+    const { error } = await sbClient.from('btc_sentiment_votes').upsert({ voter_id: voterId, choice }, { onConflict: 'voter_id' });
+    if(error) throw error;
+    loadSentimentPoll();
+  } catch(err){ /* si la tabla no existe todavía, no se rompe nada — solo no se guarda el voto */ }
+}
 /* ---- Volumen Largo vs Corto: volumen real comprador vs vendedor de BTC en Binance Futuros
    (taker buy/sell quote volume de la vela más reciente en la temporalidad elegida) — mismo
    espíritu visual de anillos que Coinglass, pero con UNA sola fuente real (Binance), nunca la
