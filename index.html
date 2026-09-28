@@ -3051,8 +3051,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="ma4yStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                📏 El <b>índice</b> es el precio de cierre de cada día dividido entre el promedio de los últimos <b>1460 días (~4 años)</b> — no se dibuja la línea del promedio en sí, solo este índice. Mayor a 1 = el precio está por encima de su propio promedio de 4 años (fase expansiva); menor a 1 = por debajo (fase de corrección). Este rango se alinea con el ciclo de halving de Bitcoin (~cada 4 años).<br>
-                🧮 Los primeros ~4 años del histórico (2009-2013) no tienen suficientes días previos para un promedio completo de 1460 días — ahí el promedio se calcula con todos los días disponibles hasta ese momento (una ventana que va creciendo), no con datos inventados ni recortados.<br>
+                📏 La línea <b>Promedio 4 años</b> es el precio de cierre promedio de los últimos <b>1460 días (~4 años)</b>, incluida en el mismo gráfico que el precio — no es un panel aparte. Este rango se alinea con el ciclo de halving de Bitcoin (~cada 4 años); históricamente, cuando el precio ha caído hasta tocar esta línea, ha coincidido con zonas de suelo del mercado.<br>
+                🧮 La línea empieza a partir de donde ya hay 1460 días previos de historial (~2013) — antes de eso no hay suficiente historia para un promedio real de 4 años completo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera — el que el precio haya reaccionado a este nivel en el pasado no garantiza que lo vuelva a hacer.</strong>
               </div>
             </div>
@@ -16370,30 +16370,25 @@ document.querySelectorAll('#rsiRangeFilter .tf-pill').forEach(btn => {
    (~4 años), sobre el mismo historial diario compartido que ya usan Halving/RSI Mensual/etc.
    (fetchHalvingHistory). Los primeros ~4 años usan una ventana que va creciendo (no hay 1460
    días previos todavía) en vez de dejar el tramo inicial vacío o inventar un valor. */
+/* ---- Media Móvil de 4 Años: SMA de 1460 días (~4 años) sobre el mismo historial diario
+   compartido que ya usan Halving/EMA200/etc. (fetchHalvingHistory), incluida en el MISMO
+   gráfico de precio (no como panel aparte) — igual al patrón ya usado en Medias Móviles 200. */
 const MA4Y_WINDOW = 1460;
 const MA4Y_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let ma4yActiveRange = 'todo';
 let ma4yCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
 let ma4ySlider = null;
-function computeMa4yIndexSeries(dailyPoints){
-  let sum = 0;
-  const out = new Array(dailyPoints.length);
-  for(let i = 0; i < dailyPoints.length; i++){
-    sum += dailyPoints[i].c;
-    if(i >= MA4Y_WINDOW) sum -= dailyPoints[i - MA4Y_WINDOW].c;
-    const count = Math.min(i + 1, MA4Y_WINDOW);
-    out[i] = dailyPoints[i].c / (sum / count);
-  }
-  return out;
-}
 function renderMa4yChart(){
   const loadingEl = document.getElementById('ma4yLoading');
   const errorEl = document.getElementById('ma4yError');
   const wrap = document.getElementById('ma4yChartWrap');
   const legendEl = document.getElementById('ma4yLegend');
   const statsEl = document.getElementById('ma4yStats');
-  const dailyPoints = halvingBtcHistory;
-  if(!dailyPoints || dailyPoints.length < 30){
+  const allPoints = halvingBtcHistory;
+  const closesFull = allPoints ? allPoints.map(p => p.c) : [];
+  const smaFull = allPoints ? smaTrailingArr(closesFull, MA4Y_WINDOW) : [];
+  const validStartIdx = allPoints ? smaFull.findIndex(v => v != null) : -1;
+  if(!allPoints || validStartIdx < 0){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
     wrap.style.display = 'none';
@@ -16407,8 +16402,10 @@ function renderMa4yChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const idxFull = computeMa4yIndexSeries(dailyPoints);
-  const fullStartMs = dailyPoints[0].t, fullEndMs = dailyPoints[dailyPoints.length - 1].t;
+  const fullPoints = allPoints.slice(validStartIdx);
+  const smaTrimmed = smaFull.slice(validStartIdx);
+
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
   let ma4yFromMs, ma4yToMs;
   if(ma4yCustomRange){
     ma4yFromMs = ma4yCustomRange.fromMs;
@@ -16418,13 +16415,13 @@ function renderMa4yChart(){
     ma4yFromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
     ma4yToMs = fullEndMs;
   }
-  let filterStartIdx = dailyPoints.findIndex(p => p.t >= ma4yFromMs);
+  let filterStartIdx = fullPoints.findIndex(p => p.t >= ma4yFromMs);
   if(filterStartIdx < 0) filterStartIdx = 0;
-  let filterEndIdx = dailyPoints.length - 1;
-  while(filterEndIdx >= 0 && dailyPoints[filterEndIdx].t > ma4yToMs) filterEndIdx--;
-  const points = dailyPoints.slice(filterStartIdx, filterEndIdx + 1);
+  let filterEndIdx = fullPoints.length - 1;
+  while(filterEndIdx >= 0 && fullPoints[filterEndIdx].t > ma4yToMs) filterEndIdx--;
+  const points = fullPoints.slice(filterStartIdx, filterEndIdx + 1);
   if(!points.length) return;
-  const idx = idxFull.slice(filterStartIdx, filterEndIdx + 1);
+  const sma4y = smaTrimmed.slice(filterStartIdx, filterEndIdx + 1);
 
   if(ma4ySlider) ma4ySlider.setRange(ma4yFromMs, ma4yToMs);
   else{
@@ -16437,42 +16434,31 @@ function renderMa4yChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const prices = points.map(p => p.c);
-  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+  const allVals = points.map(p => p.c).concat(sma4y);
+  const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 480 : 540;
-  const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
-  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 12 : 14;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
-  const panelGap = 22;
   const drawW = totalW - marginLeft - marginRight;
-  const drawHTotal = totalH - marginTop - marginBottom - panelGap;
-  const priceH = Math.round(drawHTotal * 0.63);
-  const idxH = drawHTotal - priceH;
-  const priceTop = marginTop, priceBottom = marginTop + priceH;
-  const idxTop = priceBottom + panelGap, idxBottom = idxTop + idxH;
-  const dividerY = priceBottom + panelGap / 2;
+  const drawH = totalH - marginTop - marginBottom;
 
   const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
   const logRange = (logMax - logMin) || 1;
   const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
-  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
-  const maxIdx = Math.max(...idx, 1) * 1.05;
-  const yForIdx = v => idxBottom - (v / maxIdx) * idxH;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
 
   const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yForPrice(t);
-    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+    const y = yFor(t);
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
-  const priceGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
-  `).join('');
-  const idxTicks = niceLinearTicks(0, maxIdx).filter(v => v <= maxIdx);
-  const idxGridHtml = idxTicks.map(v => `
-    <line x1="${marginLeft}" y1="${yForIdx(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForIdx(v).toFixed(1)}" stroke="${v === 1 ? 'rgba(240,178,61,.4)' : 'rgba(255,255,255,.08)'}" stroke-width="1" ${v === 1 ? 'stroke-dasharray="4,3"' : ''}/>
-    <text x="${marginLeft - 8}" y="${(yForIdx(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v}×</text>
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
   `).join('');
 
   function pathFor(getY){
@@ -16480,15 +16466,15 @@ function renderMa4yChart(){
     points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${getY(i).toFixed(1)} `; });
     return d.trim();
   }
-  const priceLine = pathFor(i => yForPrice(points[i].c));
-  const idxLine = pathFor(i => yForIdx(idx[i]));
+  const priceLine = pathFor(i => yFor(points[i].c));
+  const smaLine = pathFor(i => yFor(sma4y[i]));
 
-  const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].c);
+  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${idxBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
@@ -16499,56 +16485,40 @@ function renderMa4yChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ma4yChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-        ${priceGridHtml}
-        ${idxGridHtml}
-        <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+        ${yGridHtml}
+        <path d="${smaLine}" fill="none" stroke="#22d3ee" stroke-width="${isMobileChart ? 1.1 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${idxLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="ma4yPriceHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="ma4yPriceHoverDot" r="6" fill="#fff" style="display:none"/>
-        <rect id="ma4yPriceHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="ma4yPriceHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="ma4yPriceHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
-        <line id="ma4yIdxHoverLine" x1="0" y1="${idxTop}" x2="0" y2="${idxBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="ma4yIdxHoverDot" r="6" fill="#22c55e" style="display:none"/>
-        <rect id="ma4yIdxHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="ma4yIdxHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="ma4yIdxHoverCatcher" x="${marginLeft}" y="${idxTop}" width="${drawW}" height="${idxBottom - idxTop}" fill="transparent" style="cursor:crosshair"/>
+        <line id="ma4yHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="ma4yHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="ma4yHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="ma4yHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="ma4yHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
-      <div id="ma4yPriceTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-      <div id="ma4yIdxTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+      <div id="ma4yTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
-  const ma4ySvg = document.getElementById('ma4yChartSvg');
   wireChartHover({
-    svg: ma4ySvg, catcherId: 'ma4yPriceHoverCatcher', lineId: 'ma4yPriceHoverLine', dotId: 'ma4yPriceHoverDot',
-    dateLabelId: 'ma4yPriceHoverDateLabel', dateBgId: 'ma4yPriceHoverDateBg', tooltipId: 'ma4yPriceTooltip',
+    svg: document.getElementById('ma4yChartSvg'), catcherId: 'ma4yHoverCatcher', lineId: 'ma4yHoverLine', dotId: 'ma4yHoverDot',
+    dateLabelId: 'ma4yHoverDateLabel', dateBgId: 'ma4yHoverDateBg', tooltipId: 'ma4yTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForPrice(points[i].c),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b>`,
-  });
-  wireChartHover({
-    svg: ma4ySvg, catcherId: 'ma4yIdxHoverCatcher', lineId: 'ma4yIdxHoverLine', dotId: 'ma4yIdxHoverDot',
-    dateLabelId: 'ma4yIdxHoverDateLabel', dateBgId: 'ma4yIdxHoverDateBg', tooltipId: 'ma4yIdxTooltip',
-    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForIdx(idx[i]),
-    tooltipHtml: i => `<b style="color:#22c55e">${idx[i].toFixed(2)}×</b>`,
+    yForIdx: i => yFor(points[i].c),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#22d3ee">Prom. 4a: ${fmtHalvingPrice(sma4y[i])}</span>`,
   });
 
   legendEl.innerHTML = `
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Índice (precio ÷ promedio 4 años)</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>1× = precio igual a su promedio de 4 años</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22d3ee"></span>Promedio 4 años</span>
   `;
 
-  const lastIdx = idx[idx.length - 1];
+  const lastPrice = points[points.length - 1].c;
+  const lastSma = sma4y[sma4y.length - 1];
   statsEl.innerHTML = `
-    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Índice actual</div><div class="r-val" style="color:${lastIdx >= 1 ? '#22c55e' : '#ef4444'}">${lastIdx.toFixed(2)}×</div></div>
-    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(points[points.length - 1].c)}</div></div>
-    <div class="res-card"><div class="r-label">Máximo del índice en este rango</div><div class="r-val">${Math.max(...idx).toFixed(2)}×</div></div>
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(lastPrice)}</div></div>
+    <div class="res-card"><div class="r-label">Promedio 4 años actual</div><div class="r-val" style="color:#22d3ee">${fmtHalvingPrice(lastSma)}</div></div>
+    <div class="res-card" style="grid-column:1/-1"><div class="r-label">Precio vs. promedio</div><div class="r-val" style="color:${lastPrice >= lastSma ? '#22c55e' : '#ef4444'}">${lastPrice >= lastSma ? '+' : ''}${((lastPrice / lastSma - 1) * 100).toFixed(1)}%</div></div>
   `;
 }
 async function loadMa4yDetail(){
