@@ -1286,17 +1286,6 @@ img[src=""]{display:none}
 .ls-vol-info{flex:1;min-width:0}
 .ls-vol-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.85);margin-bottom:5px}
 .ls-vol-amount{font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:#fff;display:flex;align-items:center;gap:6px}
-.ls-poll-card{border:1px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:24px}
-.ls-poll-body{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-top:14px}
-.ls-poll-buttons{flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px}
-.ls-poll-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:9px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--white);transition:border-color .15s ease,background .15s ease;width:100%;text-align:left}
-.ls-poll-btn:hover{border-color:var(--red)}
-.ls-poll-btn.voted{border-color:#4ade80;background:rgba(74,222,128,.08)}
-.ls-poll-btn .pct{font-family:'Space Mono',monospace;color:var(--muted2);font-weight:700}
-.ls-poll-chart{display:flex;align-items:center;gap:16px;flex-shrink:0}
-.ls-poll-legend{display:flex;flex-direction:column;gap:7px}
-.ls-poll-legend-item{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted2)}
-.ls-poll-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 /* buscador de moneda para Predicciones — reemplaza la fila de pills cuando hay muchas monedas
    acumuladas y ya no cabían en una sola línea; deja escribir/autocompletar en vez de listar botones */
 .pred-coin-search{position:relative;max-width:280px;margin:4px 0 20px}
@@ -1468,7 +1457,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label">⏳ Ciclos de Mercado</div>
+      <div class="indic-cat-label">₿ BTC</div>
       <button class="sb-item" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
@@ -1490,29 +1479,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="ma4y">
         <span class="sb-item-icon">📏</span><span class="sb-item-label">Media Móvil de 4 Años</span>
       </button>
-      <div class="indic-cat-label">📊 Medias Móviles y Bandas</div>
       <button class="sb-item" data-indic-jump="ema200">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ethlogreg">
-        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ethvwap">
-        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
-      </button>
-      <button class="sb-item" data-indic-jump="total2">
-        <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
-      </button>
-      <button class="sb-item" data-indic-jump="others">
-        <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
-      </button>
-      <div class="indic-cat-label">Sentimiento</div>
-      <button class="sb-item" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
-      </button>
-      <div class="indic-cat-label">Mercado</div>
-      <button class="sb-item" data-indic-jump="cbpremium">
-        <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button class="sb-item" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
@@ -1520,8 +1488,23 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
+      <div class="indic-cat-label">Ξ ETH</div>
+      <button class="sb-item" data-indic-jump="ethlogreg">
+        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ethvwap">
+        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+      </button>
+      <div class="indic-cat-label">💹 Trading</div>
+      <button class="sb-item" data-indic-jump="cbpremium">
+        <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
+      </button>
       <button class="sb-item" data-indic-jump="longshort">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
+      </button>
+      <div class="indic-cat-label">Sentimiento</div>
+      <button class="sb-item" data-indic-jump="fng">
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item" data-indic-jump="domratio">
@@ -1547,6 +1530,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-indic-jump="ethvsalt">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
+      </button>
+      <button class="sb-item" data-indic-jump="total2">
+        <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
+      </button>
+      <button class="sb-item" data-indic-jump="others">
+        <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Portafolio</div>
@@ -1657,7 +1646,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <div class="indic-cat-label">⏳ Ciclos de Mercado</div>
+      <div class="indic-cat-label">₿ BTC</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
@@ -1679,29 +1668,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ma4y">
         <span class="sb-item-icon">📏</span><span class="sb-item-label">Media Móvil de 4 Años</span>
       </button>
-      <div class="indic-cat-label">📊 Medias Móviles y Bandas</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
-        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvwap">
-        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="total2">
-        <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="others">
-        <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
-      </button>
-      <div class="indic-cat-label">Sentimiento</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
-      </button>
-      <div class="indic-cat-label">Mercado</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
-        <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
@@ -1709,8 +1677,23 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
+      <div class="indic-cat-label">Ξ ETH</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
+        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvwap">
+        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+      </button>
+      <div class="indic-cat-label">💹 Trading</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
+        <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="longshort">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
+      </button>
+      <div class="indic-cat-label">Sentimiento</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domratio">
@@ -1736,6 +1719,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvsalt">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="total2">
+        <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="others">
+        <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
     </nav>
 
@@ -2180,12 +2169,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="indic-tabs" id="indicGroupTabs">
         <button type="button" class="indic-tab active" data-group="guia">Guía</button>
         <button type="button" class="indic-tab" data-group="predicciones">Predicciones</button>
-        <button type="button" class="indic-tab" data-group="ciclos">⏳ Ciclos de Mercado</button>
-        <button type="button" class="indic-tab" data-group="tendencia">📊 Medias Móviles y Bandas</button>
+        <button type="button" class="indic-tab" data-group="bitcoin">₿ BTC</button>
+        <button type="button" class="indic-tab" data-group="ethereum">Ξ ETH</button>
+        <button type="button" class="indic-tab" data-group="trading">💹 Trading</button>
         <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
         <button type="button" class="indic-tab" data-group="macro">Macro</button>
-        <button type="button" class="indic-tab" data-group="mercado">Mercado</button>
         <button type="button" class="indic-tab" data-group="dominancia">Dominancia</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
       </div>
@@ -2207,7 +2196,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
-            <div class="indic-guide-divider">⏳ Ciclos de Mercado</div>
+            <div class="indic-guide-divider">₿ BTC</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
               <div class="indic-guide-icon">⏳</div>
               <div class="indic-guide-card-title">Ciclos de Halving</div>
@@ -2250,52 +2239,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Qué tan lejos está el precio de su promedio de los últimos 4 años — ligado al ciclo de halving.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
-
-            <div class="indic-guide-divider">📊 Medias Móviles y Bandas</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
               <div class="indic-guide-icon">📉</div>
               <div class="indic-guide-card-title">Medias Móviles 200</div>
               <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethlogreg">
-              <div class="indic-guide-icon">Ξ</div>
-              <div class="indic-guide-card-title">Bandas Log de ETH</div>
-              <div class="indic-guide-card-text">Tres bandas de precio para Ethereum calculadas con una fórmula fija según el tiempo desde su lanzamiento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvwap">
-              <div class="indic-guide-icon">📍</div>
-              <div class="indic-guide-card-title">VWAP Anclado de ETH</div>
-              <div class="indic-guide-card-text">Precio de Ethereum con dos líneas de VWAP ancladas en fechas fijas — el precio promedio real ponderado por volumen desde ese punto.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="total2">
-              <div class="indic-guide-icon">🥈</div>
-              <div class="indic-guide-card-title">TOTAL2 EMA200</div>
-              <div class="indic-guide-card-text">Capitalización de todo el mercado sin Bitcoin, con su media móvil de 200 semanas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="others">
-              <div class="indic-guide-icon">🌱</div>
-              <div class="indic-guide-card-title">OTHERS EMA200</div>
-              <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Sentimiento</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
-              <div class="indic-guide-icon">😐</div>
-              <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
-              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Mercado</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
-              <div class="indic-guide-icon">♾️</div>
-              <div class="indic-guide-card-title">Coinbase Premium</div>
-              <div class="indic-guide-card-text">Diferencia en vivo entre el precio de BTC en Coinbase y en Binance.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="treasuries">
@@ -2310,10 +2257,40 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+
+            <div class="indic-guide-divider">Ξ ETH</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethlogreg">
+              <div class="indic-guide-icon">Ξ</div>
+              <div class="indic-guide-card-title">Bandas Log de ETH</div>
+              <div class="indic-guide-card-text">Tres bandas de precio para Ethereum calculadas con una fórmula fija según el tiempo desde su lanzamiento.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvwap">
+              <div class="indic-guide-icon">📍</div>
+              <div class="indic-guide-card-title">VWAP Anclado de ETH</div>
+              <div class="indic-guide-card-text">Precio de Ethereum con dos líneas de VWAP ancladas en fechas fijas — el precio promedio real ponderado por volumen desde ese punto.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">💹 Trading</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
+              <div class="indic-guide-icon">♾️</div>
+              <div class="indic-guide-card-title">Coinbase Premium</div>
+              <div class="indic-guide-card-text">Diferencia en vivo entre el precio de BTC en Coinbase y en Binance.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="longshort">
               <div class="indic-guide-icon">⚖️</div>
               <div class="indic-guide-card-title">Ratio Largo/Corto</div>
               <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/Bybit — minoristas y las cuentas grandes.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">Sentimiento</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
+              <div class="indic-guide-icon">😐</div>
+              <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
+              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3336,18 +3313,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div id="lsVolError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el volumen ahora mismo.</div>
                 <div id="lsVolCards" class="ls-vol-cards" style="display:none"></div>
                 <div style="font-size:10.5px;color:var(--muted);margin-top:12px">Fuente: volumen real de <b>Binance Futuros</b> (BTCUSDT) en la vela más reciente de esa temporalidad — no es la suma de todos los exchanges del mercado.</div>
-              </div>
-
-              <div class="ls-poll-card">
-                <div class="ls-vol-title">¿Cómo te sientes ahora con BTC?</div>
-                <div class="ls-poll-body">
-                  <div class="ls-poll-buttons" id="lsPollButtons"></div>
-                  <div class="ls-poll-chart">
-                    <div id="lsPollDonutWrap"></div>
-                    <div class="ls-poll-legend" id="lsPollLegend"></div>
-                  </div>
-                </div>
-                <div style="font-size:10.5px;color:var(--muted);margin-top:12px" id="lsPollNote">Encuesta real de los visitantes de este sitio — un voto por navegador, puedes cambiarlo cuando quieras.</div>
               </div>
 
               <div class="tf-pill-row" id="lsTfRow">
@@ -6540,16 +6505,16 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  ciclos: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }],
-  tendencia: [{ id: 'ema200', label: 'Medias Móviles 200' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
+  bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
+  ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }],
+  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [],
-  mercado: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
   onchain: [],
-  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }],
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'ethbtc', label: 'ETH/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'ciclos', pisomercado: 'ciclos', rsimensual: 'ciclos', ciclosoporte: 'ciclos', rainbow: 'ciclos', picycle: 'ciclos', ma4y: 'ciclos', ema200: 'tendencia', ethlogreg: 'tendencia', ethvwap: 'tendencia', total2: 'tendencia', others: 'tendencia', fng: 'sentimiento', cbpremium: 'mercado', treasuries: 'mercado', btcxau: 'mercado', longshort: 'mercado', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia' };
+const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', othersbtc: 'dominancia', ethbtc: 'dominancia', altfever: 'dominancia', ethvsalt: 'dominancia', total2: 'dominancia', others: 'dominancia' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -17999,92 +17964,7 @@ const LS_TF = {
 };
 let lsActiveTf = '1h';
 let lsLoadedOnce = false;
-function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); loadSentimentPoll(); } }
-/* ---- Encuesta real "¿Cómo te sientes con BTC?": votos reales de los visitantes de este
-   sitio guardados en Supabase (tabla btc_sentiment_votes) — un voto por navegador (voter_id en
-   localStorage, sin necesidad de cuenta), se puede cambiar después. Si la tabla todavía no
-   existe (falta correr el SQL de setup) se muestra un aviso, nunca porcentajes inventados. */
-const LS_SENTIMENT_OPTIONS = [
-  { id: 'muy_alcista', label: 'Muy alcista', color: '#0d9488' },
-  { id: 'alcista', label: 'Alcista', color: '#5eead4' },
-  { id: 'neutral', label: 'Neutral', color: '#6b7280' },
-  { id: 'bajista', label: 'Bajista', color: '#f87171' },
-  { id: 'muy_bajista', label: 'Muy bajista', color: '#dc2626' },
-];
-function getLsVoterId(){
-  let id = localStorage.getItem('lsSentimentVoterId');
-  if(!id){
-    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-    localStorage.setItem('lsSentimentVoterId', id);
-  }
-  return id;
-}
-function svgDonut(segments, size){
-  const r = size / 2 - 8;
-  const c = size / 2;
-  const circ = 2 * Math.PI * r;
-  let offset = 0;
-  const circles = segments.map(s => {
-    const len = (s.pct / 100) * circ;
-    const dashoffset = (-offset).toFixed(1);
-    offset += len;
-    return `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${s.color}" stroke-width="14" stroke-dasharray="${len.toFixed(1)} ${(circ - len).toFixed(1)}" stroke-dashoffset="${dashoffset}"/>`;
-  }).join('');
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg)">
-    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14"/>
-    ${circles}
-  </svg>`;
-}
-async function loadSentimentPoll(){
-  const buttonsEl = document.getElementById('lsPollButtons');
-  const donutWrap = document.getElementById('lsPollDonutWrap');
-  const legendEl = document.getElementById('lsPollLegend');
-  const noteEl = document.getElementById('lsPollNote');
-  try{
-    const { data, error } = await sbClient.from('btc_sentiment_votes').select('choice, voter_id');
-    if(error) throw error;
-    const total = data.length;
-    const counts = {};
-    LS_SENTIMENT_OPTIONS.forEach(o => counts[o.id] = 0);
-    data.forEach(row => { if(counts[row.choice] != null) counts[row.choice]++; });
-    const myVoterId = getLsVoterId();
-    const myVote = data.find(row => row.voter_id === myVoterId);
-    const myChoice = myVote ? myVote.choice : null;
-
-    buttonsEl.innerHTML = LS_SENTIMENT_OPTIONS.map(o => {
-      const pct = total ? (counts[o.id] / total * 100) : 0;
-      return `<button type="button" class="ls-poll-btn${o.id === myChoice ? ' voted' : ''}" data-choice="${o.id}">
-        <span>${o.label}${o.id === myChoice ? ' ✓' : ''}</span>
-        <span class="pct">${pct.toFixed(0)}%</span>
-      </button>`;
-    }).join('');
-    buttonsEl.querySelectorAll('.ls-poll-btn').forEach(btn => {
-      btn.addEventListener('click', () => castSentimentVote(btn.dataset.choice));
-    });
-
-    const segments = LS_SENTIMENT_OPTIONS.map(o => ({ pct: total ? counts[o.id] / total * 100 : 0, color: o.color }));
-    donutWrap.innerHTML = svgDonut(segments, 110);
-    legendEl.innerHTML = LS_SENTIMENT_OPTIONS.map(o => `
-      <div class="ls-poll-legend-item"><span class="ls-poll-legend-dot" style="background:${o.color}"></span>${o.label} · ${(total ? (counts[o.id] / total * 100) : 0).toFixed(0)}%</div>
-    `).join('');
-    noteEl.textContent = total
-      ? `Encuesta real de los visitantes de este sitio (${total} voto${total === 1 ? '' : 's'}) — un voto por navegador, puedes cambiarlo cuando quieras.`
-      : 'Sé el primero en votar — un voto por navegador, puedes cambiarlo cuando quieras.';
-  } catch(err){
-    buttonsEl.innerHTML = '';
-    donutWrap.innerHTML = '';
-    legendEl.innerHTML = '';
-    noteEl.textContent = '⚠️ La encuesta todavía no está activada en este sitio.';
-  }
-}
-async function castSentimentVote(choice){
-  try{
-    const voterId = getLsVoterId();
-    const { error } = await sbClient.from('btc_sentiment_votes').upsert({ voter_id: voterId, choice }, { onConflict: 'voter_id' });
-    if(error) throw error;
-    loadSentimentPoll();
-  } catch(err){ /* si la tabla no existe todavía, no se rompe nada — solo no se guarda el voto */ }
-}
+function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); } }
 /* ---- Volumen Largo vs Corto: volumen real comprador vs vendedor de BTC en Binance Futuros
    (taker buy/sell quote volume de la vela más reciente en la temporalidad elegida) — mismo
    espíritu visual de anillos que Coinglass, pero con UNA sola fuente real (Binance), nunca la
