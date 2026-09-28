@@ -1274,6 +1274,18 @@ img[src=""]{display:none}
 .ls-row-label{font-size:12px;color:var(--muted2)}
 .ls-row-val{font-family:'Space Mono',monospace;font-weight:700;font-size:13px;white-space:nowrap}
 .ls-row-val.na{color:var(--muted);font-weight:400;font-size:10.5px}
+.ls-vol-card{border:1px solid var(--border2);border-radius:16px;padding:18px;margin-bottom:24px}
+.ls-vol-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.ls-vol-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:14.5px;color:var(--white)}
+.ls-vol-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){ .ls-vol-cards{grid-template-columns:1fr} }
+.ls-vol-box{border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px}
+.ls-vol-box.long{background:linear-gradient(135deg,#189267,#0d6b4c)}
+.ls-vol-box.short{background:linear-gradient(135deg,#c0293f,#921f30)}
+.ls-vol-ring{flex-shrink:0}
+.ls-vol-info{flex:1;min-width:0}
+.ls-vol-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.85);margin-bottom:5px}
+.ls-vol-amount{font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:#fff;display:flex;align-items:center;gap:6px}
 /* buscador de moneda para Predicciones — reemplaza la fila de pills cuando hay muchas monedas
    acumuladas y ya no cabían en una sola línea; deja escribir/autocompletar en vez de listar botones */
 .pred-coin-search{position:relative;max-width:280px;margin:4px 0 20px}
@@ -3297,6 +3309,22 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Ratio Largo/Corto (BTC)</h2>
+              </div>
+
+              <div class="ls-vol-card">
+                <div class="ls-vol-head">
+                  <div class="ls-vol-title">Volumen Largo vs Corto</div>
+                  <div class="tf-pill-row" id="lsVolTfRow" style="margin:0">
+                    <button type="button" class="tf-pill" data-tf="1h">1 hora</button>
+                    <button type="button" class="tf-pill active" data-tf="4h">4 horas</button>
+                    <button type="button" class="tf-pill" data-tf="12h">12 horas</button>
+                    <button type="button" class="tf-pill" data-tf="1d">24 horas</button>
+                  </div>
+                </div>
+                <div id="lsVolLoading" style="text-align:center;padding:20px 0;color:var(--muted);font-size:12.5px">Cargando volumen…</div>
+                <div id="lsVolError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el volumen ahora mismo.</div>
+                <div id="lsVolCards" class="ls-vol-cards" style="display:none"></div>
+                <div style="font-size:10.5px;color:var(--muted);margin-top:12px">Fuente: volumen real de <b>Binance Futuros</b> (BTCUSDT) en la vela más reciente de esa temporalidad — no es la suma de todos los exchanges del mercado.</div>
               </div>
 
               <div class="tf-pill-row" id="lsTfRow">
@@ -6590,7 +6618,7 @@ function showIndicPanel(id){
   });
   setCatLabelToolOpen(id !== 'guia');
   if(id === 'cbpremium') startIndicAutoRefresh(() => loadCoinbasePremium(true), CBP_TF[cbpActiveTf].ms);
-  else if(id === 'longshort') startIndicAutoRefresh(() => loadLongShort(true), LS_TF[lsActiveTf].ms);
+  else if(id === 'longshort') startIndicAutoRefresh(() => { loadLongShort(true); loadLsVolume(); }, LS_TF[lsActiveTf].ms);
   else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
@@ -17948,7 +17976,75 @@ const LS_TF = {
 };
 let lsActiveTf = '1h';
 let lsLoadedOnce = false;
-function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); } }
+function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); } }
+/* ---- Volumen Largo vs Corto: volumen real comprador vs vendedor de BTC en Binance Futuros
+   (taker buy/sell quote volume de la vela más reciente en la temporalidad elegida) — mismo
+   espíritu visual de anillos que Coinglass, pero con UNA sola fuente real (Binance), nunca la
+   suma de todos los exchanges, que no se puede obtener gratis. */
+const LS_VOL_TF = { '1h': '1h', '4h': '4h', '12h': '12h', '1d': '1d' };
+let lsVolActiveTf = '4h';
+function svgRingArc(pct, colorBg, colorFg, size){
+  const r = size / 2 - 4;
+  const c = size / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0;transform:rotate(-90deg)">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${colorBg}" stroke-width="5"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${colorFg}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"/>
+  </svg>`;
+}
+async function loadLsVolume(){
+  const loadingEl = document.getElementById('lsVolLoading');
+  const errorEl = document.getElementById('lsVolError');
+  const cardsEl = document.getElementById('lsVolCards');
+  loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  cardsEl.style.display = 'none';
+  try{
+    const interval = LS_VOL_TF[lsVolActiveTf];
+    const res = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=${interval}&limit=1`);
+    if(!res.ok) throw new Error('binance klines failed');
+    const rows = await res.json();
+    const row = rows[rows.length - 1];
+    if(!row) throw new Error('sin datos');
+    const totalQuoteVol = parseFloat(row[7]);
+    const buyQuoteVol = parseFloat(row[10]);
+    const sellQuoteVol = totalQuoteVol - buyQuoteVol;
+    if(!(totalQuoteVol > 0)) throw new Error('sin datos');
+    const buyPct = buyQuoteVol / totalQuoteVol * 100;
+    const sellPct = 100 - buyPct;
+    loadingEl.style.display = 'none';
+    cardsEl.innerHTML = `
+      <div class="ls-vol-box long">
+        ${svgRingArc(buyPct, 'rgba(255,255,255,.22)', '#fff', 46)}
+        <div class="ls-vol-info">
+          <div class="ls-vol-label">VOLUMEN LARGO · ${buyPct.toFixed(2)}%</div>
+          <div class="ls-vol-amount">${fmtUsdBig(buyQuoteVol)} ▲</div>
+        </div>
+      </div>
+      <div class="ls-vol-box short">
+        ${svgRingArc(sellPct, 'rgba(255,255,255,.22)', '#fff', 46)}
+        <div class="ls-vol-info">
+          <div class="ls-vol-label">VOLUMEN CORTO · ${sellPct.toFixed(2)}%</div>
+          <div class="ls-vol-amount">${fmtUsdBig(sellQuoteVol)} ▼</div>
+        </div>
+      </div>
+    `;
+    cardsEl.style.display = 'grid';
+  } catch(err){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+  }
+}
+document.querySelectorAll('#lsVolTfRow .tf-pill').forEach(b => {
+  b.addEventListener('click', () => {
+    if(b.classList.contains('active')) return;
+    document.querySelectorAll('#lsVolTfRow .tf-pill').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    lsVolActiveTf = b.dataset.tf;
+    loadLsVolume();
+  });
+});
 async function fetchBinanceLsRatio(endpoint, period){
   const res = await fetch(`https://fapi.binance.com/futures/data/${endpoint}?symbol=BTCUSDT&period=${period}&limit=1`);
   if(!res.ok) throw new Error('binance ls failed');
