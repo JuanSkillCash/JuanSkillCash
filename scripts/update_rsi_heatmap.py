@@ -218,10 +218,10 @@ def compute_macd_bias(closes):
     return "bull" if hist_last >= 0 else "bear"
 
 
-def compute_stoch_bias(highs, lows, closes, k_length=STOCH_K_LENGTH, d_smooth=STOCH_D_SMOOTH):
+def compute_stoch_series(highs, lows, closes, k_length=STOCH_K_LENGTH, d_smooth=STOCH_D_SMOOTH):
     n = len(closes)
-    if n < k_length + d_smooth:
-        return None
+    if n < k_length:
+        return [], []
     percent_k = []
     for i in range(k_length - 1, n):
         window_high = max(highs[i - k_length + 1:i + 1])
@@ -229,11 +229,39 @@ def compute_stoch_bias(highs, lows, closes, k_length=STOCH_K_LENGTH, d_smooth=ST
         span = window_high - window_low
         percent_k.append(50.0 if span == 0 else (closes[i] - window_low) / span * 100)
     if len(percent_k) < d_smooth:
+        return percent_k, []
+    percent_d = []
+    for i in range(d_smooth - 1, len(percent_k)):
+        percent_d.append(sum(percent_k[i - d_smooth + 1:i + 1]) / d_smooth)
+    return percent_k, percent_d
+
+
+def compute_stoch_bias(percent_k, percent_d):
+    if not percent_k or not percent_d:
         return None
-    percent_d_last = sum(percent_k[-d_smooth:]) / d_smooth
-    # %K por encima de su propia media (%D) = el impulso reciente esta ganando fuerza (alcista);
-    # por debajo = perdiendo fuerza (bajista) - mismo principio que MACD vs su linea de señal
-    return "bull" if percent_k[-1] >= percent_d_last else "bear"
+    # estado actual (para mostrar en la columna de la tabla): %K por encima de %D ahora mismo
+    return "bull" if percent_k[-1] >= percent_d[-1] else "bear"
+
+
+# lo que de verdad usan los traders como confirmacion no es "quien va arriba ahora" sino el
+# CRUCE de %K sobre %D en si - y ese cruce pesa mucho mas cuando ocurre dentro de zona extrema
+# (sobrevendido/sobrecomprado), porque ahi es donde de verdad se lee como cambio de tendencia
+STOCH_OVERSOLD, STOCH_OVERBOUGHT = 20, 80
+
+
+def stoch_cross_signal(percent_k, percent_d):
+    if len(percent_d) < 2:
+        return None
+    k_aligned = percent_k[-len(percent_d):]
+    prev_k, curr_k = k_aligned[-2], k_aligned[-1]
+    prev_d, curr_d = percent_d[-2], percent_d[-1]
+    crossed_up = prev_k <= prev_d and curr_k > curr_d
+    crossed_down = prev_k >= prev_d and curr_k < curr_d
+    if crossed_up and (prev_k <= STOCH_OVERSOLD or prev_d <= STOCH_OVERSOLD):
+        return "bull"
+    if crossed_down and (prev_k >= STOCH_OVERBOUGHT or prev_d >= STOCH_OVERBOUGHT):
+        return "bear"
+    return None
 
 
 def replace_table_rows(rows):
@@ -285,7 +313,8 @@ def main():
             closes = candles["closes"]
             rsi_series = compute_rsi_series(closes)
             macd_bias = compute_macd_bias(closes)
-            stoch_bias = compute_stoch_bias(candles["highs"], candles["lows"], closes)
+            percent_k, percent_d = compute_stoch_series(candles["highs"], candles["lows"], closes)
+            stoch_bias = compute_stoch_bias(percent_k, percent_d)
             if not rsi_series or macd_bias is None or stoch_bias is None:
                 ok = False
                 break
@@ -298,6 +327,7 @@ def main():
                 "rsi_cross": rsi_cross_signal(rsi_series),
                 "macd_bias": macd_bias,
                 "stoch_bias": stoch_bias,
+                "stoch_cross": stoch_cross_signal(percent_k, percent_d),
                 "price": closes[-1],
                 "rank": coin["rank"],
             })
