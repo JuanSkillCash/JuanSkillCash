@@ -1349,20 +1349,30 @@ img[src=""]{display:none}
 .chart-stats-grid .r-label{min-height:34px;display:flex;align-items:flex-start}
 .chart-stats-grid .r-val{overflow-wrap:anywhere}
 
-/* ---- mapa de calor de RSI + MACD: lista de filas (una por moneda), no tabla HTML, para que
-   se acomode igual de bien en móvil que el resto de las herramientas del sitio ---- */
-.rsimap-table{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
-.rsimap-row{display:grid;grid-template-columns:1fr 64px 30px;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
-.rsimap-row:last-child{border-bottom:none}
-.rsimap-row:nth-child(odd){background:rgba(255,255,255,.025)}
-.rsimap-coin{display:flex;align-items:baseline;gap:7px;min-width:0;overflow:hidden}
+/* ---- mapa de calor de RSI + MACD: dos vistas (Zonas / Tabla), ver mas abajo ---- */
 .rsimap-coin-name{font-weight:700;font-size:13.5px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rsimap-coin-symbol{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted2);flex-shrink:0}
-.rsimap-rsi-badge{font-family:'Space Mono',monospace;font-weight:700;font-size:12.5px;text-align:center;padding:4px 0;border-radius:8px;color:#08080b}
-.rsimap-macd{font-size:14px;text-align:center;font-weight:700}
-.rsimap-macd.bull{color:var(--green)}
-.rsimap-macd.bear{color:var(--red)}
 .rsimap-updated{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:10px;text-align:right}
+
+/* ---- vista "Por Zonas": 3 columnas (sobrevendido/neutral/sobrecomprado), cada moneda cae en
+   la que le corresponde segun su RSI en la temporalidad activa ---- */
+.rsimap-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:640px){.rsimap-zones{grid-template-columns:1fr}}
+.rsimap-zone-col{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;min-height:120px}
+.rsimap-zone-title{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.rsimap-chip{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 9px;margin-bottom:6px;font-size:11.5px}
+.rsimap-chip:last-child{margin-bottom:0}
+.rsimap-chip-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsimap-chip-val{font-family:'Space Mono',monospace;font-weight:700;flex-shrink:0}
+.rsimap-zone-empty{color:var(--muted);font-size:11px;padding:4px 0}
+
+/* ---- vista "Tabla": encabezados clicables para ordenar ---- */
+.rsimap-table-el{width:100%;border-collapse:collapse;font-size:12.5px;min-width:420px}
+.rsimap-table-el th{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:0 8px 10px;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;transition:color .15s}
+.rsimap-table-el th:hover{color:var(--muted2)}
+.rsimap-table-el th.sorted{color:var(--white)}
+.rsimap-table-el th .rsimap-sort-arrow{margin-left:3px;opacity:.7}
+.rsimap-table-el td{padding:8px;border-top:1px solid var(--border)}
 @media(max-width:600px){
   .site-footer-top{flex-direction:column}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
@@ -3555,6 +3565,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Mapa de Calor RSI + MACD</h2>
               </div>
 
+              <div class="dir-toggle" id="rsimacdmapModeRow">
+                <button type="button" class="mode-btn active" data-mode="zones">Por Zonas</button>
+                <button type="button" class="mode-btn" data-mode="table">Tabla</button>
+              </div>
+
               <div class="tf-pill-row" id="rsimacdmapTfRow">
                 <button type="button" class="tf-pill" data-tf="5m">5m</button>
                 <button type="button" class="tf-pill" data-tf="15m">15m</button>
@@ -3562,6 +3577,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-tf="4h">4h</button>
                 <button type="button" class="tf-pill" data-tf="1d">1d</button>
                 <button type="button" class="tf-pill" data-tf="1w">1w</button>
+              </div>
+
+              <div class="tf-pill-row" id="rsimacdmapBiasRow" style="margin-bottom:16px">
+                <button type="button" class="tf-pill active" data-bias="all">Todos</button>
+                <button type="button" class="tf-pill" data-bias="bull">Solo Long ▲</button>
+                <button type="button" class="tf-pill" data-bias="bear">Solo Short ▼</button>
               </div>
 
               <div class="indic-chart-body" id="rsimacdmapBody">
@@ -3575,7 +3596,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
-                <div id="rsimacdmapList" class="rsimap-table" style="display:none"></div>
+                <div id="rsimacdmapEmpty" class="indic-placeholder-text" style="display:none;text-align:center;padding:24px 0">Ninguna moneda cumple este filtro en esta temporalidad.</div>
+                <div id="rsimacdmapZones" class="rsimap-zones" style="display:none"></div>
+                <div id="rsimacdmapTableWrap" style="display:none;overflow-x:auto"><table class="rsimap-table-el" id="rsimacdmapTableEl"></table></div>
                 <div class="rsimap-updated" id="rsimacdmapUpdated" style="display:none"></div>
               </div>
 
@@ -3587,10 +3610,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>RSI (Índice de Fuerza Relativa)</b> mide qué tan "estirado" está el movimiento reciente del precio, en una escala de 0 a 100. Por debajo de 30 se considera sobrevendido; por encima de 70, sobrecomprado.<br>
-                📊 La flechita de la derecha muestra el sesgo del <b>MACD</b> en esa misma temporalidad: <span style="color:var(--green)">▲ verde</span> = cruce alcista, <span style="color:var(--red)">▼ roja</span> = cruce bajista.<br>
-                🪙 Top 20 monedas por capitalización de mercado, excluyendo stablecoins.<br>
+                📊 El sesgo de <b>MACD</b> es en esa misma temporalidad: <span style="color:var(--green)">▲ Long</span> = cruce alcista, <span style="color:var(--red)">▼ Short</span> = cruce bajista.<br>
+                🪙 Top 20 monedas por capitalización de mercado, excluyendo stablecoins y versiones "Wrapped" (envueltas) de otro activo.<br>
                 🔄 Este dato no se calcula en tu navegador: se actualiza cada 5 minutos en segundo plano y se guarda ya calculado, para que las columnas de 5m/15m tengan sentido sin sobrecargar ninguna API.<br>
-                🔎 Fuente de las velas de precio: <b>Binance</b> (API pública). Selección del top 20: <b>CoinGecko</b>.<br>
+                🔎 Fuente de las velas de precio: <b>Kraken</b> (API pública). Selección del top 20: <b>CoinPaprika</b>.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -18754,21 +18777,10 @@ function ensureOptionsOiLoaded(){
 let rsiHeatmapLoadedOnce = false;
 let rsiHeatmapRowsByTf = {};
 let rsiHeatmapActiveTf = '1h';
-function rsiHeatColor(rsi){
-  const stops = [
-    { p: 0, c: [46, 204, 113] },   // --green: sobrevendido
-    { p: 50, c: [240, 178, 61] },  // --gold: neutral
-    { p: 100, c: [255, 47, 79] },  // --red: sobrecomprado
-  ];
-  let a = stops[0], b = stops[stops.length - 1];
-  for(let i = 0; i < stops.length - 1; i++){
-    if(rsi >= stops[i].p && rsi <= stops[i + 1].p){ a = stops[i]; b = stops[i + 1]; break; }
-  }
-  const span = (b.p - a.p) || 1;
-  const t = Math.max(0, Math.min(1, (rsi - a.p) / span));
-  const mix = a.c.map((v, i) => Math.round(v + (b.c[i] - v) * t));
-  return 'rgb(' + mix.join(',') + ')';
-}
+let rsiHeatmapActiveMode = 'zones'; // 'zones' | 'table'
+let rsiHeatmapBiasFilter = 'all';   // 'all' | 'bull' | 'bear'
+let rsiHeatmapSort = { key: 'rank', dir: 1 };
+function rsiHeatZoneName(rsi){ return rsi < 33 ? 'Sobrevendido' : rsi > 67 ? 'Sobrecomprado' : 'Neutral'; }
 async function fetchRsiHeatmapData(){
   const { data, error } = await sbClient
     .from('rsi_heatmap_latest')
@@ -18777,28 +18789,114 @@ async function fetchRsiHeatmapData(){
   if(error) throw error;
   return data || [];
 }
-function renderRsiHeatmapList(){
-  const listEl = document.getElementById('rsimacdmapList');
+function rsiHeatmapFilteredRows(){
+  const rows = rsiHeatmapRowsByTf[rsiHeatmapActiveTf] || [];
+  return rows.filter(r => rsiHeatmapBiasFilter === 'all' || r.macd_bias === rsiHeatmapBiasFilter);
+}
+/* ---- vista "Por Zonas": cada moneda cae en su columna (sobrevendido/neutral/sobrecomprado)
+   segun el RSI de la temporalidad activa, y dentro de cada columna se ordena por severidad
+   (la mas sobrevendida arriba en esa columna, la mas sobrecomprada arriba en la suya) para que
+   lo mas extremo salte a la vista primero ---- */
+function renderRsiHeatmapZones(){
+  const wrap = document.getElementById('rsimacdmapZones');
+  const zones = [
+    { key: 'Sobrevendido', test: r => r < 33, color: 'var(--green)', order: 'asc' },
+    { key: 'Neutral', test: r => r >= 33 && r <= 67, color: 'var(--gold)', order: 'center' },
+    { key: 'Sobrecomprado', test: r => r > 67, color: 'var(--red)', order: 'desc' },
+  ];
+  const pool = rsiHeatmapFilteredRows();
+  wrap.innerHTML = zones.map(z => {
+    let items = pool.filter(r => z.test(Number(r.rsi)));
+    items = items.slice().sort((a, b) => {
+      const ra = Number(a.rsi), rb = Number(b.rsi);
+      if(z.order === 'asc') return ra - rb;
+      if(z.order === 'desc') return rb - ra;
+      return Math.abs(ra - 50) - Math.abs(rb - 50);
+    });
+    const chips = items.map(r => {
+      const isBull = r.macd_bias === 'bull';
+      return '<div class="rsimap-chip"><span class="rsimap-chip-name"><b>' + r.symbol + '</b> ' + r.name + '</span><span class="rsimap-chip-val" style="color:' + (isBull ? 'var(--green)' : 'var(--red)') + '">' + Number(r.rsi).toFixed(1) + ' ' + (isBull ? '▲' : '▼') + '</span></div>';
+    }).join('') || '<div class="rsimap-zone-empty">Sin monedas aquí</div>';
+    return '<div class="rsimap-zone-col"><div class="rsimap-zone-title" style="color:' + z.color + '"><span>' + z.key + '</span><span>' + items.length + '</span></div>' + chips + '</div>';
+  }).join('');
+}
+/* ---- vista "Tabla": encabezados clicables — tocar uno ordena por esa columna, volver a
+   tocarlo invierte el orden (con una flechita indicando en cual quedo parado) ---- */
+const RSIMAP_TABLE_COLS = [
+  { key: 'name', label: 'Moneda' },
+  { key: 'rsi', label: 'RSI' },
+  { key: 'macd', label: 'MACD' },
+  { key: 'zone', label: 'Zona' },
+];
+function rsiHeatmapSortRows(rows){
+  const { key, dir } = rsiHeatmapSort;
+  const val = r => {
+    if(key === 'name') return r.name;
+    if(key === 'rsi') return Number(r.rsi);
+    if(key === 'macd') return r.macd_bias;
+    if(key === 'zone') return rsiHeatZoneName(Number(r.rsi));
+    return r.rank;
+  };
+  return rows.slice().sort((a, b) => {
+    const va = val(a), vb = val(b);
+    if(va < vb) return -1 * dir;
+    if(va > vb) return 1 * dir;
+    return a.rank - b.rank;
+  });
+}
+function renderRsiHeatmapTable(){
+  const tableEl = document.getElementById('rsimacdmapTableEl');
+  const rows = rsiHeatmapSortRows(rsiHeatmapFilteredRows());
+  const head = '<tr>' + RSIMAP_TABLE_COLS.map(col => {
+    const sorted = rsiHeatmapSort.key === col.key;
+    const arrow = sorted ? (rsiHeatmapSort.dir === 1 ? '↑' : '↓') : '';
+    return '<th class="' + (sorted ? 'sorted' : '') + '" data-sort="' + col.key + '">' + col.label + ' <span class="rsimap-sort-arrow">' + arrow + '</span></th>';
+  }).join('') + '</tr>';
+  const body = rows.map(r => {
+    const rsi = Number(r.rsi);
+    const isBull = r.macd_bias === 'bull';
+    return '<tr>' +
+      '<td><span class="rsimap-coin-name">' + r.symbol + '</span> <span class="rsimap-coin-symbol">' + r.name + '</span></td>' +
+      '<td style="font-family:\'Space Mono\',monospace">' + rsi.toFixed(1) + '</td>' +
+      '<td style="color:' + (isBull ? 'var(--green)' : 'var(--red)') + ';font-weight:700;font-size:11.5px">' + (isBull ? 'LONG ▲' : 'SHORT ▼') + '</td>' +
+      '<td style="color:var(--muted);font-size:11.5px">' + rsiHeatZoneName(rsi) + '</td>' +
+    '</tr>';
+  }).join('');
+  tableEl.innerHTML = head + body;
+  tableEl.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if(rsiHeatmapSort.key === key) rsiHeatmapSort.dir *= -1;
+      else rsiHeatmapSort = { key, dir: 1 };
+      renderRsiHeatmapTable();
+    });
+  });
+}
+function renderRsiHeatmapView(){
+  const zonesEl = document.getElementById('rsimacdmapZones');
+  const tableWrapEl = document.getElementById('rsimacdmapTableWrap');
+  const emptyEl = document.getElementById('rsimacdmapEmpty');
   const updatedEl = document.getElementById('rsimacdmapUpdated');
-  const rows = (rsiHeatmapRowsByTf[rsiHeatmapActiveTf] || []).slice().sort((a, b) => a.rank - b.rank);
+  const rows = rsiHeatmapFilteredRows();
   if(!rows.length){
-    listEl.innerHTML = '';
-    listEl.style.display = 'none';
+    zonesEl.style.display = 'none';
+    tableWrapEl.style.display = 'none';
+    emptyEl.style.display = 'block';
     updatedEl.style.display = 'none';
     return;
   }
-  listEl.innerHTML = rows.map(r => {
-    const rsi = Number(r.rsi);
-    const color = rsiHeatColor(rsi);
-    const isBull = r.macd_bias === 'bull';
-    return '<div class="rsimap-row">' +
-      '<div class="rsimap-coin"><span class="rsimap-coin-name">' + r.name + '</span><span class="rsimap-coin-symbol">' + r.symbol + '</span></div>' +
-      '<div class="rsimap-rsi-badge" style="background:' + color + '">' + rsi.toFixed(1) + '</div>' +
-      '<div class="rsimap-macd ' + (isBull ? 'bull' : 'bear') + '">' + (isBull ? '▲' : '▼') + '</div>' +
-    '</div>';
-  }).join('');
-  listEl.style.display = 'flex';
-  const latestMs = rows.reduce((max, r) => { const t = Date.parse(r.updated_at); return t > max ? t : max; }, 0);
+  emptyEl.style.display = 'none';
+  if(rsiHeatmapActiveMode === 'zones'){
+    renderRsiHeatmapZones();
+    zonesEl.style.display = 'grid';
+    tableWrapEl.style.display = 'none';
+  } else {
+    renderRsiHeatmapTable();
+    tableWrapEl.style.display = 'block';
+    zonesEl.style.display = 'none';
+  }
+  const allRows = rsiHeatmapRowsByTf[rsiHeatmapActiveTf] || [];
+  const latestMs = allRows.reduce((max, r) => { const t = Date.parse(r.updated_at); return t > max ? t : max; }, 0);
   if(latestMs){
     updatedEl.textContent = 'Actualizado: ' + new Date(latestMs).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
     updatedEl.style.display = 'block';
@@ -18807,10 +18905,14 @@ function renderRsiHeatmapList(){
 async function loadRsiHeatmap(){
   const loadingEl = document.getElementById('rsimacdmapLoading');
   const errorEl = document.getElementById('rsimacdmapError');
-  const listEl = document.getElementById('rsimacdmapList');
+  const zonesEl = document.getElementById('rsimacdmapZones');
+  const tableWrapEl = document.getElementById('rsimacdmapTableWrap');
+  const emptyEl = document.getElementById('rsimacdmapEmpty');
   loadingEl.style.display = 'flex';
   errorEl.style.display = 'none';
-  listEl.style.display = 'none';
+  zonesEl.style.display = 'none';
+  tableWrapEl.style.display = 'none';
+  emptyEl.style.display = 'none';
   try{
     const data = await fetchRsiHeatmapData();
     rsiHeatmapRowsByTf = {};
@@ -18819,7 +18921,7 @@ async function loadRsiHeatmap(){
       rsiHeatmapRowsByTf[r.timeframe].push(r);
     });
     loadingEl.style.display = 'none';
-    renderRsiHeatmapList();
+    renderRsiHeatmapView();
   } catch(err){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
@@ -18829,12 +18931,28 @@ function ensureRsiHeatmapLoaded(){
   if(rsiHeatmapLoadedOnce) return;
   rsiHeatmapLoadedOnce = true;
   loadRsiHeatmap();
+  document.querySelectorAll('#rsimacdmapModeRow .mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#rsimacdmapModeRow .mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      rsiHeatmapActiveMode = btn.dataset.mode;
+      renderRsiHeatmapView();
+    });
+  });
   document.querySelectorAll('#rsimacdmapTfRow .tf-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#rsimacdmapTfRow .tf-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       rsiHeatmapActiveTf = btn.dataset.tf;
-      renderRsiHeatmapList();
+      renderRsiHeatmapView();
+    });
+  });
+  document.querySelectorAll('#rsimacdmapBiasRow .tf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#rsimacdmapBiasRow .tf-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      rsiHeatmapBiasFilter = btn.dataset.bias;
+      renderRsiHeatmapView();
     });
   });
 }
