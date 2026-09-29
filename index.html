@@ -1581,7 +1581,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
       </button>
       <button class="sb-item" data-indic-jump="rsimacdmap">
-        <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Mapa de Calor RSI + MACD</span>
+        <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Mapa de Calor RSI + MACD + Estocástico</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item" data-indic-jump="fng">
@@ -1789,7 +1789,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimacdmap">
-        <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Mapa de Calor RSI + MACD</span>
+        <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Mapa de Calor RSI + MACD + Estocástico</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
@@ -2419,7 +2419,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimacdmap">
               <div class="indic-guide-icon">🌡️</div>
-              <div class="indic-guide-card-title">Mapa de Calor RSI + MACD</div>
+              <div class="indic-guide-card-title">Mapa de Calor RSI + MACD + Estocástico</div>
               <div class="indic-guide-card-text">El top 20 de criptomonedas por capitalización (sin stablecoins), con su RSI y sesgo de MACD en 6 temporalidades — de 5 minutos a 1 semana.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
@@ -3562,7 +3562,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Mapa de Calor RSI + MACD</h2>
+                <h2 class="calc-title">Mapa de Calor RSI + MACD + Estocástico</h2>
               </div>
 
               <div class="dir-toggle" id="rsimacdmapModeRow">
@@ -6943,7 +6943,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
   ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
-  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD' }],
+  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [],
@@ -18769,7 +18769,7 @@ function ensureOptionsOiLoaded(){
   });
 }
 
-/* ---- Mapa de Calor RSI + MACD: top 20 por capitalización (sin stablecoins) en 6 temporalidades.
+/* ---- Mapa de Calor RSI + MACD + Estocástico: top 20 por capitalización (sin stablecoins) en 6 temporalidades.
    A diferencia de todos los indicadores de arriba, este NO llama a ninguna API externa desde el
    navegador — el RSI y el sesgo de MACD ya vienen calculados por un robot programado (cada 5
    minutos, con velas de Binance) y guardados en Supabase (tabla rsi_heatmap_latest). Hacerlo así
