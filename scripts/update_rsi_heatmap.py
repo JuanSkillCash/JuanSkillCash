@@ -10,15 +10,19 @@ gente este viendo la pagina) y guarda el resultado ya calculado en Supabase - ca
 solo lee esa tabla, sin pedirle nada a ninguna API externa.
 
 Fuentes:
-  - CoinGecko (publica, sin llave): solo para elegir el top 20 por capitalizacion sin
-    stablecoins - una llamada cada corrida, no necesita autenticacion.
+  - CryptoCompare (misma API que ya usa el sitio como respaldo de precios, con la key que ya
+    existe como secreto del repo): solo para elegir el top 20 por capitalizacion sin
+    stablecoins, con su endpoint top/mktcapfull - una llamada cada corrida. NO se usa
+    CoinGecko aqui: probado en vivo, Actions bloquea la peticion con un 403 de CloudFront
+    ("Request blocked") en TODAS las corridas, sea cual sea el User-Agent - CoinGecko filtra
+    por rango de IP a los runners de GitHub Actions, no por header.
   - Binance (publica, sin llave, sin limite practico para este volumen): velas de precio
-    para calcular RSI y MACD en cada temporalidad. Se eligio Binance y no CoinGecko para
-    esta parte porque CoinGecko no tiene margen para refrescar velas cada 5 minutos.
+    para calcular RSI y MACD en cada temporalidad.
 
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
+    CRYPTOCOMPARE_API_KEY
 """
 
 import os
@@ -33,9 +37,10 @@ log = logging.getLogger("update_rsi_heatmap")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+CRYPTOCOMPARE_API_KEY = os.environ.get("CRYPTOCOMPARE_API_KEY", "")
 TABLE = "rsi_heatmap_latest"
 
-COINGECKO_MARKETS_URL = "https://api.coingecko.com/api/v3/coins/markets"
+CRYPTOCOMPARE_TOP_URL = "https://min-api.cryptocompare.com/data/top/mktcapfull"
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
 
 TOP_N = 20
@@ -54,9 +59,8 @@ STABLECOIN_SYMBOLS = {
     "usds", "usdp", "gusd", "frax", "lusd", "susd", "eurc", "eurt",
 }
 
-# sin un User-Agent de navegador, CoinGecko (y a veces Binance) bloquean la petición con un 403
-# de su firewall anti-bot - filtran por el User-Agent por defecto de requests (python-requests/x.x),
-# que es exactamente lo que manda un runner de GitHub Actions si no se lo cambiamos
+# User-Agent de navegador normal por si alguna de las dos APIs filtra el User-Agent por
+# defecto de requests (python-requests/x.x) - no hace daño dejarlo puesto en ambas
 REQUEST_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Accept": "application/json",
@@ -65,26 +69,27 @@ REQUEST_HEADERS = {
 
 def fetch_top_candidates():
     params = {
-        "vs_currency": "usd",
-        "order": "market_cap_desc",
-        "per_page": FETCH_BUFFER,
-        "page": 1,
-        "sparkline": "false",
+        "limit": FETCH_BUFFER,
+        "tsym": "USD",
+        "api_key": CRYPTOCOMPARE_API_KEY,
     }
-    resp = requests.get(COINGECKO_MARKETS_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
+    resp = requests.get(CRYPTOCOMPARE_TOP_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
-        raise RuntimeError(f"CoinGecko respondio {resp.status_code}: {resp.text}")
-    coins = resp.json()
+        raise RuntimeError(f"CryptoCompare respondio {resp.status_code}: {resp.text}")
+    payload = resp.json()
+    coins = payload.get("Data") or []
     out = []
+    rank = 0
     for c in coins:
-        symbol = (c.get("symbol") or "").lower()
-        if symbol in STABLECOIN_SYMBOLS:
+        info = c.get("CoinInfo") or {}
+        symbol = (info.get("Name") or "").lower()
+        if not symbol or symbol in STABLECOIN_SYMBOLS:
             continue
+        rank += 1
         out.append({
-            "id": c["id"],
             "symbol": symbol.upper(),
-            "name": c.get("name") or symbol.upper(),
-            "rank": c.get("market_cap_rank") or 999,
+            "name": info.get("FullName") or symbol.upper(),
+            "rank": rank,
         })
     return out
 
@@ -189,6 +194,9 @@ def replace_table_rows(rows):
 def main():
     if not SUPABASE_URL or not SUPABASE_KEY:
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
+        sys.exit(1)
+    if not CRYPTOCOMPARE_API_KEY:
+        log.error("Falta CRYPTOCOMPARE_API_KEY en el entorno.")
         sys.exit(1)
 
     log.info("Buscando top %d por capitalizacion (sin stablecoins)...", TOP_N)
