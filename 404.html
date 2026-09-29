@@ -1535,6 +1535,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="longshort">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
       </button>
+      <button class="sb-item" data-indic-jump="optionsoi">
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1737,6 +1740,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="longshort">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="optionsoi">
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1930,7 +1936,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
-        <div class="cat-overview-sub">29 INDICADORES</div>
+        <div class="cat-overview-sub">30 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
@@ -2355,6 +2361,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">⚖️</div>
               <div class="indic-guide-card-title">Ratio Largo/Corto</div>
               <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/Bybit — minoristas y las cuentas grandes.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="optionsoi">
+              <div class="indic-guide-icon">📐</div>
+              <div class="indic-guide-card-title">Interés Abierto en Opciones</div>
+              <div class="indic-guide-card-text">Cuántos contratos de opciones (Calls y Puts) siguen abiertos en cada precio de ejercicio, filtrable por vencimiento.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3429,6 +3441,57 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 ⚖️ Ratio = cuentas/posiciones en largo ÷ en corto, para BTC perpetuo. Mayor a 1 = hay más apostando a que sube; menor a 1 = más apostando a que baja. <b>Inversores minoristas</b> = todas las cuentas del exchange; <b>Cuentas Whale</b> = solo las cuentas más grandes (top traders); <b>Posiciones Whale</b> = lo mismo pero ponderado por el tamaño de cada posición, no por número de cuentas.<br>
                 🔎 Fuentes: APIs públicas de <b>Binance</b> y <b>Bybit</b> Futuros. OKX no está porque su API pública bloquea las llamadas hechas desde el navegador (CORS) — sin servidor propio no hay forma de traer ese dato. Bybit tampoco publica el desglose de cuentas/posiciones whale en su API pública — por eso esas dos filas salen como "no disponible" ahí, en vez de mostrarte un número inventado.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="optionsoi" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Interés Abierto en Opciones</h2>
+              </div>
+
+              <div class="tf-pill-row" id="optionsoiCurrencyRow">
+                <button type="button" class="tf-pill active" data-ccy="BTC">₿ BTC</button>
+                <button type="button" class="tf-pill" data-ccy="ETH">Ξ ETH</button>
+              </div>
+
+              <div style="margin-bottom:16px">
+                <select class="asset-filter-select" id="optionsoiExpirySelect" style="max-width:280px"></select>
+              </div>
+
+              <div class="indic-chart-body" id="optionsoiChartBody">
+                <div class="indic-chart-soon" id="optionsoiLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando datos…</div>
+                  <div class="indic-placeholder-text">Consultando la API pública de Deribit.</div>
+                </div>
+                <div class="indic-chart-soon" id="optionsoiError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="optionsoiErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                </div>
+                <div id="optionsoiChartWrap" class="chart-breakout" style="display:none"></div>
+              </div>
+
+              <div class="partner-perks" id="optionsoiLegend" style="display:none;margin-bottom:18px">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:3px;background:#3b82f6;display:inline-block"></span> Calls (opción de compra)</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:3px;background:#f0b23d;display:inline-block"></span> Puts (opción de venta)</span>
+              </div>
+              <div class="chart-stats-grid" id="optionsoiStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📐 <b>Interés abierto</b> = cuántos contratos de opciones siguen abiertos (sin cerrar ni ejercer) para cada precio de ejercicio (strike). Un <b>Call</b> es el derecho a comprar al strike; un <b>Put</b> es el derecho a vender al strike — no son "compras" ni "ventas" del activo en sí.<br>
+                🎯 Los strikes con mucho interés abierto suelen actuar como imanes de precio o zonas de mayor volatilidad cerca de su vencimiento, porque ahí hay más gente con una posición real que defender.<br>
+                🔎 Fuente: API pública de <b>Deribit</b> (el mayor exchange de opciones cripto) — mismo dato que ves en su propia página de estadísticas, en tiempo real.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -6757,7 +6820,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
   ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
-  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
+  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [],
@@ -6765,7 +6828,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins' };
+const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -6903,6 +6966,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'ethquarterly') ensureEthQuarterlyLoaded();
       if(btn.dataset.indic === 'ethmonthly') ensureEthMonthlyLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
+      if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
       if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
       if(btn.dataset.indic === 'dombtc') ensureDomBtcLoaded();
@@ -6949,6 +7013,7 @@ function jumpToIndicator(id){
     if(id === 'ethquarterly') ensureEthQuarterlyLoaded();
     if(id === 'ethmonthly') ensureEthMonthlyLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
+    if(id === 'optionsoi') ensureOptionsOiLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
     if(id === 'domall') ensureDomAllLoaded();
     if(id === 'dombtc') ensureDomBtcLoaded();
@@ -18335,6 +18400,191 @@ const LS_TF = {
 let lsActiveTf = '1h';
 let lsLoadedOnce = false;
 function ensureLongShortLoaded(){ if(!lsLoadedOnce){ lsLoadedOnce = true; loadLongShort(); loadLsVolume(); } }
+
+/* ===== INTERÉS ABIERTO EN OPCIONES (Deribit) =====
+   API pública de Deribit (sin llave, permite llamadas directas desde el navegador — confirmado
+   con el usuario antes de construir esto). get_book_summary_by_currency da, por cada instrumento
+   de opción vivo, su interés abierto actual; el nombre del instrumento (ej. "BTC-25JUN27-108000-C")
+   ya trae strike, vencimiento y tipo (Call/Put) codificados, así que no hace falta pedir nada más */
+let optionsOiActiveCcy = 'BTC';
+let optionsOiRawByCcy = {};
+let optionsOiActiveExpiry = 'all';
+let optionsOiLoadedOnce = false;
+const OPTIONS_OI_MONTHS = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+function optionsOiParseInstrument(name){
+  const parts = name.split('-');
+  if(parts.length !== 4) return null;
+  const strike = Number(parts[2]);
+  if(!isFinite(strike)) return null;
+  const m = parts[1].match(/^(\d{1,2})([A-Z]{3})(\d{2})$/);
+  if(!m) return null;
+  const month = OPTIONS_OI_MONTHS[m[2]];
+  if(month == null) return null;
+  const expiryDate = Date.UTC(2000 + Number(m[3]), month, Number(m[1]), 8, 0, 0);
+  return { strike, expiryKey: parts[1], expiryDate, type: parts[3] === 'C' ? 'call' : 'put' };
+}
+async function fetchOptionsOiData(ccy){
+  const res = await fetch('https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=' + ccy + '&kind=option');
+  if(!res.ok) throw new Error('deribit http ' + res.status);
+  const json = await res.json();
+  const rows = [];
+  let underlyingPrice = null;
+  (json.result || []).forEach(r => {
+    const info = optionsOiParseInstrument(r.instrument_name);
+    if(!info) return;
+    if(r.underlying_price) underlyingPrice = r.underlying_price;
+    rows.push({ strike: info.strike, expiryKey: info.expiryKey, expiryDate: info.expiryDate, type: info.type, oi: Number(r.open_interest) || 0 });
+  });
+  return { rows, underlyingPrice };
+}
+function optionsOiFmtExpiry(ms){
+  return new Date(ms).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function optionsOiFmtUsd(v){
+  if(v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+  if(v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+  if(v >= 1e3) return '$' + (v / 1e3).toFixed(1) + 'K';
+  return '$' + v.toFixed(0);
+}
+function optionsOiFmtNum(v){ return v.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+function renderOptionsOiExpirySelect(rows){
+  const sel = document.getElementById('optionsoiExpirySelect');
+  const uniq = new Map();
+  rows.forEach(r => { if(!uniq.has(r.expiryKey)) uniq.set(r.expiryKey, r.expiryDate); });
+  const sorted = [...uniq.entries()].sort((a, b) => a[1] - b[1]);
+  sel.innerHTML = '<option value="all">Todas las expiraciones</option>' +
+    sorted.map(([key, date]) => '<option value="' + key + '">' + optionsOiFmtExpiry(date) + '</option>').join('');
+  sel.value = sorted.some(([key]) => key === optionsOiActiveExpiry) ? optionsOiActiveExpiry : 'all';
+  optionsOiActiveExpiry = sel.value;
+}
+function renderOptionsOiChart(){
+  const data = optionsOiRawByCcy[optionsOiActiveCcy];
+  const loadingEl = document.getElementById('optionsoiLoading');
+  const errorEl = document.getElementById('optionsoiError');
+  const wrap = document.getElementById('optionsoiChartWrap');
+  const legendEl = document.getElementById('optionsoiLegend');
+  const statsEl = document.getElementById('optionsoiStats');
+  if(!data) return;
+  const filtered = optionsOiActiveExpiry === 'all' ? data.rows : data.rows.filter(r => r.expiryKey === optionsOiActiveExpiry);
+  const byStrike = new Map();
+  filtered.forEach(r => {
+    if(!byStrike.has(r.strike)) byStrike.set(r.strike, { calls: 0, puts: 0 });
+    byStrike.get(r.strike)[r.type === 'call' ? 'calls' : 'puts'] += r.oi;
+  });
+  const strikes = [...byStrike.keys()].filter(s => byStrike.get(s).calls > 0 || byStrike.get(s).puts > 0).sort((a, b) => a - b);
+  if(strikes.length === 0){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    document.getElementById('optionsoiErrorDetail').textContent = 'No hay interés abierto para ese filtro.';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const isMobileChart = window.innerWidth <= 640;
+  const n = strikes.length;
+  const barGroupW = isMobileChart ? 30 : 34;
+  const marginLeft = isMobileChart ? 44 : 58, marginRight = 10, marginTop = 14, marginBottom = isMobileChart ? 66 : 76;
+  const drawW = n * barGroupW;
+  const totalW = marginLeft + drawW + marginRight;
+  const drawH = isMobileChart ? 260 : 340;
+  const totalH = drawH + marginTop + marginBottom;
+
+  const maxOi = Math.max(...strikes.map(s => Math.max(byStrike.get(s).calls, byStrike.get(s).puts)), 1);
+  let yTicks = niceLinearTicks(0, maxOi * 1.15);
+  if(yTicks.length < 2) yTicks = [0, maxOi];
+  const topTick = yTicks[yTicks.length - 1] || maxOi;
+  const yFor = v => marginTop + drawH - (v / topTick) * drawH;
+
+  const yGridHtml = yTicks.map(t => '' +
+    '<line x1="' + marginLeft + '" y1="' + yFor(t).toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + yFor(t).toFixed(1) + '" stroke="rgba(255,255,255,.08)" stroke-width="1"/>' +
+    '<text x="' + (marginLeft - 8) + '" y="' + (yFor(t) + 4).toFixed(1) + '" text-anchor="end" font-size="' + (isMobileChart ? 9 : 11) + '" font-weight="700" fill="#c8cde0" font-family="\'Space Mono\',monospace">' + optionsOiFmtNum(t) + '</text>'
+  ).join('');
+
+  const barPairW = barGroupW * 0.7;
+  const singleBarW = barPairW / 2;
+  const baseY = marginTop + drawH;
+  const barsHtml = strikes.map((s, i) => {
+    const groupX = marginLeft + i * barGroupW + (barGroupW - barPairW) / 2;
+    const d = byStrike.get(s);
+    const callsY = yFor(d.calls), putsY = yFor(d.puts);
+    return '' +
+      '<rect x="' + groupX.toFixed(1) + '" y="' + callsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - callsY).toFixed(1) + '" fill="#3b82f6"/>' +
+      '<rect x="' + (groupX + singleBarW).toFixed(1) + '" y="' + putsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - putsY).toFixed(1) + '" fill="#f0b23d"/>';
+  }).join('');
+
+  const xLabelsHtml = strikes.map((s, i) => {
+    const x = marginLeft + i * barGroupW + barGroupW / 2;
+    const y = baseY + 14;
+    return '<text x="' + x.toFixed(1) + '" y="' + y + '" text-anchor="end" font-size="' + (isMobileChart ? 8.5 : 10) + '" fill="#8b90a8" font-family="\'Space Mono\',monospace" transform="rotate(-45 ' + x.toFixed(1) + ' ' + y + ')">' + optionsOiFmtNum(s) + '</text>';
+  }).join('');
+
+  wrap.innerHTML = '<svg viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + totalW + '" height="' + totalH + '" style="width:100%;height:auto;display:block">' +
+    yGridHtml +
+    '<line x1="' + marginLeft + '" y1="' + baseY.toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.18)" stroke-width="1"/>' +
+    barsHtml + xLabelsHtml +
+    '</svg>';
+
+  const totalCalls = filtered.filter(r => r.type === 'call').reduce((a, r) => a + r.oi, 0);
+  const totalPuts = filtered.filter(r => r.type === 'put').reduce((a, r) => a + r.oi, 0);
+  const totalOi = totalCalls + totalPuts;
+  const ratio = totalCalls > 0 ? totalPuts / totalCalls : 0;
+  const notional = totalOi * (data.underlyingPrice || 0);
+  statsEl.innerHTML = '' +
+    '<div class="res-card"><div class="r-label">Interés Abierto Calls</div><div class="r-val">' + optionsOiFmtNum(totalCalls) + '</div></div>' +
+    '<div class="res-card"><div class="r-label">Interés Abierto Puts</div><div class="r-val">' + optionsOiFmtNum(totalPuts) + '</div></div>' +
+    '<div class="res-card"><div class="r-label">Interés Abierto Total</div><div class="r-val">' + optionsOiFmtNum(totalOi) + '</div></div>' +
+    '<div class="res-card"><div class="r-label">Ratio Put/Call</div><div class="r-val">' + ratio.toFixed(2) + '</div></div>' +
+    '<div class="res-card"><div class="r-label">Valor Nominal</div><div class="r-val">' + optionsOiFmtUsd(notional) + '</div></div>';
+}
+async function loadOptionsOi(ccy){
+  const loadingEl = document.getElementById('optionsoiLoading');
+  const errorEl = document.getElementById('optionsoiError');
+  const wrap = document.getElementById('optionsoiChartWrap');
+  loadingEl.style.display = 'flex';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'none';
+  try{
+    const data = await fetchOptionsOiData(ccy);
+    optionsOiRawByCcy[ccy] = data;
+    optionsOiActiveExpiry = 'all';
+    renderOptionsOiExpirySelect(data.rows);
+    renderOptionsOiChart();
+  } catch(err){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    document.getElementById('optionsoiErrorDetail').textContent = String((err && err.message) || err);
+  }
+}
+function ensureOptionsOiLoaded(){
+  if(optionsOiLoadedOnce) return;
+  optionsOiLoadedOnce = true;
+  loadOptionsOi(optionsOiActiveCcy);
+  document.querySelectorAll('#optionsoiCurrencyRow .tf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#optionsoiCurrencyRow .tf-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      optionsOiActiveCcy = btn.dataset.ccy;
+      if(optionsOiRawByCcy[optionsOiActiveCcy]){
+        optionsOiActiveExpiry = 'all';
+        renderOptionsOiExpirySelect(optionsOiRawByCcy[optionsOiActiveCcy].rows);
+        renderOptionsOiChart();
+      } else {
+        loadOptionsOi(optionsOiActiveCcy);
+      }
+    });
+  });
+  document.getElementById('optionsoiExpirySelect').addEventListener('change', (e) => {
+    optionsOiActiveExpiry = e.target.value;
+    renderOptionsOiChart();
+  });
+}
 /* ---- Volumen Largo vs Corto: volumen real comprador vs vendedor de BTC en Binance Futuros
    (taker buy/sell quote volume de la vela más reciente en la temporalidad elegida) — mismo
    espíritu visual de anillos que Coinglass, pero con UNA sola fuente real (Binance), nunca la
