@@ -3584,7 +3584,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-bias="bull">Señal de Long ▲</button>
                 <button type="button" class="tf-pill" data-bias="bear">Señal de Short ▼</button>
               </div>
-              <p style="font-size:11.5px;color:var(--muted);margin:0 0 16px">Una "señal" exige las dos cosas de acuerdo: RSI en zona extrema (barato o caro) Y el MACD confirmando esa misma dirección — no solo el MACD suelto.</p>
+              <p style="font-size:11.5px;color:var(--muted);margin:0 0 16px">Una "señal" exige las tres cosas de acuerdo: RSI en zona extrema (barato o caro), MACD y Estocástico confirmando esa misma dirección — no solo un indicador suelto.</p>
 
               <div class="indic-chart-body" id="rsimacdmapBody">
                 <div class="indic-chart-soon" id="rsimacdmapLoading">
@@ -3611,7 +3611,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>RSI (Índice de Fuerza Relativa)</b> mide qué tan "estirado" está el movimiento reciente del precio, en una escala de 0 a 100. Por debajo de 30 se considera sobrevendido; por encima de 70, sobrecomprado.<br>
-                📊 La flechita junto a cada moneda es el sesgo de <b>MACD</b> en esa misma temporalidad: <span style="color:var(--green)">▲</span> = cruce alcista, <span style="color:var(--red)">▼</span> = cruce bajista. Los botones "Señal de Long/Short" son más exigentes: solo marcan una moneda cuando el RSI Y el MACD apuntan a la misma dirección al mismo tiempo.<br>
+                📊 La flechita junto a cada moneda es el sesgo de <b>MACD</b> en esa misma temporalidad: <span style="color:var(--green)">▲</span> = cruce alcista, <span style="color:var(--red)">▼</span> = cruce bajista. En la vista Tabla también se ve el sesgo del <b>Estocástico</b> (%K vs su propia media). Los botones "Señal de Long/Short" son más exigentes: solo marcan una moneda cuando el RSI, el MACD y el Estocástico apuntan los tres a la misma dirección al mismo tiempo.<br>
                 🪙 Top 20 monedas por capitalización de mercado, excluyendo stablecoins y versiones "Wrapped" (envueltas) de otro activo.<br>
                 🔄 Este dato no se calcula en tu navegador: se actualiza cada 5 minutos en segundo plano y se guarda ya calculado, para que las columnas de 5m/15m tengan sentido sin sobrecargar ninguna API.<br>
                 🔎 Fuente de las velas de precio: <b>Kraken</b> (API pública). Selección del top 20: <b>CoinPaprika</b>.<br>
@@ -18785,7 +18785,7 @@ function rsiHeatZoneName(rsi){ return rsi < 33 ? 'Sobrevendido' : rsi > 67 ? 'So
 async function fetchRsiHeatmapData(){
   const { data, error } = await sbClient
     .from('rsi_heatmap_latest')
-    .select('symbol,name,timeframe,rsi,macd_bias,rank,updated_at')
+    .select('symbol,name,timeframe,rsi,macd_bias,stoch_bias,rank,updated_at')
     .order('rank', { ascending: true });
   if(error) throw error;
   return data || [];
@@ -18800,8 +18800,8 @@ function rsiHeatmapFilteredRows(){
   return rows.filter(r => {
     if(rsiHeatmapBiasFilter === 'all') return true;
     const rsi = Number(r.rsi);
-    if(rsiHeatmapBiasFilter === 'bull') return rsi < 33 && r.macd_bias === 'bull';
-    if(rsiHeatmapBiasFilter === 'bear') return rsi > 67 && r.macd_bias === 'bear';
+    if(rsiHeatmapBiasFilter === 'bull') return rsi < 33 && r.macd_bias === 'bull' && r.stoch_bias === 'bull';
+    if(rsiHeatmapBiasFilter === 'bear') return rsi > 67 && r.macd_bias === 'bear' && r.stoch_bias === 'bear';
     return true;
   });
 }
@@ -18838,6 +18838,7 @@ const RSIMAP_TABLE_COLS = [
   { key: 'name', label: 'Moneda' },
   { key: 'rsi', label: 'RSI' },
   { key: 'macd', label: 'MACD' },
+  { key: 'stoch', label: 'Estocástico' },
   { key: 'zone', label: 'Zona' },
 ];
 function rsiHeatmapSortRows(rows){
@@ -18846,6 +18847,7 @@ function rsiHeatmapSortRows(rows){
     if(key === 'name') return r.name;
     if(key === 'rsi') return Number(r.rsi);
     if(key === 'macd') return r.macd_bias;
+    if(key === 'stoch') return r.stoch_bias;
     if(key === 'zone') return rsiHeatZoneName(Number(r.rsi));
     return r.rank;
   };
@@ -18867,10 +18869,12 @@ function renderRsiHeatmapTable(){
   const body = rows.map(r => {
     const rsi = Number(r.rsi);
     const isBull = r.macd_bias === 'bull';
+    const isStochBull = r.stoch_bias === 'bull';
     return '<tr>' +
       '<td><span class="rsimap-coin-name">' + r.symbol + '</span> <span class="rsimap-coin-symbol">' + r.name + '</span></td>' +
       '<td style="font-family:\'Space Mono\',monospace">' + rsi.toFixed(1) + '</td>' +
       '<td style="color:' + (isBull ? 'var(--green)' : 'var(--red)') + ';font-weight:700;font-size:11.5px">' + (isBull ? 'LONG ▲' : 'SHORT ▼') + '</td>' +
+      '<td style="color:' + (isStochBull ? 'var(--green)' : 'var(--red)') + ';font-weight:700;font-size:11.5px">' + (isStochBull ? 'LONG ▲' : 'SHORT ▼') + '</td>' +
       '<td style="color:var(--muted);font-size:11.5px">' + rsiHeatZoneName(rsi) + '</td>' +
     '</tr>';
   }).join('');
