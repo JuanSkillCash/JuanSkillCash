@@ -3565,6 +3565,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Mapa de Calor RSI + MACD + Estocástico</h2>
               </div>
 
+              <div class="indic-beta-warning">
+                <span class="indic-beta-warning-icon">⚠️</span>
+                <span><b>Herramienta en fase de pruebas (beta).</b> Es nueva y todavía la estamos verificando contra otras fuentes — los valores pueden tener algún desajuste puntual. Úsala solo como referencia educativa, nunca como asesoría financiera.</span>
+              </div>
+
               <div class="dir-toggle" id="rsimacdmapModeRow">
                 <button type="button" class="mode-btn active" data-mode="zones">Por Zonas</button>
                 <button type="button" class="mode-btn" data-mode="table">Tabla</button>
@@ -3585,6 +3590,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-bias="bear">Señal de Short ▼</button>
               </div>
               <p style="font-size:11.5px;color:var(--muted);margin:0 0 16px">Una "señal" exige las tres cosas de acuerdo: RSI en zona extrema (barato o caro), MACD y Estocástico confirmando esa misma dirección — no solo un indicador suelto.</p>
+
+              <select class="asset-filter-select" id="rsimacdmapCoinSelect" style="max-width:280px;margin-bottom:16px">
+                <option value="all">Todas las monedas</option>
+              </select>
 
               <div class="indic-chart-body" id="rsimacdmapBody">
                 <div class="indic-chart-soon" id="rsimacdmapLoading">
@@ -18780,6 +18789,7 @@ let rsiHeatmapRowsByTf = {};
 let rsiHeatmapActiveTf = '1h';
 let rsiHeatmapActiveMode = 'zones'; // 'zones' | 'table'
 let rsiHeatmapBiasFilter = 'all';   // 'all' | 'bull' | 'bear'
+let rsiHeatmapCoinFilter = 'all';   // 'all' o un symbol (ej. 'BTC')
 let rsiHeatmapSort = { key: 'rank', dir: 1 };
 function rsiHeatZoneName(rsi){ return rsi < 33 ? 'Sobrevendido' : rsi > 67 ? 'Sobrecomprado' : 'Neutral'; }
 async function fetchRsiHeatmapData(){
@@ -18798,6 +18808,7 @@ async function fetchRsiHeatmapData(){
 function rsiHeatmapFilteredRows(){
   const rows = rsiHeatmapRowsByTf[rsiHeatmapActiveTf] || [];
   return rows.filter(r => {
+    if(rsiHeatmapCoinFilter !== 'all' && r.symbol !== rsiHeatmapCoinFilter) return false;
     if(rsiHeatmapBiasFilter === 'all') return true;
     const rsi = Number(r.rsi);
     if(rsiHeatmapBiasFilter === 'bull') return rsi < 33 && r.macd_bias === 'bull' && r.stoch_bias === 'bull';
@@ -18918,6 +18929,16 @@ function renderRsiHeatmapView(){
     updatedEl.style.display = 'block';
   }
 }
+function populateRsiHeatmapCoinSelect(data){
+  const selectEl = document.getElementById('rsimacdmapCoinSelect');
+  const seen = new Map();
+  data.forEach(r => { if(!seen.has(r.symbol)) seen.set(r.symbol, r); });
+  const coins = [...seen.values()].sort((a, b) => a.rank - b.rank);
+  const keepValue = selectEl.value || 'all';
+  selectEl.innerHTML = '<option value="all">Todas las monedas</option>' +
+    coins.map(c => '<option value="' + c.symbol + '">' + c.symbol + ' — ' + c.name + '</option>').join('');
+  selectEl.value = [...selectEl.options].some(o => o.value === keepValue) ? keepValue : 'all';
+}
 async function loadRsiHeatmap(){
   const loadingEl = document.getElementById('rsimacdmapLoading');
   const errorEl = document.getElementById('rsimacdmapError');
@@ -18936,6 +18957,7 @@ async function loadRsiHeatmap(){
       if(!rsiHeatmapRowsByTf[r.timeframe]) rsiHeatmapRowsByTf[r.timeframe] = [];
       rsiHeatmapRowsByTf[r.timeframe].push(r);
     });
+    populateRsiHeatmapCoinSelect(data);
     loadingEl.style.display = 'none';
     renderRsiHeatmapView();
   } catch(err){
@@ -18962,6 +18984,10 @@ function ensureRsiHeatmapLoaded(){
       rsiHeatmapActiveTf = btn.dataset.tf;
       renderRsiHeatmapView();
     });
+  });
+  document.getElementById('rsimacdmapCoinSelect').addEventListener('change', (e) => {
+    rsiHeatmapCoinFilter = e.target.value;
+    renderRsiHeatmapView();
   });
   document.querySelectorAll('#rsimacdmapBiasRow .tf-pill').forEach(btn => {
     btn.addEventListener('click', () => {
