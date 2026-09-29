@@ -19,8 +19,11 @@ Fuentes:
       * CryptoCompare (con la key que el sitio YA usa client-side): respondio "over your rate
         limit" en la primera corrida real - esa key la comparten todos los visitantes del
         sitio, no tiene margen para 288 corridas/dia adicionales de este robot.
-  - Binance (publica, sin llave, sin limite practico para este volumen): velas de precio
-    para calcular RSI y MACD en cada temporalidad.
+  - Kraken (publica, sin llave, acepta nativamente las 6 temporalidades que usa este mapa):
+    velas de precio para calcular RSI y MACD. NO se usa Binance aqui: probado en vivo, responde
+    451 "Service unavailable from a restricted location" en TODAS las corridas - Binance.com
+    bloquea por geografia a los runners de GitHub Actions (alojados en EE.UU.), el mismo motivo
+    por el que existe Binance.US como sitio aparte.
 
 Variables de entorno requeridas:
     SUPABASE_URL
@@ -42,13 +45,19 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TABLE = "rsi_heatmap_latest"
 
 COINPAPRIKA_TICKERS_URL = "https://api.coinpaprika.com/v1/tickers"
-BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
+KRAKEN_OHLC_URL = "https://api.kraken.com/0/public/OHLC"
 
 TOP_N = 20
-FETCH_BUFFER = 40  # se piden mas de 20 por si hay que descartar stablecoins/no-listados en Binance
+FETCH_BUFFER = 40  # se piden mas de 20 por si hay que descartar stablecoins/no-listados en Kraken
 
-TIMEFRAMES = ["5m", "15m", "1h", "4h", "1d", "1w"]
-KLINES_LIMIT = 200  # suficiente warm-up para RSI(14) y MACD(12,26,9)
+# Kraken usa "XBT" en vez de "BTC" para bitcoin (unica excepcion) - todo lo demas usa el simbolo
+# estandar que ya trae CoinPaprika
+KRAKEN_SYMBOL_OVERRIDES = {"BTC": "XBT"}
+
+# temporalidad -> minutos (los unicos valores que acepta el endpoint OHLC de Kraken)
+TIMEFRAME_MINUTES = {"5m": 5, "15m": 15, "1h": 60, "4h": 240, "1d": 1440, "1w": 10080}
+TIMEFRAMES = list(TIMEFRAME_MINUTES.keys())
+KLINES_LIMIT = 200  # suficiente warm-up para RSI(14) y MACD(12,26,9) - Kraken ignora el limite exacto pero acepta 'since'
 
 RSI_LENGTH = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
@@ -92,18 +101,30 @@ def fetch_top_candidates():
     return out
 
 
-def fetch_closes(binance_symbol, interval):
-    params = {"symbol": binance_symbol, "interval": interval, "limit": KLINES_LIMIT}
-    resp = requests.get(BINANCE_KLINES_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
+def fetch_closes(kraken_pair, timeframe):
+    params = {"pair": kraken_pair, "interval": TIMEFRAME_MINUTES[timeframe]}
+    resp = requests.get(KRAKEN_OHLC_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
-        # se registra el motivo real (¿simbolo invalido, o Binance bloqueando al runner?) en vez
-        # de descartar en silencio - de otro modo un bloqueo generico se ve identico a "no listado"
-        log.info("Binance %s %s -> %s: %s", binance_symbol, interval, resp.status_code, resp.text[:200])
+        log.info("Kraken %s %s -> %s: %s", kraken_pair, timeframe, resp.status_code, resp.text[:200])
         return None
-    candles = resp.json()
+    payload = resp.json()
+    # Kraken devuelve 200 OK con un array "error" no vacio para un par invalido, en vez de un
+    # status HTTP de error - sin este chequeo ese caso se veria igual que "datos insuficientes"
+    if payload.get("error"):
+        log.info("Kraken %s %s -> error: %s", kraken_pair, timeframe, payload["error"])
+        return None
+    result = payload.get("result") or {}
+    # la clave que Kraken usa en la respuesta a veces difiere del "pair" que se mando (ej. usa su
+    # nombre interno "XXBTZUSD" en vez de "XBTUSD") - se toma la primera clave que no sea "last"
+    candles = None
+    for key, value in result.items():
+        if key != "last":
+            candles = value
+            break
     if not isinstance(candles, list) or len(candles) < MACD_SLOW + MACD_SIGNAL:
-        log.info("Binance %s %s -> respuesta insuficiente (%s velas)", binance_symbol, interval, len(candles) if isinstance(candles, list) else type(candles))
+        log.info("Kraken %s %s -> respuesta insuficiente (%s velas)", kraken_pair, timeframe, len(candles) if isinstance(candles, list) else type(candles))
         return None
+    # formato de cada vela: [time, open, high, low, close, vwap, volume, count]
     closes = [float(k[4]) for k in candles]
     return closes
 
@@ -206,11 +227,12 @@ def main():
     for coin in candidates:
         if picked >= TOP_N:
             break
-        binance_symbol = coin["symbol"] + "USDT"
+        kraken_symbol = KRAKEN_SYMBOL_OVERRIDES.get(coin["symbol"], coin["symbol"])
+        kraken_pair = kraken_symbol + "USD"
         coin_rows = []
         ok = True
         for tf in TIMEFRAMES:
-            closes = fetch_closes(binance_symbol, tf)
+            closes = fetch_closes(kraken_pair, tf)
             if not closes:
                 ok = False
                 break
@@ -228,9 +250,9 @@ def main():
                 "price": closes[-1],
                 "rank": coin["rank"],
             })
-            time.sleep(0.05)  # cortesia con la API publica de Binance, no hace falta mas
+            time.sleep(0.1)  # cortesia con la API publica de Kraken, no hace falta mas
         if not ok:
-            log.info("Descartado %s (no listado en Binance como %s, o datos insuficientes)", coin["symbol"], binance_symbol)
+            log.info("Descartado %s (no listado en Kraken como %s, o datos insuficientes)", coin["symbol"], kraken_pair)
             continue
         rows.extend(coin_rows)
         picked += 1
