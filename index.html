@@ -683,6 +683,21 @@ button{font-family:inherit;color:inherit}
 .step-btn:active{transform:translateY(0) scale(.94)}
 .step-btn:active{transform:scale(.92)}
 
+/* variante compacta de .field: la etiqueta queda afuera del recuadro (sin fondo/borde propio) y
+   el borde se mueve al input-stepper, que se hace más angosto — usada en Calculadora de Trading */
+.field.field-compact{background:none;border:none;padding:0;margin-bottom:0}
+.field.field-compact label{margin-bottom:5px;font-size:10px}
+.field.field-compact .input-stepper{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.field.field-compact:focus-within .input-stepper{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
+.field.field-compact.invalid .input-stepper{border-color:var(--red);border-left-color:var(--red)}
+.field.field-compact .step-btn{width:22px;height:22px;font-size:13px;border-radius:6px}
+.field.field-compact input[type="number"]{font-size:14.5px}
+.field.field-compact .field-err{margin-top:4px}
+
+.calc-grid.calc-grid-2col{grid-template-columns:1fr 1fr;gap:8px}
+.dir-toggle.dir-toggle-compact{padding:3px;margin-bottom:12px}
+.dir-toggle.dir-toggle-compact .dir-btn{padding:9px;font-size:13.5px}
+
 .lev-field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:15px 16px 15px 14px}
 .lev-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .lev-head label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
@@ -1368,6 +1383,7 @@ img[src=""]{display:none}
   .calc{padding:22px 18px 24px}
   .calc-body{grid-template-columns:1fr;gap:22px}
   .calc-grid{grid-template-columns:1fr}
+  .calc-grid.calc-grid-2col{grid-template-columns:1fr}
   .res-grid{grid-template-columns:1fr 1fr}
   .summary-grid{grid-template-columns:1fr}
   .modal-overlay{padding:0}
@@ -4505,13 +4521,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <div class="calc-body">
       <div class="calc-inputs">
-      <div class="dir-toggle">
+      <div class="dir-toggle dir-toggle-compact">
         <button class="dir-btn active" data-dir="long">🟢 LONG</button>
         <button class="dir-btn" data-dir="short">🔴 SHORT</button>
       </div>
 
-      <div class="calc-grid">
-        <div class="field" id="f-entry">
+      <div class="calc-grid calc-grid-2col">
+        <div class="field field-compact" id="f-entry">
           <label for="entry">Precio de entrada</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="entry" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4520,7 +4536,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
-        <div class="field" id="f-capital">
+        <div class="field field-compact" id="f-capital">
           <label for="capital">Capital / Margen (USDT)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="capital" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4529,7 +4545,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser 0 o mayor</div>
         </div>
-        <div class="field" id="f-sl">
+        <div class="field field-compact" id="f-sl">
           <label for="slpct">Stop Loss (%)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="slpct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4538,7 +4554,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser 0 o mayor</div>
         </div>
-        <div class="field" id="f-tp">
+        <div class="field field-compact" id="f-tp">
           <label for="tppct">Take Profit (%)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="tppct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4548,7 +4564,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="field-err">Debe ser 0 o mayor</div>
         </div>
 
-        <div class="lev-field">
+        <div class="lev-field" style="grid-column:1/-1">
           <div class="lev-head"><label>Apalancamiento</label><span class="lev-val" id="levVal">3x</span></div>
           <input type="range" min="1" max="100" value="3" class="lev-slider" id="levSlider">
           <div class="lev-quick" id="levQuick">
@@ -5801,7 +5817,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 <!-- ===== MODAL: PERFIL DE RIESGO ===== -->
 <div class="modal-overlay" id="quizModal" data-tool="quiz">
   <button class="modal-close" id="closeQuiz" aria-label="Cerrar">✕</button>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="quizTitleEl" style="max-width:560px">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="quizTitleEl">
 
     <div class="calc">
       <div class="calc-head">
