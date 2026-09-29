@@ -61,7 +61,10 @@ KLINES_LIMIT = 200  # suficiente warm-up para RSI(14) y MACD(12,26,9) - Kraken i
 
 RSI_LENGTH = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
-STOCH_K_LENGTH, STOCH_D_SMOOTH = 14, 3
+# Estocastico "lento" 14,3,3 (la configuracion clasica/por defecto que usan las plataformas de
+# trading): 14 velas de rango para %K crudo, ese %K crudo se SUAVIZA con una media de 3 (asi se
+# obtiene el %K que de verdad se grafica), y %D es otra media de 3 sobre ese %K ya suavizado.
+STOCH_K_LENGTH, STOCH_K_SMOOTH, STOCH_D_SMOOTH = 14, 3, 3
 
 # simbolos de stablecoins conocidos - se descartan del heat map (su RSI no aporta nada,
 # siempre rondan el mismo precio)
@@ -218,18 +221,28 @@ def compute_macd_bias(closes):
     return "bull" if hist_last >= 0 else "bear"
 
 
-def compute_stoch_series(highs, lows, closes, k_length=STOCH_K_LENGTH, d_smooth=STOCH_D_SMOOTH):
+def compute_stoch_series(highs, lows, closes, k_length=STOCH_K_LENGTH, k_smooth=STOCH_K_SMOOTH, d_smooth=STOCH_D_SMOOTH):
     n = len(closes)
     if n < k_length:
         return [], []
-    percent_k = []
+    # paso 1: %K crudo - donde quedo el cierre dentro del rango (maximo-minimo) de las ultimas
+    # 14 velas, en porcentaje (0 = en el minimo, 100 = en el maximo)
+    raw_k = []
     for i in range(k_length - 1, n):
         window_high = max(highs[i - k_length + 1:i + 1])
         window_low = min(lows[i - k_length + 1:i + 1])
         span = window_high - window_low
-        percent_k.append(50.0 if span == 0 else (closes[i] - window_low) / span * 100)
+        raw_k.append(50.0 if span == 0 else (closes[i] - window_low) / span * 100)
+    if len(raw_k) < k_smooth:
+        return [], []
+    # paso 2: %K "lento" - media movil de 3 sobre el %K crudo (esta es la linea azul que se
+    # ve de verdad en la plataforma, no el %K crudo del paso 1)
+    percent_k = []
+    for i in range(k_smooth - 1, len(raw_k)):
+        percent_k.append(sum(raw_k[i - k_smooth + 1:i + 1]) / k_smooth)
     if len(percent_k) < d_smooth:
         return percent_k, []
+    # paso 3: %D - media movil de 3 sobre el %K ya suavizado del paso 2 (la linea naranja)
     percent_d = []
     for i in range(d_smooth - 1, len(percent_k)):
         percent_d.append(sum(percent_k[i - d_smooth + 1:i + 1]) / d_smooth)
