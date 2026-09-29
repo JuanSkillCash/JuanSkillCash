@@ -751,12 +751,12 @@ button{font-family:inherit;color:inherit}
 
 .returns-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border2)}
 .returns-table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
-.returns-table th{padding:10px 12px;text-align:right;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;border-bottom:1px solid var(--border2)}
+.returns-table th{padding:10px 12px;text-align:center;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;border-bottom:1px solid var(--border2)}
 .returns-table th:first-child,.returns-table td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
-.returns-table td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
+.returns-table td{padding:10px 12px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--border)}
 .returns-table .ret-year{font-weight:700;color:var(--white)}
-.returns-table .ret-cell.pos{background:#186b45;color:#eafff1;font-weight:700}
-.returns-table .ret-cell.neg{background:#832139;color:#ffeef1;font-weight:700}
+.returns-table .ret-cell.pos{background:#51cc8b;color:#fff;font-weight:700}
+.returns-table .ret-cell.neg{background:#fb7171;color:#fff;font-weight:700}
 .returns-table .ret-cell.na{color:var(--muted);opacity:.5}
 .returns-table .ret-summary-row td{background:rgba(255,255,255,.04);color:var(--muted2);font-weight:700}
 
@@ -1510,10 +1510,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
       <button class="sb-item" data-indic-jump="btcquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales BTC</span>
       </button>
       <button class="sb-item" data-indic-jump="btcmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales BTC</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button class="sb-item" data-indic-jump="ethlogreg">
@@ -1523,10 +1523,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
       </button>
       <button class="sb-item" data-indic-jump="ethquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
       </button>
       <button class="sb-item" data-indic-jump="ethmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales ETH</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button class="sb-item" data-indic-jump="cbpremium">
@@ -1712,10 +1712,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales BTC</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales BTC</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
@@ -1725,10 +1725,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales ETH</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -2307,13 +2307,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcquarterly">
               <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Trimestrales</div>
+              <div class="indic-guide-card-title">Retornos Trimestrales BTC</div>
               <div class="indic-guide-card-text">El retorno real de Bitcoin en cada trimestre desde que hay datos, año por año.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcmonthly">
               <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Mensuales</div>
+              <div class="indic-guide-card-title">Retornos Mensuales BTC</div>
               <div class="indic-guide-card-text">El retorno real de Bitcoin en cada mes desde que hay datos, año por año.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
@@ -2333,13 +2333,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethquarterly">
               <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Trimestrales</div>
+              <div class="indic-guide-card-title">Retornos Trimestrales ETH</div>
               <div class="indic-guide-card-text">El retorno real de Ethereum en cada trimestre desde que hay datos, año por año.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethmonthly">
               <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Mensuales</div>
+              <div class="indic-guide-card-title">Retornos Mensuales ETH</div>
               <div class="indic-guide-card-text">El retorno real de Ethereum en cada mes desde que hay datos, año por año.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
@@ -6755,8 +6755,8 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales' }, { id: 'btcmonthly', label: 'Retornos Mensuales' }],
-  ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales' }, { id: 'ethmonthly', label: 'Retornos Mensuales' }],
+  bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
+  ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
   trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
