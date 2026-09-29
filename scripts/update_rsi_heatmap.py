@@ -10,19 +10,21 @@ gente este viendo la pagina) y guarda el resultado ya calculado en Supabase - ca
 solo lee esa tabla, sin pedirle nada a ninguna API externa.
 
 Fuentes:
-  - CryptoCompare (misma API que ya usa el sitio como respaldo de precios, con la key que ya
-    existe como secreto del repo): solo para elegir el top 20 por capitalizacion sin
-    stablecoins, con su endpoint top/mktcapfull - una llamada cada corrida. NO se usa
-    CoinGecko aqui: probado en vivo, Actions bloquea la peticion con un 403 de CloudFront
-    ("Request blocked") en TODAS las corridas, sea cual sea el User-Agent - CoinGecko filtra
-    por rango de IP a los runners de GitHub Actions, no por header.
+  - CoinPaprika (publica, sin llave, cupo propio - nunca antes usado por el sitio): solo para
+    elegir el top 20 por capitalizacion sin stablecoins, una llamada cada corrida. Se probaron
+    dos alternativas antes de esta y ambas fallaron en vivo:
+      * CoinGecko: Actions bloquea la peticion con un 403 de CloudFront ("Request blocked")
+        en TODAS las corridas, sea cual sea el User-Agent - filtra por rango de IP a los
+        runners de GitHub Actions, no por header.
+      * CryptoCompare (con la key que el sitio YA usa client-side): respondio "over your rate
+        limit" en la primera corrida real - esa key la comparten todos los visitantes del
+        sitio, no tiene margen para 288 corridas/dia adicionales de este robot.
   - Binance (publica, sin llave, sin limite practico para este volumen): velas de precio
     para calcular RSI y MACD en cada temporalidad.
 
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
-    CRYPTOCOMPARE_API_KEY
 """
 
 import os
@@ -37,10 +39,9 @@ log = logging.getLogger("update_rsi_heatmap")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
-CRYPTOCOMPARE_API_KEY = os.environ.get("CRYPTOCOMPARE_API_KEY", "")
 TABLE = "rsi_heatmap_latest"
 
-CRYPTOCOMPARE_TOP_URL = "https://min-api.cryptocompare.com/data/top/mktcapfull"
+COINPAPRIKA_TICKERS_URL = "https://api.coinpaprika.com/v1/tickers"
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
 
 TOP_N = 20
@@ -68,35 +69,25 @@ REQUEST_HEADERS = {
 
 
 def fetch_top_candidates():
-    params = {
-        "limit": FETCH_BUFFER,
-        "tsym": "USD",
-        "api_key": CRYPTOCOMPARE_API_KEY,
-    }
-    resp = requests.get(CRYPTOCOMPARE_TOP_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
+    params = {"limit": FETCH_BUFFER}
+    resp = requests.get(COINPAPRIKA_TICKERS_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
-        raise RuntimeError(f"CryptoCompare respondio {resp.status_code}: {resp.text}")
-    payload = resp.json()
-    # CryptoCompare a veces devuelve 200 OK con un error a nivel de aplicacion adentro del JSON
-    # (ej. api_key invalida) en vez de un status HTTP de error - sin este chequeo, ese caso se
-    # coma silenciosamente y el heat map queda vacio sin ninguna excepcion que avise por que
-    if payload.get("Response") == "Error":
-        raise RuntimeError(f"CryptoCompare devolvio un error: {payload.get('Message')}")
-    coins = payload.get("Data") or []
-    if not coins:
-        raise RuntimeError(f"CryptoCompare no devolvio monedas. Respuesta cruda: {payload}")
+        raise RuntimeError(f"CoinPaprika respondio {resp.status_code}: {resp.text}")
+    coins = resp.json()
+    if not isinstance(coins, list) or not coins:
+        raise RuntimeError(f"CoinPaprika no devolvio monedas. Respuesta cruda: {coins}")
+    # CoinPaprika ya los devuelve ordenados por rank ascendente, pero se ordena explicito
+    # por si acaso - el "rank" que guardamos es el propio de ellos (posicion real de mercado)
+    coins.sort(key=lambda c: c.get("rank") or 999999)
     out = []
-    rank = 0
     for c in coins:
-        info = c.get("CoinInfo") or {}
-        symbol = (info.get("Name") or "").lower()
+        symbol = (c.get("symbol") or "").lower()
         if not symbol or symbol in STABLECOIN_SYMBOLS:
             continue
-        rank += 1
         out.append({
             "symbol": symbol.upper(),
-            "name": info.get("FullName") or symbol.upper(),
-            "rank": rank,
+            "name": c.get("name") or symbol.upper(),
+            "rank": c.get("rank") or 999,
         })
     return out
 
@@ -201,9 +192,6 @@ def replace_table_rows(rows):
 def main():
     if not SUPABASE_URL or not SUPABASE_KEY:
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
-        sys.exit(1)
-    if not CRYPTOCOMPARE_API_KEY:
-        log.error("Falta CRYPTOCOMPARE_API_KEY en el entorno.")
         sys.exit(1)
 
     log.info("Buscando top %d por capitalizacion (sin stablecoins)...", TOP_N)
