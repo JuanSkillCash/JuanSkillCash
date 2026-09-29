@@ -96,9 +96,13 @@ def fetch_closes(binance_symbol, interval):
     params = {"symbol": binance_symbol, "interval": interval, "limit": KLINES_LIMIT}
     resp = requests.get(BINANCE_KLINES_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
-        return None  # simbolo no listado en Binance con este par, u otro error - se descarta
+        # se registra el motivo real (¿simbolo invalido, o Binance bloqueando al runner?) en vez
+        # de descartar en silencio - de otro modo un bloqueo generico se ve identico a "no listado"
+        log.info("Binance %s %s -> %s: %s", binance_symbol, interval, resp.status_code, resp.text[:200])
+        return None
     candles = resp.json()
     if not isinstance(candles, list) or len(candles) < MACD_SLOW + MACD_SIGNAL:
+        log.info("Binance %s %s -> respuesta insuficiente (%s velas)", binance_symbol, interval, len(candles) if isinstance(candles, list) else type(candles))
         return None
     closes = [float(k[4]) for k in candles]
     return closes
