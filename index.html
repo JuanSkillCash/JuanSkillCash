@@ -659,7 +659,7 @@ button{font-family:inherit;color:inherit}
 .calc-body{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
 .calc-inputs{min-width:0}
 .calc-results{min-width:0}
-.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:start}
 .field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:15px 16px 15px 14px;transition:border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
 .field:hover{border-color:var(--border2);background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
 .field:focus-within{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09),var(--shadow-sm);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
@@ -5560,7 +5560,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </div>
             <div class="field-err">Debe ser mayor a 0</div>
           </div>
-          <div class="field" id="f-coinm-margin">
+          <div class="field" id="f-coinm-margin" style="grid-column:1/-1">
             <label for="coinmMargin">Margen inicial (en la moneda, ej. BTC)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="coinmMargin" data-dir="-1" aria-label="Disminuir">−</button>
