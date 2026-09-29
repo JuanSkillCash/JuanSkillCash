@@ -54,6 +54,14 @@ STABLECOIN_SYMBOLS = {
     "usds", "usdp", "gusd", "frax", "lusd", "susd", "eurc", "eurt",
 }
 
+# sin un User-Agent de navegador, CoinGecko (y a veces Binance) bloquean la petición con un 403
+# de su firewall anti-bot - filtran por el User-Agent por defecto de requests (python-requests/x.x),
+# que es exactamente lo que manda un runner de GitHub Actions si no se lo cambiamos
+REQUEST_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+}
+
 
 def fetch_top_candidates():
     params = {
@@ -63,7 +71,7 @@ def fetch_top_candidates():
         "page": 1,
         "sparkline": "false",
     }
-    resp = requests.get(COINGECKO_MARKETS_URL, params=params, timeout=30)
+    resp = requests.get(COINGECKO_MARKETS_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
         raise RuntimeError(f"CoinGecko respondio {resp.status_code}: {resp.text}")
     coins = resp.json()
@@ -83,7 +91,7 @@ def fetch_top_candidates():
 
 def fetch_closes(binance_symbol, interval):
     params = {"symbol": binance_symbol, "interval": interval, "limit": KLINES_LIMIT}
-    resp = requests.get(BINANCE_KLINES_URL, params=params, timeout=30)
+    resp = requests.get(BINANCE_KLINES_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
         return None  # simbolo no listado en Binance con este par, u otro error - se descarta
     candles = resp.json()
