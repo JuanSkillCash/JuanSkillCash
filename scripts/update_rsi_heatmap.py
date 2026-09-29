@@ -1,6 +1,6 @@
 """
-Mapa de calor de RSI + sesgo de MACD para el top 20 de criptomonedas por capitalizacion
-(sin stablecoins), en 6 temporalidades (5m, 15m, 1h, 4h, 1d, 1w).
+Mapa de calor de RSI + sesgo de MACD + sesgo de Estocastico para el top 20 de criptomonedas
+por capitalizacion (sin stablecoins), en 6 temporalidades (5m, 15m, 1h, 4h, 1d, 1w).
 
 Por que corre asi: este dato se refresca cada 5 minutos (para que 5m/15m sirvan de verdad
 para trading intradia). Si cada visitante pidiera esto directamente desde su navegador,
@@ -61,6 +61,7 @@ KLINES_LIMIT = 200  # suficiente warm-up para RSI(14) y MACD(12,26,9) - Kraken i
 
 RSI_LENGTH = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
+STOCH_K_LENGTH, STOCH_D_SMOOTH = 14, 3
 
 # simbolos de stablecoins conocidos - se descartan del heat map (su RSI no aporta nada,
 # siempre rondan el mismo precio)
@@ -107,7 +108,7 @@ def fetch_top_candidates():
     return out
 
 
-def fetch_closes(kraken_pair, timeframe):
+def fetch_candles(kraken_pair, timeframe):
     params = {"pair": kraken_pair, "interval": TIMEFRAME_MINUTES[timeframe]}
     resp = requests.get(KRAKEN_OHLC_URL, params=params, headers=REQUEST_HEADERS, timeout=30)
     if resp.status_code >= 300:
@@ -131,8 +132,11 @@ def fetch_closes(kraken_pair, timeframe):
         log.info("Kraken %s %s -> respuesta insuficiente (%s velas)", kraken_pair, timeframe, len(candles) if isinstance(candles, list) else type(candles))
         return None
     # formato de cada vela: [time, open, high, low, close, vwap, volume, count]
-    closes = [float(k[4]) for k in candles]
-    return closes
+    return {
+        "highs": [float(k[2]) for k in candles],
+        "lows": [float(k[3]) for k in candles],
+        "closes": [float(k[4]) for k in candles],
+    }
 
 
 def rma(values, length):
@@ -196,6 +200,24 @@ def compute_macd_bias(closes):
     return "bull" if hist_last >= 0 else "bear"
 
 
+def compute_stoch_bias(highs, lows, closes, k_length=STOCH_K_LENGTH, d_smooth=STOCH_D_SMOOTH):
+    n = len(closes)
+    if n < k_length + d_smooth:
+        return None
+    percent_k = []
+    for i in range(k_length - 1, n):
+        window_high = max(highs[i - k_length + 1:i + 1])
+        window_low = min(lows[i - k_length + 1:i + 1])
+        span = window_high - window_low
+        percent_k.append(50.0 if span == 0 else (closes[i] - window_low) / span * 100)
+    if len(percent_k) < d_smooth:
+        return None
+    percent_d_last = sum(percent_k[-d_smooth:]) / d_smooth
+    # %K por encima de su propia media (%D) = el impulso reciente esta ganando fuerza (alcista);
+    # por debajo = perdiendo fuerza (bajista) - mismo principio que MACD vs su linea de señal
+    return "bull" if percent_k[-1] >= percent_d_last else "bear"
+
+
 def replace_table_rows(rows):
     headers = {
         "apikey": SUPABASE_KEY,
@@ -238,13 +260,15 @@ def main():
         coin_rows = []
         ok = True
         for tf in TIMEFRAMES:
-            closes = fetch_closes(kraken_pair, tf)
-            if not closes:
+            candles = fetch_candles(kraken_pair, tf)
+            if not candles:
                 ok = False
                 break
+            closes = candles["closes"]
             rsi = compute_rsi(closes)
             macd_bias = compute_macd_bias(closes)
-            if rsi is None or macd_bias is None:
+            stoch_bias = compute_stoch_bias(candles["highs"], candles["lows"], closes)
+            if rsi is None or macd_bias is None or stoch_bias is None:
                 ok = False
                 break
             coin_rows.append({
@@ -253,6 +277,7 @@ def main():
                 "timeframe": tf,
                 "rsi": round(rsi, 1),
                 "macd_bias": macd_bias,
+                "stoch_bias": stoch_bias,
                 "price": closes[-1],
                 "rank": coin["rank"],
             })
