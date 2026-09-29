@@ -77,7 +77,14 @@ def fetch_top_candidates():
     if resp.status_code >= 300:
         raise RuntimeError(f"CryptoCompare respondio {resp.status_code}: {resp.text}")
     payload = resp.json()
+    # CryptoCompare a veces devuelve 200 OK con un error a nivel de aplicacion adentro del JSON
+    # (ej. api_key invalida) en vez de un status HTTP de error - sin este chequeo, ese caso se
+    # coma silenciosamente y el heat map queda vacio sin ninguna excepcion que avise por que
+    if payload.get("Response") == "Error":
+        raise RuntimeError(f"CryptoCompare devolvio un error: {payload.get('Message')}")
     coins = payload.get("Data") or []
+    if not coins:
+        raise RuntimeError(f"CryptoCompare no devolvio monedas. Respuesta cruda: {payload}")
     out = []
     rank = 0
     for c in coins:
@@ -237,6 +244,11 @@ def main():
         picked += 1
 
     log.info("Calculado RSI+MACD para %d monedas x %d temporalidades (%d filas).", picked, len(TIMEFRAMES), len(rows))
+    if not rows:
+        # si algo salio mal y no se calculo nada, es mas seguro dejar la tabla como estaba
+        # (datos viejos) que borrarla entera y dejar el heat map vacio en el sitio
+        log.error("No se calculo ninguna fila - no se toca la tabla en Supabase, se aborta.")
+        sys.exit(1)
     replace_table_rows(rows)
     log.info("Listo: mapa de calor RSI+MACD actualizado en Supabase.")
 
