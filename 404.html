@@ -749,6 +749,17 @@ button{font-family:inherit;color:inherit}
 .indic-dir-text{font-size:13px;color:var(--muted);line-height:1.6}
 .indic-dir-text strong{color:var(--white)}
 
+.returns-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border2)}
+.returns-table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.returns-table th{padding:10px 12px;text-align:right;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;border-bottom:1px solid var(--border2)}
+.returns-table th:first-child,.returns-table td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+.returns-table td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
+.returns-table .ret-year{font-weight:700;color:var(--white)}
+.returns-table .ret-cell.pos{background:rgba(46,204,113,.2);color:#5fe08a;font-weight:700}
+.returns-table .ret-cell.neg{background:rgba(255,47,79,.2);color:#ff8095;font-weight:700}
+.returns-table .ret-cell.na{color:var(--muted);opacity:.5}
+.returns-table .ret-summary-row td{background:rgba(255,255,255,.04);color:var(--muted2);font-weight:700}
+
 /* SCROLL HINT (mejora 3) */
 .scroll-fade{position:sticky;bottom:0;left:0;right:0;height:44px;margin:0 -32px -1px;background:linear-gradient(to bottom,transparent,var(--bg2) 78%);pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;opacity:1;transition:opacity .25s ease;z-index:4}
 .scroll-fade.hide{opacity:0}
@@ -1498,12 +1509,24 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
+      <button class="sb-item" data-indic-jump="btcquarterly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+      </button>
+      <button class="sb-item" data-indic-jump="btcmonthly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+      </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button class="sb-item" data-indic-jump="ethlogreg">
         <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
       </button>
       <button class="sb-item" data-indic-jump="ethvwap">
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ethquarterly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+      </button>
+      <button class="sb-item" data-indic-jump="ethmonthly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button class="sb-item" data-indic-jump="cbpremium">
@@ -1688,12 +1711,24 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcquarterly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcmonthly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
+      </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
         <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvwap">
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethquarterly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethmonthly">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
@@ -1895,7 +1930,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
-        <div class="cat-overview-sub">23 INDICADORES</div>
+        <div class="cat-overview-sub">29 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
@@ -2270,6 +2305,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcquarterly">
+              <div class="indic-guide-icon">📅</div>
+              <div class="indic-guide-card-title">Retornos Trimestrales</div>
+              <div class="indic-guide-card-text">El retorno real de Bitcoin en cada trimestre desde que hay datos, año por año.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcmonthly">
+              <div class="indic-guide-icon">📅</div>
+              <div class="indic-guide-card-title">Retornos Mensuales</div>
+              <div class="indic-guide-card-text">El retorno real de Bitcoin en cada mes desde que hay datos, año por año.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
 
             <div class="indic-guide-divider">Ξ ETH</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethlogreg">
@@ -2282,6 +2329,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">📍</div>
               <div class="indic-guide-card-title">VWAP Anclado de ETH</div>
               <div class="indic-guide-card-text">Precio de Ethereum con dos líneas de VWAP ancladas en fechas fijas — el precio promedio real ponderado por volumen desde ese punto.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethquarterly">
+              <div class="indic-guide-icon">📅</div>
+              <div class="indic-guide-card-title">Retornos Trimestrales</div>
+              <div class="indic-guide-card-text">El retorno real de Ethereum en cada trimestre desde que hay datos, año por año.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethmonthly">
+              <div class="indic-guide-icon">📅</div>
+              <div class="indic-guide-card-title">Retornos Mensuales</div>
+              <div class="indic-guide-card-text">El retorno real de Ethereum en cada mes desde que hay datos, año por año.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
@@ -3823,6 +3882,142 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
                 🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado con "+" es el ciclo actual, todavía en curso: son los días que ya pasaron desde el último giro confirmado, pero como este tramo todavía no se revirtió del todo, no se sabe cuándo va a terminar de verdad.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="btcquarterly" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Retornos Trimestrales de Bitcoin</h2>
+              </div>
+
+              <div class="indic-chart-body" id="btcquarterlyChartBody">
+                <div class="indic-chart-soon" id="btcquarterlyLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de cada trimestre sobre el precio histórico de Bitcoin.</div>
+                </div>
+                <div class="indic-chart-soon" id="btcquarterlyError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="btcquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                </div>
+                <div id="btcquarterlyTableWrap" style="display:none"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📅 Retorno de cada trimestre calculado sobre el precio real de cierre de Bitcoin (precio de cierre del trimestre frente al cierre del trimestre anterior) — histórico completo desde que hay datos.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="btcmonthly" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Retornos Mensuales de Bitcoin</h2>
+              </div>
+
+              <div class="indic-chart-body" id="btcmonthlyChartBody">
+                <div class="indic-chart-soon" id="btcmonthlyLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de cada mes sobre el precio histórico de Bitcoin.</div>
+                </div>
+                <div class="indic-chart-soon" id="btcmonthlyError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="btcmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                </div>
+                <div id="btcmonthlyTableWrap" style="display:none"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📅 Retorno de cada mes calculado sobre el precio real de cierre de Bitcoin (precio de cierre del mes frente al cierre del mes anterior) — histórico completo desde que hay datos.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="ethquarterly" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Retornos Trimestrales de Ethereum</h2>
+              </div>
+
+              <div class="indic-chart-body" id="ethquarterlyChartBody">
+                <div class="indic-chart-soon" id="ethquarterlyLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de cada trimestre sobre el precio histórico de Ethereum.</div>
+                </div>
+                <div class="indic-chart-soon" id="ethquarterlyError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="ethquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                </div>
+                <div id="ethquarterlyTableWrap" style="display:none"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📅 Retorno de cada trimestre calculado sobre el precio real de cierre de Ethereum (precio de cierre del trimestre frente al cierre del trimestre anterior) — histórico completo desde que hay datos.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="ethmonthly" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Retornos Mensuales de Ethereum</h2>
+              </div>
+
+              <div class="indic-chart-body" id="ethmonthlyChartBody">
+                <div class="indic-chart-soon" id="ethmonthlyLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de cada mes sobre el precio histórico de Ethereum.</div>
+                </div>
+                <div class="indic-chart-soon" id="ethmonthlyError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                  <div class="indic-placeholder-text" id="ethmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                </div>
+                <div id="ethmonthlyTableWrap" style="display:none"></div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📅 Retorno de cada mes calculado sobre el precio real de cierre de Ethereum (precio de cierre del mes frente al cierre del mes anterior) — histórico completo desde que hay datos.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -6560,8 +6755,8 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }],
-  ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }],
+  bitcoin: [{ id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales' }, { id: 'btcmonthly', label: 'Retornos Mensuales' }],
+  ethereum: [{ id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales' }, { id: 'ethmonthly', label: 'Retornos Mensuales' }],
   trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
@@ -6570,7 +6765,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins' };
+const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -6703,6 +6898,10 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
+      if(btn.dataset.indic === 'btcquarterly') ensureBtcQuarterlyLoaded();
+      if(btn.dataset.indic === 'btcmonthly') ensureBtcMonthlyLoaded();
+      if(btn.dataset.indic === 'ethquarterly') ensureEthQuarterlyLoaded();
+      if(btn.dataset.indic === 'ethmonthly') ensureEthMonthlyLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
       if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
@@ -6745,6 +6944,10 @@ function jumpToIndicator(id){
     if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
+    if(id === 'btcquarterly') ensureBtcQuarterlyLoaded();
+    if(id === 'btcmonthly') ensureBtcMonthlyLoaded();
+    if(id === 'ethquarterly') ensureEthQuarterlyLoaded();
+    if(id === 'ethmonthly') ensureEthMonthlyLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
     if(id === 'domall') ensureDomAllLoaded();
@@ -16902,6 +17105,117 @@ async function fetchEthBtcRealHistory(){
   }
   return ethBtcRealPromise;
 }
+
+/* ===== RETORNOS TRIMESTRALES / MENSUALES (BTC y ETH) =====
+   Se calculan localmente sobre el mismo historial diario real que ya usan Ciclos de Halving
+   (BTC) y Bandas Log de ETH (ETH) — sin pedir nada nuevo a ninguna API. El retorno de cada
+   período es el precio de cierre del último día de ese período frente al cierre del último día
+   del período anterior (el período más antiguo del historial se deja en blanco: no hay un
+   período previo con el que compararlo) */
+function returnsBuildPeriods(series, granularity){
+  if(!series || series.length < 2) return [];
+  const lastClose = new Map();
+  const order = [];
+  series.forEach(p => {
+    const d = new Date(p.t);
+    const key = granularity === 'quarter'
+      ? d.getUTCFullYear() + '-Q' + (Math.floor(d.getUTCMonth() / 3) + 1)
+      : d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+    if(!lastClose.has(key)) order.push(key);
+    lastClose.set(key, p.c);
+  });
+  const periods = [];
+  for(let i = 1; i < order.length; i++){
+    const prevClose = lastClose.get(order[i - 1]);
+    const close = lastClose.get(order[i]);
+    if(prevClose > 0) periods.push({ key: order[i], pct: (close / prevClose - 1) * 100 });
+  }
+  return periods;
+}
+function returnsToYearGrid(periods, cols){
+  const years = new Map();
+  periods.forEach(p => {
+    const [yearStr, subStr] = p.key.split('-');
+    const year = Number(yearStr);
+    const idx = subStr[0] === 'Q' ? Number(subStr.slice(1)) - 1 : Number(subStr) - 1;
+    if(!years.has(year)) years.set(year, new Array(cols).fill(null));
+    years.get(year)[idx] = p.pct;
+  });
+  return years;
+}
+function returnsColStats(yearsMap, cols){
+  const avg = new Array(cols).fill(null), median = new Array(cols).fill(null);
+  for(let c = 0; c < cols; c++){
+    const vals = [];
+    yearsMap.forEach(arr => { if(arr[c] != null) vals.push(arr[c]); });
+    if(vals.length){
+      avg[c] = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const sorted = [...vals].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      median[c] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+  }
+  return { avg, median };
+}
+function returnsFmtCell(v){
+  if(v == null) return '<td class="ret-cell na">—</td>';
+  const cls = v >= 0 ? 'pos' : 'neg';
+  return '<td class="ret-cell ' + cls + '">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</td>';
+}
+function returnsFmtSummaryCell(v){
+  if(v == null) return '<td>—</td>';
+  return '<td>' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</td>';
+}
+const RETURNS_QUARTER_LABELS = ['Primer trimestre', 'Segundo trimestre', 'Tercer trimestre', 'Cuarto trimestre'];
+const RETURNS_MONTH_LABELS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+function renderReturnsTable(wrapId, series, granularity){
+  const wrap = document.getElementById(wrapId);
+  const cols = granularity === 'quarter' ? 4 : 12;
+  const colLabels = granularity === 'quarter' ? RETURNS_QUARTER_LABELS : RETURNS_MONTH_LABELS;
+  const periods = returnsBuildPeriods(series, granularity);
+  const yearsMap = returnsToYearGrid(periods, cols);
+  const years = [...yearsMap.keys()].sort((a, b) => b - a);
+  const { avg, median } = returnsColStats(yearsMap, cols);
+  let html = '<div class="returns-table-wrap"><table class="returns-table"><thead><tr><th>Año</th>';
+  colLabels.forEach(l => html += '<th>' + l + '</th>');
+  html += '</tr></thead><tbody>';
+  years.forEach(y => {
+    html += '<tr><td class="ret-year">' + y + '</td>';
+    yearsMap.get(y).forEach(v => html += returnsFmtCell(v));
+    html += '</tr>';
+  });
+  html += '<tr class="ret-summary-row"><td class="ret-year">Promedio</td>';
+  avg.forEach(v => html += returnsFmtSummaryCell(v));
+  html += '</tr><tr class="ret-summary-row"><td class="ret-year">Mediana</td>';
+  median.forEach(v => html += returnsFmtSummaryCell(v));
+  html += '</tr></tbody></table></div>';
+  wrap.innerHTML = html;
+}
+async function loadReturnsPanel(id, granularity, fetchSeriesFn){
+  const loadingEl = document.getElementById(id + 'Loading');
+  const errorEl = document.getElementById(id + 'Error');
+  const wrap = document.getElementById(id + 'TableWrap');
+  try{
+    const series = await fetchSeriesFn();
+    if(!series || series.length < 30) throw new Error('historial insuficiente');
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'block';
+    renderReturnsTable(id + 'TableWrap', series, granularity);
+  } catch(err){
+    loadingEl.style.display = 'none';
+    wrap.style.display = 'none';
+    errorEl.style.display = 'flex';
+    const detailEl = document.getElementById(id + 'ErrorDetail');
+    if(detailEl) detailEl.textContent = String((err && err.message) || err);
+  }
+}
+const returnsLoadedOnce = { btcquarterly: false, btcmonthly: false, ethquarterly: false, ethmonthly: false };
+function ensureBtcQuarterlyLoaded(){ if(!returnsLoadedOnce.btcquarterly){ returnsLoadedOnce.btcquarterly = true; loadReturnsPanel('btcquarterly', 'quarter', fetchHalvingHistory); } }
+function ensureBtcMonthlyLoaded(){ if(!returnsLoadedOnce.btcmonthly){ returnsLoadedOnce.btcmonthly = true; loadReturnsPanel('btcmonthly', 'month', fetchHalvingHistory); } }
+function ensureEthQuarterlyLoaded(){ if(!returnsLoadedOnce.ethquarterly){ returnsLoadedOnce.ethquarterly = true; loadReturnsPanel('ethquarterly', 'quarter', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
+function ensureEthMonthlyLoaded(){ if(!returnsLoadedOnce.ethmonthly){ returnsLoadedOnce.ethmonthly = true; loadReturnsPanel('ethmonthly', 'month', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
+
 // Euforia de Altcoins: OTHERS ÷ (TOTAL3 − OTHERS) — cola larga de altcoins vs. altcoins grandes
 let altFeverRealSeries = null, altFeverRealPromise = null;
 async function fetchAltFeverRealHistory(){
