@@ -152,7 +152,7 @@ def rma(values, length):
     return out
 
 
-def compute_rsi(closes, length=RSI_LENGTH):
+def compute_rsi_series(closes, length=RSI_LENGTH):
     gains = [0.0]
     losses = [0.0]
     for i in range(1, len(closes)):
@@ -161,15 +161,33 @@ def compute_rsi(closes, length=RSI_LENGTH):
         losses.append(max(-diff, 0.0))
     avg_gain = rma(gains, length)
     avg_loss = rma(losses, length)
-    rsi_last = None
-    for i in range(len(closes) - 1, -1, -1):
-        if avg_gain[i] is not None and avg_loss[i] is not None:
-            if avg_loss[i] == 0:
-                rsi_last = 100.0 if avg_gain[i] > 0 else 50.0
-            else:
-                rsi_last = 100 - 100 / (1 + avg_gain[i] / avg_loss[i])
-            break
-    return rsi_last
+    out = []
+    for i in range(len(closes)):
+        if avg_gain[i] is None or avg_loss[i] is None:
+            continue
+        if avg_loss[i] == 0:
+            out.append(100.0 if avg_gain[i] > 0 else 50.0)
+        else:
+            out.append(100 - 100 / (1 + avg_gain[i] / avg_loss[i]))
+    return out
+
+
+# el "cruce" es mas fuerte que "esta por debajo de 33 ahora mismo": un RSI puede quedarse
+# sobrevendido mucho tiempo en una tendencia bajista fuerte sin que eso signifique que ya va a
+# girar - lo que los traders usan de verdad es el momento en que el RSI, viniendo de abajo de 33,
+# vuelve a cruzar por ENCIMA de esa linea (o al reves para el lado de sobrecompra/67)
+RSI_OVERSOLD, RSI_OVERBOUGHT = 33, 67
+
+
+def rsi_cross_signal(rsi_series):
+    if len(rsi_series) < 2:
+        return None
+    prev_rsi, curr_rsi = rsi_series[-2], rsi_series[-1]
+    if prev_rsi < RSI_OVERSOLD and curr_rsi >= RSI_OVERSOLD:
+        return "bull"
+    if prev_rsi > RSI_OVERBOUGHT and curr_rsi <= RSI_OVERBOUGHT:
+        return "bear"
+    return None
 
 
 def ema_series(values, length):
@@ -265,17 +283,19 @@ def main():
                 ok = False
                 break
             closes = candles["closes"]
-            rsi = compute_rsi(closes)
+            rsi_series = compute_rsi_series(closes)
             macd_bias = compute_macd_bias(closes)
             stoch_bias = compute_stoch_bias(candles["highs"], candles["lows"], closes)
-            if rsi is None or macd_bias is None or stoch_bias is None:
+            if not rsi_series or macd_bias is None or stoch_bias is None:
                 ok = False
                 break
+            rsi = rsi_series[-1]
             coin_rows.append({
                 "symbol": coin["symbol"],
                 "name": coin["name"],
                 "timeframe": tf,
                 "rsi": round(rsi, 1),
+                "rsi_cross": rsi_cross_signal(rsi_series),
                 "macd_bias": macd_bias,
                 "stoch_bias": stoch_bias,
                 "price": closes[-1],

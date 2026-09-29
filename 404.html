@@ -3589,7 +3589,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="tf-pill" data-bias="bull">Señal de Long ▲</button>
                 <button type="button" class="tf-pill" data-bias="bear">Señal de Short ▼</button>
               </div>
-              <p style="font-size:11.5px;color:var(--muted);margin:0 0 16px">Una "señal" exige las tres cosas de acuerdo: RSI en zona extrema (barato o caro), MACD y Estocástico confirmando esa misma dirección — no solo un indicador suelto.</p>
+              <p style="font-size:11.5px;color:var(--muted);margin:0 0 16px">Una "señal" exige las tres cosas de acuerdo: el RSI <b>cruzando de vuelta</b> fuera de su zona extrema (no solo estando ahí), confirmado por MACD y Estocástico en la misma dirección — no solo un indicador suelto.</p>
 
               <select class="asset-filter-select" id="rsimacdmapCoinSelect" style="max-width:280px;margin-bottom:16px">
                 <option value="all">Todas las monedas</option>
@@ -3620,7 +3620,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>RSI (Índice de Fuerza Relativa)</b> mide qué tan "estirado" está el movimiento reciente del precio, en una escala de 0 a 100. Por debajo de 30 se considera sobrevendido; por encima de 70, sobrecomprado.<br>
-                📊 La flechita junto a cada moneda es el sesgo de <b>MACD</b> en esa misma temporalidad: <span style="color:var(--green)">▲</span> = cruce alcista, <span style="color:var(--red)">▼</span> = cruce bajista. En la vista Tabla también se ve el sesgo del <b>Estocástico</b> (%K vs su propia media). Los botones "Señal de Long/Short" son más exigentes: solo marcan una moneda cuando el RSI, el MACD y el Estocástico apuntan los tres a la misma dirección al mismo tiempo.<br>
+                📊 La flechita junto a cada moneda es el sesgo de <b>MACD</b> en esa misma temporalidad: <span style="color:var(--green)">▲</span> = cruce alcista, <span style="color:var(--red)">▼</span> = cruce bajista. En la vista Tabla también se ve el sesgo del <b>Estocástico</b> (%K vs su propia media). Los botones "Señal de Long/Short" son más exigentes: solo marcan una moneda cuando el RSI acaba de <b>cruzar de vuelta</b> fuera de su zona extrema (no solo estar ahí parado) y el MACD y el Estocástico confirman esa misma dirección al mismo tiempo.<br>
                 🪙 Top 20 monedas por capitalización de mercado, excluyendo stablecoins y versiones "Wrapped" (envueltas) de otro activo.<br>
                 🔄 Este dato no se calcula en tu navegador: se actualiza cada 5 minutos en segundo plano y se guarda ya calculado, para que las columnas de 5m/15m tengan sentido sin sobrecargar ninguna API.<br>
                 🔎 Fuente de las velas de precio: <b>Kraken</b> (API pública). Selección del top 20: <b>CoinPaprika</b>.<br>
@@ -18795,24 +18795,26 @@ function rsiHeatZoneName(rsi){ return rsi < 33 ? 'Sobrevendido' : rsi > 67 ? 'So
 async function fetchRsiHeatmapData(){
   const { data, error } = await sbClient
     .from('rsi_heatmap_latest')
-    .select('symbol,name,timeframe,rsi,macd_bias,stoch_bias,rank,updated_at')
+    .select('symbol,name,timeframe,rsi,rsi_cross,macd_bias,stoch_bias,rank,updated_at')
     .order('rank', { ascending: true });
   if(error) throw error;
   return data || [];
 }
 /* ---- "Solo Long"/"Solo Short" NO es solo el sesgo de MACD suelto - eso por si solo no es una
    señal, es simplemente "el MACD esta positivo ahora" sin importar si el precio ya esta caro o
-   barato. Una señal de entrada de verdad necesita las DOS cosas de acuerdo: RSI en zona extrema
-   (barato para long, caro para short) Y el MACD confirmando esa misma direccion. Por eso el
-   filtro exige ambas condiciones a la vez, no una sola ---- */
+   barato. Una señal de entrada de verdad necesita las tres cosas de acuerdo. Para el RSI no basta
+   con que este "por debajo de 33 ahora mismo" - un RSI puede quedarse sobrevendido mucho tiempo
+   en una tendencia bajista fuerte sin que eso signifique que ya va a girar. Lo que de verdad usan
+   los traders es el CRUCE: el momento en que el RSI, viniendo de abajo de 33, vuelve a cruzar por
+   encima de esa linea (o al reves para el lado de sobrecompra/67) - eso es lo que guarda
+   "rsi_cross" (calculado en el robot, comparando la vela actual contra la anterior) ---- */
 function rsiHeatmapFilteredRows(){
   const rows = rsiHeatmapRowsByTf[rsiHeatmapActiveTf] || [];
   return rows.filter(r => {
     if(rsiHeatmapCoinFilter !== 'all' && r.symbol !== rsiHeatmapCoinFilter) return false;
     if(rsiHeatmapBiasFilter === 'all') return true;
-    const rsi = Number(r.rsi);
-    if(rsiHeatmapBiasFilter === 'bull') return rsi < 33 && r.macd_bias === 'bull' && r.stoch_bias === 'bull';
-    if(rsiHeatmapBiasFilter === 'bear') return rsi > 67 && r.macd_bias === 'bear' && r.stoch_bias === 'bear';
+    if(rsiHeatmapBiasFilter === 'bull') return r.rsi_cross === 'bull' && r.macd_bias === 'bull' && r.stoch_bias === 'bull';
+    if(rsiHeatmapBiasFilter === 'bear') return r.rsi_cross === 'bear' && r.macd_bias === 'bear' && r.stoch_bias === 'bear';
     return true;
   });
 }
