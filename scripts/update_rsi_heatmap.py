@@ -91,7 +91,13 @@ def fetch_top_candidates():
     out = []
     for c in coins:
         symbol = (c.get("symbol") or "").lower()
+        name = (c.get("name") or "")
         if not symbol or symbol in STABLECOIN_SYMBOLS:
+            continue
+        # se descarta cualquier version "envuelta" (Wrapped Bitcoin, Wrapped stETH, Coinbase
+        # Wrapped BTC, etc.) - son un derivado 1:1 del activo real, no aportan una lectura de
+        # RSI distinta a la del activo original y confunden mas de lo que informan aqui
+        if "wrapped" in name.lower():
             continue
         out.append({
             "symbol": symbol.upper(),
