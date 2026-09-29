@@ -649,17 +649,17 @@ button{font-family:inherit;color:inherit}
 .estimate-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold);animation:pulse 1.6s infinite}
 .estimate-banner b{color:var(--gold)}
 
-.dir-toggle{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:24px}
-.dir-btn{flex:1;padding:13px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:14.5px;cursor:pointer;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.dir-toggle{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:3px;margin-bottom:14px}
+.dir-btn{flex:1;padding:9px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .dir-btn.active[data-dir="long"]{background:rgba(46,204,113,.15);color:var(--green);box-shadow:inset 0 0 0 1px rgba(46,204,113,.4),0 4px 14px rgba(46,204,113,.15)}
 .dir-btn.active[data-dir="short"]{background:rgba(255,47,79,.15);color:var(--red);box-shadow:inset 0 0 0 1px rgba(255,47,79,.4),0 4px 14px rgba(255,47,79,.15)}
-.mode-btn{flex:1;padding:13px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:14.5px;cursor:pointer;transition:background .2s,color .2s}
+.mode-btn{flex:1;padding:9px;border:none;border-radius:10px;background:none;color:var(--muted2);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .2s,color .2s}
 .mode-btn.active{background:rgba(255,47,79,.15);color:var(--white);box-shadow:inset 0 0 0 1px rgba(255,47,79,.4),0 4px 14px rgba(255,47,79,.15)}
 
 .calc-body{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
 .calc-inputs{min-width:0}
 .calc-results{min-width:0}
-.calc-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:8px}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:15px 16px 15px 14px;transition:border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
 .field:hover{border-color:var(--border2);background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
 .field:focus-within{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09),var(--shadow-sm);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
@@ -678,36 +678,38 @@ button{font-family:inherit;color:inherit}
 .field.invalid .field-err{display:block}
 
 .input-stepper{display:flex;align-items:center;gap:9px}
-.step-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted2);font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
+.step-btn{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted2);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
 .step-btn:hover{background:rgba(255,47,79,.14);color:var(--red);border-color:var(--red);transform:translateY(-1px)}
 .step-btn:active{transform:translateY(0) scale(.94)}
 .step-btn:active{transform:scale(.92)}
 
-/* variante compacta de .field: la etiqueta queda afuera del recuadro (sin fondo/borde propio) y
-   el borde se mueve al input-stepper, que se hace más angosto — usada en Calculadora de Trading */
-.field.field-compact{background:none;border:none;padding:0;margin-bottom:0}
-.field.field-compact label{margin-bottom:5px;font-size:10px}
-.field.field-compact .input-stepper{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
-.field.field-compact:focus-within .input-stepper{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
-.field.field-compact.invalid .input-stepper{border-color:var(--red);border-left-color:var(--red)}
-.field.field-compact .step-btn{width:22px;height:22px;font-size:13px;border-radius:6px}
-.field.field-compact input[type="number"]{font-size:14.5px}
-.field.field-compact .field-err{margin-top:4px}
-
-.calc-grid.calc-grid-2col{grid-template-columns:1fr 1fr;gap:8px}
-.dir-toggle.dir-toggle-compact{padding:3px;margin-bottom:12px}
-.dir-toggle.dir-toggle-compact .dir-btn{padding:9px;font-size:13.5px}
+/* campos con input-stepper (+/-): la etiqueta queda afuera del recuadro (sin fondo/borde propio) y
+   el borde se mueve al input-stepper, que se hace más angosto — aplica a todas las calculadoras
+   y simuladores del sitio por igual, ya que todos comparten estas mismas clases base */
+.field:has(.input-stepper){background:none;border:none;padding:0;margin-bottom:0}
+.field:has(.input-stepper) label{margin-bottom:5px;font-size:10px}
+.field:has(.input-stepper) .input-stepper{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.field:has(.input-stepper):focus-within .input-stepper{border-color:rgba(255,47,79,.4);border-left-color:var(--red);box-shadow:0 0 0 3px rgba(255,47,79,.09);background:linear-gradient(155deg,rgba(255,47,79,.08),rgba(255,255,255,.015))}
+.field:has(.input-stepper).invalid .input-stepper{border-color:var(--red);border-left-color:var(--red)}
+.field:has(.input-stepper) .field-err{margin-top:4px}
+.field:has(.input-stepper) input[type="number"]{font-size:14.5px}
 
 .lev-field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border2);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:15px 16px 15px 14px}
 .lev-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .lev-head label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .lev-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:var(--gold)}
 .lev-slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:8px;background:linear-gradient(90deg,var(--red),var(--gold));margin-bottom:13px;cursor:pointer;outline:none}
-.lev-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--white);border:3px solid var(--red);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4);transition:transform .15s}
-.lev-slider::-webkit-slider-thumb:hover{transform:scale(1.15)}
-.lev-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--white);border:3px solid var(--red);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4);transition:transform .15s}
-.lev-slider::-moz-range-thumb:hover{transform:scale(1.15)}
+/* anillo que "respira" alrededor de la perilla — sin los chips de al lado, esto es la única pista
+   visual de que la barra se puede arrastrar, así que tiene que notarse sin necesidad de pasar el mouse */
+@keyframes sliderThumbPulse{0%,100%{box-shadow:0 2px 8px rgba(0,0,0,.4),0 0 0 0 rgba(255,47,79,.45)}50%{box-shadow:0 2px 8px rgba(0,0,0,.4),0 0 0 7px rgba(255,47,79,0)}}
+.lev-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--white);border:3px solid var(--red);cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.4);animation:sliderThumbPulse 2s ease-out infinite;transition:transform .15s}
+.lev-slider::-webkit-slider-thumb:hover{transform:scale(1.2);animation-play-state:paused}
+.lev-slider:active::-webkit-slider-thumb{cursor:grabbing;transform:scale(1.15)}
+.lev-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--white);border:3px solid var(--red);cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.4);animation:sliderThumbPulse 2s ease-out infinite;transition:transform .15s}
+.lev-slider::-moz-range-thumb:hover{transform:scale(1.2);animation-play-state:paused}
+.lev-slider:active::-moz-range-thumb{cursor:grabbing;transform:scale(1.15)}
 .lev-slider::-moz-range-track{height:6px;border-radius:8px;background:transparent}
+#levQuick,#beLevQuick,#coinmLevQuick{display:none}
 .lev-quick{display:flex;gap:7px;flex-wrap:wrap}
 .lev-chip{padding:7px 14px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border2);color:var(--muted2);font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .lev-chip:hover{border-color:var(--gold);color:var(--gold)}
@@ -1383,7 +1385,6 @@ img[src=""]{display:none}
   .calc{padding:22px 18px 24px}
   .calc-body{grid-template-columns:1fr;gap:22px}
   .calc-grid{grid-template-columns:1fr}
-  .calc-grid.calc-grid-2col{grid-template-columns:1fr}
   .res-grid{grid-template-columns:1fr 1fr}
   .summary-grid{grid-template-columns:1fr}
   .modal-overlay{padding:0}
@@ -4521,13 +4522,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <div class="calc-body">
       <div class="calc-inputs">
-      <div class="dir-toggle dir-toggle-compact">
+      <div class="dir-toggle">
         <button class="dir-btn active" data-dir="long">🟢 LONG</button>
         <button class="dir-btn" data-dir="short">🔴 SHORT</button>
       </div>
 
-      <div class="calc-grid calc-grid-2col">
-        <div class="field field-compact" id="f-entry">
+      <div class="calc-grid">
+        <div class="field" id="f-entry">
           <label for="entry">Precio de entrada</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="entry" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4536,7 +4537,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
-        <div class="field field-compact" id="f-capital">
+        <div class="field" id="f-capital">
           <label for="capital">Capital / Margen (USDT)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="capital" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4545,7 +4546,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser 0 o mayor</div>
         </div>
-        <div class="field field-compact" id="f-sl">
+        <div class="field" id="f-sl">
           <label for="slpct">Stop Loss (%)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="slpct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4554,7 +4555,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser 0 o mayor</div>
         </div>
-        <div class="field field-compact" id="f-tp">
+        <div class="field" id="f-tp">
           <label for="tppct">Take Profit (%)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="tppct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4610,8 +4611,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="be-note" id="marginModeNote">En modo aislado, solo arriesgas el capital/margen que definiste arriba — si te liquidan, pierdes exactamente eso.</div>
         </div>
 
-        <div class="calc-grid" id="crossMarginFields" style="display:none;margin-top:2px">
-          <div class="field" id="f-cross-extra">
+        <div class="calc-grid" id="crossMarginFields" style="display:none;margin-top:2px;grid-column:1/-1">
+          <div class="field" id="f-cross-extra" style="grid-column:1/-1">
             <label for="crossExtraMargin">Margen adicional disponible (USDT)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="crossExtraMargin" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4737,7 +4738,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
-        <div class="field" id="f-profit-capital">
+        <div class="field" id="f-profit-capital" style="grid-column:1/-1">
           <label for="profitCapital">Capital invertido (USD)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="profitCapital" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4833,7 +4834,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
         <div class="be-note" style="margin:0;grid-column:1/-1">💡 Escribe el número sin el símbolo %. Si tu exchange muestra "0.0800%", escribe <strong>0.08</strong> — no 0.8, porque sería 10 veces más.</div>
-        <div class="field" id="f-be-capital">
+        <div class="field" id="f-be-capital" style="grid-column:1/-1">
           <label for="beCapital">Capital / Margen (USD)</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="beCapital" data-dir="-1" aria-label="Disminuir">−</button>
@@ -4843,7 +4844,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="field-err">Debe ser mayor a 0</div>
         </div>
 
-        <div class="lev-field" id="beLevField" style="display:none">
+        <div class="lev-field" id="beLevField" style="display:none;grid-column:1/-1">
           <div class="lev-head"><label>Apalancamiento</label><span class="lev-val" id="beLevVal">3x</span></div>
           <input type="range" min="1" max="100" value="3" class="lev-slider" id="beLevSlider">
           <div class="lev-quick" id="beLevQuick">
@@ -4947,7 +4948,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
 
         <div class="calc-grid" style="margin-top:16px">
-          <div class="field" id="f-dca-amount">
+          <div class="field" id="f-dca-amount" style="grid-column:1/-1">
             <label for="dcaAmount">Monto por compra (USD)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="dcaAmount" data-dir="-1" aria-label="Disminuir">−</button>
@@ -5588,7 +5589,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="field-err">Debe ser 0 o mayor</div>
           </div>
 
-          <div class="lev-field">
+          <div class="lev-field" style="grid-column:1/-1">
             <div class="lev-head"><label>Apalancamiento</label><span class="lev-val" id="coinmLevVal">5x</span></div>
             <input type="range" min="1" max="100" value="5" class="lev-slider" id="coinmLevSlider">
             <div class="lev-quick" id="coinmLevQuick">
@@ -5620,8 +5621,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="be-note" id="coinmMarginModeNote">En modo aislado, solo arriesgas el margen que definiste arriba — si te liquidan, pierdes exactamente eso (en la moneda).</div>
           </div>
 
-          <div class="calc-grid" id="coinmCrossMarginFields" style="display:none;margin-top:2px">
-            <div class="field" id="f-coinm-cross-extra">
+          <div class="calc-grid" id="coinmCrossMarginFields" style="display:none;margin-top:2px;grid-column:1/-1">
+            <div class="field" id="f-coinm-cross-extra" style="grid-column:1/-1">
               <label for="coinmCrossExtraMargin">Margen adicional disponible (en la moneda)</label>
               <div class="input-stepper">
                 <button type="button" class="step-btn" data-target="coinmCrossExtraMargin" data-dir="-1" aria-label="Disminuir">−</button>
@@ -5712,7 +5713,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="calc-inputs">
 
         <div class="calc-grid">
-          <div class="field" id="f-fees-volume">
+          <div class="field" id="f-fees-volume" style="grid-column:1/-1">
             <label for="feesVolume">Volumen operado al mes (USD)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="feesVolume" data-dir="-1" aria-label="Disminuir">−</button>
@@ -6135,7 +6136,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="calc-inputs">
 
         <div class="calc-grid">
-          <div class="field" id="f-wc-amount">
+          <div class="field" id="f-wc-amount" style="grid-column:1/-1">
             <label for="wcAmount">¿Cuánto tienes en cripto? (aprox. USD)</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="wcAmount" data-dir="-1" aria-label="Disminuir">−</button>
