@@ -24,7 +24,9 @@ log = logging.getLogger("update_macro_tv_daily")
 MACRO_TV_SYMBOLS = [
     {"exchange": "TVC", "symbol": "DXY"},
     {"exchange": "ECONOMICS", "symbol": "USBCOI"},
-    {"exchange": "ECONOMICS", "symbol": "USSPMI"},
+    # "ECONOMICS:USSPMI" (PMI de Servicios de EEUU) se quito de aqui: probado en vivo contra 8
+    # variantes de simbolo distintas, todas vacias - no se encontro el correcto. Agregar de vuelta
+    # en cuanto se confirme.
 ]
 N_BARS_DAILY_UPDATE = 45  # margen de sobra: el PMI solo publica una vez al mes
 

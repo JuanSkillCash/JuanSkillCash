@@ -6,7 +6,9 @@ mecanismo que ya usa este repo para CRYPTOCAP:BTC.D, ETH.D, etc.
 Simbolos que trae:
     TVC:DXY              -> DXY (Indice del Dolar que usa el mercado)
     ECONOMICS:USBCOI     -> ISM Manufacturing PMI
-    ECONOMICS:USSPMI     -> ISM Services PMI
+
+(ISM Services PMI quedo pendiente: se probaron 8 variantes de simbolo en vivo,
+ninguna funciono - agregar de vuelta en cuanto se confirme el correcto)
 
 Estos dos ultimos son simbolos de "calendario economico" de TradingView, no
 un precio que se negocia - tvDatafeed los trae igual como una serie de velas
@@ -37,7 +39,6 @@ log = logging.getLogger("backfill_macro_tv")
 MACRO_TV_SYMBOLS = [
     {"exchange": "TVC", "symbol": "DXY"},
     {"exchange": "ECONOMICS", "symbol": "USBCOI"},  # ISM Manufacturing PMI
-    {"exchange": "ECONOMICS", "symbol": "USSPMI"},  # ISM Services PMI
 ]
 N_BARS_FULL_HISTORY = 5000
 
