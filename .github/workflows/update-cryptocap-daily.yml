@@ -79,3 +79,12 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_sth_mvrv_daily.py
+
+      - name: Actualizar Costo de Produccion (Pulso de Fondo)
+        # continue-on-error: el frontend tiene su propio respaldo en vivo si esta tabla queda
+        # desactualizada - un fallo aqui no debe tumbar el resto de pasos ya corridos arriba
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_cost_of_production_daily.py
