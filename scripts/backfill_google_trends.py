@@ -12,9 +12,11 @@ sin re-escalar daria una serie sin sentido).
 
 OJO: Google Trends bloquea/limita agresivamente el trafico automatizado repetido (HTTP 429),
 sobre todo desde IPs compartidas como las de GitHub Actions - a diferencia de FRED/TradingView
-(APIs pensadas para esto), aqui puede fallar de forma intermitente. Por eso cada termino se separa
-con una pausa, y el workflow diario que corre este mismo mecanismo (update_google_trends_daily.py)
-tiene continue-on-error para no tumbar el resto del pipeline si Google Trends decide bloquear.
+(APIs pensadas para esto), aqui puede fallar de forma intermitente (visto en vivo: el primer
+termino de una corrida fresca es el mas propenso). Por eso cada termino reintenta solo con
+backoff creciente (ver fetch_term) antes de darse por vencido, ademas de la pausa entre terminos,
+y el workflow diario que corre este mismo mecanismo (update_google_trends_daily.py) tiene
+continue-on-error para no tumbar el resto del pipeline si aun asi Google Trends bloquea.
 
 Variables de entorno requeridas:
     SUPABASE_URL
@@ -72,6 +74,26 @@ def upsert_rows(rows: list[dict]):
         raise RuntimeError(f"Supabase respondio {resp.status_code}: {resp.text}")
 
 
+RETRY_WAITS_SECONDS = [15, 30, 60]  # backoff creciente - el 429 de Google suele ser momentaneo
+
+
+def fetch_term(pytrends, term):
+    last_err = None
+    for attempt, wait in enumerate([0] + RETRY_WAITS_SECONDS):
+        if wait:
+            log.info(f"{term}: reintentando en {wait}s (intento {attempt + 1})...")
+            time.sleep(wait)
+        try:
+            pytrends.build_payload([term], timeframe="all")
+            df = pytrends.interest_over_time()
+            if df is None or df.empty:
+                raise RuntimeError("interest_over_time() devolvio vacio")
+            return df[term]
+        except Exception as e:
+            last_err = e
+    raise last_err
+
+
 def main():
     if not SUPABASE_URL or not SUPABASE_KEY:
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
@@ -81,11 +103,8 @@ def main():
     ok, failed = [], []
     for i, term in enumerate(GOOGLE_TRENDS_TERMS):
         try:
-            pytrends.build_payload([term], timeframe="all")
-            df = pytrends.interest_over_time()
-            if df is None or df.empty:
-                raise RuntimeError("interest_over_time() devolvio vacio")
-            rows = rows_from_series(term, df[term])
+            series = fetch_term(pytrends, term)
+            rows = rows_from_series(term, series)
             upsert_rows(rows)
             ok.append((term, len(rows)))
             log.info(f"{term}: {len(rows)} datos respaldados")
