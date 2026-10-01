@@ -3907,6 +3907,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🪙 Cuánto vale el índice OTHERS (todas las altcoins fuera del top 10) medido en BTC en vez de en dólares — histórico real completo, no una aproximación.<br>
+                🏦 La línea azul punteada (eje derecho) es el <b>balance total de la Reserva Federal</b> (su hoja de balance en dólares): sube cuando la Fed "imprime"/compra activos (QE) y baja cuando los vende o deja vencer (QT). Muchos traders la usan como referencia de liquidez global — cuando el balance crece, suele haber más apetito por activos de riesgo como las altcoins.<br>
+                🔎 Fuente del balance de la Fed: <b>FRED</b> (Federal Reserve Economic Data, serie WALCL), oficial y gratuita.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -17136,6 +17138,8 @@ const DOM_CHART_DEFS = {
   othersbtc: {
     loadFn: () => fetchOthersBtcRealHistory(), realSeries: () => othersBtcRealSeries, exact: true, fmtVal: fmtRatioAxis,
     series: [{ key: 'v', color: '#22c55e', label: 'OTHERS/BTC' }],
+    series2: [{ key: 'v2', color: '#60a5fa', label: 'Balance de la Fed' }],
+    fmtVal2: fmtUsdTrillions,
   },
   ethbtc: {
     loadFn: () => fetchEthBtcRealHistory(), realSeries: () => ethBtcRealSeries, exact: true, fmtVal: fmtRatioAxis,
@@ -17204,6 +17208,33 @@ async function fetchCryptocapSeries(symbolFull){
   cryptocapSeriesCache[symbolFull] = series;
   return series;
 }
+// series macro de FRED (Federal Reserve Economic Data) ya guardadas en Supabase por el robot
+// diario (tabla fred_series_history: series_id, date, value) - se usa aqui solo para traer el
+// balance de la Fed (WALCL) como referencia superpuesta en OTHERS/BTC, pero sirve para cualquier
+// otra serie de esa tabla
+let fredSeriesCache = {};
+async function fetchFredSeries(seriesId){
+  if(fredSeriesCache[seriesId]) return fredSeriesCache[seriesId];
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await withRetry(() => sbClient
+      .from('fred_series_history')
+      .select('date,value')
+      .eq('series_id', seriesId)
+      .order('date', { ascending: true })
+      .range(from, from + pageSize - 1), 3, 500);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  const series = rows
+    .map(r => ({ t: Date.parse(r.date), c: Number(r.value) }))
+    .filter(r => isFinite(r.t) && isFinite(r.c));
+  fredSeriesCache[seriesId] = series;
+  return series;
+}
 let domAllRealSeries = null;
 let domAllRealFetchPromise = null;
 async function fetchDomAllRealHistory(){
@@ -17260,6 +17291,15 @@ function fmtRatioAxis(v){
   if(av >= 0.001) return v.toFixed(4);
   return v.toFixed(6);
 }
+// formato del eje secundario del balance de la Fed (WALCL llega en MILLONES de USD, ya
+// convertido a USD reales antes de llegar aqui - ver fetchOthersBtcRealHistory)
+function fmtUsdTrillions(v){
+  const av = Math.abs(v);
+  if(av >= 1e12) return '$' + (v / 1e12).toFixed(2) + 'T';
+  if(av >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+  if(av >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+  return '$' + v.toFixed(0);
+}
 const dayKeyMs = t => Math.floor(t / 86400000);
 // alinea N series [{t,c}] por día calendario (usando las fechas de la primera como referencia) y
 // devuelve solo los días donde TODAS tenían un valor > 0 — evita mezclar series que se actualizan
@@ -17282,8 +17322,20 @@ async function fetchOthersBtcRealHistory(){
     othersBtcRealPromise = Promise.all([
       fetchCryptocapSeries('CRYPTOCAP:OTHERS'),
       fetchHalvingHistory(),
-    ]).then(([others, btc]) => {
-      othersBtcRealSeries = alignSeriesByDay([others, btc]).map(r => ({ t: r.t, v: r.vals[0] / r.vals[1] }));
+      // si esto falla, el indicador principal (OTHERS/BTC) no debe romperse por eso - solo
+      // se queda sin el overlay del balance de la Fed
+      fetchFredSeries('WALCL').catch(() => []),
+    ]).then(([others, btc, fedRows]) => {
+      const base = alignSeriesByDay([others, btc]).map(r => ({ t: r.t, v: r.vals[0] / r.vals[1] }));
+      // WALCL se publica en MILLONES de USD y solo una vez por semana (los jueves) - se
+      // "mantiene" (forward-fill) el ultimo valor conocido dia a dia para poder dibujarlo
+      // junto al ratio diario de OTHERS/BTC en el mismo eje de tiempo
+      const fed = fedRows.map(p => ({ t: p.t, v: p.c * 1e6 })).sort((a, b) => a.t - b.t);
+      let fi = 0, lastFed = null;
+      othersBtcRealSeries = base.map(p => {
+        while(fi < fed.length && fed[fi].t <= p.t){ lastFed = fed[fi].v; fi++; }
+        return { t: p.t, v: p.v, v2: lastFed };
+      });
       return othersBtcRealSeries;
     });
   }
@@ -17606,7 +17658,9 @@ function renderDomChart(key){
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
-  const marginRight = isMobileChart ? 8 : 14;
+  // con un eje secundario (series2) se necesita mas espacio a la derecha para sus etiquetas
+  // (ej. "$6.75T") sin que se corten contra el borde del gráfico
+  const marginRight = def.series2 ? (isMobileChart ? 44 : 64) : (isMobileChart ? 8 : 14);
   const marginTop = 20, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
@@ -17634,6 +17688,24 @@ function renderDomChart(key){
     <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
     <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtDomVal(v)}</text>
   `).join('');
+
+  // eje secundario (derecho) para una serie en una escala totalmente distinta (ej. el balance
+  // de la Fed en USD vs un ratio pequeño como OTHERS/BTC) - solo etiquetas, sin líneas de
+  // cuadrícula propias (para no duplicar/ensuciar la cuadrícula del eje principal)
+  let yFor2 = null, fmtDomVal2 = null, yTicks2Html = '';
+  if(def.series2){
+    const values2 = points.flatMap(p => def.series2.map(s => p[s.key])).filter(v => v != null && isFinite(v));
+    if(values2.length){
+      const minV2 = Math.min(...values2), maxV2 = Math.max(...values2);
+      const pad2 = (maxV2 - minV2) * 0.12 || 1;
+      const yMin2 = minV2 - pad2, yMax2 = maxV2 + pad2;
+      yFor2 = v => marginTop + drawH - ((v - yMin2) / (yMax2 - yMin2 || 1)) * drawH;
+      fmtDomVal2 = def.fmtVal2 || fmtDomVal;
+      yTicks2Html = niceLinearTicks(yMin2, yMax2).map(v => `
+        <text x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(v) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}" font-weight="700" fill="${def.series2[0].color}" font-family="'Space Mono',monospace">${fmtDomVal2(v)}</text>
+      `).join('');
+    }
+  }
 
   // bandas de "zona de compra/venta" cerca de los extremos históricos de la propia serie (no un
   // umbral fijo), con degradado — más intensas hacia afuera, se difuminan hacia el centro. Siempre
@@ -17673,12 +17745,20 @@ function renderDomChart(key){
     `;
   }
 
-  function pathFor(getV){
-    let d = '';
-    points.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(getV(p)).toFixed(1)} `; });
+  // tolera huecos (valor null/undefined en un punto, ej. el balance de la Fed antes de su
+  // primer dato disponible) cortando el trazo ahí en vez de dibujar una línea hacia NaN
+  function pathFor(getV, yForFn){
+    let d = '', drawing = false;
+    points.forEach(p => {
+      const v = getV(p);
+      if(v == null || !isFinite(v)){ drawing = false; return; }
+      d += `${drawing ? 'L' : 'M'}${xFor(p.t).toFixed(1)},${yForFn(v).toFixed(1)} `;
+      drawing = true;
+    });
     return d.trim();
   }
-  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key])}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key], yFor)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('')
+    + (yFor2 ? def.series2.map(s => `<path d="${pathFor(p => p[s.key], yFor2)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>`).join('') : '');
 
   const lastP = points[points.length - 1];
   const lastPx = xFor(endMs);
@@ -17694,6 +17774,7 @@ function renderDomChart(key){
       <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${zonesHtml}
         ${yGridHtml}
+        ${yTicks2Html}
         ${linesHtml}
         ${xLabelsHtml}
         <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
@@ -17712,12 +17793,18 @@ function renderDomChart(key){
     dateLabelId: key + 'HoverDateLabel', dateBgId: key + 'HoverDateBg', tooltipId: key + 'Tooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i][def.series[0].key]),
-    tooltipHtml: i => def.series.map(s => `<b>${s.label}: ${fmtDomVal(points[i][s.key])}</b>`).join('<br>'),
+    tooltipHtml: i => def.series.map(s => `<b>${s.label}: ${fmtDomVal(points[i][s.key])}</b>`)
+      .concat((def.series2 || []).map(s => points[i][s.key] != null ? `<b>${s.label}: ${(fmtDomVal2 || fmtDomVal)(points[i][s.key])}</b>` : null).filter(Boolean))
+      .join('<br>'),
   });
 
-  legendEl.innerHTML = def.series.map(s => `<span class="perk-chip"><span class="perk-chip-dot" style="background:${s.color}"></span>${s.label}${def.exact ? ' — exacto' : ''}</span>`).join('');
+  const legendSeries = def.series.concat(def.series2 || []);
+  legendEl.innerHTML = legendSeries.map(s => `<span class="perk-chip"><span class="perk-chip-dot" style="background:${s.color}"></span>${s.label}${def.exact ? ' — exacto' : ''}</span>`).join('');
 
-  if(def.series.length > 1){
+  if(def.series2 && lastP[def.series2[0].key] != null){
+    statsEl.innerHTML = def.series.map(s => `<div class="res-card"><div class="r-label">${s.label} actual</div><div class="r-val">${fmtDomVal(lastP[s.key])}</div></div>`).join('')
+      + def.series2.map(s => `<div class="res-card"><div class="r-label">${s.label} actual</div><div class="r-val">${fmtDomVal2(lastP[s.key])}</div></div>`).join('');
+  } else if(def.series.length > 1){
     statsEl.innerHTML = def.series.map(s => `<div class="res-card"><div class="r-label">${s.label} (aprox.)</div><div class="r-val">${fmtDomVal(lastP[s.key])}</div></div>`).join('');
   } else {
     const s = def.series[0];

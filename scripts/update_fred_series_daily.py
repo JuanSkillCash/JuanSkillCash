@@ -31,7 +31,7 @@ FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 
 FRED_SERIES = [
     "CPIAUCSL", "CPILFESL", "PAYEMS", "UNRATE", "DFF",
-    "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS",
+    "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS", "WALCL",
 ]
 DAYS_MARGIN = 730  # ~2 anos de margen, para agarrar revisiones de datos ya publicados
 

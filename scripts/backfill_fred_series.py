@@ -17,6 +17,9 @@ Series que trae (todas oficiales y gratis via la API de FRED):
     PPIACO    -> PPI (indice de precios al productor)
     M2SL      -> M2 Money Supply
     VIXCLS    -> VIX (indice de volatilidad)
+    WALCL     -> Balance total de la Reserva Federal (su hoja de balance,
+                 en millones de USD - sube cuando la Fed "imprime"/compra
+                 activos (QE), baja cuando los vende/deja vencer (QT))
 
 De paso, a partir del historico de DFF ya subido, arma tambien el historico
 completo de decisiones del FOMC (tabla fomc_decisions) - cada dia en que la
@@ -49,7 +52,7 @@ FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 
 FRED_SERIES = [
     "CPIAUCSL", "CPILFESL", "PAYEMS", "UNRATE", "DFF",
-    "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS",
+    "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS", "WALCL",
 ]
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
