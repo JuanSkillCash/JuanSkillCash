@@ -16329,16 +16329,17 @@ async function fetchCoinMetricsDaily(metrics, asset){
 function coinMetricsSeriesFor(rows, key){
   return rows.filter(r => r[key] != null).map(r => ({ t: new Date(r.time).getTime(), v: parseFloat(r[key]) })).sort((a, b) => a.t - b.t);
 }
-// alpha=1/1800 del script original de TradingView está calibrado contra la escala interna de
-// Glassnode (GLASSNODE:BTC_DIFFICULTY), que no podemos reproducir con datos públicos. Dos intentos
-// anteriores de recalibrar automáticamente (percentil sobre ventana móvil, luego media geométrica
-// sobre toda la historia) no coincidían con el gráfico real del usuario. Se reemplazan por un
-// factor de escala FIJO (11.48), calculado una sola vez comparando el costo "crudo" real que
-// calcula esta misma fórmula contra el valor real leído directamente del gráfico de TradingView del
-// usuario en 4 fechas históricas verificadas (dic 2018, mar 2020, nov 2022, ago 2024, jun 2026) — el
-// factor implícito salió consistente en las 4 (entre 10.6 y 12.2), confirmando que la FORMA de la
-// fórmula sí es correcta y solo hacía falta la escala exacta, no una recalibración que se mueve sola
-const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA_FROZEN = 11.48;
+// Fórmula pública original del indicador de TradingView: alpha(1/1800) * dificultad^0.45 / emisión
+// diaria (subsidio*bloques + fees), suavizado con SMA. El intento anterior usaba la dificultad de
+// Coin Metrics (DiffMean) + una aproximación plana de 144 bloques/día cuando Coin Metrics fallaba,
+// y necesitaba un factor de escala "a ojo" (11.48) para que cuadrara. Investigación posterior (ver
+// sesión del 2026-10-01) confirmó con datos reales que: (a) Coin Metrics retiró DiffMean de su plan
+// gratis (ahora devuelve 403), así que la dificultad real debe salir de blockchain.info, que SÍ es
+// gratis, completa (2009-hoy) y coincide casi exacto contra otras 2 fuentes independientes
+// (Bitview, bitcoin-data.com — diferencia mediana 0%); y (b) Coin Metrics SÍ sigue dando bloques
+// minados por día reales (BlkCnt) gratis — con eso ya no hace falta aproximar 144/día. Con datos
+// reales en ambos lados, la constante pública 1/1800 se usa tal cual, sin factor de ajuste inventado
+const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA = 1 / 1800;
 const MFLOOR_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let mfloorActiveRange = 'todo';
 let mfloorCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
@@ -16350,32 +16351,31 @@ async function loadMarketFloorData(){
   if(marketFloorData) return marketFloorData;
   if(marketFloorInFlight) return marketFloorInFlight;
   marketFloorInFlight = (async () => {
-    // Promise.allSettled (en vez de Promise.all) para que si Coin Metrics falla no se pierda ni
-    // se tenga que repetir la llamada a Binance, que ya se resolvió bien — cada llamada además se
-    // reintenta un par de veces antes de darse por vencida, para no fallar por una falla puntual
-    const [weeklySettled, cmSettled] = await Promise.allSettled([
+    // la dificultad SIEMPRE sale de blockchain.info (gratis, completa, confirmada contra 2 fuentes
+    // independientes más) — Coin Metrics retiró DiffMean de su plan gratis, así que ya no se le pide
+    // (pedirla junto con las demás métricas tumba TODA la respuesta con un 403, no solo esa métrica).
+    // Promise.allSettled para que si Coin Metrics falla no se pierda ni se repita la llamada a
+    // Binance/blockchain.info que ya se resolvió bien — cada llamada se reintenta antes de rendirse
+    const [weeklySettled, diffSettled, cmSettled] = await Promise.allSettled([
       withRetry(fetchWeeklyBtcOhlc, 3, 600),
-      withRetry(() => fetchCoinMetricsDaily(['DiffMean', 'BlkCnt', 'FeeTotNtv']), 2, 500),
+      withRetry(() => fetchBlockchainInfoChart('difficulty'), 3, 600),
+      withRetry(() => fetchCoinMetricsDaily(['BlkCnt', 'FeeTotNtv']), 2, 500),
     ]);
     if(weeklySettled.status === 'rejected') throw weeklySettled.reason;
+    if(diffSettled.status === 'rejected') throw diffSettled.reason;
     const weekly = weeklySettled.value;
+    const difficulty = diffSettled.value;
 
-    let difficulty, dailyFeesBtc, dailyBlocks;
+    let dailyFeesBtc, dailyBlocks;
     if(cmSettled.status === 'fulfilled'){
-      difficulty = coinMetricsSeriesFor(cmSettled.value, 'DiffMean');
       dailyBlocks = coinMetricsSeriesFor(cmSettled.value, 'BlkCnt');
       dailyFeesBtc = coinMetricsSeriesFor(cmSettled.value, 'FeeTotNtv');
     }
-    if(!difficulty || !difficulty.length || !dailyBlocks.length || !dailyFeesBtc.length){
-      // respaldo si Coin Metrics falla (CORS, caída del servicio, series vacías, etc.):
-      // blockchain.info no tiene bloques minados por día como serie propia, así que ahí sí se
-      // aproxima con el promedio de red (144/día, el objetivo de diseño de Bitcoin)
-      const [diffCi, feesCi] = await Promise.all([
-        withRetry(() => fetchBlockchainInfoChart('difficulty'), 3, 600),
-        withRetry(() => fetchBlockchainInfoChart('transaction-fees'), 3, 600),
-      ]);
-      difficulty = diffCi;
-      dailyFeesBtc = feesCi;
+    if(!dailyBlocks || !dailyBlocks.length || !dailyFeesBtc || !dailyFeesBtc.length){
+      // respaldo si Coin Metrics falla (caída del servicio, series vacías, etc.): blockchain.info
+      // no tiene bloques minados por día como serie propia, así que ahí sí se aproxima con el
+      // promedio de red (144/día, el objetivo de diseño de Bitcoin)
+      dailyFeesBtc = await withRetry(() => fetchBlockchainInfoChart('transaction-fees'), 3, 600);
       dailyBlocks = null;
       marketFloorSource = 'blockchain-fallback';
     } else {
@@ -16396,9 +16396,7 @@ async function loadMarketFloorData(){
     const weeklyIssuance = weekly.map(w => lastValueBefore(dailyIssuance, w.t));
     const difficultySma = smaTrailingArr(weeklyDifficulty, MFLOOR_SMOOTH_WEEKS);
     const issuanceSma = smaTrailingArr(weeklyIssuance, MFLOOR_SMOOTH_WEEKS);
-    const rawCostUnscaled = difficultySma.map((d, i) => (d == null || issuanceSma[i] == null) ? null : Math.pow(d, MFLOOR_K) / issuanceSma[i]);
-
-    const costSmooth = rawCostUnscaled.map(v => v == null ? null : v * MFLOOR_ALPHA_FROZEN);
+    const costSmooth = difficultySma.map((d, i) => (d == null || issuanceSma[i] == null) ? null : MFLOOR_ALPHA * Math.pow(d, MFLOOR_K) / issuanceSma[i]);
 
     const points = weekly.map((w, i) => ({ t: w.t, price: w.c, keltnerLower: keltnerLower[i], costSmooth: costSmooth[i] }));
     marketFloorData = points;
@@ -16624,8 +16622,8 @@ function renderMarketFloorChart(){
   const sourceNoteEl = document.getElementById('mfloorSourceNote');
   sourceNoteEl.style.display = 'block';
   sourceNoteEl.innerHTML = marketFloorSource === 'coinmetrics'
-    ? '✅ Dificultad, bloques y comisiones cargados en vivo desde <b>Coin Metrics</b>.'
-    : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> como respaldo (bloques minados aproximados con el promedio de red).';
+    ? '✅ Dificultad (blockchain.info) + bloques minados y comisiones (Coin Metrics), cargados en vivo.'
+    : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> para dificultad y comisiones (bloques minados aproximados con el promedio de red).';
 
   const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
   const gapPct = ((lastKeltner - lastCost) / lastCost) * 100;
