@@ -756,6 +756,30 @@ button{font-family:inherit;color:inherit}
 .indic-beta-warning .indic-beta-warning-icon{font-size:20px;line-height:1;flex-shrink:0}
 .indic-beta-warning b{color:#fff}
 
+.macro-guia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:8px}
+.macro-guia-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.macro-guia-card:hover{border-color:var(--border2);background:rgba(255,255,255,.04)}
+.macro-guia-card-head{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:#fff}
+.macro-guia-card-icon{font-size:17px;line-height:1}
+.macro-guia-card-def{font-size:11.5px;color:var(--muted);line-height:1.45}
+.macro-guia-card-states{display:flex;flex-direction:column;gap:4px;margin-top:2px}
+.macro-guia-state-row{display:flex;align-items:baseline;gap:6px;font-size:11px;line-height:1.4}
+.macro-guia-state-arrow{font-weight:800;flex-shrink:0}
+.macro-guia-state-tag{font-weight:700;color:#fff}
+.macro-guia-state-note{color:var(--muted)}
+
+.macro-guia-combinator{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.macro-guia-pick{display:flex;flex-direction:column;gap:8px;flex:1 1 220px;min-width:200px}
+.macro-guia-plus{font-size:20px;font-weight:800;color:var(--muted);flex-shrink:0;align-self:center}
+.macro-guia-result{margin-top:16px;border-radius:12px;border:1.5px solid var(--border2);background:rgba(255,255,255,.02);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.macro-guia-result-headline{font-size:14.5px;font-weight:800;line-height:1.4}
+.macro-guia-result-tags{display:flex;gap:8px;flex-wrap:wrap}
+.macro-guia-result-notes{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted2);line-height:1.5}
+@media (max-width:640px){
+  .macro-guia-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .macro-guia-plus{display:none}
+}
+
 .indic-dir-guide{display:flex;flex-direction:column;gap:10px;margin:18px 0}
 .indic-dir-row{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--border)}
 .indic-dir-row.up{border-left:3px solid var(--green)}
@@ -1620,6 +1644,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
       <div class="indic-cat-label">🏛 Macro</div>
+      <button class="sb-item" data-indic-jump="macroguia">
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
       <button class="sb-item" data-indic-jump="dxy">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
       </button>
@@ -1877,6 +1904,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
       <div class="indic-cat-label">🏛 Macro</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="macroguia">
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dxy">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
       </button>
@@ -2373,10 +2403,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <button type="button" class="indic-tab" data-group="trading">💹 Trading</button>
         <button type="button" class="indic-tab" data-group="sentimiento">Sentimiento</button>
         <button type="button" class="indic-tab" data-group="mineria">Minería</button>
-        <button type="button" class="indic-tab" data-group="macro">Macro</button>
         <button type="button" class="indic-tab" data-group="dominancia">Dominancia</button>
         <button type="button" class="indic-tab" data-group="altcoins">🪙 Altcoins</button>
         <button type="button" class="indic-tab" data-group="onchain">On-Chain</button>
+        <button type="button" class="indic-tab" data-group="macro">🏛 Macro</button>
       </div>
 
       <div class="indic-subtabs" id="indicSubTabs"></div>
@@ -2530,6 +2560,70 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
 
+            <div class="indic-guide-divider">Dominancia</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domratio">
+              <div class="indic-guide-icon">🔄</div>
+              <div class="indic-guide-card-title">Rotación ETH.D/BTC.D</div>
+              <div class="indic-guide-card-text">Dominancia de ETH dividida entre la de BTC — hacia dónde está rotando el capital.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
+              <div class="indic-guide-icon">🗜️</div>
+              <div class="indic-guide-card-title">Descompresión Cripto</div>
+              <div class="indic-guide-card-text">La suma de la dominancia de BTC+ETH+USDT+USDC — cuando sube, las altcoins quedan comprimidas; cuando baja, se descomprimen y suben.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
+              <div class="indic-guide-icon">₿</div>
+              <div class="indic-guide-card-title">Dominancia BTC</div>
+              <div class="indic-guide-card-text">Qué tanto pesa Bitcoin solo frente al resto del mercado.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domusdt">
+              <div class="indic-guide-icon">💵</div>
+              <div class="indic-guide-card-title">Dominancia USDT</div>
+              <div class="indic-guide-card-text">Qué tanto pesa Tether solo frente al resto del mercado.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethbtc">
+              <div class="indic-guide-icon">🔁</div>
+              <div class="indic-guide-card-title">ETH/BTC</div>
+              <div class="indic-guide-card-text">Precio de Ethereum medido en Bitcoin.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
+            <div class="indic-guide-divider">🪙 Altcoins</div>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="othersbtc">
+              <div class="indic-guide-icon">🪙</div>
+              <div class="indic-guide-card-title">OTHERS/BTC</div>
+              <div class="indic-guide-card-text">Cuánto vale el índice OTHERS (altcoins fuera del top 10) medido en Bitcoin.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altfever">
+              <div class="indic-guide-icon">🔥</div>
+              <div class="indic-guide-card-title">Euforia de Altcoins</div>
+              <div class="indic-guide-card-text">Cuando las altcoins pequeñas corren más fuerte que las grandes, históricamente coincide con techos del mercado.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvsalt">
+              <div class="indic-guide-icon">⚖️</div>
+              <div class="indic-guide-card-title">Valoración Relativa ETH vs Altcoins</div>
+              <div class="indic-guide-card-text">Compara el tamaño de las altcoins contra Ethereum — te dice si conviene estar en ETH o rotar a las altcoins.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="total2">
+              <div class="indic-guide-icon">🥈</div>
+              <div class="indic-guide-card-title">TOTAL2 EMA200</div>
+              <div class="indic-guide-card-text">Capitalización de todo el mercado sin Bitcoin, con su media móvil de 200 semanas.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="others">
+              <div class="indic-guide-icon">🌱</div>
+              <div class="indic-guide-card-title">OTHERS EMA200</div>
+              <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
+              <div class="indic-guide-card-link-hint">Ver →</div>
+            </button>
+
             <div class="indic-guide-divider">🏛 Macro</div>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dxy">
               <div class="indic-guide-icon">💵</div>
@@ -2625,70 +2719,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="indic-guide-icon">🌡️</div>
               <div class="indic-guide-card-title">Balance de la Reserva Federal</div>
               <div class="indic-guide-card-text">Sube cuando la Fed "imprime"/compra activos (QE), baja cuando los vende o deja vencer (QT).</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Dominancia</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domratio">
-              <div class="indic-guide-icon">🔄</div>
-              <div class="indic-guide-card-title">Rotación ETH.D/BTC.D</div>
-              <div class="indic-guide-card-text">Dominancia de ETH dividida entre la de BTC — hacia dónde está rotando el capital.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
-              <div class="indic-guide-icon">🗜️</div>
-              <div class="indic-guide-card-title">Descompresión Cripto</div>
-              <div class="indic-guide-card-text">La suma de la dominancia de BTC+ETH+USDT+USDC — cuando sube, las altcoins quedan comprimidas; cuando baja, se descomprimen y suben.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
-              <div class="indic-guide-icon">₿</div>
-              <div class="indic-guide-card-title">Dominancia BTC</div>
-              <div class="indic-guide-card-text">Qué tanto pesa Bitcoin solo frente al resto del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domusdt">
-              <div class="indic-guide-icon">💵</div>
-              <div class="indic-guide-card-title">Dominancia USDT</div>
-              <div class="indic-guide-card-text">Qué tanto pesa Tether solo frente al resto del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethbtc">
-              <div class="indic-guide-icon">🔁</div>
-              <div class="indic-guide-card-title">ETH/BTC</div>
-              <div class="indic-guide-card-text">Precio de Ethereum medido en Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">🪙 Altcoins</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="othersbtc">
-              <div class="indic-guide-icon">🪙</div>
-              <div class="indic-guide-card-title">OTHERS/BTC</div>
-              <div class="indic-guide-card-text">Cuánto vale el índice OTHERS (altcoins fuera del top 10) medido en Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altfever">
-              <div class="indic-guide-icon">🔥</div>
-              <div class="indic-guide-card-title">Euforia de Altcoins</div>
-              <div class="indic-guide-card-text">Cuando las altcoins pequeñas corren más fuerte que las grandes, históricamente coincide con techos del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvsalt">
-              <div class="indic-guide-icon">⚖️</div>
-              <div class="indic-guide-card-title">Valoración Relativa ETH vs Altcoins</div>
-              <div class="indic-guide-card-text">Compara el tamaño de las altcoins contra Ethereum — te dice si conviene estar en ETH o rotar a las altcoins.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="total2">
-              <div class="indic-guide-icon">🥈</div>
-              <div class="indic-guide-card-title">TOTAL2 EMA200</div>
-              <div class="indic-guide-card-text">Capitalización de todo el mercado sin Bitcoin, con su media móvil de 200 semanas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="others">
-              <div class="indic-guide-icon">🌱</div>
-              <div class="indic-guide-card-title">OTHERS EMA200</div>
-              <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
           </div>
@@ -4232,6 +4262,48 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 🟢 Alto = ETH barato frente a las altcoins (acumular ETH). 🔴 Bajo = ETH caro frente a las altcoins (rotar a altcoins).<br>
                 🟢🔴 Las bandas son umbrales fijos, tomados del rango histórico completo del ratio.<br>
                 <strong>Herramienta educativa basada en un criterio personal. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="macroguia" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">📖 Guía: ¿Cómo Leer los Indicadores Macro?</h2>
+              </div>
+              <p style="color:var(--muted);font-size:13px;margin:0 0 16px">Qué significa cada indicador cuando sube o cuando baja, y qué pasa cuando combinas dos a la vez. Haz clic en una tarjeta o usa el combinador de abajo.</p>
+
+              <div class="macro-guia-grid" id="macroGuiaGrid"></div>
+
+              <div class="be-section-label" style="margin:26px 0 12px">🔀 Combinador: ¿qué pasa si...?</div>
+              <div class="macro-guia-combinator">
+                <div class="macro-guia-pick">
+                  <select class="asset-filter-select" id="macroGuiaSelA"></select>
+                  <div class="dir-toggle" id="macroGuiaDirA">
+                    <button type="button" class="mode-btn active" data-dir="high">▲ Alto</button>
+                    <button type="button" class="mode-btn" data-dir="low">▼ Bajo</button>
+                  </div>
+                </div>
+                <div class="macro-guia-plus">+</div>
+                <div class="macro-guia-pick">
+                  <select class="asset-filter-select" id="macroGuiaSelB"></select>
+                  <div class="dir-toggle" id="macroGuiaDirB">
+                    <button type="button" class="mode-btn active" data-dir="high">▲ Alto</button>
+                    <button type="button" class="mode-btn" data-dir="low">▼ Bajo</button>
+                  </div>
+                </div>
+              </div>
+              <div id="macroGuiaResult" class="macro-guia-result"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📖 Esta guía resume relaciones generales y típicas entre indicadores — la realidad del mercado tiene más matices y no siempre se mueve "como el libro". Úsala como punto de partida para entender cada dato, no como una regla fija.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -7155,6 +7227,7 @@ const INDIC_GROUPS = {
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
   macro: [
+    { id: 'macroguia', label: '📖 Guía: ¿Cómo Leer los Indicadores?' },
     { id: 'dxy', label: 'Índice del Dólar (DXY)' },
     { id: 'pmius', label: 'PMI Manufacturero de EEUU' },
     { id: 'payrolls', label: 'Nómina No Agrícola' },
@@ -7176,7 +7249,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7325,6 +7398,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'altfever') ensureAltFeverLoaded();
       if(btn.dataset.indic === 'ethvsalt') ensureEthVsAltLoaded();
       if(MACRO_CHART_IDS.includes(btn.dataset.indic)) ensureMacroChartLoaded(btn.dataset.indic);
+      if(btn.dataset.indic === 'macroguia') ensureMacroGuiaLoaded();
     });
   });
   showIndicPanel(items[0].id);
@@ -7374,6 +7448,7 @@ function jumpToIndicator(id){
     if(id === 'altfever') ensureAltFeverLoaded();
     if(id === 'ethvsalt') ensureEthVsAltLoaded();
     if(MACRO_CHART_IDS.includes(id)) ensureMacroChartLoaded(id);
+    if(id === 'macroguia') ensureMacroGuiaLoaded();
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.querySelectorAll('.indic-subtab').forEach(b => b.classList.toggle('active', b.dataset.indic === id));
   }
@@ -18369,6 +18444,156 @@ function renderMacroPanels(){
   }).join('');
 }
 renderMacroPanels();
+
+// ---- Guía interactiva "¿Cómo Leer los Indicadores Macro?" ----
+// Cada indicador declara qué significa su estado "alto" y "bajo" en un pequeño vocabulario de
+// efectos (risk_on/risk_off, growth/recession, hawkish/dovish, liquidity_up/down). El combinador
+// de abajo NO tiene texto pre-escrito para cada pareja posible (séria inmanejable: 16 indicadores
+// dan cientos de combinaciones) - en vez de eso genera la interpretación en el momento, cruzando
+// los efectos de las dos selecciones. Así cualquier combinación que el usuario arme tiene una
+// respuesta coherente, no solo un puñado de ejemplos fijos.
+const MACRO_GUIA_INDICATORS = [
+  { id: 'fedbalance', icon: '🌡️', label: 'Balance de la Fed', def: 'Cuántos activos tiene la Reserva Federal en su balance.',
+    high: { tag: 'QE — imprimiendo', effects: ['risk_on', 'liquidity_up'] },
+    low: { tag: 'QT — contrayendo', effects: ['risk_off', 'liquidity_down'] } },
+  { id: 'netliquidity', icon: '🌊', label: 'Liquidez Neta', def: 'Dinero disponible para activos de riesgo (Fed − Tesoro − Reverse Repo).',
+    high: { tag: 'Liquidez alta', effects: ['risk_on', 'liquidity_up'] },
+    low: { tag: 'Liquidez baja', effects: ['risk_off', 'liquidity_down'] } },
+  { id: 'dxy', icon: '💵', label: 'Índice del Dólar (DXY)', def: 'Qué tan fuerte está el dólar frente a otras monedas.',
+    high: { tag: 'Dólar fuerte', effects: ['risk_off'] },
+    low: { tag: 'Dólar débil', effects: ['risk_on'] } },
+  { id: 'pmius', icon: '🏭', label: 'PMI Manufacturero', def: 'Encuesta a gerentes de compras — sobre 50 es expansión.',
+    high: { tag: '>50 — expansión', effects: ['growth', 'risk_on'] },
+    low: { tag: '<50 — contracción', effects: ['recession', 'risk_off'] } },
+  { id: 'payrolls', icon: '👷', label: 'Nómina No Agrícola', def: 'Empleos nuevos creados el mes pasado en EEUU.',
+    high: { tag: 'Muchos empleos', effects: ['growth', 'hawkish'] },
+    low: { tag: 'Pocos empleos', effects: ['recession', 'dovish'] } },
+  { id: 'unrate', icon: '📉', label: 'Tasa de Desempleo', def: '% de la fuerza laboral de EEUU sin trabajo.',
+    high: { tag: 'Desempleo sube', effects: ['recession', 'dovish'] },
+    low: { tag: 'Desempleo baja', effects: ['growth', 'hawkish'] } },
+  { id: 'icsa', icon: '🧾', label: 'Solicitudes de Desempleo', def: 'Como la tasa de desempleo, pero semanal — reacciona más rápido.',
+    high: { tag: 'Suben', effects: ['recession', 'dovish'] },
+    low: { tag: 'Bajan', effects: ['growth', 'hawkish'] } },
+  { id: 'cpi', icon: '🛒', label: 'Inflación CPI', def: 'Cuánto subieron los precios al consumidor.',
+    high: { tag: 'Inflación alta', effects: ['hawkish', 'risk_off'] },
+    low: { tag: 'Inflación baja', effects: ['dovish', 'risk_on'] } },
+  { id: 'pce', icon: '💳', label: 'PCE', def: 'Otra medida de inflación — la favorita de la Reserva Federal.',
+    high: { tag: 'Inflación alta', effects: ['hawkish', 'risk_off'] },
+    low: { tag: 'Inflación baja', effects: ['dovish', 'risk_on'] } },
+  { id: 'ppi', icon: '🏗️', label: 'PPI', def: 'Inflación mayorista — suele anticipar al CPI.',
+    high: { tag: 'Sube', effects: ['hawkish'] },
+    low: { tag: 'Baja', effects: ['dovish'] } },
+  { id: 'fedfundsrate', icon: '🏦', label: 'Tasa de la Fed', def: 'La tasa de interés que fija la Reserva Federal.',
+    high: { tag: 'Tasas altas', effects: ['risk_off', 'liquidity_down'] },
+    low: { tag: 'Tasas bajas', effects: ['risk_on', 'liquidity_up'] } },
+  { id: 'treasuryyields', icon: '📜', label: 'Rendimientos del Tesoro', def: 'Lo que pagan los bonos del gobierno de EEUU.',
+    high: { tag: 'Rendimientos suben', effects: ['risk_off', 'liquidity_down'] },
+    low: { tag: 'Rendimientos bajan', effects: ['risk_on', 'liquidity_up'] } },
+  { id: 'yieldcurve', icon: '📐', label: 'Curva 10Y-2Y', def: 'Rendimiento del bono a 10 años menos el de 2 años.',
+    high: { tag: 'Positiva (normal)', effects: ['growth'] },
+    low: { tag: 'Negativa (invertida)', effects: ['recession'] } },
+  { id: 'm2supply', icon: '💰', label: 'M2', def: 'Cuánto dinero hay circulando en la economía.',
+    high: { tag: 'M2 crece', effects: ['liquidity_up', 'risk_on'] },
+    low: { tag: 'M2 se contrae', effects: ['liquidity_down', 'risk_off'] } },
+  { id: 'vixindex', icon: '😨', label: 'VIX', def: 'El "índice del miedo" de Wall Street.',
+    high: { tag: 'Miedo alto', effects: ['risk_off'] },
+    low: { tag: 'Calma / complacencia', effects: ['risk_on'] } },
+  { id: 'gdpgrowth', icon: '📊', label: 'PIB', def: 'Cuánto creció la economía de EEUU.',
+    high: { tag: 'Crece fuerte', effects: ['growth', 'hawkish'] },
+    low: { tag: 'Se contrae', effects: ['recession', 'dovish'] } },
+];
+const MACRO_GUIA_EFFECT_LABEL = {
+  risk_on: 'A favor de activos de riesgo', risk_off: 'En contra de activos de riesgo',
+  growth: 'Señal de crecimiento', recession: 'Señal de posible recesión',
+  hawkish: 'Presiona a la Fed a tasas altas', dovish: 'Presiona a la Fed a bajar tasas',
+  liquidity_up: 'Más liquidez disponible', liquidity_down: 'Menos liquidez disponible',
+};
+function renderMacroGuiaGrid(){
+  const grid = document.getElementById('macroGuiaGrid');
+  if(!grid) return;
+  grid.innerHTML = MACRO_GUIA_INDICATORS.map(ind => `
+    <div class="macro-guia-card" data-jump="${ind.id}">
+      <div class="macro-guia-card-head"><span class="macro-guia-card-icon">${ind.icon}</span>${ind.label}</div>
+      <div class="macro-guia-card-def">${ind.def}</div>
+      <div class="macro-guia-card-states">
+        <div class="macro-guia-state-row"><span class="macro-guia-state-arrow" style="color:var(--green)">▲</span><span class="macro-guia-state-tag">${ind.high.tag}:</span><span class="macro-guia-state-note">${ind.high.effects.map(e => MACRO_GUIA_EFFECT_LABEL[e]).join(', ')}</span></div>
+        <div class="macro-guia-state-row"><span class="macro-guia-state-arrow" style="color:var(--red)">▼</span><span class="macro-guia-state-tag">${ind.low.tag}:</span><span class="macro-guia-state-note">${ind.low.effects.map(e => MACRO_GUIA_EFFECT_LABEL[e]).join(', ')}</span></div>
+      </div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.macro-guia-card').forEach(card => {
+    card.addEventListener('click', () => jumpToIndicator(card.dataset.jump));
+  });
+}
+function macroGuiaInterpret(aId, aDir, bId, bDir){
+  const a = MACRO_GUIA_INDICATORS.find(x => x.id === aId);
+  const b = MACRO_GUIA_INDICATORS.find(x => x.id === bId);
+  if(!a || !b) return null;
+  const aState = a[aDir], bState = b[bDir];
+  const effects = aState.effects.concat(bState.effects);
+  const riskOn = effects.filter(e => e === 'risk_on').length;
+  const riskOff = effects.filter(e => e === 'risk_off').length;
+  let headline, headColor;
+  if(riskOn > 0 && riskOff === 0){ headline = '🟢 Esta combinación apunta a favor del apetito por riesgo (cripto incluida)'; headColor = 'var(--green)'; }
+  else if(riskOff > 0 && riskOn === 0){ headline = '🔴 Esta combinación apunta a cautela / aversión al riesgo'; headColor = 'var(--red)'; }
+  else if(riskOn > 0 && riskOff > 0){ headline = '🟡 Señales encontradas — no apuntan las dos para el mismo lado'; headColor = 'var(--gold)'; }
+  else { headline = '⚪ Combinación neutral para el apetito por riesgo directo'; headColor = 'var(--muted2)'; }
+
+  const notes = [];
+  if(effects.includes('recession')) notes.push('⚠️ Al menos una de las dos está marcando una señal de recesión — vale la pena prestarle atención.');
+  if(effects.includes('hawkish') && effects.includes('dovish')) notes.push('🏦 Mensajes contradictorios para la Fed: una presiona a subir tasas y la otra a bajarlas.');
+  else if(effects.includes('hawkish')) notes.push('🏦 Esta combinación empuja a la Fed hacia tasas más altas (o a no bajarlas tan rápido).');
+  else if(effects.includes('dovish')) notes.push('🏦 Esta combinación le da margen a la Fed para bajar tasas.');
+  if(effects.filter(e => e === 'liquidity_up').length === 2) notes.push('🌊 Doble señal de MÁS liquidez entrando al sistema.');
+  else if(effects.filter(e => e === 'liquidity_down').length === 2) notes.push('🌊 Doble señal de MENOS liquidez en el sistema.');
+
+  return { headline, headColor, aTag: aState.tag, bTag: bState.tag, aLabel: a.label, bLabel: b.label, notes };
+}
+let macroGuiaDirA = 'high', macroGuiaDirB = 'high';
+function renderMacroGuiaResult(){
+  const selA = document.getElementById('macroGuiaSelA'), selB = document.getElementById('macroGuiaSelB');
+  const resultEl = document.getElementById('macroGuiaResult');
+  if(!selA || !selB || !resultEl) return;
+  const r = macroGuiaInterpret(selA.value, macroGuiaDirA, selB.value, macroGuiaDirB);
+  if(!r) return;
+  resultEl.innerHTML = `
+    <div class="macro-guia-result-headline" style="color:${r.headColor}">${r.headline}</div>
+    <div class="macro-guia-result-tags">
+      <span class="perk-chip">${r.aLabel}: <b>${r.aTag}</b></span>
+      <span class="perk-chip">${r.bLabel}: <b>${r.bTag}</b></span>
+    </div>
+    ${r.notes.length ? '<div class="macro-guia-result-notes">' + r.notes.map(n => '<div>' + n + '</div>').join('') + '</div>' : ''}
+  `;
+}
+function ensureMacroGuiaLoaded(){
+  const selA = document.getElementById('macroGuiaSelA'), selB = document.getElementById('macroGuiaSelB');
+  if(!selA || selA.dataset.wired) { renderMacroGuiaResult(); return; }
+  selA.dataset.wired = '1';
+  renderMacroGuiaGrid();
+  const optionsHtml = MACRO_GUIA_INDICATORS.map(ind => `<option value="${ind.id}">${ind.icon} ${ind.label}</option>`).join('');
+  selA.innerHTML = optionsHtml;
+  selB.innerHTML = optionsHtml;
+  selB.value = MACRO_GUIA_INDICATORS[1].id;
+  selA.addEventListener('change', renderMacroGuiaResult);
+  selB.addEventListener('change', renderMacroGuiaResult);
+  document.querySelectorAll('#macroGuiaDirA .mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#macroGuiaDirA .mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      macroGuiaDirA = btn.dataset.dir;
+      renderMacroGuiaResult();
+    });
+  });
+  document.querySelectorAll('#macroGuiaDirB .mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#macroGuiaDirB .mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      macroGuiaDirB = btn.dataset.dir;
+      renderMacroGuiaResult();
+    });
+  });
+  renderMacroGuiaResult();
+}
 function ensureDomRatioLoaded(){ if(!domLoadedOnce.domratio){ domLoadedOnce.domratio = true; loadDomChartDetail('domratio'); } }
 function ensureDomAllLoaded(){ if(!domLoadedOnce.domall){ domLoadedOnce.domall = true; loadDomLiveDetail('domall'); loadDomChartDetail('domall'); } }
 function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc = true; loadDomLiveDetail('dombtc'); loadDomChartDetail('dombtc'); } }
