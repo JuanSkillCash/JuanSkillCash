@@ -1624,7 +1624,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
       </button>
       <button class="sb-item" data-indic-jump="pmius">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI de EEUU</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI Manufacturero de EEUU</span>
       </button>
       <button class="sb-item" data-indic-jump="payrolls">
         <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina No Agrícola</span>
@@ -1881,7 +1881,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pmius">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI de EEUU</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI Manufacturero de EEUU</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="payrolls">
         <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina No Agrícola</span>
@@ -2539,7 +2539,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </button>
             <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pmius">
               <div class="indic-guide-icon">🏭</div>
-              <div class="indic-guide-card-title">PMI de EEUU</div>
+              <div class="indic-guide-card-title">PMI Manufacturero de EEUU</div>
               <div class="indic-guide-card-text">Encuesta mensual a gerentes de compras: por encima de 50 la economía se expande, por debajo se contrae.</div>
               <div class="indic-guide-card-link-hint">Ver →</div>
             </button>
@@ -7156,7 +7156,7 @@ const INDIC_GROUPS = {
   mineria: [],
   macro: [
     { id: 'dxy', label: 'Índice del Dólar (DXY)' },
-    { id: 'pmius', label: 'PMI de EEUU (Manufacturero y Servicios)' },
+    { id: 'pmius', label: 'PMI Manufacturero de EEUU' },
     { id: 'payrolls', label: 'Nómina No Agrícola' },
     { id: 'unrate', label: 'Tasa de Desempleo' },
     { id: 'icsa', label: 'Solicitudes Semanales de Desempleo' },
@@ -17385,7 +17385,7 @@ const DOM_CHART_DEFS = {
   },
   pmius: {
     loadFn: () => pmiUsMacro.load(), realSeries: () => pmiUsMacro.series(), exact: true, fmtVal: fmtPlainIndex,
-    series: [{ key: 'mfg', color: '#60a5fa', label: 'PMI Manufacturero' }, { key: 'svc', color: '#f0b23d', label: 'PMI de Servicios' }],
+    series: [{ key: 'v', color: '#60a5fa', label: 'PMI Manufacturero' }],
     refLine: { value: 50, label: '50 = limite expansion/contraccion' },
   },
   payrolls: {
@@ -17632,15 +17632,15 @@ const dxyMacro = (() => {
     series: () => state.cache,
   };
 })();
+// solo Manufacturero por ahora - el simbolo de TradingView para "PMI de Servicios de EEUU" no se
+// pudo confirmar (probado en vivo contra 8 variantes distintas, todas vacias) - se agrega aparte
+// en cuanto se confirme el correcto, igual que el PMI de China
 const pmiUsMacro = (() => {
   const state = { cache: null, promise: null };
   return {
     load(){
       if(state.cache) return Promise.resolve(state.cache);
-      if(!state.promise) state.promise = Promise.all([
-        fetchMacroTvSeries('ECONOMICS:USBCOI'),
-        fetchMacroTvSeries('ECONOMICS:USSPMI'),
-      ]).then(([mfg, svc]) => state.cache = mergeByForwardFill([mfg, svc], ['mfg', 'svc']));
+      if(!state.promise) state.promise = fetchMacroTvSeries('ECONOMICS:USBCOI').then(s => state.cache = s.map(p => ({ t: p.t, v: p.c })));
       return state.promise;
     },
     series: () => state.cache,
@@ -18298,8 +18298,8 @@ function ensureMacroChartLoaded(id){ if(!domLoadedOnce[id]){ domLoadedOnce[id] =
 const MACRO_PANEL_META = {
   dxy: { icon: '💵', title: 'Índice del Dólar (DXY)', loading: 'Descargando el histórico del DXY.',
     disclaimer: '💵 Qué tan fuerte está el dólar frente a una canasta de otras monedas — un dólar fuerte suele presionar a la baja a las materias primas y a los activos de riesgo (cripto incluida).<br>🔎 Fuente: TradingView.<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
-  pmius: { icon: '🏭', title: 'PMI de EEUU (Manufacturero y Servicios)', loading: 'Descargando el histórico de PMI Manufacturero y de Servicios.',
-    disclaimer: '🏭 Encuesta mensual a gerentes de compras: por encima de 50 la actividad se expande, por debajo se contrae.<br>🔎 Fuente: TradingView (ISM Manufacturing / Services PMI).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
+  pmius: { icon: '🏭', title: 'PMI Manufacturero de EEUU', loading: 'Descargando el histórico de PMI Manufacturero.',
+    disclaimer: '🏭 Encuesta mensual a gerentes de compras: por encima de 50 la actividad se expande, por debajo se contrae. (El PMI de Servicios se añadirá más adelante — no se pudo confirmar aún su símbolo exacto en TradingView).<br>🔎 Fuente: TradingView (ISM Manufacturing PMI).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   payrolls: { icon: '👷', title: 'Nómina No Agrícola', loading: 'Descargando el histórico de nómina no agrícola.',
     disclaimer: '👷 Cuántos empleos nuevos creó EEUU el mes pasado (en miles) — el dato de empleo más vigilado del mundo.<br>🔎 Fuente: FRED (PAYEMS).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   unrate: { icon: '📉', title: 'Tasa de Desempleo', loading: 'Descargando el histórico de la tasa de desempleo.',
