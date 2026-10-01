@@ -153,13 +153,17 @@ bg_difficulty, bg_issued = {}, {}
 data = get_json("https://bitcoin-data.com/v1/difficulty-btc", label="bg/difficulty-btc")
 if data:
     for row in data:
-        bg_difficulty[row["d"]] = float(row["difficultyBtc"])
-    print(f"  n={len(bg_difficulty)} rango={min(bg_difficulty)}..{max(bg_difficulty)}")
+        if row.get("difficultyBtc") is not None:
+            bg_difficulty[row["d"]] = float(row["difficultyBtc"])
+    if bg_difficulty:
+        print(f"  n={len(bg_difficulty)} rango={min(bg_difficulty)}..{max(bg_difficulty)}")
 data = get_json("https://bitcoin-data.com/v1/btc-issued", label="bg/btc-issued")
 if data:
     for row in data:
-        bg_issued[row["d"]] = float(row["btcIssued"])
-    print(f"  n={len(bg_issued)} rango={min(bg_issued)}..{max(bg_issued)}")
+        if row.get("btcIssued") is not None:
+            bg_issued[row["d"]] = float(row["btcIssued"])
+    if bg_issued:
+        print(f"  n={len(bg_issued)} rango={min(bg_issued)}..{max(bg_issued)}")
 
 # ---------------------------------------------------------------------------
 print_section("5. VALIDACION CRUZADA DE DIFICULTAD (3 fuentes independientes)")
