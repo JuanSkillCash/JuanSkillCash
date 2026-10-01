@@ -496,10 +496,18 @@ button{font-family:inherit;color:inherit}
    traen la suya propia dibujada dentro del gráfico (ver chartWatermarkHtml en el script), con eso
    no hace falta repetirla aquí también */
 .sc-chart-watermark{position:relative}
+/* mismos colores/tipografía del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILLCASH"
+   en blanco (Poppins), "Tools" en rojo cursiva (Caveat) - ::before y ::after anclados al mismo
+   punto central y empujados en direcciones opuestas para que lean como una sola palabra */
 .sc-chart-watermark::before{
-  content:"SKILLCASH";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:clamp(26px,7vw,56px);
-  letter-spacing:.05em;color:rgba(255,255,255,.045);pointer-events:none;z-index:-1;white-space:nowrap;
+  content:"SKILLCASH";position:absolute;top:50%;left:50%;transform:translate(-100%,-50%);
+  font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(17px,4.6vw,38px);
+  letter-spacing:-.01em;color:rgba(247,246,251,.055);pointer-events:none;z-index:-1;white-space:nowrap;
+}
+.sc-chart-watermark::after{
+  content:"Tools";position:absolute;top:50%;left:50%;transform:translate(3px,-46%);
+  font-family:'Caveat',cursive;font-weight:700;font-size:clamp(19px,5.3vw,42px);
+  color:rgba(255,47,79,.07);pointer-events:none;z-index:-1;white-space:nowrap;
 }
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
    lo tuvieran, al no compartir el mismo origen (el gráfico es más ancho por el
@@ -15052,8 +15060,16 @@ function rainbowBandForResidual(res){
 // sitio - un solo helper reusado en cada uno en vez de repetir el mismo <text> a mano por todos
 // lados. Se dibuja SIEMPRE como el primer hijo del <svg> (detrás de grid/zonas/líneas)
 function chartWatermarkHtml(totalW, totalH){
-  const fontSize = Math.round(totalW * 0.078);
-  return `<text x="${(totalW / 2).toFixed(1)}" y="${(totalH / 2 + fontSize * 0.3).toFixed(1)}" text-anchor="middle" font-size="${fontSize}" font-weight="800" fill="rgba(255,255,255,.045)" font-family="'Space Grotesk',sans-serif" style="letter-spacing:.05em;pointer-events:none">SKILLCASH</text>`;
+  // mismos colores/tipografía del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILL" en
+  // blanco, "CASH" y "Tools" en rojo, Tools en Caveat cursiva - solo que aquí muy transparente
+  const fontSize = Math.round(totalW * 0.05);
+  const toolsFontSize = Math.round(fontSize * 1.15);
+  const cx = (totalW / 2).toFixed(1), cy = (totalH / 2 + fontSize * 0.3).toFixed(1);
+  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" style="letter-spacing:-.01em;pointer-events:none">` +
+    `<tspan font-family="'Poppins',sans-serif" font-size="${fontSize}" fill="rgba(247,246,251,.055)">SKILL</tspan>` +
+    `<tspan font-family="'Poppins',sans-serif" font-size="${fontSize}" fill="rgba(255,47,79,.07)">CASH</tspan>` +
+    `<tspan font-family="'Caveat',cursive" font-weight="700" font-size="${toolsFontSize}" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
+    `</text>`;
 }
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
    Halving — reusado por Rainbow Chart y Pi Cycle para no duplicar la misma lógica dos veces ---- */
