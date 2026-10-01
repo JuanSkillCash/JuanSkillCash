@@ -46,6 +46,9 @@ jobs:
         run: python scripts/update_cmc_fng_daily.py
 
       - name: Actualizar series macro de FRED (CPI, desempleo, tasa de la Fed, etc.)
+        # continue-on-error: un fallo aqui (ej. FRED_API_KEY faltante o caida momentanea de FRED)
+        # no debe impedir que el siguiente paso (DXY/PMI, que no depende de FRED) corra igual
+        continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
