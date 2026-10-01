@@ -64,11 +64,12 @@ except Exception as e:
     print("ERROR:", e)
 
 for candidate in [
-    "/api/vecs/sth_realized_price",
     "/api/series/sth_realized_price",
-    "/api/vecs/sth-realized-price",
-    "/api/sth_realized_price",
-    "/api/series/sth_realized_price/values",
+    "/api/series/sth_realized_price/day1",
+    "/api/series/sth_mvrv/day1",
+    "/api/series/sth_realized_price/day1?page=0",
+    "/api/series/sth_realized_price/day1?from=0&count=5",
+    "/api/series/sth_realized_price/day1?format=csv",
 ]:
     print(f"\n=== BITVIEW: {candidate} ===")
     try:
