@@ -1654,11 +1654,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="ethpmi">
         <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
-      </button>
-      <button class="sb-item" data-indic-jump="ethmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales ETH</span>
+      <button class="sb-item" data-indic-jump="ethreturns">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Ethereum</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button class="sb-item" data-indic-jump="tradingguia">
@@ -1938,11 +1935,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethpmi">
         <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales ETH</span>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethreturns">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Ethereum</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tradingguia">
@@ -2217,7 +2211,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
-        <div class="cat-overview-sub">50 INDICADORES</div>
+        <div class="cat-overview-sub">49 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
@@ -4344,7 +4338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
-        <div class="indic-panel" data-indic="ethquarterly" style="display:none">
+        <div class="indic-panel" data-indic="ethreturns" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
               <div class="calc-head">
@@ -4352,60 +4346,33 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Retornos Trimestrales de Ethereum</h2>
+                <h2 class="calc-title">Retornos de Ethereum</h2>
               </div>
 
-              <div class="indic-chart-body" id="ethquarterlyChartBody">
-                <div class="indic-chart-soon" id="ethquarterlyLoading">
+              <div class="tf-pill-row" id="ethreturnsGranularityFilter">
+                <button type="button" class="tf-pill" data-granularity="year">Anual</button>
+                <button type="button" class="tf-pill active" data-granularity="quarter">Trimestral</button>
+                <button type="button" class="tf-pill" data-granularity="month">Mensual</button>
+                <button type="button" class="tf-pill" data-granularity="week">Semanal</button>
+              </div>
+
+              <div class="indic-chart-body" id="ethreturnsChartBody">
+                <div class="indic-chart-soon" id="ethreturnsLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Calculando el retorno de cada trimestre sobre el precio histórico de Ethereum.</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de Ethereum por período sobre su precio histórico.</div>
                 </div>
-                <div class="indic-chart-soon" id="ethquarterlyError" style="display:none">
+                <div class="indic-chart-soon" id="ethreturnsError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="ethquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                  <div class="indic-placeholder-text" id="ethreturnsErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="ethquarterlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
+                <div id="ethreturnsTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                📅 Retorno de cada trimestre calculado sobre el precio real de cierre de Ethereum (precio de cierre del trimestre frente al cierre del trimestre anterior) — histórico completo desde que hay datos.<br>
-                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="indic-panel" data-indic="ethmonthly" style="display:none">
-          <div class="indic-chart-card">
-            <div class="calc">
-              <div class="calc-head">
-                <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.png" alt="SkillCash">
-                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-                </div>
-                <h2 class="calc-title">Retornos Mensuales de Ethereum</h2>
-              </div>
-
-              <div class="indic-chart-body" id="ethmonthlyChartBody">
-                <div class="indic-chart-soon" id="ethmonthlyLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Calculando el retorno de cada mes sobre el precio histórico de Ethereum.</div>
-                </div>
-                <div class="indic-chart-soon" id="ethmonthlyError" style="display:none">
-                  <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="ethmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
-                </div>
-                <div id="ethmonthlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
-              </div>
-
-              <div class="calc-disclaimer" style="margin-top:18px">
-                📅 Retorno de cada mes calculado sobre el precio real de cierre de Ethereum (precio de cierre del mes frente al cierre del mes anterior) — histórico completo desde que hay datos.<br>
+                📅 Retorno de cada período calculado sobre el precio real de cierre de Ethereum (precio de cierre del período frente al cierre del período anterior) — histórico completo desde que hay datos. La semana usa el estándar ISO-8601.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -7144,7 +7111,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }],
-  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
+  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }],
   mineria: [],
@@ -7172,7 +7139,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcreturns: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcreturns: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7306,8 +7273,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
       if(btn.dataset.indic === 'btcreturns') ensureBtcReturnsLoaded();
-      if(btn.dataset.indic === 'ethquarterly') ensureEthQuarterlyLoaded();
-      if(btn.dataset.indic === 'ethmonthly') ensureEthMonthlyLoaded();
+      if(btn.dataset.indic === 'ethreturns') ensureEthReturnsLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
       if(btn.dataset.indic === 'rsimacdmap') ensureRsiHeatmapLoaded();
@@ -7362,8 +7328,7 @@ function jumpToIndicator(id){
     if(id === 'treasuries') ensureTreasuriesLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
     if(id === 'btcreturns') ensureBtcReturnsLoaded();
-    if(id === 'ethquarterly') ensureEthQuarterlyLoaded();
-    if(id === 'ethmonthly') ensureEthMonthlyLoaded();
+    if(id === 'ethreturns') ensureEthReturnsLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'optionsoi') ensureOptionsOiLoaded();
     if(id === 'rsimacdmap') ensureRsiHeatmapLoaded();
@@ -18232,63 +18197,46 @@ function renderReturnsTable(wrapId, series, granularity){
   html += '</tr></tbody></table></div>';
   wrap.innerHTML = html;
 }
-async function loadReturnsPanel(id, granularity, fetchSeriesFn){
-  const loadingEl = document.getElementById(id + 'Loading');
-  const errorEl = document.getElementById(id + 'Error');
-  const wrap = document.getElementById(id + 'TableWrap');
-  try{
-    const series = await fetchSeriesFn();
-    if(!series || series.length < 30) throw new Error('historial insuficiente');
-    loadingEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    wrap.style.display = 'block';
-    renderReturnsTable(id + 'TableWrap', series, granularity);
-  } catch(err){
-    loadingEl.style.display = 'none';
-    wrap.style.display = 'none';
-    errorEl.style.display = 'flex';
-    const detailEl = document.getElementById(id + 'ErrorDetail');
-    if(detailEl) detailEl.textContent = String((err && err.message) || err);
+// Retornos de BTC/ETH (anual/trimestral/mensual/semanal, en pestañas) — un solo fetch del
+// historial de precio, las 4 pestañas solo cambian cómo se agrupa/pinta esa misma serie. Misma
+// fábrica para ambos activos: lo único que cambia entre ellos es el prefijo de los ids del HTML
+// y de dónde sale la serie de precio diario.
+function setupReturnsController(prefix, fetchSeriesFn){
+  let series = null;
+  let activeGranularity = 'quarter';
+  let loadedOnce = false;
+  async function load(){
+    const loadingEl = document.getElementById(prefix + 'Loading');
+    const errorEl = document.getElementById(prefix + 'Error');
+    const wrap = document.getElementById(prefix + 'TableWrap');
+    try{
+      series = await fetchSeriesFn();
+      if(!series || series.length < 30) throw new Error('historial insuficiente');
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      wrap.style.display = 'block';
+      renderReturnsTable(prefix + 'TableWrap', series, activeGranularity);
+    } catch(err){
+      loadingEl.style.display = 'none';
+      wrap.style.display = 'none';
+      errorEl.style.display = 'flex';
+      const detailEl = document.getElementById(prefix + 'ErrorDetail');
+      if(detailEl) detailEl.textContent = String((err && err.message) || err);
+    }
   }
-}
-const returnsLoadedOnce = { ethquarterly: false, ethmonthly: false };
-function ensureEthQuarterlyLoaded(){ if(!returnsLoadedOnce.ethquarterly){ returnsLoadedOnce.ethquarterly = true; loadReturnsPanel('ethquarterly', 'quarter', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
-function ensureEthMonthlyLoaded(){ if(!returnsLoadedOnce.ethmonthly){ returnsLoadedOnce.ethmonthly = true; loadReturnsPanel('ethmonthly', 'month', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
-
-// Retornos de Bitcoin (anual/trimestral/mensual/semanal, en pestañas) — un solo fetch del
-// historial de precio de BTC, las 4 pestañas solo cambian cómo se agrupa/pinta esa misma serie
-let btcReturnsSeries = null;
-let btcReturnsActiveGranularity = 'quarter';
-async function loadBtcReturnsPanel(){
-  const loadingEl = document.getElementById('btcreturnsLoading');
-  const errorEl = document.getElementById('btcreturnsError');
-  const wrap = document.getElementById('btcreturnsTableWrap');
-  try{
-    btcReturnsSeries = await fetchHalvingHistory();
-    if(!btcReturnsSeries || btcReturnsSeries.length < 30) throw new Error('historial insuficiente');
-    loadingEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    wrap.style.display = 'block';
-    renderReturnsTable('btcreturnsTableWrap', btcReturnsSeries, btcReturnsActiveGranularity);
-  } catch(err){
-    loadingEl.style.display = 'none';
-    wrap.style.display = 'none';
-    errorEl.style.display = 'flex';
-    const detailEl = document.getElementById('btcreturnsErrorDetail');
-    if(detailEl) detailEl.textContent = String((err && err.message) || err);
-  }
-}
-let btcReturnsLoadedOnce = false;
-function ensureBtcReturnsLoaded(){ if(!btcReturnsLoadedOnce){ btcReturnsLoadedOnce = true; loadBtcReturnsPanel(); } }
-document.querySelectorAll('#btcreturnsGranularityFilter .tf-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.classList.contains('active')) return;
-    document.querySelectorAll('#btcreturnsGranularityFilter .tf-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    btcReturnsActiveGranularity = btn.dataset.granularity;
-    if(btcReturnsSeries) renderReturnsTable('btcreturnsTableWrap', btcReturnsSeries, btcReturnsActiveGranularity);
+  document.querySelectorAll('#' + prefix + 'GranularityFilter .tf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.classList.contains('active')) return;
+      document.querySelectorAll('#' + prefix + 'GranularityFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeGranularity = btn.dataset.granularity;
+      if(series) renderReturnsTable(prefix + 'TableWrap', series, activeGranularity);
+    });
   });
-});
+  return function ensureLoaded(){ if(!loadedOnce){ loadedOnce = true; load(); } };
+}
+const ensureBtcReturnsLoaded = setupReturnsController('btcreturns', fetchHalvingHistory);
+const ensureEthReturnsLoaded = setupReturnsController('ethreturns', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory));
 
 // Euforia de Altcoins: OTHERS ÷ (TOTAL3 − OTHERS) — cola larga de altcoins vs. altcoins grandes
 let altFeverRealSeries = null, altFeverRealPromise = null;
@@ -18985,8 +18933,7 @@ const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },
   { id: 'ethvwap', icon: '⚓', label: 'VWAP Anclado de ETH', def: 'El precio promedio ponderado por volumen desde un punto de referencia (ej. un máximo o mínimo importante) — una vara para medir si el precio de hoy está "caro" o "barato" frente a ese punto.' },
   { id: 'ethpmi', icon: '🏭', label: 'Precio de ETH + PMI Manufacturero', def: 'El precio de ETH superpuesto con el PMI Manufacturero de EEUU — para ver si las subidas/bajadas de ETH coinciden con la economía expandiéndose (PMI > 50) o contrayéndose (PMI < 50).' },
-  { id: 'ethquarterly', icon: '📅', label: 'Retornos Trimestrales ETH', def: 'Cómo le ha ido a ETH, trimestre por trimestre.' },
-  { id: 'ethmonthly', icon: '🗓️', label: 'Retornos Mensuales ETH', def: 'Lo mismo, pero por mes del año.' },
+  { id: 'ethreturns', icon: '📅', label: 'Retornos de Ethereum', def: 'Cómo le ha ido a ETH por año, trimestre, mes o semana — en pestañas.' },
 ];
 const TRADING_GUIA_INDICATORS = [
   { id: 'cbpremium', icon: '🏦', label: 'Coinbase Premium', def: 'La diferencia de precio de BTC entre Coinbase (EEUU) y Binance. Positivo y alto = instituciones/EEUU comprando fuerte. Negativo = vendiendo o poca demanda institucional.' },
