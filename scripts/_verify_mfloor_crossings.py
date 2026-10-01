@@ -38,49 +38,90 @@ def get_json(url, params=None, label=""):
     return r.json()
 
 
-print("=== 1. Binance BTCUSDT semanal ===")
+def iso_week_key_ms(t_ms):
+    # aritmetica pura relativa al epoch (sin pasar por .timestamp(), que interpreta un
+    # datetime naive como hora LOCAL del sistema y desfasaria todo por la zona horaria)
+    d = datetime.utcfromtimestamp(t_ms / 1000)
+    day_start = datetime(d.year, d.month, d.day)
+    monday = day_start - timedelta(days=d.weekday())  # weekday(): 0=lunes
+    return int((monday - EPOCH).total_seconds() * 1000)
+
+
+def resample_weekly_from_daily_ohlc(daily):
+    """daily: lista de {t,o,h,l,c} con HIGH/LOW reales (no solo cierres). Agrupa por semana ISO
+    (lunes) preservando el high/low REAL de cada dia, para no subestimar el true range semanal."""
+    buckets = {}
+    for p in sorted(daily, key=lambda p: p["t"]):
+        key = iso_week_key_ms(p["t"])
+        if key not in buckets:
+            buckets[key] = {"t": key, "o": p["o"], "h": p["h"], "l": p["l"], "c": p["c"]}
+        b = buckets[key]
+        b["h"] = max(b["h"], p["h"])
+        b["l"] = min(b["l"], p["l"])
+        b["c"] = p["c"]
+    return sorted(buckets.values(), key=lambda w: w["t"])
+
+
+def fetch_coinbase_daily_ohlc():
+    """Velas DIARIAS reales (con high/low verdaderos, no solo cierres) de Coinbase Exchange,
+    API publica sin autenticacion. Se pagina de a <=300 dias por llamada desde 2015."""
+    url = "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    headers = {"User-Agent": "mfloor-verify-script"}
+    out = []
+    cur_end = datetime(2026, 10, 1)
+    start_limit = datetime(2015, 1, 1)
+    while cur_end > start_limit:
+        cur_start = max(start_limit, cur_end - timedelta(days=290))
+        params = {
+            "start": cur_start.strftime("%Y-%m-%dT%H:%M:%S"),
+            "end": cur_end.strftime("%Y-%m-%dT%H:%M:%S"),
+            "granularity": 86400,
+        }
+        r = requests.get(url, params=params, headers=headers, timeout=30)
+        print(f"  [coinbase-daily] {cur_start.date()}..{cur_end.date()} status={r.status_code}")
+        if r.status_code != 200:
+            print(f"  [coinbase-daily] body[:300]={r.text[:300]}")
+            return None
+        rows = r.json()
+        for row in rows:
+            # [ time, low, high, open, close, volume ]
+            out.append({"t": row[0] * 1000, "l": row[1], "h": row[2], "o": row[3], "c": row[4]})
+        cur_end = cur_start - timedelta(days=1)
+    out.sort(key=lambda p: p["t"])
+    return out
+
+
+print("=== 1. Velas semanales de BTC ===")
 klines = get_json(
     "https://api.binance.com/api/v3/klines",
     params={"symbol": "BTCUSDT", "interval": "1w", "limit": 1000},
     label="binance",
 )
 weekly = None
+weekly_source = None
 if klines and isinstance(klines, list):
     weekly = [{"t": k[6], "o": float(k[1]), "h": float(k[2]), "l": float(k[3]), "c": float(k[4])} for k in klines]
     weekly.sort(key=lambda w: w["t"])
-    print(f"  {len(weekly)} velas semanales (Binance, t=CIERRE de la semana), rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
+    weekly_source = "binance (t=CIERRE/domingo de la semana)"
 else:
-    # Binance bloquea IPs de datacenter (GitHub Actions incluido) - mismo respaldo que ya usa el
-    # sitio en vivo: precio diario de blockchain.info, agrupado por semana ISO (lunes-domingo),
-    # con el timestamp = LUNES (inicio de semana) - OJO: distinto de Binance, que da el cierre
-    # (domingo). Para comparar fechas contra TradingView hay que tener esto en cuenta.
-    print("  Binance no disponible - usando respaldo (blockchain.info, agrupado por semana ISO)")
-    price_raw = get_json(
-        "https://api.blockchain.info/charts/market-price",
-        params={"timespan": "all", "format": "json", "sampled": "false"},
-        label="bc-price",
-    )
-    daily_price = sorted([{"t": v["x"] * 1000, "c": v["y"]} for v in price_raw["values"] if v["y"] > 0], key=lambda p: p["t"])
+    print("  Binance no disponible (bloquea IPs de datacenter) - probando Coinbase Exchange (velas DIARIAS reales)")
+    daily_ohlc = fetch_coinbase_daily_ohlc()
+    if daily_ohlc:
+        weekly = resample_weekly_from_daily_ohlc(daily_ohlc)
+        weekly_source = "coinbase (high/low diarios reales, t=INICIO/lunes de la semana)"
+    else:
+        print("  Coinbase tampoco disponible - usando respaldo degradado (blockchain.info, solo precio de CIERRE diario -> subestima el true range semanal)")
+        price_raw = get_json(
+            "https://api.blockchain.info/charts/market-price",
+            params={"timespan": "all", "format": "json", "sampled": "false"},
+            label="bc-price",
+        )
+        daily_price = sorted([{"t": v["x"] * 1000, "o": v["y"], "h": v["y"], "l": v["y"], "c": v["y"]} for v in price_raw["values"] if v["y"] > 0], key=lambda p: p["t"])
+        weekly = resample_weekly_from_daily_ohlc(daily_price)
+        weekly_source = "blockchain.info DEGRADADO (solo cierres diarios, t=INICIO/lunes de la semana)"
 
-    def iso_week_key_ms(t_ms):
-        # aritmetica pura relativa al epoch (sin pasar por .timestamp(), que interpreta un
-        # datetime naive como hora LOCAL del sistema y desfasaria todo por la zona horaria)
-        d = datetime.utcfromtimestamp(t_ms / 1000)
-        day_start = datetime(d.year, d.month, d.day)
-        monday = day_start - timedelta(days=d.weekday())  # weekday(): 0=lunes
-        return int((monday - EPOCH).total_seconds() * 1000)
-
-    buckets = {}
-    for p in daily_price:
-        key = iso_week_key_ms(p["t"])
-        if key not in buckets:
-            buckets[key] = {"t": key, "o": p["c"], "h": p["c"], "l": p["c"], "c": p["c"]}
-        b = buckets[key]
-        b["h"] = max(b["h"], p["c"])
-        b["l"] = min(b["l"], p["c"])
-        b["c"] = p["c"]
-    weekly = sorted(buckets.values(), key=lambda w: w["t"])
-    print(f"  {len(weekly)} semanas (respaldo, t=INICIO/lunes de la semana), rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
+print(f"  fuente semanal usada: {weekly_source}")
+print(f"  {len(weekly)} semanas, rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
 
 print("\n=== 2. blockchain.info dificultad ===")
 diff_raw = get_json(
