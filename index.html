@@ -1569,6 +1569,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
+      <button class="sb-item" data-indic-jump="btcmacro">
+        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + Datos Macroeconómicos</span>
+      </button>
       <button class="sb-item" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
       </button>
@@ -1846,6 +1849,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcmacro">
+        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + Datos Macroeconómicos</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
@@ -2875,6 +2881,52 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="calc-disclaimer" style="margin-top:18px">
                 📐 <b>El eje vertical (precio) usa escala logarítmica</b>, no lineal — así se puede comparar un ciclo donde Bitcoin costaba $13 con uno donde costaba $100.000, sin que el primero se vea como una línea plana en cero.<br>
                 📅 <b>El eje horizontal</b> son días desde el halving de ese ciclo (no fechas de calendario) — el día 0 es siempre el halving, así los 4 ciclos arrancan en el mismo punto y se pueden comparar entre sí. En "Todo el historial" sí se usan fechas reales, con una línea vertical marcando cada halving.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="btcmacro" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">🏛 BTC + Datos Macroeconómicos</h2>
+              </div>
+
+              <div class="tf-pill-row" id="btcmacroRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+              <div class="tf-pill-row" id="btcmacroOverlayToggles"></div>
+
+              <div class="indic-chart-body" id="btcmacroChartBody">
+                <div class="indic-chart-soon" id="btcmacroLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Descargando el precio de BTC y los datos macroeconómicos.</div>
+                </div>
+                <div class="indic-chart-soon" id="btcmacroError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="btcmacroChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="btcmacroDateSlider" class="date-range-slider"></div>
+              </div>
+              <div class="partner-perks" id="btcmacroLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="btcmacroStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🏛 El precio de BTC (eje izquierdo, escala logarítmica) con hasta 4 datos macroeconómicos superpuestos (eje derecho) — actívalos o desactívalos con los botones de arriba, se pueden combinar varios a la vez.<br>
+                📐 Como cada dato macro tiene su propia unidad (PMI, % de inflación, $ del balance de la Fed...), todos se <b>normalizan a una escala de 0% a 100%</b> dentro del rango de fechas que estés viendo — así se puede comparar la forma de sus movimientos contra el precio de BTC, aunque el número real de cada uno aparece en la leyenda y al pasar el mouse.<br>
+                🔎 Fuentes: TradingView (PMI) y FRED (Inflación CPI, Tasa de la Fed, Balance de la Fed).<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -7024,7 +7076,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
@@ -7052,7 +7104,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7198,6 +7250,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'domusdt') ensureDomUsdtLoaded();
       if(btn.dataset.indic === 'othersbtc') ensureOthersBtcLoaded();
       if(btn.dataset.indic === 'ethpmi') ensureEthPmiLoaded();
+      if(btn.dataset.indic === 'btcmacro') ensureBtcMacroLoaded();
       if(btn.dataset.indic === 'ethbtc') ensureEthBtcLoaded();
       if(btn.dataset.indic === 'altfever') ensureAltFeverLoaded();
       if(btn.dataset.indic === 'ethvsalt') ensureEthVsAltLoaded();
@@ -7254,6 +7307,7 @@ function jumpToIndicator(id){
     if(id === 'othersbtc') ensureOthersBtcLoaded();
     if(id === 'ethbtc') ensureEthBtcLoaded();
     if(id === 'ethpmi') ensureEthPmiLoaded();
+    if(id === 'btcmacro') ensureBtcMacroLoaded();
     if(id === 'altfever') ensureAltFeverLoaded();
     if(id === 'ethvsalt') ensureEthVsAltLoaded();
     if(MACRO_CHART_IDS.includes(id)) ensureMacroChartLoaded(id);
@@ -17645,6 +17699,59 @@ const netLiquidityMacro = (() => {
   };
 })();
 
+// BTC + Datos Macroeconómicos: precio de BTC (log) con hasta 4 series macro superpuestas, cada
+// una activable/desactivable por separado - a diferencia de los overlays de un solo dato (ej.
+// OTHERS/BTC + balance de la Fed), aquí pueden estar varias a la vez y cada una tiene su propia
+// unidad (PMI es un índice ~30-65, CPI ~100-300, la tasa de la Fed es %, el balance son billones
+// de USD), así que no caben juntas en un solo eje con su valor real - se normalizan a 0-100% (ver
+// renderBtcMacroChart) y el valor real de cada una queda disponible en la leyenda/tooltip
+const BTC_MACRO_OVERLAY_DEFS = {
+  pmi: { label: 'PMI Manufacturero', color: '#60a5fa', fmt: fmtPlainIndex },
+  cpi: { label: 'Inflación (CPI)', color: '#ff2f4f', fmt: fmtPlainIndex },
+  fedfunds: { label: 'Tasa de Interés de la Fed', color: '#22c55e', fmt: v => v.toFixed(2) + '%' },
+  fedbalance: { label: 'Balance de la Fed', color: '#c084fc', fmt: fmtUsdTrillions },
+};
+let btcMacroSeries = null, btcMacroPromise = null;
+async function fetchBtcMacroOverlaySeries(){
+  if(btcMacroSeries) return btcMacroSeries;
+  if(!btcMacroPromise){
+    btcMacroPromise = Promise.all([
+      fetchHalvingHistory(),
+      // si algún dato macro falla, el precio de BTC no debe romperse por eso - solo se queda sin
+      // ese overlay disponible (su botón simplemente no hará nada si no hay datos)
+      pmiUsMacro.load().catch(() => []),
+      cpiMacro.load().catch(() => []),
+      fedFundsMacro.load().catch(() => []),
+      fedBalanceMacro.load().catch(() => []),
+    ]).then(([btc]) => {
+      const rawOverlays = {
+        pmi: (pmiUsMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
+        cpi: (cpiMacro.series() || []).map(p => ({ t: p.t, v: p.general })),
+        fedfunds: (fedFundsMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
+        fedbalance: (fedBalanceMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
+      };
+      const keys = Object.keys(rawOverlays);
+      const sorted = {};
+      keys.forEach(k => { sorted[k] = rawOverlays[k].slice().sort((a, b) => a.t - b.t); });
+      const idx = {}, last = {};
+      keys.forEach(k => { idx[k] = 0; last[k] = null; });
+      // BTC (diario) manda la línea de tiempo - cada dato macro (mensual/semanal) se "mantiene"
+      // (forward-fill) sobre ella, mismo mecanismo que ya usa OTHERS/BTC con el balance de la Fed
+      btcMacroSeries = btc.map(p => {
+        const row = { t: p.t, btc: p.c };
+        keys.forEach(k => {
+          const s = sorted[k];
+          while(idx[k] < s.length && s[idx[k]].t <= p.t){ last[k] = s[idx[k]].v; idx[k]++; }
+          row[k] = last[k];
+        });
+        return row;
+      });
+      return btcMacroSeries;
+    });
+  }
+  return btcMacroPromise;
+}
+
 let domAllRealSeries = null;
 let domAllRealFetchPromise = null;
 async function fetchDomAllRealHistory(){
@@ -18529,6 +18636,7 @@ function ensureMacroGuiaLoaded(){
 // rota el capital) y sí combinan con sentido, así que llevan el mismo combinador que Macro.
 const BITCOIN_GUIA_INDICATORS = [
   { id: 'halving', icon: '⏳', label: 'Ciclos de Halving', def: 'Cuenta el tiempo desde el último halving (el evento que reduce a la mitad la recompensa de minería cada ~4 años) — históricamente marca el ritmo de los ciclos alcistas y bajistas de BTC.' },
+  { id: 'btcmacro', icon: '🏛', label: 'BTC + Datos Macroeconómicos', def: 'El precio de BTC con PMI, inflación, tasas de interés y/o el balance de la Fed superpuestos — activa los que quieras ver y compara su forma contra el precio.' },
   { id: 'pisomercado', icon: '⚓', label: 'Pulso de Fondo', def: 'Un modelo estadístico de "piso" de mercado — qué tan cerca o lejos está el precio de zonas históricas donde BTC tocó fondo.' },
   { id: 'rsimensual', icon: '📊', label: 'RSI Mensual', def: 'La fuerza relativa del precio en velas mensuales — sobrecomprado o sobrevendido, visto en el timeframe más grande.' },
   { id: 'ciclosoporte', icon: '🏔️', label: 'Techo Anterior', def: 'Compara el precio de hoy contra el máximo del ciclo alcista anterior — ese techo viejo suele actuar después como soporte o resistencia.' },
@@ -18774,6 +18882,224 @@ function ensureEthBtcLoaded(){ if(!domLoadedOnce.ethbtc){ domLoadedOnce.ethbtc =
 function ensureEthPmiLoaded(){ if(!domLoadedOnce.ethpmi){ domLoadedOnce.ethpmi = true; loadDomChartDetail('ethpmi'); } }
 function ensureAltFeverLoaded(){ if(!domLoadedOnce.altfever){ domLoadedOnce.altfever = true; loadDomChartDetail('altfever'); } }
 function ensureEthVsAltLoaded(){ if(!domLoadedOnce.ethvsalt){ domLoadedOnce.ethvsalt = true; loadDomChartDetail('ethvsalt'); } }
+
+// qué overlays macro están activos ahora mismo (se pueden combinar varios a la vez) y en qué
+// rango de fechas está el gráfico - mismo patrón de estado que ya usan los demás gráficos con
+// filtro en píldora + slider de arrastre
+const btcMacroActiveOverlays = new Set();
+const BTC_MACRO_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let btcMacroActiveRange = 'todo';
+let btcMacroCustomRange = null;
+let btcMacroSlider = null;
+function renderBtcMacroToggles(){
+  const row = document.getElementById('btcmacroOverlayToggles');
+  if(!row) return;
+  row.innerHTML = Object.keys(BTC_MACRO_OVERLAY_DEFS).map(key => {
+    const def = BTC_MACRO_OVERLAY_DEFS[key];
+    const active = btcMacroActiveOverlays.has(key);
+    // el estado activo usa el color propio de ese dato (en vez del rojo genérico de .tf-pill.active)
+    // para que el botón funcione como vista previa del color de su línea en el gráfico
+    return `<button type="button" class="tf-pill${active ? ' active' : ''}" data-overlay="${key}" style="${active ? `background:${def.color};border-color:${def.color};color:#080c1a` : ''}">${def.label}</button>`;
+  }).join('');
+  row.querySelectorAll('[data-overlay]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.overlay;
+      if(btcMacroActiveOverlays.has(key)) btcMacroActiveOverlays.delete(key);
+      else btcMacroActiveOverlays.add(key);
+      renderBtcMacroToggles();
+      renderBtcMacroChart();
+    });
+  });
+}
+function renderBtcMacroChart(){
+  const loadingEl = document.getElementById('btcmacroLoading');
+  const errorEl = document.getElementById('btcmacroError');
+  const wrap = document.getElementById('btcmacroChartWrap');
+  const legendEl = document.getElementById('btcmacroLegend');
+  const statsEl = document.getElementById('btcmacroStats');
+  const allPoints = btcMacroSeries;
+  if(!allPoints || allPoints.length < 10){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const fullStartMs = allPoints[0].t, fullEndMs = allPoints[allPoints.length - 1].t;
+  let fromMs, toMs;
+  if(btcMacroCustomRange){
+    fromMs = btcMacroCustomRange.fromMs;
+    toMs = btcMacroCustomRange.toMs;
+  } else {
+    const rangeYears = BTC_MACRO_RANGE_YEARS[btcMacroActiveRange];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const points = allPoints.filter(p => p.t >= fromMs && p.t <= toMs);
+  if(!points.length) return;
+
+  if(btcMacroSlider) btcMacroSlider.setRange(fromMs, toMs);
+  else{
+    btcMacroSlider = createDateRangeSlider('btcmacroDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      btcMacroCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#btcmacroRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderBtcMacroChart();
+    });
+  }
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+
+  const btcVals = points.map(p => p.btc).filter(v => v != null && v > 0);
+  const minPrice = Math.min(...btcVals), maxPrice = Math.max(...btcVals);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const yFontSize = isMobileChart ? 10 : 12;
+  const xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58;
+  const marginRight = isMobileChart ? 40 : 54; // espacio para las etiquetas del eje derecho (%)
+  const marginTop = 20, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawH = totalH - marginTop - marginBottom;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
+  const yFor2 = pct => marginTop + drawH - (pct / 100) * drawH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yFor(t);
+    return y > marginTop + 2 && y < marginTop + drawH - 4;
+  });
+  const yGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+  // eje derecho fijo 0-100%: todos los overlays macro activos se normalizan a esa escala dentro
+  // del rango visible actual (ver más abajo), así pueden compartir un solo eje aunque tengan
+  // unidades distintas - el valor real de cada uno va en la leyenda y el tooltip, no en el eje
+  const pct2TicksHtml = [0, 25, 50, 75, 100].map(pct => `
+    <text x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(pct) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}" font-weight="700" fill="rgba(255,255,255,.4)" font-family="'Space Mono',monospace">${pct}%</text>
+  `).join('');
+
+  function pathFor(getV, yForFn){
+    let d = '', drawing = false;
+    points.forEach(p => {
+      const v = getV(p);
+      if(v == null || !isFinite(v)){ drawing = false; return; }
+      d += `${drawing ? 'L' : 'M'}${xFor(p.t).toFixed(1)},${yForFn(v).toFixed(1)} `;
+      drawing = true;
+    });
+    return d.trim();
+  }
+  const btcPathD = pathFor(p => p.btc, yFor);
+
+  // normaliza cada overlay activo a 0-100% DENTRO del rango de fechas visible ahora mismo (no del
+  // historial completo) - así, sin importar si se está viendo "todo" o solo los últimos 2 años, la
+  // línea siempre usa el rango completo del eje para que se vea bien su forma, nunca aplastada
+  let overlayPathsHtml = '';
+  const overlayLastVals = {};
+  btcMacroActiveOverlays.forEach(key => {
+    const def = BTC_MACRO_OVERLAY_DEFS[key];
+    const vals = points.map(p => p[key]).filter(v => v != null && isFinite(v));
+    if(vals.length < 2) return; // sin datos de este overlay en el rango visible - no se dibuja
+    const minV = Math.min(...vals), maxV = Math.max(...vals);
+    const range = (maxV - minV) || 1;
+    const d = pathFor(p => (p[key] == null || !isFinite(p[key])) ? null : ((p[key] - minV) / range) * 100, yFor2);
+    overlayPathsHtml += `<path d="${d}" fill="none" stroke="${def.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>`;
+    overlayLastVals[key] = vals[vals.length - 1];
+  });
+
+  const lastPx = xFor(endMs);
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="btcmacroChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${yGridHtml}
+        ${pct2TicksHtml}
+        <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        ${overlayPathsHtml}
+        ${xLabelsHtml}
+        <line id="btcmacroHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="btcmacroHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="btcmacroHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="btcmacroHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="btcmacroHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="btcmacroTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const svg = document.getElementById('btcmacroChartSvg');
+  wireChartHover({
+    svg, catcherId: 'btcmacroHoverCatcher', lineId: 'btcmacroHoverLine', dotId: 'btcmacroHoverDot',
+    dateLabelId: 'btcmacroHoverDateLabel', dateBgId: 'btcmacroHoverDateBg', tooltipId: 'btcmacroTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yFor(points[i].btc),
+    tooltipHtml: i => {
+      const p = points[i];
+      let html = `<b>₿ ${fmtHalvingPrice(p.btc)}</b>`;
+      btcMacroActiveOverlays.forEach(key => {
+        if(p[key] == null || overlayLastVals[key] === undefined) return;
+        const def = BTC_MACRO_OVERLAY_DEFS[key];
+        html += `<br><span style="color:${def.color}">${def.label}: ${def.fmt(p[key])}</span>`;
+      });
+      return html;
+    },
+  });
+
+  let legendHtml = `<span class="perk-chip"><span class="perk-chip-dot" style="background:#f7931a"></span>Precio de BTC</span>`;
+  btcMacroActiveOverlays.forEach(key => {
+    if(overlayLastVals[key] === undefined) return;
+    const def = BTC_MACRO_OVERLAY_DEFS[key];
+    legendHtml += `<span class="perk-chip"><span class="perk-chip-dot" style="background:${def.color}"></span>${def.label}</span>`;
+  });
+  legendEl.innerHTML = legendHtml;
+
+  let statsHtml = `<div class="res-card"><div class="r-label">Precio de BTC actual</div><div class="r-val">${fmtHalvingPrice(btcVals[btcVals.length - 1])}</div></div>`;
+  btcMacroActiveOverlays.forEach(key => {
+    if(overlayLastVals[key] === undefined) return;
+    const def = BTC_MACRO_OVERLAY_DEFS[key];
+    statsHtml += `<div class="res-card"><div class="r-label">${def.label}</div><div class="r-val">${def.fmt(overlayLastVals[key])}</div></div>`;
+  });
+  statsEl.innerHTML = statsHtml;
+}
+async function loadBtcMacroDetail(){
+  try{ await fetchBtcMacroOverlaySeries(); } catch(err){ /* renderBtcMacroChart muestra el estado de error si no hay datos */ }
+  renderBtcMacroToggles();
+  renderBtcMacroChart();
+}
+let btcMacroLoadedOnce = false;
+function ensureBtcMacroLoaded(){ if(!btcMacroLoadedOnce){ btcMacroLoadedOnce = true; loadBtcMacroDetail(); } }
+document.querySelectorAll('#btcmacroRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#btcmacroRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    btcMacroActiveRange = btn.dataset.range;
+    btcMacroCustomRange = null;
+    renderBtcMacroChart();
+  });
+});
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="btcmacro"]').style.display !== 'none') renderBtcMacroChart();
+});
+
 window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="domratio"]').style.display !== 'none') renderDomChart('domratio');
   if(document.querySelector('.indic-panel[data-indic="domall"]').style.display !== 'none') renderDomChart('domall');
