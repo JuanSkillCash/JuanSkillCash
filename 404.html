@@ -16279,7 +16279,11 @@ async function fetchWeeklyBtcOhlc(){
     const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=1000');
     const rows = await res.json();
     if(!Array.isArray(rows)) throw new Error('binance http ' + res.status + ' (' + (rows && rows.msg || 'sin datos') + ')');
-    return rows.map(r => ({ t: r[6], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }));
+    // r[0] = apertura de la vela (lunes 00:00 UTC) - TradingView etiqueta cada vela semanal por su
+    // apertura (ej. "lun 19 Ago '24"), no por el cierre (r[6], domingo ~23:59 UTC). Usar r[6] no
+    // cambia ningún valor calculado (misma vela, mismos datos), pero sí desfasaba ~6 días la fecha
+    // que se le mostraba al usuario en el tooltip/cruces frente a lo que ve en TradingView.
+    return rows.map(r => ({ t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4] }));
   } catch(err){
     // Binance bloquea el acceso desde ciertos países/operadores móviles (a veces distinto de la
     // red wifi del mismo usuario) y devuelve un objeto de error en vez de un arreglo de velas — sin
@@ -16294,20 +16298,17 @@ async function fetchWeeklyBtcOhlc(){
   }
 }
 function buildWeeklyOhlcFromDailyCloses(daily){
-  // OJO: el bucket se agrupa por semana ISO (lunes-domingo), pero el timestamp "t" que se guarda es
-  // el del ÚLTIMO día visto de esa semana (≈domingo) y no el lunes de inicio — así coincide con el
-  // criterio de Binance en fetchWeeklyBtcOhlc (r[6] = cierre de la vela), que es la fuente primaria.
-  // Antes este respaldo guardaba el lunes de inicio, lo que desfasaba varios días las fechas
-  // mostradas (tooltip, cruces de Pulso de Fondo, etc.) cada vez que Binance no estaba disponible.
+  // El bucket se agrupa por semana ISO (lunes-domingo) y "t" = el lunes de inicio de esa semana -
+  // mismo criterio que ahora usa fetchWeeklyBtcOhlc (r[0] = apertura, lunes), que es la fuente
+  // primaria, y que coincide con cómo TradingView etiqueta cada vela semanal (por su apertura).
   const buckets = new Map();
   daily.forEach(p => {
     const key = isoWeekKeyMs(p.t);
-    if(!buckets.has(key)) buckets.set(key, { t: p.t, o: p.c, h: p.c, l: p.c, c: p.c });
+    if(!buckets.has(key)) buckets.set(key, { t: key, o: p.c, h: p.c, l: p.c, c: p.c });
     const b = buckets.get(key);
     b.h = Math.max(b.h, p.c);
     b.l = Math.min(b.l, p.c);
     b.c = p.c;
-    b.t = p.t;
   });
   return [...buckets.values()].sort((a, b) => a.t - b.t);
 }
