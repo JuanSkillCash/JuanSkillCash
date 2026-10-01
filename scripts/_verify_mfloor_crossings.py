@@ -7,9 +7,11 @@ lo que el usuario ve en su grafico de TradingView.
 
 import json
 import bisect
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import requests
+
+EPOCH = datetime(1970, 1, 1)
 
 HALVINGS = [
     (date(2012, 11, 28), 25.0),
@@ -42,9 +44,43 @@ klines = get_json(
     params={"symbol": "BTCUSDT", "interval": "1w", "limit": 1000},
     label="binance",
 )
-weekly = [{"t": k[6], "o": float(k[1]), "h": float(k[2]), "l": float(k[3]), "c": float(k[4])} for k in klines]
-weekly.sort(key=lambda w: w["t"])
-print(f"  {len(weekly)} velas semanales, rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
+weekly = None
+if klines and isinstance(klines, list):
+    weekly = [{"t": k[6], "o": float(k[1]), "h": float(k[2]), "l": float(k[3]), "c": float(k[4])} for k in klines]
+    weekly.sort(key=lambda w: w["t"])
+    print(f"  {len(weekly)} velas semanales (Binance, t=CIERRE de la semana), rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
+else:
+    # Binance bloquea IPs de datacenter (GitHub Actions incluido) - mismo respaldo que ya usa el
+    # sitio en vivo: precio diario de blockchain.info, agrupado por semana ISO (lunes-domingo),
+    # con el timestamp = LUNES (inicio de semana) - OJO: distinto de Binance, que da el cierre
+    # (domingo). Para comparar fechas contra TradingView hay que tener esto en cuenta.
+    print("  Binance no disponible - usando respaldo (blockchain.info, agrupado por semana ISO)")
+    price_raw = get_json(
+        "https://api.blockchain.info/charts/market-price",
+        params={"timespan": "all", "format": "json", "sampled": "false"},
+        label="bc-price",
+    )
+    daily_price = sorted([{"t": v["x"] * 1000, "c": v["y"]} for v in price_raw["values"] if v["y"] > 0], key=lambda p: p["t"])
+
+    def iso_week_key_ms(t_ms):
+        # aritmetica pura relativa al epoch (sin pasar por .timestamp(), que interpreta un
+        # datetime naive como hora LOCAL del sistema y desfasaria todo por la zona horaria)
+        d = datetime.utcfromtimestamp(t_ms / 1000)
+        day_start = datetime(d.year, d.month, d.day)
+        monday = day_start - timedelta(days=d.weekday())  # weekday(): 0=lunes
+        return int((monday - EPOCH).total_seconds() * 1000)
+
+    buckets = {}
+    for p in daily_price:
+        key = iso_week_key_ms(p["t"])
+        if key not in buckets:
+            buckets[key] = {"t": key, "o": p["c"], "h": p["c"], "l": p["c"], "c": p["c"]}
+        b = buckets[key]
+        b["h"] = max(b["h"], p["c"])
+        b["l"] = min(b["l"], p["c"])
+        b["c"] = p["c"]
+    weekly = sorted(buckets.values(), key=lambda w: w["t"])
+    print(f"  {len(weekly)} semanas (respaldo, t=INICIO/lunes de la semana), rango {datetime.utcfromtimestamp(weekly[0]['t']/1000).date()} .. {datetime.utcfromtimestamp(weekly[-1]['t']/1000).date()}")
 
 print("\n=== 2. blockchain.info dificultad ===")
 diff_raw = get_json(
