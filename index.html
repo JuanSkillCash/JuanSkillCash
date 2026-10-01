@@ -184,8 +184,19 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed .mh-eyebrow{opacity:0;pointer-events:none}
 .sb-nav{display:flex;flex-direction:column;gap:3px;padding:0 10px}
 .indic-mobile-nav{display:none;flex-direction:column;gap:3px;padding:0 10px}
-.indic-cat-label{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:11px 10px 5px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.sidebar.indic-active .sb-search-wrap,
+.indic-cat-label{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:11px 10px 5px;white-space:nowrap;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.indic-cat-label::after{content:'';margin-left:auto;width:5px;height:5px;border-right:1.3px solid var(--muted);border-bottom:1.3px solid var(--muted);transform:rotate(45deg);transition:transform var(--dur-base) var(--ease-out);flex-shrink:0}
+.indic-cat-label.collapsed::after{transform:rotate(-45deg)}
+/* encabezado del sidebar (logo + buscador + control de expandir/contraer) fijo arriba mientras
+   se hace scroll por la lista larga de indicadores - mismo fondo con blur que ya usa .sidebar,
+   para que el contenido que pasa por debajo no se transparente sobre el texto */
+.sb-sticky-head{position:sticky;top:0;z-index:6;background:rgba(8,12,32,.92);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%)}
+.sb-cat-controls{padding:2px 18px 10px}
+.sidebar.collapsed .sb-cat-controls{display:none}
+.sb-cat-toggle-all{display:flex;align-items:center;gap:7px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:8px 11px;color:var(--muted2);font-family:'Space Grotesk',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.sb-cat-toggle-all:hover{background:rgba(255,47,79,.1);border-color:rgba(255,47,79,.35);color:var(--white)}
+.sb-cat-toggle-all svg{flex-shrink:0;transition:transform var(--dur-base) var(--ease-out)}
+.sb-cat-toggle-all.all-expanded svg{transform:rotate(180deg)}
 .sidebar.indic-active .sb-section-label,
 .sidebar.indic-active .sb-nav{display:none}
 .sidebar.indic-active .indic-mobile-nav{display:flex}
@@ -1560,19 +1571,27 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
   <div class="sb-backdrop" id="sbBackdrop"></div>
 
   <aside class="sidebar" id="sidebar">
-    <div class="sb-top">
-      <a href="#" class="sb-logo" id="sbLogo">
-        <span class="sb-logo-mark"><img src="/logo-skillcash-600.png" alt="SkillCash"></span>
-        <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
-      </a>
-      <button class="sb-toggle" id="sbToggle" title="Colapsar" aria-label="Colapsar menú">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
-    <div class="sb-search-wrap">
-      <svg class="sb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
+    <div class="sb-sticky-head">
+      <div class="sb-top">
+        <a href="#" class="sb-logo" id="sbLogo">
+          <span class="sb-logo-mark"><img src="/logo-skillcash-600.png" alt="SkillCash"></span>
+          <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
+        </a>
+        <button class="sb-toggle" id="sbToggle" title="Colapsar" aria-label="Colapsar menú">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
+      <div class="sb-search-wrap">
+        <svg class="sb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="sbSearchInput" placeholder="Buscar herramienta..." autocomplete="off">
+      </div>
+      <div class="sb-cat-controls">
+        <button type="button" class="sb-cat-toggle-all" id="sbCatToggleAll">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>
+          <span id="sbCatToggleAllLabel">Expandir categorías</span>
+        </button>
+      </div>
     </div>
     <nav class="sb-nav">
       <div class="sb-cat-label" data-category="indicadores">Indicadores de Mercado</div>
@@ -1619,11 +1638,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales BTC</span>
-      </button>
-      <button class="sb-item" data-indic-jump="btcmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales BTC</span>
+      <button class="sb-item" data-indic-jump="btcreturns">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Bitcoin</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button class="sb-item" data-indic-jump="ethereumguia">
@@ -1906,11 +1922,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcquarterly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales BTC</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcmonthly">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Mensuales BTC</span>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcreturns">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Bitcoin</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethereumguia">
@@ -2204,7 +2217,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
-        <div class="cat-overview-sub">51 INDICADORES</div>
+        <div class="cat-overview-sub">50 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
@@ -4290,7 +4303,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
-        <div class="indic-panel" data-indic="btcquarterly" style="display:none">
+        <div class="indic-panel" data-indic="btcreturns" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
               <div class="calc-head">
@@ -4298,60 +4311,33 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Retornos Trimestrales de Bitcoin</h2>
+                <h2 class="calc-title">Retornos de Bitcoin</h2>
               </div>
 
-              <div class="indic-chart-body" id="btcquarterlyChartBody">
-                <div class="indic-chart-soon" id="btcquarterlyLoading">
+              <div class="tf-pill-row" id="btcreturnsGranularityFilter">
+                <button type="button" class="tf-pill" data-granularity="year">Anual</button>
+                <button type="button" class="tf-pill active" data-granularity="quarter">Trimestral</button>
+                <button type="button" class="tf-pill" data-granularity="month">Mensual</button>
+                <button type="button" class="tf-pill" data-granularity="week">Semanal</button>
+              </div>
+
+              <div class="indic-chart-body" id="btcreturnsChartBody">
+                <div class="indic-chart-soon" id="btcreturnsLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Calculando el retorno de cada trimestre sobre el precio histórico de Bitcoin.</div>
+                  <div class="indic-placeholder-text">Calculando el retorno de Bitcoin por período sobre su precio histórico.</div>
                 </div>
-                <div class="indic-chart-soon" id="btcquarterlyError" style="display:none">
+                <div class="indic-chart-soon" id="btcreturnsError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
                   <div class="indic-placeholder-title">No se pudo cargar el historial</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="btcquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
+                  <div class="indic-placeholder-text" id="btcreturnsErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="btcquarterlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
+                <div id="btcreturnsTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                📅 Retorno de cada trimestre calculado sobre el precio real de cierre de Bitcoin (precio de cierre del trimestre frente al cierre del trimestre anterior) — histórico completo desde que hay datos.<br>
-                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="indic-panel" data-indic="btcmonthly" style="display:none">
-          <div class="indic-chart-card">
-            <div class="calc">
-              <div class="calc-head">
-                <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.png" alt="SkillCash">
-                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-                </div>
-                <h2 class="calc-title">Retornos Mensuales de Bitcoin</h2>
-              </div>
-
-              <div class="indic-chart-body" id="btcmonthlyChartBody">
-                <div class="indic-chart-soon" id="btcmonthlyLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Calculando el retorno de cada mes sobre el precio histórico de Bitcoin.</div>
-                </div>
-                <div class="indic-chart-soon" id="btcmonthlyError" style="display:none">
-                  <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                  <div class="indic-placeholder-text" id="btcmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
-                </div>
-                <div id="btcmonthlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
-              </div>
-
-              <div class="calc-disclaimer" style="margin-top:18px">
-                📅 Retorno de cada mes calculado sobre el precio real de cierre de Bitcoin (precio de cierre del mes frente al cierre del mes anterior) — histórico completo desde que hay datos.<br>
+                📅 Retorno de cada período calculado sobre el precio real de cierre de Bitcoin (precio de cierre del período frente al cierre del período anterior) — histórico completo desde que hay datos. La semana usa el estándar ISO-8601.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -7157,7 +7143,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }],
@@ -7186,7 +7172,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcreturns: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7319,8 +7305,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
-      if(btn.dataset.indic === 'btcquarterly') ensureBtcQuarterlyLoaded();
-      if(btn.dataset.indic === 'btcmonthly') ensureBtcMonthlyLoaded();
+      if(btn.dataset.indic === 'btcreturns') ensureBtcReturnsLoaded();
       if(btn.dataset.indic === 'ethquarterly') ensureEthQuarterlyLoaded();
       if(btn.dataset.indic === 'ethmonthly') ensureEthMonthlyLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
@@ -7376,8 +7361,7 @@ function jumpToIndicator(id){
     if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
-    if(id === 'btcquarterly') ensureBtcQuarterlyLoaded();
-    if(id === 'btcmonthly') ensureBtcMonthlyLoaded();
+    if(id === 'btcreturns') ensureBtcReturnsLoaded();
     if(id === 'ethquarterly') ensureEthQuarterlyLoaded();
     if(id === 'ethmonthly') ensureEthMonthlyLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
@@ -18152,15 +18136,28 @@ async function fetchEthPmiOverlay(){
    período es el precio de cierre del último día de ese período frente al cierre del último día
    del período anterior (el período más antiguo del historial se deja en blanco: no hay un
    período previo con el que compararlo) */
+function returnsSubInfo(d, granularity){
+  if(granularity === 'year') return { year: d.getUTCFullYear(), idx: 0 };
+  if(granularity === 'quarter') return { year: d.getUTCFullYear(), idx: Math.floor(d.getUTCMonth() / 3) };
+  if(granularity === 'month') return { year: d.getUTCFullYear(), idx: d.getUTCMonth() };
+  // 'week': número de semana ISO-8601 — se le atribuye la semana al año de SU jueves (no al año
+  // calendario de la fecha original), que es el estándar ISO y evita que las fechas de fin/inicio
+  // de año queden mal asignadas a la semana equivocada
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dayNum = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - dayNum);
+  const isoYear = t.getUTCFullYear();
+  const yearStart = new Date(Date.UTC(isoYear, 0, 1));
+  const weekNo = Math.ceil((((t - yearStart) / 86400000) + 1) / 7);
+  return { year: isoYear, idx: weekNo - 1 };
+}
 function returnsBuildPeriods(series, granularity){
   if(!series || series.length < 2) return [];
   const lastClose = new Map();
   const order = [];
   series.forEach(p => {
-    const d = new Date(p.t);
-    const key = granularity === 'quarter'
-      ? d.getUTCFullYear() + '-Q' + (Math.floor(d.getUTCMonth() / 3) + 1)
-      : d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+    const { year, idx } = returnsSubInfo(new Date(p.t), granularity);
+    const key = year + '-' + String(idx).padStart(2, '0');
     if(!lastClose.has(key)) order.push(key);
     lastClose.set(key, p.c);
   });
@@ -18175,9 +18172,9 @@ function returnsBuildPeriods(series, granularity){
 function returnsToYearGrid(periods, cols){
   const years = new Map();
   periods.forEach(p => {
-    const [yearStr, subStr] = p.key.split('-');
-    const year = Number(yearStr);
-    const idx = subStr[0] === 'Q' ? Number(subStr.slice(1)) - 1 : Number(subStr) - 1;
+    const sep = p.key.lastIndexOf('-');
+    const year = Number(p.key.slice(0, sep));
+    const idx = Number(p.key.slice(sep + 1));
     if(!years.has(year)) years.set(year, new Array(cols).fill(null));
     years.get(year)[idx] = p.pct;
   });
@@ -18206,12 +18203,16 @@ function returnsFmtSummaryCell(v){
   if(v == null) return '<td>—</td>';
   return '<td>' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</td>';
 }
+const RETURNS_YEAR_LABELS = ['Retorno anual'];
 const RETURNS_QUARTER_LABELS = ['Primer trimestre', 'Segundo trimestre', 'Tercer trimestre', 'Cuarto trimestre'];
 const RETURNS_MONTH_LABELS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const RETURNS_WEEK_LABELS = Array.from({ length: 53 }, (_, i) => 'S' + (i + 1));
+const RETURNS_COLS_BY_GRANULARITY = { year: 1, quarter: 4, month: 12, week: 53 };
+const RETURNS_LABELS_BY_GRANULARITY = { year: RETURNS_YEAR_LABELS, quarter: RETURNS_QUARTER_LABELS, month: RETURNS_MONTH_LABELS, week: RETURNS_WEEK_LABELS };
 function renderReturnsTable(wrapId, series, granularity){
   const wrap = document.getElementById(wrapId);
-  const cols = granularity === 'quarter' ? 4 : 12;
-  const colLabels = granularity === 'quarter' ? RETURNS_QUARTER_LABELS : RETURNS_MONTH_LABELS;
+  const cols = RETURNS_COLS_BY_GRANULARITY[granularity];
+  const colLabels = RETURNS_LABELS_BY_GRANULARITY[granularity];
   const periods = returnsBuildPeriods(series, granularity);
   const yearsMap = returnsToYearGrid(periods, cols);
   const years = [...yearsMap.keys()].sort((a, b) => b - a);
@@ -18250,11 +18251,44 @@ async function loadReturnsPanel(id, granularity, fetchSeriesFn){
     if(detailEl) detailEl.textContent = String((err && err.message) || err);
   }
 }
-const returnsLoadedOnce = { btcquarterly: false, btcmonthly: false, ethquarterly: false, ethmonthly: false };
-function ensureBtcQuarterlyLoaded(){ if(!returnsLoadedOnce.btcquarterly){ returnsLoadedOnce.btcquarterly = true; loadReturnsPanel('btcquarterly', 'quarter', fetchHalvingHistory); } }
-function ensureBtcMonthlyLoaded(){ if(!returnsLoadedOnce.btcmonthly){ returnsLoadedOnce.btcmonthly = true; loadReturnsPanel('btcmonthly', 'month', fetchHalvingHistory); } }
+const returnsLoadedOnce = { ethquarterly: false, ethmonthly: false };
 function ensureEthQuarterlyLoaded(){ if(!returnsLoadedOnce.ethquarterly){ returnsLoadedOnce.ethquarterly = true; loadReturnsPanel('ethquarterly', 'quarter', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
 function ensureEthMonthlyLoaded(){ if(!returnsLoadedOnce.ethmonthly){ returnsLoadedOnce.ethmonthly = true; loadReturnsPanel('ethmonthly', 'month', () => ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory)); } }
+
+// Retornos de Bitcoin (anual/trimestral/mensual/semanal, en pestañas) — un solo fetch del
+// historial de precio de BTC, las 4 pestañas solo cambian cómo se agrupa/pinta esa misma serie
+let btcReturnsSeries = null;
+let btcReturnsActiveGranularity = 'quarter';
+async function loadBtcReturnsPanel(){
+  const loadingEl = document.getElementById('btcreturnsLoading');
+  const errorEl = document.getElementById('btcreturnsError');
+  const wrap = document.getElementById('btcreturnsTableWrap');
+  try{
+    btcReturnsSeries = await fetchHalvingHistory();
+    if(!btcReturnsSeries || btcReturnsSeries.length < 30) throw new Error('historial insuficiente');
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    wrap.style.display = 'block';
+    renderReturnsTable('btcreturnsTableWrap', btcReturnsSeries, btcReturnsActiveGranularity);
+  } catch(err){
+    loadingEl.style.display = 'none';
+    wrap.style.display = 'none';
+    errorEl.style.display = 'flex';
+    const detailEl = document.getElementById('btcreturnsErrorDetail');
+    if(detailEl) detailEl.textContent = String((err && err.message) || err);
+  }
+}
+let btcReturnsLoadedOnce = false;
+function ensureBtcReturnsLoaded(){ if(!btcReturnsLoadedOnce){ btcReturnsLoadedOnce = true; loadBtcReturnsPanel(); } }
+document.querySelectorAll('#btcreturnsGranularityFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#btcreturnsGranularityFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    btcReturnsActiveGranularity = btn.dataset.granularity;
+    if(btcReturnsSeries) renderReturnsTable('btcreturnsTableWrap', btcReturnsSeries, btcReturnsActiveGranularity);
+  });
+});
 
 // Euforia de Altcoins: OTHERS ÷ (TOTAL3 − OTHERS) — cola larga de altcoins vs. altcoins grandes
 let altFeverRealSeries = null, altFeverRealPromise = null;
@@ -18945,8 +18979,7 @@ const BITCOIN_GUIA_INDICATORS = [
   { id: 'ema200', icon: '📉', label: 'Medias Móviles 200', def: 'La media móvil de 200 (semanal o diaria) que separa la tendencia alcista de la bajista de largo plazo.' },
   { id: 'treasuries', icon: '🏢', label: 'Balances Corporativos', def: 'Cuánto BTC tienen acumulado empresas públicas como MicroStrategy — el apetito institucional, en números reales.' },
   { id: 'btcxau', icon: '🥇', label: 'BTC/XAU', def: 'El precio de BTC medido en onzas de oro, en vez de dólares — para comparar los dos "activos refugio".' },
-  { id: 'btcquarterly', icon: '📅', label: 'Retornos Trimestrales BTC', def: 'Cómo le ha ido a BTC, trimestre por trimestre, a lo largo de su historia.' },
-  { id: 'btcmonthly', icon: '🗓️', label: 'Retornos Mensuales BTC', def: 'Lo mismo, pero por mes del año — para ver si hay estacionalidad (ej. "septiembre rojo").' },
+  { id: 'btcreturns', icon: '📅', label: 'Retornos de Bitcoin', def: 'Cómo le ha ido a BTC por año, trimestre, mes o semana — en pestañas, para ver de un vistazo si hay estacionalidad (ej. "septiembre rojo").' },
 ];
 const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },
