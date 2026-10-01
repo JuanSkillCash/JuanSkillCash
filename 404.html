@@ -7458,7 +7458,13 @@ function jumpToIndicator(id){
     if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   });
   document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
-    item.classList.toggle('active', item.dataset.indicJump === id);
+    const active = item.dataset.indicJump === id;
+    item.classList.toggle('active', active);
+    // sin esto, el ítem queda marcado "activo" pero fuera de vista si la barra lateral no tiene
+    // scroll hasta ahí (ej. al entrar directo a un indicador que vive más abajo en la lista, como
+    // los de Macro) - el usuario ve la barra igual que al cargar la página, sin pista de qué
+    // está seleccionado
+    if(active) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   // reemplaza la URL actual (nunca apila una entrada nueva) — cambiar de indicador es como
   // cambiar de pestaña/filtro, no una "navegación" que deba poder deshacerse con el botón atrás
