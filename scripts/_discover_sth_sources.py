@@ -54,3 +54,26 @@ try:
     print(r.text[:1000])
 except Exception as e:
     print("ERROR:", e)
+
+print("\n=== BITVIEW: /openapi.json (primeros 6000 chars) ===")
+try:
+    r = requests.get("https://bitview.space/openapi.json", timeout=30)
+    print("status:", r.status_code)
+    print(r.text[:6000])
+except Exception as e:
+    print("ERROR:", e)
+
+for candidate in [
+    "/api/vecs/sth_realized_price",
+    "/api/series/sth_realized_price",
+    "/api/vecs/sth-realized-price",
+    "/api/sth_realized_price",
+    "/api/series/sth_realized_price/values",
+]:
+    print(f"\n=== BITVIEW: {candidate} ===")
+    try:
+        r = requests.get("https://bitview.space" + candidate, timeout=30)
+        print("status:", r.status_code)
+        print(r.text[:1500])
+    except Exception as e:
+        print("ERROR:", e)
