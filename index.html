@@ -491,6 +491,16 @@ button{font-family:inherit;color:inherit}
 .indic-chart-body{
   position:relative;min-height:260px;border-radius:12px;
 }
+/* marca de agua de fondo para los indicadores que NO son un gráfico SVG (tablas de retornos,
+   Balances Corporativos, Ratio Largo/Corto, el mapa de calor RSI+MACD) - los que sí son SVG ya
+   traen la suya propia dibujada dentro del gráfico (ver chartWatermarkHtml en el script), con eso
+   no hace falta repetirla aquí también */
+.sc-chart-watermark{position:relative}
+.sc-chart-watermark::before{
+  content:"SKILLCASH";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:clamp(26px,7vw,56px);
+  letter-spacing:.05em;color:rgba(255,255,255,.045);pointer-events:none;z-index:-1;white-space:nowrap;
+}
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
    lo tuvieran, al no compartir el mismo origen (el gráfico es más ancho por el
    "breakout") las líneas quedaban desfasadas y se veían como dos cuadrículas encimadas */
@@ -3620,7 +3630,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-title">No se pudo cargar el dato</div>
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                 </div>
-                <div id="lsGrid" class="ls-grid" style="display:none"></div>
+                <div id="lsGrid" class="ls-grid sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div style="text-align:center;margin-top:18px">
@@ -3731,7 +3741,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <option value="all">Todas las monedas</option>
               </select>
 
-              <div class="indic-chart-body" id="rsimacdmapBody">
+              <div class="indic-chart-body sc-chart-watermark" id="rsimacdmapBody">
                 <div class="indic-chart-soon" id="rsimacdmapLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando datos…</div>
@@ -3780,7 +3790,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div id="treasLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando datos…</div>
               <div id="treasError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar la lista de empresas ahora mismo. Intenta de nuevo en un momento.</div>
 
-              <div id="treasContent" style="display:none">
+              <div id="treasContent" class="sc-chart-watermark" style="display:none">
                 <div class="chart-stats-grid">
                   <div class="res-card"><div class="r-label">BTC total en manos corporativas</div><div class="r-val" id="treasTotalBtc">—</div></div>
                   <div class="res-card"><div class="r-label">Valor en USD (hoy)</div><div class="r-val" id="treasTotalUsd">—</div></div>
@@ -4291,7 +4301,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                   <div class="indic-placeholder-text" id="btcquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="btcquarterlyTableWrap" class="chart-breakout" style="display:none"></div>
+                <div id="btcquarterlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -4325,7 +4335,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                   <div class="indic-placeholder-text" id="btcmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="btcmonthlyTableWrap" class="chart-breakout" style="display:none"></div>
+                <div id="btcmonthlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -4359,7 +4369,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                   <div class="indic-placeholder-text" id="ethquarterlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="ethquarterlyTableWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ethquarterlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -4393,7 +4403,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
                   <div class="indic-placeholder-text" id="ethmonthlyErrorDetail" style="font-family:'Space Mono',monospace;font-size:10.5px;opacity:.65"></div>
                 </div>
-                <div id="ethmonthlyTableWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ethmonthlyTableWrap" class="chart-breakout sc-chart-watermark" style="display:none"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
@@ -14231,6 +14241,7 @@ function renderFngChart(fromMs, toMs){
   document.getElementById('fngChartWrap').innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="fngChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         <defs>
           <linearGradient id="fngBgGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#2ecc71" stop-opacity=".16"/>
@@ -14682,6 +14693,7 @@ function renderHalvingChart(cycleIndex){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="${lineStrokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
@@ -14883,6 +14895,7 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${halvingLinesHtml}
         ${projLineHtml}
@@ -15032,6 +15045,13 @@ function rainbowBandForResidual(res){
     if(res <= RAINBOW_BANDS[i].max) return RAINBOW_BANDS[i];
   }
   return RAINBOW_BANDS[RAINBOW_BANDS.length - 1];
+}
+// marca de agua de fondo (texto centrado, muy transparente) para todos los gráficos SVG del
+// sitio - un solo helper reusado en cada uno en vez de repetir el mismo <text> a mano por todos
+// lados. Se dibuja SIEMPRE como el primer hijo del <svg> (detrás de grid/zonas/líneas)
+function chartWatermarkHtml(totalW, totalH){
+  const fontSize = Math.round(totalW * 0.078);
+  return `<text x="${(totalW / 2).toFixed(1)}" y="${(totalH / 2 + fontSize * 0.3).toFixed(1)}" text-anchor="middle" font-size="${fontSize}" font-weight="800" fill="rgba(255,255,255,.045)" font-family="'Space Grotesk',sans-serif" style="letter-spacing:.05em;pointer-events:none">SKILLCASH</text>`;
 }
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
    Halving — reusado por Rainbow Chart y Pi Cycle para no duplicar la misma lógica dos veces ---- */
@@ -15266,6 +15286,7 @@ function renderRainbowChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="rainbowChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${bandsHtml}
         ${yGridHtml}
         <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -15513,6 +15534,7 @@ function renderEthLogRegChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ethlogregChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         <path d="${fillD.trim()}Z" fill="#2ecc71" opacity=".1"/>
         ${yGridHtml}
         <path d="${pathFor(upperAt)}" fill="none" stroke="#ff2f4f" stroke-width="1.6" stroke-linecap="round"/>
@@ -15781,6 +15803,7 @@ function renderEthVwapChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ethvwapChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${vwapPathsHtml}
         <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -15995,6 +16018,7 @@ function renderPiCycleChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="picycleChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${crossHtml}
         <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -16418,6 +16442,7 @@ function renderMarketFloorChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="mfloorChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${crossHtml}
         <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -16598,6 +16623,7 @@ function renderEma200Chart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ema200ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${smaLine}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${emaLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -16827,6 +16853,7 @@ function renderCicloSoporteChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ciclosoporteChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${peakLinesHtml}
@@ -17065,6 +17092,7 @@ function renderRsiChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="rsiChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
         ${rsiGridHtml}
         <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
@@ -17257,6 +17285,7 @@ function renderMa4yChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ma4yChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${smaLine}" fill="none" stroke="#22d3ee" stroke-width="${isMobileChart ? 1.1 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -18549,6 +18578,7 @@ function renderDomChart(key){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${zonesHtml}
         ${yGridHtml}
         ${yTicks2Html}
@@ -18704,13 +18734,9 @@ renderMacroPanels();
 // dan cientos de combinaciones) - en vez de eso genera la interpretación en el momento, cruzando
 // los efectos de las dos selecciones. Así cualquier combinación que el usuario arme tiene una
 // respuesta coherente, no solo un puñado de ejemplos fijos.
+// mismo orden que el sidebar (INDIC_GROUPS.macro) - antes esta lista tenía su propio orden a
+// mano, desincronizado del menú hamburguesa, y los dos deberían contar la misma historia
 const MACRO_GUIA_INDICATORS = [
-  { id: 'fedbalance', icon: '🌡️', label: 'Balance de la Fed', def: 'Cuántos activos tiene la Reserva Federal en su balance.',
-    high: { tag: 'QE — imprimiendo', effects: ['risk_on', 'liquidity_up'] },
-    low: { tag: 'QT — contrayendo', effects: ['risk_off', 'liquidity_down'] } },
-  { id: 'netliquidity', icon: '🌊', label: 'Liquidez Neta', def: 'Dinero disponible para activos de riesgo (Fed − Tesoro − Reverse Repo).',
-    high: { tag: 'Liquidez alta', effects: ['risk_on', 'liquidity_up'] },
-    low: { tag: 'Liquidez baja', effects: ['risk_off', 'liquidity_down'] } },
   { id: 'dxy', icon: '💵', label: 'Índice del Dólar (DXY)', def: 'Qué tan fuerte está el dólar frente a otras monedas.',
     high: { tag: 'Dólar fuerte', effects: ['risk_off'] },
     low: { tag: 'Dólar débil', effects: ['risk_on'] } },
@@ -18727,6 +18753,9 @@ const MACRO_GUIA_INDICATORS = [
     high: { tag: 'Suben', effects: ['recession', 'dovish'] },
     low: { tag: 'Bajan', effects: ['growth', 'hawkish'] } },
   { id: 'cpi', icon: '🛒', label: 'Inflación CPI', def: 'Cuánto subieron los precios al consumidor.',
+    high: { tag: 'Inflación alta', effects: ['hawkish', 'risk_off'] },
+    low: { tag: 'Inflación baja', effects: ['dovish', 'risk_on'] } },
+  { id: 'cpiyoy', icon: '📈', label: 'Inflación Interanual (CPI YoY)', def: 'El % de cambio del CPI contra el mismo mes del año pasado — el número que la gente dice cuando habla de "la inflación".',
     high: { tag: 'Inflación alta', effects: ['hawkish', 'risk_off'] },
     low: { tag: 'Inflación baja', effects: ['dovish', 'risk_on'] } },
   { id: 'pce', icon: '💳', label: 'PCE', def: 'Otra medida de inflación — la favorita de la Reserva Federal.',
@@ -18750,9 +18779,15 @@ const MACRO_GUIA_INDICATORS = [
   { id: 'vixindex', icon: '😨', label: 'VIX', def: 'El "índice del miedo" de Wall Street.',
     high: { tag: 'Miedo alto', effects: ['risk_off'] },
     low: { tag: 'Calma / complacencia', effects: ['risk_on'] } },
+  { id: 'netliquidity', icon: '🌊', label: 'Liquidez Neta', def: 'Dinero disponible para activos de riesgo (Fed − Tesoro − Reverse Repo).',
+    high: { tag: 'Liquidez alta', effects: ['risk_on', 'liquidity_up'] },
+    low: { tag: 'Liquidez baja', effects: ['risk_off', 'liquidity_down'] } },
   { id: 'gdpgrowth', icon: '📊', label: 'PIB', def: 'Cuánto creció la economía de EEUU.',
     high: { tag: 'Crece fuerte', effects: ['growth', 'hawkish'] },
     low: { tag: 'Se contrae', effects: ['recession', 'dovish'] } },
+  { id: 'fedbalance', icon: '🌡️', label: 'Balance de la Fed', def: 'Cuántos activos tiene la Reserva Federal en su balance.',
+    high: { tag: 'QE — imprimiendo', effects: ['risk_on', 'liquidity_up'] },
+    low: { tag: 'QT — contrayendo', effects: ['risk_off', 'liquidity_down'] } },
 ];
 const MACRO_GUIA_EFFECT_LABEL = {
   risk_on: 'A favor de activos de riesgo', risk_off: 'En contra de activos de riesgo',
@@ -19251,6 +19286,7 @@ function renderBtcMacroChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="btcmacroChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${pct2TicksHtml}
         <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -19458,6 +19494,7 @@ function renderBtcTrendsChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="btctrendsChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${pct2TicksHtml}
         <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -19739,6 +19776,7 @@ function renderMcapEmaChart(key){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${emaLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -20022,6 +20060,7 @@ function renderBtcXauChart(){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="btcxauChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${ratioLine.trim()}" fill="none" stroke="#fbbf24" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         ${cycleMarkersHtml}
@@ -20232,6 +20271,7 @@ function renderCbpChart(data){
   wrap.innerHTML = `
     <div style="position:relative">
       <svg id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
         <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.2}" stroke-linecap="round" stroke-linejoin="round"/>
         <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
@@ -20514,6 +20554,7 @@ function renderOptionsOiChart(){
   const minVisibleW = isMobileChart ? 320 : 600;
   const svgDisplayW = Math.max(totalW, minVisibleW);
   wrap.innerHTML = '<svg viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + svgDisplayW + '" height="' + (totalH * (svgDisplayW / totalW)).toFixed(1) + '" style="display:block">' +
+    chartWatermarkHtml(totalW, totalH) +
     yGridHtml + yTicks2Html +
     '<line x1="' + marginLeft + '" y1="' + baseY.toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.18)" stroke-width="1"/>' +
     barsHtml + xLabelsHtml +
