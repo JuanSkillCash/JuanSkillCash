@@ -15223,7 +15223,11 @@ function wireChartHover(cfg){
     hoverLine.style.display = 'block';
     hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
     hoverDot.style.display = 'block';
-    const dateLabel = new Date(cfg.points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    // timeZone:'UTC' es necesario porque los timestamps semanales/diarios se calculan como
+    // medianoche UTC (ej. el lunes de inicio de semana) - sin forzarlo, toLocaleDateString usa la
+    // hora LOCAL del navegador, y para cualquier usuario al oeste de UTC (ej. Colombia, UTC-5) la
+    // medianoche del lunes cae el domingo a las 7pm hora local, mostrando la fecha un día antes
+    const dateLabel = new Date(cfg.points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
     tooltip.innerHTML = cfg.tooltipHtml(idx);
     tooltip.style.display = 'block';
     // el tooltip se centra en el cursor (transform:translate(-50%,...)) - cerca de cualquiera de
@@ -16587,7 +16591,7 @@ function renderMarketFloorChart(){
     const px = pxNum.toFixed(1);
     const showLabel = pxNum - lastLabelPx > 50;
     if(showLabel) lastLabelPx = pxNum;
-    const label = new Date(c.t).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+    const label = new Date(c.t).toLocaleDateString('es-ES', { month: 'short', year: 'numeric', timeZone: 'UTC' });
     return `
       <line x1="${px}" y1="${marginTop}" x2="${px}" y2="${marginTop + drawH}" stroke="rgba(34,197,94,.55)" stroke-width="1.5" stroke-dasharray="4,3"/>
       ${showLabel ? `<text x="${px}" y="${marginTop - 12}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#22c55e" font-family="'Space Mono',monospace">PISO ${label}</text>` : ''}
@@ -16595,13 +16599,15 @@ function renderMarketFloorChart(){
   }).join('');
 
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].price);
-  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  // timeZone:'UTC' - ver el comentario en wireChartHover() sobre por qué hace falta (si no, un
+  // timestamp de medianoche UTC se muestra un día antes para cualquier usuario al oeste de UTC)
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
     <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
   `;
-  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'UTC' });
   const xLabelsHtml = `
     <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
     <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
