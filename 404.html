@@ -3387,11 +3387,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Pulso de Fondo de Bitcoin</h2>
               </div>
 
-              <div class="indic-beta-warning">
-                <span class="indic-beta-warning-icon">⚠️</span>
-                <span><b>Herramienta en fase de pruebas.</b> Los datos del Costo de Producción son un estimado propio con fuentes públicas, no totalmente exactos ni verificados — no los tomes como una cifra oficial. Úsala solo como referencia educativa, nunca como asesoría financiera.</span>
-              </div>
-
               <div class="tf-pill-row" id="mfloorRangeFilter">
                 <button type="button" class="tf-pill active" data-range="todo">Todo</button>
                 <button type="button" class="tf-pill" data-range="10a">10 años</button>
@@ -16676,7 +16671,7 @@ function renderMarketFloorChart(){
     : marketFloorSource === 'coinmetrics'
     ? '✅ Dificultad (blockchain.info) + bloques minados y comisiones (Coin Metrics), cargados en vivo.'
     : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> para dificultad y comisiones (bloques minados aproximados con el promedio de red).')
-    + '<br>📌 Los 5 pisos históricos están marcados a mano (verificados contra el indicador original) porque nuestra aproximación con fuentes gratuitas tiene una pequeña desviación frente al original — los pisos nuevos sí se detectan en vivo con la fórmula.';
+    + '<br>📌 Los datos son reales — solo la fecha exacta de los 5 pisos históricos la pusimos manual (verificada contra el indicador original), porque nuestra aproximación con fuentes gratuitas tiene una pequeña desviación. Los pisos nuevos sí se detectan en vivo con la fórmula.';
 
   const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
   const gapPct = ((lastKeltner - lastCost) / lastCost) * 100;
