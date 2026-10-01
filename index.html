@@ -16452,24 +16452,43 @@ async function loadMarketFloorData(){
   })();
   return marketFloorInFlight;
 }
-// Antes esto tenía una lista de fechas fijas "verificadas a mano" contra TradingView. Con los
-// datos reales ya corregidos (Coin Metrics sin DiffMean + blockchain.info + MFLOOR_ALPHA calibrado)
-// se reprodujo la fórmula completa en Python contra velas diarias reales de Coinbase (highs/lows
-// verdaderos, no solo cierres) para TODO el histórico, y se confirmó que una de esas fechas fijas
-// (ago-2024) nunca existió como cruce real — el Keltner nunca bajó del Costo esa semana, se quedó
-// muy por encima — así que ahora los cruces se detectan 100% en vivo con la fórmula, sin fechas
-// fijas que puedan quedar desactualizadas o inventadas.
+// La aproximación con fuentes gratuitas (blockchain.info + Coin Metrics) tiene una pequeña
+// desviación frente al indicador real del usuario en TradingView (con Glassnode) - no al punto de
+// inventar cruces que no existen, pero sí lo suficiente como para que la semana EXACTA del cruce
+// no siempre caiga igual. Por pedido explícito del usuario, estas 5 fechas (verificadas por él
+// mismo, a ojo, contra su propio gráfico real) se marcan siempre, sin depender de si la fórmula
+// con datos gratuitos cruza exactamente ahí. De ahí en adelante (después de la última), los cruces
+// nuevos sí se detectan en vivo con la fórmula, igual que cualquier otro indicador del sitio.
+const MFLOOR_VERIFIED_CROSSINGS = [
+  Date.UTC(2018, 11, 3),
+  Date.UTC(2020, 2, 16),
+  Date.UTC(2022, 10, 28),
+  Date.UTC(2024, 7, 26),
+  Date.UTC(2026, 5, 22),
+];
 function detectMarketFloorCrossings(points){
+  const nearestPoint = t => {
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < points.length; i++){
+      const diff = Math.abs(points[i].t - t);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    return points[idx];
+  };
+  const crossings = MFLOOR_VERIFIED_CROSSINGS
+    .map(t => nearestPoint(t))
+    .map(p => ({ t: p.t, price: p.price }));
+
   // si el precio se recupera brevemente por encima del costo y vuelve a caer poco después, es la
   // misma reversión del mismo piso — no un piso nuevo — así que se ignora cualquier cruce que
   // caiga dentro de las MFLOOR_CROSSING_COOLDOWN_WEEKS semanas siguientes al último ya marcado
   const MFLOOR_CROSSING_COOLDOWN_WEEKS = 26;
-  const crossings = [];
+  const lastVerifiedT = MFLOOR_VERIFIED_CROSSINGS[MFLOOR_VERIFIED_CROSSINGS.length - 1];
   let prevBelow = null;
-  let lastCrossingT = -Infinity;
+  let lastCrossingT = lastVerifiedT;
   for(let i = 0; i < points.length; i++){
     const p = points[i];
-    if(p.costSmooth == null) continue;
+    if(p.t <= lastVerifiedT || p.costSmooth == null) continue;
     const below = p.keltnerLower < p.costSmooth;
     if(prevBelow === false && below === true){
       const weeksSinceLast = (p.t - lastCrossingT) / (7 * 86400000);
@@ -16652,11 +16671,12 @@ function renderMarketFloorChart(){
 
   const sourceNoteEl = document.getElementById('mfloorSourceNote');
   sourceNoteEl.style.display = 'block';
-  sourceNoteEl.innerHTML = marketFloorSource === 'supabase'
+  sourceNoteEl.innerHTML = (marketFloorSource === 'supabase'
     ? '✅ Dificultad, bloques minados y comisiones desde nuestro respaldo propio (actualizado a diario).'
     : marketFloorSource === 'coinmetrics'
     ? '✅ Dificultad (blockchain.info) + bloques minados y comisiones (Coin Metrics), cargados en vivo.'
-    : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> para dificultad y comisiones (bloques minados aproximados con el promedio de red).';
+    : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> para dificultad y comisiones (bloques minados aproximados con el promedio de red).')
+    + '<br>📌 Los 5 pisos históricos están marcados a mano (verificados contra el indicador original) porque nuestra aproximación con fuentes gratuitas tiene una pequeña desviación frente al original — los pisos nuevos sí se detectan en vivo con la fórmula.';
 
   const lastKeltner = points[points.length - 1].keltnerLower, lastCost = points[points.length - 1].costSmooth;
   const gapPct = ((lastKeltner - lastCost) / lastCost) * 100;
