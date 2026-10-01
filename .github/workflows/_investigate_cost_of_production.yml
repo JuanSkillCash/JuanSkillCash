@@ -1,0 +1,24 @@
+name: (Descartable) Investigar viabilidad de BTC Cost of Production con fuentes gratis
+
+# Workflow temporal, de un solo uso: investiga si blockchain.info + Coin Metrics Community
+# (gratis, sin key) pueden recrear el indicador "BTC Cost of Production" de TradingView, con
+# validacion cruzada real entre fuentes. No escribe nada en Supabase, no usa secretos. Se
+# borra en cuanto cumpla su proposito.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  investigate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Investigar fuentes y calcular cost_floor
+        run: python scripts/_investigate_cost_of_production.py
