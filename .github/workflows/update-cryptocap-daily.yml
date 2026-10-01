@@ -24,7 +24,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas
+          pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas pytrends
 
       - name: Descargar y subir datos del dia (CRYPTOCAP)
         env:
@@ -60,3 +60,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_macro_tv_daily.py
+
+      - name: Actualizar Google Trends
+        # continue-on-error: esta es la fuente mas fragil del pipeline (pytrends no es una API
+        # oficial, Google bloquea trafico automatizado repetido) - un fallo aqui no debe tumbar
+        # el resto de pasos ya corridos arriba
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_google_trends_daily.py
