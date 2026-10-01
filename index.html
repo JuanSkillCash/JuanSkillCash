@@ -3943,7 +3943,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="dombtcLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Trayendo el histórico real de BTC.D.</div>
+                  <div class="indic-placeholder-text">Trayendo el histórico real de BTC.D y el precio de BTC.</div>
                 </div>
                 <div class="indic-chart-soon" id="dombtcError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -3961,6 +3961,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 ₿ Histórico real de BTC.D completo — no una aproximación. El número grande de abajo es el % de HOY en vivo, vía CoinGecko.<br>
+                ⚪ La línea blanca (eje derecho) es el <b>precio de BTC</b> — para ver si los movimientos de la dominancia coinciden con subidas/bajadas de precio, o van cada uno por su lado.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -3989,7 +3990,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="domusdtLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Trayendo el histórico real de USDT.D.</div>
+                  <div class="indic-placeholder-text">Trayendo el histórico real de USDT.D y el precio de BTC.</div>
                 </div>
                 <div class="indic-chart-soon" id="domusdtError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -4007,6 +4008,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 💵 Histórico real de USDT.D completo — no una aproximación. El número grande de abajo es el % de HOY en vivo, vía CoinGecko.<br>
+                ⚪ La línea blanca (eje derecho) es el <b>precio de BTC</b> — para ver si los movimientos de la dominancia coinciden con subidas/bajadas de precio, o van cada uno por su lado.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -17455,10 +17457,14 @@ const DOM_CHART_DEFS = {
   dombtc: {
     loadFn: () => fetchDomBtcRealHistory(), realSeries: () => domBtcRealSeries, exact: true, statsId: 'dombtcChartStats',
     series: [{ key: 'v', color: '#f7931a', label: 'Dominancia BTC' }],
+    series2: [{ key: 'v2', color: '#ffffff', label: 'Precio de BTC' }],
+    fmtVal2: fmtHalvingPrice,
   },
   domusdt: {
     loadFn: () => fetchDomUsdtRealHistory(), realSeries: () => domUsdtRealSeries, exact: true, statsId: 'domusdtChartStats',
     series: [{ key: 'v', color: '#26a17b', label: 'Dominancia USDT' }],
+    series2: [{ key: 'v2', color: '#ffffff', label: 'Precio de BTC' }],
+    fmtVal2: fmtHalvingPrice,
   },
   othersbtc: {
     loadFn: () => fetchOthersBtcRealHistory(), realSeries: () => othersBtcRealSeries, exact: true, fmtVal: fmtRatioAxis,
@@ -17985,16 +17991,29 @@ async function fetchDomAllRealHistory(){
 function singleSymbolRealSeries(symbolFull){
   return fetchCryptocapSeries(symbolFull).then(series => series.map(p => ({ t: p.t, v: p.c })));
 }
+// superpone el precio de BTC (eje derecho) sobre un gráfico de dominancia que de por sí solo es
+// una sola línea de % "flotando sola" sin nada con qué compararla visualmente - mismo mecanismo
+// de forward-fill que ya usa OTHERS/BTC con el balance de la Fed, generalizado aquí para no
+// repetirlo a mano en cada dominancia que lo necesite
+async function withBtcPriceOverlay(basePromise){
+  const [base, btc] = await Promise.all([basePromise, fetchHalvingHistory()]);
+  const sortedBtc = btc.slice().sort((a, b) => a.t - b.t);
+  let bi = 0, lastBtc = null;
+  return base.map(p => {
+    while(bi < sortedBtc.length && sortedBtc[bi].t <= p.t){ lastBtc = sortedBtc[bi].c; bi++; }
+    return { t: p.t, v: p.v, v2: lastBtc };
+  });
+}
 let domBtcRealSeries = null, domBtcRealPromise = null;
 async function fetchDomBtcRealHistory(){
   if(domBtcRealSeries) return domBtcRealSeries;
-  if(!domBtcRealPromise) domBtcRealPromise = singleSymbolRealSeries('CRYPTOCAP:BTC.D').then(s => domBtcRealSeries = s);
+  if(!domBtcRealPromise) domBtcRealPromise = withBtcPriceOverlay(singleSymbolRealSeries('CRYPTOCAP:BTC.D')).then(s => domBtcRealSeries = s);
   return domBtcRealPromise;
 }
 let domUsdtRealSeries = null, domUsdtRealPromise = null;
 async function fetchDomUsdtRealHistory(){
   if(domUsdtRealSeries) return domUsdtRealSeries;
-  if(!domUsdtRealPromise) domUsdtRealPromise = singleSymbolRealSeries('CRYPTOCAP:USDT.D').then(s => domUsdtRealSeries = s);
+  if(!domUsdtRealPromise) domUsdtRealPromise = withBtcPriceOverlay(singleSymbolRealSeries('CRYPTOCAP:USDT.D')).then(s => domUsdtRealSeries = s);
   return domUsdtRealPromise;
 }
 // formato de eje/tooltip para los ratios OTHERS/BTC, ETH/BTC, y las "valoración X vs Altcoins" —
