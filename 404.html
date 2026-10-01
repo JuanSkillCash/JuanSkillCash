@@ -1612,6 +1612,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="ethvwap">
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
       </button>
+      <button class="sb-item" data-indic-jump="ethpmi">
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
+      </button>
       <button class="sb-item" data-indic-jump="ethquarterly">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
       </button>
@@ -1886,6 +1889,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvwap">
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethpmi">
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethquarterly">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos Trimestrales ETH</span>
@@ -3001,6 +3007,50 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 💱 Datos de <b>Binance, par ETH/USDT</b> (no un promedio de varias exchanges) — arranca el 17 de agosto de 2017 porque ahí fue que Binance empezó a listar ese par, no hay nada de antes.<br>
                 📊 El eje vertical usa escala <b>lineal</b> (no logarítmica como el resto de gráficos del sitio) desde $0, igual que en TradingView.<br>
                 🧹 A los días con un salto de volumen anómalo (errores o cambios en las fuentes de datos) se les recorta el peso para que no tuerzan la curva con un escalón artificial — un VWAP acumulado de verdad nunca da saltos bruscos.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="ethpmi" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">🏭 Precio de ETH + PMI Manufacturero</h2>
+              </div>
+
+              <div class="tf-pill-row" id="ethpmiRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
+              <div class="indic-chart-body" id="ethpmiChartBody">
+                <div class="indic-chart-soon" id="ethpmiLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Descargando el histórico de ETH y del PMI Manufacturero.</div>
+                </div>
+                <div class="indic-chart-soon" id="ethpmiError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="ethpmiChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="ethpmiDateSlider" class="date-range-slider"></div>
+              </div>
+              <div class="partner-perks" id="ethpmiLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="ethpmiStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🏭 Compara el precio de ETH (eje izquierdo) con el <b>PMI Manufacturero de EEUU</b> (línea punteada, eje derecho) — una encuesta mensual a gerentes de compras. Por encima de 50 la actividad manufacturera se expande (más apetito por activos de riesgo, cripto incluida), por debajo de 50 se contrae.<br>
+                🔎 Fuente del PMI: <b>TradingView</b> (ISM Manufacturing PMI). Precio de ETH: Coin Metrics (respaldo: CoinGecko).<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -6975,7 +7025,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcquarterly', label: 'Retornos Trimestrales BTC' }, { id: 'btcmonthly', label: 'Retornos Mensuales BTC' }],
-  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
+  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethquarterly', label: 'Retornos Trimestrales ETH' }, { id: 'ethmonthly', label: 'Retornos Mensuales ETH' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }],
   mineria: [],
@@ -7002,7 +7052,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7147,6 +7197,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'dombtc') ensureDomBtcLoaded();
       if(btn.dataset.indic === 'domusdt') ensureDomUsdtLoaded();
       if(btn.dataset.indic === 'othersbtc') ensureOthersBtcLoaded();
+      if(btn.dataset.indic === 'ethpmi') ensureEthPmiLoaded();
       if(btn.dataset.indic === 'ethbtc') ensureEthBtcLoaded();
       if(btn.dataset.indic === 'altfever') ensureAltFeverLoaded();
       if(btn.dataset.indic === 'ethvsalt') ensureEthVsAltLoaded();
@@ -7202,6 +7253,7 @@ function jumpToIndicator(id){
     if(id === 'domusdt') ensureDomUsdtLoaded();
     if(id === 'othersbtc') ensureOthersBtcLoaded();
     if(id === 'ethbtc') ensureEthBtcLoaded();
+    if(id === 'ethpmi') ensureEthPmiLoaded();
     if(id === 'altfever') ensureAltFeverLoaded();
     if(id === 'ethvsalt') ensureEthVsAltLoaded();
     if(MACRO_CHART_IDS.includes(id)) ensureMacroChartLoaded(id);
@@ -14121,13 +14173,15 @@ function renderFngChart(fromMs, toMs){
     const dateLabel = dates[idx].toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     const btcLine = btcValues[idx] !== null ? `<br>₿ $${Math.round(btcValues[idx]).toLocaleString('es-ES')}` : '';
     tooltip.innerHTML = `<b style="color:${fngZoneColor(values[idx])}">${values[idx]}</b> · ${FNG_LABELS_ES[values[idx] <= 24 ? 'Extreme Fear' : values[idx] <= 44 ? 'Fear' : values[idx] <= 55 ? 'Neutral' : values[idx] <= 75 ? 'Greed' : 'Extreme Greed']}<br>${dateLabel}${btcLine}`;
+    tooltip.style.display = 'block';
 
     const rectWrap = svg.parentElement.getBoundingClientRect();
     const pxPixels = (px / totalW) * rect.width;
     const pyPixels = (py / totalH) * rect.height;
-    tooltip.style.left = pxPixels + 'px';
+    // recorta el tooltip (centrado en el cursor) para que no se salga del gráfico cerca de los bordes
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max(pxPixels, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
     tooltip.style.top = pyPixels + 'px';
-    tooltip.style.display = 'block';
   }
 
   catcher.addEventListener('mousemove', (e) => showAt(e.clientX, e.clientY));
@@ -14552,9 +14606,11 @@ function renderHalvingChart(cycleIndex){
     hoverDot.style.display = 'block';
     const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     tooltip.innerHTML = `<b>${fmtHalvingPrice(prices[idx])}</b><br>Día ${Math.round(days[idx])} · ${dateLabel}`;
-    tooltip.style.left = ((px / totalW) * rect.width) + 'px';
-    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
     tooltip.style.display = 'block';
+    // recorta el tooltip (centrado en el cursor) para que no se salga del gráfico cerca de los bordes
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
     // la fecha también queda fija abajo, en el eje, mientras se pasa el mouse — para leerla
     // sin depender del cuadrito flotante que se mueve con el cursor; el rectángulo de fondo
     // tapa cualquier etiqueta de "Año N" que quede justo debajo
@@ -14753,9 +14809,11 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
     hoverDot.style.display = 'block';
     const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     tooltip.innerHTML = `<b>${fmtHalvingPrice(points[idx].c)}</b><br>${dateLabel}`;
-    tooltip.style.left = ((px / totalW) * rect.width) + 'px';
-    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
     tooltip.style.display = 'block';
+    // recorta el tooltip (centrado en el cursor) para que no se salga del gráfico cerca de los bordes
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
     const clampedPx = Math.min(Math.max(px, marginLeft + 24), totalW - marginRight - 24);
     hoverDateLabel.setAttribute('x', clampedPx);
     hoverDateLabel.textContent = dateLabel;
@@ -14886,9 +14944,14 @@ function wireChartHover(cfg){
     hoverDot.style.display = 'block';
     const dateLabel = new Date(cfg.points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     tooltip.innerHTML = cfg.tooltipHtml(idx);
-    tooltip.style.left = ((px / cfg.totalW) * rect.width) + 'px';
-    tooltip.style.top = ((py / cfg.totalH) * rect.height) + 'px';
     tooltip.style.display = 'block';
+    // el tooltip se centra en el cursor (transform:translate(-50%,...)) - cerca de cualquiera de
+    // los dos bordes eso lo saca de la vista (la mitad del cuadro queda fuera). Se mide su ancho
+    // real ya mostrado y se recorta su posición para que siempre quepa dentro del gráfico
+    const rawLeftPx = (px / cfg.totalW) * rect.width;
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max(rawLeftPx, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+    tooltip.style.top = ((py / cfg.totalH) * rect.height) + 'px';
     const clampedPx = Math.min(Math.max(px, cfg.marginLeft + 24), cfg.totalW - cfg.marginRight - 24);
     hoverDateLabel.setAttribute('x', clampedPx);
     hoverDateLabel.textContent = dateLabel;
@@ -17258,6 +17321,12 @@ const DOM_CHART_DEFS = {
     series2: [{ key: 'v2', color: '#60a5fa', label: 'Balance de la Fed' }],
     fmtVal2: fmtUsdTrillions,
   },
+  ethpmi: {
+    loadFn: () => fetchEthPmiOverlay(), realSeries: () => ethPmiRealSeries, exact: true, fmtVal: fmtEthExactPrice,
+    series: [{ key: 'v', color: '#8b8bf5', label: 'Precio de ETH' }],
+    series2: [{ key: 'v2', color: '#60a5fa', label: 'PMI Manufacturero' }],
+    fmtVal2: fmtPlainIndex,
+  },
   ethbtc: {
     loadFn: () => fetchEthBtcRealHistory(), realSeries: () => ethBtcRealSeries, exact: true, fmtVal: fmtRatioAxis,
     series: [{ key: 'v', color: '#8b8bf5', label: 'ETH/BTC' }],
@@ -17700,6 +17769,30 @@ async function fetchEthBtcRealHistory(){
     });
   }
   return ethBtcRealPromise;
+}
+// Precio de ETH + PMI Manufacturero de EEUU superpuesto (eje derecho) - mismo mecanismo que
+// OTHERS/BTC con el balance de la Fed: el PMI es mensual, así que se "mantiene" (forward-fill)
+// el último dato conocido día a día sobre el historial diario de ETH (que manda la línea
+// temporal del gráfico)
+let ethPmiRealSeries = null, ethPmiRealPromise = null;
+async function fetchEthPmiOverlay(){
+  if(ethPmiRealSeries) return ethPmiRealSeries;
+  if(!ethPmiRealPromise){
+    ethPmiRealPromise = Promise.all([
+      ensureEthDailyHistoryLoaded().then(() => ethLogRegHistory),
+      // si el PMI falla, el precio de ETH no debe romperse por eso - solo se queda sin el overlay
+      pmiUsMacro.load().catch(() => []),
+    ]).then(([eth]) => {
+      const pmi = (pmiUsMacro.series() || []).slice().sort((a, b) => a.t - b.t);
+      let pi = 0, lastPmi = null;
+      ethPmiRealSeries = eth.map(p => {
+        while(pi < pmi.length && pmi[pi].t <= p.t){ lastPmi = pmi[pi].v; pi++; }
+        return { t: p.t, v: p.c, v2: lastPmi };
+      });
+      return ethPmiRealSeries;
+    });
+  }
+  return ethPmiRealPromise;
 }
 
 /* ===== RETORNOS TRIMESTRALES / MENSUALES (BTC y ETH) =====
@@ -18187,7 +18280,7 @@ async function loadDomChartDetail(key){
   }
   renderDomChart(key);
 }
-const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false };
+const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false, ethpmi: false };
 // indicadores "Macroeconómicos": todos comparten el mismo motor (renderDomChart/loadDomChartDetail),
 // así que un solo helper generico basta en vez de una función ensureXLoaded por cada uno
 const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'pce', 'ppi', 'fedfundsrate', 'treasuryyields', 'yieldcurve', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
@@ -18451,6 +18544,7 @@ const BITCOIN_GUIA_INDICATORS = [
 const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },
   { id: 'ethvwap', icon: '⚓', label: 'VWAP Anclado de ETH', def: 'El precio promedio ponderado por volumen desde un punto de referencia (ej. un máximo o mínimo importante) — una vara para medir si el precio de hoy está "caro" o "barato" frente a ese punto.' },
+  { id: 'ethpmi', icon: '🏭', label: 'Precio de ETH + PMI Manufacturero', def: 'El precio de ETH superpuesto con el PMI Manufacturero de EEUU — para ver si las subidas/bajadas de ETH coinciden con la economía expandiéndose (PMI > 50) o contrayéndose (PMI < 50).' },
   { id: 'ethquarterly', icon: '📅', label: 'Retornos Trimestrales ETH', def: 'Cómo le ha ido a ETH, trimestre por trimestre.' },
   { id: 'ethmonthly', icon: '🗓️', label: 'Retornos Mensuales ETH', def: 'Lo mismo, pero por mes del año.' },
 ];
@@ -18677,6 +18771,7 @@ function ensureDomBtcLoaded(){ if(!domLoadedOnce.dombtc){ domLoadedOnce.dombtc =
 function ensureDomUsdtLoaded(){ if(!domLoadedOnce.domusdt){ domLoadedOnce.domusdt = true; loadDomLiveDetail('domusdt'); loadDomChartDetail('domusdt'); } }
 function ensureOthersBtcLoaded(){ if(!domLoadedOnce.othersbtc){ domLoadedOnce.othersbtc = true; loadDomChartDetail('othersbtc'); } }
 function ensureEthBtcLoaded(){ if(!domLoadedOnce.ethbtc){ domLoadedOnce.ethbtc = true; loadDomChartDetail('ethbtc'); } }
+function ensureEthPmiLoaded(){ if(!domLoadedOnce.ethpmi){ domLoadedOnce.ethpmi = true; loadDomChartDetail('ethpmi'); } }
 function ensureAltFeverLoaded(){ if(!domLoadedOnce.altfever){ domLoadedOnce.altfever = true; loadDomChartDetail('altfever'); } }
 function ensureEthVsAltLoaded(){ if(!domLoadedOnce.ethvsalt){ domLoadedOnce.ethvsalt = true; loadDomChartDetail('ethvsalt'); } }
 window.addEventListener('resize', () => {
@@ -18688,6 +18783,7 @@ window.addEventListener('resize', () => {
   if(document.querySelector('.indic-panel[data-indic="ethbtc"]').style.display !== 'none') renderDomChart('ethbtc');
   if(document.querySelector('.indic-panel[data-indic="altfever"]').style.display !== 'none') renderDomChart('altfever');
   if(document.querySelector('.indic-panel[data-indic="ethvsalt"]').style.display !== 'none') renderDomChart('ethvsalt');
+  if(document.querySelector('.indic-panel[data-indic="ethpmi"]').style.display !== 'none') renderDomChart('ethpmi');
   MACRO_CHART_IDS.forEach(id => {
     const panel = document.querySelector('.indic-panel[data-indic="' + id + '"]');
     if(panel && panel.style.display !== 'none') renderDomChart(id);
@@ -18723,10 +18819,10 @@ document.querySelectorAll('#domusdtRangeFilter .tf-pill').forEach(btn => {
     renderDomChart('domusdt');
   });
 });
-// mismo filtro en píldora que los gráficos de arriba, pero en un solo loop (son 16 indicadores,
-// todos con el mismo patrón Todo/10a/5a/2a - escribirlos a mano sería repetir este mismo bloque
-// 16 veces)
-MACRO_CHART_IDS.forEach(id => {
+// mismo filtro en píldora que los gráficos de arriba, pero en un solo loop (son 16 indicadores
+// macro + ETH/PMI, todos con el mismo patrón Todo/10a/5a/2a - escribirlos a mano sería repetir
+// este mismo bloque 17 veces)
+MACRO_CHART_IDS.concat(['ethpmi']).forEach(id => {
   document.querySelectorAll('#' + id + 'RangeFilter .tf-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       if(btn.classList.contains('active')) return;
