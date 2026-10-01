@@ -392,6 +392,24 @@ button{font-family:inherit;color:inherit}
   display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
 }
 .indic-guide-divider:first-child{margin-top:0}
+/* ---- Índice de Indicadores: lista compacta (no cajas grandes) generada por JS desde
+   INDIC_GROUPS - ver renderIndicIndexList(). #indicGuideGrid pisa el display:grid heredado de
+   .indic-guide-grid (pensado para cajas de ancho fijo) porque aquí adentro van secciones de
+   ancho completo (encabezado + lista), no celdas de una grilla ---- */
+#indicGuideGrid{display:block}
+.indic-index-standalone{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:rgba(124,127,245,.08);border:1px solid rgba(124,127,245,.25);color:#fff;font-family:inherit;font-weight:700;font-size:14px;margin-bottom:22px;width:100%;text-align:left;cursor:pointer;transition:background var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+.indic-index-standalone:hover{background:rgba(124,127,245,.14);border-color:rgba(124,127,245,.4)}
+.indic-index-header{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin:24px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.indic-index-header:first-of-type{margin-top:0}
+.indic-index-list{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:4px}
+@media(max-width:640px){ .indic-index-list{grid-template-columns:1fr} }
+.indic-index-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.015);border:1px solid var(--border);color:var(--white);cursor:pointer;text-align:left;font-family:inherit;font-size:13.5px;font-weight:600;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.indic-index-row:hover{border-color:var(--border2);background:rgba(255,255,255,.035)}
+.indic-index-row-icon{font-size:16px;flex-shrink:0;width:22px;text-align:center;line-height:1}
+.indic-index-row-title{flex:1;line-height:1.3}
+.indic-index-row.curated{border-color:rgba(240,178,61,.4);background:rgba(240,178,61,.05)}
+.indic-index-row.curated:hover{border-color:rgba(240,178,61,.65);background:rgba(240,178,61,.09)}
+.indic-index-juan-badge{font-family:'Space Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--bg);background:var(--gold);padding:2px 6px;border-radius:5px;flex-shrink:0}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
 .pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
@@ -2444,350 +2462,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div id="indicPanels">
         <div class="indic-panel" data-indic="guia" style="display:block">
           <div class="indic-guide-intro">
-            <div class="indic-guide-title">Bienvenido a Indicadores de Mercado</div>
-            <p class="indic-guide-text">Aquí vas a encontrar señales para entender en qué momento del mercado estamos — organizadas por pestañas para que sea rápido encontrar la que buscas. Esto va a ir creciendo con el tiempo. Por ahora, así está organizado:</p>
-            <p class="indic-guide-text">Ninguna señal, por sí sola, te dice "comprá" o "vendé" — cada una es solo una pieza más del rompecabezas. Mientras más señales apunten en la misma dirección al mismo tiempo, más peso le podés dar a esa lectura.</p>
+            <div class="indic-guide-title">Índice de Indicadores</div>
+            <p class="indic-guide-text">Haz clic en cualquiera de la lista para abrir su gráfico en vivo. Están agrupadas por categoría — las marcadas <span class="indic-index-juan-badge" style="vertical-align:1px">JUAN</span> son las que uso yo personalmente.</p>
           </div>
-          <div class="indic-guide-grid">
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="predicciones">
-              <div class="indic-guide-icon">🔮</div>
-              <div class="indic-guide-card-title">Predicciones</div>
-              <div class="indic-guide-card-text">Predicciones de precio públicas, con fecha, para ver después si se cumplieron.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">₿ BTC</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="bitcoinguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué muestra cada herramienta de BTC y cómo leerla.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="halving">
-              <div class="indic-guide-icon">⏳</div>
-              <div class="indic-guide-card-title">Ciclos de Halving</div>
-              <div class="indic-guide-card-text">Dónde estamos dentro del ciclo de Bitcoin: halvings, zonas históricas de techo y suelo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pisomercado">
-              <div class="indic-guide-icon">⚓</div>
-              <div class="indic-guide-card-title">Pulso de Fondo</div>
-              <div class="indic-guide-card-text">Cruce del Canal de Keltner semanal con el Costo de Producción de BTC: ha coincidido con mínimos históricos, sin garantía.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimensual">
-              <div class="indic-guide-icon">📶</div>
-              <div class="indic-guide-card-title">RSI Mensual</div>
-              <div class="indic-guide-card-text">Cuando el RSI mensual de BTC vuelve a superar la zona de 50-55, históricamente el suelo del mercado ya se había formado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ciclosoporte">
-              <div class="indic-guide-icon">🪜</div>
-              <div class="indic-guide-card-title">Techo Anterior</div>
-              <div class="indic-guide-card-text">El máximo del ciclo pasado, trazado hasta donde el precio lo volvió a tocar como soporte.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rainbow">
-              <div class="indic-guide-icon">🌈</div>
-              <div class="indic-guide-card-title">Rainbow Chart</div>
-              <div class="indic-guide-card-text">Franjas de color sobre el precio histórico de BTC: de "muy barato" a "burbuja".</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="picycle">
-              <div class="indic-guide-icon">📐</div>
-              <div class="indic-guide-card-title">Techo Pi Cycle</div>
-              <div class="indic-guide-card-text">El cruce de dos promedios móviles que históricamente ha marcado el techo del ciclo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ma4y">
-              <div class="indic-guide-icon">📏</div>
-              <div class="indic-guide-card-title">Media Móvil de 4 Años</div>
-              <div class="indic-guide-card-text">Qué tan lejos está el precio de su promedio de los últimos 4 años — ligado al ciclo de halving.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ema200">
-              <div class="indic-guide-icon">📉</div>
-              <div class="indic-guide-card-title">Medias Móviles 200</div>
-              <div class="indic-guide-card-text">Precio de Bitcoin junto a su EMA y SMA de 200 días.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="treasuries">
-              <div class="indic-guide-icon">🏢</div>
-              <div class="indic-guide-card-title">Balances Corporativos</div>
-              <div class="indic-guide-card-text">Cuánto Bitcoin tienen acumulado en su balance las empresas públicas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcxau">
-              <div class="indic-guide-icon">🥇</div>
-              <div class="indic-guide-card-title">BTC/XAU</div>
-              <div class="indic-guide-card-text">Cuántas onzas de oro compra 1 Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcquarterly">
-              <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Trimestrales BTC</div>
-              <div class="indic-guide-card-text">El retorno real de Bitcoin en cada trimestre desde que hay datos, año por año.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="btcmonthly">
-              <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Mensuales BTC</div>
-              <div class="indic-guide-card-text">El retorno real de Bitcoin en cada mes desde que hay datos, año por año.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Ξ ETH</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethereumguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué muestra cada herramienta de ETH y cómo leerla.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethlogreg">
-              <div class="indic-guide-icon">Ξ</div>
-              <div class="indic-guide-card-title">Bandas Log de ETH</div>
-              <div class="indic-guide-card-text">Tres bandas de precio para Ethereum calculadas con una fórmula fija según el tiempo desde su lanzamiento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvwap">
-              <div class="indic-guide-icon">📍</div>
-              <div class="indic-guide-card-title">VWAP Anclado de ETH</div>
-              <div class="indic-guide-card-text">Precio de Ethereum con dos líneas de VWAP ancladas en fechas fijas — el precio promedio real ponderado por volumen desde ese punto.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethquarterly">
-              <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Trimestrales ETH</div>
-              <div class="indic-guide-card-text">El retorno real de Ethereum en cada trimestre desde que hay datos, año por año.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethmonthly">
-              <div class="indic-guide-icon">📅</div>
-              <div class="indic-guide-card-title">Retornos Mensuales ETH</div>
-              <div class="indic-guide-card-text">El retorno real de Ethereum en cada mes desde que hay datos, año por año.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">💹 Trading</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="tradingguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué muestra cada herramienta de trading y cómo leerla.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cbpremium">
-              <div class="indic-guide-icon">♾️</div>
-              <div class="indic-guide-card-title">Coinbase Premium</div>
-              <div class="indic-guide-card-text">Diferencia en vivo entre el precio de BTC en Coinbase y en Binance.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="longshort">
-              <div class="indic-guide-icon">⚖️</div>
-              <div class="indic-guide-card-title">Ratio Largo/Corto</div>
-              <div class="indic-guide-card-text">Cuántos traders están en largo vs en corto, en Binance/Bybit — minoristas y las cuentas grandes.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="optionsoi">
-              <div class="indic-guide-icon">📐</div>
-              <div class="indic-guide-card-title">Interés Abierto en Opciones</div>
-              <div class="indic-guide-card-text">Cuántos contratos de opciones (Calls y Puts) siguen abiertos en cada precio de ejercicio, filtrable por vencimiento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="rsimacdmap">
-              <div class="indic-guide-icon">🌡️</div>
-              <div class="indic-guide-card-title">Mapa de Calor RSI + MACD + Estocástico</div>
-              <div class="indic-guide-card-text">El top 20 de criptomonedas por capitalización (sin stablecoins), con su RSI y sesgo de MACD en 6 temporalidades — de 5 minutos a 1 semana.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Sentimiento</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fng">
-              <div class="indic-guide-icon">😐</div>
-              <div class="indic-guide-card-title">Índice de Miedo y Codicia</div>
-              <div class="indic-guide-card-text">Qué tan miedoso o codicioso está el mercado en este momento.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">Dominancia</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dominanciaguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué significa cada indicador de dominancia, y un combinador para ver hacia dónde rota el capital.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domratio">
-              <div class="indic-guide-icon">🔄</div>
-              <div class="indic-guide-card-title">Rotación ETH.D/BTC.D</div>
-              <div class="indic-guide-card-text">Dominancia de ETH dividida entre la de BTC — hacia dónde está rotando el capital.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domall">
-              <div class="indic-guide-icon">🗜️</div>
-              <div class="indic-guide-card-title">Descompresión Cripto</div>
-              <div class="indic-guide-card-text">La suma de la dominancia de BTC+ETH+USDT+USDC — cuando sube, las altcoins quedan comprimidas; cuando baja, se descomprimen y suben.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dombtc">
-              <div class="indic-guide-icon">₿</div>
-              <div class="indic-guide-card-title">Dominancia BTC</div>
-              <div class="indic-guide-card-text">Qué tanto pesa Bitcoin solo frente al resto del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="domusdt">
-              <div class="indic-guide-icon">💵</div>
-              <div class="indic-guide-card-title">Dominancia USDT</div>
-              <div class="indic-guide-card-text">Qué tanto pesa Tether solo frente al resto del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethbtc">
-              <div class="indic-guide-icon">🔁</div>
-              <div class="indic-guide-card-title">ETH/BTC</div>
-              <div class="indic-guide-card-text">Precio de Ethereum medido en Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">🪙 Altcoins</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altcoinsguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué significa cada indicador de altcoins, y un combinador para ver hacia dónde rota el capital.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="othersbtc">
-              <div class="indic-guide-icon">🪙</div>
-              <div class="indic-guide-card-title">OTHERS/BTC</div>
-              <div class="indic-guide-card-text">Cuánto vale el índice OTHERS (altcoins fuera del top 10) medido en Bitcoin.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="altfever">
-              <div class="indic-guide-icon">🔥</div>
-              <div class="indic-guide-card-title">Euforia de Altcoins</div>
-              <div class="indic-guide-card-text">Cuando las altcoins pequeñas corren más fuerte que las grandes, históricamente coincide con techos del mercado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ethvsalt">
-              <div class="indic-guide-icon">⚖️</div>
-              <div class="indic-guide-card-title">Valoración Relativa ETH vs Altcoins</div>
-              <div class="indic-guide-card-text">Compara el tamaño de las altcoins contra Ethereum — te dice si conviene estar en ETH o rotar a las altcoins.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="total2">
-              <div class="indic-guide-icon">🥈</div>
-              <div class="indic-guide-card-title">TOTAL2 EMA200</div>
-              <div class="indic-guide-card-text">Capitalización de todo el mercado sin Bitcoin, con su media móvil de 200 semanas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="others">
-              <div class="indic-guide-icon">🌱</div>
-              <div class="indic-guide-card-title">OTHERS EMA200</div>
-              <div class="indic-guide-card-text">Capitalización del mercado sin el top 10, con su media móvil de 200 semanas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-
-            <div class="indic-guide-divider">🏛 Macro</div>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="macroguia">
-              <div class="indic-guide-icon">📖</div>
-              <div class="indic-guide-card-title">Guía: ¿Cómo Leer los Indicadores?</div>
-              <div class="indic-guide-card-text">Qué significa cada indicador cuando sube o baja, y un combinador para ver qué pasa cuando mezclas dos a la vez.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="dxy">
-              <div class="indic-guide-icon">💵</div>
-              <div class="indic-guide-card-title">Índice del Dólar (DXY)</div>
-              <div class="indic-guide-card-text">Qué tan fuerte está el dólar frente a una canasta de otras monedas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pmius">
-              <div class="indic-guide-icon">🏭</div>
-              <div class="indic-guide-card-title">PMI Manufacturero de EEUU</div>
-              <div class="indic-guide-card-text">Encuesta mensual a gerentes de compras: por encima de 50 la economía se expande, por debajo se contrae.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="payrolls">
-              <div class="indic-guide-icon">👷</div>
-              <div class="indic-guide-card-title">Nómina No Agrícola</div>
-              <div class="indic-guide-card-text">Cuántos empleos nuevos creó EEUU el mes pasado — el dato de empleo más vigilado del mundo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="unrate">
-              <div class="indic-guide-icon">📉</div>
-              <div class="indic-guide-card-title">Tasa de Desempleo</div>
-              <div class="indic-guide-card-text">Porcentaje de la fuerza laboral de EEUU sin trabajo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="icsa">
-              <div class="indic-guide-icon">🧾</div>
-              <div class="indic-guide-card-title">Solicitudes Semanales de Desempleo</div>
-              <div class="indic-guide-card-text">Como la tasa de desempleo, pero semanal — reacciona más rápido a cambios en el mercado laboral.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="cpi">
-              <div class="indic-guide-icon">🛒</div>
-              <div class="indic-guide-card-title">Inflación CPI</div>
-              <div class="indic-guide-card-text">Cuánto subieron los precios al consumidor — general y núcleo (sin alimentos ni energía).</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="pce">
-              <div class="indic-guide-icon">💳</div>
-              <div class="indic-guide-card-title">PCE</div>
-              <div class="indic-guide-card-text">Otra medida de inflación — la favorita de la Reserva Federal para decidir sus tasas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="ppi">
-              <div class="indic-guide-icon">🏗️</div>
-              <div class="indic-guide-card-title">PPI</div>
-              <div class="indic-guide-card-text">Inflación mayorista — lo que pagan las empresas antes de que el costo llegue al consumidor.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fedfundsrate">
-              <div class="indic-guide-icon">🏦</div>
-              <div class="indic-guide-card-title">Tasa de Interés de la Fed</div>
-              <div class="indic-guide-card-text">La tasa que fija la Reserva Federal — mueve todos los mercados cuando cambia.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="treasuryyields">
-              <div class="indic-guide-icon">📜</div>
-              <div class="indic-guide-card-title">Rendimientos del Tesoro de EEUU</div>
-              <div class="indic-guide-card-text">Los bonos a 2, 5, 10, 20 y 30 años — referencia de hipotecas, bonos y el "precio del dinero" a largo plazo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="yieldcurve">
-              <div class="indic-guide-icon">📐</div>
-              <div class="indic-guide-card-title">Curva 10Y-2Y</div>
-              <div class="indic-guide-card-text">Cuando se vuelve negativa (el bono corto paga más que el largo), es la señal de recesión más citada en finanzas.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="m2supply">
-              <div class="indic-guide-icon">💰</div>
-              <div class="indic-guide-card-title">M2 (Oferta Monetaria)</div>
-              <div class="indic-guide-card-text">Cuánto dinero hay circulando en la economía — más dinero circulando suele significar más apetito por activos de riesgo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="vixindex">
-              <div class="indic-guide-icon">😨</div>
-              <div class="indic-guide-card-title">VIX (Índice del Miedo)</div>
-              <div class="indic-guide-card-text">Sube cuando el mercado de acciones se asusta — una referencia clásica de aversión al riesgo.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="netliquidity">
-              <div class="indic-guide-icon">🌊</div>
-              <div class="indic-guide-card-title">Liquidez Neta</div>
-              <div class="indic-guide-card-text">Balance de la Fed menos la Cuenta del Tesoro menos el Reverse Repo — el indicador de liquidez que más sigue la gente de cripto.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="gdpgrowth">
-              <div class="indic-guide-icon">📊</div>
-              <div class="indic-guide-card-title">PIB (Crecimiento Real)</div>
-              <div class="indic-guide-card-text">Cuánto creció (o se contrajo) la economía de EEUU, en % trimestral anualizado.</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-            <button type="button" class="indic-guide-card indic-guide-card-link" data-indic-jump="fedbalance">
-              <div class="indic-guide-icon">🌡️</div>
-              <div class="indic-guide-card-title">Balance de la Reserva Federal</div>
-              <div class="indic-guide-card-text">Sube cuando la Fed "imprime"/compra activos (QE), baja cuando los vende o deja vencer (QT).</div>
-              <div class="indic-guide-card-link-hint">Ver →</div>
-            </button>
-          </div>
+          <div class="indic-guide-grid" id="indicGuideGrid"></div>
         </div>
 
         <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -8388,17 +8066,57 @@ document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
 // giratorio + cinta "JUAN" + punto en vivo (sin estrella, para no confundirse con favoritos).
 // Va en las cajitas de la guía de Panorama, NO en el menú lateral (ese queda normal)
 const CURATED_INDICATORS = ['pisomercado', 'ciclosoporte', 'rsimensual', 'picycle', 'btcxau', 'domratio', 'domall', 'ethlogreg', 'ethvwap', 'total2', 'others', 'altfever', 'ma4y', 'ethvsalt'];
-document.querySelectorAll('.indic-guide-card[data-indic-jump]').forEach(card => {
-  if(!CURATED_INDICATORS.includes(card.dataset.indicJump)) return;
-  card.classList.add('curated');
-  const ribbon = document.createElement('span');
-  ribbon.className = 'curated-ribbon';
-  ribbon.textContent = 'JUAN';
-  card.appendChild(ribbon);
-  const dot = document.createElement('span');
-  dot.className = 'curated-live-dot';
-  card.appendChild(dot);
-});
+// ---- Índice de Indicadores: lista generada a partir de INDIC_GROUPS (la misma fuente que ya
+// maneja las pestañas) en vez de ~70 tarjetas escritas a mano - con tantas categorías ya no cabía
+// como grilla de cajas grandes, y escribirlas a mano garantizaba que alguna quedara desactualizada
+// (como pasó con la guía de Macro, que se registró en todos lados MENOS en esta lista). Los iconos
+// se toman de la barra lateral (ya tiene uno por cada indicador) para no mantener un segundo mapa
+// de icono por id a mano.
+const INDIC_INDEX_CATEGORY_ORDER = [
+  { group: 'bitcoin', label: '₿ BTC' },
+  { group: 'ethereum', label: 'Ξ ETH' },
+  { group: 'trading', label: '💹 Trading' },
+  { group: 'sentimiento', label: 'Sentimiento' },
+  { group: 'dominancia', label: 'Dominancia' },
+  { group: 'altcoins', label: '🪙 Altcoins' },
+  { group: 'macro', label: '🏛 Macro' },
+];
+function renderIndicIndexList(){
+  const grid = document.getElementById('indicGuideGrid');
+  if(!grid) return;
+  const iconMap = {};
+  document.querySelectorAll('.sb-nav .sb-item[data-indic-jump]').forEach(btn => {
+    const icon = btn.querySelector('.sb-item-icon');
+    if(icon) iconMap[btn.dataset.indicJump] = icon.innerHTML;
+  });
+  let html = `
+    <button type="button" class="indic-index-standalone" data-jump="predicciones">
+      <span class="indic-index-row-icon">🔮</span>
+      <span class="indic-index-row-title">Predicciones de Precio</span>
+    </button>
+  `;
+  INDIC_INDEX_CATEGORY_ORDER.forEach(cat => {
+    const items = INDIC_GROUPS[cat.group] || [];
+    if(!items.length) return;
+    html += `<div class="indic-index-header">${cat.label}</div><div class="indic-index-list">`;
+    items.forEach(it => {
+      const curated = CURATED_INDICATORS.includes(it.id);
+      html += `
+        <button type="button" class="indic-index-row${curated ? ' curated' : ''}" data-jump="${it.id}">
+          <span class="indic-index-row-icon">${iconMap[it.id] || '•'}</span>
+          <span class="indic-index-row-title">${it.label}</span>
+          ${curated ? '<span class="indic-index-juan-badge">JUAN</span>' : ''}
+        </button>
+      `;
+    });
+    html += `</div>`;
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jumpToIndicator(el.dataset.jump));
+  });
+}
+renderIndicIndexList();
 
 /* ---- marcar en el menú lateral y en las pastillas de celular cuál herramienta está abierta ahora mismo ----
    ojo: el selector debe ser específico (no '[data-tool]' a secas) porque el .modal-overlay de cada
@@ -18737,9 +18455,11 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
   { id: 'rsimacdmap', icon: '🌡️', label: 'Mapa de Calor RSI + MACD + Estocástico', def: 'Combina tres indicadores técnicos a la vez (RSI, MACD y Estocástico) sobre el top 20 de monedas, en 6 temporalidades — solo marca una señal de Long/Short cuando los tres están de acuerdo.' },
 ];
-const DEF_GUIA_DATA = { bitcoin: BITCOIN_GUIA_INDICATORS, ethereum: ETHEREUM_GUIA_INDICATORS, trading: TRADING_GUIA_INDICATORS };
+// las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
+// el id del contenedor que genera buildGuiaPanelHtml (id + 'Grid'), si no, el grid queda vacío
+const DEF_GUIA_DATA = { bitcoinguia: BITCOIN_GUIA_INDICATORS, ethereumguia: ETHEREUM_GUIA_INDICATORS, tradingguia: TRADING_GUIA_INDICATORS };
 function renderDefGuiaGrid(groupKey){
-  const grid = document.getElementById(groupKey + 'GuiaGrid');
+  const grid = document.getElementById(groupKey + 'Grid');
   if(!grid) return;
   grid.innerHTML = (DEF_GUIA_DATA[groupKey] || []).map(ind => `
     <div class="macro-guia-card" data-jump="${ind.id}">
@@ -18752,7 +18472,7 @@ function renderDefGuiaGrid(groupKey){
   });
 }
 function ensureDefGuiaLoaded(groupKey){
-  const grid = document.getElementById(groupKey + 'GuiaGrid');
+  const grid = document.getElementById(groupKey + 'Grid');
   if(!grid || grid.dataset.rendered) return;
   grid.dataset.rendered = '1';
   renderDefGuiaGrid(groupKey);
@@ -18787,9 +18507,11 @@ const STATE_GUIA_EFFECT_LABEL = {
   eth_rotation: 'Capital rotando hacia ETH', risk_on: 'Apetito por riesgo', risk_off: 'Aversión al riesgo',
   warning_top: 'Señal históricamente asociada a techos de ciclo',
 };
+// mismo motivo que DEF_GUIA_DATA: las claves son el id REAL del panel ('dominanciaguia', no
+// 'dominancia'), para que coincida con los ids que genera buildGuiaPanelHtml
 const STATE_GUIA_DATA = {
-  dominancia: { indicators: DOMINANCIA_GUIA_INDICATORS },
-  altcoins: { indicators: ALTCOINS_GUIA_INDICATORS },
+  dominanciaguia: { indicators: DOMINANCIA_GUIA_INDICATORS },
+  altcoinsguia: { indicators: ALTCOINS_GUIA_INDICATORS },
 };
 const STATE_GUIA_POS = ['alt_season', 'eth_rotation', 'risk_on'];
 const STATE_GUIA_NEG = ['btc_dominant', 'risk_off'];
@@ -18812,10 +18534,10 @@ function stateGuiaInterpret(groupKey, aId, aDir, bId, bDir){
   if(effects.filter(e => e === 'btc_dominant').length === 2) notes.push('₿ Doble señal de que el capital se está refugiando en BTC.');
   return { headline, headColor, aTag: aState.tag, bTag: bState.tag, aLabel: a.label, bLabel: b.label, notes };
 }
-const stateGuiaDir = { dominancia: { a: 'high', b: 'high' }, altcoins: { a: 'high', b: 'high' } };
+const stateGuiaDir = { dominanciaguia: { a: 'high', b: 'high' }, altcoinsguia: { a: 'high', b: 'high' } };
 function renderStateGuiaGrid(groupKey){
   const cfg = STATE_GUIA_DATA[groupKey];
-  const grid = document.getElementById(groupKey + 'GuiaGrid');
+  const grid = document.getElementById(groupKey + 'Grid');
   if(!grid) return;
   grid.innerHTML = cfg.indicators.map(ind => `
     <div class="macro-guia-card" data-jump="${ind.id}">
@@ -18832,8 +18554,8 @@ function renderStateGuiaGrid(groupKey){
   });
 }
 function renderStateGuiaResult(groupKey){
-  const selA = document.getElementById(groupKey + 'GuiaSelA'), selB = document.getElementById(groupKey + 'GuiaSelB');
-  const resultEl = document.getElementById(groupKey + 'GuiaResult');
+  const selA = document.getElementById(groupKey + 'SelA'), selB = document.getElementById(groupKey + 'SelB');
+  const resultEl = document.getElementById(groupKey + 'Result');
   if(!selA || !selB || !resultEl) return;
   const dir = stateGuiaDir[groupKey];
   const r = stateGuiaInterpret(groupKey, selA.value, dir.a, selB.value, dir.b);
@@ -18848,7 +18570,7 @@ function renderStateGuiaResult(groupKey){
   `;
 }
 function ensureStateGuiaLoaded(groupKey){
-  const selA = document.getElementById(groupKey + 'GuiaSelA'), selB = document.getElementById(groupKey + 'GuiaSelB');
+  const selA = document.getElementById(groupKey + 'SelA'), selB = document.getElementById(groupKey + 'SelB');
   if(!selA || selA.dataset.wired) { renderStateGuiaResult(groupKey); return; }
   selA.dataset.wired = '1';
   renderStateGuiaGrid(groupKey);
@@ -18859,17 +18581,17 @@ function ensureStateGuiaLoaded(groupKey){
   selB.value = cfg.indicators[1].id;
   selA.addEventListener('change', () => renderStateGuiaResult(groupKey));
   selB.addEventListener('change', () => renderStateGuiaResult(groupKey));
-  document.querySelectorAll('#' + groupKey + 'GuiaDirA .mode-btn').forEach(btn => {
+  document.querySelectorAll('#' + groupKey + 'DirA .mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('#' + groupKey + 'GuiaDirA .mode-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#' + groupKey + 'DirA .mode-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       stateGuiaDir[groupKey].a = btn.dataset.dir;
       renderStateGuiaResult(groupKey);
     });
   });
-  document.querySelectorAll('#' + groupKey + 'GuiaDirB .mode-btn').forEach(btn => {
+  document.querySelectorAll('#' + groupKey + 'DirB .mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('#' + groupKey + 'GuiaDirB .mode-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#' + groupKey + 'DirB .mode-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       stateGuiaDir[groupKey].b = btn.dataset.dir;
       renderStateGuiaResult(groupKey);
@@ -18939,11 +18661,8 @@ GUIA_SLOTS.forEach(g => {
 const GUIA_GROUP_ID = { macro: 'macroguia', bitcoin: 'bitcoinguia', ethereum: 'ethereumguia', trading: 'tradingguia', dominancia: 'dominanciaguia', altcoins: 'altcoinsguia' };
 function ensureGroupGuiaLoaded(id){
   if(id === 'macroguia') return ensureMacroGuiaLoaded();
-  if(id === 'dominanciaguia') return ensureStateGuiaLoaded('dominancia');
-  if(id === 'altcoinsguia') return ensureStateGuiaLoaded('altcoins');
-  if(id === 'bitcoinguia') return ensureDefGuiaLoaded('bitcoin');
-  if(id === 'ethereumguia') return ensureDefGuiaLoaded('ethereum');
-  if(id === 'tradingguia') return ensureDefGuiaLoaded('trading');
+  if(id === 'dominanciaguia' || id === 'altcoinsguia') return ensureStateGuiaLoaded(id);
+  if(id === 'bitcoinguia' || id === 'ethereumguia' || id === 'tradingguia') return ensureDefGuiaLoaded(id);
 }
 const ALL_GUIA_IDS = Object.values(GUIA_GROUP_ID);
 
