@@ -16346,40 +16346,73 @@ let mfloorCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sob
 let mfloorSlider = null;
 let marketFloorData = null;
 let marketFloorInFlight = null;
-let marketFloorSource = null; // 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
+// respaldo en Supabase de los mismos insumos (dificultad, comisiones, bloques minados) que trae
+// backfill_cost_of_production.py / update_cost_of_production_daily.py — se intenta primero por
+// ser la vía más rápida y barata; si la tabla está vacía o falla, cae al mismo camino en vivo que
+// ya existía (Coin Metrics + blockchain.info, con su propio respaldo si Coin Metrics falla)
+let costProdRawCache = null;
+async function fetchCostOfProductionFromSupabase(){
+  if(costProdRawCache) return costProdRawCache;
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await withRetry(() => sbClient
+      .from('cost_of_production_history')
+      .select('date,difficulty,fees_btc,blocks_mined')
+      .order('date', { ascending: true })
+      .range(from, from + pageSize - 1), 2, 500);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  costProdRawCache = rows;
+  return rows;
+}
+let marketFloorSource = null; // 'supabase' | 'coinmetrics' | 'blockchain-fallback' — para mostrarlo en pantalla
 async function loadMarketFloorData(){
   if(marketFloorData) return marketFloorData;
   if(marketFloorInFlight) return marketFloorInFlight;
   marketFloorInFlight = (async () => {
-    // la dificultad SIEMPRE sale de blockchain.info (gratis, completa, confirmada contra 2 fuentes
-    // independientes más) — Coin Metrics retiró DiffMean de su plan gratis, así que ya no se le pide
-    // (pedirla junto con las demás métricas tumba TODA la respuesta con un 403, no solo esa métrica).
-    // Promise.allSettled para que si Coin Metrics falla no se pierda ni se repita la llamada a
-    // Binance/blockchain.info que ya se resolvió bien — cada llamada se reintenta antes de rendirse
-    const [weeklySettled, diffSettled, cmSettled] = await Promise.allSettled([
-      withRetry(fetchWeeklyBtcOhlc, 3, 600),
-      withRetry(() => fetchBlockchainInfoChart('difficulty'), 3, 600),
-      withRetry(() => fetchCoinMetricsDaily(['BlkCnt', 'FeeTotNtv']), 2, 500),
-    ]);
-    if(weeklySettled.status === 'rejected') throw weeklySettled.reason;
-    if(diffSettled.status === 'rejected') throw diffSettled.reason;
-    const weekly = weeklySettled.value;
-    const difficulty = diffSettled.value;
+    const weekly = await withRetry(fetchWeeklyBtcOhlc, 3, 600);
 
-    let dailyFeesBtc, dailyBlocks;
-    if(cmSettled.status === 'fulfilled'){
-      dailyBlocks = coinMetricsSeriesFor(cmSettled.value, 'BlkCnt');
-      dailyFeesBtc = coinMetricsSeriesFor(cmSettled.value, 'FeeTotNtv');
-    }
-    if(!dailyBlocks || !dailyBlocks.length || !dailyFeesBtc || !dailyFeesBtc.length){
-      // respaldo si Coin Metrics falla (caída del servicio, series vacías, etc.): blockchain.info
-      // no tiene bloques minados por día como serie propia, así que ahí sí se aproxima con el
-      // promedio de red (144/día, el objetivo de diseño de Bitcoin)
-      dailyFeesBtc = await withRetry(() => fetchBlockchainInfoChart('transaction-fees'), 3, 600);
-      dailyBlocks = null;
-      marketFloorSource = 'blockchain-fallback';
-    } else {
-      marketFloorSource = 'coinmetrics';
+    let difficulty, dailyFeesBtc, dailyBlocks;
+    try{
+      const rows = await fetchCostOfProductionFromSupabase();
+      // >1000 días es una señal sana de que el backfill ya corrió (la tabla vacía o recién creada
+      // tendría 0) — por debajo de eso se prefiere el camino en vivo, que sí trae la historia completa
+      if(rows.length > 1000){
+        difficulty = rows.filter(r => r.difficulty != null).map(r => ({ t: Date.parse(r.date), v: Number(r.difficulty) }));
+        dailyBlocks = rows.filter(r => r.blocks_mined != null).map(r => ({ t: Date.parse(r.date), v: Number(r.blocks_mined) }));
+        dailyFeesBtc = rows.filter(r => r.fees_btc != null).map(r => ({ t: Date.parse(r.date), v: Number(r.fees_btc) }));
+        if(difficulty.length && dailyBlocks.length && dailyFeesBtc.length) marketFloorSource = 'supabase';
+      }
+    } catch(err){ /* sigue al respaldo en vivo de abajo */ }
+
+    if(!difficulty || !difficulty.length || !dailyBlocks || !dailyBlocks.length || !dailyFeesBtc || !dailyFeesBtc.length){
+      // la dificultad SIEMPRE sale de blockchain.info (gratis, completa, confirmada contra 2
+      // fuentes independientes más) — Coin Metrics retiró DiffMean de su plan gratis, así que ya
+      // no se le pide (pedirla junto con las demás métricas tumba TODA la respuesta con un 403)
+      const [diffSettled, cmSettled] = await Promise.allSettled([
+        withRetry(() => fetchBlockchainInfoChart('difficulty'), 3, 600),
+        withRetry(() => fetchCoinMetricsDaily(['BlkCnt', 'FeeTotNtv']), 2, 500),
+      ]);
+      if(diffSettled.status === 'rejected') throw diffSettled.reason;
+      difficulty = diffSettled.value;
+      if(cmSettled.status === 'fulfilled'){
+        dailyBlocks = coinMetricsSeriesFor(cmSettled.value, 'BlkCnt');
+        dailyFeesBtc = coinMetricsSeriesFor(cmSettled.value, 'FeeTotNtv');
+      }
+      if(!dailyBlocks || !dailyBlocks.length || !dailyFeesBtc || !dailyFeesBtc.length){
+        // respaldo si Coin Metrics también falla (caída del servicio, series vacías, etc.):
+        // blockchain.info no tiene bloques minados por día como serie propia, así que ahí sí se
+        // aproxima con el promedio de red (144/día, el objetivo de diseño de Bitcoin)
+        dailyFeesBtc = await withRetry(() => fetchBlockchainInfoChart('transaction-fees'), 3, 600);
+        dailyBlocks = null;
+        marketFloorSource = 'blockchain-fallback';
+      } else {
+        marketFloorSource = 'coinmetrics';
+      }
     }
     const dailyIssuance = dailyFeesBtc.map(f => {
       const blocksThatDay = dailyBlocks ? (lastValueBefore(dailyBlocks, f.t) || MFLOOR_BLOCKS_PER_DAY) : MFLOOR_BLOCKS_PER_DAY;
@@ -16621,7 +16654,9 @@ function renderMarketFloorChart(){
 
   const sourceNoteEl = document.getElementById('mfloorSourceNote');
   sourceNoteEl.style.display = 'block';
-  sourceNoteEl.innerHTML = marketFloorSource === 'coinmetrics'
+  sourceNoteEl.innerHTML = marketFloorSource === 'supabase'
+    ? '✅ Dificultad, bloques minados y comisiones desde nuestro respaldo propio (actualizado a diario).'
+    : marketFloorSource === 'coinmetrics'
     ? '✅ Dificultad (blockchain.info) + bloques minados y comisiones (Coin Metrics), cargados en vivo.'
     : '⚠️ Coin Metrics no respondió — usando <b>blockchain.info</b> para dificultad y comisiones (bloques minados aproximados con el promedio de red).';
 
