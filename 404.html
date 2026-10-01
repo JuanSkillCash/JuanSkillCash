@@ -7089,6 +7089,7 @@ const INDIC_GROUPS = {
     { id: 'unrate', label: 'Tasa de Desempleo' },
     { id: 'icsa', label: 'Solicitudes Semanales de Desempleo' },
     { id: 'cpi', label: 'Inflación CPI (General y Núcleo)' },
+    { id: 'cpiyoy', label: 'Inflación Interanual (CPI YoY)' },
     { id: 'pce', label: 'PCE' },
     { id: 'ppi', label: 'PPI' },
     { id: 'fedfundsrate', label: 'Tasa de Interés de la Fed' },
@@ -7104,7 +7105,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcquarterly: 'bitcoin', btcmonthly: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethquarterly: 'ethereum', ethmonthly: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -17428,6 +17429,10 @@ const DOM_CHART_DEFS = {
     loadFn: () => cpiMacro.load(), realSeries: () => cpiMacro.series(), exact: true, fmtVal: fmtPlainIndex,
     series: [{ key: 'general', color: '#ff2f4f', label: 'CPI General' }, { key: 'nucleo', color: '#60a5fa', label: 'CPI Núcleo' }],
   },
+  cpiyoy: {
+    loadFn: () => cpiYoyMacro.load(), realSeries: () => cpiYoyMacro.series(), exact: true, fmtVal: v => v.toFixed(1) + '%',
+    series: [{ key: 'general', color: '#ff2f4f', label: 'Inflación General (interanual)' }, { key: 'nucleo', color: '#60a5fa', label: 'Inflación Núcleo (interanual)' }],
+  },
   pce: {
     loadFn: () => pceMacro.load(), realSeries: () => pceMacro.series(), exact: true, fmtVal: fmtPlainIndex,
     series: [{ key: 'v', color: '#c084fc', label: 'PCE' }],
@@ -17644,6 +17649,43 @@ const fedBalanceMacro = makeSingleFredSeries('WALCL', 1e6);
 
 const cpiMacro = makeMergedFredSeries(['CPIAUCSL', 'CPILFESL'], ['general', 'nucleo']);
 const treasuryYieldsMacro = makeMergedFredSeries(['DGS2', 'DGS5', 'DGS10', 'DGS20', 'DGS30'], ['y2', 'y5', 'y10', 'y20', 'y30']);
+// % de cambio del CPI contra el mismo mes del año anterior (ej. "USIRYY" en TradingView) - distinto
+// del índice CPI en sí (que casi siempre sube y no se lee como "la inflación está en X%"). Se
+// calcula localmente a partir del mismo CPI que ya se trae arriba, sin pedir ningún dato nuevo -
+// se compara por mes calendario (no por posición fija 12 atrás en el arreglo) para no desalinearse
+// si algún mes llega a faltar en la serie
+function cpiRowsToYoy(rows){
+  const byMonth = new Map();
+  rows.forEach(p => {
+    const d = new Date(p.t);
+    byMonth.set(d.getUTCFullYear() * 12 + d.getUTCMonth(), p);
+  });
+  const out = [];
+  rows.forEach(p => {
+    const d = new Date(p.t);
+    const prev = byMonth.get(d.getUTCFullYear() * 12 + d.getUTCMonth() - 12);
+    if(!prev) return;
+    const row = { t: p.t };
+    if(prev.general != null && p.general != null && prev.general !== 0) row.general = ((p.general / prev.general) - 1) * 100;
+    if(prev.nucleo != null && p.nucleo != null && prev.nucleo !== 0) row.nucleo = ((p.nucleo / prev.nucleo) - 1) * 100;
+    out.push(row);
+  });
+  return out;
+}
+const cpiYoyMacro = (() => {
+  const state = { cache: null, promise: null };
+  return {
+    load(){
+      if(state.cache) return Promise.resolve(state.cache);
+      if(!state.promise) state.promise = cpiMacro.load().then(rows => {
+        state.cache = cpiRowsToYoy(rows);
+        return state.cache;
+      });
+      return state.promise;
+    },
+    series: () => state.cache,
+  };
+})();
 
 const dxyMacro = (() => {
   const state = { cache: null, promise: null };
@@ -17707,7 +17749,7 @@ const netLiquidityMacro = (() => {
 // renderBtcMacroChart) y el valor real de cada una queda disponible en la leyenda/tooltip
 const BTC_MACRO_OVERLAY_DEFS = {
   pmi: { label: 'PMI Manufacturero', color: '#60a5fa', fmt: fmtPlainIndex },
-  cpi: { label: 'Inflación (CPI)', color: '#ff2f4f', fmt: fmtPlainIndex },
+  cpiyoy: { label: 'Inflación Interanual (CPI YoY)', color: '#ff2f4f', fmt: v => v.toFixed(1) + '%' },
   fedfunds: { label: 'Tasa de Interés de la Fed', color: '#22c55e', fmt: v => v.toFixed(2) + '%' },
   fedbalance: { label: 'Balance de la Fed', color: '#c084fc', fmt: fmtUsdTrillions },
 };
@@ -17720,13 +17762,13 @@ async function fetchBtcMacroOverlaySeries(){
       // si algún dato macro falla, el precio de BTC no debe romperse por eso - solo se queda sin
       // ese overlay disponible (su botón simplemente no hará nada si no hay datos)
       pmiUsMacro.load().catch(() => []),
-      cpiMacro.load().catch(() => []),
+      cpiYoyMacro.load().catch(() => []),
       fedFundsMacro.load().catch(() => []),
       fedBalanceMacro.load().catch(() => []),
     ]).then(([btc]) => {
       const rawOverlays = {
         pmi: (pmiUsMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
-        cpi: (cpiMacro.series() || []).map(p => ({ t: p.t, v: p.general })),
+        cpiyoy: (cpiYoyMacro.series() || []).map(p => ({ t: p.t, v: p.general })),
         fedfunds: (fedFundsMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
         fedbalance: (fedBalanceMacro.series() || []).map(p => ({ t: p.t, v: p.v })),
       };
@@ -18390,7 +18432,7 @@ async function loadDomChartDetail(key){
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false, ethpmi: false };
 // indicadores "Macroeconómicos": todos comparten el mismo motor (renderDomChart/loadDomChartDetail),
 // así que un solo helper generico basta en vez de una función ensureXLoaded por cada uno
-const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'pce', 'ppi', 'fedfundsrate', 'treasuryyields', 'yieldcurve', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
+const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'cpiyoy', 'pce', 'ppi', 'fedfundsrate', 'treasuryyields', 'yieldcurve', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
 MACRO_CHART_IDS.forEach(id => { domLoadedOnce[id] = false; domActiveRanges[id] = 'todo'; });
 function ensureMacroChartLoaded(id){ if(!domLoadedOnce[id]){ domLoadedOnce[id] = true; loadDomChartDetail(id); } }
 // contenido (icono/titulo/texto de carga/disclaimer) de cada panel "Macroeconómico" - el HTML en
@@ -18409,6 +18451,8 @@ const MACRO_PANEL_META = {
     disclaimer: '🧾 Como la tasa de desempleo, pero semanal — reacciona más rápido a cambios en el mercado laboral.<br>🔎 Fuente: FRED (ICSA).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   cpi: { icon: '🛒', title: 'Inflación CPI (General y Núcleo)', loading: 'Descargando el histórico de CPI general y núcleo.',
     disclaimer: '🛒 Cuánto subieron los precios al consumidor. El núcleo excluye alimentos y energía (muy volátiles) — es el que de verdad mira la Fed.<br>🔎 Fuente: FRED (CPIAUCSL, CPILFESL).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
+  cpiyoy: { icon: '📈', title: 'Inflación Interanual (CPI YoY)', loading: 'Calculando la inflación interanual a partir del CPI.',
+    disclaimer: '📈 El % de cambio del CPI comparado con el mismo mes del año anterior — el número que la gente dice cuando habla de "la inflación está en X%" (en TradingView es el símbolo USIRYY). Distinto del indicador "Inflación CPI (General y Núcleo)": ese muestra el índice en sí (un nivel que casi siempre sube), este muestra el % de cambio interanual (que sube y baja). El núcleo excluye alimentos y energía.<br>🔎 Calculado a partir de FRED (CPIAUCSL, CPILFESL) — mismo dato fuente que el índice CPI, expresado como % interanual.<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   pce: { icon: '💳', title: 'PCE', loading: 'Descargando el histórico de PCE.',
     disclaimer: '💳 Otra medida de inflación — la favorita de la Reserva Federal para decidir sus tasas.<br>🔎 Fuente: FRED (PCEPI).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   ppi: { icon: '🏗️', title: 'PPI', loading: 'Descargando el histórico de PPI.',
