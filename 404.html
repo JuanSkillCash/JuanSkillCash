@@ -16294,14 +16294,20 @@ async function fetchWeeklyBtcOhlc(){
   }
 }
 function buildWeeklyOhlcFromDailyCloses(daily){
+  // OJO: el bucket se agrupa por semana ISO (lunes-domingo), pero el timestamp "t" que se guarda es
+  // el del ÚLTIMO día visto de esa semana (≈domingo) y no el lunes de inicio — así coincide con el
+  // criterio de Binance en fetchWeeklyBtcOhlc (r[6] = cierre de la vela), que es la fuente primaria.
+  // Antes este respaldo guardaba el lunes de inicio, lo que desfasaba varios días las fechas
+  // mostradas (tooltip, cruces de Pulso de Fondo, etc.) cada vez que Binance no estaba disponible.
   const buckets = new Map();
   daily.forEach(p => {
     const key = isoWeekKeyMs(p.t);
-    if(!buckets.has(key)) buckets.set(key, { t: key, o: p.c, h: p.c, l: p.c, c: p.c });
+    if(!buckets.has(key)) buckets.set(key, { t: p.t, o: p.c, h: p.c, l: p.c, c: p.c });
     const b = buckets.get(key);
     b.h = Math.max(b.h, p.c);
     b.l = Math.min(b.l, p.c);
     b.c = p.c;
+    b.t = p.t;
   });
   return [...buckets.values()].sort((a, b) => a.t - b.t);
 }
@@ -16441,42 +16447,24 @@ async function loadMarketFloorData(){
   })();
   return marketFloorInFlight;
 }
-// Pisos históricos ya verificados por el usuario contra su propio gráfico real de TradingView
-// (mismo Canal de Keltner + Costo de Producción, con Glassnode/Coinmetrics). La fórmula pública,
-// sin acceso a esas fuentes, ubica estos mismos cruces con un desfase de entre 1 y varias semanas
-// según la época — así que en vez de mostrar una fecha aproximada donde ya se sabe la real, se fija
-// la fecha verificada para el pasado. De aquí en adelante (después del último piso confirmado), los
-// cruces nuevos sí se detectan en vivo con la fórmula, igual que cualquier otro indicador del sitio
-const MFLOOR_VERIFIED_CROSSINGS = [
-  Date.UTC(2018, 11, 10),
-  Date.UTC(2020, 2, 16),
-  Date.UTC(2022, 10, 28),
-  Date.UTC(2024, 7, 26),
-  Date.UTC(2026, 5, 22),
-];
+// Antes esto tenía una lista de fechas fijas "verificadas a mano" contra TradingView. Con los
+// datos reales ya corregidos (Coin Metrics sin DiffMean + blockchain.info + MFLOOR_ALPHA calibrado)
+// se reprodujo la fórmula completa en Python contra velas diarias reales de Coinbase (highs/lows
+// verdaderos, no solo cierres) para TODO el histórico, y se confirmó que una de esas fechas fijas
+// (ago-2024) nunca existió como cruce real — el Keltner nunca bajó del Costo esa semana, se quedó
+// muy por encima — así que ahora los cruces se detectan 100% en vivo con la fórmula, sin fechas
+// fijas que puedan quedar desactualizadas o inventadas.
 function detectMarketFloorCrossings(points){
-  const nearestPoint = t => {
-    let idx = 0, bestDiff = Infinity;
-    for(let i = 0; i < points.length; i++){
-      const diff = Math.abs(points[i].t - t);
-      if(diff < bestDiff){ bestDiff = diff; idx = i; }
-    }
-    return points[idx];
-  };
-  const crossings = MFLOOR_VERIFIED_CROSSINGS
-    .map(t => nearestPoint(t))
-    .map(p => ({ t: p.t, price: p.price }));
-
   // si el precio se recupera brevemente por encima del costo y vuelve a caer poco después, es la
   // misma reversión del mismo piso — no un piso nuevo — así que se ignora cualquier cruce que
   // caiga dentro de las MFLOOR_CROSSING_COOLDOWN_WEEKS semanas siguientes al último ya marcado
   const MFLOOR_CROSSING_COOLDOWN_WEEKS = 26;
-  const lastVerifiedT = MFLOOR_VERIFIED_CROSSINGS[MFLOOR_VERIFIED_CROSSINGS.length - 1];
+  const crossings = [];
   let prevBelow = null;
-  let lastCrossingT = lastVerifiedT;
+  let lastCrossingT = -Infinity;
   for(let i = 0; i < points.length; i++){
     const p = points[i];
-    if(p.t <= lastVerifiedT || p.costSmooth == null) continue;
+    if(p.costSmooth == null) continue;
     const below = p.keltnerLower < p.costSmooth;
     if(prevBelow === false && below === true){
       const weeksSinceLast = (p.t - lastCrossingT) / (7 * 86400000);
