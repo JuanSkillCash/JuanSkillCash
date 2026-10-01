@@ -17943,11 +17943,14 @@ async function fetchBtcMacroOverlaySeries(){
 // overlay macro de arriba, aqui NO hace falta renormalizar por rango visible: el 0-100 de cada
 // termino ya es comparable en TODA su historia (viene de una sola llamada con timeframe='all' en
 // el backend, ver backfill_google_trends.py), asi que se dibuja tal cual
+// el label muestra el término TAL CUAL se busca en Google Trends (entre comillas, como quien dice
+// "esto es exactamente lo que se busca") en vez de una descripción en español - más claro sobre
+// qué es cada línea, ya que total es solo interés de búsqueda de esa frase exacta
 const BTC_TRENDS_OVERLAY_DEFS = {
-  bitcoin: { term: 'bitcoin', label: 'Interés General en Bitcoin', color: '#60a5fa' },
-  buybitcoin: { term: 'buy bitcoin', label: 'Interés en Comprar BTC', color: '#22c55e' },
-  bitcoincrash: { term: 'bitcoin crash', label: 'Miedo / Pánico (Bitcoin Crash)', color: '#ff2f4f' },
-  altcoinseason: { term: 'altcoin season', label: 'Interés en Altcoin Season', color: '#f0b23d' },
+  bitcoin: { term: 'bitcoin', label: '"bitcoin"', color: '#60a5fa' },
+  buybitcoin: { term: 'buy bitcoin', label: '"buy bitcoin"', color: '#22c55e' },
+  bitcoincrash: { term: 'bitcoin crash', label: '"bitcoin crash"', color: '#ff2f4f' },
+  altcoinseason: { term: 'altcoin season', label: '"altcoin season"', color: '#f0b23d' },
 };
 let btcTrendsSeries = null, btcTrendsPromise = null;
 async function fetchBtcTrendsOverlaySeries(){
