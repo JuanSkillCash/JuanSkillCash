@@ -70,3 +70,12 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_google_trends_daily.py
+
+      - name: Actualizar STH-MVRV
+        # continue-on-error: Bitview/bitcoin-data.com son fuentes comunitarias sin SLA - un
+        # fallo aqui no debe tumbar el resto de pasos ya corridos arriba
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_sth_mvrv_daily.py
