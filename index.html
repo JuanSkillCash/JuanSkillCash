@@ -18191,7 +18191,7 @@ const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: 
 // indicadores "Macroeconómicos": todos comparten el mismo motor (renderDomChart/loadDomChartDetail),
 // así que un solo helper generico basta en vez de una función ensureXLoaded por cada uno
 const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'pce', 'ppi', 'fedfundsrate', 'treasuryyields', 'yieldcurve', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
-MACRO_CHART_IDS.forEach(id => { domLoadedOnce[id] = false; });
+MACRO_CHART_IDS.forEach(id => { domLoadedOnce[id] = false; domActiveRanges[id] = 'todo'; });
 function ensureMacroChartLoaded(id){ if(!domLoadedOnce[id]){ domLoadedOnce[id] = true; loadDomChartDetail(id); } }
 // contenido (icono/titulo/texto de carga/disclaimer) de cada panel "Macroeconómico" - el HTML en
 // si se genera una sola vez con renderMacroPanels() en vez de escribir 16 bloques casi idénticos
@@ -18245,6 +18245,12 @@ function renderMacroPanels(){
                 <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
               </div>
               <h2 class="calc-title">${m.icon} ${m.title}</h2>
+            </div>
+            <div class="tf-pill-row" id="${id}RangeFilter">
+              <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+              <button type="button" class="tf-pill" data-range="10a">10 años</button>
+              <button type="button" class="tf-pill" data-range="5a">5 años</button>
+              <button type="button" class="tf-pill" data-range="2a">2 años</button>
             </div>
             <div class="indic-chart-body" id="${id}ChartBody">
               <div class="indic-chart-soon" id="${id}Loading">
@@ -18715,6 +18721,21 @@ document.querySelectorAll('#domusdtRangeFilter .tf-pill').forEach(btn => {
     domActiveRanges.domusdt = btn.dataset.range;
     delete domCustomRanges.domusdt;
     renderDomChart('domusdt');
+  });
+});
+// mismo filtro en píldora que los gráficos de arriba, pero en un solo loop (son 16 indicadores,
+// todos con el mismo patrón Todo/10a/5a/2a - escribirlos a mano sería repetir este mismo bloque
+// 16 veces)
+MACRO_CHART_IDS.forEach(id => {
+  document.querySelectorAll('#' + id + 'RangeFilter .tf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.classList.contains('active')) return;
+      document.querySelectorAll('#' + id + 'RangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      domActiveRanges[id] = btn.dataset.range;
+      delete domCustomRanges[id];
+      renderDomChart(id);
+    });
   });
 });
 
