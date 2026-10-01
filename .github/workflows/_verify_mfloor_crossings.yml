@@ -1,0 +1,24 @@
+name: (Descartable) Verificar cruces reales de Pulso de Fondo
+
+# Workflow temporal, de un solo uso: reproduce en Python la misma logica de Keltner+Costo de
+# Produccion de Pulso de Fondo con datos reales, para encontrar los cruces reales y compararlos
+# contra TradingView. No escribe nada en Supabase, no usa secretos - se borra en cuanto cumpla
+# su proposito.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Calcular cruces reales
+        run: python scripts/_verify_mfloor_crossings.py
