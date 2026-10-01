@@ -20,6 +20,26 @@ Series que trae (todas oficiales y gratis via la API de FRED):
     WALCL     -> Balance total de la Reserva Federal (su hoja de balance,
                  en millones de USD - sube cuando la Fed "imprime"/compra
                  activos (QE), baja cuando los vende/deja vencer (QT))
+    DGS2, DGS5, DGS20, DGS30 -> Rendimientos del Tesoro de EEUU a 2, 5, 20 y
+                 30 anos (junto con DGS10 ya arriba, forman la "curva" completa
+                 que la gente de bonos sigue)
+    T10Y2Y    -> Spread 10 anos menos 2 anos - cuando se vuelve negativo (el
+                 bono corto paga mas que el largo) es la señal de recesion mas
+                 citada en finanzas
+    ICSA      -> Solicitudes iniciales de desempleo, semanal (reacciona mas
+                 rapido que la tasa de desempleo mensual)
+    A191RL1Q225SBEA -> Crecimiento del PIB real de EEUU (% trimestral
+                 anualizado) - el numero de "cuanto crecio la economia" que
+                 sale en las noticias
+    WTREGEN   -> Cuenta General del Tesoro (TGA) - cuanto efectivo tiene el
+                 gobierno de EEUU parqueado en la Fed
+    RRPONTSYD -> Reverse Repo (RRP) - cuanto efectivo "estacionan" bancos y
+                 fondos en la Fed a cambio de un interes de un dia para otro
+
+    WTREGEN y RRPONTSYD se usan junto con WALCL para calcular "Liquidez Neta"
+    (Balance Fed - TGA - RRP) en el sitio - un indicador que seguidores de
+    cripto usan como referencia de cuanto dinero hay disponible para activos
+    de riesgo.
 
 De paso, a partir del historico de DFF ya subido, arma tambien el historico
 completo de decisiones del FOMC (tabla fomc_decisions) - cada dia en que la
@@ -53,6 +73,8 @@ FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 FRED_SERIES = [
     "CPIAUCSL", "CPILFESL", "PAYEMS", "UNRATE", "DFF",
     "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS", "WALCL",
+    "DGS2", "DGS5", "DGS20", "DGS30", "T10Y2Y", "ICSA",
+    "A191RL1Q225SBEA", "WTREGEN", "RRPONTSYD",
 ]
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
