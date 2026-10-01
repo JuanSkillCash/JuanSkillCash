@@ -1,0 +1,28 @@
+name: Respaldar historico completo de Google Trends (una sola vez)
+
+# Se dispara solo a mano, desde la pestana "Actions" de GitHub -> elegir este
+# workflow -> boton "Run workflow". Trae TODO el historico disponible de los
+# 4 terminos de Google Trends que usa el grafico BTC + Google Trends. El
+# robot diario ya lo mantiene al dia despues de esto.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir pytrends requests
+
+      - name: Descargar y subir historico completo de Google Trends
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/backfill_google_trends.py
