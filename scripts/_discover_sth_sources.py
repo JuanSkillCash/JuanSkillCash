@@ -64,17 +64,13 @@ except Exception as e:
     print("ERROR:", e)
 
 for candidate in [
-    "/api/series/sth_realized_price",
-    "/api/series/sth_realized_price/day1",
-    "/api/series/sth_mvrv/day1",
-    "/api/series/sth_realized_price/day1?page=0",
-    "/api/series/sth_realized_price/day1?from=0&count=5",
-    "/api/series/sth_realized_price/day1?format=csv",
+    "/api/series/indexes",
+    "/api/series/sth_mvrv/day1?from=6465&count=19",
 ]:
     print(f"\n=== BITVIEW: {candidate} ===")
     try:
         r = requests.get("https://bitview.space" + candidate, timeout=30)
         print("status:", r.status_code)
-        print(r.text[:1500])
+        print(r.text[:3000])
     except Exception as e:
         print("ERROR:", e)
