@@ -16329,17 +16329,20 @@ async function fetchCoinMetricsDaily(metrics, asset){
 function coinMetricsSeriesFor(rows, key){
   return rows.filter(r => r[key] != null).map(r => ({ t: new Date(r.time).getTime(), v: parseFloat(r[key]) })).sort((a, b) => a.t - b.t);
 }
-// Fórmula pública original del indicador de TradingView: alpha(1/1800) * dificultad^0.45 / emisión
-// diaria (subsidio*bloques + fees), suavizado con SMA. El intento anterior usaba la dificultad de
-// Coin Metrics (DiffMean) + una aproximación plana de 144 bloques/día cuando Coin Metrics fallaba,
-// y necesitaba un factor de escala "a ojo" (11.48) para que cuadrara. Investigación posterior (ver
-// sesión del 2026-10-01) confirmó con datos reales que: (a) Coin Metrics retiró DiffMean de su plan
-// gratis (ahora devuelve 403), así que la dificultad real debe salir de blockchain.info, que SÍ es
-// gratis, completa (2009-hoy) y coincide casi exacto contra otras 2 fuentes independientes
-// (Bitview, bitcoin-data.com — diferencia mediana 0%); y (b) Coin Metrics SÍ sigue dando bloques
-// minados por día reales (BlkCnt) gratis — con eso ya no hace falta aproximar 144/día. Con datos
-// reales en ambos lados, la constante pública 1/1800 se usa tal cual, sin factor de ajuste inventado
-const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA = 1 / 1800;
+// Fórmula pública original del indicador de TradingView: alpha * dificultad^0.45 / emisión diaria
+// (subsidio*bloques + fees), suavizado con SMA. OJO: el alpha=1/1800 del script de TradingView está
+// calibrado contra GLASSNODE:BTC_DIFFICULTY como TradingView lo representa internamente — NO contra
+// la dificultad cruda de la red (la que da blockchain.info/Coin Metrics/Bitview). Se probó usar
+// 1/1800 tal cual sobre dificultad cruda y el resultado colapsó a ~0 en producción (confirmado por
+// el usuario con una captura real) — la escala de Glassnode-en-TradingView y la dificultad cruda NO
+// son la misma unidad, así que ese factor NO es transferible sin recalibrar. Se mantiene entonces el
+// factor de escala calibrado a mano (11.48) contra el gráfico real de TradingView del usuario en 4
+// fechas verificadas (dic 2018, mar 2020, nov 2022, ago 2024, jun 2026) — lo único que sí cambió fue
+// la calidad de los INSUMOS (dificultad real de blockchain.info en vez de la de Coin Metrics, que ya
+// no está disponible gratis; bloques minados reales de Coin Metrics en vez de la aproximación plana
+// de 144/día) — si el usuario reporta que el costo ya no calza con su TradingView, este es el único
+// número que hay que tocar
+const MFLOOR_K = 0.45, MFLOOR_SMOOTH_WEEKS = 13, MFLOOR_BLOCKS_PER_DAY = 144, MFLOOR_ALPHA = 11.48;
 const MFLOOR_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let mfloorActiveRange = 'todo';
 let mfloorCustomRange = null; // {fromMs, toMs} — arrastrar el slider gana sobre los botones fijos
