@@ -496,17 +496,19 @@ button{font-family:inherit;color:inherit}
    traen la suya propia dibujada dentro del gráfico (ver chartWatermarkHtml en el script), con eso
    no hace falta repetirla aquí también */
 .sc-chart-watermark{position:relative}
-/* mismos colores/tipografía del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILLCASH"
-   en blanco (Poppins), "Tools" en rojo cursiva (Caveat) - ::before y ::after anclados al mismo
-   punto central y empujados en direcciones opuestas para que lean como una sola palabra */
+/* mismos colores del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILLCASH" en blanco,
+   "Tools" en rojo - "Tools" en Poppins itálica, no en Caveat (misma razón que chartWatermarkHtml
+   en el script: Poppins ya está garantizada en todo el sitio, sin riesgo de fuente sin cargar).
+   ::before y ::after anclados al mismo punto central y empujados en direcciones opuestas para
+   que lean como una sola palabra */
 .sc-chart-watermark::before{
   content:"SKILLCASH";position:absolute;top:50%;left:50%;transform:translate(-100%,-50%);
   font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(17px,4.6vw,38px);
   letter-spacing:-.01em;color:rgba(247,246,251,.055);pointer-events:none;z-index:-1;white-space:nowrap;
 }
 .sc-chart-watermark::after{
-  content:"Tools";position:absolute;top:50%;left:50%;transform:translate(3px,-46%);
-  font-family:'Caveat',cursive;font-weight:700;font-size:clamp(19px,5.3vw,42px);
+  content:"Tools";position:absolute;top:50%;left:50%;transform:translate(3px,-50%);
+  font-family:'Poppins',sans-serif;font-weight:900;font-style:italic;font-size:clamp(17px,4.6vw,38px);
   color:rgba(255,47,79,.07);pointer-events:none;z-index:-1;white-space:nowrap;
 }
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
@@ -15060,15 +15062,19 @@ function rainbowBandForResidual(res){
 // sitio - un solo helper reusado en cada uno en vez de repetir el mismo <text> a mano por todos
 // lados. Se dibuja SIEMPRE como el primer hijo del <svg> (detrás de grid/zonas/líneas)
 function chartWatermarkHtml(totalW, totalH){
-  // mismos colores/tipografía del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILL" en
-  // blanco, "CASH" y "Tools" en rojo, Tools en Caveat cursiva - solo que aquí muy transparente
+  // mismos colores del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILL" en blanco,
+  // "CASH" y "Tools" en rojo - "Tools" va en Poppins itálica (no en Caveat, la fuente cursiva que
+  // sí usa el logo real): un <tspan> con una fuente nueva dentro de un <text> inyectado por
+  // innerHTML a veces queda pintado con la fuente de respaldo si esa fuente (Caveat) todavía no
+  // había terminado de cargar en el navegador la primera vez que ese gráfico se dibuja, y un SVG
+  // no se repinta solo cuando la fuente llega tarde (a diferencia del texto HTML normal) - Poppins
+  // ya está garantizada (es la fuente de encabezados de todo el sitio), así que no tiene ese riesgo
   const fontSize = Math.round(totalW * 0.05);
-  const toolsFontSize = Math.round(fontSize * 1.15);
   const cx = (totalW / 2).toFixed(1), cy = (totalH / 2 + fontSize * 0.3).toFixed(1);
-  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" style="letter-spacing:-.01em;pointer-events:none">` +
-    `<tspan font-family="'Poppins',sans-serif" font-size="${fontSize}" fill="rgba(247,246,251,.055)">SKILL</tspan>` +
-    `<tspan font-family="'Poppins',sans-serif" font-size="${fontSize}" fill="rgba(255,47,79,.07)">CASH</tspan>` +
-    `<tspan font-family="'Caveat',cursive" font-weight="700" font-size="${toolsFontSize}" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
+  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="'Poppins',sans-serif" font-weight="900" font-size="${fontSize}" style="letter-spacing:-.01em;pointer-events:none">` +
+    `<tspan fill="rgba(247,246,251,.055)">SKILL</tspan>` +
+    `<tspan fill="rgba(255,47,79,.07)">CASH</tspan>` +
+    `<tspan font-style="italic" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
     `</text>`;
 }
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
