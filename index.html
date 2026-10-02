@@ -8539,23 +8539,11 @@ function wireCollapsibleLabel(label){
   });
 }
 document.querySelectorAll('.sb-cat-label').forEach(label => {
-  label.classList.add('collapsed'); // empiezan plegadas
-  let el = label.nextElementSibling;
-  while(el && !el.classList.contains('sb-cat-label')){
-    el.style.display = 'none';
-    el = el.nextElementSibling;
-  }
-  wireCollapsibleLabel(label);
+  wireCollapsibleLabel(label); // empiezan desplegadas - el usuario las puede plegar a mano
 });
 document.querySelectorAll('.indic-cat-label').forEach(label => {
   if(label.id === 'indicNavTitle') return;
-  label.classList.add('collapsed'); // empiezan plegadas
-  let el = label.nextElementSibling;
-  while(el && !el.classList.contains('sb-cat-label') && !el.classList.contains('indic-cat-label')){
-    el.style.display = 'none';
-    el = el.nextElementSibling;
-  }
-  wireCollapsibleLabel(label);
+  wireCollapsibleLabel(label); // empiezan desplegadas - el usuario las puede plegar a mano
 });
 
 /* ---- recuadro fijo arriba del sidebar para expandir/contraer TODOS los sub-grupos de
@@ -8585,7 +8573,7 @@ function setAllIndicCatLabelsCollapsed(collapsed){
   });
 }
 const sbCatToggleAll = document.getElementById('sbCatToggleAll');
-let allIndicCatsExpanded = false;
+let allIndicCatsExpanded = true; // todas las categorías empiezan desplegadas
 function syncCatToggleAllState(){
   sbCatToggleAll.classList.toggle('all-expanded', allIndicCatsExpanded);
   const label = allIndicCatsExpanded ? 'Contraer categorías' : 'Expandir categorías';
@@ -8597,6 +8585,7 @@ sbCatToggleAll.addEventListener('click', () => {
   setAllIndicCatLabelsCollapsed(!allIndicCatsExpanded);
   syncCatToggleAllState();
 });
+syncCatToggleAllState();
 
 const sbSearchInput = document.getElementById('sbSearchInput');
 sbSearchInput.addEventListener('input', () => {
