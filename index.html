@@ -1315,6 +1315,12 @@ img[src=""]{display:none}
 .partner-perks{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:26px}
 .perk-chip{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--white);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:99px;padding:7px 13px 7px 11px}
 .perk-chip-dot{width:6px;height:6px;border-radius:50%;background:var(--pc,var(--muted));flex-shrink:0}
+/* leyenda clicable (ej. Calls/Puts en Interés Abierto en Opciones) - clic para ocultar/mostrar esa serie, igual que en Deribit */
+.optionsoi-legend-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2);background:none;border:none;padding:2px 4px;margin:-2px -4px;border-radius:6px;cursor:pointer;font-family:inherit;transition:background .15s,opacity .15s}
+.optionsoi-legend-btn:hover{background:rgba(255,255,255,.05)}
+.optionsoi-legend-btn.off{opacity:.45}
+.optionsoi-legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;transition:background .15s}
+.optionsoi-legend-btn.off .optionsoi-legend-dot{background:#6b7280 !important}
 .partner-cta{display:inline-flex;align-items:center;gap:9px;font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:#050810;background:var(--pc,var(--white));padding:14px 26px;border-radius:12px;text-decoration:none;transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
 .partner-cta:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px var(--pt,rgba(0,0,0,.5))}
 .partner-cta-sub{font-size:11px;color:var(--muted);margin-top:11px}
@@ -3705,8 +3711,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="partner-perks" id="optionsoiLegend" style="display:none;margin-bottom:18px">
-                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:3px;background:#3b82f6;display:inline-block"></span> Calls (opción de compra)</span>
-                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:3px;background:#f0b23d;display:inline-block"></span> Puts (opción de venta)</span>
+                <button type="button" id="optionsoiToggleCalls" class="optionsoi-legend-btn"><span class="optionsoi-legend-dot" style="background:#3b82f6"></span> Calls (opción de compra)</button>
+                <button type="button" id="optionsoiTogglePuts" class="optionsoi-legend-btn"><span class="optionsoi-legend-dot" style="background:#f0b23d"></span> Puts (opción de venta)</button>
                 <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:14px;height:2px;background:#ff2f4f;display:inline-block"></span> Valor Intrínseco Total (Máximo Dolor)</span>
               </div>
               <div class="chart-stats-grid" id="optionsoiStats" style="display:none"></div>
@@ -21334,6 +21340,7 @@ let optionsOiActiveCcy = 'BTC';
 let optionsOiRawByCcy = {};
 let optionsOiActiveExpiry = 'all';
 let optionsOiLoadedOnce = false;
+let optionsOiShowCalls = true, optionsOiShowPuts = true; // clic en la leyenda oculta/muestra cada serie, igual que Deribit
 const OPTIONS_OI_MONTHS = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
 function optionsOiParseInstrument(name){
   const parts = name.split('-');
@@ -21444,7 +21451,13 @@ function renderOptionsOiChart(){
   const drawH = isMobileChart ? 220 : 340;
   const totalH = drawH + marginTop + marginBottom;
 
-  const maxOi = Math.max(...strikes.map(s => Math.max(byStrike.get(s).calls, byStrike.get(s).puts)), 1);
+  const maxOi = Math.max(...strikes.map(s => {
+    const d = byStrike.get(s);
+    let m = 0;
+    if(optionsOiShowCalls) m = Math.max(m, d.calls);
+    if(optionsOiShowPuts) m = Math.max(m, d.puts);
+    return m;
+  }), 1);
   let yTicks = niceLinearTicks(0, maxOi * 1.15);
   if(yTicks.length < 2) yTicks = [0, maxOi];
   const topTick = yTicks[yTicks.length - 1] || maxOi;
@@ -21474,9 +21487,10 @@ function renderOptionsOiChart(){
     const groupX = marginLeft + i * barGroupW + (barGroupW - barPairW) / 2;
     const d = byStrike.get(s);
     const callsY = yFor(d.calls), putsY = yFor(d.puts);
-    return '' +
-      '<rect x="' + groupX.toFixed(1) + '" y="' + callsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - callsY).toFixed(1) + '" fill="#3b82f6"/>' +
-      '<rect x="' + (groupX + singleBarW).toFixed(1) + '" y="' + putsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - putsY).toFixed(1) + '" fill="#f0b23d"/>';
+    let html = '';
+    if(optionsOiShowCalls) html += '<rect x="' + groupX.toFixed(1) + '" y="' + callsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - callsY).toFixed(1) + '" fill="#3b82f6"/>';
+    if(optionsOiShowPuts) html += '<rect x="' + (groupX + singleBarW).toFixed(1) + '" y="' + putsY.toFixed(1) + '" width="' + singleBarW.toFixed(1) + '" height="' + Math.max(0, baseY - putsY).toFixed(1) + '" fill="#f0b23d"/>';
+    return html;
   }).join('');
 
   // con muchos strikes, un texto rotado debajo de CADA barra se encima y queda ilegible — se
@@ -21582,6 +21596,23 @@ function ensureOptionsOiLoaded(){
     optionsOiActiveExpiry = e.target.value;
     renderOptionsOiChart();
   });
+  document.getElementById('optionsoiToggleCalls').addEventListener('click', () => {
+    optionsOiShowCalls = !optionsOiShowCalls;
+    if(!optionsOiShowCalls && !optionsOiShowPuts) optionsOiShowPuts = true; // nunca las dos apagadas a la vez
+    syncOptionsOiLegendState();
+    renderOptionsOiChart();
+  });
+  document.getElementById('optionsoiTogglePuts').addEventListener('click', () => {
+    optionsOiShowPuts = !optionsOiShowPuts;
+    if(!optionsOiShowCalls && !optionsOiShowPuts) optionsOiShowCalls = true;
+    syncOptionsOiLegendState();
+    renderOptionsOiChart();
+  });
+  syncOptionsOiLegendState();
+}
+function syncOptionsOiLegendState(){
+  document.getElementById('optionsoiToggleCalls').classList.toggle('off', !optionsOiShowCalls);
+  document.getElementById('optionsoiTogglePuts').classList.toggle('off', !optionsOiShowPuts);
 }
 
 /* ---- Mapa de Calor RSI + MACD + Estocástico: top 20 por capitalización (sin stablecoins) en 6 temporalidades.
