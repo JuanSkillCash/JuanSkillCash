@@ -20866,7 +20866,12 @@ function renderBtcAaplChart(){
     return out;
   }
   function hullPathHtml(hull, color){
-    const clipped = clipHullToRange(hull, startMs, endMs);
+    // el primer y el último vértice de la envolvente son SIEMPRE el primer/último dato del
+    // historial (es forzoso matemáticamente, no un toque real de tendencia) - dibujarlos obliga a
+    // la línea a "doblarse" para cerrar justo en el borde del gráfico. Se recortan esos dos
+    // extremos forzados y se deja la línea abierta, terminando en el último toque real interior
+    const interior = hull.slice(1, -1);
+    const clipped = clipHullToRange(interior, startMs, endMs);
     if(clipped.length < 2) return '';
     let d = '';
     clipped.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.x).toFixed(1)},${yFor(Math.pow(10, p.y)).toFixed(1)} `; });
