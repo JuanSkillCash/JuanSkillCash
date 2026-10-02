@@ -4295,7 +4295,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
-                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" de cada ciclo NO son la fecha exacta del máximo menos la del mínimo (eso puede dar un número chiquito y engañoso si el precio cayó rápido pero tardó mucho en confirmarse como un giro real — ej. el crash de abril de 2013, donde el mínimo exacto se tocó a los 7 días pero no se confirmó como piso real hasta 2 años después); se usa la fecha en la que YA SE SABÍA que el giro era real, que es la duración de verdad del ciclo. El tramo marcado con "+" es el ciclo actual, todavía en curso.<br>
+                🔴🟢 Los techos y pisos de ciclo se detectan automáticamente sobre el historial real: un techo es un máximo histórico que luego cae al menos 65% desde ese precio; si dos techos candidatos quedan a menos de 650 días entre sí, solo se conserva el más alto; el piso de cada ciclo es siempre el precio más bajo real entre dos techos consecutivos, sin excepción. Los "días" de cada tramo son siempre la diferencia real de fechas entre un punto y el siguiente. El tramo marcado con "+" es el ciclo actual, todavía en curso (piso provisional).<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -20507,55 +20507,74 @@ function buildBtcXauRows(){
 function fmtOz(v){
   return v.toLocaleString('en-US', { minimumFractionDigits: v < 1 ? 3 : 2, maximumFractionDigits: v < 1 ? 3 : 2 }) + ' oz';
 }
-// detector de máximos/mínimos de CICLO (tipo ZigZag): sigue el extremo candidato mientras el
-// precio se mueva en esa dirección, y solo lo confirma como máximo/mínimo de ciclo cuando (a) el
-// precio se revierte al menos "thresholdPct" desde ese candidato Y (b) desde el giro confirmado
-// anterior ya pasaron al menos "minDays" — así un repunte o caída fuerte pero rápida (semanas o
-// pocos meses) no cuenta como un ciclo, solo un giro grande Y sostenido en el tiempo. Con solo el
-// umbral de precio, en datos reales de BTC/XAU salían demasiados giros (hay correcciones de 50%+
-// que se resuelven en semanas) — el filtro de tiempo mínimo es el que de verdad aísla los ciclos
-function detectCyclePeaksTroughs(points, thresholdPct, minDays){
-  if(!points || points.length < 2) return [];
-  const minMs = (minDays || 0) * 86400000;
+// ---- parámetros editables de detección de ciclos (reglas pedidas por el usuario) ----
+const CYCLE_PEAK_DRAWDOWN_PCT = 0.65; // regla 1: un techo es un máximo histórico que luego cae al menos este % desde su precio
+const CYCLE_MIN_DAYS_BETWEEN_PEAKS = 650; // regla 2: entre dos techos debe haber mínimo estos días; si quedan más cerca, se conserva solo el más alto
+
+// Regla 1, zigzag puro sobre el precio (sin filtro de tiempo): sigue el candidato a máximo
+// mientras el precio suba, y solo lo confirma como techo en cuanto cae CYCLE_PEAK_DRAWDOWN_PCT
+// desde ese candidato. El piso de cada ciclo NO sale de aquí (eso es la regla 3, más abajo) - esta
+// función solo detecta techos reales; un giro que todavía no cayó lo suficiente al llegar al final
+// de los datos no es un techo confirmado y se descarta.
+function rawZigzagPeaks(points, thresholdPct){
   const events = [];
-  let mode = null; // 'seekingPeak' | 'seekingTrough'
+  let mode = null; // 'peak' | 'trough'
   let candidate = points[0];
-  let legStartT = points[0].t;
   for(let i = 1; i < points.length; i++){
     const p = points[i];
     if(mode === null){
-      if(p.ratio > candidate.ratio){ mode = 'seekingPeak'; candidate = p; }
-      else if(p.ratio < candidate.ratio){ mode = 'seekingTrough'; candidate = p; }
+      if(p.ratio > candidate.ratio){ mode = 'peak'; candidate = p; }
+      else if(p.ratio < candidate.ratio){ mode = 'trough'; candidate = p; }
       continue;
     }
-    if(mode === 'seekingPeak'){
+    if(mode === 'peak'){
       if(p.ratio >= candidate.ratio){ candidate = p; }
-      // el tiempo mínimo se mide hasta "p" (el punto que estamos evaluando ahora), no hasta
-      // "candidate" (la fecha del extremo, que deja de avanzar en cuanto el precio empieza a
-      // revertirse) — si se comparara contra candidate.t, una vez el candidato deja de
-      // actualizarse la condición de tiempo quedaría fija para siempre y nunca podría cumplirse
-      else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
-        // confirmedAt = la fecha en la que se SUPO que este máximo era real (cuando el precio ya
-        // había caído el % exigido) - distinta de "t" (la fecha exacta del máximo). Un máximo real
-        // puede confirmarse apenas unos días después si la caída fue muy rápida (ver más abajo)
-        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak', confirmedAt: p.t });
-        mode = 'seekingTrough';
-        legStartT = candidate.t;
+      else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct){
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak' });
+        mode = 'trough';
         candidate = p;
       }
     } else {
       if(p.ratio <= candidate.ratio){ candidate = p; }
-      else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
-        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough', confirmedAt: p.t });
-        mode = 'seekingPeak';
-        legStartT = candidate.t;
+      else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct){
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough' });
+        mode = 'peak';
         candidate = p;
       }
     }
   }
-  // el extremo que se estaba siguiendo al llegar al final de los datos todavía no se revirtió lo
-  // suficiente (o no pasó suficiente tiempo) para confirmarse — es el ciclo en curso
-  if(mode) events.push({ t: candidate.t, ratio: candidate.ratio, type: mode === 'seekingPeak' ? 'peak' : 'trough', unconfirmed: true });
+  return events.filter(e => e.type === 'peak');
+}
+// Regla 2: entre dos techos debe haber mínimo minDays días - si dos candidatos quedan más cerca,
+// se conserva solo el más alto. Fusión secuencial: cada candidato se compara contra el ÚLTIMO
+// techo ya sobreviviente.
+function mergeClosePeaks(peaks, minDays){
+  const minMs = minDays * 86400000;
+  const survivors = [];
+  peaks.forEach(p => {
+    if(!survivors.length){ survivors.push(p); return; }
+    const last = survivors[survivors.length - 1];
+    if((p.t - last.t) >= minMs) survivors.push(p);
+    else if(p.ratio > last.ratio) survivors[survivors.length - 1] = p;
+  });
+  return survivors;
+}
+// Construye la secuencia final techo→piso→techo→piso... (regla 3: el piso es el precio MÁS BAJO
+// real entre dos techos consecutivos, sin excepción - puede quedar a pocos días del techo si así
+// fue en la realidad; regla 5: el tramo final, desde el último techo hasta hoy, queda como piso
+// PROVISIONAL, marcado con unconfirmed)
+function detectCyclePeaksTroughs(points){
+  const peaks = mergeClosePeaks(rawZigzagPeaks(points, CYCLE_PEAK_DRAWDOWN_PCT), CYCLE_MIN_DAYS_BETWEEN_PEAKS);
+  const events = [];
+  peaks.forEach((peak, i) => {
+    events.push({ t: peak.t, ratio: peak.ratio, type: 'peak' });
+    const windowEndT = i + 1 < peaks.length ? peaks[i + 1].t : null;
+    const window = points.filter(p => p.t > peak.t && (windowEndT === null || p.t < windowEndT));
+    if(!window.length) return;
+    let troughPoint = window[0];
+    for(let j = 1; j < window.length; j++){ if(window[j].ratio < troughPoint.ratio) troughPoint = window[j]; }
+    events.push({ t: troughPoint.t, ratio: troughPoint.ratio, type: 'trough', unconfirmed: i === peaks.length - 1 });
+  });
   return events;
 }
 const BTCXAU_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2 };
@@ -20616,9 +20635,9 @@ function renderBtcXauChart(){
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
   const marginRight = isMobileChart ? 8 : 14;
-  // espacio arriba para la etiqueta de cada ciclo (tipo + días) - una sola fila, más grande y
-  // legible que las flechas chiquitas de antes
-  const marginTop = isMobileChart ? 46 : 52, marginBottom = isMobileChart ? 30 : 34;
+  // espacio arriba para las DOS filas de etiquetas de ciclo (alcistas arriba, bajistas abajo) más
+  // el margen que necesita la etiqueta "HOY" para no tocarlas (ver topRowY/bottomRowY más abajo)
+  const marginTop = isMobileChart ? 68 : 78, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
 
@@ -20639,31 +20658,22 @@ function renderBtcXauChart(){
   let ratioLine = '';
   points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.ratio).toFixed(1)} `; });
 
-  // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible). Se
-  // exige que el giro esté separado del anterior por al menos 2 años (730 días) además de la
-  // caída/subida del 50% — así se filtran giros rápidos que no son un ciclo de verdad, solo
-  // ruido de corto plazo.
-  //
-  // OJO con los días mostrados: NO es "fecha exacta del máximo" menos "fecha exacta del mínimo"
-  // (eso puede dar un número chiquito y engañoso si el precio cayó rápido pero se tardó mucho en
-  // confirmarse como un giro real - ej. el crash de abril de 2013, donde el mínimo EXACTO se tocó
-  // apenas 7 días después del máximo, pero el mercado no confirmó que ese era el piso real sino
-  // hasta 2 años después). Se usa en cambio confirmedAt del extremo de llegada: la fecha en la que
-  // YA SE SABÍA que ese giro era real, que es la duración de verdad del ciclo
-  const cycleEvents = detectCyclePeaksTroughs(allPoints, 0.5, 730);
+  // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible), según
+  // las reglas 1-3 y 5 de arriba. Los días de cada tramo son siempre la diferencia real de fechas
+  // entre un punto y el siguiente (regla 3) - nunca una duración fija ni una fecha "confirmada"
+  // aparte.
+  const cycleEvents = detectCyclePeaksTroughs(allPoints);
   const cycleSegments = [];
   for(let i = 0; i < cycleEvents.length - 1; i++){
     const a = cycleEvents[i], b = cycleEvents[i + 1];
     if(b.t < startMs || a.t > endMs) continue; // fuera del rango visible actual (Todo/5a/2a)
-    const toMs = b.confirmedAt != null ? b.confirmedAt : b.t;
     cycleSegments.push({
       fromT: a.t, toT: b.t, fromType: a.type,
-      days: Math.round((toMs - a.t) / 86400000),
+      days: Math.round((b.t - a.t) / 86400000),
       unconfirmed: !!b.unconfirmed,
     });
   }
   const clampT = t => Math.max(startMs, Math.min(endMs, t));
-  const clampX = t => Math.max(marginLeft, Math.min(totalW - marginRight, xFor(t)));
   // fondo alterno (alcista=verde, bajista=rojo) para dividir el gráfico en bloques bien marcados
   const segmentBgHtml = cycleSegments.map(seg => {
     const x1 = xFor(clampT(seg.fromT)), x2 = xFor(clampT(seg.toT));
@@ -20680,18 +20690,24 @@ function renderBtcXauChart(){
       <circle cx="${x}" cy="${yFor(e.ratio).toFixed(1)}" r="4.5" fill="${color}" stroke="#0a0a12" stroke-width="1.5"/>
     `;
   }).join('');
-  // etiqueta de cada ciclo (tipo + días), centrada en la porción visible del tramo - solo si hay
-  // espacio suficiente para que no se amontonen en los tramos muy angostos (zoom "Todo")
+  // etiqueta de cada ciclo (tipo + días, texto corto), centrada en la porción visible del tramo.
+  // Dos filas separadas - alcistas (verde) arriba, bajistas (rojo) abajo - para que nunca se toquen
+  // entre sí; la etiqueta "HOY" (ver todayMarkerHtml) se limita a marginTop-4 como techo, que queda
+  // por debajo de bottomRowY, así que tampoco choca con ninguna de las dos filas.
+  const topRowY = marginTop - (isMobileChart ? 38 : 44);
+  const bottomRowY = marginTop - (isMobileChart ? 18 : 20);
   const cycleLabelHtml = cycleSegments.map(seg => {
     const x1 = xFor(clampT(seg.fromT)), x2 = xFor(clampT(seg.toT));
     const segW = x2 - x1;
-    const minLabelW = isMobileChart ? 56 : 70;
+    const minLabelW = isMobileChart ? 46 : 58;
     if(segW < minLabelW) return '';
     const midX = ((x1 + x2) / 2).toFixed(1);
-    const color = seg.fromType === 'trough' ? '#22c55e' : '#ff2f4f';
-    const typeLabel = seg.fromType === 'trough' ? 'Ciclo Alcista' : 'Ciclo Bajista';
-    const daysLabel = seg.days + (seg.unconfirmed ? '+ días' : ' días');
-    return `<text x="${midX}" y="${(marginTop - 10).toFixed(1)}" text-anchor="middle" font-size="${isMobileChart ? 11 : 12.5}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">${typeLabel} · ${daysLabel}</text>`;
+    const isAlcista = seg.fromType === 'trough';
+    const color = isAlcista ? '#22c55e' : '#ff2f4f';
+    const rowY = isAlcista ? topRowY : bottomRowY;
+    const typeLabel = isAlcista ? 'Alcista' : 'Bajista';
+    const daysLabel = seg.days + (seg.unconfirmed ? '+' : '') + ' d';
+    return `<text x="${midX}" y="${rowY.toFixed(1)}" text-anchor="middle" font-size="${isMobileChart ? 11 : 12.5}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">${typeLabel} · ${daysLabel}</text>`;
   }).join('');
 
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].ratio);
@@ -20773,8 +20789,7 @@ document.querySelectorAll('#btcxauRangeFilter .tf-pill').forEach(btn => {
 });
 
 /* ---- BTC en acciones de Apple: 1 BTC ÷ precio de AAPL — ambos precios reales, sin aproximar
-   nada. Mismo mecanismo que BTC/XAU (arriba): Apple vía Twelve Data, BTC vía el historial
-   compartido del sitio, y se reutiliza el mismo detector de ciclos (detectCyclePeaksTroughs) ---- */
+   nada. Apple vía Twelve Data, BTC vía el historial compartido del sitio (fetchHalvingHistory) ---- */
 let aaplHistory = null; // [{t, c}] ascendente
 async function fetchAaplHistory(){
   if(aaplHistory) return aaplHistory;
