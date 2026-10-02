@@ -4338,7 +4338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🍎 Precio de la acción de Apple (AAPL) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio. Apple no cotiza fines de semana/feriados — esos días se usa el último precio conocido (misma lógica que BTC/XAU con el oro).<br>
-                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo) calculado como una envolvente (convex hull) sobre el historial real desde 2017 (antes de esa fecha no se traza nada) — por diseño no puede pasar por encima de ningún mínimo real ni por debajo de ningún máximo real, toca exactamente los puntos que forman el límite superior/inferior del precio. Al final se extiende en línea recta hasta hoy, con la pendiente del último tramo real.<br>
+                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo): cada una es UNA sola línea recta que conecta el primer y el último toque real de máximo/mínimo desde 2017 (antes de esa fecha no se traza nada), extendida tal cual hasta hoy — sin tramos ni quiebres intermedios.<br>
                 ⚪ Abajo se muestra el precio de BTC en dólares, para ubicar en qué momento del mercado ocurre cada mínimo/máximo — la línea vertical al pasar el cursor atraviesa los dos paneles a la vez.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
@@ -20918,50 +20918,22 @@ function renderBtcAaplChart(){
     }
     return hull;
   }
-  // recorta la polilínea de la envolvente (ya en espacio t/log-ratio) al rango visible actual,
-  // interpolando en el punto exacto donde entra/sale - para que no cambie de forma al hacer zoom
-  function clipHullToRange(hull, fromMs, toMs){
-    const out = [];
-    for(let i = 0; i < hull.length; i++){
-      const p = hull[i];
-      if(p.x < fromMs){
-        if(i + 1 < hull.length && hull[i + 1].x > fromMs){
-          const q = hull[i + 1];
-          const frac = (fromMs - p.x) / (q.x - p.x);
-          out.push({ x: fromMs, y: p.y + frac * (q.y - p.y) });
-        }
-        continue;
-      }
-      if(p.x > toMs){
-        if(out.length && i > 0){
-          const prev = hull[i - 1];
-          const frac = (toMs - prev.x) / (p.x - prev.x);
-          out.push({ x: toMs, y: prev.y + frac * (p.y - prev.y) });
-        }
-        break;
-      }
-      out.push({ x: p.x, y: p.y });
-    }
-    return out;
-  }
+  // UNA sola línea recta por canal - no una polilínea con varios quiebres. Se define solo con el
+  // PRIMER y el ÚLTIMO toque real interior de la envolvente (el primer/último vértice de la
+  // envolvente completa son siempre el primer/último dato del historial, forzoso matemáticamente,
+  // no un toque real - por eso se recortan con slice(1,-1)). Al ser una sola recta (misma ecuación
+  // de principio a fin) nunca se "dobla": extenderla hasta HOY es simplemente seguir la misma línea
   function hullPathHtml(hull, color){
-    // el primer y el último vértice de la envolvente son SIEMPRE el primer/último dato del
-    // historial (es forzoso matemáticamente, no un toque real de tendencia) - dibujarlos obliga a
-    // la línea a "doblarse" para cerrar justo en el borde del gráfico. Se recortan esos dos
-    // extremos forzados y se deja la línea abierta, empezando en el primer toque real interior
     const interior = hull.slice(1, -1);
     if(interior.length < 2) return '';
-    // al final (lado derecho) SÍ se extiende la recta hasta HOY, usando la pendiente del ÚLTIMO
-    // tramo real (entre los 2 últimos toques interiores) - sin esto la línea se doblaría hacia el
-    // último dato real, que puede estar más abajo/arriba de la tendencia ya establecida
-    const lastA = interior[interior.length - 2], lastB = interior[interior.length - 1];
-    const extSlope = (lastB.y - lastA.y) / (lastB.x - lastA.x);
-    const extended = lastB.x < endMs ? [...interior, { x: endMs, y: lastB.y + extSlope * (endMs - lastB.x) }] : interior;
-    const clipped = clipHullToRange(extended, startMs, endMs);
-    if(clipped.length < 2) return '';
-    let d = '';
-    clipped.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.x).toFixed(1)},${yForRatio(Math.pow(10, p.y)).toFixed(1)} `; });
-    return `<path d="${d.trim()}" fill="none" stroke="${color}" stroke-width="1.5" stroke-dasharray="7,4"/>`;
+    const first = interior[0], last = interior[interior.length - 1];
+    const slope = (last.y - first.y) / (last.x - first.x);
+    const lineAt = x => first.y + slope * (x - first.x);
+    const fromX = Math.max(startMs, first.x);
+    if(fromX > endMs) return '';
+    const tx1 = xFor(fromX).toFixed(1), ty1 = yForRatio(Math.pow(10, lineAt(fromX))).toFixed(1);
+    const tx2 = xFor(endMs).toFixed(1), ty2 = yForRatio(Math.pow(10, lineAt(endMs))).toFixed(1);
+    return `<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="7,4"/>`;
   }
   const trendPts = allPoints.filter(p => p.t >= BTCAAPL_TREND_START_MS).map(p => ({ x: p.t, y: Math.log10(p.ratio) }));
   let trendLineUpperHtml = '', trendLineLowerHtml = '';
