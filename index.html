@@ -4295,7 +4295,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🥇 Precio del oro (XAU/USD) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio.<br>
-                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" son el cálculo exacto entre esas fechas reales. El tramo marcado con "+" es el ciclo actual, todavía en curso: son los días que ya pasaron desde el último giro confirmado, pero como este tramo todavía no se revirtió del todo, no se sabe cuándo va a terminar de verdad.<br>
+                🔴🟢 Los máximos/mínimos de ciclo se detectan automáticamente sobre el historial real: se confirma un máximo cuando el precio cae 50%+ desde ahí sin volver a superarlo Y ya pasaron al menos 2 años desde el giro anterior, y un mínimo cuando sube 50%+ sin volver a caer debajo con esa misma condición de tiempo — así un giro rápido (semanas o pocos meses) no se marca por error como el fin de un ciclo. Los "días" de cada ciclo NO son la fecha exacta del máximo menos la del mínimo (eso puede dar un número chiquito y engañoso si el precio cayó rápido pero tardó mucho en confirmarse como un giro real — ej. el crash de abril de 2013, donde el mínimo exacto se tocó a los 7 días pero no se confirmó como piso real hasta 2 años después); se usa la fecha en la que YA SE SABÍA que el giro era real, que es la duración de verdad del ciclo. El tramo marcado con "+" es el ciclo actual, todavía en curso.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -20535,7 +20535,10 @@ function detectCyclePeaksTroughs(points, thresholdPct, minDays){
       // revertirse) — si se comparara contra candidate.t, una vez el candidato deja de
       // actualizarse la condición de tiempo quedaría fija para siempre y nunca podría cumplirse
       else if((candidate.ratio - p.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
-        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak' });
+        // confirmedAt = la fecha en la que se SUPO que este máximo era real (cuando el precio ya
+        // había caído el % exigido) - distinta de "t" (la fecha exacta del máximo). Un máximo real
+        // puede confirmarse apenas unos días después si la caída fue muy rápida (ver más abajo)
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'peak', confirmedAt: p.t });
         mode = 'seekingTrough';
         legStartT = candidate.t;
         candidate = p;
@@ -20543,7 +20546,7 @@ function detectCyclePeaksTroughs(points, thresholdPct, minDays){
     } else {
       if(p.ratio <= candidate.ratio){ candidate = p; }
       else if((p.ratio - candidate.ratio) / candidate.ratio >= thresholdPct && (p.t - legStartT) >= minMs){
-        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough' });
+        events.push({ t: candidate.t, ratio: candidate.ratio, type: 'trough', confirmedAt: p.t });
         mode = 'seekingPeak';
         legStartT = candidate.t;
         candidate = p;
@@ -20613,8 +20616,9 @@ function renderBtcXauChart(){
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
   const marginRight = isMobileChart ? 8 : 14;
-  // 2 filas extra arriba del gráfico para las flechas de "días de expansión/caída" de ciclo
-  const marginTop = isMobileChart ? 54 : 60, marginBottom = isMobileChart ? 30 : 34;
+  // espacio arriba para la etiqueta de cada ciclo (tipo + días) - una sola fila, más grande y
+  // legible que las flechas chiquitas de antes
+  const marginTop = isMobileChart ? 46 : 52, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
   const drawH = totalH - marginTop - marginBottom;
 
@@ -20635,41 +20639,59 @@ function renderBtcXauChart(){
   let ratioLine = '';
   points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.ratio).toFixed(1)} `; });
 
-  // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible),
-  // marcando cuántos días exactos duró cada tramo de caída (pico -> valle, rojo) y de expansión
-  // (valle -> pico, verde). Se exige que el giro esté separado del anterior por al menos 2 años
-  // (730 días) además de la caída/subida del 50% — así se filtran giros rápidos que no son un
-  // ciclo de verdad, solo ruido de corto plazo
+  // máximos/mínimos de ciclo detectados sobre TODO el historial (no solo el rango visible). Se
+  // exige que el giro esté separado del anterior por al menos 2 años (730 días) además de la
+  // caída/subida del 50% — así se filtran giros rápidos que no son un ciclo de verdad, solo
+  // ruido de corto plazo.
+  //
+  // OJO con los días mostrados: NO es "fecha exacta del máximo" menos "fecha exacta del mínimo"
+  // (eso puede dar un número chiquito y engañoso si el precio cayó rápido pero se tardó mucho en
+  // confirmarse como un giro real - ej. el crash de abril de 2013, donde el mínimo EXACTO se tocó
+  // apenas 7 días después del máximo, pero el mercado no confirmó que ese era el piso real sino
+  // hasta 2 años después). Se usa en cambio confirmedAt del extremo de llegada: la fecha en la que
+  // YA SE SABÍA que ese giro era real, que es la duración de verdad del ciclo
   const cycleEvents = detectCyclePeaksTroughs(allPoints, 0.5, 730);
   const cycleSegments = [];
   for(let i = 0; i < cycleEvents.length - 1; i++){
     const a = cycleEvents[i], b = cycleEvents[i + 1];
     if(b.t < startMs || a.t > endMs) continue; // fuera del rango visible actual (Todo/5a/2a)
+    const toMs = b.confirmedAt != null ? b.confirmedAt : b.t;
     cycleSegments.push({
       fromT: a.t, toT: b.t, fromType: a.type,
-      // en el tramo en curso (unconfirmed) igual se sabe la fecha real del último extremo
-      // marcado, así que se muestran los días transcurridos hasta ahí en vez de un "¿?" vacío
-      days: Math.round((b.t - a.t) / 86400000),
+      days: Math.round((toMs - a.t) / 86400000),
       unconfirmed: !!b.unconfirmed,
     });
   }
+  const clampT = t => Math.max(startMs, Math.min(endMs, t));
   const clampX = t => Math.max(marginLeft, Math.min(totalW - marginRight, xFor(t)));
-  const cycleMarkersHtml = cycleEvents.filter(e => e.t >= startMs && e.t <= endMs).map(e => `
-    <circle cx="${xFor(e.t).toFixed(1)}" cy="${yFor(e.ratio).toFixed(1)}" r="4.5" fill="${e.type === 'peak' ? '#ff2f4f' : '#22c55e'}" stroke="#0a0a12" stroke-width="1.5"/>
-  `).join('');
-  const expansionRowY = isMobileChart ? 16 : 18, declineRowY = isMobileChart ? 36 : 40;
-  const cycleArrowsHtml = cycleSegments.map(seg => {
-    const rowY = seg.fromType === 'trough' ? expansionRowY : declineRowY;
-    const color = seg.fromType === 'trough' ? '#22c55e' : '#ff2f4f';
-    const x1 = clampX(seg.fromT), x2 = clampX(seg.toT);
-    const label = seg.days + (seg.unconfirmed ? '+ días' : ' días');
-    const midX = (x1 + x2) / 2;
+  // fondo alterno (alcista=verde, bajista=rojo) para dividir el gráfico en bloques bien marcados
+  const segmentBgHtml = cycleSegments.map(seg => {
+    const x1 = xFor(clampT(seg.fromT)), x2 = xFor(clampT(seg.toT));
+    const fill = seg.fromType === 'trough' ? 'rgba(34,197,94,.07)' : 'rgba(255,47,79,.07)';
+    return `<rect x="${x1.toFixed(1)}" y="${marginTop}" width="${(x2 - x1).toFixed(1)}" height="${drawH}" fill="${fill}"/>`;
+  }).join('');
+  // líneas verticales de borde a borde en cada máximo/mínimo real (no las flechitas chiquitas de
+  // antes) - mucho más fáciles de ubicar en el eje de tiempo
+  const cycleLinesHtml = cycleEvents.filter(e => e.t >= startMs && e.t <= endMs).map(e => {
+    const color = e.type === 'peak' ? '#ff2f4f' : '#22c55e';
+    const x = xFor(e.t).toFixed(1);
     return `
-      <line x1="${x1.toFixed(1)}" y1="${rowY}" x2="${x2.toFixed(1)}" y2="${rowY}" stroke="${color}" stroke-width="1.5" ${seg.unconfirmed ? 'stroke-dasharray="4,3"' : ''}/>
-      <path d="M${(x2 - 5).toFixed(1)},${rowY - 3} L${x2.toFixed(1)},${rowY} L${(x2 - 5).toFixed(1)},${rowY + 3}" fill="none" stroke="${color}" stroke-width="1.5"/>
-      <rect x="${(midX - 22).toFixed(1)}" y="${rowY - 9}" width="44" height="13" fill="#0a0a12"/>
-      <text x="${midX.toFixed(1)}" y="${rowY + 1}" text-anchor="middle" font-size="${isMobileChart ? 9 : 10}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">${label}</text>
+      <line x1="${x}" y1="${marginTop}" x2="${x}" y2="${(marginTop + drawH).toFixed(1)}" stroke="${color}" stroke-width="1.3" stroke-dasharray="5,4" opacity=".75"/>
+      <circle cx="${x}" cy="${yFor(e.ratio).toFixed(1)}" r="4.5" fill="${color}" stroke="#0a0a12" stroke-width="1.5"/>
     `;
+  }).join('');
+  // etiqueta de cada ciclo (tipo + días), centrada en la porción visible del tramo - solo si hay
+  // espacio suficiente para que no se amontonen en los tramos muy angostos (zoom "Todo")
+  const cycleLabelHtml = cycleSegments.map(seg => {
+    const x1 = xFor(clampT(seg.fromT)), x2 = xFor(clampT(seg.toT));
+    const segW = x2 - x1;
+    const minLabelW = isMobileChart ? 56 : 70;
+    if(segW < minLabelW) return '';
+    const midX = ((x1 + x2) / 2).toFixed(1);
+    const color = seg.fromType === 'trough' ? '#22c55e' : '#ff2f4f';
+    const typeLabel = seg.fromType === 'trough' ? 'Ciclo Alcista' : 'Ciclo Bajista';
+    const daysLabel = seg.days + (seg.unconfirmed ? '+ días' : ' días');
+    return `<text x="${midX}" y="${(marginTop - 10).toFixed(1)}" text-anchor="middle" font-size="${isMobileChart ? 11 : 12.5}" font-weight="700" fill="${color}" font-family="'Space Mono',monospace">${typeLabel} · ${daysLabel}</text>`;
   }).join('');
 
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].ratio);
@@ -20689,12 +20711,13 @@ function renderBtcXauChart(){
     <div style="position:relative">
       <svg class="fng-chart-svg" id="btcxauChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${chartWatermarkHtml(totalW, totalH)}
+        ${segmentBgHtml}
         ${yGridHtml}
         <path d="${ratioLine.trim()}" fill="none" stroke="#fbbf24" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        ${cycleMarkersHtml}
+        ${cycleLinesHtml}
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        ${cycleArrowsHtml}
+        ${cycleLabelHtml}
         <line id="btcxauHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
         <circle id="btcxauHoverDot" r="6" fill="#fff" style="display:none"/>
         <rect id="btcxauHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
