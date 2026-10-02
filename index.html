@@ -4338,7 +4338,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🍎 Precio de la acción de Apple (AAPL) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio. Apple no cotiza fines de semana/feriados — esos días se usa el último precio conocido (misma lógica que BTC/XAU con el oro).<br>
-                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo) calculado como una envolvente (convex hull) sobre el historial real desde 2017 (antes de esa fecha no se traza nada) — por diseño no puede pasar por encima de ningún mínimo real ni por debajo de ningún máximo real, toca exactamente los puntos que forman el límite superior/inferior del precio.<br>
+                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo) calculado como una envolvente (convex hull) sobre el historial real desde 2017 (antes de esa fecha no se traza nada) — por diseño no puede pasar por encima de ningún mínimo real ni por debajo de ningún máximo real, toca exactamente los puntos que forman el límite superior/inferior del precio. Al final se extiende en línea recta hasta hoy, con la pendiente del último tramo real.<br>
+                ⚪ Abajo se muestra el precio de BTC en dólares, para ubicar en qué momento del mercado ocurre cada mínimo/máximo — la línea vertical al pasar el cursor atraviesa los dos paneles a la vez.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -15302,6 +15303,63 @@ function wireChartHover(cfg){
     tooltip.style.display = 'none';
   });
 }
+/* ---- hover para gráficos de DOS paneles apilados (ej. BTC/AAPL con el precio de BTC abajo):
+   igual que wireChartHover, pero con un solo "catcher" que cubre ambos paneles, UNA línea vertical
+   que los atraviesa de punta a punta, y UN punto por panel (cada uno con su propia escala Y) ---- */
+function wireDualPanelHover(cfg){
+  const catcher = document.getElementById(cfg.catcherId);
+  const hoverLine = document.getElementById(cfg.lineId);
+  const dotUpper = document.getElementById(cfg.dotUpperId);
+  const dotLower = document.getElementById(cfg.dotLowerId);
+  const hoverDateLabel = document.getElementById(cfg.dateLabelId);
+  const hoverDateBg = document.getElementById(cfg.dateBgId);
+  const tooltip = document.getElementById(cfg.tooltipId);
+  if(!catcher) return;
+  function showAt(clientX){
+    const rect = cfg.svg.getBoundingClientRect();
+    const scaleX = cfg.totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    const targetMs = cfg.startMs + ((svgX - cfg.marginLeft) / cfg.drawW) * cfg.spanMs;
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < cfg.points.length; i++){
+      const diff = Math.abs(cfg.points[i].t - targetMs);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    const px = cfg.xFor(cfg.points[idx].t);
+    const pyUpper = cfg.yForUpperIdx(idx), pyLower = cfg.yForLowerIdx(idx);
+    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+    hoverLine.style.display = 'block';
+    dotUpper.setAttribute('cx', px); dotUpper.setAttribute('cy', pyUpper);
+    dotUpper.style.display = 'block';
+    dotLower.setAttribute('cx', px); dotLower.setAttribute('cy', pyLower);
+    dotLower.style.display = 'block';
+    const dateLabel = new Date(cfg.points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    tooltip.innerHTML = cfg.tooltipHtml(idx);
+    tooltip.style.display = 'block';
+    const rawLeftPx = (px / cfg.totalW) * rect.width;
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max(rawLeftPx, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+    tooltip.style.top = ((pyUpper / cfg.totalH) * rect.height) + 'px';
+    const clampedPx = Math.min(Math.max(px, cfg.marginLeft + 24), cfg.totalW - cfg.marginRight - 24);
+    hoverDateLabel.setAttribute('x', clampedPx);
+    hoverDateLabel.textContent = dateLabel;
+    hoverDateLabel.style.display = 'block';
+    const bboxW = hoverDateLabel.getBBox().width;
+    hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
+    hoverDateBg.setAttribute('width', bboxW + 24);
+    hoverDateBg.style.display = 'block';
+  }
+  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
+  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+  catcher.addEventListener('mouseleave', () => {
+    hoverLine.style.display = 'none';
+    dotUpper.style.display = 'none';
+    dotLower.style.display = 'none';
+    hoverDateLabel.style.display = 'none';
+    hoverDateBg.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+}
 /* ---- hover genérico para gráficos de barras (Coinbase Premium): a diferencia de
    wireChartHover no interpola entre puntos — resalta la barra más cercana al mouse ---- */
 function wireBarChartHover(cfg){
@@ -20724,7 +20782,7 @@ async function fetchAaplHistory(){
     .sort((a, b) => a.t - b.t);
   return aaplHistory;
 }
-let btcAaplRows = null; // [{t, ratio}]
+let btcAaplRows = null; // [{t, ratio, btcPrice}]
 function buildBtcAaplRows(){
   if(!halvingBtcHistory || !aaplHistory) return [];
   const aaplDays = aaplHistory.map(p => Math.floor(p.t / 86400000) * 86400000);
@@ -20733,7 +20791,7 @@ function buildBtcAaplRows(){
   halvingBtcHistory.forEach(p => {
     const dayKey = Math.floor(p.t / 86400000) * 86400000;
     while(ai < aaplDays.length && aaplDays[ai] <= dayKey){ lastAapl = aaplHistory[ai].c; ai++; }
-    if(lastAapl) rows.push({ t: p.t, ratio: p.c / lastAapl });
+    if(lastAapl) rows.push({ t: p.t, ratio: p.c / lastAapl, btcPrice: p.c });
   });
   btcAaplRows = rows;
   return rows;
@@ -20792,33 +20850,54 @@ function renderBtcAaplChart(){
   const spanMs = (endMs - startMs) || 1;
   const ratios = points.map(p => p.ratio);
   const minR = Math.min(...ratios), maxR = Math.max(...ratios);
+  const btcPrices = points.map(p => p.btcPrice);
+  const minP = Math.min(...btcPrices), maxP = Math.max(...btcPrices);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 560 : 640;
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
   const marginRight = isMobileChart ? 8 : 14;
   const marginTop = isMobileChart ? 20 : 24, marginBottom = isMobileChart ? 30 : 34;
+  // panel superior (BTC/AAPL) 60% del alto disponible, panel inferior (precio de BTC) 40%, con un
+  // espacio en medio para la etiqueta del panel de abajo y para que no se vean pegados
+  const panelGap = isMobileChart ? 34 : 38;
   const drawW = totalW - marginLeft - marginRight;
-  const drawH = totalH - marginTop - marginBottom;
+  const totalDrawH = totalH - marginTop - marginBottom - panelGap;
+  const upperH = Math.round(totalDrawH * 0.6);
+  const lowerH = totalDrawH - upperH;
+  const upperTop = marginTop;
+  const lowerTop = marginTop + upperH + panelGap;
 
-  const logMin = Math.log10(minR), logMax = Math.log10(maxR);
-  const logRange = (logMax - logMin) || 1;
   const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
-  const yFor = r => marginTop + drawH - ((Math.log10(r) - logMin) / logRange) * drawH;
+  const logMinR = Math.log10(minR), logMaxR = Math.log10(maxR), logRangeR = (logMaxR - logMinR) || 1;
+  const yForRatio = r => upperTop + upperH - ((Math.log10(r) - logMinR) / logRangeR) * upperH;
+  const logMinP = Math.log10(minP), logMaxP = Math.log10(maxP), logRangeP = (logMaxP - logMinP) || 1;
+  const yForPrice = v => lowerTop + lowerH - ((Math.log10(v) - logMinP) / logRangeP) * lowerH;
 
-  const yTicks = niceLogTicks(minR, maxR).filter(t => {
-    const y = yFor(t);
-    return y > marginTop + 2 && y < marginTop + drawH - 4;
+  const yTicksR = niceLogTicks(minR, maxR).filter(t => {
+    const y = yForRatio(t);
+    return y > upperTop + 2 && y < upperTop + upperH - 4;
   });
-  const yGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${t >= 1 ? t.toFixed(t >= 10 ? 0 : 1) : t.toFixed(3)}</text>
+  const yGridUpperHtml = yTicksR.map(t => `
+    <line x1="${marginLeft}" y1="${yForRatio(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForRatio(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForRatio(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${t >= 1 ? t.toFixed(t >= 10 ? 0 : 1) : t.toFixed(3)}</text>
   `).join('');
+  const yTicksP = niceLogTicks(minP, maxP).filter(t => {
+    const y = yForPrice(t);
+    return y > lowerTop + 2 && y < lowerTop + lowerH - 4;
+  });
+  const yGridLowerHtml = yTicksP.map(t => `
+    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+  const panelLabelHtml = `<text x="${marginLeft}" y="${(lowerTop - panelGap / 2 + 4).toFixed(1)}" font-size="${xFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">Precio de BTC (USD)</text>`;
 
   let ratioLine = '';
-  points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.ratio).toFixed(1)} `; });
+  points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForRatio(p.ratio).toFixed(1)} `; });
+  let btcPriceLine = '';
+  points.forEach((p, i) => { btcPriceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(p.btcPrice).toFixed(1)} `; });
 
   // Canal de tendencia (superior por máximos, inferior por mínimos), ambos anclados SOLO desde
   // 2017 en adelante (nada antes). Conectar solo el primer y el último mínimo/máximo de CICLO
@@ -20869,12 +20948,19 @@ function renderBtcAaplChart(){
     // el primer y el último vértice de la envolvente son SIEMPRE el primer/último dato del
     // historial (es forzoso matemáticamente, no un toque real de tendencia) - dibujarlos obliga a
     // la línea a "doblarse" para cerrar justo en el borde del gráfico. Se recortan esos dos
-    // extremos forzados y se deja la línea abierta, terminando en el último toque real interior
+    // extremos forzados y se deja la línea abierta, empezando en el primer toque real interior
     const interior = hull.slice(1, -1);
-    const clipped = clipHullToRange(interior, startMs, endMs);
+    if(interior.length < 2) return '';
+    // al final (lado derecho) SÍ se extiende la recta hasta HOY, usando la pendiente del ÚLTIMO
+    // tramo real (entre los 2 últimos toques interiores) - sin esto la línea se doblaría hacia el
+    // último dato real, que puede estar más abajo/arriba de la tendencia ya establecida
+    const lastA = interior[interior.length - 2], lastB = interior[interior.length - 1];
+    const extSlope = (lastB.y - lastA.y) / (lastB.x - lastA.x);
+    const extended = lastB.x < endMs ? [...interior, { x: endMs, y: lastB.y + extSlope * (endMs - lastB.x) }] : interior;
+    const clipped = clipHullToRange(extended, startMs, endMs);
     if(clipped.length < 2) return '';
     let d = '';
-    clipped.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.x).toFixed(1)},${yFor(Math.pow(10, p.y)).toFixed(1)} `; });
+    clipped.forEach((p, i) => { d += `${i === 0 ? 'M' : 'L'}${xFor(p.x).toFixed(1)},${yForRatio(Math.pow(10, p.y)).toFixed(1)} `; });
     return `<path d="${d.trim()}" fill="none" stroke="${color}" stroke-width="1.5" stroke-dasharray="7,4"/>`;
   }
   const trendPts = allPoints.filter(p => p.t >= BTCAAPL_TREND_START_MS).map(p => ({ x: p.t, y: Math.log10(p.ratio) }));
@@ -20886,14 +20972,13 @@ function renderBtcAaplChart(){
     trendLineUpperHtml = hullPathHtml(upper, '#ff2f4f');
   }
 
-  const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].ratio);
-  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const lastPx = xFor(endMs), lastPyUpper = yForRatio(points[points.length - 1].ratio);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#9ca3af"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPyUpper.toFixed(1)}" r="5" fill="#9ca3af"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPyUpper - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
   `;
-  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'UTC' });
   const xLabelsHtml = `
     <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
     <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
@@ -20903,39 +20988,47 @@ function renderBtcAaplChart(){
     <div style="position:relative">
       <svg class="fng-chart-svg" id="btcaaplChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${chartWatermarkHtml(totalW, totalH)}
-        ${yGridHtml}
+        ${yGridUpperHtml}
+        ${yGridLowerHtml}
+        ${panelLabelHtml}
         <path d="${ratioLine.trim()}" fill="none" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         ${trendLineUpperHtml}
         ${trendLineLowerHtml}
+        <path d="${btcPriceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="btcaaplHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="btcaaplHoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="btcaaplHoverLine" x1="0" y1="${upperTop}" x2="0" y2="${lowerTop + lowerH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="btcaaplHoverDotUpper" r="6" fill="#fff" style="display:none"/>
+        <circle id="btcaaplHoverDotLower" r="5" fill="#fff" style="display:none"/>
         <rect id="btcaaplHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
         <text id="btcaaplHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="btcaaplHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <rect id="btcaaplHoverCatcher" x="${marginLeft}" y="${upperTop}" width="${drawW}" height="${lowerTop + lowerH - upperTop}" fill="transparent" style="cursor:crosshair"/>
       </svg>
       <div id="btcaaplTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const baSvg = document.getElementById('btcaaplChartSvg');
-  wireChartHover({
-    svg: baSvg, catcherId: 'btcaaplHoverCatcher', lineId: 'btcaaplHoverLine', dotId: 'btcaaplHoverDot',
+  wireDualPanelHover({
+    svg: baSvg, catcherId: 'btcaaplHoverCatcher', lineId: 'btcaaplHoverLine',
+    dotUpperId: 'btcaaplHoverDotUpper', dotLowerId: 'btcaaplHoverDotLower',
     dateLabelId: 'btcaaplHoverDateLabel', dateBgId: 'btcaaplHoverDateBg', tooltipId: 'btcaaplTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yFor(points[i].ratio),
-    tooltipHtml: i => `<b>${fmtShares(points[i].ratio)}</b>`,
+    yForUpperIdx: i => yForRatio(points[i].ratio),
+    yForLowerIdx: i => yForPrice(points[i].btcPrice),
+    tooltipHtml: i => `<b>${fmtShares(points[i].ratio)}</b><br><span style="color:#fff">BTC: ${fmtHalvingPrice(points[i].btcPrice)}</span>`,
   });
 
   legendEl.innerHTML = '<span class="perk-chip"><span class="perk-chip-dot" style="background:#9ca3af"></span>1 BTC en acciones de Apple</span>' +
     '<span class="perk-chip"><span class="perk-chip-dot" style="background:#ff2f4f"></span>Tendencia superior (máximos)</span>' +
-    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Tendencia inferior (mínimos)</span>';
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Tendencia inferior (mínimos)</span>' +
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#ffffff"></span>Precio de BTC (USD)</span>';
 
   const allRatios = allPoints.map(p => p.ratio);
   const maxAll = Math.max(...allRatios), minAll = Math.min(...allRatios);
   statsEl.innerHTML = `
     <div class="res-card"><div class="r-label">1 BTC equivale hoy a</div><div class="r-val">${fmtShares(points[points.length - 1].ratio)}</div></div>
+    <div class="res-card"><div class="r-label">Precio de BTC hoy</div><div class="r-val">${fmtHalvingPrice(points[points.length - 1].btcPrice)}</div></div>
     <div class="res-card"><div class="r-label">Máximo histórico</div><div class="r-val">${fmtShares(maxAll)}</div></div>
     <div class="res-card"><div class="r-label">Mínimo histórico</div><div class="r-val">${fmtShares(minAll)}</div></div>
   `;
