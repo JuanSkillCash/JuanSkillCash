@@ -21429,17 +21429,19 @@ function renderOptionsOiChart(){
   loadingEl.style.display = 'none';
   errorEl.style.display = 'none';
   wrap.style.display = 'block';
-  wrap.style.overflowX = 'auto';
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
   const isMobileChart = window.innerWidth <= 640;
   const n = strikes.length;
-  const barGroupW = isMobileChart ? 22 : 34;
-  const marginLeft = isMobileChart ? 44 : 58, marginRight = isMobileChart ? 44 : 58, marginTop = 26, marginBottom = isMobileChart ? 66 : 76;
-  const drawW = n * barGroupW;
-  const totalW = marginLeft + drawW + marginRight;
-  const drawH = isMobileChart ? 260 : 340;
+  // el SVG escala siempre al ancho de la tarjeta (igual que el resto de los gráficos del sitio,
+  // y que la propia app de Deribit en celular) - con muchos strikes las barras y el espaciado de
+  // etiquetas simplemente se achican, en vez de forzar un scroll horizontal
+  const marginLeft = isMobileChart ? 40 : 58, marginRight = isMobileChart ? 36 : 58, marginTop = 26, marginBottom = isMobileChart ? 56 : 76;
+  const totalW = isMobileChart ? 420 : 1100;
+  const drawW = totalW - marginLeft - marginRight;
+  const barGroupW = drawW / n;
+  const drawH = isMobileChart ? 220 : 340;
   const totalH = drawH + marginTop + marginBottom;
 
   const maxOi = Math.max(...strikes.map(s => Math.max(byStrike.get(s).calls, byStrike.get(s).puts)), 1);
@@ -21497,14 +21499,7 @@ function renderOptionsOiChart(){
     '<line x1="' + maxPainX.toFixed(1) + '" y1="' + marginTop + '" x2="' + maxPainX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#ff2f4f" stroke-width="1.3" stroke-dasharray="4,3"/>' +
     '<text x="' + maxPainX.toFixed(1) + '" y="' + (marginTop - 10) + '" text-anchor="middle" font-size="' + (isMobileChart ? 9 : 10.5) + '" font-weight="700" fill="#ff2f4f" font-family="\'Space Grotesk\',sans-serif">Máximo Dolor: ' + optionsOiFmtPrice(maxPainStrike) + '</text>';
 
-  // a diferencia de los gráficos de línea (que sí escalan bien con width:100%), acá con muchos
-  // strikes escalar el SVG completo al ancho de la tarjeta encoge las barras y el texto hasta
-  // volverlos ilegibles en celular — se dibuja a su tamaño real en píxeles y, si no cabe, el
-  // contenedor (overflow-x:auto de arriba) permite deslizar horizontalmente, igual que hace la
-  // propia app de Deribit en celular
-  const minVisibleW = isMobileChart ? 320 : 600;
-  const svgDisplayW = Math.max(totalW, minVisibleW);
-  wrap.innerHTML = '<svg viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + svgDisplayW + '" height="' + (totalH * (svgDisplayW / totalW)).toFixed(1) + '" style="display:block">' +
+  wrap.innerHTML = '<svg viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + totalW + '" height="' + totalH + '" style="width:100%;height:auto;display:block">' +
     chartWatermarkHtml(totalW, totalH) +
     yGridHtml + yTicks2Html +
     '<line x1="' + marginLeft + '" y1="' + baseY.toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.18)" stroke-width="1"/>' +
