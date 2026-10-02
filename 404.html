@@ -2899,11 +2899,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="indic-chart-controls" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
+                <button type="button" class="indic-chart-btn active" data-cycle="all">Todo el historial</button>
                 <button type="button" class="indic-chart-btn" data-cycle="0">2012</button>
                 <button type="button" class="indic-chart-btn" data-cycle="1">2016</button>
                 <button type="button" class="indic-chart-btn" data-cycle="2">2020</button>
-                <button type="button" class="indic-chart-btn active" data-cycle="3">2024</button>
-                <button type="button" class="indic-chart-btn" data-cycle="all">Todo el historial</button>
+                <button type="button" class="indic-chart-btn" data-cycle="3">2024</button>
               </div>
 
               <div class="dom-card" id="halvingMobileCountdown" style="display:none;margin-bottom:16px;background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(59,130,246,.12), transparent 65%), #080c20;border-color:rgba(59,130,246,.3)">
@@ -14610,7 +14610,7 @@ const HALVING_CYCLES = [
   { label: '2020', date: new Date('2020-05-11T00:00:00Z') },
   { label: '2024', date: new Date('2024-04-20T00:09:27Z') }
 ];
-let halvingActiveCycle = 3; // arranca mostrando el ciclo actual
+let halvingActiveCycle = 'all'; // arranca mostrando todo el historial
 let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo, ascendente
 let halvingLoadFailed = false;
 let halvingHistoryInFlight = null;
