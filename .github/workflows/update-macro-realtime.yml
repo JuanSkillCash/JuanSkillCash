@@ -1,0 +1,77 @@
+name: Actualizar datos macro poco despues de su hora de publicacion
+
+# Los indicadores macro de EEUU (CPI, PMI, PIB, etc.) no publican a una hora
+# cualquiera - cada uno sale en una ventana fija y conocida (8:30am ET para
+# la mayoria de reportes del BLS/BEA, 10:00am ET para ISM PMI, 1:00-1:15pm ET
+# para M2/Reverse Repo, 2:00pm ET los dias de decision del FOMC, y entre
+# 3:30pm y 4:30pm ET para el Tesoro y el balance de la Fed) - pero el DIA
+# exacto del mes si varia (festivos, cierres de gobierno, etc.), as que en
+# vez de intentar calcular la fecha exacta de cada publicacion (fragil, se
+# rompe cada vez que cambia un feriado), esto simplemente vuelve a correr los
+# mismos scripts (son "upsert", correrlos de mas no hace dano) varias veces
+# al dia, agrupadas alrededor de esas horas - asi el dato nuevo entra poco
+# despues de salir en vez de esperar hasta la corrida diaria de las 00:30 UTC.
+#
+# Los horarios estan en hora de EEUU (ET), que cambia entre EST (UTC-5) y EDT
+# (UTC-4) dos veces al ano - para no tener que editar este archivo en cada
+# cambio de horario, se programan AMBAS horas UTC posibles para cada ventana
+# (la que no aplica esa temporada simplemente vuelve a subir el mismo dato,
+# sin costo real). Horas objetivo (ET, con ~15-20 min de margen):
+#   8:50am  -> CPI, PPI, Nomina no agricola/desempleo, PCE, PIB, Solicitudes de desempleo
+#   10:20am -> ISM PMI (manufacturero y de servicios)
+#   1:20pm  -> M2 (4to martes del mes)
+#   1:40pm  -> Reverse Repo (RRP)
+#   2:20pm  -> Decision de tasa del FOMC (solo ~8 veces al ano, inofensivo el resto)
+#   4:20pm  -> Cuenta General del Tesoro (TGA)
+#   4:50pm  -> Balance de la Reserva Federal (reporte H.4.1, jueves)
+#   6:00pm  -> Curva de rendimientos del Tesoro (puede demorarse hasta esta hora)
+on:
+  schedule:
+    # --- EDT (UTC-4, marzo-noviembre aprox.) ---
+    - cron: "50 12 * * 1-5"
+    - cron: "20 14 * * 1-5"
+    - cron: "20 17 * * 1-5"
+    - cron: "40 17 * * 1-5"
+    - cron: "20 18 * * 1-5"
+    - cron: "20 20 * * 1-5"
+    - cron: "50 20 * * 1-5"
+    - cron: "0 22 * * 1-5"
+    # --- EST (UTC-5, noviembre-marzo aprox.) ---
+    - cron: "50 13 * * 1-5"
+    - cron: "20 15 * * 1-5"
+    # (18:20 UTC ya cubierto arriba por el horario EDT de las 2:20pm ET)
+    - cron: "40 18 * * 1-5"
+    - cron: "20 19 * * 1-5"
+    - cron: "20 21 * * 1-5"
+    - cron: "50 21 * * 1-5"
+    - cron: "0 23 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests
+
+      - name: Actualizar series macro de FRED (CPI, desempleo, tasa de la Fed, etc.)
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_fred_series_daily.py
+
+      - name: Actualizar DXY y PMI (TradingView)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_macro_tv_daily.py
