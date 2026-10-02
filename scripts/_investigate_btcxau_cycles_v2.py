@@ -13,7 +13,7 @@ TWELVE_DATA_API_KEY = "9a29593d7a534876afbf043270133831"
 
 # ---- parametros editables (mismos que pide el usuario para el codigo final) ----
 PEAK_DRAWDOWN_PCT = 0.65
-MIN_DAYS_BETWEEN_PEAKS = 700
+MIN_DAYS_BETWEEN_PEAKS = 650
 MIN_DAYS_ANY_GAP = 200
 
 
