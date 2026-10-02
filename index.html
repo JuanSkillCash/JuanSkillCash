@@ -4338,7 +4338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🍎 Precio de la acción de Apple (AAPL) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio. Apple no cotiza fines de semana/feriados — esos días se usa el último precio conocido (misma lógica que BTC/XAU con el oro).<br>
-                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo): cada una es UNA sola línea recta que conecta el primer y el último toque real de máximo/mínimo desde 2017 (antes de esa fecha no se traza nada), extendida tal cual hasta hoy — sin tramos ni quiebres intermedios.<br>
+                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo): cada una es UNA sola línea recta que empieza en una fecha fija (verde: 16 jul 2017, roja: 16 dic 2017) y llega hasta el último máximo/mínimo real, extendida tal cual hasta hoy — sin tramos ni quiebres intermedios.<br>
                 ⚪ Abajo se muestra el precio de BTC en dólares, para ubicar en qué momento del mercado ocurre cada mínimo/máximo — la línea vertical al pasar el cursor atraviesa los dos paneles a la vez.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
@@ -20899,15 +20899,15 @@ function renderBtcAaplChart(){
   let btcPriceLine = '';
   points.forEach((p, i) => { btcPriceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(p.btcPrice).toFixed(1)} `; });
 
-  // Canal de tendencia (superior por máximos, inferior por mínimos), ambos anclados SOLO desde
-  // 2017 en adelante (nada antes). Conectar solo el primer y el último mínimo/máximo de CICLO
-  // MAYOR (detectCyclePeaksTroughs, que exige una caída/subida del 50%+ y 2 años de separación)
-  // dejaba la línea por ENCIMA de varios mínimos reales más chicos que sí tocan el precio - una
-  // línea de tendencia de verdad no puede pasar por encima de ningún dato real. La forma correcta
-  // es una ENVOLVENTE (convex hull): la inferior conecta los puntos que forman el límite más bajo
-  // posible sin dejar ningún dato por debajo, y la superior lo mismo por arriba - así se garantiza
-  // que toca exactamente los mínimos/máximos reales, sean "ciclo mayor" o no.
-  const BTCAAPL_TREND_START_MS = Date.UTC(2017, 0, 1);
+  // Canal de tendencia (superior por máximos, inferior por mínimos): UNA sola línea recta por
+  // canal, con el punto de INICIO fijado por el usuario en fechas exactas (verificadas por él
+  // contra su propio gráfico), no calculado - la verde empieza el 16 jul 2017, la roja el 16 dic
+  // 2017. El otro extremo que define la pendiente es el último toque real (máximo/mínimo genuino
+  // más reciente, no el dato de HOY) - para encontrar ESE sin que un giro reciente pequeño lo
+  // confunda, se usa una envolvente (convex hull) sobre el historial desde 2017, y se toma su
+  // penúltimo vértice (el último vértice es siempre forzosamente el dato de HOY, no un toque real)
+  const BTCAAPL_LOWER_START_MS = Date.UTC(2017, 6, 16); // 16 de julio de 2017
+  const BTCAAPL_UPPER_START_MS = Date.UTC(2017, 11, 16); // 16 de diciembre de 2017
   function crossProd(o, a, b){ return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x); }
   // Andrew's monotone chain, solo la mitad inferior (puntos ya vienen ordenados por x/tiempo)
   function lowerHull(pts){
@@ -20918,16 +20918,21 @@ function renderBtcAaplChart(){
     }
     return hull;
   }
-  // UNA sola línea recta por canal - no una polilínea con varios quiebres. Se define solo con el
-  // PRIMER y el ÚLTIMO toque real interior de la envolvente (el primer/último vértice de la
-  // envolvente completa son siempre el primer/último dato del historial, forzoso matemáticamente,
-  // no un toque real - por eso se recortan con slice(1,-1)). Al ser una sola recta (misma ecuación
-  // de principio a fin) nunca se "dobla": extenderla hasta HOY es simplemente seguir la misma línea
-  function hullPathHtml(hull, color){
-    const interior = hull.slice(1, -1);
-    if(interior.length < 2) return '';
-    const first = interior[0], last = interior[interior.length - 1];
-    const slope = (last.y - first.y) / (last.x - first.x);
+  function nearestPointAt(ms){
+    let best = allPoints[0], bestDiff = Infinity;
+    for(const p of allPoints){
+      const diff = Math.abs(p.t - ms);
+      if(diff < bestDiff){ bestDiff = diff; best = p; }
+    }
+    return best;
+  }
+  function fixedTrendLineHtml(hull, startAnchorMs, color){
+    if(hull.length < 2) return '';
+    const lastReal = hull[hull.length - 2]; // el último vértice (hull[length-1]) es siempre HOY
+    const startPoint = nearestPointAt(startAnchorMs);
+    const first = { x: startPoint.t, y: Math.log10(startPoint.ratio) };
+    if(lastReal.x === first.x) return '';
+    const slope = (lastReal.y - first.y) / (lastReal.x - first.x);
     const lineAt = x => first.y + slope * (x - first.x);
     const fromX = Math.max(startMs, first.x);
     if(fromX > endMs) return '';
@@ -20935,13 +20940,13 @@ function renderBtcAaplChart(){
     const tx2 = xFor(endMs).toFixed(1), ty2 = yForRatio(Math.pow(10, lineAt(endMs))).toFixed(1);
     return `<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="7,4"/>`;
   }
-  const trendPts = allPoints.filter(p => p.t >= BTCAAPL_TREND_START_MS).map(p => ({ x: p.t, y: Math.log10(p.ratio) }));
+  const trendPts = allPoints.filter(p => p.t >= Math.min(BTCAAPL_LOWER_START_MS, BTCAAPL_UPPER_START_MS)).map(p => ({ x: p.t, y: Math.log10(p.ratio) }));
   let trendLineUpperHtml = '', trendLineLowerHtml = '';
   if(trendPts.length >= 2){
     const lower = lowerHull(trendPts);
     const upper = lowerHull(trendPts.map(p => ({ x: p.x, y: -p.y }))).map(p => ({ x: p.x, y: -p.y }));
-    trendLineLowerHtml = hullPathHtml(lower, '#22c55e');
-    trendLineUpperHtml = hullPathHtml(upper, '#ff2f4f');
+    trendLineLowerHtml = fixedTrendLineHtml(lower, BTCAAPL_LOWER_START_MS, '#22c55e');
+    trendLineUpperHtml = fixedTrendLineHtml(upper, BTCAAPL_UPPER_START_MS, '#ff2f4f');
   }
 
   const lastPx = xFor(endMs), lastPyUpper = yForRatio(points[points.length - 1].ratio);
