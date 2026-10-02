@@ -4338,7 +4338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🍎 Precio de la acción de Apple (AAPL) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio. Apple no cotiza fines de semana/feriados — esos días se usa el último precio conocido (misma lógica que BTC/XAU con el oro).<br>
-                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo), cada una UNA sola línea recta extendida hasta hoy sin tramos ni quiebres intermedios. La roja va del 16 dic 2017 al último máximo real. La verde va de fecha fija a fecha fija: 16 jul 2017 al 28 jul 2026.<br>
+                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba, verde abajo), cada una UNA sola línea recta extendida hasta hoy sin tramos ni quiebres intermedios. La roja va del 16 dic 2017 al último máximo real. La verde va de fecha fija a fecha fija: 16 jul 2017 al 14 mar 2020.<br>
                 ⚪ Abajo se muestra el precio de BTC en dólares, para ubicar en qué momento del mercado ocurre cada mínimo/máximo — la línea vertical al pasar el cursor atraviesa los dos paneles a la vez.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
@@ -20911,7 +20911,7 @@ function renderBtcAaplChart(){
   // la verde (inferior) seguía "el precio" de cerca porque su segundo punto (el último mínimo real
   // detectado por la envolvente) resultó ser un mínimo muy reciente y chico, no el verdadero mínimo
   // que define la tendencia - se fija también a mano, igual que el punto de inicio
-  const BTCAAPL_LOWER_END_MS = Date.UTC(2026, 6, 28); // 28 de julio de 2026
+  const BTCAAPL_LOWER_END_MS = Date.UTC(2020, 2, 14); // 14 de marzo de 2020
   function crossProd(o, a, b){ return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x); }
   // Andrew's monotone chain, solo la mitad inferior (puntos ya vienen ordenados por x/tiempo)
   function lowerHull(pts){
