@@ -162,10 +162,12 @@ if gold:
 
     cycle_events, raw, peaks = find_cycles(rows)
 
-    print(f"\n=== 4. Picos RAW (zigzag puro, threshold={PEAK_DRAWDOWN_PCT}, SIN filtro de tiempo) ===")
-    raw_peaks_all = [e for e in raw if e["type"] == "peak"]
-    for e in raw_peaks_all:
-        print(f"  peak {fmt_date(e['t'])}  ratio={e['ratio']:.6f}" + ("  (unconfirmed)" if e.get("unconfirmed") else ""))
+    print(f"\n=== 4. TODOS los eventos RAW (zigzag puro, threshold={PEAK_DRAWDOWN_PCT}, SIN filtro de tiempo) ===")
+    prev_t = None
+    for e in raw:
+        gap = "" if prev_t is None else f"  <- {round((e['t']-prev_t)/86400000)} dias"
+        print(f"  {e['type']:6s} {fmt_date(e['t'])}  ratio={e['ratio']:.6f}{gap}" + ("  (unconfirmed)" if e.get("unconfirmed") else ""))
+        prev_t = e['t']
 
     print(f"\n=== 5. Techos tras aplicar regla 2 (min {MIN_DAYS_BETWEEN_PEAKS} dias, se queda el mas alto) ===")
     for p in peaks:
