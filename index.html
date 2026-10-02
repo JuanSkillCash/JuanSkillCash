@@ -4338,7 +4338,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🍎 Precio de la acción de Apple (AAPL) vía Twelve Data, precio de BTC vía el mismo historial que usan los demás gráficos del sitio. Apple no cotiza fines de semana/feriados — esos días se usa el último precio conocido (misma lógica que BTC/XAU con el oro).<br>
-                📈 La línea de tendencia (punteada) es una regresión lineal en escala logarítmica ajustada sobre los mínimos de ciclo reales de todo el historial (mismo detector que BTC/XAU) — no se dibuja a mano, se calcula con los datos reales.<br>
+                📈 Las dos líneas punteadas son un canal de tendencia (roja arriba por los máximos, verde abajo por los mínimos), calculado conectando el primer y el último máximo/mínimo de ciclo real desde 2017 (antes de esa fecha no se traza nada) — misma técnica de trazar una línea de tendencia a mano, pero calculada sobre los datos reales en vez de a ojo.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -20820,25 +20820,34 @@ function renderBtcAaplChart(){
   let ratioLine = '';
   points.forEach((p, i) => { ratioLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.ratio).toFixed(1)} `; });
 
-  // Línea de tendencia: regresión lineal (mínimos cuadrados) en escala logarítmica -misma escala
-  // que usa el eje Y- ajustada sobre los MÍNIMOS de ciclo reales de todo el historial (mismo
-  // detector que ya usa BTC/XAU, detectCyclePeaksTroughs, pero solo como anclas de la recta -no
-  // se marcan en el gráfico). Una recta en escala log se ve como una curva suave en el eje lineal.
-  const troughAnchors = detectCyclePeaksTroughs(allPoints, 0.5, 730).filter(e => e.type === 'trough');
-  let trendLineHtml = '';
-  if(troughAnchors.length >= 2){
-    const xs = troughAnchors.map(e => e.t), ys = troughAnchors.map(e => Math.log10(e.ratio));
-    const n = xs.length;
-    const meanX = xs.reduce((a, b) => a + b, 0) / n, meanY = ys.reduce((a, b) => a + b, 0) / n;
-    let num = 0, den = 0;
-    for(let i = 0; i < n; i++){ num += (xs[i] - meanX) * (ys[i] - meanY); den += (xs[i] - meanX) ** 2; }
-    const slope = den ? num / den : 0;
-    const intercept = meanY - slope * meanX;
-    const trendAt = t => Math.pow(10, slope * t + intercept);
-    const tx1 = xFor(startMs).toFixed(1), ty1 = yFor(trendAt(startMs)).toFixed(1);
+  // Canal de tendencia (superior por máximos, inferior por mínimos), ambos anclados SOLO desde
+  // 2017 en adelante (nada antes de esa fecha) - usa los mismos máximos/mínimos de ciclo reales
+  // que ya detecta BTC/XAU (detectCyclePeaksTroughs), pero sin marcarlos en el gráfico. En vez de
+  // una regresión por mínimos cuadrados sobre TODOS los anclajes (que puede quedar torcida si un
+  // anclaje intermedio está muy lejos de la tendencia real), se conecta el PRIMER anclaje desde
+  // 2017 con el ÚLTIMO anclaje real (el más reciente) - la técnica clásica de trazar una línea de
+  // tendencia a mano, calculada aquí con los datos reales. Se dibuja en escala log (como el eje Y)
+  // desde 2017 hasta HOY, para que la pendiente ya quede lista a extenderse sola hacia la derecha
+  // a medida que aparezcan nuevos máximos/mínimos.
+  const BTCAAPL_TREND_START_MS = Date.UTC(2017, 0, 1);
+  function trendLineFromAnchors(type, color){
+    const anchors = detectCyclePeaksTroughs(allPoints, 0.5, 730)
+      .filter(e => e.type === type && e.t >= BTCAAPL_TREND_START_MS)
+      .sort((a, b) => a.t - b.t);
+    if(anchors.length < 2) return '';
+    const first = anchors[0], last = anchors[anchors.length - 1];
+    if(last.t === first.t) return '';
+    const logFirst = Math.log10(first.ratio), logLast = Math.log10(last.ratio);
+    const slope = (logLast - logFirst) / (last.t - first.t);
+    const trendAt = t => Math.pow(10, logFirst + slope * (t - first.t));
+    const drawFromMs = Math.max(startMs, BTCAAPL_TREND_START_MS);
+    if(drawFromMs > endMs) return '';
+    const tx1 = xFor(drawFromMs).toFixed(1), ty1 = yFor(trendAt(drawFromMs)).toFixed(1);
     const tx2 = xFor(endMs).toFixed(1), ty2 = yFor(trendAt(endMs)).toFixed(1);
-    trendLineHtml = `<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="7,4"/>`;
+    return `<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="7,4"/>`;
   }
+  const trendLineUpperHtml = trendLineFromAnchors('peak', '#ff2f4f');
+  const trendLineLowerHtml = trendLineFromAnchors('trough', '#22c55e');
 
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].ratio);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -20859,7 +20868,8 @@ function renderBtcAaplChart(){
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${ratioLine.trim()}" fill="none" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        ${trendLineHtml}
+        ${trendLineUpperHtml}
+        ${trendLineLowerHtml}
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="btcaaplHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
@@ -20882,7 +20892,8 @@ function renderBtcAaplChart(){
   });
 
   legendEl.innerHTML = '<span class="perk-chip"><span class="perk-chip-dot" style="background:#9ca3af"></span>1 BTC en acciones de Apple</span>' +
-    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#fbbf24"></span>Línea de tendencia (sobre los mínimos)</span>';
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#ff2f4f"></span>Tendencia superior (máximos)</span>' +
+    '<span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Tendencia inferior (mínimos)</span>';
 
   const allRatios = allPoints.map(p => p.ratio);
   const maxAll = Math.max(...allRatios), minAll = Math.min(...allRatios);
