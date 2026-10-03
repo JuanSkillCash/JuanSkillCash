@@ -574,6 +574,23 @@ button{font-family:inherit;color:inherit}
 }
 .bite-mark{position:absolute;right:-1px;bottom:-1px;width:64px;height:64px;pointer-events:none}
 .cat-overview-card:hover{transform:translateY(-3px)}
+.cat-flip-outer{perspective:1600px}
+.cat-flip-inner{position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
+.cat-flip-outer:hover .cat-flip-inner,.cat-flip-outer:focus-within .cat-flip-inner{transform:rotateY(180deg)}
+.cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cat-flip-front:hover{transform:none}
+.cat-flip-back{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);
+  border-radius:18px;padding:20px;box-sizing:border-box;border:1px solid var(--bc);cursor:pointer;
+  background:radial-gradient(ellipse 130% 100% at 100% 0%, var(--tint), transparent 65%), #080c20;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.cat-flip-back-eyebrow{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--muted2);margin-bottom:11px}
+.cat-flip-back-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;flex:1}
+.cat-flip-back-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--white);line-height:1.35}
+.cat-flip-back-dot{width:5px;height:5px;border-radius:50%;background:var(--c);flex-shrink:0;margin-top:6px}
+.cat-flip-back-cta{margin-top:12px;padding-top:12px;border-top:1px solid var(--border2);font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--c)}
+@media(prefers-reduced-motion:reduce){.cat-flip-inner{transition:none}}
 .cat-overview-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .cat-overview-num{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;color:var(--c);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .cat-overview-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;flex:1;color:var(--white);display:flex;align-items:center;gap:8px}
@@ -2275,7 +2292,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
     <div id="categoryOverviewGrid">
     <div class="cat-overview-featured">
 
-      <button type="button" class="cat-overview-card big" data-category="indicadores" style="--c:#3b82f6;--bc:rgba(59,130,246,.28);--tint:rgba(59,130,246,.12)">
+      <div class="cat-flip-outer big">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="indicadores" style="--c:#3b82f6;--bc:rgba(59,130,246,.28);--tint:rgba(59,130,246,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">1</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
@@ -2303,10 +2322,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Ciclos de halving, dominancia, sentimiento y más señales de mercado en un solo lugar, organizadas por pestañas.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,30.0 L54.8,27.3 L55.9,36.3 L45.1,31.8 L48.7,43.4 L38.3,39.6 L41.0,50.1 L30.2,45.8 L33.2,56.7 L24.5,54.7 L26.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,30.0 L54.8,27.3 L55.9,36.3 L45.1,31.8 L48.7,43.4 L38.3,39.6 L41.0,50.1 L30.2,45.8 L33.2,56.7 L24.5,54.7 L26.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,30.0 L54.8,27.3 L55.9,36.3 L45.1,31.8 L48.7,43.4 L38.3,39.6 L41.0,50.1 L30.2,45.8 L33.2,56.7 L24.5,54.7 L26.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M30.0,64.0 A6.86,6.86 0 0,0 31.66,53.49 A9.23,9.23 0 0,0 36.49,44.02 A9.0,9.0 0 0,0 44.02,36.49 A8.28,8.28 0 0,0 53.49,31.66 A7.1,7.1 0 0,0 64.0,30.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M30.0,64.0 A6.86,6.86 0 0,0 31.66,53.49 A9.23,9.23 0 0,0 36.49,44.02 A9.0,9.0 0 0,0 44.02,36.49 A8.28,8.28 0 0,0 53.49,31.66 A7.1,7.1 0 0,0 64.0,30.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M30.0,64.0 A6.86,6.86 0 0,0 31.66,53.49 A9.23,9.23 0 0,0 36.49,44.02 A9.0,9.0 0 0,0 44.02,36.49 A8.28,8.28 0 0,0 53.49,31.66 A7.1,7.1 0 0,0 64.0,30.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="indicadores" style="--c:#3b82f6;--bc:rgba(59,130,246,.28);--tint:rgba(59,130,246,.12)"><div class="cat-flip-back-eyebrow">PESTAÑAS REALES</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Bitcoin</li><li><span class="cat-flip-back-dot"></span>Ethereum</li><li><span class="cat-flip-back-dot"></span>Trading</li><li><span class="cat-flip-back-dot"></span>Sentimiento</li><li><span class="cat-flip-back-dot"></span>Macro</li><li><span class="cat-flip-back-dot"></span>Dominancia</li><li><span class="cat-flip-back-dot"></span>Altcoins</li></ul><div class="cat-flip-back-cta">Explorar →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card big" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)">
+      <div class="cat-flip-outer big">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">2</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><circle cx="7" cy="10" r="5"/><circle cx="13" cy="10" r="5"/></svg><span>Partners</span></div>
@@ -2332,13 +2356,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,24.0 L50.6,19.6 L58.7,30.2 L50.0,29.1 L54.6,37.3 L41.8,33.3 L49.5,43.6 L37.9,40.5 L45.1,50.5 L33.5,47.4 L40.2,57.0 L29.0,54.1 L36.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,24.0 L50.6,19.6 L58.7,30.2 L50.0,29.1 L54.6,37.3 L41.8,33.3 L49.5,43.6 L37.9,40.5 L45.1,50.5 L33.5,47.4 L40.2,57.0 L29.0,54.1 L36.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,24.0 L50.6,19.6 L58.7,30.2 L50.0,29.1 L54.6,37.3 L41.8,33.3 L49.5,43.6 L37.9,40.5 L45.1,50.5 L33.5,47.4 L40.2,57.0 L29.0,54.1 L36.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M26.0,64.0 A9.75,9.75 0 0,0 27.29,54.16 A6.29,6.29 0 0,0 31.09,45.0 A5.8,5.8 0 0,0 37.13,37.13 A9.91,9.91 0 0,0 45.0,31.09 A6.48,6.48 0 0,0 54.16,27.29 A6.22,6.22 0 0,0 64.0,26.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M26.0,64.0 A9.75,9.75 0 0,0 27.29,54.16 A6.29,6.29 0 0,0 31.09,45.0 A5.8,5.8 0 0,0 37.13,37.13 A9.91,9.91 0 0,0 45.0,31.09 A6.48,6.48 0 0,0 54.16,27.29 A6.22,6.22 0 0,0 64.0,26.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M26.0,64.0 A9.75,9.75 0 0,0 27.29,54.16 A6.29,6.29 0 0,0 31.09,45.0 A5.8,5.8 0 0,0 37.13,37.13 A9.91,9.91 0 0,0 45.0,31.09 A6.48,6.48 0 0,0 54.16,27.29 A6.22,6.22 0 0,0 64.0,26.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)"><div class="cat-flip-back-eyebrow">LO QUE NEGOCIÉ PARA TI</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Comisión reducida en Bitunix</li><li><span class="cat-flip-back-dot"></span>Bono de bienvenida exclusivo</li><li><span class="cat-flip-back-dot"></span>Mentoría 1:1 incluida</li><li><span class="cat-flip-back-dot"></span>Sin letra pequeña</li></ul><div class="cat-flip-back-cta">Ver alianzas →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
     </div>
     <div class="cat-overview-grid">
 
-      <button type="button" class="cat-overview-card" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">3</div>
           <div class="cat-overview-title">💼 Simulador de Portafolio</div>
@@ -2376,10 +2405,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,36.0 L54.4,33.0 L53.3,42.7 L43.6,39.5 L42.8,49.6 L32.4,45.5 L32.5,57.0 L23.5,54.8 L22.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,36.0 L54.4,33.0 L53.3,42.7 L43.6,39.5 L42.8,49.6 L32.4,45.5 L32.5,57.0 L23.5,54.8 L22.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,36.0 L54.4,33.0 L53.3,42.7 L43.6,39.5 L42.8,49.6 L32.4,45.5 L32.5,57.0 L23.5,54.8 L22.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M35.0,64.0 A10.96,10.96 0 0,0 37.21,52.9 A11.07,11.07 0 0,0 43.49,43.49 A10.8,10.8 0 0,0 52.9,37.21 A6.91,6.91 0 0,0 64.0,35.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M35.0,64.0 A10.96,10.96 0 0,0 37.21,52.9 A11.07,11.07 0 0,0 43.49,43.49 A10.8,10.8 0 0,0 52.9,37.21 A6.91,6.91 0 0,0 64.0,35.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M35.0,64.0 A10.96,10.96 0 0,0 37.21,52.9 A11.07,11.07 0 0,0 43.49,43.49 A10.8,10.8 0 0,0 52.9,37.21 A6.91,6.91 0 0,0 64.0,35.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)"><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Perfil de Riesgo</li><li><span class="cat-flip-back-dot"></span>Simulador de Portafolio</li><li><span class="cat-flip-back-dot"></span>Monitor de Correlación</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">4</div>
           <div class="cat-overview-title">📈 Calculadoras de Trading</div>
@@ -2424,10 +2458,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Calcula tu precio de liquidación, break-even, comisiones y ganancia real — todo antes de arriesgar tu dinero en una posición apalancada.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,20.0 L52.9,17.5 L58.6,27.3 L46.8,24.3 L53.2,34.6 L43.1,32.8 L47.7,41.8 L33.6,37.1 L42.0,48.9 L29.0,45.0 L37.2,56.5 L24.8,53.1 L32.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,20.0 L52.9,17.5 L58.6,27.3 L46.8,24.3 L53.2,34.6 L43.1,32.8 L47.7,41.8 L33.6,37.1 L42.0,48.9 L29.0,45.0 L37.2,56.5 L24.8,53.1 L32.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,20.0 L52.9,17.5 L58.6,27.3 L46.8,24.3 L53.2,34.6 L43.1,32.8 L47.7,41.8 L33.6,37.1 L42.0,48.9 L29.0,45.0 L37.2,56.5 L24.8,53.1 L32.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)"><div class="cat-flip-back-eyebrow">LAS 4 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Calculadora de Trading</li><li><span class="cat-flip-back-dot"></span>Calculadora de Break-even</li><li><span class="cat-flip-back-dot"></span>Calculadora Coin-M</li><li><span class="cat-flip-back-dot"></span>Calculadora de Comisiones</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">5</div>
           <div class="cat-overview-title">🪙 Calculadoras de Inversión</div>
@@ -2456,10 +2495,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Simula tus compras periódicas, calcula tu rentabilidad real, compara capitalizaciones de mercado, y descubre cuándo podrías vivir de tus inversiones.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,30.0 L53.1,25.9 L56.8,36.4 L45.7,32.1 L49.9,43.1 L39.1,39.1 L43.1,49.9 L34.8,48.4 L36.5,56.9 L24.8,52.0 L30.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,30.0 L53.1,25.9 L56.8,36.4 L45.7,32.1 L49.9,43.1 L39.1,39.1 L43.1,49.9 L34.8,48.4 L36.5,56.9 L24.8,52.0 L30.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,30.0 L53.1,25.9 L56.8,36.4 L45.7,32.1 L49.9,43.1 L39.1,39.1 L43.1,49.9 L34.8,48.4 L36.5,56.9 L24.8,52.0 L30.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M31.0,64.0 A7.59,7.59 0 0,0 32.62,53.8 A10.0,10.0 0 0,0 37.3,44.6 A9.64,9.64 0 0,0 44.6,37.3 A6.87,6.87 0 0,0 53.8,32.62 A9.76,9.76 0 0,0 64.0,31.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M31.0,64.0 A7.59,7.59 0 0,0 32.62,53.8 A10.0,10.0 0 0,0 37.3,44.6 A9.64,9.64 0 0,0 44.6,37.3 A6.87,6.87 0 0,0 53.8,32.62 A9.76,9.76 0 0,0 64.0,31.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M31.0,64.0 A7.59,7.59 0 0,0 32.62,53.8 A10.0,10.0 0 0,0 37.3,44.6 A9.64,9.64 0 0,0 44.6,37.3 A6.87,6.87 0 0,0 53.8,32.62 A9.76,9.76 0 0,0 64.0,31.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)"><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Calculadora de Rentabilidad</li><li><span class="cat-flip-back-dot"></span>Simulador de DCA de Compra</li><li><span class="cat-flip-back-dot"></span>Simulador de DCA de Venta</li><li><span class="cat-flip-back-dot"></span>Comparador de Market Cap</li><li><span class="cat-flip-back-dot"></span>Tiempo hasta la Libertad Financiera</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">6</div>
           <div class="cat-overview-title">🛡️ Checklists de Seguridad</div>
@@ -2503,10 +2547,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,38.0 L53.2,32.4 L52.7,44.0 L43.0,40.1 L41.9,50.8 L33.1,48.4 L30.8,57.1 L21.0,53.1 L20.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,38.0 L53.2,32.4 L52.7,44.0 L43.0,40.1 L41.9,50.8 L33.1,48.4 L30.8,57.1 L21.0,53.1 L20.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,38.0 L53.2,32.4 L52.7,44.0 L43.0,40.1 L41.9,50.8 L33.1,48.4 L30.8,57.1 L21.0,53.1 L20.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36.0,64.0 A9.76,9.76 0 0,0 38.13,53.28 A7.22,7.22 0 0,0 44.2,44.2 A7.23,7.23 0 0,0 53.28,38.13 A9.08,9.08 0 0,0 64.0,36.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M36.0,64.0 A9.76,9.76 0 0,0 38.13,53.28 A7.22,7.22 0 0,0 44.2,44.2 A7.23,7.23 0 0,0 53.28,38.13 A9.08,9.08 0 0,0 64.0,36.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M36.0,64.0 A9.76,9.76 0 0,0 38.13,53.28 A7.22,7.22 0 0,0 44.2,44.2 A7.23,7.23 0 0,0 53.28,38.13 A9.08,9.08 0 0,0 64.0,36.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)"><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Checklist de Seguridad</li><li><span class="cat-flip-back-dot"></span>Comparador de Wallets</li><li><span class="cat-flip-back-dot"></span>Verificar Aprobaciones</li><li><span class="cat-flip-back-dot"></span>Herencia Digital</li><li><span class="cat-flip-back-dot"></span>Analizador de Token</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">7</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M10 5.5c-1.5-1.3-3.5-2-6-2v11c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2v-11c-2.5 0-4.5.7-6 2z"/><path d="M10 5.5v11"/></svg><span>Guías y Glosario</span></div>
@@ -2529,10 +2578,15 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,18.0 L53.1,16.9 L59.6,25.6 L47.2,23.7 L55.3,33.3 L43.4,31.7 L50.7,40.8 L41.4,40.6 L46.3,48.4 L37.1,48.3 L42.0,56.1 L32.7,55.9 L38.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,18.0 L53.1,16.9 L59.6,25.6 L47.2,23.7 L55.3,33.3 L43.4,31.7 L50.7,40.8 L41.4,40.6 L46.3,48.4 L37.1,48.3 L42.0,56.1 L32.7,55.9 L38.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,18.0 L53.1,16.9 L59.6,25.6 L47.2,23.7 L55.3,33.3 L43.4,31.7 L50.7,40.8 L41.4,40.6 L46.3,48.4 L37.1,48.3 L42.0,56.1 L32.7,55.9 L38.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M28.0,64.0 A8.0,8.0 0 0,0 29.23,54.68 A8.2,8.2 0 0,0 32.82,46.0 A9.23,9.23 0 0,0 38.54,38.54 A6.19,6.19 0 0,0 46.0,32.82 A5.66,5.66 0 0,0 54.68,29.23 A8.7,8.7 0 0,0 64.0,28.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M28.0,64.0 A8.0,8.0 0 0,0 29.23,54.68 A8.2,8.2 0 0,0 32.82,46.0 A9.23,9.23 0 0,0 38.54,38.54 A6.19,6.19 0 0,0 46.0,32.82 A5.66,5.66 0 0,0 54.68,29.23 A8.7,8.7 0 0,0 64.0,28.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M28.0,64.0 A8.0,8.0 0 0,0 29.23,54.68 A8.2,8.2 0 0,0 32.82,46.0 A9.23,9.23 0 0,0 38.54,38.54 A6.19,6.19 0 0,0 46.0,32.82 A5.66,5.66 0 0,0 54.68,29.23 A8.7,8.7 0 0,0 64.0,28.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)"><div class="cat-flip-back-eyebrow">LAS 2 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Glosario Cripto</li><li><span class="cat-flip-back-dot"></span>Biblioteca de Errores Comunes</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
-      <button type="button" class="cat-overview-card" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)">
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">8</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M13.4 3.4a3.8 3.8 0 00-5.1 4.6L3.5 12.7v3.8h3.8l4.7-4.8a3.8 3.8 0 004.6-5.1l-2.5 2.5-1.9-1.9 2.5-2.5z"/></svg><span>Herramientas Rápidas</span></div>
@@ -2555,8 +2609,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Convierte entre unidades cripto, calcula porcentajes al instante, y compara la hora entre países para coordinar con tu comunidad.</div>
         <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64.0,28.0 L54.2,25.3 L55.7,34.6 L46.8,32.8 L48.0,42.0 L39.1,40.2 L40.5,49.5 L28.2,44.0 L32.7,56.7 L21.6,52.5 L25.0,64.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M64.0,28.0 L54.2,25.3 L55.7,34.6 L46.8,32.8 L48.0,42.0 L39.1,40.2 L40.5,49.5 L28.2,44.0 L32.7,56.7 L21.6,52.5 L25.0,64.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M64.0,28.0 L54.2,25.3 L55.7,34.6 L46.8,32.8 L48.0,42.0 L39.1,40.2 L40.5,49.5 L28.2,44.0 L32.7,56.7 L21.6,52.5 L25.0,64.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M33.0,64.0 A6.04,6.04 0 0,0 34.52,54.42 A6.11,6.11 0 0,0 38.92,45.78 A8.04,8.04 0 0,0 45.78,38.92 A6.31,6.31 0 0,0 54.42,34.52 A6.12,6.12 0 0,0 64.0,33.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M33.0,64.0 A6.04,6.04 0 0,0 34.52,54.42 A6.11,6.11 0 0,0 38.92,45.78 A8.04,8.04 0 0,0 45.78,38.92 A6.31,6.31 0 0,0 54.42,34.52 A6.12,6.12 0 0,0 64.0,33.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M33.0,64.0 A6.04,6.04 0 0,0 34.52,54.42 A6.11,6.11 0 0,0 38.92,45.78 A8.04,8.04 0 0,0 45.78,38.92 A6.31,6.31 0 0,0 54.42,34.52 A6.12,6.12 0 0,0 64.0,33.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
+      <div class="cat-flip-back" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)"><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-dot"></span>Conversor de Unidades</li><li><span class="cat-flip-back-dot"></span>Calculadora de Porcentajes</li><li><span class="cat-flip-back-dot"></span>Reloj de Zona Horaria</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0 L64.0,64.0 Z" fill="#0a1024"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M24.0,64.0 A9.16,9.16 0 0,0 25.36,53.65 A9.73,9.73 0 0,0 29.36,44.0 A6.81,6.81 0 0,0 35.72,35.72 A10.43,10.43 0 0,0 44.0,29.36 A6.87,6.87 0 0,0 53.65,25.36 A8.98,8.98 0 0,0 64.0,24.0" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
 
     </div>
     </div>
@@ -22693,6 +22750,11 @@ setInterval(updateMarketSessions, 1000);
     bg.setAttribute('aria-hidden','true');
     document.body.insertBefore(bg, document.body.firstChild);
     addSparks(bg, 15, false);
+    document.querySelectorAll('.cat-flip-back[data-category]').forEach(function(back){
+      back.addEventListener('click', function(){
+        if(typeof showCategoryDetail==='function') showCategoryDetail(back.dataset.category);
+      });
+    });
   }
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded', init);
