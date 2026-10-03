@@ -583,7 +583,8 @@ button{font-family:inherit;color:inherit}
 .cat-overview-preview{
   height:78px;border-radius:12px;margin-bottom:14px;position:relative;overflow:hidden;
   background:
-    radial-gradient(rgba(255,255,255,.16) 1px,transparent 1.4px) 0 0/16px 16px,
+    radial-gradient(ellipse 75% 70% at 28% 32%, transparent 0%, rgba(8,12,32,.82) 100%),
+    radial-gradient(rgba(255,255,255,.09) 1px,transparent 1.4px) 0 0/16px 16px,
     rgba(255,255,255,.02);
 }
 .cat-overview-preview svg{filter:drop-shadow(0 0 5px var(--c))}
@@ -592,7 +593,7 @@ button{font-family:inherit;color:inherit}
 .cat-overview-preview .spark{box-shadow:0 0 6px 1.5px var(--c)}
 .page-sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .page-sparks .spark{background:#eaf1ff;box-shadow:0 0 5px 1.5px rgba(167,197,255,.8)}
-@keyframes sparkTwinkle{0%,100%{opacity:0;transform:scale(.3)}45%,55%{opacity:1;transform:scale(1.15)}}
+@keyframes sparkTwinkle{0%,100%{opacity:0;transform:scale(.3)}45%,55%{opacity:var(--peak,1);transform:scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
 .cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
@@ -22662,26 +22663,36 @@ setInterval(updateMarketSessions, 1000);
 </script>
 <script>
 (function(){
-  function addSparks(container, count){
+  function randomizeSpark(s, isPreview){
+    var depth=Math.random();
+    var peak=(0.3+depth*0.7).toFixed(2);
+    var size=isPreview ? (2+depth*2.2) : (1.3+depth*2.4);
+    s.style.left=(Math.random()*92+3)+'%';
+    s.style.top=(Math.random()*80+8)+'%';
+    s.style.width=size.toFixed(1)+'px';
+    s.style.height=size.toFixed(1)+'px';
+    s.style.setProperty('--peak', peak);
+    s.style.animationDuration=(2+Math.random()*2.6).toFixed(2)+'s';
+  }
+  function addSparks(container, count, isPreview){
     for(var i=0;i<count;i++){
       var s=document.createElement('div');
       s.className='spark';
-      s.style.left=(Math.random()*92+3)+'%';
-      s.style.top=(Math.random()*80+8)+'%';
+      randomizeSpark(s, isPreview);
       s.style.animationDelay=(Math.random()*3.2).toFixed(2)+'s';
-      s.style.animationDuration=(2.1+Math.random()*2.2).toFixed(2)+'s';
+      s.addEventListener('animationiteration', function(){ randomizeSpark(this, isPreview); });
       container.appendChild(s);
     }
   }
   function init(){
     document.querySelectorAll('.cat-overview-preview').forEach(function(el){
-      addSparks(el, 3+Math.floor(Math.random()*3));
+      addSparks(el, 6, true);
     });
     var bg=document.createElement('div');
     bg.className='page-sparks';
     bg.setAttribute('aria-hidden','true');
     document.body.insertBefore(bg, document.body.firstChild);
-    addSparks(bg, 13);
+    addSparks(bg, 24, false);
   }
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded', init);
