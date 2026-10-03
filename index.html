@@ -576,7 +576,9 @@ button{font-family:inherit;color:inherit}
 .cat-overview-card:hover{transform:translateY(-3px)}
 .cat-flip-outer{perspective:1600px}
 .cat-flip-inner{position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
-.cat-flip-outer:hover .cat-flip-inner,.cat-flip-outer:focus-within .cat-flip-inner{transform:rotateY(180deg)}
+@media (hover:hover){
+  .cat-flip-outer:hover .cat-flip-inner,.cat-flip-outer:focus-within .cat-flip-inner{transform:rotateY(180deg)}
+}
 .cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .cat-flip-front:hover{transform:none}
 .cat-flip-back{
