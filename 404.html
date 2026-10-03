@@ -570,7 +570,9 @@ button{font-family:inherit;color:inherit}
   border-radius:18px;padding:20px;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);
   border:1px solid var(--bc);cursor:pointer;text-align:left;width:100%;font-family:inherit;
   background:radial-gradient(ellipse 130% 100% at 0% 0%, var(--tint), transparent 65%), #080c20;
+  position:relative;
 }
+.bite-mark{position:absolute;right:-1px;bottom:-1px;width:64px;height:64px;pointer-events:none}
 .cat-overview-card:hover{transform:translateY(-3px)}
 .cat-overview-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .cat-overview-num{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;color:var(--c);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
@@ -581,12 +583,17 @@ button{font-family:inherit;color:inherit}
 .cat-overview-preview{
   height:78px;border-radius:12px;margin-bottom:14px;position:relative;overflow:hidden;
   background:
-    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 13px,
-    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/18px 100%,
+    radial-gradient(rgba(255,255,255,.16) 1px,transparent 1.4px) 0 0/16px 16px,
     rgba(255,255,255,.02);
 }
 .cat-overview-preview svg{filter:drop-shadow(0 0 5px var(--c))}
 .cat-overview-preview>div>div{filter:drop-shadow(0 0 5px var(--c))}
+.spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;pointer-events:none;animation:sparkTwinkle 2.6s ease-in-out infinite}
+.cat-overview-preview .spark{box-shadow:0 0 6px 1.5px var(--c)}
+.page-sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.page-sparks .spark{background:#eaf1ff;box-shadow:0 0 5px 1.5px rgba(167,197,255,.8)}
+@keyframes sparkTwinkle{0%,100%{opacity:0;transform:scale(.3)}45%,55%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
 .cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
 
@@ -2295,6 +2302,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Ciclos de halving, dominancia, sentimiento y más señales de mercado en un solo lugar, organizadas por pestañas.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,32 C42,39.0 34.1,45 28,64 L64,64 Z" fill="#0a1024"/><path d="M64,32 C42,39.0 34.1,45 28,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,32 C42,39.0 34.1,45 28,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card big" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)">
@@ -2323,6 +2331,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,26 C37,34.6 43.7,40 36,64 L64,64 Z" fill="#0a1024"/><path d="M64,26 C37,34.6 43.7,40 36,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,26 C37,34.6 43.7,40 36,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
     </div>
@@ -2366,6 +2375,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,36 C46,41.8 29.0,42 22,64 L64,64 Z" fill="#0a1024"/><path d="M64,36 C46,41.8 29.0,42 22,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,36 C46,41.8 29.0,42 22,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)">
@@ -2413,6 +2423,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Calcula tu precio de liquidación, break-even, comisiones y ganancia real — todo antes de arriesgar tu dinero en una posición apalancada.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,22 C39,30.0 38.4,44 32,64 L64,64 Z" fill="#0a1024"/><path d="M64,22 C39,30.0 38.4,44 32,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,22 C39,30.0 38.4,44 32,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)">
@@ -2444,6 +2455,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Simula tus compras periódicas, calcula tu rentabilidad real, compara capitalizaciones de mercado, y descubre cuándo podrías vivir de tus inversiones.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,30 C43,36.7 36.7,43 30,64 L64,64 Z" fill="#0a1024"/><path d="M64,30 C43,36.7 36.7,43 30,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,30 C43,36.7 36.7,43 30,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)">
@@ -2490,6 +2502,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,38 C48,43.1 27.7,40 20,64 L64,64 Z" fill="#0a1024"/><path d="M64,38 C48,43.1 27.7,40 20,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,38 C48,43.1 27.7,40 20,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)">
@@ -2515,6 +2528,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,20 C40,27.7 42.8,49 38,64 L64,64 Z" fill="#0a1024"/><path d="M64,20 C40,27.7 42.8,49 38,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,20 C40,27.7 42.8,49 38,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
       <button type="button" class="cat-overview-card" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)">
@@ -2540,6 +2554,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
         <div class="cat-overview-desc">Convierte entre unidades cripto, calcula porcentajes al instante, y compara la hora entre países para coordinar con tu comunidad.</div>
         <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M64,29 C44,35.4 32.4,41 25,64 L64,64 Z" fill="#0a1024"/><path d="M64,29 C44,35.4 32.4,41 25,64" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><path d="M64,29 C44,35.4 32.4,41 25,64" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
 
     </div>
@@ -22642,6 +22657,36 @@ setInterval(updateMarketSessions, 1000);
         })
         .catch(function(){});
     }
+  }
+})();
+</script>
+<script>
+(function(){
+  function addSparks(container, count){
+    for(var i=0;i<count;i++){
+      var s=document.createElement('div');
+      s.className='spark';
+      s.style.left=(Math.random()*92+3)+'%';
+      s.style.top=(Math.random()*80+8)+'%';
+      s.style.animationDelay=(Math.random()*3.2).toFixed(2)+'s';
+      s.style.animationDuration=(2.1+Math.random()*2.2).toFixed(2)+'s';
+      container.appendChild(s);
+    }
+  }
+  function init(){
+    document.querySelectorAll('.cat-overview-preview').forEach(function(el){
+      addSparks(el, 3+Math.floor(Math.random()*3));
+    });
+    var bg=document.createElement('div');
+    bg.className='page-sparks';
+    bg.setAttribute('aria-hidden','true');
+    document.body.insertBefore(bg, document.body.firstChild);
+    addSparks(bg, 13);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
 </script>
