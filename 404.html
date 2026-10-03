@@ -19279,54 +19279,10 @@ function renderDomChart(key){
     });
     return d.trim();
   }
-  // relleno de área verde/rojo según tendencia (como se ve en el Balance de la Fed) - solo para
-  // indicadores de UNA sola línea (con varias, ej. CPI general+núcleo, cada una ya usa su propio
-  // color fijo para distinguirse entre sí; mezclar eso con rojo/verde las haría ilegibles). Se
-  // compara cada punto contra uno ~N atrás (una fracción de los puntos visibles, no un número fijo
-  // de días) para que la línea no parpadee con cada sube-y-baja diario, sino que forme zonas largas
-  let trendFillHtml = '';
-  if(def.series.length === 1){
-    const s = def.series[0];
-    const UP_COLOR = '#22c55e', DOWN_COLOR = '#ff2f4f';
-    const lookback = Math.max(5, Math.round(points.length * 0.04));
-    const bottomY = marginTop + drawH;
-    const segments = [];
-    let curColor = null, curPts = [];
-    points.forEach((p, i) => {
-      const v = p[s.key];
-      if(v == null || !isFinite(v)){
-        if(curPts.length > 1) segments.push({ color: curColor, pts: curPts });
-        curColor = null; curPts = [];
-        return;
-      }
-      const refV = points[Math.max(0, i - lookback)][s.key];
-      const color = (refV != null && v < refV) ? DOWN_COLOR : UP_COLOR;
-      const pt = { x: xFor(p.t), y: yFor(v) };
-      if(color !== curColor){
-        if(curPts.length > 1) segments.push({ color: curColor, pts: curPts });
-        curPts = curPts.length ? [curPts[curPts.length - 1]] : []; // sin hueco visual entre segmentos
-        curColor = color;
-      }
-      curPts.push(pt);
-    });
-    if(curPts.length > 1) segments.push({ color: curColor, pts: curPts });
-
-    trendFillHtml = segments.map((seg, i) => {
-      const lineD = seg.pts.map((pt, j) => `${j === 0 ? 'M' : 'L'}${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ');
-      const first = seg.pts[0], last = seg.pts[seg.pts.length - 1];
-      const areaD = `${lineD} L${last.x.toFixed(1)},${bottomY.toFixed(1)} L${first.x.toFixed(1)},${bottomY.toFixed(1)} Z`;
-      const gradId = `${key}TrendGrad${i}`;
-      return `
-        <defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${seg.color}" stop-opacity="0.32"/>
-          <stop offset="100%" stop-color="${seg.color}" stop-opacity="0"/>
-        </linearGradient></defs>
-        <path d="${areaD}" fill="url(#${gradId})" stroke="none"/>
-        <path d="${lineD}" fill="none" stroke="${seg.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      `;
-    }).join('');
-  }
-  const linesHtml = (def.series.length === 1 ? trendFillHtml : def.series.map(s => `<path d="${pathFor(p => p[s.key], yFor)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join(''))
+  // antes esto pintaba la línea de un solo indicador en verde/rojo según la tendencia reciente —
+  // se quitó: ahora cada serie usa siempre su color fijo (def.series[].color), igual que los
+  // indicadores de varias líneas (ej. CPI general+núcleo) ya hacían desde el principio
+  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key], yFor)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('')
     + (yFor2 ? def.series2.map(s => `<path d="${pathFor(p => p[s.key], yFor2)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>`).join('') : '');
 
   const lastP = points[points.length - 1];
