@@ -942,6 +942,16 @@ button{font-family:inherit;color:inherit}
 /* ===== CALCULADORA DE BREAK-EVEN ===== */
 .be-section-label{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .be-section-label.bitunix{color:var(--green)}
+
+/* ===== TOP BAR LIST (ranking tipo "top N" con barras horizontales) ===== */
+.top-bar-list{display:flex;flex-direction:column;gap:10px;margin:4px 0 2px}
+.top-bar-row{display:flex;align-items:center;gap:10px}
+.top-bar-rank{width:16px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right}
+.top-bar-label{width:126px;flex-shrink:0;font-size:12.5px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top-bar-track{flex:1;height:18px;min-width:24px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.top-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#2563eb,#60a5fa);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.top-bar-value{width:88px;flex-shrink:0;font-size:12px;font-weight:800;color:var(--white);text-align:right;font-family:'Space Mono',monospace}
+@media(max-width:480px){.top-bar-label{width:84px;font-size:11px}.top-bar-value{width:70px;font-size:10.5px}}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
 .be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
@@ -1690,6 +1700,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
       </button>
+      <button class="sb-item" data-indic-jump="govtreasuries">
+        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas Gubernamentales</span>
+      </button>
       <button class="sb-item" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
@@ -1976,6 +1989,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="govtreasuries">
+        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas Gubernamentales</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
@@ -3956,12 +3972,46 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="res-card"><div class="r-label">Empresas reportando</div><div class="r-val" id="treasCount">—</div></div>
                 </div>
 
+                <div class="be-section-label" style="margin:22px 0 12px">🏆 Top 10 por BTC acumulado</div>
+                <div id="treasTopBars" class="top-bar-list"></div>
+
                 <div class="be-section-label" style="margin:22px 0 12px">🏢 Top empresas por BTC acumulado</div>
                 <div id="treasList"></div>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🏢 Datos reportados públicamente por cada empresa (balances trimestrales, compras anunciadas) y agregados por CoinGecko — pueden tener algo de rezago frente a compras muy recientes.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="govtreasuries" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Reservas Gubernamentales de Bitcoin</h2>
+              </div>
+
+              <div class="chart-stats-grid">
+                <div class="res-card"><div class="r-label">BTC total en manos de gobiernos</div><div class="r-val" id="govTotalBtc">—</div></div>
+                <div class="res-card"><div class="r-label">% de todo el Bitcoin que existe</div><div class="r-val" id="govDominance">—</div></div>
+                <div class="res-card"><div class="r-label">Países/entidades reportados</div><div class="r-val" id="govCount">—</div></div>
+              </div>
+
+              <div class="be-section-label" style="margin:22px 0 12px">🏆 Top países por BTC en reservas</div>
+              <div id="govTopBars" class="top-bar-list"></div>
+
+              <div class="be-section-label" style="margin:22px 0 12px">🏛️ Detalle por país</div>
+              <div id="govList"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🏛️ BTC confiscado, en reserva estratégica o comprado directamente por gobiernos — a diferencia de las empresas, los gobiernos no reportan esto en vivo, así que esta lista se actualiza manualmente de vez en cuando y puede no reflejar movimientos muy recientes.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -7387,7 +7437,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }],
@@ -7416,7 +7466,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7548,6 +7598,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'ciclosoporte') ensureCicloSoporteLoaded();
       if(btn.dataset.indic === 'rsimensual') ensureRsiLoaded();
       if(btn.dataset.indic === 'treasuries') ensureTreasuriesLoaded();
+      if(btn.dataset.indic === 'govtreasuries') ensureGovTreasuriesLoaded();
       if(btn.dataset.indic === 'btcxau') ensureBtcXauLoaded();
       if(btn.dataset.indic === 'btcaapl') ensureBtcAaplLoaded();
       if(btn.dataset.indic === 'btcreturns') ensureBtcReturnsLoaded();
@@ -7605,6 +7656,7 @@ function jumpToIndicator(id){
     if(id === 'ciclosoporte') ensureCicloSoporteLoaded();
     if(id === 'rsimensual') ensureRsiLoaded();
     if(id === 'treasuries') ensureTreasuriesLoaded();
+    if(id === 'govtreasuries') ensureGovTreasuriesLoaded();
     if(id === 'btcxau') ensureBtcXauLoaded();
     if(id === 'btcaapl') ensureBtcAaplLoaded();
     if(id === 'btcreturns') ensureBtcReturnsLoaded();
@@ -19621,6 +19673,7 @@ const BITCOIN_GUIA_INDICATORS = [
   { id: 'ma4y', icon: '📏', label: 'Media Móvil de 4 Años', def: 'Una media móvil de ~1458 días — la "línea de tendencia" de muy largo plazo de BTC.' },
   { id: 'ema200', icon: '📉', label: 'Medias Móviles 200', def: 'La media móvil de 200 (semanal o diaria) que separa la tendencia alcista de la bajista de largo plazo.' },
   { id: 'treasuries', icon: '🏢', label: 'Balances Corporativos', def: 'Cuánto BTC tienen acumulado empresas públicas como MicroStrategy — el apetito institucional, en números reales.' },
+  { id: 'govtreasuries', icon: '🏛️', label: 'Reservas Gubernamentales', def: 'Cuánto BTC tienen acumulado los gobiernos (confiscado, reservas estratégicas o compras directas) — de EEUU a El Salvador.' },
   { id: 'btcxau', icon: '🥇', label: 'BTC/XAU', def: 'El precio de BTC medido en onzas de oro, en vez de dólares — para comparar los dos "activos refugio".' },
   { id: 'btcaapl', icon: '🍎', label: 'BTC/AAPL', def: 'El precio de BTC medido en acciones de Apple, en vez de dólares.' },
   { id: 'btcreturns', icon: '📅', label: 'Retornos de Bitcoin', def: 'Cómo le ha ido a BTC por año, trimestre, mes o semana — en pestañas, para ver de un vistazo si hay estacionalidad (ej. "septiembre rojo").' },
@@ -22090,6 +22143,28 @@ document.querySelectorAll('#lsTfRow .tf-pill').forEach(b => {
 });
 document.getElementById('lsRefreshBtn').addEventListener('click', () => loadLongShort());
 
+/* ---- lista "top N" con barras horizontales (estilo ranking), usada por Balances Corporativos
+   y por Reservas Gubernamentales — recibe {name, btc, flag?} ya ordenado de mayor a menor ---- */
+function fmtBtcShort(btc){
+  if(btc >= 1000) return (btc / 1000).toFixed(2) + 'K BTC';
+  if(btc >= 1) return btc.toFixed(2) + ' BTC';
+  return btc.toFixed(4) + ' BTC';
+}
+function renderTopBars(containerEl, items){
+  const maxVal = Math.max(...items.map(it => it.btc));
+  containerEl.innerHTML = items.map((it, i) => {
+    const pct = Math.max(1.2, (it.btc / maxVal * 100));
+    return `
+      <div class="top-bar-row">
+        <div class="top-bar-rank">${i + 1}</div>
+        <div class="top-bar-label">${it.flag ? it.flag + ' ' : ''}${it.name}</div>
+        <div class="top-bar-track"><div class="top-bar-fill" style="width:${pct.toFixed(2)}%"></div></div>
+        <div class="top-bar-value">${fmtBtcShort(it.btc)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 /* ---- Bitcoin en Balances Corporativos: endpoint público de CoinGecko con las empresas que
    reportan tenencias de BTC en su balance ---- */
 async function loadCorporateTreasuries(){
@@ -22109,6 +22184,8 @@ async function loadCorporateTreasuries(){
     document.getElementById('treasTotalUsd').textContent = fmtUsdBig(data.total_value_usd);
     document.getElementById('treasDominance').textContent = (data.market_cap_dominance != null ? data.market_cap_dominance.toFixed(2) : '—') + '%';
     document.getElementById('treasCount').textContent = companies.length;
+
+    renderTopBars(document.getElementById('treasTopBars'), companies.slice(0, 10).map(c => ({ name: c.name, btc: c.total_holdings })));
 
     const listEl = document.getElementById('treasList');
     listEl.innerHTML = companies.slice(0, 15).map((c, i) => {
@@ -22135,6 +22212,52 @@ async function loadCorporateTreasuries(){
 }
 let treasuriesLoadedOnce = false;
 function ensureTreasuriesLoaded(){ if(!treasuriesLoadedOnce){ treasuriesLoadedOnce = true; loadCorporateTreasuries(); } }
+
+/* ---- Reservas Gubernamentales de Bitcoin: a diferencia de las empresas (CoinGecko las agrega
+   en vivo), los gobiernos no reportan sus tenencias por una API pública — son cifras públicas
+   (BTC confiscado, reservas estratégicas o compras directas) que hay que actualizar a mano de vez
+   en cuando. % del total calculado sobre el supply máximo de 21M BTC, igual que hacen las fuentes
+   públicas de referencia (coinglass, bitcointreasuries). ---- */
+const GOV_BTC_HOLDINGS = [
+  { name: 'Estados Unidos', flag: '🇺🇸', btc: 198012 },
+  { name: 'China', flag: '🇨🇳', btc: 194000 },
+  { name: 'Reino Unido', flag: '🇬🇧', btc: 61245 },
+  { name: 'Ucrania', flag: '🇺🇦', btc: 46351 },
+  { name: 'Bután', flag: '🇧🇹', btc: 11285 },
+  { name: 'El Salvador', flag: '🇸🇻', btc: 7474 },
+  { name: 'Finlandia', flag: '🇫🇮', btc: 90 },
+  { name: 'Georgia', flag: '🇬🇪', btc: 66 },
+  { name: 'Roswell, Nuevo México (EE.UU.)', flag: '🏙️', btc: 0.1684 },
+  { name: 'Alemania', flag: '🇩🇪', btc: 0.0068 },
+];
+const BTC_MAX_SUPPLY = 21000000;
+function renderGovTreasuries(){
+  const total = GOV_BTC_HOLDINGS.reduce((sum, g) => sum + g.btc, 0);
+  document.getElementById('govTotalBtc').textContent = Math.round(total).toLocaleString('es-ES') + ' BTC';
+  document.getElementById('govDominance').textContent = (total / BTC_MAX_SUPPLY * 100).toFixed(2) + '%';
+  document.getElementById('govCount').textContent = GOV_BTC_HOLDINGS.length;
+
+  renderTopBars(document.getElementById('govTopBars'), GOV_BTC_HOLDINGS);
+
+  const listEl = document.getElementById('govList');
+  listEl.innerHTML = GOV_BTC_HOLDINGS.map((g, i) => {
+    const pct = g.btc / BTC_MAX_SUPPLY * 100;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--border2);font-family:'Space Grotesk',sans-serif">
+        <div style="width:22px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--muted);text-align:right">${i + 1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;color:var(--white);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.flag} ${g.name}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-weight:800;color:var(--white);font-size:13.5px">${fmtBtcShort(g.btc)}</div>
+          <div style="font-size:11.5px;font-weight:700;color:#f0b23d">${pct.toFixed(3)}% del total</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+let govTreasuriesLoadedOnce = false;
+function ensureGovTreasuriesLoaded(){ if(!govTreasuriesLoadedOnce){ govTreasuriesLoadedOnce = true; renderGovTreasuries(); } }
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){
@@ -22687,14 +22810,17 @@ setInterval(updateMarketSessions, 1000);
 </script>
 <script>
 (function(){
-  function randomizeSpark(s, isPreview){
+  function placeSpark(s, isPreview){
     var depth=Math.random();
-    var peak=(0.3+depth*0.7).toFixed(2);
     var size=isPreview ? (2+depth*2.2) : (1.3+depth*2.4);
     s.style.left=(Math.random()*92+3)+'%';
     s.style.top=(Math.random()*80+8)+'%';
     s.style.width=size.toFixed(1)+'px';
     s.style.height=size.toFixed(1)+'px';
+  }
+  function randomizeSpark(s){
+    var depth=Math.random();
+    var peak=(0.3+depth*0.7).toFixed(2);
     s.style.setProperty('--peak', peak);
     s.style.animationDuration=(6+Math.random()*6).toFixed(2)+'s';
   }
@@ -22702,9 +22828,10 @@ setInterval(updateMarketSessions, 1000);
     for(var i=0;i<count;i++){
       var s=document.createElement('div');
       s.className='spark';
-      randomizeSpark(s, isPreview);
+      placeSpark(s, isPreview);
+      randomizeSpark(s);
       s.style.animationDelay=(Math.random()*6).toFixed(2)+'s';
-      s.addEventListener('animationiteration', function(){ randomizeSpark(this, isPreview); });
+      s.addEventListener('animationiteration', function(){ randomizeSpark(this); });
       container.appendChild(s);
     }
   }
