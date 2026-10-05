@@ -22346,6 +22346,7 @@ let bubblesNodes = [];
 let bubblesAnimHandle = null;
 let bubblesSettleFrames = 0;
 let bubblesMode = 'settle'; // 'settle' (asentandose, fisica fuerte) | 'ambient' (flotando, para siempre)
+let bubblesDragNode = null; // la burbuja que se esta arrastrando con el mouse/dedo ahora mismo, o null
 let bubblesCanvas = null, bubblesCtx = null, bubblesResizeObserver = null;
 const bubblesImgCache = {}; // url -> HTMLImageElement, compartido entre todas las burbujas/paginas
 const BUBBLES_SETTLE_FRAMES = 130;
@@ -22398,8 +22399,15 @@ function setupBubblesCanvas(){
     bubblesResizeObserver = new ResizeObserver(() => handleBubblesResize());
     bubblesResizeObserver.observe(document.getElementById('bubblesWrap'));
   }
-  bubblesCanvas.addEventListener('mousemove', onBubblesMouseMove);
-  bubblesCanvas.addEventListener('mouseleave', () => { document.getElementById('bubblesTooltip').style.display = 'none'; });
+  bubblesCanvas.style.touchAction = 'none'; // sin esto, arrastrar una burbuja en celular hace scroll de la pagina
+  bubblesCanvas.style.cursor = 'grab';
+  // pointermove/down/up cubren mouse, tactil y lapiz en un solo set de eventos - no hace
+  // falta mousemove aparte
+  bubblesCanvas.addEventListener('pointermove', onBubblesMouseMove);
+  bubblesCanvas.addEventListener('pointerleave', () => { if(!bubblesDragNode) document.getElementById('bubblesTooltip').style.display = 'none'; });
+  bubblesCanvas.addEventListener('pointerdown', onBubblesPointerDown);
+  bubblesCanvas.addEventListener('pointerup', onBubblesPointerUp);
+  bubblesCanvas.addEventListener('pointercancel', onBubblesPointerUp);
   document.getElementById('bubblesTfRow').addEventListener('click', (e) => {
     const btn = e.target.closest('.tf-pill');
     if(!btn) return;
@@ -22451,9 +22459,27 @@ function bubblesGetImg(url){
 // capitalizacion) - a pedido explicito, para que se vea cual moneda se movio mas en 1H/1D/
 // 1W/1M/1Y, igual que el sitio de referencia. Cual CONJUNTO de monedas se muestra (el rango
 // "Top 1-100" etc.) si sigue siendo por capitalizacion - esa parte no cambio.
-function bubblesWeightFor(row){
+//
+// Bug real que hubo aqui: usar el % crudo de las 100 monedas para fijar la escala se rompe
+// con datos reales, porque casi siempre hay una moneda rara con un % disparatado (ej. +5000%
+// en un mes, comun en monedas de muy baja capitalizacion/baja liquidez) - esa UNICA moneda
+// infla tanto la suma que la escala resultante deja a las otras 99 todas pegadas al tamano
+// minimo (se ven "todas iguales"). La correccion es "capar" (winsorizar) los valores antes de
+// escalar: por encima del percentil 85 del propio grupo, todo se trata como si fuera ese
+// percentil x2.2 - la moneda mas extrema SIGUE siendo la mas grande (llega al tope), pero ya
+// no arruina la comparacion del resto. CryptoBubbles.io no publica su formula exacta (es
+// cerrada), asi que esto es una tecnica estandar de visualizacion de datos para el mismo
+// problema (outliers que aplastan la escala), no una copia de la suya.
+function bubblesSizeCapFor(rows){
+  const mags = rows.map(r => Math.abs(r[bubblesActiveTf] == null ? 0 : r[bubblesActiveTf])).sort((a, b) => a - b);
+  if(!mags.length) return 1;
+  const p85 = mags[Math.floor(mags.length * 0.85)];
+  return Math.max(p85 * 2.2, 5);
+}
+function bubblesWeightFor(row, cap){
   const pct = row[bubblesActiveTf];
-  return Math.sqrt(Math.abs(pct == null ? 0 : pct));
+  const mag = Math.abs(pct == null ? 0 : pct);
+  return Math.sqrt(Math.min(mag, cap));
 }
 // el radio es proporcional a la raiz del %, no al % directo (area proporcional, no el radio) -
 // pero la ESCALA de esa proporcion no puede ser fija: en 1H casi todos los % son chiquitos y en
@@ -22461,7 +22487,8 @@ function bubblesWeightFor(row){
 // fraccion del lienzo, cualquiera sea la temporalidad. La fraccion es 0.4 (no 1) para que quede
 // aire real entre ellas - burbujas de verdad flotan con espacio, no vienen pegadas.
 function computeBubbleRadii(rows, w, h){
-  const weights = rows.map(bubblesWeightFor);
+  const cap = bubblesSizeCapFor(rows);
+  const weights = rows.map(r => bubblesWeightFor(r, cap));
   const sumSq = weights.reduce((s, wt) => s + wt * wt, 0) || 1;
   const targetArea = w * h * 0.4;
   const scale = Math.sqrt(targetArea / (Math.PI * sumSq));
@@ -22507,6 +22534,9 @@ const BUBBLES_COLLISION_PASSES = 3; // varias pasadas por cuadro = converge much
                                      // a "sin encimes" cuando hay muchas burbujas de tamano
                                      // parecido (una sola pasada tarda demasiados cuadros)
 const BUBBLES_GAP = 7;
+// mientras se arrastra una burbuja con el mouse/dedo, esa burbuja actua como un obstaculo fijo
+// en la posicion del cursor (las demas le hacen espacio empujandose, pero ella no se mueve por
+// la colision) - asi es como se comporta en el sitio de referencia.
 function resolveBubblesCollisions(){
   const n = bubblesNodes.length;
   for(let pass = 0; pass < BUBBLES_COLLISION_PASSES; pass++){
@@ -22518,10 +22548,12 @@ function resolveBubblesCollisions(){
         const minDist = a.r + b.r + BUBBLES_GAP;
         if(dist < minDist){
           if(dist < 0.01){ dx = Math.random() - 0.5; dy = Math.random() - 0.5; dist = 0.01; }
-          const overlap = (minDist - dist) / 2;
+          const overlap = minDist - dist;
           const nx = dx / dist, ny = dy / dist;
-          a.x -= nx * overlap; a.y -= ny * overlap;
-          b.x += nx * overlap; b.y += ny * overlap;
+          const aFixed = a === bubblesDragNode, bFixed = b === bubblesDragNode;
+          if(aFixed){ b.x += nx * overlap; b.y += ny * overlap; }
+          else if(bFixed){ a.x -= nx * overlap; a.y -= ny * overlap; }
+          else { a.x -= nx * overlap / 2; a.y -= ny * overlap / 2; b.x += nx * overlap / 2; b.y += ny * overlap / 2; }
         }
       }
     }
@@ -22531,11 +22563,13 @@ function resolveBubblesCollisions(){
 function stepBubblesSettle(w, h){
   const cx = w / 2, cy = h / 2;
   bubblesNodes.forEach(a => {
+    if(a === bubblesDragNode) return; // la arrastrada la mueve el cursor, no la fisica
     a.vx += (cx - a.x) * 0.0022;
     a.vy += (cy - a.y) * 0.0022;
   });
   resolveBubblesCollisions();
   bubblesNodes.forEach(a => {
+    if(a === bubblesDragNode) return;
     a.x += a.vx; a.y += a.vy;
     a.vx *= 0.82; a.vy *= 0.82;
     a.x = Math.max(a.r, Math.min(w - a.r, a.x));
@@ -22548,6 +22582,7 @@ function stepBubblesSettle(w, h){
 function stepBubblesAmbient(w, h){
   const cx = w / 2, cy = h / 2;
   bubblesNodes.forEach(a => {
+    if(a === bubblesDragNode) return;
     a.vx += (Math.random() - 0.5) * 0.05;
     a.vy += (Math.random() - 0.5) * 0.05;
     a.vx += (cx - a.x) * 0.0009;
@@ -22555,6 +22590,7 @@ function stepBubblesAmbient(w, h){
   });
   resolveBubblesCollisions();
   bubblesNodes.forEach(a => {
+    if(a === bubblesDragNode) return;
     a.x += a.vx; a.y += a.vy;
     a.vx *= 0.9; a.vy *= 0.9;
     a.x = Math.max(a.r, Math.min(w - a.r, a.x));
@@ -22683,21 +22719,57 @@ function drawBubbles(){
     }
   });
 }
-function onBubblesMouseMove(e){
-  const rect = bubblesCanvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-  let hit = null;
+function bubblesHitTest(mx, my){
   for(let i = bubblesNodes.length - 1; i >= 0; i--){
     const n = bubblesNodes[i];
     const dx = mx - n.x, dy = my - n.y;
-    if(dx * dx + dy * dy <= n.r * n.r){ hit = n; break; }
+    if(dx * dx + dy * dy <= n.r * n.r) return n;
   }
+  return null;
+}
+function bubblesPointerPos(e){
+  const rect = bubblesCanvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+function showBubbleTooltip(n){
   const tip = document.getElementById('bubblesTooltip');
-  if(!hit){ tip.style.display = 'none'; return; }
+  if(!n){ tip.style.display = 'none'; return; }
   tip.style.display = 'block';
-  tip.style.left = hit.x + 'px';
-  tip.style.top = (hit.y - hit.r) + 'px';
-  tip.innerHTML = '<b>' + hit.row.name + '</b> (' + hit.row.symbol + ')';
+  tip.style.left = n.x + 'px';
+  tip.style.top = (n.y - n.r) + 'px';
+  tip.innerHTML = '<b>' + n.row.name + '</b> (' + n.row.symbol + ')';
+}
+function onBubblesMouseMove(e){
+  if(bubblesDragNode){
+    const p = bubblesPointerPos(e);
+    bubblesDragNode.x = p.x - bubblesDragOffset.x;
+    bubblesDragNode.y = p.y - bubblesDragOffset.y;
+    showBubbleTooltip(bubblesDragNode);
+    return;
+  }
+  const p = bubblesPointerPos(e);
+  showBubbleTooltip(bubblesHitTest(p.x, p.y));
+}
+// arrastrar una burbuja: mientras se sostiene, sigue al cursor/dedo y actua como obstaculo
+// fijo para las demas (ver resolveBubblesCollisions) - las vecinas le hacen espacio, igual
+// que en el sitio de referencia. Pointer Events para que funcione con mouse y con tactil.
+let bubblesDragOffset = { x: 0, y: 0 };
+function onBubblesPointerDown(e){
+  const p = bubblesPointerPos(e);
+  const hit = bubblesHitTest(p.x, p.y);
+  if(!hit) return;
+  bubblesDragNode = hit;
+  bubblesDragOffset = { x: p.x - hit.x, y: p.y - hit.y };
+  hit.vx = 0; hit.vy = 0;
+  bubblesCanvas.setPointerCapture(e.pointerId);
+  bubblesCanvas.style.cursor = 'grabbing';
+  if(!bubblesAnimHandle) bubblesAnimHandle = requestAnimationFrame(bubblesTick);
+}
+function onBubblesPointerUp(e){
+  if(!bubblesDragNode) return;
+  bubblesDragNode = null;
+  bubblesCanvas.style.cursor = 'grab';
+  try{ bubblesCanvas.releasePointerCapture(e.pointerId); }catch(err){}
 }
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
