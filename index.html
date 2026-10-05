@@ -961,6 +961,8 @@ button{font-family:inherit;color:inherit}
 /* ===== GRAFICO AVANZADO (embed de TradingView) ===== */
 .tv-chart-wrap{position:relative;height:650px;max-height:80vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
 @media(max-width:700px){.tv-chart-wrap{height:480px}}
+.tv-gauge-wrap{position:relative;height:460px;max-height:70vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
+@media(max-width:700px){.tv-gauge-wrap{height:400px}}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
 .be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
@@ -1759,6 +1761,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
       </button>
+      <button class="sb-item" data-indic-jump="tagauge">
+        <span class="sb-item-icon">⏱️</span><span class="sb-item-label">Medidor Técnico</span>
+      </button>
+      <button class="sb-item" data-indic-jump="screener">
+        <span class="sb-item-icon">🧮</span><span class="sb-item-label">Screener de Criptomonedas</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -1768,6 +1776,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-indic-jump="cryptobubbles">
         <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
+      </button>
+      <button class="sb-item" data-indic-jump="cryptonews">
+        <span class="sb-item-icon">📰</span><span class="sb-item-label">Noticias en Vivo</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item" data-indic-jump="dominanciaguia">
@@ -1807,9 +1818,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="others">
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
+      <div class="indic-cat-label">⛓️ On-Chain</div>
+      <button class="sb-item" data-indic-jump="defitvl">
+        <span class="sb-item-icon">🔗</span><span class="sb-item-label">TVL Total de DeFi</span>
+      </button>
       <div class="indic-cat-label">🏛 Macro</div>
       <button class="sb-item" data-indic-jump="macroguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
+      <button class="sb-item" data-indic-jump="econcalendar">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
       </button>
       <button class="sb-item" data-indic-jump="dxy">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
@@ -2055,6 +2073,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tagauge">
+        <span class="sb-item-icon">⏱️</span><span class="sb-item-label">Medidor Técnico</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="screener">
+        <span class="sb-item-icon">🧮</span><span class="sb-item-label">Screener de Criptomonedas</span>
+      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
@@ -2064,6 +2088,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptobubbles">
         <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptonews">
+        <span class="sb-item-icon">📰</span><span class="sb-item-label">Noticias en Vivo</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dominanciaguia">
@@ -2103,9 +2130,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="others">
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
+      <div class="indic-cat-label">⛓️ On-Chain</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="defitvl">
+        <span class="sb-item-icon">🔗</span><span class="sb-item-label">TVL Total de DeFi</span>
+      </button>
       <div class="indic-cat-label">🏛 Macro</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="macroguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="econcalendar">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dxy">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
@@ -2990,6 +3024,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
+        <div class="indic-panel" data-indic="cryptonews" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Noticias en Vivo</h2>
+              </div>
+
+              <div class="tv-chart-wrap chart-breakout">
+                <div class="tradingview-widget-container" id="tvNewsContainer" style="height:100%;width:100%">
+                  <div class="tradingview-widget-container__widget"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📰 Feed de noticias cripto en vivo de <strong>TradingView</strong>, actualizado todo el día.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="indic-panel" data-indic="fng" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
@@ -3485,6 +3544,29 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 🪙 <b>OTHERS</b> = capitalización de todo el mercado cripto excluyendo el top 10 de monedas por capitalización — la parte "de cola larga" del mercado.<br>
                 📐 La línea verde es la <b>EMA de 200 semanas</b> — la referencia de tendencia de largo plazo más usada para altcoins.<br>
                 📊 El eje vertical usa escala logarítmica, histórico real completo.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="defitvl" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">TVL Total de DeFi</h2>
+              </div>
+
+              <div class="tv-chart-wrap chart-breakout">
+                <iframe src="https://defillama.com/chart/chain/All?theme=dark" loading="lazy" title="TVL Total DeFi - DefiLlama" style="width:100%;height:100%;border:none"></iframe>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🔗 <strong>TVL</strong> (Total Value Locked) = cuánto dinero hay depositado en protocolos DeFi (préstamos, exchanges descentralizados, staking, etc.) en todas las blockchains combinadas — un termómetro de cuánta confianza/actividad real hay en DeFi. Datos en vivo de <strong>DefiLlama</strong>.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -4020,6 +4102,56 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
+        <div class="indic-panel" data-indic="tagauge" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Medidor Técnico</h2>
+              </div>
+
+              <div class="tv-gauge-wrap chart-breakout">
+                <div class="tradingview-widget-container" id="tvGaugeContainer" style="height:100%;width:100%">
+                  <div class="tradingview-widget-container__widget"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                ⏱️ Resumen de <strong>TradingView</strong>: combina medias móviles e indicadores técnicos para dar una lectura rápida de "Compra fuerte" a "Venta fuerte" por símbolo y temporalidad.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="screener" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Screener de Criptomonedas</h2>
+              </div>
+
+              <div class="tv-chart-wrap chart-breakout">
+                <div class="tradingview-widget-container" id="tvScreenerContainer" style="height:100%;width:100%">
+                  <div class="tradingview-widget-container__widget"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🧮 Tabla en vivo de <strong>TradingView</strong> — ordena y filtra el mercado cripto por precio, cambio %, volumen, capitalización y más.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="indic-panel" data-indic="treasuries" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
@@ -4514,6 +4646,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
 
         <div id="macroIndicatorsContainer"></div>
+
+        <div class="indic-panel" data-indic="econcalendar" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Calendario Económico</h2>
+              </div>
+
+              <div class="tv-chart-wrap chart-breakout">
+                <div class="tradingview-widget-container" id="tvCalendarContainer" style="height:100%;width:100%">
+                  <div class="tradingview-widget-container__widget"></div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                📅 Calendario de eventos macroeconómicos en vivo de <strong>TradingView</strong> (CPI, decisiones de tasas, nómina no agrícola, etc.) — filtrado a EEUU y Eurozona, los que más mueven el mercado cripto.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="indic-panel" data-indic="btcxau" style="display:none">
           <div class="indic-chart-card">
@@ -7509,8 +7666,8 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
-  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
+  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }, { id: 'tvchart', label: 'Gráfico Avanzado' }, { id: 'tagauge', label: 'Medidor Técnico' }, { id: 'screener', label: 'Screener de Criptomonedas' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }, { id: 'cryptonews', label: 'Noticias en Vivo' }],
   mineria: [],
   macro: [
     { id: 'macroguia', label: '📖 Guía: ¿Cómo Leer los Indicadores?' },
@@ -7531,8 +7688,9 @@ const INDIC_GROUPS = {
     { id: 'netliquidity', label: 'Liquidez Neta' },
     { id: 'gdpgrowth', label: 'PIB (Crecimiento Real)' },
     { id: 'fedbalance', label: 'Balance de la Reserva Federal' },
+    { id: 'econcalendar', label: 'Calendario Económico' },
   ],
-  onchain: [],
+  onchain: [{ id: 'defitvl', label: 'TVL Total de DeFi' }],
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
@@ -7546,7 +7704,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', tagauge: 'trading', screener: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', cryptonews: 'sentimiento', defitvl: 'onchain', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7688,6 +7846,10 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
       if(btn.dataset.indic === 'rsimacdmap') ensureRsiHeatmapLoaded();
       if(btn.dataset.indic === 'tvchart') ensureTvChartLoaded();
+      if(btn.dataset.indic === 'tagauge') ensureTvGaugeLoaded();
+      if(btn.dataset.indic === 'screener') ensureTvScreenerLoaded();
+      if(btn.dataset.indic === 'cryptonews') ensureTvNewsLoaded();
+      if(btn.dataset.indic === 'econcalendar') ensureTvCalendarLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
       if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
       if(btn.dataset.indic === 'dombtc') ensureDomBtcLoaded();
@@ -7747,6 +7909,10 @@ function jumpToIndicator(id){
     if(id === 'optionsoi') ensureOptionsOiLoaded();
     if(id === 'rsimacdmap') ensureRsiHeatmapLoaded();
     if(id === 'tvchart') ensureTvChartLoaded();
+    if(id === 'tagauge') ensureTvGaugeLoaded();
+    if(id === 'screener') ensureTvScreenerLoaded();
+    if(id === 'cryptonews') ensureTvNewsLoaded();
+    if(id === 'econcalendar') ensureTvCalendarLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
     if(id === 'domall') ensureDomAllLoaded();
     if(id === 'dombtc') ensureDomBtcLoaded();
@@ -8635,6 +8801,7 @@ const INDIC_INDEX_CATEGORY_ORDER = [
   { group: 'sentimiento', label: 'Sentimiento' },
   { group: 'dominancia', label: 'Dominancia' },
   { group: 'altcoins', label: '🪙 Altcoins' },
+  { group: 'onchain', label: '⛓️ On-Chain' },
   { group: 'macro', label: '🏛 Macro' },
 ];
 function renderIndicIndexList(){
@@ -19773,6 +19940,8 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
   { id: 'rsimacdmap', icon: '🌡️', label: 'Mapa de Calor RSI + MACD + Estocástico', def: 'Combina tres indicadores técnicos a la vez (RSI, MACD y Estocástico) sobre el top 20 de monedas, en 6 temporalidades — solo marca una señal de Long/Short cuando los tres están de acuerdo.' },
   { id: 'tvchart', icon: '🕯️', label: 'Gráfico Avanzado', def: 'Gráfico de velas en vivo con indicadores técnicos reales, cambio de símbolo libre y herramientas de dibujo — un gráfico de trading de verdad, no un modelo propio.' },
+  { id: 'tagauge', icon: '⏱️', label: 'Medidor Técnico', def: 'Resumen rápido de Compra/Venta de BTC combinando medias móviles y osciladores en varias temporalidades — un termómetro técnico inmediato, sin tener que leer el gráfico completo.' },
+  { id: 'screener', icon: '🧮', label: 'Screener de Criptomonedas', def: 'Tabla comparativa en vivo de las principales criptomonedas — precio, cambio %, volumen y más — para detectar oportunidades sin revisar moneda por moneda.' },
 ];
 // las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
 // el id del contenedor que genera buildGuiaPanelHtml (id + 'Grid'), si no, el grid queda vacío
@@ -22371,6 +22540,94 @@ function ensureTvChartLoaded(){
     allow_symbol_change: true,
     hide_side_toolbar: false,
     studies: ['STD;RSI', 'STD;MACD'],
+  });
+  container.appendChild(script);
+}
+
+let tvGaugeLoadedOnce = false;
+function ensureTvGaugeLoaded(){
+  if(tvGaugeLoadedOnce) return;
+  tvGaugeLoadedOnce = true;
+  const container = document.getElementById('tvGaugeContainer');
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+  script.async = true;
+  script.textContent = JSON.stringify({
+    interval: '1D',
+    width: '100%',
+    height: '100%',
+    symbol: 'BINANCE:BTCUSDT',
+    showIntervalTabs: true,
+    displayMode: 'single',
+    locale: 'es',
+    colorTheme: 'dark',
+    isTransparent: false,
+  });
+  container.appendChild(script);
+}
+
+let tvScreenerLoadedOnce = false;
+function ensureTvScreenerLoaded(){
+  if(tvScreenerLoadedOnce) return;
+  tvScreenerLoadedOnce = true;
+  const container = document.getElementById('tvScreenerContainer');
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+  script.async = true;
+  script.textContent = JSON.stringify({
+    width: '100%',
+    height: '100%',
+    defaultColumn: 'overview',
+    screener_type: 'crypto_mkt',
+    displayCurrency: 'USD',
+    colorTheme: 'dark',
+    locale: 'es',
+    isTransparent: false,
+  });
+  container.appendChild(script);
+}
+
+let tvNewsLoadedOnce = false;
+function ensureTvNewsLoaded(){
+  if(tvNewsLoadedOnce) return;
+  tvNewsLoadedOnce = true;
+  const container = document.getElementById('tvNewsContainer');
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+  script.async = true;
+  script.textContent = JSON.stringify({
+    feedMode: 'market',
+    market: 'crypto',
+    colorTheme: 'dark',
+    isTransparent: false,
+    displayMode: 'regular',
+    width: '100%',
+    height: '100%',
+    locale: 'es',
+  });
+  container.appendChild(script);
+}
+
+let tvCalendarLoadedOnce = false;
+function ensureTvCalendarLoaded(){
+  if(tvCalendarLoadedOnce) return;
+  tvCalendarLoadedOnce = true;
+  const container = document.getElementById('tvCalendarContainer');
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+  script.async = true;
+  script.textContent = JSON.stringify({
+    colorTheme: 'dark',
+    isTransparent: false,
+    width: '100%',
+    height: '100%',
+    locale: 'es',
+    importanceFilter: '0,1',
+    countryFilter: 'us,eu',
   });
   container.appendChild(script);
 }
