@@ -1271,6 +1271,16 @@ img[src=""]{display:none}
 .alloc-bar-label.over b{color:var(--red)}
 .alloc-bar-label.ok b{color:var(--green)}
 
+/* ---- resumen grande del simulador de portafolio: arriba de todo, antes de la torta, para
+   que el total y la ganancia/pérdida se vean de un vistazo sin bajar a desplazar la página ---- */
+.pf-headline{text-align:center;padding:18px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:14px;margin-bottom:18px}
+.pf-headline-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.pf-headline-value{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(30px,6vw,42px);color:var(--white);letter-spacing:-.01em}
+.pf-headline-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.pf-headline-chip{font-family:'Space Mono',monospace;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.pf-headline-chip.pos{color:var(--green);border-color:rgba(46,204,113,.35);background:rgba(46,204,113,.1)}
+.pf-headline-chip.neg{color:var(--red);border-color:rgba(255,47,79,.35);background:rgba(255,47,79,.1)}
+
 /* SESIÓN GLOBAL (sidebar) */
 .sb-session{margin:0 12px 12px;padding:11px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;display:none;flex-direction:column;gap:8px}
 .sb-session-row{display:flex;align-items:center;gap:8px}
@@ -7157,6 +7167,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
             </div>
 
+            <div id="portfolioTotals"></div>
+
             <div class="cat-tabs" id="portfolioCatTabs">
               <button class="cat-tab active" data-cat="cripto">Cripto</button>
               <button class="cat-tab" data-cat="acciones">Acciones</button>
@@ -7185,8 +7197,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
             <div id="portfolioItemsList"></div>
             <div class="portfolio-empty" id="portfolioItemsEmpty" style="display:none">Todavía no agregaste ningún activo.</div>
-
-            <div id="portfolioTotals"></div>
 
             <button class="a-btn" id="openAvgSimBtn" type="button" style="display:none;margin:14px 0">🧮 Simular nueva compra (sin guardar)</button>
             <div id="avgSimBox"></div>
@@ -10020,10 +10030,10 @@ async function refreshLivePricesAndRender(){
     const idxIds = uniqueIds.filter(id => id.startsWith('idx:'));
     const comIds = uniqueIds.filter(id => id.startsWith('com:'));
 
-    // cripto: un solo batch a CoinGecko
+    // cripto: un solo batch a CoinGecko (con cambio 24h para el resumen de arriba)
     if(cryptoIds.length > 0){
       try{
-        const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(cryptoIds.join(',')) + '&vs_currencies=usd'));
+        const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(cryptoIds.join(',')) + '&vs_currencies=usd&include_24hr_change=true'));
         const data = await res.json();
         Object.assign(livePricesCache, data);
       } catch(err){ /* si falla, se muestra solo lo registrado */ }
@@ -10121,7 +10131,7 @@ function renderPortfolioItems(){
   const filtered = activeAssetFilter ? portfolioItems.filter(i => i.asset_id === activeAssetFilter) : portfolioItems;
 
   let totalTargetPct = 0;
-  let totalInvested = 0, totalCurrentValue = 0;
+  let totalInvested = 0, totalCurrentValue = 0, total24hAgoValue = 0;
 
   if(isPlan){
     filtered.forEach(item => {
@@ -10181,7 +10191,10 @@ function renderPortfolioItems(){
 
       const priceData = livePricesCache[item.asset_id];
       const currentPrice = priceData && typeof priceData.usd === 'number' ? priceData.usd : null;
-      totalCurrentValue += currentPrice !== null ? qty * currentPrice : qty * buyPrice;
+      const itemCurrentValue = currentPrice !== null ? qty * currentPrice : qty * buyPrice;
+      totalCurrentValue += itemCurrentValue;
+      const change24h = priceData && typeof priceData.usd_24h_change === 'number' ? priceData.usd_24h_change : null;
+      total24hAgoValue += change24h !== null ? itemCurrentValue / (1 + change24h / 100) : itemCurrentValue;
     });
 
     Object.values(groups).forEach(g => {
@@ -10227,7 +10240,7 @@ function renderPortfolioItems(){
     });
   }
 
-  renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue);
+  renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue, total24hAgoValue);
 }
 
 function showPfTooltip(tooltipEl, containerEl, html, clientX, clientY){
@@ -10807,7 +10820,7 @@ function renderAvgSimBox(){
   });
 }
 
-function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue){
+function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurrentValue, total24hAgoValue){
   const totalsEl = document.getElementById('portfolioTotals');
   if(isPlan){
     const over = totalTargetPct > 100;
@@ -10828,8 +10841,19 @@ function renderPortfolioTotals(isPlan, totalTargetPct, totalInvested, totalCurre
   } else {
     const gain = totalCurrentValue - totalInvested;
     const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
+    const change24h = totalCurrentValue - total24hAgoValue;
+    const change24hPct = total24hAgoValue > 0 ? (change24h / total24hAgoValue) * 100 : 0;
+    const has24h = total24hAgoValue > 0;
     totalsEl.innerHTML =
-      '<div class="summary-grid" style="margin-top:16px">' +
+      '<div class="pf-headline">' +
+        '<div class="pf-headline-label">Valor actual del portafolio</div>' +
+        '<div class="pf-headline-value">$' + totalCurrentValue.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
+        '<div class="pf-headline-chips">' +
+          (has24h ? '<span class="pf-headline-chip ' + (change24h >= 0 ? 'pos' : 'neg') + '">24h: ' + (change24h >= 0 ? '+' : '-') + '$' + numES(Math.abs(change24h), 2) + ' (' + (change24hPct >= 0 ? '+' : '') + numES(change24hPct, 1) + '%)</span>' : '') +
+          '<span class="pf-headline-chip ' + (gain >= 0 ? 'pos' : 'neg') + '">P/G total: ' + (gain >= 0 ? '+' : '-') + '$' + numES(Math.abs(gain), 2) + ' (' + (gainPct >= 0 ? '+' : '') + numES(gainPct, 1) + '%)</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="summary-grid" style="margin-top:14px">' +
         '<div class="sum-row"><span class="s-label">Total invertido</span><span class="s-val">$' + totalInvested.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
         '<div class="sum-row"><span class="s-label">Valor actual</span><span class="s-val">$' + totalCurrentValue.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span></div>' +
         '<div class="sum-row full"><span class="s-label">Ganancia / Pérdida total</span><span class="s-val ' + (gain >= 0 ? 'pos' : 'neg') + '">' + (gain >= 0 ? '+' : '-') + '$' + numES(Math.abs(gain), 2) + ' (' + (gainPct >= 0 ? '+' : '') + numES(gainPct, 1) + '%)</span></div>' +
