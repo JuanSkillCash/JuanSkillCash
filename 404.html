@@ -7631,7 +7631,7 @@ function renderIndicSubtabs(group){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.innerHTML = '';
     showIndicPanel(group);
-    if(group === 'cryptobubbles') ensureCryptoBubblesLoaded();
+    if(group === 'cryptobubbles'){ ensureCryptoBubblesLoaded(); resumeBubblesAnimation(); }
     return;
   }
   const items = INDIC_GROUPS[group] || [];
@@ -22345,8 +22345,10 @@ let bubblesActiveOffset = 0;
 let bubblesNodes = [];
 let bubblesAnimHandle = null;
 let bubblesSettleFrames = 0;
+let bubblesMode = 'settle'; // 'settle' (asentandose, fisica fuerte) | 'ambient' (flotando, para siempre)
 let bubblesCanvas = null, bubblesCtx = null, bubblesResizeObserver = null;
-const BUBBLES_SETTLE_FRAMES = 140;
+const bubblesImgCache = {}; // url -> HTMLImageElement, compartido entre todas las burbujas/paginas
+const BUBBLES_SETTLE_FRAMES = 130;
 const BUBBLES_PAGE_SIZE = 100;
 
 async function loadCryptoBubbles(){
@@ -22356,7 +22358,7 @@ async function loadCryptoBubbles(){
   try{
     const { data, error } = await sbClient
       .from('crypto_bubbles_latest')
-      .select('id,rank,symbol,name,price_usd,market_cap_usd,pct_1h,pct_24h,pct_7d,pct_30d,pct_1y,updated_at')
+      .select('id,rank,symbol,name,price_usd,market_cap_usd,pct_1h,pct_24h,pct_7d,pct_30d,pct_1y,logo_url,updated_at')
       .order('rank', { ascending: true });
     if(error) throw error;
     if(!data || !data.length) throw new Error('sin datos');
@@ -22431,6 +22433,20 @@ function handleBubblesResize(){
   drawBubbles();
 }
 
+function bubblesGetImg(url){
+  if(!url) return null;
+  let img = bubblesImgCache[url];
+  if(!img){
+    img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+    img.loaded = false;
+    img.addEventListener('load', () => { img.loaded = true; drawBubbles(); });
+    bubblesImgCache[url] = img;
+  }
+  return img;
+}
+
 function renderBubblesRange(){
   const wrap = document.getElementById('bubblesWrap');
   const w = wrap.clientWidth, h = wrap.clientHeight;
@@ -22440,13 +22456,15 @@ function renderBubblesRange(){
   // rango donde las capitalizaciones son parecidas (ej. 101-200), casi todas las burbujas salen
   // casi del mismo tamano maximo y sencillamente no caben sin encimarse. En vez de eso se calcula
   // el factor de escala que hace que la SUMA de areas quepa en una fraccion del lienzo,
-  // cualquiera sea la cantidad de burbujas o que tan parecidas sean sus capitalizaciones.
+  // cualquiera sea la cantidad de burbujas o que tan parecidas sean sus capitalizaciones. La
+  // fraccion es mas baja que "llenar todo" (0.4, no 1) para que quede aire real entre ellas -
+  // burbujas de verdad flotan con espacio, no vienen pegadas unas a otras.
   const weights = rows.map(r => Math.sqrt(r.market_cap_usd || 0));
   const sumSq = weights.reduce((s, wt) => s + wt * wt, 0) || 1;
-  const targetArea = w * h * 0.5;
+  const targetArea = w * h * 0.4;
   const scale = Math.sqrt(targetArea / (Math.PI * sumSq));
-  const minR = 11;
-  const absoluteMaxR = Math.max(34, Math.min(120, Math.min(w, h) / 3.4));
+  const minR = 13;
+  const absoluteMaxR = Math.max(34, Math.min(120, Math.min(w, h) / 3.6));
   bubblesNodes = rows.map((row, i) => {
     const r = Math.max(minR, Math.min(absoluteMaxR, scale * weights[i]));
     return {
@@ -22454,31 +22472,28 @@ function renderBubblesRange(){
       x: w / 2 + (Math.random() - 0.5) * w * 0.7,
       y: h / 2 + (Math.random() - 0.5) * h * 0.7,
       vx: 0, vy: 0,
+      img: bubblesGetImg(row.logo_url),
     };
   });
   startBubblesAnimation();
 }
 
 // colision + atraccion al centro, resuelta por posicion directa (estable y simple, no hace
-// falta un motor de fisica real para < 100 circulos)
+// falta un motor de fisica real para < 100 circulos). GAP = aire visible entre burbujas, para
+// que de verdad se vean como burbujas separadas y no como una mancha pegada.
 const BUBBLES_COLLISION_PASSES = 3; // varias pasadas por cuadro = converge mucho mas rapido
                                      // a "sin encimes" cuando hay muchas burbujas de tamano
                                      // parecido (una sola pasada tarda demasiados cuadros)
-function stepBubblesPhysics(w, h){
-  const cx = w / 2, cy = h / 2;
+const BUBBLES_GAP = 7;
+function resolveBubblesCollisions(){
   const n = bubblesNodes.length;
-  for(let i = 0; i < n; i++){
-    const a = bubblesNodes[i];
-    a.vx += (cx - a.x) * 0.0022;
-    a.vy += (cy - a.y) * 0.0022;
-  }
   for(let pass = 0; pass < BUBBLES_COLLISION_PASSES; pass++){
     for(let i = 0; i < n; i++){
       for(let j = i + 1; j < n; j++){
         const a = bubblesNodes[i], b = bubblesNodes[j];
         let dx = b.x - a.x, dy = b.y - a.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
-        const minDist = a.r + b.r + 2;
+        const minDist = a.r + b.r + BUBBLES_GAP;
         if(dist < minDist){
           if(dist < 0.01){ dx = Math.random() - 0.5; dy = Math.random() - 0.5; dist = 0.01; }
           const overlap = (minDist - dist) / 2;
@@ -22489,39 +22504,90 @@ function stepBubblesPhysics(w, h){
       }
     }
   }
-  for(let i = 0; i < n; i++){
-    const a = bubblesNodes[i];
+}
+// fase 1: "asentandose" - fuerzas fuertes para pasar rapido de disperso aleatorio a empacado
+function stepBubblesSettle(w, h){
+  const cx = w / 2, cy = h / 2;
+  bubblesNodes.forEach(a => {
+    a.vx += (cx - a.x) * 0.0022;
+    a.vy += (cy - a.y) * 0.0022;
+  });
+  resolveBubblesCollisions();
+  bubblesNodes.forEach(a => {
     a.x += a.vx; a.y += a.vy;
     a.vx *= 0.82; a.vy *= 0.82;
     a.x = Math.max(a.r, Math.min(w - a.r, a.x));
     a.y = Math.max(a.r, Math.min(h - a.r, a.y));
+  });
+}
+// fase 2: "flotando" - una vez asentadas, perpetuo e intencionalmente sutil: un empujoncito
+// aleatorio constante (como si flotaran en el agua) + la misma atraccion/colision pero mas
+// debil, para que nunca dejen de moverse un poco sin volverse caotico ni desarmar el empaque
+function stepBubblesAmbient(w, h){
+  const cx = w / 2, cy = h / 2;
+  bubblesNodes.forEach(a => {
+    a.vx += (Math.random() - 0.5) * 0.05;
+    a.vy += (Math.random() - 0.5) * 0.05;
+    a.vx += (cx - a.x) * 0.0009;
+    a.vy += (cy - a.y) * 0.0009;
+  });
+  resolveBubblesCollisions();
+  bubblesNodes.forEach(a => {
+    a.x += a.vx; a.y += a.vy;
+    a.vx *= 0.9; a.vy *= 0.9;
+    a.x = Math.max(a.r, Math.min(w - a.r, a.x));
+    a.y = Math.max(a.r, Math.min(h - a.r, a.y));
+  });
+}
+function bubblesPanelVisible(){
+  const panel = document.querySelector('.indic-panel[data-indic="cryptobubbles"]');
+  return !!panel && panel.style.display !== 'none';
+}
+function bubblesTick(){
+  if(!bubblesPanelVisible()){ bubblesAnimHandle = null; return; } // se retoma solo al volver (resumeBubblesAnimation)
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(bubblesMode === 'settle'){
+    stepBubblesSettle(w, h);
+    bubblesSettleFrames++;
+    if(bubblesSettleFrames >= BUBBLES_SETTLE_FRAMES) bubblesMode = 'ambient';
+  } else {
+    stepBubblesAmbient(w, h);
   }
+  drawBubbles();
+  bubblesAnimHandle = requestAnimationFrame(bubblesTick);
 }
 function startBubblesAnimation(){
   if(bubblesAnimHandle) cancelAnimationFrame(bubblesAnimHandle);
   bubblesSettleFrames = 0;
-  const tick = () => {
-    const wrap = document.getElementById('bubblesWrap');
-    stepBubblesPhysics(wrap.clientWidth, wrap.clientHeight);
-    drawBubbles();
-    bubblesSettleFrames++;
-    if(bubblesSettleFrames < BUBBLES_SETTLE_FRAMES){
-      bubblesAnimHandle = requestAnimationFrame(tick);
-    } else {
-      bubblesAnimHandle = null;
-    }
-  };
-  bubblesAnimHandle = requestAnimationFrame(tick);
+  bubblesMode = 'settle';
+  bubblesAnimHandle = requestAnimationFrame(bubblesTick);
+}
+// se llama cada vez que se vuelve a esta herramienta (no solo la primera vez) - si la
+// animacion se habia detenido por estar en otra pestana del menu, la retoma donde iba
+// (en el mismo modo en que iba, sin reiniciar el asentado)
+function resumeBubblesAnimation(){
+  if(bubblesNodes.length && !bubblesAnimHandle) bubblesAnimHandle = requestAnimationFrame(bubblesTick);
 }
 
 function bubblesColorFor(pct){
-  if(pct == null) return { fill: 'rgba(255,255,255,.08)', border: 'rgba(255,255,255,.2)', text: '#dfe3f0' };
+  if(pct == null) return { fill0: 'rgba(255,255,255,.16)', fill1: 'rgba(255,255,255,.05)', border: 'rgba(255,255,255,.28)', glow: 'rgba(255,255,255,.25)', text: '#dfe3f0' };
   const clamped = Math.max(-12, Math.min(12, pct));
   const intensity = Math.abs(clamped) / 12;
-  const alpha = (0.16 + intensity * 0.55).toFixed(2);
-  const borderAlpha = (0.5 + intensity * 0.5).toFixed(2);
-  if(pct >= 0) return { fill: `rgba(46,204,113,${alpha})`, border: `rgba(74,222,128,${borderAlpha})`, text: '#eafff2' };
-  return { fill: `rgba(255,47,79,${alpha})`, border: `rgba(255,90,110,${borderAlpha})`, text: '#ffeef0' };
+  if(pct >= 0) return {
+    fill0: `rgba(74,222,128,${(0.34 + intensity * 0.3).toFixed(2)})`,
+    fill1: `rgba(16,90,56,${(0.22 + intensity * 0.3).toFixed(2)})`,
+    border: `rgba(94,242,148,${(0.55 + intensity * 0.45).toFixed(2)})`,
+    glow: `rgba(74,222,128,${(0.3 + intensity * 0.45).toFixed(2)})`,
+    text: '#eafff2',
+  };
+  return {
+    fill0: `rgba(255,107,130,${(0.34 + intensity * 0.3).toFixed(2)})`,
+    fill1: `rgba(120,16,34,${(0.22 + intensity * 0.3).toFixed(2)})`,
+    border: `rgba(255,120,140,${(0.55 + intensity * 0.45).toFixed(2)})`,
+    glow: `rgba(255,47,79,${(0.3 + intensity * 0.45).toFixed(2)})`,
+    text: '#ffeef0',
+  };
 }
 function drawBubbles(){
   if(!bubblesCtx) return;
@@ -22531,24 +22597,66 @@ function drawBubbles(){
   bubblesNodes.forEach(n => {
     const pct = n.row[bubblesActiveTf];
     const c = bubblesColorFor(pct);
+
+    // brillo alrededor del borde - lo que hace que lea como burbuja/orbe y no como un circulo plano
+    bubblesCtx.save();
+    bubblesCtx.shadowColor = c.glow;
+    bubblesCtx.shadowBlur = Math.max(6, n.r * 0.5);
     bubblesCtx.beginPath();
     bubblesCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    bubblesCtx.fillStyle = c.fill;
-    bubblesCtx.fill();
-    bubblesCtx.lineWidth = 1.4;
+    bubblesCtx.lineWidth = 1.6;
     bubblesCtx.strokeStyle = c.border;
     bubblesCtx.stroke();
-    if(n.r > 20){
+    bubblesCtx.restore();
+
+    // relleno con degradado radial (mas claro arriba-izquierda, como luz pegandole al vidrio)
+    const grad = bubblesCtx.createRadialGradient(
+      n.x - n.r * 0.35, n.y - n.r * 0.4, n.r * 0.05,
+      n.x, n.y, n.r,
+    );
+    grad.addColorStop(0, c.fill0);
+    grad.addColorStop(1, c.fill1);
+    bubblesCtx.beginPath();
+    bubblesCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    bubblesCtx.fillStyle = grad;
+    bubblesCtx.fill();
+
+    // reflejo pequeno (el "brillito" de vidrio/burbuja real)
+    bubblesCtx.beginPath();
+    bubblesCtx.ellipse(n.x - n.r * 0.38, n.y - n.r * 0.42, n.r * 0.32, n.r * 0.18, -0.6, 0, Math.PI * 2);
+    bubblesCtx.fillStyle = 'rgba(255,255,255,.22)';
+    bubblesCtx.fill();
+
+    const hasLogo = n.img && n.img.loaded && n.r >= 16;
+    if(hasLogo){
+      const logoR = n.r * (n.r > 32 ? 0.46 : 0.56);
+      const logoCy = n.r > 32 ? n.y - n.r * 0.22 : n.y;
+      bubblesCtx.save();
+      bubblesCtx.beginPath();
+      bubblesCtx.arc(n.x, logoCy, logoR, 0, Math.PI * 2);
+      bubblesCtx.clip();
+      bubblesCtx.drawImage(n.img, n.x - logoR, logoCy - logoR, logoR * 2, logoR * 2);
+      bubblesCtx.restore();
+    }
+
+    // nombre: visible en casi todas (hasta las chiquitas), solo se omite en las verdaderamente
+    // diminutas donde el texto no cabria de forma legible
+    if(n.r >= 10){
       bubblesCtx.fillStyle = c.text;
       bubblesCtx.textAlign = 'center';
       bubblesCtx.textBaseline = 'middle';
-      const symFont = Math.max(10, Math.min(16, n.r * 0.34));
-      bubblesCtx.font = '800 ' + symFont.toFixed(0) + 'px Space Grotesk, sans-serif';
-      bubblesCtx.fillText(n.row.symbol, n.x, n.y - (n.r > 32 ? symFont * 0.5 : 0));
-      if(n.r > 32 && pct != null){
-        const pctFont = Math.max(9, symFont * 0.62);
-        bubblesCtx.font = '700 ' + pctFont.toFixed(0) + 'px Space Mono, monospace';
+      const symFont = Math.max(8.5, Math.min(15, n.r * 0.3));
+      bubblesCtx.font = '800 ' + symFont.toFixed(1) + 'px Space Grotesk, sans-serif';
+      const symY = hasLogo ? n.y + n.r * 0.38 : (n.r > 28 ? n.y - symFont * 0.5 : n.y);
+      bubblesCtx.fillText(n.row.symbol, n.x, symY);
+      if(!hasLogo && n.r > 28 && pct != null){
+        const pctFont = Math.max(8, symFont * 0.62);
+        bubblesCtx.font = '700 ' + pctFont.toFixed(1) + 'px Space Mono, monospace';
         bubblesCtx.fillText((pct >= 0 ? '+' : '') + pct.toFixed(1) + '%', n.x, n.y + symFont * 0.55);
+      } else if(hasLogo && n.r > 30 && pct != null){
+        const pctFont = Math.max(8, symFont * 0.58);
+        bubblesCtx.font = '700 ' + pctFont.toFixed(1) + 'px Space Mono, monospace';
+        bubblesCtx.fillText((pct >= 0 ? '+' : '') + pct.toFixed(1) + '%', n.x, symY + symFont * 0.95);
       }
     }
   });

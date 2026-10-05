@@ -16,6 +16,14 @@ request. Cada 10 minutos = ~4,320 llamadas/mes, muy por debajo del cupo. CoinPap
 solo actualiza sus propios numeros cada ~10 minutos en su plan gratis, asi que pedir mas
 seguido no traeria nada mas fresco.
 
+Logos: a diferencia del precio/market cap, el logo de cada moneda NO viene en /v1/tickers -
+hay que pedirlo moneda por moneda via /v1/coins/{id}. Pedir las 1000 en cada corrida saldria
+carisimo en cupo (1000 x 144 corridas/dia), asi que se cachean para siempre en la tabla
+crypto_bubbles_logos y cada corrida solo pide el logo de las monedas que TODAVIA no estan
+ahi (un tope por corrida) - en unas horas termina teniendo las 1000 en cache, y de ahi en
+adelante casi no vuelve a gastar cupo en esto (solo cuando entra una moneda nueva al top
+1000 que nunca se habia visto).
+
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
@@ -23,6 +31,7 @@ Variables de entorno requeridas:
 
 import os
 import sys
+import time
 import logging
 
 import requests
@@ -33,9 +42,13 @@ log = logging.getLogger("update_crypto_bubbles")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TABLE = "crypto_bubbles_latest"
+LOGOS_TABLE = "crypto_bubbles_logos"
 
 COINPAPRIKA_TICKERS_URL = "https://api.coinpaprika.com/v1/tickers"
+COINPAPRIKA_COIN_URL = "https://api.coinpaprika.com/v1/coins/{id}"
 TOP_N = 1000
+LOGOS_PER_RUN = 40  # tope de logos nuevos a pedir por corrida - de sobra para llenar el
+                     # cache de las 1000 monedas en pocas horas sin acercarse al cupo mensual
 
 REQUEST_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -88,12 +101,58 @@ def build_rows(coins):
     return rows
 
 
-def replace_table_rows(rows):
-    headers = {
+def sb_headers():
+    return {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
         "Content-Type": "application/json",
     }
+
+
+def fetch_cached_logos():
+    """Trae {id: logo_url} de TODO lo que ya esta cacheado (paginado, Supabase tope 1000
+    filas por defecto pero se pide explicito por si acaso)."""
+    out = {}
+    offset = 0
+    page_size = 1000
+    while True:
+        resp = requests.get(
+            f"{SUPABASE_URL}/rest/v1/{LOGOS_TABLE}?select=id,logo_url&limit={page_size}&offset={offset}",
+            headers=sb_headers(), timeout=30,
+        )
+        if resp.status_code >= 300:
+            raise RuntimeError(f"Supabase (logos select) respondio {resp.status_code}: {resp.text}")
+        page = resp.json()
+        for row in page:
+            out[row["id"]] = row.get("logo_url")
+        if len(page) < page_size:
+            break
+        offset += page_size
+    return out
+
+
+def fetch_logo(coin_id):
+    try:
+        resp = requests.get(COINPAPRIKA_COIN_URL.format(id=coin_id), headers=REQUEST_HEADERS, timeout=20)
+        if resp.status_code >= 300:
+            return None
+        return (resp.json() or {}).get("logo")
+    except requests.RequestException:
+        return None
+
+
+def upsert_logos(new_logos):
+    if not new_logos:
+        return
+    rows = [{"id": cid, "logo_url": url} for cid, url in new_logos.items()]
+    headers = dict(sb_headers(), **{"Prefer": "resolution=merge-duplicates,return=minimal"})
+    resp = requests.post(f"{SUPABASE_URL}/rest/v1/{LOGOS_TABLE}", json=rows, headers=headers, timeout=30)
+    if resp.status_code >= 300:
+        raise RuntimeError(f"Supabase (logos upsert) respondio {resp.status_code}: {resp.text}")
+
+
+def replace_table_rows(rows):
+    headers = sb_headers()
     # se borra todo y se reinserta - es una tabla de "ultima foto", no historico, asi que
     # reemplazar completo es lo mas simple y evita dejar filas viejas de monedas que salieron
     # del top 1000
@@ -130,6 +189,24 @@ def main():
         # estaba (datos viejos) que borrarla entera y dejar las burbujas vacias en el sitio
         log.error("No se armo ninguna fila - no se toca la tabla en Supabase, se aborta.")
         sys.exit(1)
+
+    cached_logos = fetch_cached_logos()
+    missing = [r["id"] for r in rows if r["id"] not in cached_logos]
+    log.info("Logos ya en cache: %d. Faltantes: %d.", len(cached_logos), len(missing))
+    new_logos = {}
+    for coin_id in missing[:LOGOS_PER_RUN]:
+        url = fetch_logo(coin_id)
+        if url:
+            new_logos[coin_id] = url
+        time.sleep(0.15)  # cortesia con la API publica, no hace falta mas
+    if new_logos:
+        upsert_logos(new_logos)
+        log.info("Logos nuevos cacheados esta corrida: %d.", len(new_logos))
+    cached_logos.update(new_logos)
+
+    for r in rows:
+        r["logo_url"] = cached_logos.get(r["id"])
+
     replace_table_rows(rows)
     log.info("Listo: burbujas cripto actualizadas en Supabase.")
 
