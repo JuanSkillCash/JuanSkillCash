@@ -22375,6 +22375,15 @@ async function loadCryptoBubbles(){
     loadingEl.style.display = 'none';
     wrapEl.style.display = 'none';
     errorEl.style.display = 'block';
+    // detalle tecnico visible temporalmente mientras se depura el primer despliegue de esta
+    // tabla nueva - sin esto el mensaje generico no deja saber si es RLS, tabla inexistente,
+    // columna con otro nombre, etc.
+    console.error('crypto_bubbles_latest:', err);
+    const detail = (err && (err.message || err.code || err.hint)) ? [err.message, err.code, err.hint].filter(Boolean).join(' · ') : String(err);
+    const detailEl = document.createElement('div');
+    detailEl.style.cssText = 'margin-top:6px;font-family:\'Space Mono\',monospace;font-size:10.5px;opacity:.7';
+    detailEl.textContent = 'Detalle: ' + detail;
+    errorEl.appendChild(detailEl);
   }
 }
 function ensureCryptoBubblesLoaded(){ if(!bubblesLoadedOnce){ bubblesLoadedOnce = true; loadCryptoBubbles(); } }
