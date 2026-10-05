@@ -952,6 +952,15 @@ button{font-family:inherit;color:inherit}
 .top-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#2563eb,#60a5fa);transition:width .6s cubic-bezier(.2,.8,.2,1)}
 .top-bar-value{width:88px;flex-shrink:0;font-size:12px;font-weight:800;color:var(--white);text-align:right;font-family:'Space Mono',monospace}
 @media(max-width:480px){.top-bar-label{width:84px;font-size:11px}.top-bar-value{width:70px;font-size:10.5px}}
+
+/* ===== BURBUJAS CRIPTO ===== */
+.bubbles-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.bubbles-canvas-wrap{position:relative;width:100%;height:640px;max-height:70vh;border-radius:14px;background:radial-gradient(ellipse 90% 80% at 50% 30%,rgba(255,255,255,.03),transparent 70%),#080c20;border:1px solid var(--border2);overflow:hidden}
+.bubbles-canvas-wrap canvas{display:block;width:100%;height:100%}
+.bubbles-tooltip{position:absolute;pointer-events:none;z-index:2;background:#0d1326;border:1px solid var(--border2);border-radius:8px;padding:7px 11px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;color:var(--white);white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translate(-50%,-115%)}
+.bubbles-tooltip b{font-weight:800}
+.bubbles-updated{margin-top:10px;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted2);text-align:right}
+@media(max-width:600px){.bubbles-canvas-wrap{height:480px}}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
 .be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
@@ -1666,6 +1675,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
+      <button class="sb-item" data-indic-jump="cryptobubbles">
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
+      </button>
       <div class="indic-cat-label">₿ BTC</div>
       <button class="sb-item" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
@@ -1955,6 +1967,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptobubbles">
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="bitcoinguia">
@@ -2940,6 +2955,56 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="calc-disclaimer" style="margin-top:18px">
                 🎟️ Cada boleto queda tal como se publicó — si una predicción falla, se marca como fallida, no se borra ni se edita.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="cryptobubbles" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Burbujas Cripto</h2>
+              </div>
+
+              <div class="bubbles-toolbar">
+                <div class="tf-pill-row" id="bubblesTfRow" style="margin:0">
+                  <button type="button" class="tf-pill active" data-tf="pct_1h">1H</button>
+                  <button type="button" class="tf-pill" data-tf="pct_24h">1D</button>
+                  <button type="button" class="tf-pill" data-tf="pct_7d">1W</button>
+                  <button type="button" class="tf-pill" data-tf="pct_30d">1M</button>
+                  <button type="button" class="tf-pill" data-tf="pct_1y">1Y</button>
+                </div>
+                <select id="bubblesRangeSelect" class="asset-filter-select" style="max-width:220px" aria-label="Rango de monedas">
+                  <option value="0">Top 1 - 100</option>
+                  <option value="100">Top 101 - 200</option>
+                  <option value="200">Top 201 - 300</option>
+                  <option value="300">Top 301 - 400</option>
+                  <option value="400">Top 401 - 500</option>
+                  <option value="500">Top 501 - 600</option>
+                  <option value="600">Top 601 - 700</option>
+                  <option value="700">Top 701 - 800</option>
+                  <option value="800">Top 801 - 900</option>
+                  <option value="900">Top 901 - 1000</option>
+                </select>
+              </div>
+
+              <div id="bubblesLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando datos…</div>
+              <div id="bubblesError" class="calc-disclaimer" style="display:none">⚠️ No se pudo cargar el mapa de burbujas ahora mismo. Intenta de nuevo en un momento.</div>
+
+              <div id="bubblesWrap" class="bubbles-canvas-wrap" style="display:none">
+                <canvas id="bubblesCanvas"></canvas>
+                <div id="bubblesTooltip" class="bubbles-tooltip" style="display:none"></div>
+              </div>
+              <div class="bubbles-updated" id="bubblesUpdatedAt"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🫧 El tamaño de cada burbuja es su capitalización de mercado; el color y la intensidad son su % de cambio en la temporalidad elegida (verde = sube, rojo = baja). Datos de CoinPaprika, actualizados cada ~10 minutos.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -7508,7 +7573,7 @@ const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
 });
-const INDIC_LABELS = { guia: 'Guía', predicciones: 'Predicciones' };
+const INDIC_LABELS = { guia: 'Guía', predicciones: 'Predicciones', cryptobubbles: 'Burbujas Cripto' };
 Object.values(INDIC_GROUPS).flat().forEach(it => { INDIC_LABELS[it.id] = it.label; });
 // nombre completo de cada ticker, para que el buscador entienda tanto "SOL" como "Solana" —
 // si algún día se agrega una moneda que no esté aquí, simplemente no tiene nombre largo propio
@@ -7562,10 +7627,11 @@ function showIndicPanel(id){
   else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
-  if(group === 'guia' || group === 'predicciones'){
+  if(group === 'guia' || group === 'predicciones' || group === 'cryptobubbles'){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.innerHTML = '';
     showIndicPanel(group);
+    if(group === 'cryptobubbles') ensureCryptoBubblesLoaded();
     return;
   }
   const items = INDIC_GROUPS[group] || [];
@@ -7634,7 +7700,7 @@ function jumpToIndicator(id){
   // puede aterrizar a mitad del panel nuevo (más corto), mostrando solo las tarjetas/disclaimer
   // del final en vez del título y el gráfico
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const standalone = id === 'guia' || id === 'predicciones';
+  const standalone = id === 'guia' || id === 'predicciones' || id === 'cryptobubbles';
   const group = standalone ? id : (INDIC_ID_TO_GROUP[id] || 'guia');
   if(indicGroupTabs){
     indicGroupTabs.querySelectorAll('.indic-tab').forEach(b => b.classList.toggle('active', b.dataset.group === group));
@@ -7930,7 +7996,7 @@ function applyRoute(path){
   if(segs[0] === 'indicadores'){
     showCategoryDetail('indicadores');
     const seg = segs[1];
-    const id = seg ? ((seg === 'guia' || seg === 'predicciones') ? seg : INDIC_SLUG_TO_ID[seg]) : 'guia';
+    const id = seg ? ((seg === 'guia' || seg === 'predicciones' || seg === 'cryptobubbles') ? seg : INDIC_SLUG_TO_ID[seg]) : 'guia';
     if(id) jumpToIndicator(id);
   } else if(segs[0] === 'herramientas' && segs[1] && document.querySelector('.tool-section[data-category="' + segs[1] + '"]')){
     const cat = segs[1];
@@ -8567,6 +8633,10 @@ function renderIndicIndexList(){
     <button type="button" class="indic-index-standalone" data-jump="predicciones">
       <span class="indic-index-row-icon">🔮</span>
       <span class="indic-index-row-title">Predicciones de Precio</span>
+    </button>
+    <button type="button" class="indic-index-standalone" data-jump="cryptobubbles">
+      <span class="indic-index-row-icon">🫧</span>
+      <span class="indic-index-row-title">Burbujas Cripto</span>
     </button>
   `;
   INDIC_INDEX_CATEGORY_ORDER.forEach(cat => {
@@ -22258,6 +22328,238 @@ function renderGovTreasuries(){
 }
 let govTreasuriesLoadedOnce = false;
 function ensureGovTreasuriesLoaded(){ if(!govTreasuriesLoadedOnce){ govTreasuriesLoadedOnce = true; renderGovTreasuries(); } }
+
+/* ---- Burbujas Cripto: top 1000 monedas por capitalizacion, calculadas por un robot cada
+   10 minutos (scripts/update_crypto_bubbles.py, fuente CoinPaprika) y guardadas en Supabase -
+   igual que el mapa de calor RSI+MACD, ningun visitante le pide nada a ninguna API externa.
+   El tamano de cada burbuja es su capitalizacion (raiz cuadrada, para que el AREA sea
+   proporcional, no el radio); el color es su % de cambio en la temporalidad elegida. La
+   posicion se resuelve con una mini-simulacion fisica (colision + atraccion suave al centro)
+   que corre un numero fijo de cuadros y se detiene sola al asentarse - nunca mas de 100
+   burbujas a la vez (una "pagina" del selector de rango), asi que es liviana. Sin clic: parado
+   encima de una burbuja solo aparece su nombre completo, pedido explicito del usuario. ---- */
+let bubblesLoadedOnce = false;
+let bubblesAllRows = [];
+let bubblesActiveTf = 'pct_1h';
+let bubblesActiveOffset = 0;
+let bubblesNodes = [];
+let bubblesAnimHandle = null;
+let bubblesSettleFrames = 0;
+let bubblesCanvas = null, bubblesCtx = null, bubblesResizeObserver = null;
+const BUBBLES_SETTLE_FRAMES = 140;
+const BUBBLES_PAGE_SIZE = 100;
+
+async function loadCryptoBubbles(){
+  const loadingEl = document.getElementById('bubblesLoading');
+  const errorEl = document.getElementById('bubblesError');
+  const wrapEl = document.getElementById('bubblesWrap');
+  try{
+    const { data, error } = await sbClient
+      .from('crypto_bubbles_latest')
+      .select('id,rank,symbol,name,price_usd,market_cap_usd,pct_1h,pct_24h,pct_7d,pct_30d,pct_1y,updated_at')
+      .order('rank', { ascending: true });
+    if(error) throw error;
+    if(!data || !data.length) throw new Error('sin datos');
+    bubblesAllRows = data;
+
+    loadingEl.style.display = 'none';
+    wrapEl.style.display = 'block';
+    const updated = data[0].updated_at ? new Date(data[0].updated_at) : null;
+    document.getElementById('bubblesUpdatedAt').textContent = updated
+      ? 'Actualizado ' + updated.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+      : '';
+
+    setupBubblesCanvas();
+    renderBubblesRange();
+  } catch(err){
+    loadingEl.style.display = 'none';
+    wrapEl.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+}
+function ensureCryptoBubblesLoaded(){ if(!bubblesLoadedOnce){ bubblesLoadedOnce = true; loadCryptoBubbles(); } }
+
+function setupBubblesCanvas(){
+  bubblesCanvas = document.getElementById('bubblesCanvas');
+  bubblesCtx = bubblesCanvas.getContext('2d');
+  resizeBubblesCanvasBuffer();
+  if(!bubblesResizeObserver){
+    bubblesResizeObserver = new ResizeObserver(() => handleBubblesResize());
+    bubblesResizeObserver.observe(document.getElementById('bubblesWrap'));
+  }
+  bubblesCanvas.addEventListener('mousemove', onBubblesMouseMove);
+  bubblesCanvas.addEventListener('mouseleave', () => { document.getElementById('bubblesTooltip').style.display = 'none'; });
+  document.getElementById('bubblesTfRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tf-pill');
+    if(!btn) return;
+    document.querySelectorAll('#bubblesTfRow .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    bubblesActiveTf = btn.dataset.tf;
+    drawBubbles();
+  });
+  document.getElementById('bubblesRangeSelect').addEventListener('change', (e) => {
+    bubblesActiveOffset = parseInt(e.target.value, 10) || 0;
+    renderBubblesRange();
+  });
+}
+function resizeBubblesCanvasBuffer(){
+  const wrap = document.getElementById('bubblesWrap');
+  const dpr = window.devicePixelRatio || 1;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  bubblesCanvas.width = Math.max(1, w * dpr);
+  bubblesCanvas.height = Math.max(1, h * dpr);
+  bubblesCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function handleBubblesResize(){
+  if(!bubblesCanvas) return;
+  resizeBubblesCanvasBuffer();
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  bubblesNodes.forEach(n => {
+    n.x = Math.max(n.r, Math.min(w - n.r, n.x));
+    n.y = Math.max(n.r, Math.min(h - n.r, n.y));
+  });
+  drawBubbles();
+}
+
+function renderBubblesRange(){
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const rows = bubblesAllRows.slice(bubblesActiveOffset, bubblesActiveOffset + BUBBLES_PAGE_SIZE);
+  // el radio es proporcional a la raiz de la capitalizacion (area proporcional, no el radio
+  // directo) - pero la ESCALA de esa proporcion no puede ser fija por ancho de pantalla: en un
+  // rango donde las capitalizaciones son parecidas (ej. 101-200), casi todas las burbujas salen
+  // casi del mismo tamano maximo y sencillamente no caben sin encimarse. En vez de eso se calcula
+  // el factor de escala que hace que la SUMA de areas quepa en una fraccion del lienzo,
+  // cualquiera sea la cantidad de burbujas o que tan parecidas sean sus capitalizaciones.
+  const weights = rows.map(r => Math.sqrt(r.market_cap_usd || 0));
+  const sumSq = weights.reduce((s, wt) => s + wt * wt, 0) || 1;
+  const targetArea = w * h * 0.5;
+  const scale = Math.sqrt(targetArea / (Math.PI * sumSq));
+  const minR = 11;
+  const absoluteMaxR = Math.max(34, Math.min(120, Math.min(w, h) / 3.4));
+  bubblesNodes = rows.map((row, i) => {
+    const r = Math.max(minR, Math.min(absoluteMaxR, scale * weights[i]));
+    return {
+      row, r,
+      x: w / 2 + (Math.random() - 0.5) * w * 0.7,
+      y: h / 2 + (Math.random() - 0.5) * h * 0.7,
+      vx: 0, vy: 0,
+    };
+  });
+  startBubblesAnimation();
+}
+
+// colision + atraccion al centro, resuelta por posicion directa (estable y simple, no hace
+// falta un motor de fisica real para < 100 circulos)
+const BUBBLES_COLLISION_PASSES = 3; // varias pasadas por cuadro = converge mucho mas rapido
+                                     // a "sin encimes" cuando hay muchas burbujas de tamano
+                                     // parecido (una sola pasada tarda demasiados cuadros)
+function stepBubblesPhysics(w, h){
+  const cx = w / 2, cy = h / 2;
+  const n = bubblesNodes.length;
+  for(let i = 0; i < n; i++){
+    const a = bubblesNodes[i];
+    a.vx += (cx - a.x) * 0.0022;
+    a.vy += (cy - a.y) * 0.0022;
+  }
+  for(let pass = 0; pass < BUBBLES_COLLISION_PASSES; pass++){
+    for(let i = 0; i < n; i++){
+      for(let j = i + 1; j < n; j++){
+        const a = bubblesNodes[i], b = bubblesNodes[j];
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = a.r + b.r + 2;
+        if(dist < minDist){
+          if(dist < 0.01){ dx = Math.random() - 0.5; dy = Math.random() - 0.5; dist = 0.01; }
+          const overlap = (minDist - dist) / 2;
+          const nx = dx / dist, ny = dy / dist;
+          a.x -= nx * overlap; a.y -= ny * overlap;
+          b.x += nx * overlap; b.y += ny * overlap;
+        }
+      }
+    }
+  }
+  for(let i = 0; i < n; i++){
+    const a = bubblesNodes[i];
+    a.x += a.vx; a.y += a.vy;
+    a.vx *= 0.82; a.vy *= 0.82;
+    a.x = Math.max(a.r, Math.min(w - a.r, a.x));
+    a.y = Math.max(a.r, Math.min(h - a.r, a.y));
+  }
+}
+function startBubblesAnimation(){
+  if(bubblesAnimHandle) cancelAnimationFrame(bubblesAnimHandle);
+  bubblesSettleFrames = 0;
+  const tick = () => {
+    const wrap = document.getElementById('bubblesWrap');
+    stepBubblesPhysics(wrap.clientWidth, wrap.clientHeight);
+    drawBubbles();
+    bubblesSettleFrames++;
+    if(bubblesSettleFrames < BUBBLES_SETTLE_FRAMES){
+      bubblesAnimHandle = requestAnimationFrame(tick);
+    } else {
+      bubblesAnimHandle = null;
+    }
+  };
+  bubblesAnimHandle = requestAnimationFrame(tick);
+}
+
+function bubblesColorFor(pct){
+  if(pct == null) return { fill: 'rgba(255,255,255,.08)', border: 'rgba(255,255,255,.2)', text: '#dfe3f0' };
+  const clamped = Math.max(-12, Math.min(12, pct));
+  const intensity = Math.abs(clamped) / 12;
+  const alpha = (0.16 + intensity * 0.55).toFixed(2);
+  const borderAlpha = (0.5 + intensity * 0.5).toFixed(2);
+  if(pct >= 0) return { fill: `rgba(46,204,113,${alpha})`, border: `rgba(74,222,128,${borderAlpha})`, text: '#eafff2' };
+  return { fill: `rgba(255,47,79,${alpha})`, border: `rgba(255,90,110,${borderAlpha})`, text: '#ffeef0' };
+}
+function drawBubbles(){
+  if(!bubblesCtx) return;
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  bubblesCtx.clearRect(0, 0, w, h);
+  bubblesNodes.forEach(n => {
+    const pct = n.row[bubblesActiveTf];
+    const c = bubblesColorFor(pct);
+    bubblesCtx.beginPath();
+    bubblesCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    bubblesCtx.fillStyle = c.fill;
+    bubblesCtx.fill();
+    bubblesCtx.lineWidth = 1.4;
+    bubblesCtx.strokeStyle = c.border;
+    bubblesCtx.stroke();
+    if(n.r > 20){
+      bubblesCtx.fillStyle = c.text;
+      bubblesCtx.textAlign = 'center';
+      bubblesCtx.textBaseline = 'middle';
+      const symFont = Math.max(10, Math.min(16, n.r * 0.34));
+      bubblesCtx.font = '800 ' + symFont.toFixed(0) + 'px Space Grotesk, sans-serif';
+      bubblesCtx.fillText(n.row.symbol, n.x, n.y - (n.r > 32 ? symFont * 0.5 : 0));
+      if(n.r > 32 && pct != null){
+        const pctFont = Math.max(9, symFont * 0.62);
+        bubblesCtx.font = '700 ' + pctFont.toFixed(0) + 'px Space Mono, monospace';
+        bubblesCtx.fillText((pct >= 0 ? '+' : '') + pct.toFixed(1) + '%', n.x, n.y + symFont * 0.55);
+      }
+    }
+  });
+}
+function onBubblesMouseMove(e){
+  const rect = bubblesCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  let hit = null;
+  for(let i = bubblesNodes.length - 1; i >= 0; i--){
+    const n = bubblesNodes[i];
+    const dx = mx - n.x, dy = my - n.y;
+    if(dx * dx + dy * dy <= n.r * n.r){ hit = n; break; }
+  }
+  const tip = document.getElementById('bubblesTooltip');
+  if(!hit){ tip.style.display = 'none'; return; }
+  tip.style.display = 'block';
+  tip.style.left = hit.x + 'px';
+  tip.style.top = (hit.y - hit.r) + 'px';
+  tip.innerHTML = '<b>' + hit.row.name + '</b> (' + hit.row.symbol + ')';
+}
 
 /* ---- capturar como imagen y copiar al portapapeles (con respaldo de descarga) ---- */
 async function captureAndShare(elementId, filename){

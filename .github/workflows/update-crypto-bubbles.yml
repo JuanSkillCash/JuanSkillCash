@@ -1,0 +1,31 @@
+name: Actualizar burbujas cripto
+
+# Corre cada 10 minutos - CoinPaprika (la fuente que usa este robot) solo actualiza sus
+# propios numeros con esa misma frecuencia en el plan gratis, asi que pedir mas seguido no
+# traeria nada mas fresco. El minuto de arranque NO es 0 a proposito, por la misma razon que
+# el robot del RSI+MACD: ":00/:10/:20..." coincide con el momento de mas carga de todos los
+# cron de GitHub Actions a la vez.
+on:
+  schedule:
+    - cron: "3-59/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests
+
+      - name: Pedir top 1000 por capitalizacion a CoinPaprika y subir a Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_crypto_bubbles.py
