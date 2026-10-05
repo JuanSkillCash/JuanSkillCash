@@ -954,12 +954,12 @@ button{font-family:inherit;color:inherit}
 @media(max-width:480px){.top-bar-label{width:84px;font-size:11px}.top-bar-value{width:70px;font-size:10.5px}}
 
 /* ===== BURBUJAS CRIPTO (embed de cryptobubbles.net) ===== */
-.bubbles-iframe-wrap{position:relative;width:100%;height:800px;max-height:80vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
+.bubbles-iframe-wrap{position:relative;height:800px;max-height:80vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
 .bubbles-iframe-wrap iframe{display:block;width:100%;height:100%;border:none}
 @media(max-width:700px){.bubbles-iframe-wrap{height:600px}}
 
 /* ===== GRAFICO AVANZADO (embed de TradingView) ===== */
-.tv-chart-wrap{position:relative;width:100%;height:650px;max-height:80vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
+.tv-chart-wrap{position:relative;height:650px;max-height:80vh;border-radius:14px;overflow:hidden;border:1px solid var(--border2);background:#080c20}
 @media(max-width:700px){.tv-chart-wrap{height:480px}}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .be-savings-box{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(191,250,44,.16),rgba(191,250,44,.02) 70%);border:1px solid rgba(191,250,44,.3);border-radius:var(--r-lg);padding:26px 22px;margin:20px 0;text-align:center;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
@@ -2348,7 +2348,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
-        <div class="cat-overview-sub">50 INDICADORES</div>
+        <div class="cat-overview-sub" id="indicCountBadge">50 INDICADORES</div>
         <div class="cat-overview-preview">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
@@ -2978,7 +2978,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Burbujas Cripto</h2>
               </div>
 
-              <div class="bubbles-iframe-wrap">
+              <div class="bubbles-iframe-wrap chart-breakout">
                 <iframe src="https://cryptobubbles.net" loading="lazy" title="Crypto Bubbles" allowfullscreen></iframe>
               </div>
 
@@ -4005,7 +4005,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Gráfico Avanzado</h2>
               </div>
 
-              <div class="tv-chart-wrap">
+              <div class="tv-chart-wrap chart-breakout">
                 <div class="tradingview-widget-container" id="tvChartContainer" style="height:100%;width:100%">
                   <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
                   <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
@@ -7536,6 +7536,16 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
+// el numero en la tarjeta de "Indicadores de Mercado" (panorama de categorias) se calcula solo
+// a partir de INDIC_GROUPS - asi nunca se vuelve a desactualizar cuando se agregue/quite un
+// indicador (paso que se quedo olvidado varias veces seguidas al agregar uno nuevo a mano). No
+// cuentan las tarjetas "guia" (son cards de navegacion/combinador, no un indicador real).
+(function updateIndicCountBadge(){
+  const el = document.getElementById('indicCountBadge');
+  if(!el) return;
+  const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
+  el.textContent = count + ' INDICADORES';
+})();
 const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
@@ -19762,6 +19772,7 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'longshort', icon: '⚖️', label: 'Ratio Largo/Corto', def: 'Cuántos traders apuestan a que sube (largo) contra cuántos a que baja (corto) en futuros. Lecturas muy extremas en cualquier dirección suelen ser señal de un mercado "sobre-apalancado", con riesgo de liquidaciones en cadena.' },
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
   { id: 'rsimacdmap', icon: '🌡️', label: 'Mapa de Calor RSI + MACD + Estocástico', def: 'Combina tres indicadores técnicos a la vez (RSI, MACD y Estocástico) sobre el top 20 de monedas, en 6 temporalidades — solo marca una señal de Long/Short cuando los tres están de acuerdo.' },
+  { id: 'tvchart', icon: '🕯️', label: 'Gráfico Avanzado', def: 'Gráfico de velas en vivo con indicadores técnicos reales, cambio de símbolo libre y herramientas de dibujo — un gráfico de trading de verdad, no un modelo propio.' },
 ];
 // las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
 // el id del contenedor que genera buildGuiaPanelHtml (id + 'Grid'), si no, el grid queda vacío
