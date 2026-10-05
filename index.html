@@ -1671,9 +1671,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <button class="sb-item" data-indic-jump="cryptobubbles">
-        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
-      </button>
       <div class="indic-cat-label">₿ BTC</div>
       <button class="sb-item" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
@@ -1761,6 +1758,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button class="sb-item" data-indic-jump="btctrends">
         <span class="sb-item-icon">🔍</span><span class="sb-item-label">BTC + Google Trends</span>
+      </button>
+      <button class="sb-item" data-indic-jump="cryptobubbles">
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item" data-indic-jump="dominanciaguia">
@@ -1964,9 +1964,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptobubbles">
-        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
-      </button>
       <div class="indic-cat-label">₿ BTC</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
@@ -2054,6 +2051,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btctrends">
         <span class="sb-item-icon">🔍</span><span class="sb-item-label">BTC + Google Trends</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptobubbles">
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dominanciaguia">
@@ -7474,7 +7474,7 @@ const INDIC_GROUPS = {
   bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'rsimacdmap', label: 'Mapa de Calor RSI + MACD + Estocástico' }],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
   mineria: [],
   macro: [
     { id: 'macroguia', label: '📖 Guía: ¿Cómo Leer los Indicadores?' },
@@ -7500,7 +7500,7 @@ const INDIC_GROUPS = {
   dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
   altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7542,7 +7542,7 @@ const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
 });
-const INDIC_LABELS = { guia: 'Guía', predicciones: 'Predicciones', cryptobubbles: 'Burbujas Cripto' };
+const INDIC_LABELS = { guia: 'Guía', predicciones: 'Predicciones' };
 Object.values(INDIC_GROUPS).flat().forEach(it => { INDIC_LABELS[it.id] = it.label; });
 // nombre completo de cada ticker, para que el buscador entienda tanto "SOL" como "Solana" —
 // si algún día se agrega una moneda que no esté aquí, simplemente no tiene nombre largo propio
@@ -7596,7 +7596,7 @@ function showIndicPanel(id){
   else stopIndicAutoRefresh();
 }
 function renderIndicSubtabs(group){
-  if(group === 'guia' || group === 'predicciones' || group === 'cryptobubbles'){
+  if(group === 'guia' || group === 'predicciones'){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.innerHTML = '';
     showIndicPanel(group);
@@ -7668,7 +7668,7 @@ function jumpToIndicator(id){
   // puede aterrizar a mitad del panel nuevo (más corto), mostrando solo las tarjetas/disclaimer
   // del final en vez del título y el gráfico
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const standalone = id === 'guia' || id === 'predicciones' || id === 'cryptobubbles';
+  const standalone = id === 'guia' || id === 'predicciones';
   const group = standalone ? id : (INDIC_ID_TO_GROUP[id] || 'guia');
   if(indicGroupTabs){
     indicGroupTabs.querySelectorAll('.indic-tab').forEach(b => b.classList.toggle('active', b.dataset.group === group));
@@ -7964,7 +7964,7 @@ function applyRoute(path){
   if(segs[0] === 'indicadores'){
     showCategoryDetail('indicadores');
     const seg = segs[1];
-    const id = seg ? ((seg === 'guia' || seg === 'predicciones' || seg === 'cryptobubbles') ? seg : INDIC_SLUG_TO_ID[seg]) : 'guia';
+    const id = seg ? ((seg === 'guia' || seg === 'predicciones') ? seg : INDIC_SLUG_TO_ID[seg]) : 'guia';
     if(id) jumpToIndicator(id);
   } else if(segs[0] === 'herramientas' && segs[1] && document.querySelector('.tool-section[data-category="' + segs[1] + '"]')){
     const cat = segs[1];
@@ -8601,10 +8601,6 @@ function renderIndicIndexList(){
     <button type="button" class="indic-index-standalone" data-jump="predicciones">
       <span class="indic-index-row-icon">🔮</span>
       <span class="indic-index-row-title">Predicciones de Precio</span>
-    </button>
-    <button type="button" class="indic-index-standalone" data-jump="cryptobubbles">
-      <span class="indic-index-row-icon">🫧</span>
-      <span class="indic-index-row-title">Burbujas Cripto</span>
     </button>
   `;
   INDIC_INDEX_CATEGORY_ORDER.forEach(cat => {
