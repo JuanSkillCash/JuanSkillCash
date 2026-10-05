@@ -3004,7 +3004,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="bubbles-updated" id="bubblesUpdatedAt"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🫧 El tamaño de cada burbuja es su capitalización de mercado; el color y la intensidad son su % de cambio en la temporalidad elegida (verde = sube, rojo = baja). Datos de CoinPaprika, actualizados cada ~10 minutos.<br>
+                🫧 El tamaño de cada burbuja es cuánto se movió (en cualquier dirección) en la temporalidad elegida; el color y la intensidad son si subió o bajó (verde = sube, rojo = baja). El rango (Top 1-100, etc.) sí se elige por capitalización de mercado. Datos de CoinPaprika, actualizados cada ~10 minutos.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -22406,7 +22406,7 @@ function setupBubblesCanvas(){
     document.querySelectorAll('#bubblesTfRow .tf-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     bubblesActiveTf = btn.dataset.tf;
-    drawBubbles();
+    retargetBubblesForTf();
   });
   document.getElementById('bubblesRangeSelect').addEventListener('change', (e) => {
     bubblesActiveOffset = parseInt(e.target.value, 10) || 0;
@@ -22447,35 +22447,57 @@ function bubblesGetImg(url){
   return img;
 }
 
-function renderBubblesRange(){
-  const wrap = document.getElementById('bubblesWrap');
-  const w = wrap.clientWidth, h = wrap.clientHeight;
-  const rows = bubblesAllRows.slice(bubblesActiveOffset, bubblesActiveOffset + BUBBLES_PAGE_SIZE);
-  // el radio es proporcional a la raiz de la capitalizacion (area proporcional, no el radio
-  // directo) - pero la ESCALA de esa proporcion no puede ser fija por ancho de pantalla: en un
-  // rango donde las capitalizaciones son parecidas (ej. 101-200), casi todas las burbujas salen
-  // casi del mismo tamano maximo y sencillamente no caben sin encimarse. En vez de eso se calcula
-  // el factor de escala que hace que la SUMA de areas quepa en una fraccion del lienzo,
-  // cualquiera sea la cantidad de burbujas o que tan parecidas sean sus capitalizaciones. La
-  // fraccion es mas baja que "llenar todo" (0.4, no 1) para que quede aire real entre ellas -
-  // burbujas de verdad flotan con espacio, no vienen pegadas unas a otras.
-  const weights = rows.map(r => Math.sqrt(r.market_cap_usd || 0));
+// el tamano de cada burbuja es su % de cambio en la temporalidad elegida (no la
+// capitalizacion) - a pedido explicito, para que se vea cual moneda se movio mas en 1H/1D/
+// 1W/1M/1Y, igual que el sitio de referencia. Cual CONJUNTO de monedas se muestra (el rango
+// "Top 1-100" etc.) si sigue siendo por capitalizacion - esa parte no cambio.
+function bubblesWeightFor(row){
+  const pct = row[bubblesActiveTf];
+  return Math.sqrt(Math.abs(pct == null ? 0 : pct));
+}
+// el radio es proporcional a la raiz del %, no al % directo (area proporcional, no el radio) -
+// pero la ESCALA de esa proporcion no puede ser fija: en 1H casi todos los % son chiquitos y en
+// 1Y pueden ser enormes, asi que se calcula el factor que hace que la SUMA de areas quepa en una
+// fraccion del lienzo, cualquiera sea la temporalidad. La fraccion es 0.4 (no 1) para que quede
+// aire real entre ellas - burbujas de verdad flotan con espacio, no vienen pegadas.
+function computeBubbleRadii(rows, w, h){
+  const weights = rows.map(bubblesWeightFor);
   const sumSq = weights.reduce((s, wt) => s + wt * wt, 0) || 1;
   const targetArea = w * h * 0.4;
   const scale = Math.sqrt(targetArea / (Math.PI * sumSq));
   const minR = 13;
   const absoluteMaxR = Math.max(34, Math.min(120, Math.min(w, h) / 3.6));
-  bubblesNodes = rows.map((row, i) => {
-    const r = Math.max(minR, Math.min(absoluteMaxR, scale * weights[i]));
-    return {
-      row, r,
-      x: w / 2 + (Math.random() - 0.5) * w * 0.7,
-      y: h / 2 + (Math.random() - 0.5) * h * 0.7,
-      vx: 0, vy: 0,
-      img: bubblesGetImg(row.logo_url),
-    };
-  });
+  return weights.map(wt => Math.max(minR, Math.min(absoluteMaxR, scale * wt)));
+}
+
+function renderBubblesRange(){
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const rows = bubblesAllRows.slice(bubblesActiveOffset, bubblesActiveOffset + BUBBLES_PAGE_SIZE);
+  const radii = computeBubbleRadii(rows, w, h);
+  bubblesNodes = rows.map((row, i) => ({
+    row, r: radii[i],
+    x: w / 2 + (Math.random() - 0.5) * w * 0.7,
+    y: h / 2 + (Math.random() - 0.5) * h * 0.7,
+    vx: 0, vy: 0,
+    img: bubblesGetImg(row.logo_url),
+  }));
   startBubblesAnimation();
+}
+
+// al cambiar de temporalidad: mismas burbujas, mismo lugar - solo cambia el radio objetivo de
+// cada una, y se les da un empujoncito de reacomodo (reutilizando la fase "settle", mas fuerte
+// que el modo ambiente) para que crezcan/encojan y se acomoden sin encimarse, SIN volver a
+// dispersarlas al azar como en una carga nueva.
+function retargetBubblesForTf(){
+  if(!bubblesNodes.length) return;
+  const wrap = document.getElementById('bubblesWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const radii = computeBubbleRadii(bubblesNodes.map(n => n.row), w, h);
+  bubblesNodes.forEach((n, i) => { n.r = radii[i]; });
+  bubblesSettleFrames = 0;
+  bubblesMode = 'settle';
+  if(!bubblesAnimHandle) bubblesAnimHandle = requestAnimationFrame(bubblesTick);
 }
 
 // colision + atraccion al centro, resuelta por posicion directa (estable y simple, no hace
