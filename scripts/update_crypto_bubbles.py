@@ -47,6 +47,8 @@ LOGOS_TABLE = "crypto_bubbles_logos"
 COINPAPRIKA_TICKERS_URL = "https://api.coinpaprika.com/v1/tickers"
 COINPAPRIKA_COIN_URL = "https://api.coinpaprika.com/v1/coins/{id}"
 TOP_N = 1000
+FETCH_N = TOP_N + 30  # se pide un poco mas de lo que se guarda, para que al excluir
+                      # BTC/ETH/stablecoins sigan quedando 1000 filas reales, no 1000-18
 LOGOS_PER_RUN = 40  # tope de logos nuevos a pedir por corrida - de sobra para llenar el
                      # cache de las 1000 monedas en pocas horas sin acercarse al cupo mensual
 
@@ -59,7 +61,7 @@ REQUEST_HEADERS = {
 def fetch_tickers():
     resp = requests.get(
         COINPAPRIKA_TICKERS_URL,
-        params={"limit": TOP_N},
+        params={"limit": FETCH_N},
         headers=REQUEST_HEADERS,
         timeout=30,
     )
@@ -71,6 +73,17 @@ def fetch_tickers():
     return coins
 
 
+# BTC, ETH y las stablecoins se excluyen a pedido explicito: son tan grandes (BTC/ETH) o tan
+# planas (stablecoins, 0% de cambio siempre) que opacan visualmente al resto - el mapa de
+# burbujas es mas util para comparar el resto del mercado sin ellas. Misma lista de
+# stablecoins que ya usa update_rsi_heatmap.py, para no mantener dos listas distintas.
+EXCLUDED_SYMBOLS = {
+    "btc", "eth",
+    "usdt", "usdc", "dai", "busd", "tusd", "usdd", "fdusd", "pyusd", "usde",
+    "usds", "usdp", "gusd", "frax", "lusd", "susd", "eurc", "eurt",
+}
+
+
 def build_rows(coins):
     rows = []
     for c in coins:
@@ -79,6 +92,8 @@ def build_rows(coins):
         name = c.get("name")
         quotes = (c.get("quotes") or {}).get("USD") or {}
         if not c.get("id") or not rank or not symbol or not name:
+            continue
+        if symbol.lower() in EXCLUDED_SYMBOLS:
             continue
         # sin precio o sin market cap la burbuja no se puede dibujar (ni tamano ni color) -
         # se descarta en vez de guardar un 0 enganoso
@@ -98,6 +113,12 @@ def build_rows(coins):
             "pct_1y": quotes.get("percent_change_1y"),
         })
     rows.sort(key=lambda r: r["rank"])
+    rows = rows[:TOP_N]
+    # se renumera el rank sobre la lista YA filtrada - si no, "Top 1-100" en el selector de
+    # rango mostraria huecos (sin el puesto 1 y 2, que eran BTC/ETH) en vez de las 100
+    # siguientes monedas reales
+    for i, r in enumerate(rows, start=1):
+        r["rank"] = i
     return rows
 
 
@@ -179,7 +200,7 @@ def main():
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
         sys.exit(1)
 
-    log.info("Pidiendo top %d por capitalizacion a CoinPaprika...", TOP_N)
+    log.info("Pidiendo top %d por capitalizacion a CoinPaprika...", FETCH_N)
     coins = fetch_tickers()
     rows = build_rows(coins)
 
