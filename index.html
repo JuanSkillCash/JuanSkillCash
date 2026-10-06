@@ -21292,28 +21292,13 @@ function renderBtcAaplChart(){
   points.forEach((p, i) => { btcPriceLine += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(p.btcPrice).toFixed(1)} `; });
 
   // Canal de tendencia (superior por máximos, inferior por mínimos): UNA sola línea recta por
-  // canal, con el punto de INICIO fijado por el usuario en fechas exactas (verificadas por él
-  // contra su propio gráfico), no calculado - la verde empieza el 16 jul 2017, la roja el 16 dic
-  // 2017. El otro extremo que define la pendiente es el último toque real (máximo/mínimo genuino
-  // más reciente, no el dato de HOY) - para encontrar ESE sin que un giro reciente pequeño lo
-  // confunda, se usa una envolvente (convex hull) sobre el historial desde 2017, y se toma su
-  // penúltimo vértice (el último vértice es siempre forzosamente el dato de HOY, no un toque real)
+  // canal, con los DOS puntos fijados por el usuario en fechas exactas (verificadas por él contra
+  // su propio gráfico), nunca calculados - así ninguna de las dos líneas se mueve con el tiempo.
+  // Verde: empieza 16 jul 2017, termina 14 mar 2020. Roja: empieza 16 dic 2017, termina 13 mar 2021.
   const BTCAAPL_LOWER_START_MS = Date.UTC(2017, 6, 16); // 16 de julio de 2017
   const BTCAAPL_UPPER_START_MS = Date.UTC(2017, 11, 16); // 16 de diciembre de 2017
-  // la verde (inferior) seguía "el precio" de cerca porque su segundo punto (el último mínimo real
-  // detectado por la envolvente) resultó ser un mínimo muy reciente y chico, no el verdadero mínimo
-  // que define la tendencia - se fija también a mano, igual que el punto de inicio
   const BTCAAPL_LOWER_END_MS = Date.UTC(2020, 2, 14); // 14 de marzo de 2020
-  function crossProd(o, a, b){ return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x); }
-  // Andrew's monotone chain, solo la mitad inferior (puntos ya vienen ordenados por x/tiempo)
-  function lowerHull(pts){
-    const hull = [];
-    for(const p of pts){
-      while(hull.length >= 2 && crossProd(hull[hull.length - 2], hull[hull.length - 1], p) <= 0) hull.pop();
-      hull.push(p);
-    }
-    return hull;
-  }
+  const BTCAAPL_UPPER_END_MS = Date.UTC(2021, 2, 13); // 13 de marzo de 2021
   function nearestPointAt(ms){
     let best = allPoints[0], bestDiff = Infinity;
     for(const p of allPoints){
@@ -21338,20 +21323,8 @@ function renderBtcAaplChart(){
     const p = nearestPointAt(ms);
     return { x: p.t, y: Math.log10(p.ratio) };
   }
-  const trendPts = allPoints.filter(p => p.t >= Math.min(BTCAAPL_LOWER_START_MS, BTCAAPL_UPPER_START_MS)).map(p => ({ x: p.t, y: Math.log10(p.ratio) }));
-  let trendLineUpperHtml = '', trendLineLowerHtml = '';
-  if(trendPts.length >= 2){
-    // superior (roja): el segundo punto es el último máximo real detectado por la envolvente
-    // (su penúltimo vértice - el último es siempre forzosamente HOY, no un toque real)
-    const upperHull = lowerHull(trendPts.map(p => ({ x: p.x, y: -p.y }))).map(p => ({ x: p.x, y: -p.y }));
-    if(upperHull.length >= 2){
-      trendLineUpperHtml = straightLineHtml(pointAt(BTCAAPL_UPPER_START_MS), upperHull[upperHull.length - 2], '#ff2f4f');
-    }
-    // inferior (verde): los DOS puntos son fechas fijas (el último mínimo real que detectaba la
-    // envolvente resultó ser un mínimo muy reciente y chico, haciendo que la línea "siguiera el
-    // precio" en vez de ser una tendencia de verdad)
-    trendLineLowerHtml = straightLineHtml(pointAt(BTCAAPL_LOWER_START_MS), pointAt(BTCAAPL_LOWER_END_MS), '#22c55e');
-  }
+  const trendLineUpperHtml = straightLineHtml(pointAt(BTCAAPL_UPPER_START_MS), pointAt(BTCAAPL_UPPER_END_MS), '#ff2f4f');
+  const trendLineLowerHtml = straightLineHtml(pointAt(BTCAAPL_LOWER_START_MS), pointAt(BTCAAPL_LOWER_END_MS), '#22c55e');
 
   const lastPx = xFor(endMs), lastPyUpper = yForRatio(points[points.length - 1].ratio);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
