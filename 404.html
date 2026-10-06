@@ -7940,8 +7940,13 @@ function closeAnyOpenToolInline(){
   wrap.remove();
   toolDetailSlot.style.display = 'none';
   setCatLabelToolOpen(false);
-  const grid = document.querySelector('.tool-section[data-category="' + prevCategory + '"] .tool-grid');
+  const prevSectionEl = document.querySelector('.tool-section[data-category="' + prevCategory + '"]');
+  const grid = prevSectionEl ? prevSectionEl.querySelector('.tool-grid') : null;
   if(grid) grid.style.display = '';
+  const prevIntroTitle = prevSectionEl ? prevSectionEl.querySelector('.section-intro-title') : null;
+  const prevIntroText = prevSectionEl ? prevSectionEl.querySelector('.section-intro-text') : null;
+  if(prevIntroTitle) prevIntroTitle.style.display = '';
+  if(prevIntroText) prevIntroText.style.display = '';
   document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => pill.classList.remove('active'));
   document.querySelectorAll('[data-cat-home]').forEach(item => {
@@ -7956,8 +7961,15 @@ function openModalGeneric(overlay, panel, focusTarget){
     // si ya había otra herramienta abierta en línea (p.ej. la cambiaron desde el menú lateral sin cerrarla), se quita primero para que nunca queden dos apiladas
     const hadPreviousTool = !!toolDetailSlot.querySelector('.tool-detail-card');
     showCategoryDetail(category);
-    const grid = document.querySelector('.tool-section[data-category="' + category + '"] .tool-grid');
+    const sectionEl = document.querySelector('.tool-section[data-category="' + category + '"]');
+    const grid = sectionEl ? sectionEl.querySelector('.tool-grid') : null;
     if(grid) grid.style.display = 'none';
+    // la bienvenida de la categoria ("Bienvenido a...") es solo para cuando se esta viendo la
+    // cuadricula de tarjetas - con una herramienta puntual abierta no deberia seguir ahi debajo
+    const introTitle = sectionEl ? sectionEl.querySelector('.section-intro-title') : null;
+    const introText = sectionEl ? sectionEl.querySelector('.section-intro-text') : null;
+    if(introTitle) introTitle.style.display = 'none';
+    if(introText) introText.style.display = 'none';
     const wrap = document.createElement('div');
     wrap.className = 'tool-detail-card';
     wrap.dataset.category = category;
