@@ -1616,6 +1616,11 @@ img[src=""]{display:none}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
 .hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
 
+/* ---- precios en vivo del hero (widget externo de TheCoinPerspective, sin caja propia encima
+   para que se vea lo mas incrustado posible contra el fondo del sitio) ---- */
+.hero-live-prices{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;max-width:900px;margin:18px auto 0;padding:0 20px}
+.hero-price-widget{flex:1 1 300px;max-width:440px;width:100%;height:150px;border:none;background:transparent}
+
 /* ===== CINTA DE CRIPTOS ===== */
 .crypto-ticker{
   position:relative;overflow:hidden;margin:0 0 22px;padding:12px 0;
@@ -1637,6 +1642,8 @@ img[src=""]{display:none}
   .hero-mascot-text{padding:0}
   .hero-mascot-title{justify-content:center}
   .hero-mascot-desc{margin-left:auto;margin-right:auto}
+  .hero-live-prices{flex-direction:column;align-items:stretch}
+  .hero-price-widget{max-width:none}
 }
 
 /* Regla global (pedida por Juan): todo el sitio usa Space Grotesk — la misma tipografía redonda
@@ -2253,6 +2260,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
         <p class="hero-mascot-desc">Calculadoras, simuladores, indicadores de mercado y guías 100% gratuitas para operar cripto con criterio: trading, inversión, portafolio, seguridad y más — sin señales ni promesas vacías.</p>
       </div>
+    </div>
+
+    <div class="hero-live-prices">
+      <iframe class="hero-price-widget" loading="lazy" title="Precio en vivo de Bitcoin" src="https://thecoinperspective.com/widgets/coin?c=bitcoin&vs=bitcoin&fx=USD&stats=false&chart=false&theme=dark" frameborder="0" allowtransparency="true"></iframe>
+      <iframe class="hero-price-widget" loading="lazy" title="Precio en vivo de Ethereum" src="https://thecoinperspective.com/widgets/coin?c=ethereum&vs=bitcoin&fx=USD&stats=false&chart=false&theme=dark" frameborder="0" allowtransparency="true"></iframe>
     </div>
 
     <div class="crypto-ticker" aria-hidden="true">
