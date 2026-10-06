@@ -68,13 +68,6 @@
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;min-height:100vh}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 900px 480px at 12% -8%,rgba(255,47,79,.05),transparent 58%),
-    radial-gradient(ellipse 700px 420px at 100% 10%,rgba(240,178,61,.07),transparent 58%),
-    radial-gradient(ellipse 700px 500px at 20% 100%,rgba(46,204,113,.04),transparent 60%);
-}
 body::after{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.045;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -236,7 +229,7 @@ button{font-family:inherit;color:inherit}
   .market-overview .dom-card.halving{grid-column:1 / -1}
 }
 
-.fng-section{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(240,178,61,.12), transparent 65%), #080c20;border:1px solid rgba(240,178,61,.25);border-radius:0;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
+.fng-section{background:#080c20;border:1px solid rgba(240,178,61,.25);border-radius:0;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
@@ -276,9 +269,9 @@ button{font-family:inherit;color:inherit}
 .dom-card{
   background:#080c20;border:1px solid var(--border);border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
 }
-.dom-card.btc{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(240,178,61,.12), transparent 65%), #080c20;border-color:rgba(240,178,61,.25)}
-.dom-card.usdt{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(46,204,113,.12), transparent 65%), #080c20;border-color:rgba(46,204,113,.25)}
-.dom-card.halving{background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(255,47,79,.12), transparent 65%), #080c20;border-color:rgba(255,47,79,.25)}
+.dom-card.btc{background:#080c20;border-color:rgba(240,178,61,.25)}
+.dom-card.usdt{background:#080c20;border-color:rgba(46,204,113,.25)}
+.dom-card.halving{background:#080c20;border-color:rgba(255,47,79,.25)}
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -294,7 +287,7 @@ button{font-family:inherit;color:inherit}
   .market-sessions-row{gap:0}
 }
 .session-card{
-  background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(34,211,238,.1), transparent 65%), #080c20;
+  background:#080c20;
   border:1px solid rgba(34,211,238,.22);
   padding:9px 13px;display:flex;flex-direction:column;gap:4px
 }
@@ -388,7 +381,7 @@ button{font-family:inherit;color:inherit}
 .indic-guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
 .indic-guide-card{
   border-radius:14px;padding:18px;border:1px solid rgba(59,130,246,.22);
-  background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
+  background:#080c20;
   text-align:left;width:100%;display:block;font-family:inherit;
 }
 .indic-guide-card-link{cursor:pointer;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
@@ -490,7 +483,7 @@ button{font-family:inherit;color:inherit}
 .pred-result-stamp.win{color:#0fa34a}
 .indic-chart-card{
   border-radius:18px;padding:20px;border:1px solid rgba(59,130,246,.22);
-  background:radial-gradient(ellipse 130% 100% at 0% 0%,rgba(59,130,246,.1),transparent 65%),#080c20;
+  background:#080c20;
 }
 .indic-chart-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
 .indic-chart-eyebrow{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#60a5fa;margin-bottom:4px}
@@ -679,7 +672,7 @@ button{font-family:inherit;color:inherit}
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(5,4,7,.72);backdrop-filter:blur(10px) saturate(150%);-webkit-backdrop-filter:blur(10px) saturate(150%);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal-panel{background:linear-gradient(160deg,rgba(26,35,60,.6),rgba(9,13,28,.75));backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 60px rgba(255,47,79,.1);opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
+.modal-panel{background:rgba(8,12,32,.82);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 60px rgba(255,47,79,.1);opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
 .modal-panel::before{content:'';position:absolute;top:0;left:12%;right:12%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--red),var(--gold),transparent);opacity:.55}
 .modal-overlay.open .modal-panel{opacity:1;transform:translateY(0) scale(1)}
 .modal-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(6px);border:1px solid var(--border2);color:var(--white);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:background .2s,transform .2s}
@@ -690,7 +683,7 @@ button{font-family:inherit;color:inherit}
 .tool-detail-card{
   --bc:rgba(59,130,246,.45);--tint:rgba(59,130,246,.14);
   border-radius:18px;border:1px solid var(--bc);
-  background:radial-gradient(ellipse 130% 100% at 0% 0%,var(--tint),transparent 65%),#080c20;
+  background:#080c20;
   box-shadow:0 0 32px rgba(59,130,246,.1);
 }
 .modal-overlay.inline-mode{position:relative;inset:auto;display:block;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:auto;padding:0;overflow:visible}
@@ -1362,7 +1355,7 @@ img[src=""]{display:none}
 :root{ --bitunix-green:#bffa2c; }
 .promo-note{
   display:block;
-  background:radial-gradient(ellipse 130% 110% at 100% -10%,rgba(191,250,44,.12),transparent 60%),#080c20;
+  background:#080c20;
   border:1px solid rgba(191,250,44,.3);border-radius:14px;
   padding:15px 17px;text-decoration:none;transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out);
   box-shadow:var(--shadow-sm);
@@ -1397,7 +1390,7 @@ img[src=""]{display:none}
 .partner-block{
   position:relative;overflow:hidden;
   border-radius:22px;border:1px solid var(--pbc,var(--border2));
-  background:radial-gradient(ellipse 130% 110% at 100% -10%,var(--pt,rgba(255,255,255,.05)),transparent 60%),#080c20;
+  background:#080c20;
   padding:36px;margin-bottom:22px;
 }
 .partner-block:last-child{margin-bottom:0}
@@ -3121,7 +3114,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="indic-chart-btn" data-cycle="3">2024</button>
               </div>
 
-              <div class="dom-card" id="halvingMobileCountdown" style="display:none;margin-bottom:16px;background:radial-gradient(ellipse 130% 100% at 0% 0%, rgba(59,130,246,.12), transparent 65%), #080c20;border-color:rgba(59,130,246,.3)">
+              <div class="dom-card" id="halvingMobileCountdown" style="display:none;margin-bottom:16px;background:#080c20;border-color:rgba(59,130,246,.3)">
                 <div class="dom-card-label"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;color:#60a5fa"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo halving (estimado)</div>
                 <div class="dom-card-value halving-countdown-value" style="font-size:19px">—</div>
                 <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></div></div>
@@ -7943,8 +7936,10 @@ function closeAnyOpenToolInline(){
   const prevSectionEl = document.querySelector('.tool-section[data-category="' + prevCategory + '"]');
   const grid = prevSectionEl ? prevSectionEl.querySelector('.tool-grid') : null;
   if(grid) grid.style.display = '';
+  const prevCatLabel = prevSectionEl ? prevSectionEl.querySelector('.tool-cat-label') : null;
   const prevIntroTitle = prevSectionEl ? prevSectionEl.querySelector('.section-intro-title') : null;
   const prevIntroText = prevSectionEl ? prevSectionEl.querySelector('.section-intro-text') : null;
+  if(prevCatLabel) prevCatLabel.style.display = '';
   if(prevIntroTitle) prevIntroTitle.style.display = '';
   if(prevIntroText) prevIntroText.style.display = '';
   document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
@@ -7964,10 +7959,13 @@ function openModalGeneric(overlay, panel, focusTarget){
     const sectionEl = document.querySelector('.tool-section[data-category="' + category + '"]');
     const grid = sectionEl ? sectionEl.querySelector('.tool-grid') : null;
     if(grid) grid.style.display = 'none';
-    // la bienvenida de la categoria ("Bienvenido a...") es solo para cuando se esta viendo la
-    // cuadricula de tarjetas - con una herramienta puntual abierta no deberia seguir ahi debajo
+    // la bienvenida de la categoria ("Bienvenido a...", su etiqueta y su descripcion) es solo
+    // para cuando se esta viendo la cuadricula de tarjetas - con una herramienta puntual abierta
+    // no deberia seguir nada de eso ahi debajo
+    const catLabel = sectionEl ? sectionEl.querySelector('.tool-cat-label') : null;
     const introTitle = sectionEl ? sectionEl.querySelector('.section-intro-title') : null;
     const introText = sectionEl ? sectionEl.querySelector('.section-intro-text') : null;
+    if(catLabel) catLabel.style.display = 'none';
     if(introTitle) introTitle.style.display = 'none';
     if(introText) introText.style.display = 'none';
     const wrap = document.createElement('div');
