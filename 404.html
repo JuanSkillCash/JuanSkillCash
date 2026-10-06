@@ -966,6 +966,39 @@ button{font-family:inherit;color:inherit}
 .be-savings-box.is-loss{background:radial-gradient(ellipse 140% 100% at 50% -20%,rgba(255,47,79,.16),rgba(255,47,79,.02) 70%);border-color:rgba(255,47,79,.35)}
 .be-savings-box.is-loss .be-savings-value{color:var(--red);text-shadow:0 0 30px rgba(255,47,79,.35)}
 
+/* ---- Comparador de Market Cap: Moneda A y Moneda B lado a lado (no una sobre otra), con el
+   resultado abajo ocupando todo el ancho ---- */
+.mcap-howto{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.28);border-radius:var(--r-md);padding:13px 15px;font-size:13px;line-height:1.6;color:var(--muted2);margin-bottom:20px}
+.mcap-howto strong{color:#60a5fa}
+.mcap-pickers-row{display:flex;align-items:center;gap:18px}
+.mcap-picker-col{flex:1;min-width:0}
+.mcap-swap-col{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-top:24px}
+.mcap-swap-btn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--muted2);cursor:pointer;transition:transform var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+.mcap-swap-btn:hover{color:var(--white);border-color:var(--red)}
+.mcap-result-row{margin-top:4px}
+.mcap-rank-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;color:var(--white);margin-bottom:14px}
+.mcap-rank-list{display:flex;flex-direction:column;gap:10px}
+.mcap-rank-row{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;flex-wrap:wrap}
+.mcap-rank-idx{font-family:'Space Mono',monospace;font-weight:700;font-size:14px;color:var(--muted);width:22px;flex-shrink:0;text-align:center}
+.mcap-rank-coin{display:flex;align-items:center;gap:10px;min-width:170px}
+.mcap-rank-coin img{width:30px;height:30px;border-radius:50%;flex-shrink:0}
+.mcap-rank-coin-info{min-width:0}
+.mcap-rank-coin-name{font-weight:700;font-size:13.5px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcap-rank-coin-mcap{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--muted2);white-space:nowrap}
+.mcap-rank-stats{display:flex;gap:22px;margin-left:auto;flex-wrap:wrap}
+.mcap-rank-stat{text-align:right;min-width:90px}
+.mcap-rank-stat-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+.mcap-rank-stat-val{font-family:'Space Mono',monospace;font-weight:700;font-size:13.5px;color:var(--white)}
+.mcap-rank-stat-val.pos{color:var(--green)}
+.mcap-rank-stat-val.neg{color:var(--red)}
+@media(max-width:700px){
+  .mcap-pickers-row{flex-direction:column;align-items:stretch;gap:4px}
+  .mcap-swap-col{padding:2px 0;transform:rotate(90deg)}
+  .mcap-rank-row{gap:10px}
+  .mcap-rank-stats{gap:14px;margin-left:0;width:100%;justify-content:space-between}
+  .mcap-rank-stat{text-align:left}
+}
+
 /* DCA calculator */
 .dca-selected-asset{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-top:10px}
 img[src=""]{display:none}
@@ -5645,50 +5678,70 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <p class="calc-sub">¿Y si Moneda A tuviera la capitalización de Moneda B?</p>
       </div>
 
-      <div class="calc-body">
-      <div class="calc-inputs">
+      <div class="mcap-howto" id="mcapHowtoText">🧮 Elige la <strong>Moneda A</strong> (la que tienes o te interesa) y la <strong>Moneda B</strong> (la capitalización que quieres imitar) — te mostramos qué precio tendría A si todo su suministro circulante valiera lo mismo que el mercado total de B hoy.</div>
 
-        <div class="field" style="margin-bottom:4px">
-          <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🪙 Moneda A</label>
-        </div>
-        <div class="asset-search" id="mcapMyAssetSearchWrap">
-          <input type="text" id="mcapMyAssetSearch" class="search-highlight" placeholder="Busca la Moneda A (ej. Solana, Cardano...)" autocomplete="off">
-          <div class="asset-dropdown" id="mcapMyAssetDropdown"></div>
-        </div>
-        <div class="dca-selected-asset" id="mcapMySelectedAsset">
-          <img id="mcapMyAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
-          <div>
-            <div class="dca-selected-name" id="mcapMyAssetName">Solana (SOL)</div>
-            <div class="dca-selected-price" id="mcapMyAssetPrice">Cargando datos…</div>
+      <div class="mode-tabs">
+        <button type="button" class="mode-tab active" id="mcapModeSingleBtn" data-mcapmode="single">Comparar 1 a 1</button>
+        <button type="button" class="mode-tab" id="mcapModeRankingBtn" data-mcapmode="ranking">Vs. el Top de mercado</button>
+      </div>
+
+      <div class="mcap-layout">
+        <div class="mcap-pickers-row">
+          <div class="mcap-picker-col">
+            <div class="field" style="margin-bottom:4px">
+              <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🪙 Moneda A — la que proyectas</label>
+            </div>
+            <div class="asset-search" id="mcapMyAssetSearchWrap">
+              <input type="text" id="mcapMyAssetSearch" class="search-highlight" placeholder="Busca la Moneda A (ej. Solana, Cardano...)" autocomplete="off">
+              <div class="asset-dropdown" id="mcapMyAssetDropdown"></div>
+            </div>
+            <div class="dca-selected-asset" id="mcapMySelectedAsset">
+              <img id="mcapMyAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
+              <div>
+                <div class="dca-selected-name" id="mcapMyAssetName">Solana (SOL)</div>
+                <div class="dca-selected-price" id="mcapMyAssetPrice">Cargando datos…</div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div style="display:flex;justify-content:center;margin:10px 0">
-          <button type="button" id="btnMcapSwap" title="Intercambiar Moneda A y Moneda B" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--muted2);cursor:pointer;transition:transform var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4l4 4-4 4"/><path d="M17 8H5"/><path d="M7 12l-4 4 4 4"/><path d="M3 16h12"/></svg>
-          </button>
-        </div>
+          <div class="mcap-swap-col" id="mcapSwapCol">
+            <button type="button" id="btnMcapSwap" title="Intercambiar Moneda A y Moneda B" class="mcap-swap-btn">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4l4 4-4 4"/><path d="M17 8H5"/><path d="M7 12l-4 4 4 4"/><path d="M3 16h12"/></svg>
+            </button>
+          </div>
 
-        <div class="field" style="margin-top:0;margin-bottom:4px">
-          <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🎯 Moneda B</label>
-        </div>
-        <div class="asset-search" id="mcapTargetAssetSearchWrap">
-          <input type="text" id="mcapTargetAssetSearch" class="search-highlight" placeholder="Busca la Moneda B (ej. Bitcoin, Ethereum...)" autocomplete="off">
-          <div class="asset-dropdown" id="mcapTargetAssetDropdown"></div>
-        </div>
-        <div class="dca-selected-asset" id="mcapTargetSelectedAsset">
-          <img id="mcapTargetAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
-          <div>
-            <div class="dca-selected-name" id="mcapTargetAssetName">Bitcoin (BTC)</div>
-            <div class="dca-selected-price" id="mcapTargetAssetPrice">Cargando datos…</div>
+          <div class="mcap-picker-col" id="mcapTargetPickerCol">
+            <div class="field" style="margin-bottom:4px">
+              <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🎯 Moneda B — la capitalización meta</label>
+            </div>
+            <div class="asset-search" id="mcapTargetAssetSearchWrap">
+              <input type="text" id="mcapTargetAssetSearch" class="search-highlight" placeholder="Busca la Moneda B (ej. Bitcoin, Ethereum...)" autocomplete="off">
+              <div class="asset-dropdown" id="mcapTargetAssetDropdown"></div>
+            </div>
+            <div class="dca-selected-asset" id="mcapTargetSelectedAsset">
+              <img id="mcapTargetAssetImg" src="" alt="" onerror="this.style.display='none'" onload="this.style.display=''">
+              <div>
+                <div class="dca-selected-name" id="mcapTargetAssetName">Bitcoin (BTC)</div>
+                <div class="dca-selected-price" id="mcapTargetAssetPrice">Cargando datos…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mcap-picker-col" id="mcapRankTopNCol" style="display:none">
+            <div class="field" style="margin-bottom:4px">
+              <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">📊 Comparar contra</label>
+            </div>
+            <select class="asset-filter-select" id="mcapRankTopNSelect" style="width:100%">
+              <option value="50">Top 50 por capitalización</option>
+              <option value="100" selected>Top 100 por capitalización</option>
+              <option value="200">Top 200 por capitalización</option>
+            </select>
           </div>
         </div>
 
         <div class="be-note" style="margin-top:16px" id="mcapErrorNote"></div>
 
-      </div>
-
-      <div class="calc-results">
+        <div class="mcap-result-row" id="mcapSingleResultRow">
         <div class="be-savings-box" id="mcapResultBox">
           <div class="be-savings-label" id="mcapResultLabel">📌 Si Moneda A tuviera la capitalización de Moneda B...</div>
           <div class="be-savings-value" id="mcapHypoPrice">—</div>
@@ -5709,10 +5762,26 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </a>
       </div>
+
+        <div class="mcap-result-row" id="mcapRankingSection" style="display:none">
+          <div class="mcap-rank-head" id="mcapRankHead">¿Y si Moneda A alcanzara la capitalización de...?</div>
+          <div class="indic-chart-soon" id="mcapRankLoading">
+            <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+            <div class="indic-placeholder-title">Cargando datos…</div>
+            <div class="indic-placeholder-text">Descargando el top del mercado.</div>
+          </div>
+          <div class="indic-chart-soon" id="mcapRankError" style="display:none">
+            <div class="indic-placeholder-icon">⚠️</div>
+            <div class="indic-placeholder-title">No se pudo cargar el dato</div>
+            <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+          </div>
+          <div id="mcapRankList" style="display:none"></div>
+          <div class="be-note" style="margin-top:16px">💡 Igual que en la comparación 1 a 1: asume que <strong>todo el suministro circulante</strong> de la Moneda A se reparte el mismo valor de mercado que cada moneda de la lista — no considera si eso es realista ni cuánto tiempo podría tomar. La moneda elegida como A no aparece en su propia lista.</div>
+        </div>
       </div>
 
     </div>
-  
+
       <div class="tool-footer-links">
         <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
         <span>·</span>
@@ -12400,7 +12469,7 @@ const closeMcapCompare = document.getElementById('closeMcapCompare');
 function openMcapCompareModal(){
   openModalGeneric(mcapCompareModal, mcapComparePanel, closeMcapCompare);
   if(!mcapMySelected.marketCap || !mcapTargetSelected.marketCap) refreshMcapBothAssets();
-  else computeMcap();
+  else computeMcapActive();
   setRandomPromoText('promoTextMcap');
 }
 function closeMcapCompareModal(){ closeModalGeneric(mcapCompareModal); }
@@ -12519,7 +12588,7 @@ async function selectMcapAsset(coin, which){
     document.getElementById(priceId).textContent = 'No se pudo obtener el dato — intenta de nuevo';
     return;
   }
-  computeMcap();
+  computeMcapActive();
 }
 
 async function refreshMcapBothAssets(){
@@ -12537,7 +12606,7 @@ async function refreshMcapBothAssets(){
   } catch(err){
     document.getElementById('mcapErrorNote').textContent = '⚠️ No se pudo cargar los datos iniciales. Busca de nuevo tu moneda o la moneda meta para reintentar.';
   }
-  computeMcap();
+  computeMcapActive();
 }
 
 document.getElementById('btnMcapSwap').addEventListener('click', function(){
@@ -12550,7 +12619,7 @@ document.getElementById('btnMcapSwap').addEventListener('click', function(){
   document.getElementById('mcapTargetAssetPrice').textContent = mcapTargetSelected.marketCap ? 'Market cap: ' + numES(mcapTargetSelected.marketCap, 0) + ' USD' : 'Cargando datos…';
   this.style.transform = 'rotate(180deg)';
   setTimeout(() => { this.style.transform = 'rotate(0deg)'; }, 300);
-  computeMcap();
+  computeMcapActive();
 });
 
 function computeMcap(){
@@ -12580,6 +12649,115 @@ function computeMcap(){
     : 'Eso sería ' + numES(multiplier, 2) + 'x el precio actual (' + formatPrice(mcapMySelected.price) + ' USD) — una ganancia de ' + numES(pctChange, 1) + '%.';
   document.getElementById('mcapMultText').textContent = multText;
   document.getElementById('mcapResultBox').classList.toggle('is-loss', isLoss);
+}
+
+/* ---- modo "Vs. el Top de mercado": en vez de comparar contra UNA Moneda B, recorre el top N
+   del mercado (CoinGecko, ordenado por capitalización) y muestra, fila por fila, qué precio
+   tendría la Moneda A si alcanzara la capitalización de cada una ---- */
+let mcapMode = 'single';
+const mcapRankCache = {};
+const mcapRankFetchPromise = {};
+
+function computeMcapActive(){
+  if(mcapMode === 'ranking') computeMcapRanking();
+  else computeMcap();
+}
+
+function setMcapMode(mode){
+  mcapMode = mode;
+  document.getElementById('mcapModeSingleBtn').classList.toggle('active', mode === 'single');
+  document.getElementById('mcapModeRankingBtn').classList.toggle('active', mode === 'ranking');
+  document.getElementById('mcapTargetPickerCol').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('mcapSwapCol').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('mcapRankTopNCol').style.display = mode === 'ranking' ? '' : 'none';
+  document.getElementById('mcapSingleResultRow').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('mcapRankingSection').style.display = mode === 'ranking' ? '' : 'none';
+  document.getElementById('mcapHowtoText').innerHTML = mode === 'single'
+    ? '🧮 Elige la <strong>Moneda A</strong> (la que tienes o te interesa) y la <strong>Moneda B</strong> (la capitalización que quieres imitar) — te mostramos qué precio tendría A si todo su suministro circulante valiera lo mismo que el mercado total de B hoy.'
+    : '🧮 Elige la <strong>Moneda A</strong> — te mostramos, moneda por moneda, qué precio tendría si alcanzara la capitalización del top del mercado que elijas abajo.';
+  document.getElementById('mcapErrorNote').textContent = '';
+  computeMcapActive();
+}
+document.getElementById('mcapModeSingleBtn').addEventListener('click', () => setMcapMode('single'));
+document.getElementById('mcapModeRankingBtn').addEventListener('click', () => setMcapMode('ranking'));
+document.getElementById('mcapRankTopNSelect').addEventListener('change', () => { if(mcapMode === 'ranking') computeMcapRanking(); });
+
+async function fetchMcapRankList(topN){
+  if(mcapRankCache[topN]) return mcapRankCache[topN];
+  if(!mcapRankFetchPromise[topN]){
+    mcapRankFetchPromise[topN] = fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=' + topN + '&page=1&sparkline=false'))
+      .then(res => res.json())
+      .then(data => { mcapRankCache[topN] = Array.isArray(data) ? data : []; return mcapRankCache[topN]; })
+      .catch(err => { delete mcapRankFetchPromise[topN]; throw err; });
+  }
+  return mcapRankFetchPromise[topN];
+}
+
+async function computeMcapRanking(){
+  const headEl = document.getElementById('mcapRankHead');
+  const loadingEl = document.getElementById('mcapRankLoading');
+  const errorEl = document.getElementById('mcapRankError');
+  const listEl = document.getElementById('mcapRankList');
+
+  if(!mcapMySelected.marketCap || !mcapMySelected.circulatingSupply || !mcapMySelected.price){
+    headEl.textContent = '¿Y si tu moneda alcanzara la capitalización de...?';
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    listEl.style.display = 'none';
+    return;
+  }
+
+  headEl.textContent = '¿Y si ' + mcapMySelected.name + ' alcanzara la capitalización bursátil de...?';
+  loadingEl.style.display = 'flex';
+  errorEl.style.display = 'none';
+  listEl.style.display = 'none';
+
+  const topN = Number(document.getElementById('mcapRankTopNSelect').value) || 100;
+  const mySelectedAtStart = mcapMySelected;
+  let coins;
+  try{
+    coins = await fetchMcapRankList(topN);
+  } catch(err){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    return;
+  }
+  // si el usuario cambio de Moneda A o de modo mientras esta peticion estaba en vuelo, este
+  // resultado ya quedo obsoleto - no pisar lo que se este mostrando ahora
+  if(mcapMySelected !== mySelectedAtStart || mcapMode !== 'ranking') return;
+
+  const rows = coins.filter(c => c.id !== mcapMySelected.id && c.market_cap > 0);
+
+  loadingEl.style.display = 'none';
+  if(!rows.length){
+    errorEl.style.display = 'flex';
+    return;
+  }
+  listEl.style.display = 'block';
+  listEl.innerHTML = '<div class="mcap-rank-list">' + rows.map((c, idx) => {
+    const hypoPrice = c.market_cap / mcapMySelected.circulatingSupply;
+    const multiplier = hypoPrice / mcapMySelected.price;
+    const isLoss = multiplier < 1;
+    const pctChange = (multiplier - 1) * 100;
+    const profitText = (!isLoss && multiplier >= 10)
+      ? numES(multiplier, 0) + 'x'
+      : (pctChange >= 0 ? '+' : '') + numES(pctChange, 1) + '%';
+    return '<div class="mcap-rank-row">' +
+      '<div class="mcap-rank-idx">' + (idx + 1) + '</div>' +
+      '<div class="mcap-rank-coin">' +
+        '<img src="' + (c.image || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '<div class="mcap-rank-coin-info">' +
+          '<div class="mcap-rank-coin-name">' + escapeHtml(c.name) + ' (' + escapeHtml((c.symbol || '').toUpperCase()) + ')</div>' +
+          '<div class="mcap-rank-coin-mcap">' + fmtUsdBig(c.market_cap) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="mcap-rank-stats">' +
+        '<div class="mcap-rank-stat"><div class="mcap-rank-stat-label">Precio actual</div><div class="mcap-rank-stat-val">' + formatPrice(mcapMySelected.price) + '</div></div>' +
+        '<div class="mcap-rank-stat"><div class="mcap-rank-stat-label">Precio potencial</div><div class="mcap-rank-stat-val">' + formatPrice(hypoPrice) + '</div></div>' +
+        '<div class="mcap-rank-stat"><div class="mcap-rank-stat-label">Potencial</div><div class="mcap-rank-stat-val ' + (isLoss ? 'neg' : 'pos') + '">' + profitText + '</div></div>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
 }
 
 /* ========= TIEMPO HASTA LA LIBERTAD FINANCIERA ========= */
