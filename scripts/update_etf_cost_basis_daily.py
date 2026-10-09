@@ -3,8 +3,10 @@ Costo base de ETFs spot de Bitcoin (Fase 2 del indicador "Costo Base Institucion
 update_treasury_cost_basis_daily.py para la Fase 1, treasuries corporativas).
 
 Fuente: tabla publica de flujos diarios de Farside Investors (en millones de USD por ETF),
-convertida a BTC comprado/vendido cada dia con el precio de cierre de ese dia (CoinGecko). Se
-calcula el costo promedio ponderado (VWAC) acumulado por ETF y se agregan todos entre si.
+convertida a BTC comprado/vendido cada dia con el precio de cierre de ese dia (blockchain.info,
+la misma fuente que ya usa el sitio para el historico completo - CoinGecko en su tier gratis
+solo da 365 dias). Se calcula el costo promedio ponderado (VWAC) acumulado por ETF y se agregan
+todos entre si.
 
 GBTC se excluye del agregado: traia BTC desde antes de convertirse en ETF (enero 2024) y su
 historial de flujos post-conversion es casi puro de salida - tratarlo solo con flujos post-
@@ -39,8 +41,6 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TABLE = "etf_cost_basis_daily"
 
-# Mismo API key "Demo" de CoinGecko que ya se usa en index.html y en el robot de treasuries.
-COINGECKO_API_KEY = "CG-B17Pfy5LygHBnhQCoxkh2U2W"
 FARSIDE_URL = "https://farside.co.uk/bitcoin-etf-flow-all-data/"
 EXCLUDE_TICKERS = {"GBTC", "TOTAL", ""}
 MIN_SANE_PRICE = 100
@@ -51,18 +51,23 @@ MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
 
 
 def fetch_btc_price_history() -> dict:
-    """fecha ISO -> precio de cierre usd, misma fuente (CoinGecko) que el resto del robot."""
+    """fecha ISO -> precio de cierre usd. CoinGecko en su tier gratuito solo da 365 dias de
+    historico (devuelve 401 "exceeds the allowed time range" con days=max) - se usa en su lugar
+    blockchain.info, la misma fuente que ya usa fetchHalvingHistory() del lado del cliente para
+    el historico completo de precio sin ese limite."""
     resp = requests.get(
-        "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart",
-        params={"vs_currency": "usd", "days": "max", "interval": "daily",
-                "x_cg_demo_api_key": COINGECKO_API_KEY},
+        "https://api.blockchain.info/charts/market-price",
+        params={"timespan": "all", "format": "json", "cors": "true"},
         timeout=30,
     )
     if resp.status_code != 200:
-        raise RuntimeError(f"CoinGecko market_chart respondio {resp.status_code}: {resp.text[:300]}")
+        raise RuntimeError(f"blockchain.info respondio {resp.status_code}: {resp.text[:300]}")
     out = {}
-    for t_ms, price in resp.json().get("prices", []):
-        d = datetime.fromtimestamp(t_ms / 1000, tz=timezone.utc).date().isoformat()
+    for row in resp.json().get("values", []):
+        price = row.get("y")
+        if not price or price <= 0:
+            continue
+        d = datetime.fromtimestamp(row["x"], tz=timezone.utc).date().isoformat()
         out[d] = price
     return out
 
