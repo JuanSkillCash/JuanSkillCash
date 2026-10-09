@@ -4691,8 +4691,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±0.5 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
-                🏢 Cuando el precio de BTC está muy por encima de la línea dorada, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
+                💎 <b>Costo Base Institucional</b> (azul): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (naranja, empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (verde, IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±0.5 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
+                🏢 Cuando el precio de BTC está muy por encima de la línea azul, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
                 🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se excluye por tener BTC desde antes de ser ETF.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
@@ -18447,9 +18447,9 @@ function renderTreasCostBasisChart(){
         <path d="${lowerAreaD}" fill="rgba(34,197,94,.14)" stroke="none"/>
         <path d="${upperLine}" fill="none" stroke="rgba(255,47,79,.55)" stroke-width="1" stroke-dasharray="5,3"/>
         <path d="${lowerLine}" fill="none" stroke="rgba(34,197,94,.55)" stroke-width="1" stroke-dasharray="5,3"/>
-        <path d="${treasuryLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${etfLine}" fill="none" stroke="#a78bfa" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${blendedLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1.2 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${treasuryLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${etfLine}" fill="none" stroke="#2ecc71" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${blendedLine}" fill="none" stroke="#3fa9f5" stroke-width="${isMobileChart ? 1.2 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
@@ -18472,18 +18472,18 @@ function renderTreasCostBasisChart(){
     tooltipHtml: i => {
       const p = points[i];
       let html = `<b>${fmtHalvingPrice(p.btc)}</b>`;
-      html += `<br><span style="color:#f0b23d">Institucional: ${fmtHalvingPrice(p.blendedCost)}</span>`;
-      html += `<br><span style="color:#2fd0c5">Treasuries: ${fmtHalvingPrice(p.treasuryCost)}</span>`;
-      if(p.etfCost != null) html += `<br><span style="color:#a78bfa">ETFs: ${fmtHalvingPrice(p.etfCost)}</span>`;
+      html += `<br><span style="color:#3fa9f5">Institucional: ${fmtHalvingPrice(p.blendedCost)}</span>`;
+      html += `<br><span style="color:#f0b23d">Treasuries: ${fmtHalvingPrice(p.treasuryCost)}</span>`;
+      if(p.etfCost != null) html += `<br><span style="color:#2ecc71">ETFs: ${fmtHalvingPrice(p.etfCost)}</span>`;
       return html;
     },
   });
 
   legendEl.innerHTML = `
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Institucional (combinado)</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2fd0c5"></span>Treasuries corporativas</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#a78bfa"></span>ETFs spot</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#3fa9f5"></span>Institucional (combinado)</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Treasuries corporativas</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2ecc71"></span>ETFs spot</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,47,79,.55)"></span>Banda superior ±0.5σ</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(34,197,94,.55)"></span>Banda inferior ±0.5σ</span>
   `;
@@ -18492,10 +18492,10 @@ function renderTreasCostBasisChart(){
   const premiumPct = (last.btc / last.blendedCost - 1) * 100;
   statsEl.innerHTML = `
     <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(last.btc)}</div></div>
-    <div class="res-card"><div class="r-label" style="color:#f0b23d">Costo Base Institucional</div><div class="r-val">${fmtHalvingPrice(last.blendedCost)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#3fa9f5">Costo Base Institucional</div><div class="r-val">${fmtHalvingPrice(last.blendedCost)}</div></div>
     <div class="res-card"><div class="r-label">Premio/Descuento vs. costo base</div><div class="r-val" style="color:${premiumPct >= 0 ? '#22c55e' : '#ff2f4f'}">${premiumPct >= 0 ? '+' : ''}${premiumPct.toFixed(1)}%</div></div>
-    <div class="res-card"><div class="r-label" style="color:#2fd0c5">Treasuries</div><div class="r-val">${fmtHalvingPrice(last.treasuryCost)}</div></div>
-    <div class="res-card"><div class="r-label" style="color:#a78bfa">ETFs spot</div><div class="r-val">${last.etfCost != null ? fmtHalvingPrice(last.etfCost) : '—'}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#f0b23d">Treasuries</div><div class="r-val">${fmtHalvingPrice(last.treasuryCost)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#2ecc71">ETFs spot</div><div class="r-val">${last.etfCost != null ? fmtHalvingPrice(last.etfCost) : '—'}</div></div>
     <div class="res-card"><div class="r-label">BTC total cubierto</div><div class="r-val">${Math.round(last.blendedBtc).toLocaleString('es-ES')} BTC</div></div>
   `;
 }
