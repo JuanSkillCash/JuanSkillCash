@@ -73,8 +73,13 @@ jobs:
       - name: Actualizar Google Trends
         # continue-on-error: esta es la fuente mas fragil del pipeline (pytrends no es una API
         # oficial, Google bloquea trafico automatizado repetido) - un fallo aqui no debe tumbar
-        # el resto de pasos ya corridos arriba
+        # el resto de pasos ya corridos arriba. timeout-minutes: sin esto, un bloqueo de Google
+        # (reintentos sin limite dentro del script) deja el paso colgado indefinidamente y nunca
+        # llega a correr el resto de los pasos de abajo (confirmado dos veces seguidas corriendo
+        # el workflow de verdad) - continue-on-error solo evita que el workflow FALLE, no evita
+        # que un paso colgado bloquee a los siguientes
         continue-on-error: true
+        timeout-minutes: 3
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
