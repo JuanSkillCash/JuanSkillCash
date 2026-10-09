@@ -18349,14 +18349,15 @@ function renderTreasCostBasisChart(){
   // historial de transacciones ya acumulado) en vez de la desviacion estandar de CADA dia por
   // separado. Esa version dia-a-dia quedaba ruidosa al principio del historico (cuando una
   // empresa recien tenia 2-3 compras, el rango de precios recorrido hasta ese punto ya era un
-  // porcentaje enorme de una base todavia chiquita) y ademas, al sumar/restar esa desviacion en
-  // dolares sobre una escala logaritmica, se veia asimetrica (restar es una caida porcentual mas
-  // grande que sumar es una subida, en una grafica log) - la referencia real de Capriole muestra
-  // un canal de ancho estable en todo el historico, no uno que se infla al principio
+  // porcentaje enorme de una base todavia chiquita) - la referencia real de Capriole muestra un
+  // canal de ancho estable en todo el historico, no uno que se infla al principio. Los valores
+  // reales de su leyenda (90,256 arriba / 77,044 medio / 63,831 abajo, sobre un costo ~77,044)
+  // confirman que es un porcentaje LINEAL simetrico (+17.15%/-17.15%, no dividir para abajo en
+  // escala log) - costo*(1+r) arriba, costo*(1-r) abajo, igual de lejos en terminos lineales
   const lastFullPt = fullPoints[fullPoints.length - 1];
   const bandRatio = lastFullPt.blendedCost > 0 ? lastFullPt.blendedStd / lastFullPt.blendedCost : 0;
   const upperVals = points.map(p => p.blendedCost * (1 + bandRatio));
-  const lowerVals = points.map(p => Math.max(p.blendedCost / (1 + bandRatio), p.blendedCost * 0.3));
+  const lowerVals = points.map(p => Math.max(p.blendedCost * (1 - bandRatio), p.blendedCost * 0.3));
   const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
     .flat().filter(v => v > 0);
   const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
