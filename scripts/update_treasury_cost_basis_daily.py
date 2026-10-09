@@ -164,6 +164,12 @@ def parse_tx_date(raw) -> str | None:
     return d.isoformat()
 
 
+MIN_SANE_PRICE = 100       # un average_entry_value_usd por debajo de esto es dato corrupto, no un
+MAX_SANE_PRICE = 1_000_000  # precio real de BTC - sin este filtro, una sola transaccion con
+                             # avg_cost en 0 (visto en los datos reales) arrastra el promedio
+                             # ponderado completo hacia abajo el dia que esa empresa pesa fuerte
+
+
 def build_company_series(txs: list[dict]) -> list[tuple]:
     rows = []
     for tx in txs:
@@ -172,7 +178,11 @@ def build_company_series(txs: list[dict]) -> list[tuple]:
         avg_cost = tx.get("average_entry_value_usd")
         if d is None or balance is None or avg_cost is None:
             continue
-        rows.append((d, float(balance), float(avg_cost)))
+        balance = float(balance)
+        avg_cost = float(avg_cost)
+        if balance <= 0 or not (MIN_SANE_PRICE <= avg_cost <= MAX_SANE_PRICE):
+            continue
+        rows.append((d, balance, avg_cost))
     rows.sort(key=lambda r: r[0])
     # si hay varias transacciones el mismo dia, nos quedamos con la ultima (balance ya acumulado)
     by_date = {}
@@ -282,6 +292,16 @@ def main():
                 "avg_cost_basis_usd": round(weighted_sum / total_btc, 2),
             })
         d += timedelta(days=1)
+
+    # diagnostico de sanidad: aporte final de cada empresa y rango del costo base agregado -
+    # permite confirmar desde el log que ninguna empresa quedo con cifras absurdas, sin tener
+    # que consultar Supabase directamente
+    for name in sorted(company_series, key=lambda n: last_known[n][0], reverse=True):
+        balance, avg_cost = last_known[name]
+        log.info(f"  {name}: {balance:,.0f} BTC @ ${avg_cost:,.0f} costo base")
+    if rows:
+        costs = [r["avg_cost_basis_usd"] for r in rows]
+        log.info(f"avg_cost_basis_usd en el historico: min=${min(costs):,.0f} max=${max(costs):,.0f} hoy=${costs[-1]:,.0f}")
 
     delete_all_rows()
     upsert_rows(rows)
