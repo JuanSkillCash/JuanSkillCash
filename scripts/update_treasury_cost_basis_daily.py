@@ -13,12 +13,17 @@ Pasos:
   2. entities/list -> mapa symbol -> entity_id (CoinGecko no expone el entity_id en el paso 1).
   3. Para las N empresas con mas BTC: public_treasury/{entity_id}/transaction_history
      (coin_ids=bitcoin, per_page=250 cabe en una sola pagina gratuita para cualquier empresa
-     del top, incluida Strategy con ~120 transacciones) -> serie de holding_balance /
-     average_entry_value_usd por fecha.
-  4. Para cada dia (desde la primera transaccion encontrada hasta hoy) se arrastra el ultimo
+     del top, incluida Strategy con ~120 transacciones) -> lista de transacciones.
+  4. OJO: average_entry_value_usd de cada transaccion NO es el costo base acumulado de la
+     empresa a esa fecha - es el precio pagado en ESA transaccion puntual (confirmado con datos
+     reales: Strategy mostraba saltos de +50% en ese campo con apenas +1% mas BTC, algo
+     imposible para un promedio acumulado real). Por eso se reconstruye el costo base propio
+     igual que el VWAC de los ETFs: por cada transaccion, holding_net_change es cuanto BTC
+     compro/vendio y average_entry_value_usd el precio de esa compra/venta puntual.
+  5. Para cada dia (desde la primera transaccion encontrada hasta hoy) se arrastra el ultimo
      valor conocido de cada empresa (forward-fill) y se agrega:
-       total_btc_held      = suma de holding_balance de todas las empresas ese dia
-       avg_cost_basis_usd   = suma(holding_balance_i * average_entry_value_usd_i) / total_btc_held
+       total_btc_held      = suma del BTC acumulado de todas las empresas ese dia
+       avg_cost_basis_usd   = promedio ponderado por BTC entre las empresas
 
 Variables de entorno requeridas:
     SUPABASE_URL
@@ -171,24 +176,45 @@ MAX_SANE_PRICE = 1_000_000  # precio real de BTC - sin este filtro, una sola tra
 
 
 def build_company_series(txs: list[dict]) -> list[tuple]:
-    rows = []
+    # average_entry_value_usd es el precio de ESA transaccion puntual, no el costo base
+    # acumulado de la empresa (ver punto 4 del docstring) - se reconstruye el propio costo
+    # base con VWAC, exactamente igual que compute_etf_daily_rows del script de ETFs:
+    # cada transaccion es una compra (holding_net_change > 0) o una venta (< 0) a su propio
+    # precio, y se acumula btc/costo dia a dia en vez de confiar en holding_balance/
+    # average_entry_value_usd como si ya fueran el estado acumulado.
+    parsed = []
     for tx in txs:
         d = parse_tx_date(tx.get("date"))
-        balance = tx.get("holding_balance")
-        avg_cost = tx.get("average_entry_value_usd")
-        if d is None or balance is None or avg_cost is None:
+        net_change = tx.get("holding_net_change")
+        price = tx.get("average_entry_value_usd")
+        if d is None or net_change is None or price is None:
             continue
-        balance = float(balance)
-        avg_cost = float(avg_cost)
-        if balance <= 0 or not (MIN_SANE_PRICE <= avg_cost <= MAX_SANE_PRICE):
+        net_change = float(net_change)
+        price = float(price)
+        if net_change == 0 or not (MIN_SANE_PRICE <= price <= MAX_SANE_PRICE):
             continue
-        rows.append((d, balance, avg_cost))
-    rows.sort(key=lambda r: r[0])
-    # si hay varias transacciones el mismo dia, nos quedamos con la ultima (balance ya acumulado)
-    by_date = {}
-    for d, balance, avg_cost in rows:
-        by_date[d] = (balance, avg_cost)
-    return [(d, balance, avg_cost) for d, (balance, avg_cost) in sorted(by_date.items())]
+        parsed.append((d, net_change, price))
+    parsed.sort(key=lambda r: r[0])
+
+    by_date: dict[str, list[tuple]] = {}
+    for d, net_change, price in parsed:
+        by_date.setdefault(d, []).append((net_change, price))
+
+    series = []
+    btc, cost = 0.0, 0.0
+    for d in sorted(by_date):
+        for net_change, price in by_date[d]:
+            if net_change > 0:
+                btc += net_change
+                cost += net_change * price
+            elif btc > 0:
+                btc_out = min(-net_change, btc)
+                avg = cost / btc
+                cost -= btc_out * avg
+                btc -= btc_out
+        if btc > 0:
+            series.append((d, btc, cost / btc))
+    return series
 
 
 def delete_all_rows():
