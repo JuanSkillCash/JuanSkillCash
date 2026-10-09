@@ -100,11 +100,14 @@ jobs:
         run: python scripts/update_treasury_cost_basis_daily.py
 
       - name: Actualizar Costo Base Institucional (ETFs spot)
-        # continue-on-error: raspa la tabla publica de Farside Investors (sin API oficial, el
-        # sitio esta detras de Cloudflare) - un fallo aqui no debe tumbar el resto de pasos ya
-        # corridos arriba
+        # continue-on-error: raspa la tabla publica de Farside Investors con un navegador
+        # headless (esta detras de un challenge JS de Cloudflare, un simple requests.get no
+        # alcanza) - un fallo aqui no debe tumbar el resto de pasos ya corridos arriba
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python scripts/update_etf_cost_basis_daily.py
+        run: |
+          pip install --no-cache-dir playwright
+          playwright install --with-deps chromium
+          python scripts/update_etf_cost_basis_daily.py

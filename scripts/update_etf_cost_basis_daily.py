@@ -8,6 +8,12 @@ la misma fuente que ya usa el sitio para el historico completo - CoinGecko en su
 solo da 365 dias). Se calcula el costo promedio ponderado (VWAC) acumulado por ETF y se agregan
 todos entre si.
 
+Farside esta detras de un challenge JS real de Cloudflare ("Just a moment...", confirmado
+corriendo el robot de verdad - un simple requests.get con headers de navegador no basta, por
+mas realistas que sean, porque no hay motor JS que lo resuelva). Por eso fetch_farside_table usa
+Playwright (Chromium headless) en vez de requests: un navegador de verdad SI puede resolver ese
+challenge solo, con tal de esperar a que la pagina real cargue.
+
 GBTC se excluye del agregado: traia BTC desde antes de convertirse en ETF (enero 2024) y su
 historial de flujos post-conversion es casi puro de salida - tratarlo solo con flujos post-
 conversion daria un balance/costo sin sentido (negativo o indefinido).
@@ -33,6 +39,7 @@ from datetime import date, datetime, timezone
 
 import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("update_etf_cost_basis_daily")
@@ -100,36 +107,22 @@ def parse_flow_value(text: str) -> float | None:
     return -v if neg else v
 
 
-FARSIDE_HEADERS = {
-    # el primer intento uso un User-Agent que se identificaba como bot ("SkillCashTools/1.0") y
-    # Cloudflare lo bloqueo con 403 de inmediato - un UA de navegador real de verdad, con el
-    # resto de headers que manda un Chrome real, es la primera defensa barata contra eso antes
-    # de asumir que hace falta un navegador headless
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-    # sin "br" (Brotli) en Accept-Encoding: el runner no tiene la libreria brotli instalada, asi
-    # que si el servidor responde comprimido con br, requests no lo puede decodificar y
-    # resp.text queda como basura binaria ilegible (eso paso en el intento anterior - no se pudo
-    # ni diagnosticar el bloqueo real por este motivo)
-    "Accept-Encoding": "gzip, deflate",
-    "Upgrade-Insecure-Requests": "1",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-User": "?1",
-}
+FARSIDE_USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36")
 
 
 def fetch_farside_table() -> tuple[list[str], list[dict]]:
-    session = requests.Session()
-    session.headers.update(FARSIDE_HEADERS)
-    warmup = session.get("https://farside.co.uk/", timeout=30)
-    log.info(f"warmup a farside.co.uk/: status {warmup.status_code}, {len(warmup.content)} bytes")
-    resp = session.get(FARSIDE_URL, timeout=30)
-    if resp.status_code != 200:
-        raise RuntimeError(f"Farside respondio {resp.status_code}: {resp.text[:500]!r}")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page(user_agent=FARSIDE_USER_AGENT)
+        page.goto(FARSIDE_URL, wait_until="domcontentloaded", timeout=45000)
+        # Cloudflare muestra "Just a moment..." un par de segundos y redirige solo a la pagina
+        # real - un Chromium de verdad lo resuelve el solo, basta con esperar a que aparezca la
+        # tabla (si nunca aparece, el timeout de abajo lo deja claro en vez de colgarse)
+        page.wait_for_selector("table", timeout=30000)
+        html = page.content()
+        browser.close()
+    soup = BeautifulSoup(html, "html.parser")
     table = soup.find("table")
     if table is None:
         raise RuntimeError("no se encontro ninguna tabla en la pagina de Farside")
