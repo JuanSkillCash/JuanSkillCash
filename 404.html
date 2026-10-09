@@ -4663,7 +4663,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Costo Base Institucional (Treasuries Corporativas)</h2>
+                <h2 class="calc-title">Costo Base Institucional</h2>
               </div>
 
               <div class="tf-pill-row" id="treascbRangeFilter">
@@ -4677,7 +4677,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="treascbLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Reconstruyendo el costo base de las empresas con BTC en su balance.</div>
+                  <div class="indic-placeholder-text">Reconstruyendo el costo base de empresas y ETFs con BTC en su balance.</div>
                 </div>
                 <div class="indic-chart-soon" id="treascbError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -4691,9 +4691,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b>: el precio promedio (ponderado por BTC en balance) al que compraron las empresas públicas con más Bitcoin en su tesorería — reconstruido transacción por transacción desde que cada una empezó a comprar.<br>
-                🏢 Cuando el precio de BTC está muy por encima de esta línea, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
-                🔎 Fuente de datos: API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones de las principales empresas con BTC en balance, ej. Strategy/MicroStrategy). Solo cubre empresas, no ETFs spot.<br>
+                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado, más una <b>banda inferior</b> (verde punteada) con la más barata de las dos cada día.<br>
+                🏢 Cuando el precio de BTC está muy por encima de la línea dorada, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
+                🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se excluye por tener BTC desde antes de ser ETF.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -18222,21 +18222,66 @@ async function fetchTreasCostBasisHistory(){
   treasCbRawCache = rows;
   return rows;
 }
+let etfCbRawCache = null;
+async function fetchEtfCostBasisHistory(){
+  if(etfCbRawCache) return etfCbRawCache;
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await withRetry(() => sbClient
+      .from('etf_cost_basis_daily')
+      .select('date,total_btc_held,avg_cost_basis_usd')
+      .order('date', { ascending: true })
+      .range(from, from + pageSize - 1), 3, 500);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  etfCbRawCache = rows;
+  return rows;
+}
 let treasCbMergedCache = null;
+// combina Treasuries (empresas, desde ago-2020) + ETFs spot (desde ene-2024, cuando lanzaron) en
+// un solo set de lineas: cada una por separado, mas un agregado "Institucional" ponderado por
+// BTC entre las dos, mas una banda inferior = la mas barata de las dos ese dia. Antes de que
+// existieran los ETFs, Institucional/banda inferior son iguales a Treasuries (es lo unico que
+// habia) - si el robot de ETFs aun no corrio o no hay tabla todavia, el catch deja esa parte en
+// null y el gráfico sigue funcionando solo con Treasuries (se degrada, no se rompe)
 async function fetchTreasCostBasisMergedSeries(){
   if(treasCbMergedCache) return treasCbMergedCache;
-  const [btcHistory, cbRows] = await Promise.all([fetchHalvingHistory(), fetchTreasCostBasisHistory()]);
-  const cbByDay = new Map();
-  cbRows.forEach(r => {
+  const [btcHistory, treasRows, etfRows] = await Promise.all([
+    fetchHalvingHistory(), fetchTreasCostBasisHistory(), fetchEtfCostBasisHistory().catch(() => []),
+  ]);
+  const treasByDay = new Map();
+  treasRows.forEach(r => {
     const costBasis = r.avg_cost_basis_usd != null ? Number(r.avg_cost_basis_usd) : null;
     const btcHeld = r.total_btc_held != null ? Number(r.total_btc_held) : null;
-    if(costBasis > 0) cbByDay.set(r.date, { costBasis, btcHeld });
+    if(costBasis > 0) treasByDay.set(r.date, { costBasis, btcHeld });
+  });
+  const etfByDay = new Map();
+  etfRows.forEach(r => {
+    const costBasis = r.avg_cost_basis_usd != null ? Number(r.avg_cost_basis_usd) : null;
+    const btcHeld = r.total_btc_held != null ? Number(r.total_btc_held) : null;
+    if(costBasis > 0) etfByDay.set(r.date, { costBasis, btcHeld });
   });
   const merged = [];
   btcHistory.forEach(p => {
     const key = new Date(p.t).toISOString().slice(0, 10);
-    const c = cbByDay.get(key);
-    if(c) merged.push({ t: p.t, btc: p.c, costBasis: c.costBasis, btcHeld: c.btcHeld });
+    const tr = treasByDay.get(key);
+    if(!tr) return;
+    const et = etfByDay.get(key) || null;
+    const blendedBtc = tr.btcHeld + (et ? et.btcHeld : 0);
+    const blendedCost = blendedBtc > 0
+      ? (tr.btcHeld * tr.costBasis + (et ? et.btcHeld * et.costBasis : 0)) / blendedBtc
+      : tr.costBasis;
+    const lowerCost = et ? Math.min(tr.costBasis, et.costBasis) : tr.costBasis;
+    merged.push({
+      t: p.t, btc: p.c,
+      treasuryCost: tr.costBasis, treasuryBtc: tr.btcHeld,
+      etfCost: et ? et.costBasis : null, etfBtc: et ? et.btcHeld : null,
+      blendedCost, blendedBtc, lowerCost,
+    });
   });
   treasCbMergedCache = merged;
   return merged;
@@ -18290,7 +18335,8 @@ function renderTreasCostBasisChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const allPrices = points.map(p => p.btc).concat(points.map(p => p.costBasis)).filter(v => v > 0);
+  const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost)]
+    .flat().filter(v => v > 0);
   const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
 
   const isMobileChart = window.innerWidth <= 640;
@@ -18327,7 +18373,10 @@ function renderTreasCostBasisChart(){
     return d.trim();
   }
   const btcLine = pathFor(p => p.btc);
-  const costBasisLine = pathFor(p => p.costBasis);
+  const blendedLine = pathFor(p => p.blendedCost);
+  const treasuryLine = pathFor(p => p.treasuryCost);
+  const etfLine = pathFor(p => p.etfCost);
+  const lowerLine = pathFor(p => p.lowerCost);
 
   const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -18347,7 +18396,10 @@ function renderTreasCostBasisChart(){
       <svg class="fng-chart-svg" id="treascbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
-        <path d="${costBasisLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${lowerLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-dasharray="5,3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${treasuryLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${etfLine}" fill="none" stroke="#a78bfa" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${blendedLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1.2 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
@@ -18367,21 +18419,33 @@ function renderTreasCostBasisChart(){
     dateLabelId: 'treascbHoverDateLabel', dateBgId: 'treascbHoverDateBg', tooltipId: 'treascbTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yForPrice(points[i].btc),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].btc)}</b><br><span style="color:#2fd0c5">Costo base institucional: ${fmtHalvingPrice(points[i].costBasis)}</span>`,
+    tooltipHtml: i => {
+      const p = points[i];
+      let html = `<b>${fmtHalvingPrice(p.btc)}</b>`;
+      html += `<br><span style="color:#f0b23d">Institucional: ${fmtHalvingPrice(p.blendedCost)}</span>`;
+      html += `<br><span style="color:#2fd0c5">Treasuries: ${fmtHalvingPrice(p.treasuryCost)}</span>`;
+      if(p.etfCost != null) html += `<br><span style="color:#a78bfa">ETFs: ${fmtHalvingPrice(p.etfCost)}</span>`;
+      return html;
+    },
   });
 
   legendEl.innerHTML = `
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2fd0c5"></span>Costo Base Institucional</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Institucional (combinado)</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2fd0c5"></span>Treasuries corporativas</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#a78bfa"></span>ETFs spot</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Banda inferior (la más barata)</span>
   `;
 
   const last = points[points.length - 1];
-  const premiumPct = (last.btc / last.costBasis - 1) * 100;
+  const premiumPct = (last.btc / last.blendedCost - 1) * 100;
   statsEl.innerHTML = `
     <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(last.btc)}</div></div>
-    <div class="res-card"><div class="r-label">Costo Base Institucional</div><div class="r-val">${fmtHalvingPrice(last.costBasis)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#f0b23d">Costo Base Institucional</div><div class="r-val">${fmtHalvingPrice(last.blendedCost)}</div></div>
     <div class="res-card"><div class="r-label">Premio/Descuento vs. costo base</div><div class="r-val" style="color:${premiumPct >= 0 ? '#22c55e' : '#ff2f4f'}">${premiumPct >= 0 ? '+' : ''}${premiumPct.toFixed(1)}%</div></div>
-    <div class="res-card"><div class="r-label">BTC en balance (empresas cubiertas)</div><div class="r-val">${Math.round(last.btcHeld).toLocaleString('es-ES')} BTC</div></div>
+    <div class="res-card"><div class="r-label" style="color:#2fd0c5">Treasuries</div><div class="r-val">${fmtHalvingPrice(last.treasuryCost)}</div></div>
+    <div class="res-card"><div class="r-label" style="color:#a78bfa">ETFs spot</div><div class="r-val">${last.etfCost != null ? fmtHalvingPrice(last.etfCost) : '—'}</div></div>
+    <div class="res-card"><div class="r-label">BTC total cubierto</div><div class="r-val">${Math.round(last.blendedBtc).toLocaleString('es-ES')} BTC</div></div>
   `;
 }
 async function loadTreasCostBasisDetail(){
@@ -20151,7 +20215,7 @@ const BITCOIN_GUIA_INDICATORS = [
   { id: 'btcaapl', icon: '🍎', label: 'BTC/AAPL', def: 'El precio de BTC medido en acciones de Apple, en vez de dólares.' },
   { id: 'btcreturns', icon: '📅', label: 'Retornos de Bitcoin', def: 'Cómo le ha ido a BTC por año, trimestre, mes o semana — en pestañas, para ver de un vistazo si hay estacionalidad (ej. "septiembre rojo").' },
   { id: 'sthmvrv', icon: '⚓', label: 'STH-MVRV', def: 'El precio de BTC frente al costo base promedio de quien compró hace menos de 150 días — por encima de 1 ese holder está en ganancia, por debajo en pérdida. Útil para ver capitulaciones y euforia de corto plazo.' },
-  { id: 'treascb', icon: '💎', label: 'Costo Base Institucional', def: 'El precio promedio al que compraron BTC las empresas públicas con más Bitcoin en su balance (ej. Strategy/MicroStrategy) — reconstruido transacción por transacción desde la API pública de CoinGecko.' },
+  { id: 'treascb', icon: '💎', label: 'Costo Base Institucional', def: 'El precio promedio al que compraron BTC los grandes holders institucionales — empresas públicas (Strategy/MicroStrategy, etc.) y ETFs spot (IBIT, FBTC, etc.) combinados, más cada uno por separado.' },
 ];
 const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },

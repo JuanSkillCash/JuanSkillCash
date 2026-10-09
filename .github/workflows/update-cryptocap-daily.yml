@@ -24,7 +24,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas pytrends
+          pip install --no-cache-dir "git+https://github.com/rongardF/tvdatafeed.git" requests pandas pytrends beautifulsoup4
 
       - name: Descargar y subir datos del dia (CRYPTOCAP)
         env:
@@ -98,3 +98,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_treasury_cost_basis_daily.py
+
+      - name: Actualizar Costo Base Institucional (ETFs spot)
+        # continue-on-error: raspa la tabla publica de Farside Investors (sin API oficial, el
+        # sitio esta detras de Cloudflare) - un fallo aqui no debe tumbar el resto de pasos ya
+        # corridos arriba
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_etf_cost_basis_daily.py
