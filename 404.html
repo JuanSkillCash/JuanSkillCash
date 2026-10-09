@@ -4691,7 +4691,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son ±1 desviación estándar histórica de cuánto se aleja el precio de BTC de ese costo base.<br>
+                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son ±1 desviación estándar ponderada por BTC de los precios de entrada individuales que componen ese costo base — es decir, qué tan dispersas están las compras reales entre sí, no cuánto se aleja el precio actual de BTC de ellas.<br>
                 🏢 Cuando el precio de BTC está muy por encima de la línea dorada, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
                 🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se excluye por tener BTC desde antes de ser ETF.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -18211,7 +18211,7 @@ async function fetchTreasCostBasisHistory(){
   for(let from = 0; ; from += pageSize){
     const { data, error } = await withRetry(() => sbClient
       .from('treasury_cost_basis_daily')
-      .select('date,total_btc_held,avg_cost_basis_usd')
+      .select('date,total_btc_held,avg_cost_basis_usd,cost_basis_std_usd')
       .order('date', { ascending: true })
       .range(from, from + pageSize - 1), 3, 500);
     if(error) throw error;
@@ -18230,7 +18230,7 @@ async function fetchEtfCostBasisHistory(){
   for(let from = 0; ; from += pageSize){
     const { data, error } = await withRetry(() => sbClient
       .from('etf_cost_basis_daily')
-      .select('date,total_btc_held,avg_cost_basis_usd')
+      .select('date,total_btc_held,avg_cost_basis_usd,cost_basis_std_usd')
       .order('date', { ascending: true })
       .range(from, from + pageSize - 1), 3, 500);
     if(error) throw error;
@@ -18257,13 +18257,15 @@ async function fetchTreasCostBasisMergedSeries(){
   treasRows.forEach(r => {
     const costBasis = r.avg_cost_basis_usd != null ? Number(r.avg_cost_basis_usd) : null;
     const btcHeld = r.total_btc_held != null ? Number(r.total_btc_held) : null;
-    if(costBasis > 0) treasByDay.set(r.date, { costBasis, btcHeld });
+    const std = r.cost_basis_std_usd != null ? Number(r.cost_basis_std_usd) : 0;
+    if(costBasis > 0) treasByDay.set(r.date, { costBasis, btcHeld, std });
   });
   const etfByDay = new Map();
   etfRows.forEach(r => {
     const costBasis = r.avg_cost_basis_usd != null ? Number(r.avg_cost_basis_usd) : null;
     const btcHeld = r.total_btc_held != null ? Number(r.total_btc_held) : null;
-    if(costBasis > 0) etfByDay.set(r.date, { costBasis, btcHeld });
+    const std = r.cost_basis_std_usd != null ? Number(r.cost_basis_std_usd) : 0;
+    if(costBasis > 0) etfByDay.set(r.date, { costBasis, btcHeld, std });
   });
   const merged = [];
   btcHistory.forEach(p => {
@@ -18275,25 +18277,24 @@ async function fetchTreasCostBasisMergedSeries(){
     const blendedCost = blendedBtc > 0
       ? (tr.btcHeld * tr.costBasis + (et ? et.btcHeld * et.costBasis : 0)) / blendedBtc
       : tr.costBasis;
+    // reconstruye sqcost = btc*(std^2+avg^2) de cada fuente y los suma para obtener la varianza
+    // ponderada real del conjunto combinado (misma identidad que agrega btc*cost) - asi la banda
+    // mide dispersion real de los precios de entrada, no cuanto se aleja el precio de BTC del
+    // costo base (esa version vieja quedaba desproporcionada, ver update_treasury_cost_basis_daily.py)
+    const sqCostTreas = tr.btcHeld * (tr.std * tr.std + tr.costBasis * tr.costBasis);
+    const sqCostEtf = et ? et.btcHeld * (et.std * et.std + et.costBasis * et.costBasis) : 0;
+    const blendedVariance = blendedBtc > 0
+      ? Math.max((sqCostTreas + sqCostEtf) / blendedBtc - blendedCost * blendedCost, 0)
+      : 0;
     merged.push({
       t: p.t, btc: p.c,
       treasuryCost: tr.costBasis, treasuryBtc: tr.btcHeld,
       etfCost: et ? et.costBasis : null, etfBtc: et ? et.btcHeld : null,
-      blendedCost, blendedBtc,
+      blendedCost, blendedBtc, blendedStd: Math.sqrt(blendedVariance),
     });
   });
   treasCbMergedCache = merged;
   return merged;
-}
-// bandas Upper/Lower: no son "la mas barata entre Treasuries y ETFs" (eso ya lo muestran esas
-// dos lineas por separado) sino una banda de volatilidad alrededor de la linea Institucional -
-// misma tecnica que ya usa STH-MVRV en este sitio (computeSthMvrvBandStats): el promedio ± 1
-// desviacion estandar historica de cuanto se aleja el precio de BTC de ese costo base
-function computeTreasCbBandStats(merged){
-  const ratios = merged.map(p => p.btc / p.blendedCost).filter(v => isFinite(v) && v > 0);
-  const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
-  const variance = ratios.reduce((a, b) => a + (b - mean) * (b - mean), 0) / ratios.length;
-  return { mean, std: Math.sqrt(variance) };
 }
 const TREASCB_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2, '1a': 1 };
 let treasCbActiveRange = 'todo';
@@ -18333,8 +18334,6 @@ function renderTreasCostBasisChart(){
   const points = fullPoints.filter(p => p.t >= fromMs && p.t <= toMs);
   if(!points.length) return;
 
-  const { mean: cbMean, std: cbStd } = computeTreasCbBandStats(fullPoints);
-
   if(treasCbSlider) treasCbSlider.setRange(fromMs, toMs);
   else{
     treasCbSlider = createDateRangeSlider('treascbDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
@@ -18346,8 +18345,8 @@ function renderTreasCostBasisChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const upperVals = points.map(p => p.blendedCost * (cbMean + cbStd));
-  const lowerVals = points.map(p => Math.max(p.blendedCost * (cbMean - cbStd), p.blendedCost * 0.3));
+  const upperVals = points.map(p => p.blendedCost + p.blendedStd);
+  const lowerVals = points.map(p => Math.max(p.blendedCost - p.blendedStd, p.blendedCost * 0.3));
   const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
     .flat().filter(v => v > 0);
   const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);

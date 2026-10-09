@@ -23,7 +23,15 @@ Pasos:
   5. Para cada dia (desde la primera transaccion encontrada hasta hoy) se arrastra el ultimo
      valor conocido de cada empresa (forward-fill) y se agrega:
        total_btc_held      = suma del BTC acumulado de todas las empresas ese dia
-       avg_cost_basis_usd   = promedio ponderado por BTC entre las empresas
+       avg_cost_basis_usd  = promedio ponderado por BTC entre las empresas
+       cost_basis_std_usd  = desviacion estandar ponderada por BTC de los precios de entrada que
+                             componen el balance actual (var = sqcost/btc - avg^2, acumulando
+                             sqcost = suma(qty*precio^2) igual que btc/cost) - alimenta la banda
+                             Upper/Lower del lado del cliente. OJO: esto mide que tan dispersos
+                             estan los precios de compra que componen el costo base, NO cuanto se
+                             aleja el precio de BTC de ese costo base (esa era la version vieja,
+                             basada en el ratio btc/blendedCost - quedaba desproporcionada porque
+                             mide volatilidad de precio de BTC, no dispersion real del costo base)
 
 Variables de entorno requeridas:
     SUPABASE_URL
@@ -182,6 +190,9 @@ def build_company_series(txs: list[dict]) -> list[tuple]:
     # cada transaccion es una compra (holding_net_change > 0) o una venta (< 0) a su propio
     # precio, y se acumula btc/costo dia a dia en vez de confiar en holding_balance/
     # average_entry_value_usd como si ya fueran el estado acumulado.
+    # tambien se acumula sqcost = suma(qty*precio^2) de las monedas que siguen en balance, igual
+    # que en el script de ETFs: var = sqcost/btc - avg^2 da la varianza real (ponderada por BTC)
+    # de los precios de entrada que componen el balance actual de la empresa a esa fecha.
     parsed = []
     for tx in txs:
         d = parse_tx_date(tx.get("date"))
@@ -201,19 +212,22 @@ def build_company_series(txs: list[dict]) -> list[tuple]:
         by_date.setdefault(d, []).append((net_change, price))
 
     series = []
-    btc, cost = 0.0, 0.0
+    btc, cost, sqcost = 0.0, 0.0, 0.0
     for d in sorted(by_date):
         for net_change, price in by_date[d]:
             if net_change > 0:
                 btc += net_change
                 cost += net_change * price
+                sqcost += net_change * price * price
             elif btc > 0:
                 btc_out = min(-net_change, btc)
                 avg = cost / btc
+                avgsq = sqcost / btc
                 cost -= btc_out * avg
+                sqcost -= btc_out * avgsq
                 btc -= btc_out
         if btc > 0:
-            series.append((d, btc, cost / btc))
+            series.append((d, btc, cost, sqcost))
     return series
 
 
@@ -289,30 +303,34 @@ def main():
 
     # puntero de forward-fill por empresa: indice del ultimo elemento <= dia actual
     pointers = {name: -1 for name in company_series}
-    last_known = {name: (0.0, 0.0) for name in company_series}
+    last_known = {name: (0.0, 0.0, 0.0) for name in company_series}  # (btc, cost, sqcost)
 
     rows = []
     d = start
     while d <= today:
         iso = d.isoformat()
         total_btc = 0.0
-        weighted_sum = 0.0
+        total_cost = 0.0
+        total_sqcost = 0.0
         for name, series in company_series.items():
             idx = pointers[name]
             while idx + 1 < len(series) and series[idx + 1][0] <= iso:
                 idx += 1
-                last_known[name] = (series[idx][1], series[idx][2])
+                last_known[name] = (series[idx][1], series[idx][2], series[idx][3])
             pointers[name] = idx
             if idx >= 0:
-                balance, avg_cost = last_known[name]
+                balance, cost, sqcost = last_known[name]
                 total_btc += balance
-                weighted_sum += balance * avg_cost
+                total_cost += cost
+                total_sqcost += sqcost
         if total_btc > 0:
-            avg = weighted_sum / total_btc
+            avg = total_cost / total_btc
+            variance = max(total_sqcost / total_btc - avg * avg, 0.0)
             rows.append({
                 "date": iso,
                 "total_btc_held": round(total_btc, 4),
                 "avg_cost_basis_usd": round(avg, 2),
+                "cost_basis_std_usd": round(variance ** 0.5, 2),
             })
         d += timedelta(days=1)
 
@@ -320,11 +338,13 @@ def main():
     # permite confirmar desde el log que ninguna empresa quedo con cifras absurdas, sin tener
     # que consultar Supabase directamente
     for name in sorted(company_series, key=lambda n: last_known[n][0], reverse=True):
-        balance, avg_cost = last_known[name]
+        balance, cost, sqcost = last_known[name]
+        avg_cost = cost / balance if balance > 0 else 0
         log.info(f"  {name}: {balance:,.0f} BTC @ ${avg_cost:,.0f} costo base")
     if rows:
         costs = [r["avg_cost_basis_usd"] for r in rows]
         log.info(f"avg_cost_basis_usd en el historico: min=${min(costs):,.0f} max=${max(costs):,.0f} hoy=${costs[-1]:,.0f}")
+        log.info(f"cost_basis_std_usd hoy: ${rows[-1]['cost_basis_std_usd']:,.0f} ({rows[-1]['cost_basis_std_usd'] / rows[-1]['avg_cost_basis_usd'] * 100:.1f}% del costo base)")
 
     delete_all_rows()
     upsert_rows(rows)

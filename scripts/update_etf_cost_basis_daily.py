@@ -150,8 +150,15 @@ def fetch_farside_table() -> tuple[list[str], list[dict]]:
 
 
 def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price: dict) -> list[dict]:
+    # ademas de btc/cost (para el promedio ponderado) se acumula sqcost = suma(qty*precio^2) de
+    # las monedas que siguen en balance - con eso, var = sqcost/btc - avg^2 es la varianza real
+    # (ponderada por BTC) de los precios de entrada que componen el balance actual, sin tener que
+    # guardar cada compra individual. Esto alimenta la banda Upper/Lower del lado del cliente:
+    # antes se armaba con cuanto se aleja el PRECIO DE BTC del costo base (eso mide volatilidad de
+    # BTC, no dispersion del costo base, y por eso la banda quedaba desproporcionada - un dia de
+    # 2021 con el precio en 4x el costo base de entonces inflaba la banda para todo el historico).
     active = [t for t in tickers if t.strip().upper() not in EXCLUDE_TICKERS]
-    state = {t: {"btc": 0.0, "cost": 0.0} for t in active}
+    state = {t: {"btc": 0.0, "cost": 0.0, "sqcost": 0.0} for t in active}
     out = []
     for row in sorted(flow_rows, key=lambda r: r["date"]):
         d = row["date"]
@@ -167,20 +174,26 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
             if flow_usd > 0:
                 st["btc"] += flow_usd / price
                 st["cost"] += flow_usd
+                st["sqcost"] += flow_usd * price
             elif flow_usd < 0 and st["btc"] > 0:
                 btc_out = min(-flow_usd / price, st["btc"])
                 avg = st["cost"] / st["btc"]
+                avgsq = st["sqcost"] / st["btc"]
                 st["cost"] -= btc_out * avg
+                st["sqcost"] -= btc_out * avgsq
                 st["btc"] -= btc_out
         total_btc = sum(s["btc"] for s in state.values())
         total_cost = sum(s["cost"] for s in state.values())
+        total_sqcost = sum(s["sqcost"] for s in state.values())
         if total_btc > 0:
             avg_cost = total_cost / total_btc
+            variance = max(total_sqcost / total_btc - avg_cost * avg_cost, 0.0)
             if MIN_SANE_PRICE <= avg_cost <= MAX_SANE_PRICE:
                 out.append({
                     "date": d,
                     "total_btc_held": round(total_btc, 4),
                     "avg_cost_basis_usd": round(avg_cost, 2),
+                    "cost_basis_std_usd": round(variance ** 0.5, 2),
                 })
     return forward_fill_daily(out), state, active
 
@@ -204,7 +217,8 @@ def forward_fill_daily(rows: list[dict]) -> list[dict]:
             last = by_date[iso]
         if last is not None:
             filled.append({"date": iso, "total_btc_held": last["total_btc_held"],
-                           "avg_cost_basis_usd": last["avg_cost_basis_usd"]})
+                           "avg_cost_basis_usd": last["avg_cost_basis_usd"],
+                           "cost_basis_std_usd": last["cost_basis_std_usd"]})
         d += timedelta(days=1)
     return filled
 
@@ -265,6 +279,7 @@ def main():
         log.info(f"  {t}: {btc:,.0f} BTC @ ${avg:,.0f} costo base")
     costs = [r["avg_cost_basis_usd"] for r in rows]
     log.info(f"avg_cost_basis_usd en el historico: min=${min(costs):,.0f} max=${max(costs):,.0f} hoy=${costs[-1]:,.0f}")
+    log.info(f"cost_basis_std_usd hoy: ${rows[-1]['cost_basis_std_usd']:,.0f} ({rows[-1]['cost_basis_std_usd'] / rows[-1]['avg_cost_basis_usd'] * 100:.1f}% del costo base)")
 
     delete_all_rows()
     upsert_rows(rows)
