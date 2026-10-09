@@ -14,9 +14,20 @@ mas realistas que sean, porque no hay motor JS que lo resuelva). Por eso fetch_f
 Playwright (Chromium headless) en vez de requests: un navegador de verdad SI puede resolver ese
 challenge solo, con tal de esperar a que la pagina real cargue.
 
-GBTC se excluye del agregado: traia BTC desde antes de convertirse en ETF (enero 2024) y su
-historial de flujos post-conversion es casi puro de salida - tratarlo solo con flujos post-
-conversion daria un balance/costo sin sentido (negativo o indefinido).
+GBTC se incluye con un "arranque" especial: traia BTC desde antes de convertirse en ETF (enero
+2024, como fideicomiso cerrado desde 2013) y su historial de flujos post-conversion en Farside es
+casi puro de salida - tratarlo solo con esos flujos (sin saldo inicial) da un balance/costo sin
+sentido (negativo o indefinido). Por eso se siembra su estado a la fecha de conversion con:
+  - GBTC_CONVERSION_BTC: su balance real ese dia (dato publico, de la propia conversion).
+  - GBTC_CONVERSION_AVG_COST_USD: UNA ESTIMACION documentada, no una reconstruccion - a diferencia
+    de todo lo demas en este robot, no existe un feed de transacciones de GBTC como fideicomiso
+    (2013-2024, acumulo BTC por aportes en especie de inversionistas, no compras en mercado
+    abierto con precio observable) para reconstruir un VWAC real. La estimacion refleja que el
+    grueso de su crecimiento en BTC ocurrio durante el rally 2020-2021 (precio tipico $10k-$35k),
+    no en sus años mas baratos (2013-2017) ni en sus años mas caros (2021-2023), cuando ya estaba
+    estancado por su descuento perenne frente al NAV.
+Desde ese arranque, sus flujos reales de Farside (casi siempre negativos, salidas) se procesan con
+la misma formula VWAC de abajo - una salida no cambia el costo promedio, solo reduce el balance.
 
 Formula VWAC por ETF (se reconstruye el historico completo en cada corrida, igual que el resto
 de robots del repo - Farside no tiene paginacion/limite de tasa documentado y el calculo entero
@@ -49,9 +60,16 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TABLE = "etf_cost_basis_daily"
 
 FARSIDE_URL = "https://farside.co.uk/bitcoin-etf-flow-all-data/"
-EXCLUDE_TICKERS = {"GBTC", "TOTAL", ""}
+EXCLUDE_TICKERS = {"TOTAL", ""}
 MIN_SANE_PRICE = 100
 MAX_SANE_PRICE = 1_000_000
+
+# balance real de GBTC al momento de su conversion a ETF (11-ene-2024, dato publico de Grayscale/
+# la propia conversion) y una estimacion documentada de su costo base de esa epoca (ver docstring
+# arriba - no hay transacciones reconstruibles de sus años como fideicomiso)
+GBTC_CONVERSION_DATE = "2024-01-11"
+GBTC_CONVERSION_BTC = 619_220
+GBTC_CONVERSION_AVG_COST_USD = 22_000
 
 MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
           "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
@@ -159,27 +177,19 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
     # 2021 con el precio en 4x el costo base de entonces inflaba la banda para todo el historico).
     active = [t for t in tickers if t.strip().upper() not in EXCLUDE_TICKERS]
     state = {t: {"btc": 0.0, "cost": 0.0, "sqcost": 0.0} for t in active}
+    if "GBTC" in state:
+        # arranque de GBTC a su fecha de conversion - ver docstring y constantes arriba
+        state["GBTC"] = {
+            "btc": float(GBTC_CONVERSION_BTC),
+            "cost": GBTC_CONVERSION_BTC * GBTC_CONVERSION_AVG_COST_USD,
+            "sqcost": GBTC_CONVERSION_BTC * GBTC_CONVERSION_AVG_COST_USD ** 2,
+        }
     out = []
-    # diagnostico temporal: el usuario comparo contra Capriole y alla Treasuries queda POR ENCIMA
-    # de ETFs (al reves que en nuestros datos) - esto traza la trayectoria mes a mes del costo de
-    # IBIT (el ETF dominante, con historia publica conocida: arranco ene-2024 con BTC ~$46k y tuvo
-    # entradas masivas en sus primeros meses) para confirmar si esas compras baratas de verdad
-    # estan entrando al promedio ponderado o se estan perdiendo en algun punto del calculo
-    seen_months = set()
-    skipped_no_price = []
     for row in sorted(flow_rows, key=lambda r: r["date"]):
         d = row["date"]
         price = btc_price.get(d)
         if price is None or not (MIN_SANE_PRICE <= price <= MAX_SANE_PRICE):
-            skipped_no_price.append(d)
             continue
-        month_key = d[:7]
-        if month_key not in seen_months:
-            seen_months.add(month_key)
-            ibit = state.get("IBIT")
-            if ibit and ibit["btc"] > 0:
-                avg = ibit["cost"] / ibit["btc"]
-                log.info(f"DIAG IBIT al {d}: {ibit['btc']:,.0f} BTC @ ${avg:,.0f}")
         for t in active:
             flow_m = row.get(t)
             if flow_m is None:
@@ -210,8 +220,6 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
                     "avg_cost_basis_usd": round(avg_cost, 2),
                     "cost_basis_std_usd": round(variance ** 0.5, 2),
                 })
-    if skipped_no_price:
-        log.info(f"DIAG {len(skipped_no_price)} filas de Farside sin precio de BTC (se omitieron): {skipped_no_price[:5]}{'...' if len(skipped_no_price) > 5 else ''}")
     return forward_fill_daily(out), state, active
 
 
@@ -284,10 +292,6 @@ def main():
 
     tickers, flow_rows = fetch_farside_table()
     log.info(f"Farside: columnas {tickers}, {len(flow_rows)} filas de fecha")
-    if flow_rows:
-        sorted_rows = sorted(flow_rows, key=lambda r: r["date"])
-        log.info(f"DIAG primera fecha de Farside: {sorted_rows[0]}")
-        log.info(f"DIAG primeras 5 filas IBIT: {[(r['date'], r.get('IBIT')) for r in sorted_rows[:5]]}")
 
     rows, state, active = compute_etf_daily_rows(tickers, flow_rows, btc_price)
     if not rows:
