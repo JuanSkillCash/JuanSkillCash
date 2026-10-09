@@ -4691,7 +4691,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son ±1 desviación estándar ponderada por BTC de los precios de entrada individuales que componen ese costo base — es decir, qué tan dispersas están las compras reales entre sí, no cuánto se aleja el precio actual de BTC de ellas.<br>
+                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±1 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
                 🏢 Cuando el precio de BTC está muy por encima de la línea dorada, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
                 🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se excluye por tener BTC desde antes de ser ETF.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -18345,8 +18345,18 @@ function renderTreasCostBasisChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const upperVals = points.map(p => p.blendedCost + p.blendedStd);
-  const lowerVals = points.map(p => Math.max(p.blendedCost - p.blendedStd, p.blendedCost * 0.3));
+  // la banda usa un porcentaje CONSTANTE (la dispersion de HOY, la mas madura: con todo el
+  // historial de transacciones ya acumulado) en vez de la desviacion estandar de CADA dia por
+  // separado. Esa version dia-a-dia quedaba ruidosa al principio del historico (cuando una
+  // empresa recien tenia 2-3 compras, el rango de precios recorrido hasta ese punto ya era un
+  // porcentaje enorme de una base todavia chiquita) y ademas, al sumar/restar esa desviacion en
+  // dolares sobre una escala logaritmica, se veia asimetrica (restar es una caida porcentual mas
+  // grande que sumar es una subida, en una grafica log) - la referencia real de Capriole muestra
+  // un canal de ancho estable en todo el historico, no uno que se infla al principio
+  const lastFullPt = fullPoints[fullPoints.length - 1];
+  const bandRatio = lastFullPt.blendedCost > 0 ? lastFullPt.blendedStd / lastFullPt.blendedCost : 0;
+  const upperVals = points.map(p => p.blendedCost * (1 + bandRatio));
+  const lowerVals = points.map(p => Math.max(p.blendedCost / (1 + bandRatio), p.blendedCost * 0.3));
   const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
     .flat().filter(v => v > 0);
   const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
