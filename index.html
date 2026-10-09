@@ -1735,6 +1735,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="sthmvrv">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">STH-MVRV</span>
       </button>
+      <button class="sb-item" data-indic-jump="treascb">
+        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
+      </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button class="sb-item" data-indic-jump="ethereumguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
@@ -2030,6 +2033,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="sthmvrv">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">STH-MVRV</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treascb">
+        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethereumguia">
@@ -4643,6 +4649,51 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 ⚓ <b>STH Cost Basis</b>: el costo base promedio (ponderado por valor) de las monedas que se movieron on-chain por última vez hace menos de 150 días — es el precio al que "en promedio" compró el holder de corto plazo. Las bandas punteadas son ±1 desviación estándar del MVRV histórico sobre ese costo base.<br>
                 📊 <b>STH-MVRV</b> (panel inferior) es el precio actual dividido entre ese costo base — por encima de 1 (verde) el holder de corto plazo promedio está en ganancia, por debajo de 1 (rojo) está en pérdida.<br>
                 🔎 Fuente de datos: <a href="https://bitview.space" target="_blank" rel="noopener">Bitview / Bitcoin Research Kit</a> (histórico completo, calculado desde un nodo Bitcoin Core independiente), con <a href="https://bitcoin-data.com" target="_blank" rel="noopener">bitcoin-data.com</a> como referencia cruzada.<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="treascb" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Costo Base Institucional (Treasuries Corporativas)</h2>
+              </div>
+
+              <div class="tf-pill-row" id="treascbRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+                <button type="button" class="tf-pill" data-range="1a">1 año</button>
+              </div>
+
+              <div class="indic-chart-body" id="treascbChartBody">
+                <div class="indic-chart-soon" id="treascbLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Reconstruyendo el costo base de las empresas con BTC en su balance.</div>
+                </div>
+                <div class="indic-chart-soon" id="treascbError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="treascbChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="treascbDateSlider" class="date-range-slider"></div>
+              </div>
+              <div class="partner-perks" id="treascbLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                💎 <b>Costo Base Institucional</b>: el precio promedio (ponderado por BTC en balance) al que compraron las empresas públicas con más Bitcoin en su tesorería — reconstruido transacción por transacción desde que cada una empezó a comprar.<br>
+                🏢 Cuando el precio de BTC está muy por encima de esta línea, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
+                🔎 Fuente de datos: API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones de las principales empresas con BTC en balance, ej. Strategy/MicroStrategy). Solo cubre empresas, no ETFs spot.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -7503,7 +7554,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
@@ -7543,7 +7594,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -7680,6 +7731,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'btcaapl') ensureBtcAaplLoaded();
       if(btn.dataset.indic === 'btcreturns') ensureBtcReturnsLoaded();
       if(btn.dataset.indic === 'sthmvrv') ensureSthMvrvLoaded();
+      if(btn.dataset.indic === 'treascb') ensureTreasCostBasisLoaded();
       if(btn.dataset.indic === 'ethreturns') ensureEthReturnsLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
@@ -7739,6 +7791,7 @@ function jumpToIndicator(id){
     if(id === 'btcaapl') ensureBtcAaplLoaded();
     if(id === 'btcreturns') ensureBtcReturnsLoaded();
     if(id === 'sthmvrv') ensureSthMvrvLoaded();
+    if(id === 'treascb') ensureTreasCostBasisLoaded();
     if(id === 'ethreturns') ensureEthReturnsLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'optionsoi') ensureOptionsOiLoaded();
@@ -18150,6 +18203,212 @@ document.querySelectorAll('#sthmvrvRangeFilter .tf-pill').forEach(btn => {
     renderSthMvrvChart();
   });
 });
+/* ---- Costo Base Institucional: precio de BTC + costo base promedio (ponderado por BTC en
+   balance) de las empresas públicas con más Bitcoin en su tesorería. Datos desde Supabase
+   (tabla treasury_cost_basis_daily), alimentada por update_treasury_cost_basis_daily.py
+   (fuente: API pública de CoinGecko Public Treasury - transaction_history por empresa). Fase 1
+   del indicador "Costo Base Institucional" de Capriole - solo empresas, los ETFs spot quedan
+   para una fase 2 aparte. */
+let treasCbRawCache = null;
+async function fetchTreasCostBasisHistory(){
+  if(treasCbRawCache) return treasCbRawCache;
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await withRetry(() => sbClient
+      .from('treasury_cost_basis_daily')
+      .select('date,total_btc_held,avg_cost_basis_usd')
+      .order('date', { ascending: true })
+      .range(from, from + pageSize - 1), 3, 500);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  treasCbRawCache = rows;
+  return rows;
+}
+let treasCbMergedCache = null;
+async function fetchTreasCostBasisMergedSeries(){
+  if(treasCbMergedCache) return treasCbMergedCache;
+  const [btcHistory, cbRows] = await Promise.all([fetchHalvingHistory(), fetchTreasCostBasisHistory()]);
+  const cbByDay = new Map();
+  cbRows.forEach(r => {
+    const costBasis = r.avg_cost_basis_usd != null ? Number(r.avg_cost_basis_usd) : null;
+    const btcHeld = r.total_btc_held != null ? Number(r.total_btc_held) : null;
+    if(costBasis > 0) cbByDay.set(r.date, { costBasis, btcHeld });
+  });
+  const merged = [];
+  btcHistory.forEach(p => {
+    const key = new Date(p.t).toISOString().slice(0, 10);
+    const c = cbByDay.get(key);
+    if(c) merged.push({ t: p.t, btc: p.c, costBasis: c.costBasis, btcHeld: c.btcHeld });
+  });
+  treasCbMergedCache = merged;
+  return merged;
+}
+const TREASCB_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2, '1a': 1 };
+let treasCbActiveRange = 'todo';
+let treasCbCustomRange = null;
+let treasCbSlider = null;
+function renderTreasCostBasisChart(){
+  const loadingEl = document.getElementById('treascbLoading');
+  const errorEl = document.getElementById('treascbError');
+  const wrap = document.getElementById('treascbChartWrap');
+  const legendEl = document.getElementById('treascbLegend');
+  const statsEl = document.getElementById('treascbStats');
+  const fullPoints = treasCbMergedCache;
+  if(!fullPoints || fullPoints.length < 30){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
+  let fromMs, toMs;
+  if(treasCbCustomRange){
+    fromMs = treasCbCustomRange.fromMs;
+    toMs = treasCbCustomRange.toMs;
+  } else {
+    const rangeYears = TREASCB_RANGE_YEARS[treasCbActiveRange];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const points = fullPoints.filter(p => p.t >= fromMs && p.t <= toMs);
+  if(!points.length) return;
+
+  if(treasCbSlider) treasCbSlider.setRange(fromMs, toMs);
+  else{
+    treasCbSlider = createDateRangeSlider('treascbDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      treasCbCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderTreasCostBasisChart();
+    });
+  }
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const allPrices = points.map(p => p.btc).concat(points.map(p => p.costBasis)).filter(v => v > 0);
+  const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 460;
+  const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const drawW = totalW - marginLeft - marginRight;
+  const priceTop = marginTop, priceBottom = totalH - marginBottom;
+  const priceH = priceBottom - priceTop;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
+
+  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yForPrice(t);
+    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+  });
+  const priceGridHtml = yTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+
+  function pathFor(getV){
+    let d = '', drawing = false;
+    points.forEach(p => {
+      const v = getV(p);
+      if(v == null || !isFinite(v) || v <= 0){ drawing = false; return; }
+      d += `${drawing ? 'L' : 'M'}${xFor(p.t).toFixed(1)},${yForPrice(v).toFixed(1)} `;
+      drawing = true;
+    });
+    return d.trim();
+  }
+  const btcLine = pathFor(p => p.btc);
+  const costBasisLine = pathFor(p => p.costBasis);
+
+  const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${priceBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="treascbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
+        ${priceGridHtml}
+        <path d="${costBasisLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="treascbHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="treascbHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="treascbHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="treascbHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="treascbHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="treascbTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const treascbSvg = document.getElementById('treascbChartSvg');
+  wireChartHover({
+    svg: treascbSvg, catcherId: 'treascbHoverCatcher', lineId: 'treascbHoverLine', dotId: 'treascbHoverDot',
+    dateLabelId: 'treascbHoverDateLabel', dateBgId: 'treascbHoverDateBg', tooltipId: 'treascbTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yForPrice(points[i].btc),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].btc)}</b><br><span style="color:#2fd0c5">Costo base institucional: ${fmtHalvingPrice(points[i].costBasis)}</span>`,
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2fd0c5"></span>Costo Base Institucional</span>
+  `;
+
+  const last = points[points.length - 1];
+  const premiumPct = (last.btc / last.costBasis - 1) * 100;
+  statsEl.innerHTML = `
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(last.btc)}</div></div>
+    <div class="res-card"><div class="r-label">Costo Base Institucional</div><div class="r-val">${fmtHalvingPrice(last.costBasis)}</div></div>
+    <div class="res-card"><div class="r-label">Premio/Descuento vs. costo base</div><div class="r-val" style="color:${premiumPct >= 0 ? '#22c55e' : '#ff2f4f'}">${premiumPct >= 0 ? '+' : ''}${premiumPct.toFixed(1)}%</div></div>
+    <div class="res-card"><div class="r-label">BTC en balance (empresas cubiertas)</div><div class="r-val">${Math.round(last.btcHeld).toLocaleString('es-ES')} BTC</div></div>
+  `;
+}
+async function loadTreasCostBasisDetail(){
+  try{ await fetchTreasCostBasisMergedSeries(); } catch(err){ /* renderTreasCostBasisChart muestra el estado de error si no hay datos */ }
+  renderTreasCostBasisChart();
+}
+let treasCbLoadedOnce = false;
+function ensureTreasCostBasisLoaded(){ if(!treasCbLoadedOnce){ treasCbLoadedOnce = true; loadTreasCostBasisDetail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="treascb"]').style.display !== 'none') renderTreasCostBasisChart();
+});
+document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    treasCbActiveRange = btn.dataset.range;
+    treasCbCustomRange = null;
+    renderTreasCostBasisChart();
+  });
+});
 /* ---- Media Móvil de 4 Años: índice = precio de cierre ÷ promedio de los últimos 1460 días
    (~4 años), sobre el mismo historial diario compartido que ya usan Halving/RSI Mensual/etc.
    (fetchHalvingHistory). Los primeros ~4 años usan una ventana que va creciendo (no hay 1460
@@ -19898,6 +20157,7 @@ const BITCOIN_GUIA_INDICATORS = [
   { id: 'btcaapl', icon: '🍎', label: 'BTC/AAPL', def: 'El precio de BTC medido en acciones de Apple, en vez de dólares.' },
   { id: 'btcreturns', icon: '📅', label: 'Retornos de Bitcoin', def: 'Cómo le ha ido a BTC por año, trimestre, mes o semana — en pestañas, para ver de un vistazo si hay estacionalidad (ej. "septiembre rojo").' },
   { id: 'sthmvrv', icon: '⚓', label: 'STH-MVRV', def: 'El precio de BTC frente al costo base promedio de quien compró hace menos de 150 días — por encima de 1 ese holder está en ganancia, por debajo en pérdida. Útil para ver capitulaciones y euforia de corto plazo.' },
+  { id: 'treascb', icon: '💎', label: 'Costo Base Institucional', def: 'El precio promedio al que compraron BTC las empresas públicas con más Bitcoin en su balance (ej. Strategy/MicroStrategy) — reconstruido transacción por transacción desde la API pública de CoinGecko.' },
 ];
 const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },

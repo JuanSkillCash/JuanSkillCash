@@ -88,3 +88,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_cost_of_production_daily.py
+
+      - name: Actualizar Costo Base Institucional (Treasuries corporativas)
+        # continue-on-error: depende de la API publica de CoinGecko (companies/public_treasury
+        # + entities/list + transaction_history) - un fallo o un entity_id que cambie de nombre
+        # no debe tumbar el resto de pasos ya corridos arriba
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_treasury_cost_basis_daily.py
