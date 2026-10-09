@@ -19,13 +19,17 @@ GBTC se incluye con un "arranque" especial: traia BTC desde antes de convertirse
 casi puro de salida - tratarlo solo con esos flujos (sin saldo inicial) da un balance/costo sin
 sentido (negativo o indefinido). Por eso se siembra su estado a la fecha de conversion con:
   - GBTC_CONVERSION_BTC: su balance real ese dia (dato publico, de la propia conversion).
-  - GBTC_CONVERSION_AVG_COST_USD: UNA ESTIMACION documentada, no una reconstruccion - a diferencia
-    de todo lo demas en este robot, no existe un feed de transacciones de GBTC como fideicomiso
-    (2013-2024, acumulo BTC por aportes en especie de inversionistas, no compras en mercado
-    abierto con precio observable) para reconstruir un VWAC real. La estimacion refleja que el
-    grueso de su crecimiento en BTC ocurrio durante el rally 2020-2021 (precio tipico $10k-$35k),
-    no en sus años mas baratos (2013-2017) ni en sus años mas caros (2021-2023), cuando ya estaba
-    estancado por su descuento perenne frente al NAV.
+  - el precio de mercado REAL de blockchain.info en GBTC_CONVERSION_DATE, como costo base de
+    arranque. No existe un feed de transacciones de GBTC como fideicomiso (2013-2024, acumulo BTC
+    por aportes en especie de inversionistas, no compras en mercado abierto con precio obervable
+    dia a dia) para reconstruir un VWAC real de esa etapa - pero la conversion a ETF en si misma
+    SI tiene un precio de mercado real y verificable ese dia, y tratar esa conversion como la
+    "entrada" de esas monedas al costo de mercado de ese dia (igual que cualquier flujo de
+    cualquier otro ETF) es consistente con el resto del calculo, no una estimacion a ojo. (Una
+    primera version de este robot uso un estimado fijo de $22,000 basado en que el grueso del
+    crecimiento de GBTC fue durante el rally 2020-2021 - comparado contra la referencia real de
+    Capriole, el costo base de ETFs quedaba ~3% mas bajo que el de ellos; el precio real de
+    conversion calza casi exacto con el valor que haria falta para cuadrar esa diferencia).
 Desde ese arranque, sus flujos reales de Farside (casi siempre negativos, salidas) se procesan con
 la misma formula VWAC de abajo - una salida no cambia el costo promedio, solo reduce el balance.
 
@@ -65,11 +69,10 @@ MIN_SANE_PRICE = 100
 MAX_SANE_PRICE = 1_000_000
 
 # balance real de GBTC al momento de su conversion a ETF (11-ene-2024, dato publico de Grayscale/
-# la propia conversion) y una estimacion documentada de su costo base de esa epoca (ver docstring
-# arriba - no hay transacciones reconstruibles de sus años como fideicomiso)
+# la propia conversion) - el costo base de arranque se toma del precio real de mercado ese mismo
+# dia (ver docstring arriba), no de un estimado
 GBTC_CONVERSION_DATE = "2024-01-11"
 GBTC_CONVERSION_BTC = 619_220
-GBTC_CONVERSION_AVG_COST_USD = 22_000
 
 MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
           "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
@@ -178,12 +181,25 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
     active = [t for t in tickers if t.strip().upper() not in EXCLUDE_TICKERS]
     state = {t: {"btc": 0.0, "cost": 0.0, "sqcost": 0.0} for t in active}
     if "GBTC" in state:
-        # arranque de GBTC a su fecha de conversion - ver docstring y constantes arriba
+        # arranque de GBTC a su fecha de conversion - ver docstring y constantes arriba. el costo
+        # de arranque es el precio REAL de blockchain.info ese dia, no un estimado - si por algun
+        # motivo faltara ese dia puntual en btc_price, se busca el mas cercano en vez de fallar
+        conv_price = btc_price.get(GBTC_CONVERSION_DATE)
+        if conv_price is None:
+            conv_date = date.fromisoformat(GBTC_CONVERSION_DATE)
+            for offset in range(1, 8):
+                conv_price = btc_price.get((conv_date + timedelta(days=offset)).isoformat()) \
+                    or btc_price.get((conv_date - timedelta(days=offset)).isoformat())
+                if conv_price is not None:
+                    break
+        if conv_price is None:
+            raise RuntimeError(f"no se encontro precio de BTC cerca de {GBTC_CONVERSION_DATE} para sembrar GBTC")
         state["GBTC"] = {
             "btc": float(GBTC_CONVERSION_BTC),
-            "cost": GBTC_CONVERSION_BTC * GBTC_CONVERSION_AVG_COST_USD,
-            "sqcost": GBTC_CONVERSION_BTC * GBTC_CONVERSION_AVG_COST_USD ** 2,
+            "cost": GBTC_CONVERSION_BTC * conv_price,
+            "sqcost": GBTC_CONVERSION_BTC * conv_price ** 2,
         }
+        log.info(f"GBTC sembrado: {GBTC_CONVERSION_BTC:,.0f} BTC @ ${conv_price:,.0f} (precio real de {GBTC_CONVERSION_DATE})")
     out = []
     for row in sorted(flow_rows, key=lambda r: r["date"]):
         d = row["date"]
