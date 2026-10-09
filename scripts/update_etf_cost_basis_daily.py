@@ -14,20 +14,32 @@ mas realistas que sean, porque no hay motor JS que lo resuelva). Por eso fetch_f
 Playwright (Chromium headless) en vez de requests: un navegador de verdad SI puede resolver ese
 challenge solo, con tal de esperar a que la pagina real cargue.
 
-GBTC se incluye con un "arranque" especial - traia BTC desde antes de convertirse en ETF
-(fideicomiso cerrado desde 2013, sin flujos diarios publicos reconstruibles). Se siembra su
-balance real del dia de conversion a ETF (11-ene-2024, 619,220 BTC, dato publico) con un costo
-base de arranque = el precio REAL de mercado de BTC ese mismo dia (blockchain.info) - se trata la
-conversion como si esas monedas "entraran" ese dia al precio de mercado, igual que cualquier flujo
-de cualquier otro ETF. De ahi en adelante GBTC sigue exactamente la misma formula VWAC que el
-resto de ETFs (sin regla de salida especial).
+GBTC se incluye con un "arranque" especial y una regla de salida distinta al resto de ETFs -
+traia BTC desde antes de convertirse en ETF (fideicomiso cerrado desde 2013) y su historial de
+flujos post-conversion en Farside es casi puro de salida (redenciones). Dos versiones previas de
+este robot adivinaron el costo base de arranque (primero $22,000 a ojo, despues el precio de
+mercado del dia de conversion, ~$46,649) - ambas resultaron mal. La version real viene de los
+propios 10-K/10-Q de Grayscale ante la SEC (reportan el costo total en USD del Bitcoin en
+cartera junto con el balance en BTC - ver GBTC_SEED_* abajo):
+  31-dic-2023 (ultimo reporte antes de convertirse en ETF): 619,526 BTC @ $7,016.9M = ~$11,326/BTC
+Ademas, los reportes posteriores muestran que el costo POR BTC de GBTC SUBE con el tiempo
+(~$11,326 a fin de 2023 -> ~$17,160 a fin de 2025 -> ~$18,440 a jun-2026) - algo que NO puede pasar
+si las redenciones sacan una porcion proporcional al costo promedio corriente (eso deja el
+promedio igual, nunca lo sube). Solo se explica si Grayscale da de baja los lotes MAS BARATOS
+primero en cada redencion (contablemente FIFO o similar). Se reconstruyen los costos de remocion
+implicitos en cada tramo real reportado (ver GBTC_REMOVAL_COST_INTERVALS): para fechas sin reporte
+todavia (despues de jun-2026) se usa el costo de remocion del ultimo tramo conocido en vez de
+inventar una extrapolacion sin respaldo.
 
 Formula VWAC por ETF (se reconstruye el historico completo en cada corrida, igual que el resto
 de robots del repo - Farside no tiene paginacion/limite de tasa documentado y el calculo entero
 es barato):
   - entrada ese dia (flow > 0 USD): btc += flow/precio ; costo += flow
-  - salida ese dia (flow < 0 USD): btc_out = min(|flow|/precio, btc) ; costo -= btc_out*(costo/btc)
-    ; btc -= btc_out (el costo promedio por moneda NO cambia en una salida, solo el total)
+  - salida ese dia (flow < 0 USD): btc_out = min(|flow|/precio, btc) ; costo -= btc_out*costo_remocion
+    ; btc -= btc_out . Para todos los ETFs excepto GBTC, costo_remocion = costo/btc (el costo
+    promedio por moneda NO cambia en una salida, solo el total). Para GBTC, costo_remocion viene
+    de GBTC_REMOVAL_COST_INTERVALS (los lotes mas baratos salen primero, el promedio de lo que
+    queda sube).
   - costo base del ETF en cualquier momento = costo / btc
 
 Variables de entorno requeridas:
@@ -57,9 +69,29 @@ EXCLUDE_TICKERS = {"TOTAL", ""}
 MIN_SANE_PRICE = 100
 MAX_SANE_PRICE = 1_000_000
 
-# balance real de GBTC al convertirse en ETF (11-ene-2024, dato publico) - ver docstring arriba
-GBTC_CONVERSION_DATE = "2024-01-11"
-GBTC_CONVERSION_BTC = 619_220
+# estado real de GBTC segun su ultimo 10-K/10-Q ante la SEC antes de convertirse en ETF
+# (31-dic-2023: 619,526 BTC @ $7,016.9M de costo total) - ver docstring arriba
+GBTC_SEED_DATE = "2023-12-31"
+GBTC_SEED_BTC = 619_526
+GBTC_SEED_COST_USD = 7_016_900_000.0
+
+# costo de remocion implicito por tramo, reconstruido de reportes reales de la SEC (no es el
+# costo promedio corriente - es mas bajo, porque las redenciones dan de baja los lotes mas
+# baratos primero): (fecha_desde, fecha_hasta, costo_usd_por_btc_removido)
+#   tramo 2024-2025: (7,016.9M-2,841.5M)/(619,526-165,591 BTC removidos) = $9,199.37
+#   tramo ene-jun 2026: (2,841.5M-2,554.3M)/(165,591-138,506 BTC removidos) = $10,602.93
+GBTC_REMOVAL_COST_INTERVALS = [
+    ("2024-01-01", "2025-12-31", 9_199.37),
+    ("2026-01-01", "2026-06-30", 10_602.93),
+]
+GBTC_REMOVAL_COST_DEFAULT = 10_602.93  # tramo mas reciente conocido - se usa tambien hacia adelante
+
+
+def gbtc_removal_cost(iso_date: str) -> float:
+    for start, end, cost in GBTC_REMOVAL_COST_INTERVALS:
+        if start <= iso_date <= end:
+            return cost
+    return GBTC_REMOVAL_COST_DEFAULT
 
 MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
           "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
@@ -168,24 +200,15 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
     active = [t for t in tickers if t.strip().upper() not in EXCLUDE_TICKERS]
     state = {t: {"btc": 0.0, "cost": 0.0, "sqcost": 0.0} for t in active}
     if "GBTC" in state:
-        # arranque de GBTC con su balance real del dia de conversion a ETF, al precio REAL de
-        # mercado de BTC ese mismo dia - ver docstring y constantes arriba
-        conv_price = btc_price.get(GBTC_CONVERSION_DATE)
-        if conv_price is None:
-            conv_date = date.fromisoformat(GBTC_CONVERSION_DATE)
-            for offset in range(1, 8):
-                conv_price = (btc_price.get((conv_date + timedelta(days=offset)).isoformat())
-                              or btc_price.get((conv_date - timedelta(days=offset)).isoformat()))
-                if conv_price is not None:
-                    break
-        if conv_price is None:
-            raise RuntimeError(f"no se encontro precio de BTC cerca de {GBTC_CONVERSION_DATE} para sembrar GBTC")
+        # arranque de GBTC con su estado real segun el ultimo 10-K/10-Q de Grayscale antes de
+        # convertirse en ETF - ver docstring y constantes arriba
+        seed_avg = GBTC_SEED_COST_USD / GBTC_SEED_BTC
         state["GBTC"] = {
-            "btc": float(GBTC_CONVERSION_BTC),
-            "cost": GBTC_CONVERSION_BTC * conv_price,
-            "sqcost": GBTC_CONVERSION_BTC * conv_price ** 2,
+            "btc": float(GBTC_SEED_BTC),
+            "cost": GBTC_SEED_COST_USD,
+            "sqcost": GBTC_SEED_BTC * seed_avg ** 2,
         }
-        log.info(f"GBTC sembrado: {GBTC_CONVERSION_BTC:,.0f} BTC @ ${conv_price:,.0f} (precio real de {GBTC_CONVERSION_DATE})")
+        log.info(f"GBTC sembrado: {GBTC_SEED_BTC:,.0f} BTC @ ${seed_avg:,.0f} (10-K/10-Q SEC al {GBTC_SEED_DATE})")
     out = []
     for row in sorted(flow_rows, key=lambda r: r["date"]):
         d = row["date"]
@@ -204,10 +227,15 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
                 st["sqcost"] += flow_usd * price
             elif flow_usd < 0 and st["btc"] > 0:
                 btc_out = min(-flow_usd / price, st["btc"])
-                avg = st["cost"] / st["btc"]
-                avgsq = st["sqcost"] / st["btc"]
-                st["cost"] -= btc_out * avg
-                st["sqcost"] -= btc_out * avgsq
+                if t == "GBTC":
+                    # las redenciones de GBTC dan de baja los lotes mas baratos primero (ver
+                    # docstring) - el costo de remocion real NO es el promedio corriente
+                    removal = gbtc_removal_cost(d)
+                else:
+                    removal = st["cost"] / st["btc"]
+                removal_sq = removal ** 2 if t == "GBTC" else st["sqcost"] / st["btc"]
+                st["cost"] -= btc_out * removal
+                st["sqcost"] -= btc_out * removal_sq
                 st["btc"] -= btc_out
         total_btc = sum(s["btc"] for s in state.values())
         total_cost = sum(s["cost"] for s in state.values())
