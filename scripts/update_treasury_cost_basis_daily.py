@@ -90,8 +90,28 @@ def normalize_name(name: str) -> str:
 
 
 def fetch_entity_id_map() -> tuple[dict, dict]:
-    raw = cg_get("entities/list")
-    entities = raw if isinstance(raw, list) else raw.get("entities", raw.get("data", []))
+    # entities/list no tiene filtro por nombre/simbolo - hay que paginarlo entero. La primera
+    # corrida real (con el per_page=100 por defecto) mostro que entities/list no viene ordenado
+    # por tenencia/relevancia (la entidad #1 era "333D", una desconocida) sino aparentemente por
+    # id alfabetico - con eso Strategy/Tesla (que empiezan tarde en el alfabeto) quedaban fuera
+    # de las primeras 100. page>1 esta bloqueado para el plan gratuito en transaction_history,
+    # pero no hay esa restriccion documentada para entities/list, así que se pagina hasta que
+    # una pagina salga vacia o falle (en cuyo caso nos quedamos con lo ya conseguido)
+    entities = []
+    for page in range(1, 11):
+        try:
+            raw = cg_get("entities/list", {"per_page": 250, "page": page})
+        except RuntimeError as err:
+            log.warning(f"entities/list pagina {page} fallo (probablemente limite del plan gratis): {err}")
+            break
+        batch = raw if isinstance(raw, list) else raw.get("entities", raw.get("data", []))
+        if not batch:
+            break
+        entities.extend(batch)
+        if len(batch) < 250:
+            break
+        time.sleep(REQUEST_SLEEP_SECONDS)
+
     by_symbol, by_name = {}, {}
     for e in entities:
         entity_id = e.get("entity_id") or e.get("id")
@@ -103,17 +123,7 @@ def fetch_entity_id_map() -> tuple[dict, dict]:
         name = normalize_name(e.get("name") or "")
         if name and name not in by_name:
             by_name[name] = entity_id
-    # diagnostico temporal: la primera corrida real solo calzo 1 de 20 empresas (ni Strategy ni
-    # Tesla aparecieron) - esto confirma si entities/list de verdad trae esos nombres y bajo que
-    # campos exactos, en vez de seguir adivinando el formato a ciegas
-    log.info(f"entities/list: {len(entities)} entidades, {len(by_symbol)} con symbol, {len(by_name)} con name")
-    if entities:
-        log.info(f"ejemplo crudo de una entidad: {entities[0]}")
-    needles = ("strateg", "tesla", "metaplanet")
-    for e in entities:
-        n = (e.get("name") or "").lower()
-        if any(x in n for x in needles):
-            log.info(f"match por nombre en entities/list: {e}")
+    log.info(f"entities/list: {len(entities)} entidades en total, {len(by_symbol)} con symbol, {len(by_name)} con name")
     return by_symbol, by_name
 
 
