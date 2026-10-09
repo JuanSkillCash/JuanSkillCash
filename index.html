@@ -16291,9 +16291,11 @@ window.addEventListener('resize', () => {
    misma API que ya usa Pulso de Fondo para las velas semanales de BTC), en vez de a través de un
    proxy de terceros */
 const ETH_VWAP_DATA_START_MS = Date.UTC(2017, 7, 17);
+// las fechas/precios exactos de anclaje no se muestran en ningún texto del sitio (tooltip,
+// leyenda, etc.) — solo se ve la línea en el gráfico, a propósito
 const ETH_VWAP_ANCHORS = [
-  { id: 'a1', label: '10 ene 2018', ms: Date.UTC(2018, 0, 10), color: '#ff2f4f' },
-  { id: 'a2', label: '15 dic 2018', ms: Date.UTC(2018, 11, 15), color: '#ff6b81' },
+  { id: 'a1', ms: Date.UTC(2018, 0, 10), color: '#ff2f4f' },
+  { id: 'a2', ms: Date.UTC(2018, 11, 15), color: '#ff6b81' },
 ];
 let ethVwapHistory = null;
 async function fetchEthVwapHistory(){
@@ -16528,20 +16530,12 @@ function renderEthVwapChart(){
     dateLabelId: 'ethvwapHoverDateLabel', dateBgId: 'ethvwapHoverDateBg', tooltipId: 'ethvwapTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
-    tooltipHtml: i => {
-      let html = `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USDT · Binance</span>`;
-      vwapSeries.forEach(a => {
-        const v = a.series[i];
-        if(v != null) html += `<br><span style="color:${a.color}">VWAP ${a.label}: ${fmtEthExactPrice(v)}</span>`;
-      });
-      return html;
-    },
+    tooltipHtml: i => `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USDT · Binance</span>`,
   });
 
   let statsHtml = `<div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtEthExactPrice(lastPoint.c)}</div></div>`;
-  vwapByAnchor.forEach(a => {
-    const lastVal = [...a.series].reverse().find(v => v != null);
-    statsHtml += `<div class="res-card"><div class="r-label" style="color:${a.color}">VWAP anclado ${a.label}</div><div class="r-val">${lastVal != null ? fmtEthExactPrice(lastVal) : '—'}</div></div>`;
+  vwapByAnchor.forEach((a, i) => {
+    statsHtml += `<div class="res-card"><div class="r-label" style="color:${a.color}">● VWAP Anclado ${i + 1}</div><div class="r-val" style="font-size:13px;color:var(--muted)">Ver línea en el gráfico</div></div>`;
   });
   statsEl.innerHTML = statsHtml;
 }

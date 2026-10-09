@@ -90,9 +90,10 @@ def normalize_name(name: str) -> str:
 
 
 def fetch_entity_id_map() -> tuple[dict, dict]:
-    entities = cg_get("entities/list")
+    raw = cg_get("entities/list")
+    entities = raw if isinstance(raw, list) else raw.get("entities", raw.get("data", []))
     by_symbol, by_name = {}, {}
-    for e in entities if isinstance(entities, list) else entities.get("entities", []):
+    for e in entities:
         entity_id = e.get("entity_id") or e.get("id")
         if not entity_id:
             continue
@@ -102,6 +103,17 @@ def fetch_entity_id_map() -> tuple[dict, dict]:
         name = normalize_name(e.get("name") or "")
         if name and name not in by_name:
             by_name[name] = entity_id
+    # diagnostico temporal: la primera corrida real solo calzo 1 de 20 empresas (ni Strategy ni
+    # Tesla aparecieron) - esto confirma si entities/list de verdad trae esos nombres y bajo que
+    # campos exactos, en vez de seguir adivinando el formato a ciegas
+    log.info(f"entities/list: {len(entities)} entidades, {len(by_symbol)} con symbol, {len(by_name)} con name")
+    if entities:
+        log.info(f"ejemplo crudo de una entidad: {entities[0]}")
+    needles = ("strateg", "tesla", "metaplanet")
+    for e in entities:
+        n = (e.get("name") or "").lower()
+        if any(x in n for x in needles):
+            log.info(f"match por nombre en entities/list: {e}")
     return by_symbol, by_name
 
 
@@ -116,14 +128,24 @@ def fetch_transaction_history(entity_id: str) -> list[dict]:
     return txs
 
 
+COVERAGE_START = date(2020, 8, 1)  # CoinGecko documenta historico desde agosto 2020
+
+
 def parse_tx_date(raw) -> str | None:
     if not raw:
         return None
     text = str(raw)[:10]
     try:
-        return date.fromisoformat(text).isoformat()
+        d = date.fromisoformat(text)
     except ValueError:
         return None
+    # defensa contra fechas basura del API (sentinelas tipo "0001-01-01" o fechas futuras) que
+    # de otro modo arman un rango de dias absurdo en el forward-fill (ya paso una vez: una sola
+    # fecha mala produjo "90323 dias actualizados")
+    today = datetime.now(timezone.utc).date()
+    if d < COVERAGE_START or d > today:
+        return None
+    return d.isoformat()
 
 
 def build_company_series(txs: list[dict]) -> list[tuple]:
@@ -141,6 +163,22 @@ def build_company_series(txs: list[dict]) -> list[tuple]:
     for d, balance, avg_cost in rows:
         by_date[d] = (balance, avg_cost)
     return [(d, balance, avg_cost) for d, (balance, avg_cost) in sorted(by_date.items())]
+
+
+def delete_all_rows():
+    # la tabla la llena solo este robot y se reconstruye completa cada corrida - se borra todo
+    # antes de insertar en vez de solo hacer upsert, para que un run anterior con datos malos
+    # (ej. el bug de fechas que una vez dejo 90323 dias de basura) no deje filas huerfanas que un
+    # upsert nunca borra
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?date=gte.1900-01-01"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Prefer": "return=minimal",
+    }
+    resp = requests.delete(url, headers=headers, timeout=60)
+    if resp.status_code >= 300:
+        raise RuntimeError(f"Supabase (delete) respondio {resp.status_code}: {resp.text[:500]}")
 
 
 def upsert_rows(rows: list[dict]):
@@ -225,6 +263,7 @@ def main():
             })
         d += timedelta(days=1)
 
+    delete_all_rows()
     upsert_rows(rows)
     log.info(f"{len(rows)} dias actualizados a partir de {len(company_series)} empresas")
 
