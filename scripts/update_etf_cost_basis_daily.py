@@ -160,11 +160,26 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
     active = [t for t in tickers if t.strip().upper() not in EXCLUDE_TICKERS]
     state = {t: {"btc": 0.0, "cost": 0.0, "sqcost": 0.0} for t in active}
     out = []
+    # diagnostico temporal: el usuario comparo contra Capriole y alla Treasuries queda POR ENCIMA
+    # de ETFs (al reves que en nuestros datos) - esto traza la trayectoria mes a mes del costo de
+    # IBIT (el ETF dominante, con historia publica conocida: arranco ene-2024 con BTC ~$46k y tuvo
+    # entradas masivas en sus primeros meses) para confirmar si esas compras baratas de verdad
+    # estan entrando al promedio ponderado o se estan perdiendo en algun punto del calculo
+    seen_months = set()
+    skipped_no_price = []
     for row in sorted(flow_rows, key=lambda r: r["date"]):
         d = row["date"]
         price = btc_price.get(d)
         if price is None or not (MIN_SANE_PRICE <= price <= MAX_SANE_PRICE):
+            skipped_no_price.append(d)
             continue
+        month_key = d[:7]
+        if month_key not in seen_months:
+            seen_months.add(month_key)
+            ibit = state.get("IBIT")
+            if ibit and ibit["btc"] > 0:
+                avg = ibit["cost"] / ibit["btc"]
+                log.info(f"DIAG IBIT al {d}: {ibit['btc']:,.0f} BTC @ ${avg:,.0f}")
         for t in active:
             flow_m = row.get(t)
             if flow_m is None:
@@ -195,6 +210,8 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
                     "avg_cost_basis_usd": round(avg_cost, 2),
                     "cost_basis_std_usd": round(variance ** 0.5, 2),
                 })
+    if skipped_no_price:
+        log.info(f"DIAG {len(skipped_no_price)} filas de Farside sin precio de BTC (se omitieron): {skipped_no_price[:5]}{'...' if len(skipped_no_price) > 5 else ''}")
     return forward_fill_daily(out), state, active
 
 
@@ -267,6 +284,10 @@ def main():
 
     tickers, flow_rows = fetch_farside_table()
     log.info(f"Farside: columnas {tickers}, {len(flow_rows)} filas de fecha")
+    if flow_rows:
+        sorted_rows = sorted(flow_rows, key=lambda r: r["date"])
+        log.info(f"DIAG primera fecha de Farside: {sorted_rows[0]}")
+        log.info(f"DIAG primeras 5 filas IBIT: {[(r['date'], r.get('IBIT')) for r in sorted_rows[:5]]}")
 
     rows, state, active = compute_etf_daily_rows(tickers, flow_rows, btc_price)
     if not rows:
