@@ -61,10 +61,13 @@ def fetch_btc_price_history() -> dict:
     """fecha ISO -> precio de cierre usd. CoinGecko en su tier gratuito solo da 365 dias de
     historico (devuelve 401 "exceeds the allowed time range" con days=max) - se usa en su lugar
     blockchain.info, la misma fuente que ya usa fetchHalvingHistory() del lado del cliente para
-    el historico completo de precio sin ese limite."""
+    el historico completo de precio. OJO: con timespan=all, blockchain.info devuelve una
+    muestra dispersa (confirmado en una corrida real: solo 174 de 704 dias de ETFs tenian
+    precio, ~1 de cada 4) en vez de un punto por dia - los ETFs solo llevan desde ene-2024, asi
+    que alcanza de sobra con una ventana mas corta, que si viene en resolucion diaria."""
     resp = requests.get(
         "https://api.blockchain.info/charts/market-price",
-        params={"timespan": "all", "format": "json", "cors": "true"},
+        params={"timespan": "4years", "format": "json", "cors": "true"},
         timeout=30,
     )
     if resp.status_code != 200:
@@ -218,7 +221,11 @@ def main():
         sys.exit(1)
 
     btc_price = fetch_btc_price_history()
-    log.info(f"{len(btc_price)} dias de precio BTC (CoinGecko)")
+    if btc_price:
+        dates_sorted = sorted(btc_price)
+        log.info(f"{len(btc_price)} dias de precio BTC, de {dates_sorted[0]} a {dates_sorted[-1]}")
+    else:
+        log.info("0 dias de precio BTC")
 
     tickers, flow_rows = fetch_farside_table()
     log.info(f"Farside: columnas {tickers}, {len(flow_rows)} filas de fecha")
