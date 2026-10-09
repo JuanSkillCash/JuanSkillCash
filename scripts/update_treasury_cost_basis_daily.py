@@ -142,16 +142,22 @@ COVERAGE_START = date(2020, 8, 1)  # CoinGecko documenta historico desde agosto 
 
 
 def parse_tx_date(raw) -> str | None:
-    if not raw:
+    if raw is None or raw == "":
         return None
-    text = str(raw)[:10]
     try:
-        d = date.fromisoformat(text)
-    except ValueError:
+        if isinstance(raw, (int, float)):
+            # transaction_history da "date" como epoch en MILISEGUNDOS (confirmado con un
+            # ejemplo real: 1791158400000 = oct-2026) y no como texto ISO - es lo contrario de
+            # lo que se asumió al principio, y la razón por la que ninguna transacción pasaba
+            ms = raw if raw > 1e12 else raw * 1000  # por si algún día viniera en segundos
+            d = datetime.fromtimestamp(ms / 1000, tz=timezone.utc).date()
+        else:
+            d = date.fromisoformat(str(raw)[:10])
+    except (ValueError, OverflowError, OSError):
         return None
-    # defensa contra fechas basura del API (sentinelas tipo "0001-01-01" o fechas futuras) que
-    # de otro modo arman un rango de dias absurdo en el forward-fill (ya paso una vez: una sola
-    # fecha mala produjo "90323 dias actualizados")
+    # defensa contra fechas basura del API (sentinelas o fechas futuras) que de otro modo arman
+    # un rango de dias absurdo en el forward-fill (ya paso una vez: una sola fecha mala produjo
+    # "90323 dias actualizados")
     today = datetime.now(timezone.utc).date()
     if d < COVERAGE_START or d > today:
         return None
@@ -234,14 +240,9 @@ def main():
             log.warning(f"Fallo transaction_history de {c.get('name')} ({entity_id}): {err}")
             continue
         series = build_company_series(txs)
-        # diagnostico temporal: todas las empresas calzaron entity_id pero ninguna produjo serie -
-        # esto confirma si transaction_history trae transacciones y bajo que forma exacta vienen
-        # sus campos, en vez de seguir adivinando el nombre del campo de fecha/balance/costo
         if not debug_dumped:
             debug_dumped = True
-            log.info(f"diagnostico {c.get('name')} ({entity_id}): {len(txs)} transacciones crudas, {len(series)} validas")
-            if txs:
-                log.info(f"ejemplo crudo de transaccion: {txs[0]}")
+            log.info(f"{c.get('name')}: {len(txs)} transacciones crudas, {len(series)} validas (verificación de formato)")
         if series:
             company_series[c["name"]] = series
         time.sleep(REQUEST_SLEEP_SECONDS)
