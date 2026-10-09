@@ -4691,7 +4691,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado, más una <b>banda inferior</b> (verde punteada) con la más barata de las dos cada día.<br>
+                💎 <b>Costo Base Institucional</b> (dorado): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son ±1 desviación estándar histórica de cuánto se aleja el precio de BTC de ese costo base.<br>
                 🏢 Cuando el precio de BTC está muy por encima de la línea dorada, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
                 🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se excluye por tener BTC desde antes de ser ETF.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -18275,16 +18275,25 @@ async function fetchTreasCostBasisMergedSeries(){
     const blendedCost = blendedBtc > 0
       ? (tr.btcHeld * tr.costBasis + (et ? et.btcHeld * et.costBasis : 0)) / blendedBtc
       : tr.costBasis;
-    const lowerCost = et ? Math.min(tr.costBasis, et.costBasis) : tr.costBasis;
     merged.push({
       t: p.t, btc: p.c,
       treasuryCost: tr.costBasis, treasuryBtc: tr.btcHeld,
       etfCost: et ? et.costBasis : null, etfBtc: et ? et.btcHeld : null,
-      blendedCost, blendedBtc, lowerCost,
+      blendedCost, blendedBtc,
     });
   });
   treasCbMergedCache = merged;
   return merged;
+}
+// bandas Upper/Lower: no son "la mas barata entre Treasuries y ETFs" (eso ya lo muestran esas
+// dos lineas por separado) sino una banda de volatilidad alrededor de la linea Institucional -
+// misma tecnica que ya usa STH-MVRV en este sitio (computeSthMvrvBandStats): el promedio ± 1
+// desviacion estandar historica de cuanto se aleja el precio de BTC de ese costo base
+function computeTreasCbBandStats(merged){
+  const ratios = merged.map(p => p.btc / p.blendedCost).filter(v => isFinite(v) && v > 0);
+  const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+  const variance = ratios.reduce((a, b) => a + (b - mean) * (b - mean), 0) / ratios.length;
+  return { mean, std: Math.sqrt(variance) };
 }
 const TREASCB_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2, '1a': 1 };
 let treasCbActiveRange = 'todo';
@@ -18324,6 +18333,8 @@ function renderTreasCostBasisChart(){
   const points = fullPoints.filter(p => p.t >= fromMs && p.t <= toMs);
   if(!points.length) return;
 
+  const { mean: cbMean, std: cbStd } = computeTreasCbBandStats(fullPoints);
+
   if(treasCbSlider) treasCbSlider.setRange(fromMs, toMs);
   else{
     treasCbSlider = createDateRangeSlider('treascbDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
@@ -18335,7 +18346,9 @@ function renderTreasCostBasisChart(){
 
   const startMs = points[0].t, endMs = points[points.length - 1].t;
   const spanMs = (endMs - startMs) || 1;
-  const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost)]
+  const upperVals = points.map(p => p.blendedCost * (cbMean + cbStd));
+  const lowerVals = points.map(p => Math.max(p.blendedCost * (cbMean - cbStd), p.blendedCost * 0.3));
+  const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
     .flat().filter(v => v > 0);
   const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
 
@@ -18376,7 +18389,8 @@ function renderTreasCostBasisChart(){
   const blendedLine = pathFor(p => p.blendedCost);
   const treasuryLine = pathFor(p => p.treasuryCost);
   const etfLine = pathFor(p => p.etfCost);
-  const lowerLine = pathFor(p => p.lowerCost);
+  const upperLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(upperVals[i]).toFixed(1)}`).join(' ');
+  const lowerLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(lowerVals[i]).toFixed(1)}`).join(' ');
 
   const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -18396,7 +18410,8 @@ function renderTreasCostBasisChart(){
       <svg class="fng-chart-svg" id="treascbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
-        <path d="${lowerLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-dasharray="5,3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${upperLine}" fill="none" stroke="rgba(255,47,79,.55)" stroke-width="1" stroke-dasharray="5,3"/>
+        <path d="${lowerLine}" fill="none" stroke="rgba(34,197,94,.55)" stroke-width="1" stroke-dasharray="5,3"/>
         <path d="${treasuryLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${etfLine}" fill="none" stroke="#a78bfa" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${blendedLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1.2 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
@@ -18434,7 +18449,8 @@ function renderTreasCostBasisChart(){
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Institucional (combinado)</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#2fd0c5"></span>Treasuries corporativas</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#a78bfa"></span>ETFs spot</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#22c55e"></span>Banda inferior (la más barata)</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,47,79,.55)"></span>Banda superior ±1σ</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(34,197,94,.55)"></span>Banda inferior ±1σ</span>
   `;
 
   const last = points[points.length - 1];

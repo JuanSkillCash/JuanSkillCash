@@ -6,6 +6,15 @@ on:
     - cron: "30 0 * * *"
   workflow_dispatch: {}
 
+# Los robots de Treasuries/ETFs borran toda la tabla y la reinsertan completa en cada corrida -
+# si dos corridas se superponen (ej. un workflow_dispatch manual justo antes de que dispare el
+# cron programado) cada una borra lo que la otra ya habia insertado a medio camino, dejando datos
+# mezclados/corruptos en Supabase (le paso de verdad una vez). concurrency hace que una corrida
+# nueva ESPERE a que la anterior termine en vez de correr las dos al mismo tiempo.
+concurrency:
+  group: update-cryptocap-daily
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
