@@ -108,7 +108,11 @@ FARSIDE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br",
+    # sin "br" (Brotli) en Accept-Encoding: el runner no tiene la libreria brotli instalada, asi
+    # que si el servidor responde comprimido con br, requests no lo puede decodificar y
+    # resp.text queda como basura binaria ilegible (eso paso en el intento anterior - no se pudo
+    # ni diagnosticar el bloqueo real por este motivo)
+    "Accept-Encoding": "gzip, deflate",
     "Upgrade-Insecure-Requests": "1",
     "Sec-Fetch-Dest": "document",
     "Sec-Fetch-Mode": "navigate",
@@ -120,10 +124,11 @@ FARSIDE_HEADERS = {
 def fetch_farside_table() -> tuple[list[str], list[dict]]:
     session = requests.Session()
     session.headers.update(FARSIDE_HEADERS)
-    session.get("https://farside.co.uk/", timeout=30)  # calienta cookies antes de pedir la tabla
+    warmup = session.get("https://farside.co.uk/", timeout=30)
+    log.info(f"warmup a farside.co.uk/: status {warmup.status_code}, {len(warmup.content)} bytes")
     resp = session.get(FARSIDE_URL, timeout=30)
     if resp.status_code != 200:
-        raise RuntimeError(f"Farside respondio {resp.status_code}: {resp.text[:400]!r}")
+        raise RuntimeError(f"Farside respondio {resp.status_code}: {resp.text[:500]!r}")
     soup = BeautifulSoup(resp.text, "html.parser")
     table = soup.find("table")
     if table is None:
