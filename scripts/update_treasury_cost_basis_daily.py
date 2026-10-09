@@ -270,28 +270,48 @@ def main():
     last_known = {name: (0.0, 0.0) for name in company_series}
 
     rows = []
+    jumps = []  # diagnostico: (pct_jump, date, empresas_que_cambiaron_ese_dia, antes, despues)
+    prev_avg = None
     d = start
     while d <= today:
         iso = d.isoformat()
         total_btc = 0.0
         weighted_sum = 0.0
+        changed_today = []
         for name, series in company_series.items():
             idx = pointers[name]
             while idx + 1 < len(series) and series[idx + 1][0] <= iso:
                 idx += 1
+                old = last_known[name]
                 last_known[name] = (series[idx][1], series[idx][2])
+                changed_today.append((name, old, last_known[name]))
             pointers[name] = idx
             if idx >= 0:
                 balance, avg_cost = last_known[name]
                 total_btc += balance
                 weighted_sum += balance * avg_cost
         if total_btc > 0:
+            avg = weighted_sum / total_btc
+            if prev_avg and prev_avg > 0:
+                pct = abs(avg - prev_avg) / prev_avg
+                if pct > 0.03:
+                    jumps.append((pct, iso, changed_today, prev_avg, avg))
+            prev_avg = avg
             rows.append({
                 "date": iso,
                 "total_btc_held": round(total_btc, 4),
-                "avg_cost_basis_usd": round(weighted_sum / total_btc, 2),
+                "avg_cost_basis_usd": round(avg, 2),
             })
         d += timedelta(days=1)
+
+    # diagnostico temporal: el usuario comparo contra Capriole y nuestras lineas son mucho mas
+    # dentadas (saltos grandes dia a dia) que las de ellos, que casi no se mueven - esto confirma
+    # que empresa(s) causan los saltos mas grandes y con que valores, antes de decidir si hay que
+    # excluir alguna o si el problema es otro
+    jumps.sort(key=lambda j: j[0], reverse=True)
+    for pct, iso, changed, before, after in jumps[:8]:
+        changes_str = "; ".join(f"{n}: {o[0]:,.0f}BTC@${o[1]:,.0f} -> {nw[0]:,.0f}BTC@${nw[1]:,.0f}" for n, o, nw in changed)
+        log.info(f"SALTO {pct*100:.1f}% en {iso}: ${before:,.0f} -> ${after:,.0f} | cambios: {changes_str}")
 
     # diagnostico de sanidad: aporte final de cada empresa y rango del costo base agregado -
     # permite confirmar desde el log que ninguna empresa quedo con cifras absurdas, sin tener
