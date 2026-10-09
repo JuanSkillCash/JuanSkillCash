@@ -221,6 +221,7 @@ def main():
     time.sleep(REQUEST_SLEEP_SECONDS)
 
     company_series = {}  # name -> [(date, balance, avg_cost), ...]
+    debug_dumped = False
     for c in companies:
         symbol = normalize_symbol(c.get("symbol") or "")
         entity_id = entity_by_symbol.get(symbol) or entity_by_name.get(normalize_name(c.get("name") or ""))
@@ -233,6 +234,14 @@ def main():
             log.warning(f"Fallo transaction_history de {c.get('name')} ({entity_id}): {err}")
             continue
         series = build_company_series(txs)
+        # diagnostico temporal: todas las empresas calzaron entity_id pero ninguna produjo serie -
+        # esto confirma si transaction_history trae transacciones y bajo que forma exacta vienen
+        # sus campos, en vez de seguir adivinando el nombre del campo de fecha/balance/costo
+        if not debug_dumped:
+            debug_dumped = True
+            log.info(f"diagnostico {c.get('name')} ({entity_id}): {len(txs)} transacciones crudas, {len(series)} validas")
+            if txs:
+                log.info(f"ejemplo crudo de transaccion: {txs[0]}")
         if series:
             company_series[c["name"]] = series
         time.sleep(REQUEST_SLEEP_SECONDS)
