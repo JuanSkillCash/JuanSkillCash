@@ -4691,9 +4691,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (azul): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (naranja, empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (verde, IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±0.5 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
+                💎 <b>Costo Base Institucional</b> (azul): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (naranja, empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (verde, IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±0.37 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
                 🏢 Cuando el precio de BTC está muy por encima de la línea azul, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
-                🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se incluye desde su balance real al convertirse en ETF (traía BTC desde 2013 como fideicomiso cerrado, con un costo base estimado para esa etapa previa ya que no hay transacciones públicas que reconstruir).<br>
+                🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se incluye desde su balance y costo real según sus últimos 10-K/10-Q ante la SEC antes de convertirse en ETF (traía BTC desde 2013 como fideicomiso cerrado), y sus redenciones posteriores se descuentan al costo de remoción implícito en esos mismos reportes, no al promedio corriente.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -18350,15 +18350,15 @@ function renderTreasCostBasisChart(){
   // separado. Esa version dia-a-dia quedaba ruidosa al principio del historico (cuando una
   // empresa recien tenia 2-3 compras, el rango de precios recorrido hasta ese punto ya era un
   // porcentaje enorme de una base todavia chiquita) - la referencia real de Capriole muestra un
-  // canal de ancho estable en todo el historico, no uno que se infla al principio. Los valores
-  // reales de su leyenda (90,256 arriba / 77,044 medio / 63,831 abajo, sobre un costo ~77,044)
-  // confirman que es un porcentaje LINEAL simetrico (+17.15%/-17.15%, no dividir para abajo en
-  // escala log) - costo*(1+r) arriba, costo*(1-r) abajo, igual de lejos en terminos lineales
+  // canal de ancho estable en todo el historico, no uno que se infla al principio. costo*(1+r)
+  // arriba, costo*(1-r) abajo (porcentaje LINEAL simetrico, no dividir para abajo en escala log)
   const lastFullPt = fullPoints[fullPoints.length - 1];
-  // ±0.5 desviacion estandar, no ±1: la desviacion completa (ej. 34% con los datos reales de hoy)
-  // queda el doble de ancha que el canal real de Capriole (confirmado con sus propios numeros de
-  // leyenda, ~±17%) - la mitad calza con esa proporcion
-  const bandRatio = lastFullPt.blendedCost > 0 ? (lastFullPt.blendedStd / lastFullPt.blendedCost) * 0.5 : 0;
+  // 0.37 (no 0.5, no 1.0): la desviacion completa ponderada por BTC de los precios de entrada
+  // reales (~39.5% con los datos reales de hoy) queda bastante mas ancha que el canal real de
+  // Capriole - sus propios numeros de leyenda mas recientes (Upper 89,192 / Institutional 77,813
+  // / Lower 66,433) dan un canal de ±14.6% sobre el costo institucional. 14.6/39.5 = 0.37 es el
+  // multiplicador que mejor calza con esa referencia real al momento de este ajuste.
+  const bandRatio = lastFullPt.blendedCost > 0 ? (lastFullPt.blendedStd / lastFullPt.blendedCost) * 0.37 : 0;
   const upperVals = points.map(p => p.blendedCost * (1 + bandRatio));
   const lowerVals = points.map(p => Math.max(p.blendedCost * (1 - bandRatio), p.blendedCost * 0.3));
   const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
@@ -18484,8 +18484,8 @@ function renderTreasCostBasisChart(){
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#3fa9f5"></span>Institucional (combinado)</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Treasuries corporativas</span>
     <span class="perk-chip"><span class="perk-chip-dot" style="background:#2ecc71"></span>ETFs spot</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,47,79,.55)"></span>Banda superior ±0.5σ</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(34,197,94,.55)"></span>Banda inferior ±0.5σ</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,47,79,.55)"></span>Banda superior ±0.37σ</span>
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(34,197,94,.55)"></span>Banda inferior ±0.37σ</span>
   `;
 
   const last = points[points.length - 1];
