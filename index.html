@@ -18392,6 +18392,26 @@ function renderTreasCostBasisChart(){
   const upperLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(upperVals[i]).toFixed(1)}`).join(' ');
   const lowerLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(lowerVals[i]).toFixed(1)}`).join(' ');
 
+  // zonas sombreadas entre cada linea de costo base y su banda - solo sobre el tramo donde
+  // ambos bordes existen (antes de ene-2024 no hay ETFs todavia, asi que no hay zona verde ahi)
+  function areaBetween(getTop, getBottom){
+    let startIdx = -1, endIdx = -1;
+    for(let i = 0; i < points.length; i++){
+      const t = getTop(i), b = getBottom(i);
+      if(t != null && isFinite(t) && t > 0 && b != null && isFinite(b) && b > 0){
+        if(startIdx === -1) startIdx = i;
+        endIdx = i;
+      }
+    }
+    if(startIdx === -1) return '';
+    let d = '';
+    for(let i = startIdx; i <= endIdx; i++) d += `${i === startIdx ? 'M' : 'L'}${xFor(points[i].t).toFixed(1)},${yForPrice(getTop(i)).toFixed(1)} `;
+    for(let i = endIdx; i >= startIdx; i--) d += `L${xFor(points[i].t).toFixed(1)},${yForPrice(getBottom(i)).toFixed(1)} `;
+    return d + 'Z';
+  }
+  const upperAreaD = areaBetween(i => upperVals[i], i => points[i].treasuryCost);
+  const lowerAreaD = areaBetween(i => points[i].etfCost, i => lowerVals[i]);
+
   const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
@@ -18410,6 +18430,8 @@ function renderTreasCostBasisChart(){
       <svg class="fng-chart-svg" id="treascbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
         ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
+        <path d="${upperAreaD}" fill="rgba(255,47,79,.14)" stroke="none"/>
+        <path d="${lowerAreaD}" fill="rgba(34,197,94,.14)" stroke="none"/>
         <path d="${upperLine}" fill="none" stroke="rgba(255,47,79,.55)" stroke-width="1" stroke-dasharray="5,3"/>
         <path d="${lowerLine}" fill="none" stroke="rgba(34,197,94,.55)" stroke-width="1" stroke-dasharray="5,3"/>
         <path d="${treasuryLine}" fill="none" stroke="#2fd0c5" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
