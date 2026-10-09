@@ -100,12 +100,30 @@ def parse_flow_value(text: str) -> float | None:
     return -v if neg else v
 
 
+FARSIDE_HEADERS = {
+    # el primer intento uso un User-Agent que se identificaba como bot ("SkillCashTools/1.0") y
+    # Cloudflare lo bloqueo con 403 de inmediato - un UA de navegador real de verdad, con el
+    # resto de headers que manda un Chrome real, es la primera defensa barata contra eso antes
+    # de asumir que hace falta un navegador headless
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+}
+
+
 def fetch_farside_table() -> tuple[list[str], list[dict]]:
-    resp = requests.get(FARSIDE_URL, timeout=30, headers={
-        "User-Agent": "Mozilla/5.0 (compatible; SkillCashTools/1.0; +https://juanskillcash.com)"
-    })
+    session = requests.Session()
+    session.headers.update(FARSIDE_HEADERS)
+    session.get("https://farside.co.uk/", timeout=30)  # calienta cookies antes de pedir la tabla
+    resp = session.get(FARSIDE_URL, timeout=30)
     if resp.status_code != 200:
-        raise RuntimeError(f"Farside respondio {resp.status_code}")
+        raise RuntimeError(f"Farside respondio {resp.status_code}: {resp.text[:400]!r}")
     soup = BeautifulSoup(resp.text, "html.parser")
     table = soup.find("table")
     if table is None:
