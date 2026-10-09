@@ -35,7 +35,7 @@ import os
 import re
 import sys
 import logging
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import requests
 from bs4 import BeautifulSoup
@@ -182,7 +182,31 @@ def compute_etf_daily_rows(tickers: list[str], flow_rows: list[dict], btc_price:
                     "total_btc_held": round(total_btc, 4),
                     "avg_cost_basis_usd": round(avg_cost, 2),
                 })
-    return out, state, active
+    return forward_fill_daily(out), state, active
+
+
+def forward_fill_daily(rows: list[dict]) -> list[dict]:
+    # Farside solo publica dias habiles (el mercado de ETFs en EEUU cierra fines de semana) -
+    # sin esto, la tabla queda con huecos en sabado/domingo y el merge del lado del cliente los
+    # interpreta como "todavia no hay ETFs ese dia" en vez de "arrastrar el ultimo valor
+    # conocido", alternando entre el costo combinado (dia habil) y solo-Treasuries (fin de
+    # semana) - un zigzag en el grafico que no es un dato real, es un hueco (le paso de verdad)
+    if not rows:
+        return rows
+    by_date = {r["date"]: r for r in rows}
+    filled = []
+    d = date.fromisoformat(rows[0]["date"])
+    today = datetime.now(timezone.utc).date()
+    last = None
+    while d <= today:
+        iso = d.isoformat()
+        if iso in by_date:
+            last = by_date[iso]
+        if last is not None:
+            filled.append({"date": iso, "total_btc_held": last["total_btc_held"],
+                           "avg_cost_basis_usd": last["avg_cost_basis_usd"]})
+        d += timedelta(days=1)
+    return filled
 
 
 def delete_all_rows():
