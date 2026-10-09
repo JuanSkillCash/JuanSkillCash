@@ -26,6 +26,7 @@ Variables de entorno requeridas:
 """
 
 import os
+import re
 import sys
 import time
 import logging
@@ -68,15 +69,40 @@ def fetch_top_companies() -> list[dict]:
     return companies[:TOP_N_COMPANIES]
 
 
-def fetch_entity_id_map() -> dict:
+def normalize_symbol(symbol: str) -> str:
+    # companies/public_treasury/bitcoin devuelve tickers tipo "MSTR.US"/"3350.T"/"SWC.L" (con
+    # sufijo de bolsa) mientras que entities/list los da "pelados" (solo "MSTR") - sin esto casi
+    # ninguna empresa calza (confirmado al correr el robot: 14 de 20 quedaban sin entity_id)
+    return (symbol or "").strip().upper().split(".")[0]
+
+
+_NAME_SUFFIXES = (" inc", " corp", " corporation", " co", " ltd", " plc", " group",
+                   " holdings", " holding", " technologies", " technology", " llc", " sa", " ag")
+
+
+def normalize_name(name: str) -> str:
+    n = (name or "").lower()
+    n = re.sub(r"[^a-z0-9 ]", "", n)
+    for suf in _NAME_SUFFIXES:
+        if n.endswith(suf):
+            n = n[: -len(suf)]
+    return n.strip()
+
+
+def fetch_entity_id_map() -> tuple[dict, dict]:
     entities = cg_get("entities/list")
-    out = {}
+    by_symbol, by_name = {}, {}
     for e in entities if isinstance(entities, list) else entities.get("entities", []):
-        symbol = (e.get("symbol") or "").strip().upper()
         entity_id = e.get("entity_id") or e.get("id")
-        if symbol and entity_id and symbol not in out:
-            out[symbol] = entity_id
-    return out
+        if not entity_id:
+            continue
+        symbol = normalize_symbol(e.get("symbol") or "")
+        if symbol and symbol not in by_symbol:
+            by_symbol[symbol] = entity_id
+        name = normalize_name(e.get("name") or "")
+        if name and name not in by_name:
+            by_name[name] = entity_id
+    return by_symbol, by_name
 
 
 def fetch_transaction_history(entity_id: str) -> list[dict]:
@@ -114,7 +140,7 @@ def build_company_series(txs: list[dict]) -> list[tuple]:
     by_date = {}
     for d, balance, avg_cost in rows:
         by_date[d] = (balance, avg_cost)
-    return sorted(by_date.items())
+    return [(d, balance, avg_cost) for d, (balance, avg_cost) in sorted(by_date.items())]
 
 
 def upsert_rows(rows: list[dict]):
@@ -143,15 +169,15 @@ def main():
     companies = fetch_top_companies()
     log.info(f"{len(companies)} empresas candidatas (top {TOP_N_COMPANIES} por tenencia con costo base reportado)")
 
-    entity_map = fetch_entity_id_map()
+    entity_by_symbol, entity_by_name = fetch_entity_id_map()
     time.sleep(REQUEST_SLEEP_SECONDS)
 
     company_series = {}  # name -> [(date, balance, avg_cost), ...]
     for c in companies:
-        symbol = (c.get("symbol") or "").strip().upper()
-        entity_id = entity_map.get(symbol)
+        symbol = normalize_symbol(c.get("symbol") or "")
+        entity_id = entity_by_symbol.get(symbol) or entity_by_name.get(normalize_name(c.get("name") or ""))
         if not entity_id:
-            log.warning(f"Sin entity_id para {c.get('name')} ({symbol}) - se omite")
+            log.warning(f"Sin entity_id para {c.get('name')} ({c.get('symbol')}) - se omite")
             continue
         try:
             txs = fetch_transaction_history(entity_id)
