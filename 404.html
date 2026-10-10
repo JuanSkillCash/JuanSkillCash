@@ -834,6 +834,28 @@ button{font-family:inherit;color:inherit}
 .indic-beta-warning .indic-beta-warning-icon{font-size:20px;line-height:1;flex-shrink:0}
 .indic-beta-warning b{color:#fff}
 
+/* ---- artículo del Whitepaper de Bitcoin: mismo sistema de tokens de color que el resto del
+   sitio, pero con tipografía de lectura larga (texto más ancho de línea, más interlineado) en
+   vez del estilo de tarjetas/gráficos del resto de los indicadores */
+.wp-article{padding:4px 2px 0}
+.wp-meta{text-align:center;color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.wp-meta b{color:var(--muted2)}
+.wp-abstract{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:34px}
+.wp-label{display:block;font-family:'Poppins',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:11.5px;color:var(--gold);margin-bottom:12px}
+.wp-abstract p{font-size:15px;line-height:1.85;color:var(--white)}
+.wp-section{margin-bottom:34px}
+.wp-section h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(17px,3vw,21px);color:var(--white);margin-bottom:15px;display:flex;align-items:baseline;gap:9px}
+.wp-section h3 .wp-num{color:var(--gold);font-family:'Space Mono',monospace;font-size:.82em;flex-shrink:0}
+.wp-section p{font-size:15.5px;line-height:1.85;color:#d6d2e3;margin-bottom:15px;max-width:68ch}
+.wp-section p:last-child{margin-bottom:0}
+.wp-formula{font-family:'Space Mono',monospace;font-size:14.5px;color:var(--gold);background:rgba(240,178,61,.07);border:1px solid rgba(240,178,61,.25);border-radius:8px;padding:10px 16px;margin:10px 0 16px;display:inline-block}
+.wp-note{font-size:13px;color:var(--muted);line-height:1.8;background:rgba(255,255,255,.02);border-left:3px solid var(--border2);padding:10px 14px;margin:10px 0 16px;max-width:68ch}
+.wp-figure{margin:24px 0 28px;padding:20px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;text-align:center}
+.wp-figure svg{max-width:100%;height:auto}
+.wp-figure figcaption{margin-top:14px;font-size:12.5px;color:var(--muted);font-style:italic}
+.wp-refs{font-size:13px;color:var(--muted);line-height:2;padding-left:18px}
+.wp-refs li{margin-bottom:5px}
+
 .macro-guia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:8px}
 .macro-guia-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
 .macro-guia-card:hover{border-color:var(--border2);background:rgba(255,255,255,.04)}
@@ -1687,6 +1709,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
+      <button class="sb-item" data-indic-jump="whitepaper">
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
+      </button>
       <button class="sb-item" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
@@ -1986,6 +2011,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whitepaper">
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
@@ -3099,6 +3127,361 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
 
         <div id="bitcoinGuiaSlot"></div>
+
+        <div class="indic-panel" data-indic="whitepaper" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">Whitepaper de Bitcoin</h2>
+              </div>
+
+              <div class="wp-article">
+                <div class="wp-meta">
+                  <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white);margin-bottom:6px">Bitcoin: Un Sistema de Efectivo Electrónico Usuario a Usuario</div>
+                  <div>Satoshi Nakamoto · octubre de 2008</div>
+                  <div style="margin-top:4px">Traducción propia al español, con las figuras originales del documento reconstruidas — no es un PDF adjunto, es el mismo texto del paper integrado en esta página.</div>
+                </div>
+
+                <div class="wp-abstract">
+                  <span class="wp-label">Resumen</span>
+                  <p>Una versión puramente usuario-a-usuario de efectivo electrónico permitiría que los pagos en línea se enviaran directamente de una parte a otra sin pasar por una institución financiera. Las firmas digitales son parte de la solución, pero los beneficios principales se pierden si de todos modos se necesita un tercero de confianza para evitar el doble gasto. Proponemos una solución al problema del doble gasto usando una red entre pares (peer-to-peer). La red marca con fecha y hora las transacciones, hasheándolas en una cadena continua de prueba de trabajo basada en hash, formando un registro que no puede modificarse sin rehacer esa prueba de trabajo. La cadena más larga no solo sirve como prueba de la secuencia de eventos presenciada, sino como prueba de que proviene del conjunto más grande de poder de cómputo. Mientras la mayoría de ese poder de cómputo esté controlada por nodos que no cooperan para atacar la red, los nodos honestos generarán la cadena más larga y superarán a los atacantes. La red misma requiere una estructura mínima. Los mensajes se difunden con el mejor esfuerzo posible, y los nodos pueden salir y volver a entrar a la red a voluntad, aceptando la cadena de prueba de trabajo más larga como prueba de lo que pasó mientras estuvieron ausentes.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">1</span> Introducción</h3>
+                  <p>El comercio en Internet ha llegado a depender casi exclusivamente de instituciones financieras que actúan como terceros de confianza para procesar pagos electrónicos. Si bien el sistema funciona razonablemente bien para la mayoría de las transacciones, sigue sufriendo las debilidades inherentes del modelo basado en confianza. Las transacciones completamente irreversibles no son realmente posibles, ya que las instituciones financieras no pueden evitar mediar en disputas. El costo de esa mediación aumenta los costos de transacción, limitando el tamaño práctico mínimo de las transacciones y cortando de raíz la posibilidad de pequeñas transacciones casuales — y existe un costo más amplio en la pérdida de la capacidad de hacer pagos irreversibles por servicios irreversibles. Con la posibilidad de reversión, la necesidad de confianza se extiende: los comerciantes deben desconfiar de sus clientes, molestándolos para pedir más información de la que de otro modo necesitarían. Cierto porcentaje de fraude se acepta como inevitable. Estos costos y la incertidumbre de los pagos pueden evitarse en persona usando efectivo físico, pero no existe ningún mecanismo para hacer pagos a través de un canal de comunicación sin un tercero de confianza.</p>
+                  <p>Lo que se necesita es un sistema de efectivo electrónico basado en prueba criptográfica en lugar de confianza, que permita a dos partes dispuestas transar directamente entre sí sin necesidad de un tercero de confianza. Las transacciones que son computacionalmente poco prácticas de revertir protegerían a los vendedores del fraude, y mecanismos de depósito en garantía de rutina podrían implementarse fácilmente para proteger a los compradores. En este artículo proponemos una solución al problema del doble gasto usando un servidor de marcas de tiempo distribuido entre pares, que genera prueba computacional del orden cronológico de las transacciones. El sistema es seguro mientras los nodos honestos controlen colectivamente más poder de cómputo que cualquier grupo cooperante de nodos atacantes.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">2</span> Transacciones</h3>
+                  <p>Definimos una moneda electrónica como una cadena de firmas digitales. Cada propietario transfiere la moneda al siguiente firmando digitalmente un hash de la transacción anterior y la clave pública del siguiente propietario, y agregando estos al final de la moneda. Un beneficiario puede verificar las firmas para comprobar la cadena de propiedad.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 780 180" width="780" height="180" xmlns="http://www.w3.org/2000/svg">
+                      <defs><marker id="wpArrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f0b23d"/></marker></defs>
+                      <g font-family="'Space Grotesk',sans-serif">
+                        <text x="30" y="24" font-size="11" fill="#847e93">Propietario 0 firma</text>
+                        <rect x="30" y="40" width="190" height="90" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="125" y="62" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Transacción 1</text>
+                        <text x="125" y="86" text-anchor="middle" font-size="11" fill="#c8cde0">Clave pública del</text>
+                        <text x="125" y="100" text-anchor="middle" font-size="11" fill="#c8cde0">Propietario 1</text>
+                        <text x="125" y="120" text-anchor="middle" font-size="10" fill="#847e93">Hash(Tx anterior)</text>
+
+                        <rect x="295" y="40" width="190" height="90" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="390" y="62" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Transacción 2</text>
+                        <text x="390" y="86" text-anchor="middle" font-size="11" fill="#c8cde0">Clave pública del</text>
+                        <text x="390" y="100" text-anchor="middle" font-size="11" fill="#c8cde0">Propietario 2</text>
+                        <text x="390" y="120" text-anchor="middle" font-size="10" fill="#847e93">Hash(Tx 1)</text>
+
+                        <rect x="560" y="40" width="190" height="90" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="655" y="62" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Transacción 3</text>
+                        <text x="655" y="86" text-anchor="middle" font-size="11" fill="#c8cde0">Clave pública del</text>
+                        <text x="655" y="100" text-anchor="middle" font-size="11" fill="#c8cde0">Propietario 3</text>
+                        <text x="655" y="120" text-anchor="middle" font-size="10" fill="#847e93">Hash(Tx 2)</text>
+
+                        <line x1="220" y1="85" x2="293" y2="85" stroke="#f0b23d" stroke-width="1.5" marker-end="url(#wpArrow1)"/>
+                        <line x1="485" y1="85" x2="558" y2="85" stroke="#f0b23d" stroke-width="1.5" marker-end="url(#wpArrow1)"/>
+                        <text x="256" y="70" text-anchor="middle" font-size="9.5" fill="#f0b23d">Firma 1</text>
+                        <text x="521" y="70" text-anchor="middle" font-size="9.5" fill="#f0b23d">Firma 2</text>
+                        <circle cx="256" cy="100" r="9" fill="none" stroke="#2ecc71" stroke-width="1.3"/>
+                        <text x="256" y="104" text-anchor="middle" font-size="10" fill="#2ecc71">✓</text>
+                        <circle cx="521" cy="100" r="9" fill="none" stroke="#2ecc71" stroke-width="1.3"/>
+                        <text x="521" y="104" text-anchor="middle" font-size="10" fill="#2ecc71">✓</text>
+                        <text x="655" y="155" text-anchor="middle" font-size="11" fill="#847e93">Propietario 3 recibe →</text>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 1 — cada propietario firma el hash de la transacción anterior más la clave pública del siguiente propietario, formando una cadena verificable.</figcaption>
+                  </figure>
+                  <p>El problema, por supuesto, es que el beneficiario no puede verificar que uno de los propietarios no haya gastado la moneda dos veces. Una solución común es introducir una autoridad central de confianza, o "casa de moneda", que verifique cada transacción en busca de doble gasto. Después de cada transacción, la moneda debe devolverse a la casa de moneda para acuñar una nueva moneda, y solo las monedas emitidas directamente por ella son de confianza. El problema de esta solución es que el destino de todo el sistema monetario depende de la empresa que opera la casa de moneda, con cada transacción teniendo que pasar por ella, igual que un banco.</p>
+                  <p>Necesitamos una manera de que el beneficiario sepa que los propietarios anteriores no firmaron ninguna transacción anterior. A nuestros efectos, la transacción más antigua es la que cuenta, así que no nos importan los intentos posteriores de doble gasto. La única manera de confirmar la ausencia de una transacción es estar al tanto de todas las transacciones. En el modelo de la casa de moneda, ella estaba al tanto de todas las transacciones y decidía cuál llegó primero. Para lograr esto sin un tercero de confianza, las transacciones deben anunciarse públicamente, y necesitamos un sistema para que los participantes se pongan de acuerdo sobre un único historial en el orden en que se recibieron. El beneficiario necesita prueba de que, en el momento de cada transacción, la mayoría de los nodos acordó que fue la primera recibida.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">3</span> Servidor de Marcas de Tiempo</h3>
+                  <p>La solución que proponemos comienza con un servidor de marcas de tiempo (timestamp server). Un servidor de este tipo funciona tomando el hash de un bloque de elementos a marcar y publicando ampliamente ese hash — como en un periódico o en un post de Usenet. La marca de tiempo prueba que los datos debieron haber existido en ese momento, obviamente, para poder entrar al hash. Cada marca de tiempo incluye la marca de tiempo anterior en su propio hash, formando una cadena, con cada marca adicional reforzando a las que vinieron antes.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">4</span> Prueba de Trabajo</h3>
+                  <p>Para implementar un servidor de marcas de tiempo distribuido entre pares, necesitamos usar un sistema de prueba de trabajo similar al Hashcash de Adam Back, en lugar de un periódico o un post de Usenet. La prueba de trabajo consiste en buscar un valor que, al ser hasheado (por ejemplo con SHA-256), el hash comience con un número determinado de bits en cero. El trabajo promedio requerido es exponencial en el número de bits en cero exigidos, y puede verificarse ejecutando un único hash.</p>
+                  <p>Para nuestra red de marcas de tiempo, implementamos la prueba de trabajo incrementando un nonce en el bloque hasta encontrar un valor que le dé al hash del bloque los bits en cero requeridos. Una vez que se gasta el esfuerzo de cómputo para satisfacer la prueba de trabajo, el bloque no puede modificarse sin rehacer ese trabajo. Como los bloques posteriores se encadenan después de él, el trabajo para modificar un bloque incluiría rehacer todos los bloques posteriores.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 800 200" width="800" height="200" xmlns="http://www.w3.org/2000/svg">
+                      <defs><marker id="wpArrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f0b23d"/></marker></defs>
+                      <g font-family="'Space Grotesk',sans-serif">
+                        <rect x="20" y="35" width="220" height="130" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="130" y="58" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Bloque 1</text>
+                        <line x1="34" y1="68" x2="226" y2="68" stroke="#2a3350"/>
+                        <text x="34" y="88" font-size="10.5" fill="#847e93">Hash Anterior: génesis</text>
+                        <text x="34" y="106" font-size="10.5" fill="#847e93">Nonce: 93 284</text>
+                        <text x="34" y="128" font-size="11" fill="#c8cde0">Tx &nbsp; Tx &nbsp; Tx</text>
+
+                        <rect x="290" y="35" width="220" height="130" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="400" y="58" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Bloque 2</text>
+                        <line x1="304" y1="68" x2="496" y2="68" stroke="#2a3350"/>
+                        <text x="304" y="88" font-size="10.5" fill="#847e93">Hash Anterior: 0000a7f…</text>
+                        <text x="304" y="106" font-size="10.5" fill="#847e93">Nonce: 17 042</text>
+                        <text x="304" y="128" font-size="11" fill="#c8cde0">Tx &nbsp; Tx &nbsp; Tx</text>
+
+                        <rect x="560" y="35" width="220" height="130" rx="10" fill="rgba(240,178,61,.05)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="670" y="58" text-anchor="middle" font-weight="700" font-size="13" fill="#f7f6fb">Bloque 3</text>
+                        <line x1="574" y1="68" x2="766" y2="68" stroke="#2a3350"/>
+                        <text x="574" y="88" font-size="10.5" fill="#847e93">Hash Anterior: 0000c31…</text>
+                        <text x="574" y="106" font-size="10.5" fill="#847e93">Nonce: 55 901</text>
+                        <text x="574" y="128" font-size="11" fill="#c8cde0">Tx &nbsp; Tx &nbsp; Tx</text>
+
+                        <line x1="240" y1="85" x2="290" y2="85" stroke="#f0b23d" stroke-width="1.5" marker-end="url(#wpArrow2)"/>
+                        <line x1="510" y1="85" x2="560" y2="85" stroke="#f0b23d" stroke-width="1.5" marker-end="url(#wpArrow2)"/>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 2 — cada bloque incluye el hash del bloque anterior; modificar un bloque exigiría rehacer la prueba de trabajo de todos los bloques posteriores.</figcaption>
+                  </figure>
+                  <p>La prueba de trabajo también resuelve el problema de determinar la representación en la toma de decisiones por mayoría. Si la mayoría se basara en "un IP, un voto", podría ser subvertida por cualquiera capaz de asignarse muchas IPs. La prueba de trabajo es esencialmente "una CPU, un voto". La decisión de la mayoría está representada por la cadena más larga, en la que se ha invertido el mayor esfuerzo de prueba de trabajo. Si la mayoría del poder de cómputo está controlada por nodos honestos, la cadena honesta crecerá más rápido y superará a cualquier cadena competidora. Para modificar un bloque pasado, un atacante tendría que rehacer la prueba de trabajo de ese bloque y de todos los posteriores, y luego alcanzar y superar el trabajo de los nodos honestos — y esa probabilidad disminuye exponencialmente a medida que se agregan más bloques.</p>
+                  <p>Para compensar el aumento en la velocidad del hardware y el interés variable en ejecutar nodos con el tiempo, la dificultad de la prueba de trabajo se determina mediante un promedio móvil que apunta a un número promedio de bloques por hora: si se generan demasiado rápido, la dificultad aumenta.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">5</span> Red</h3>
+                  <p>Los pasos para operar la red son los siguientes:</p>
+                  <p>1) Las nuevas transacciones se difunden a todos los nodos.<br>2) Cada nodo recolecta las nuevas transacciones en un bloque.<br>3) Cada nodo trabaja en encontrar una prueba de trabajo difícil para su bloque.<br>4) Cuando un nodo encuentra una prueba de trabajo, difunde el bloque a todos los nodos.<br>5) Los nodos aceptan el bloque solo si todas las transacciones en él son válidas y no han sido gastadas antes.<br>6) Los nodos expresan su aceptación trabajando en crear el siguiente bloque de la cadena, usando el hash del bloque aceptado como el hash anterior.</p>
+                  <p>Los nodos siempre consideran que la cadena más larga es la correcta y seguirán trabajando para extenderla. Si dos nodos difunden versiones diferentes del siguiente bloque simultáneamente, algunos nodos pueden recibir una primero; en ese caso trabajan en la primera que recibieron, pero guardan la otra rama por si se vuelve más larga. El empate se rompe cuando se encuentra la siguiente prueba de trabajo y una de las ramas se vuelve más larga; los nodos que trabajaban en la otra rama cambian entonces a la más larga.</p>
+                  <p>Las nuevas transmisiones de transacciones no necesariamente tienen que llegar a todos los nodos: mientras lleguen a muchos, entrarán en un bloque en poco tiempo. Las transmisiones de bloques también toleran mensajes perdidos — si un nodo no recibe un bloque, lo pedirá al recibir el siguiente y darse cuenta de que se perdió uno.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">6</span> Incentivo</h3>
+                  <p>Por convención, la primera transacción en un bloque es una transacción especial que inicia una nueva moneda propiedad del creador del bloque. Esto añade un incentivo para que los nodos apoyen la red, y provee una manera de poner monedas en circulación inicialmente, ya que no hay ninguna autoridad central que las emita. La adición constante de una cantidad fija de nuevas monedas es análoga a los mineros de oro que gastan recursos para agregar oro a la circulación — en nuestro caso, es tiempo de CPU y electricidad lo que se gasta.</p>
+                  <p>El incentivo también puede financiarse con comisiones de transacción: si el valor de salida de una transacción es menor que su valor de entrada, la diferencia es una comisión que se añade al valor de incentivo del bloque que la contiene. Una vez que un número predeterminado de monedas haya entrado en circulación, el incentivo puede transicionar completamente a comisiones de transacción y estar totalmente libre de inflación.</p>
+                  <p>El incentivo también puede ayudar a alentar a los nodos a mantenerse honestos. Si un atacante codicioso lograra reunir más poder de cómputo que todos los nodos honestos juntos, tendría que elegir entre usarlo para defraudar a la gente robándole sus pagos, o usarlo para generar nuevas monedas. Debería encontrarle más rentable jugar según las reglas — reglas que lo favorecen con más monedas nuevas que todos los demás combinados — en vez de socavar el sistema y la validez de su propia riqueza.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">7</span> Recuperación de Espacio en Disco</h3>
+                  <p>Una vez que la transacción más reciente de una moneda está enterrada bajo suficientes bloques, las transacciones gastadas antes de ella pueden descartarse para ahorrar espacio en disco. Para facilitar esto sin romper el hash del bloque, las transacciones se hashean en un árbol de Merkle, con solo la raíz incluida en el hash del bloque. Los bloques antiguos pueden entonces compactarse podando ramas del árbol — no es necesario almacenar los hashes internos.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 820 270" width="820" height="270" xmlns="http://www.w3.org/2000/svg">
+                      <g font-family="'Space Grotesk',sans-serif" font-size="10.5">
+                        <text x="200" y="20" text-anchor="middle" font-size="11" fill="#847e93">Antes de podar</text>
+                        <rect x="130" y="30" width="140" height="34" rx="8" fill="rgba(240,178,61,.07)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="200" y="51" text-anchor="middle" fill="#f7f6fb" font-weight="700">Raíz Hash (Bloque)</text>
+                        <circle cx="120" cy="110" r="22" fill="none" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="120" y="114" text-anchor="middle" fill="#c8cde0">Hash01</text>
+                        <circle cx="280" cy="110" r="22" fill="none" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="280" y="114" text-anchor="middle" fill="#c8cde0">Hash23</text>
+                        <line x1="190" y1="64" x2="128" y2="90" stroke="#2a3350"/>
+                        <line x1="210" y1="64" x2="272" y2="90" stroke="#2a3350"/>
+
+                        <rect x="35" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350"/>
+                        <text x="65" y="187" text-anchor="middle" fill="#847e93">Hash0</text>
+                        <rect x="105" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350"/>
+                        <text x="135" y="187" text-anchor="middle" fill="#847e93">Hash1</text>
+                        <rect x="195" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350"/>
+                        <text x="225" y="187" text-anchor="middle" fill="#847e93">Hash2</text>
+                        <rect x="265" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350"/>
+                        <text x="295" y="187" text-anchor="middle" fill="#847e93">Hash3</text>
+                        <line x1="110" y1="132" x2="65" y2="168" stroke="#2a3350"/>
+                        <line x1="130" y1="132" x2="135" y2="168" stroke="#2a3350"/>
+                        <line x1="270" y1="132" x2="225" y2="168" stroke="#2a3350"/>
+                        <line x1="290" y1="132" x2="295" y2="168" stroke="#2a3350"/>
+
+                        <rect x="35" y="220" width="60" height="26" rx="6" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.2"/>
+                        <text x="65" y="237" text-anchor="middle" fill="#2ecc71">Tx0</text>
+                        <rect x="105" y="220" width="60" height="26" rx="6" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.2"/>
+                        <text x="135" y="237" text-anchor="middle" fill="#2ecc71">Tx1</text>
+                        <rect x="195" y="220" width="60" height="26" rx="6" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.2"/>
+                        <text x="225" y="237" text-anchor="middle" fill="#2ecc71">Tx2</text>
+                        <rect x="265" y="220" width="60" height="26" rx="6" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.2"/>
+                        <text x="295" y="237" text-anchor="middle" fill="#2ecc71">Tx3</text>
+
+                        <line x1="410" y1="0" x2="410" y2="260" stroke="#2a3350" stroke-dasharray="4,4"/>
+
+                        <text x="600" y="20" text-anchor="middle" font-size="11" fill="#847e93">Después de podar Tx0–Tx2 del bloque</text>
+                        <rect x="530" y="30" width="140" height="34" rx="8" fill="rgba(240,178,61,.07)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="600" y="51" text-anchor="middle" fill="#f7f6fb" font-weight="700">Raíz Hash (Bloque)</text>
+                        <circle cx="520" cy="110" r="22" fill="none" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="520" y="114" text-anchor="middle" fill="#c8cde0">Hash01</text>
+                        <circle cx="680" cy="110" r="22" fill="none" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="680" y="114" text-anchor="middle" fill="#c8cde0">Hash23</text>
+                        <line x1="590" y1="64" x2="528" y2="90" stroke="#2a3350"/>
+                        <line x1="610" y1="64" x2="672" y2="90" stroke="#2a3350"/>
+                        <line x1="670" y1="132" x2="625" y2="168" stroke="#2a3350"/>
+                        <line x1="690" y1="132" x2="695" y2="168" stroke="#2a3350"/>
+
+                        <rect x="595" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350" stroke-dasharray="3,3"/>
+                        <text x="625" y="187" text-anchor="middle" fill="#4a4660">Hash2</text>
+                        <rect x="665" y="170" width="60" height="26" rx="6" fill="none" stroke="#2a3350"/>
+                        <text x="695" y="187" text-anchor="middle" fill="#847e93">Hash3</text>
+                        <line x1="695" y1="196" x2="695" y2="218" stroke="#2a3350"/>
+                        <rect x="665" y="220" width="60" height="26" rx="6" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.2"/>
+                        <text x="695" y="237" text-anchor="middle" fill="#2ecc71">Tx3</text>
+                        <text x="625" y="237" text-anchor="middle" font-size="9.5" fill="#4a4660">(Tx0–Tx2 podados)</text>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 3 — árbol de Merkle: solo la raíz entra al hash del bloque, así que las transacciones viejas pueden podarse del disco sin invalidar ningún hash.</figcaption>
+                  </figure>
+                  <p>El encabezado de un bloque sin transacciones pesaría alrededor de 80 bytes. Si suponemos que los bloques se generan cada diez minutos, 80 bytes × 6 × 24 × 365 = 4.2 MB por año. Con los sistemas de computadoras típicos vendidos en 2008 con 2 GB de RAM, y con la Ley de Moore prediciendo un crecimiento de 1.2 GB por año, el almacenamiento no debería ser un problema incluso si los encabezados de los bloques deben mantenerse en memoria.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">8</span> Verificación de Pagos Simplificada</h3>
+                  <p>Es posible verificar los pagos sin ejecutar un nodo de red completo. Un usuario solo necesita conservar una copia de los encabezados de bloque de la cadena de prueba de trabajo más larga, que puede obtener consultando a los nodos de la red hasta convencerse de que tiene la cadena más larga, y obtener la rama de Merkle que enlaza la transacción con el bloque en el que se marcó con fecha y hora. No puede verificar la transacción por sí mismo, pero al enlazarla con un lugar en la cadena, puede ver que un nodo de la red la ha aceptado, y los bloques añadidos después confirman que la red la ha aceptado.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 800 220" width="800" height="220" xmlns="http://www.w3.org/2000/svg">
+                      <defs><marker id="wpArrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a3350"/></marker></defs>
+                      <g font-family="'Space Grotesk',sans-serif">
+                        <text x="400" y="18" text-anchor="middle" font-size="11" fill="#847e93">Cadena de Prueba de Trabajo más larga</text>
+                        <g font-size="9.5">
+                          <rect x="40" y="30" width="110" height="46" rx="6" fill="none" stroke="#2a3350"/>
+                          <text x="95" y="48" text-anchor="middle" fill="#c8cde0">Bloque</text>
+                          <text x="95" y="62" text-anchor="middle" fill="#4a4660">Raíz Merkle</text>
+
+                          <rect x="180" y="30" width="110" height="46" rx="6" fill="none" stroke="#2a3350"/>
+                          <text x="235" y="48" text-anchor="middle" fill="#c8cde0">Bloque</text>
+                          <text x="235" y="62" text-anchor="middle" fill="#4a4660">Raíz Merkle</text>
+
+                          <rect x="320" y="30" width="110" height="46" rx="6" fill="rgba(240,178,61,.06)" stroke="#f0b23d" stroke-width="1.4"/>
+                          <text x="375" y="48" text-anchor="middle" fill="#f7f6fb" font-weight="700">Bloque</text>
+                          <text x="375" y="62" text-anchor="middle" fill="#f0b23d">Raíz Merkle</text>
+
+                          <rect x="460" y="30" width="110" height="46" rx="6" fill="none" stroke="#2a3350"/>
+                          <text x="515" y="48" text-anchor="middle" fill="#c8cde0">Bloque</text>
+                          <text x="515" y="62" text-anchor="middle" fill="#4a4660">Raíz Merkle</text>
+
+                          <rect x="600" y="30" width="110" height="46" rx="6" fill="none" stroke="#2a3350"/>
+                          <text x="655" y="48" text-anchor="middle" fill="#c8cde0">Bloque</text>
+                          <text x="655" y="62" text-anchor="middle" fill="#4a4660">Raíz Merkle</text>
+                        </g>
+                        <line x1="150" y1="53" x2="178" y2="53" stroke="#2a3350" marker-end="url(#wpArrow3)"/>
+                        <line x1="290" y1="53" x2="318" y2="53" stroke="#2a3350" marker-end="url(#wpArrow3)"/>
+                        <line x1="430" y1="53" x2="458" y2="53" stroke="#2a3350" marker-end="url(#wpArrow3)"/>
+                        <line x1="570" y1="53" x2="598" y2="53" stroke="#2a3350" marker-end="url(#wpArrow3)"/>
+
+                        <line x1="375" y1="76" x2="375" y2="120" stroke="#f0b23d" stroke-width="1.4" stroke-dasharray="4,3"/>
+                        <rect x="295" y="122" width="160" height="34" rx="8" fill="rgba(240,178,61,.06)" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="375" y="143" text-anchor="middle" font-size="11" fill="#f0b23d">Rama de Merkle</text>
+                        <line x1="375" y1="156" x2="375" y2="180" stroke="#f0b23d" stroke-width="1.4"/>
+                        <rect x="315" y="182" width="120" height="30" rx="8" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.3"/>
+                        <text x="375" y="202" text-anchor="middle" font-size="11" fill="#2ecc71">Tx3</text>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 4 — un cliente ligero (SPV) solo guarda los encabezados de bloque y pide la rama de Merkle que conecta su transacción con uno de ellos, sin descargar la cadena completa.</figcaption>
+                  </figure>
+                  <p>Como tal, la verificación es confiable mientras los nodos honestos controlen la red, pero es más vulnerable si la red es dominada por un atacante. Mientras que los nodos de la red pueden verificar las transacciones por sí mismos, el método simplificado puede ser engañado por transacciones fabricadas de un atacante mientras este siga pudiendo superar a la red. Una estrategia para protegerse de esto sería aceptar alertas de los nodos de la red cuando detecten un bloque inválido, incitando al software del usuario a descargar el bloque completo y las transacciones alertadas para confirmar la inconsistencia. Los negocios que reciben pagos frecuentes probablemente aún querrán operar sus propios nodos para una seguridad más independiente y una verificación más rápida.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">9</span> Combinación y División de Valor</h3>
+                  <p>Aunque sería posible manejar monedas individualmente, sería incómodo hacer una transacción separada por cada céntimo en una transferencia. Para permitir que el valor se divida y combine, las transacciones contienen múltiples entradas y salidas. Normalmente habrá una sola entrada de una transacción anterior más grande, o múltiples entradas combinando cantidades más pequeñas, y como máximo dos salidas: una para el pago, y una devolviendo el cambio, si lo hay, de vuelta al emisor.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 700 170" width="700" height="170" xmlns="http://www.w3.org/2000/svg">
+                      <defs><marker id="wpArrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f0b23d"/></marker></defs>
+                      <g font-family="'Space Grotesk',sans-serif" font-size="11">
+                        <rect x="20" y="30" width="150" height="40" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="95" y="54" text-anchor="middle" fill="#c8cde0">Entrada 1 (0.6 BTC)</text>
+                        <rect x="20" y="100" width="150" height="40" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="95" y="124" text-anchor="middle" fill="#c8cde0">Entrada 2 (0.25 BTC)</text>
+
+                        <rect x="270" y="55" width="160" height="60" rx="10" fill="rgba(240,178,61,.07)" stroke="#f0b23d" stroke-width="1.5"/>
+                        <text x="350" y="90" text-anchor="middle" font-weight="700" fill="#f7f6fb">Transacción</text>
+
+                        <rect x="530" y="30" width="150" height="40" rx="8" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.3"/>
+                        <text x="605" y="54" text-anchor="middle" fill="#2ecc71">Salida 1: pago (0.8)</text>
+                        <rect x="530" y="100" width="150" height="40" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="605" y="124" text-anchor="middle" fill="#c8cde0">Salida 2: cambio (0.05)</text>
+
+                        <line x1="170" y1="50" x2="268" y2="75" stroke="#2a3350" marker-end="url(#wpArrow4)"/>
+                        <line x1="170" y1="120" x2="268" y2="95" stroke="#2a3350" marker-end="url(#wpArrow4)"/>
+                        <line x1="430" y1="75" x2="528" y2="50" stroke="#f0b23d" marker-end="url(#wpArrow4)"/>
+                        <line x1="430" y1="95" x2="528" y2="120" stroke="#2a3350" marker-end="url(#wpArrow4)"/>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 5 — una transacción puede combinar varias entradas y dividir el resultado en un pago y un cambio de vuelta al emisor.</figcaption>
+                  </figure>
+                  <p>Cabe señalar que la "propagación" (fan-out), donde una transacción depende de varias transacciones y esas de muchas más, no es un problema aquí: nunca hay necesidad de extraer una copia completa e independiente del historial de una transacción.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">10</span> Privacidad</h3>
+                  <p>El modelo bancario tradicional logra un nivel de privacidad al limitar el acceso a la información a las partes involucradas y al tercero de confianza. La necesidad de anunciar públicamente todas las transacciones descarta este método, pero la privacidad aún puede mantenerse rompiendo el flujo de información en otro lugar: manteniendo las claves públicas anónimas. El público puede ver que alguien le envía una cantidad a otro alguien, pero sin información que vincule la transacción a nadie — similar al nivel de información publicado por las bolsas de valores, donde se da a conocer el momento y el tamaño de las operaciones individuales sin decir quiénes fueron las partes.</p>
+                  <figure class="wp-figure">
+                    <svg viewBox="0 0 780 190" width="780" height="190" xmlns="http://www.w3.org/2000/svg">
+                      <defs><marker id="wpArrow5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a3350"/></marker></defs>
+                      <g font-family="'Space Grotesk',sans-serif" font-size="11">
+                        <text x="185" y="18" text-anchor="middle" fill="#847e93" font-size="11">Modelo tradicional</text>
+                        <rect x="30" y="35" width="130" height="38" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="95" y="58" text-anchor="middle" fill="#c8cde0">Identidades</text>
+                        <rect x="195" y="35" width="150" height="38" rx="8" fill="rgba(240,178,61,.06)" stroke="#f0b23d" stroke-width="1.3"/>
+                        <text x="270" y="58" text-anchor="middle" fill="#f0b23d">Tercero de Confianza</text>
+                        <rect x="195" y="120" width="150" height="38" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="270" y="143" text-anchor="middle" fill="#c8cde0">Público</text>
+                        <rect x="30" y="120" width="130" height="38" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="95" y="143" text-anchor="middle" fill="#c8cde0">Contraparte</text>
+                        <line x1="160" y1="54" x2="193" y2="54" stroke="#2a3350" marker-end="url(#wpArrow5)"/>
+                        <line x1="270" y1="73" x2="270" y2="118" stroke="#2a3350" marker-end="url(#wpArrow5)"/>
+                        <line x1="193" y1="139" x2="162" y2="139" stroke="#2a3350" marker-end="url(#wpArrow5)"/>
+
+                        <line x1="400" y1="0" x2="400" y2="190" stroke="#2a3350" stroke-dasharray="4,4"/>
+
+                        <text x="590" y="18" text-anchor="middle" fill="#847e93" font-size="11">Modelo nuevo</text>
+                        <rect x="430" y="35" width="130" height="38" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="495" y="58" text-anchor="middle" fill="#c8cde0">Identidades</text>
+                        <rect x="430" y="120" width="130" height="38" rx="8" fill="rgba(46,204,113,.08)" stroke="#2ecc71" stroke-width="1.3"/>
+                        <text x="495" y="143" text-anchor="middle" fill="#2ecc71">Transacciones</text>
+                        <rect x="620" y="120" width="130" height="38" rx="8" fill="none" stroke="#2a3350"/>
+                        <text x="685" y="143" text-anchor="middle" fill="#c8cde0">Público</text>
+                        <line x1="495" y1="73" x2="495" y2="118" stroke="#2a3350" stroke-dasharray="3,3"/>
+                        <text x="495" y="100" text-anchor="middle" font-size="9.5" fill="#4a4660">(sin vínculo directo)</text>
+                        <line x1="560" y1="139" x2="618" y2="139" stroke="#2ecc71" marker-end="url(#wpArrow5)"/>
+                      </g>
+                    </svg>
+                    <figcaption>Figura 6 — en el modelo tradicional el tercero de confianza conoce ambas identidades; en Bitcoin las transacciones son públicas, pero las claves públicas no están vinculadas a una identidad conocida.</figcaption>
+                  </figure>
+                  <p>Como salvaguarda adicional, se debería usar un nuevo par de claves para cada transacción, para evitar que se las vincule a un propietario común. Es inevitable cierto enlace en transacciones con múltiples entradas, ya que necesariamente revelan que esas entradas pertenecían al mismo propietario. El riesgo es que si se revela el propietario de una clave, el enlace podría revelar otras transacciones que pertenecían al mismo propietario.</p>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">11</span> Cálculos</h3>
+                  <p>Consideramos el escenario de un atacante tratando de generar una cadena alternativa más rápido que la cadena honesta. Incluso si esto se logra, no abre el sistema a cambios arbitrarios, como crear valor de la nada o tomar dinero que nunca perteneció al atacante: los nodos no aceptarán una transacción inválida como pago, y los nodos honestos nunca aceptarán un bloque que las contenga. Un atacante solo puede intentar cambiar una de sus propias transacciones para recuperar dinero que gastó recientemente.</p>
+                  <p>La carrera entre la cadena honesta y la de un atacante puede modelarse como una Caminata Aleatoria Binaria: el evento de "éxito" es que la cadena honesta se extienda un bloque (+1), y el de "fracaso" es que la cadena del atacante se extienda un bloque (−1). La probabilidad de que el atacante alcance a la cadena honesta desde un déficit de <em>z</em> bloques es análoga al clásico Problema de la Ruina del Apostador:</p>
+                  <div class="wp-formula">q<sub>z</sub> = (q/p)<sup>z</sup> &nbsp; si&nbsp; p ≤ q &nbsp;·&nbsp; q<sub>z</sub> = 1 &nbsp; si&nbsp; p &gt; q</div>
+                  <p>donde <em>p</em> es la probabilidad de que un nodo honesto encuentre el siguiente bloque y <em>q</em> la de que lo encuentre el atacante. Dada nuestra suposición de que <em>p</em> &gt; <em>q</em>, la probabilidad disminuye exponencialmente a medida que aumenta el número de bloques que el atacante debe recuperar. Con las probabilidades en su contra, si no tiene un golpe de suerte temprano que lo adelante, sus posibilidades se vuelven insignificantes a medida que cae más y más atrás.</p>
+                  <p>Esto lleva a la pregunta de cuánto debe esperar el receptor de una nueva transacción antes de estar suficientemente seguro de que el emisor no puede revertirla. El receptor espera hasta que la transacción se haya agregado a un bloque y <em>z</em> bloques se hayan enlazado después. Asumiendo que los bloques honestos tomaron el tiempo promedio esperado por bloque, el progreso potencial del atacante sigue una distribución de Poisson con valor esperado:</p>
+                  <div class="wp-formula">λ = z · (q/p)</div>
+                  <div class="wp-note">El paper original continúa desde aquí con la derivación algebraica completa (la densidad de Poisson, la suma acumulada, y el pseudocódigo en C que calcula la probabilidad exacta de éxito del atacante para distintos valores de z). El resultado práctico de esa derivación es el que importa en el día a día: la probabilidad de que un atacante alcance a la cadena cae exponencialmente a medida que z crece, y ya con z = 6 confirmaciones esa probabilidad es menor al 0.1% frente a un atacante con hasta el 10% del poder de cómputo de la red — el origen de la convención de "esperar 6 confirmaciones" en Bitcoin.</div>
+                </div>
+
+                <div class="wp-section">
+                  <h3><span class="wp-num">12</span> Conclusión</h3>
+                  <p>Hemos propuesto un sistema para transacciones electrónicas que no depende de la confianza. Comenzamos con el marco habitual de monedas hechas de firmas digitales, que provee un control fuerte sobre la propiedad, pero que es incompleto sin una manera de evitar el doble gasto. Para resolver esto, propusimos una red entre pares usando prueba de trabajo para registrar un historial público de transacciones que rápidamente se vuelve computacionalmente impráctico de modificar para un atacante, si los nodos honestos controlan la mayoría del poder de cómputo.</p>
+                  <p>La red es robusta en su simplicidad no estructurada: los nodos trabajan todos a la vez con poca coordinación, no necesitan ser identificados, y los mensajes solo necesitan entregarse con el mejor esfuerzo posible. Los nodos pueden salir y volver a unirse a la red a voluntad, aceptando la cadena de prueba de trabajo como prueba de lo que pasó mientras estuvieron ausentes. Votan con su poder de cómputo, expresando su aceptación de bloques válidos trabajando en extenderlos y rechazando los inválidos al negarse a trabajar en ellos. Cualquier regla y los incentivos necesarios pueden hacerse cumplir con este mecanismo de consenso.</p>
+                </div>
+
+                <div class="wp-section" style="margin-bottom:8px">
+                  <h3><span class="wp-num">↳</span> Referencias</h3>
+                  <ol class="wp-refs">
+                    <li>W. Dai, "b-money", lista de correo de cypherpunks, 1998.</li>
+                    <li>H. Massias, X.S. Avila y J.-J. Quisquater, "Diseño de un sistema seguro de marcas de tiempo con requisitos mínimos de confianza", 20º Simposio sobre Teoría de la Información en el Benelux, 1999.</li>
+                    <li>S. Haber y W.S. Stornetta, "Cómo poner fecha y hora a un documento digital", Journal of Cryptology, vol. 3, n.º 2, pp. 99–111, 1991.</li>
+                    <li>D. Bayer, S. Haber y W.S. Stornetta, "Mejorando la eficiencia y confiabilidad del marcado de tiempo digital", en Sequences II: Methods in Communication, Security and Computer Science, pp. 329–334, 1993.</li>
+                    <li>S. Haber y W.S. Stornetta, "Marcado de tiempo seguro de nombres", Proceedings of the 4th ACM Conference on Computer and Communications Security, pp. 28–35, 1997.</li>
+                    <li>A. Back, "Hashcash — una medida contra el abuso", 2002.</li>
+                    <li>R.C. Merkle, "Protocolos para criptosistemas de clave pública", Proceedings of the 1980 Symposium on Security and Privacy, IEEE Computer Society, pp. 122–133, 1980.</li>
+                    <li>W. Feller, "Una introducción a la teoría de la probabilidad y sus aplicaciones", 1957.</li>
+                  </ol>
+                </div>
+
+                <div class="calc-disclaimer" style="margin-top:10px">
+                  📜 Esta es nuestra propia traducción al español del whitepaper original de Bitcoin (2008), con sus figuras reconstruidas para integrarse nativamente en el sitio — no un PDF adjunto. El texto en inglés original está disponible públicamente en <a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">bitcoin.org/bitcoin.pdf</a> si quieres comparar la fuente original.<br>
+                  <strong>Documento histórico con fines educativos.</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="indic-panel" data-indic="halving" style="display:none">
           <div class="indic-chart-card">
@@ -7555,7 +7938,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
+  bitcoin: [{ id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
@@ -7595,7 +7978,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
