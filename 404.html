@@ -5049,35 +5049,23 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <h2 class="calc-title">Costo Base Institucional</h2>
               </div>
 
-              <div class="tf-pill-row" id="treascbRangeFilter">
-                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
-                <button type="button" class="tf-pill" data-range="5a">5 años</button>
-                <button type="button" class="tf-pill" data-range="2a">2 años</button>
-                <button type="button" class="tf-pill" data-range="1a">1 año</button>
+              <div class="indic-chart-soon" id="treascbLoading">
+                <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                <div class="indic-placeholder-title">Cargando datos…</div>
+                <div class="indic-placeholder-text">Reconstruyendo el costo base de empresas y ETFs con BTC en su balance.</div>
               </div>
-
-              <div class="indic-chart-body" id="treascbChartBody">
-                <div class="indic-chart-soon" id="treascbLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
-                  <div class="indic-placeholder-title">Cargando historial…</div>
-                  <div class="indic-placeholder-text">Reconstruyendo el costo base de empresas y ETFs con BTC en su balance.</div>
-                </div>
-                <div class="indic-chart-soon" id="treascbError" style="display:none">
-                  <div class="indic-placeholder-icon">⚠️</div>
-                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
-                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
-                </div>
-                <div id="treascbChartWrap" class="chart-breakout" style="display:none"></div>
-                <div id="treascbDateSlider" class="date-range-slider"></div>
+              <div class="indic-chart-soon" id="treascbError" style="display:none">
+                <div class="indic-placeholder-icon">⚠️</div>
+                <div class="indic-placeholder-title">No se pudo cargar los datos</div>
+                <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
               </div>
-              <div class="partner-perks" id="treascbLegend" style="display:none;margin-bottom:18px"></div>
               <div class="chart-stats-grid" id="treascbStats" style="display:none"></div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                💎 <b>Costo Base Institucional</b> (azul): el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (naranja, empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (verde, IBIT, FBTC, etc.) — las dos líneas se muestran también por separado. Las bandas punteadas (roja arriba, verde abajo) son un canal de ±0.37 desviación estándar — qué tan dispersas están las compras reales entre sí — calculado con el historial completo de transacciones hasta hoy y aplicado como un porcentaje constante a lo largo de todo el gráfico, igual que el canal de la referencia original de Capriole.<br>
-                🏢 Cuando el precio de BTC está muy por encima de la línea azul, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
+                💎 <b>Costo Base Institucional</b>: el precio promedio ponderado por BTC en balance entre <b>Treasuries corporativas</b> (empresas públicas como Strategy/MicroStrategy) y <b>ETFs spot</b> (IBIT, FBTC, etc.) — hoy, combinado y por separado.<br>
+                🏢 Cuando el precio de BTC está muy por encima de ese costo base, el "holder institucional promedio" está en una ganancia amplia; cuando se acerca o cae por debajo, ese colchón de ganancia se achica o desaparece.<br>
                 🔎 Fuentes de datos: Treasuries desde la API pública de <a href="https://www.coingecko.com/en/api/treasuries" target="_blank" rel="noopener">CoinGecko Public Treasury</a> (historial de transacciones, reconstruido desde ago-2020). ETFs desde los flujos diarios publicados por <a href="https://farside.co.uk/bitcoin-etf-flow-all-data/" target="_blank" rel="noopener">Farside Investors</a> (desde ene-2024, cuando lanzaron), convertidos a costo promedio ponderado por volumen — GBTC se incluye desde su balance y costo real según sus últimos 10-K/10-Q ante la SEC antes de convertirse en ETF (traía BTC desde 2013 como fideicomiso cerrado), y sus redenciones posteriores se descuentan al costo de remoción implícito en esos mismos reportes, no al promedio corriente.<br>
-                📊 Este gráfico es nuestra propia reconstrucción, inspirada en el indicador real <b>"BTC Institutional Cost Basis"</b> de <a href="https://quant.capriole.com/?chart=btc-treasuries-institutional-cost-basis" target="_blank" rel="noopener">Capriole Investments</a> — ahí vas a encontrar los números exactos de su propia metodología (no publicada), que puede diferir de los nuestros. Capriole también publica <a href="https://quant.capriole.com/?chart=btc-treasuries-total-holdings" target="_blank" rel="noopener">"BTC Treasuries Total Holdings"</a> (el BTC total acumulado, en vez del costo promedio) — un gráfico que intentamos replicar aquí y no logramos reproducir fielmente con datos públicos, así que no está disponible en este sitio.<br>
+                📊 Inspirado en el indicador real <b>"BTC Institutional Cost Basis"</b> de <a href="https://quant.capriole.com/?chart=btc-treasuries-institutional-cost-basis" target="_blank" rel="noopener">Capriole Investments</a> — ahí vas a encontrar los números exactos de su propia metodología (no publicada), que puede diferir de los nuestros. Capriole también publica <a href="https://quant.capriole.com/?chart=btc-treasuries-total-holdings" target="_blank" rel="noopener">"BTC Treasuries Total Holdings"</a> (el BTC total acumulado, en vez del costo promedio) — un gráfico que intentamos replicar aquí y no logramos reproducir fielmente con datos públicos, así que no está disponible en este sitio.<br>
                 <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
@@ -18680,199 +18668,25 @@ async function fetchTreasCostBasisMergedSeries(){
   treasCbMergedCache = merged;
   return merged;
 }
-const TREASCB_RANGE_YEARS = { todo: null, '5a': 5, '2a': 2, '1a': 1 };
-let treasCbActiveRange = 'todo';
-let treasCbCustomRange = null;
-let treasCbSlider = null;
+// a pedido del usuario se quito la visualizacion grafica (el canal Upper/Lower nunca calzo con
+// precision la referencia real de Capriole, ver intentos previos) - queda solo la parte de datos:
+// los valores de HOY en tarjetas, sin lineas ni bandas que comparar visualmente
 function renderTreasCostBasisChart(){
   const loadingEl = document.getElementById('treascbLoading');
   const errorEl = document.getElementById('treascbError');
-  const wrap = document.getElementById('treascbChartWrap');
-  const legendEl = document.getElementById('treascbLegend');
   const statsEl = document.getElementById('treascbStats');
   const fullPoints = treasCbMergedCache;
   if(!fullPoints || fullPoints.length < 30){
     loadingEl.style.display = 'none';
     errorEl.style.display = 'flex';
-    wrap.style.display = 'none';
-    legendEl.style.display = 'none';
     statsEl.style.display = 'none';
     return;
   }
   loadingEl.style.display = 'none';
   errorEl.style.display = 'none';
-  wrap.style.display = 'block';
-  legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
-  let fromMs, toMs;
-  if(treasCbCustomRange){
-    fromMs = treasCbCustomRange.fromMs;
-    toMs = treasCbCustomRange.toMs;
-  } else {
-    const rangeYears = TREASCB_RANGE_YEARS[treasCbActiveRange];
-    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
-    toMs = fullEndMs;
-  }
-  const points = fullPoints.filter(p => p.t >= fromMs && p.t <= toMs);
-  if(!points.length) return;
-
-  if(treasCbSlider) treasCbSlider.setRange(fromMs, toMs);
-  else{
-    treasCbSlider = createDateRangeSlider('treascbDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
-      treasCbCustomRange = { fromMs: f, toMs: t };
-      document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
-      renderTreasCostBasisChart();
-    });
-  }
-
-  const startMs = points[0].t, endMs = points[points.length - 1].t;
-  const spanMs = (endMs - startMs) || 1;
-  // la banda usa un porcentaje CONSTANTE (la dispersion de HOY, la mas madura: con todo el
-  // historial de transacciones ya acumulado) en vez de la desviacion estandar de CADA dia por
-  // separado. Esa version dia-a-dia quedaba ruidosa al principio del historico (cuando una
-  // empresa recien tenia 2-3 compras, el rango de precios recorrido hasta ese punto ya era un
-  // porcentaje enorme de una base todavia chiquita) - la referencia real de Capriole muestra un
-  // canal de ancho estable en todo el historico, no uno que se infla al principio. costo*(1+r)
-  // arriba, costo*(1-r) abajo (porcentaje LINEAL simetrico, no dividir para abajo en escala log)
-  const lastFullPt = fullPoints[fullPoints.length - 1];
-  // 0.37 (no 0.5, no 1.0): la desviacion completa ponderada por BTC de los precios de entrada
-  // reales (~39.5% con los datos reales de hoy) queda bastante mas ancha que el canal real de
-  // Capriole - sus propios numeros de leyenda mas recientes (Upper 89,192 / Institutional 77,813
-  // / Lower 66,433) dan un canal de ±14.6% sobre el costo institucional. 14.6/39.5 = 0.37 es el
-  // multiplicador que mejor calza con esa referencia real al momento de este ajuste.
-  const bandRatio = lastFullPt.blendedCost > 0 ? (lastFullPt.blendedStd / lastFullPt.blendedCost) * 0.37 : 0;
-  const upperVals = points.map(p => p.blendedCost * (1 + bandRatio));
-  const lowerVals = points.map(p => Math.max(p.blendedCost * (1 - bandRatio), p.blendedCost * 0.3));
-  const allPrices = [points.map(p => p.btc), points.map(p => p.treasuryCost), points.map(p => p.etfCost), points.map(p => p.blendedCost), upperVals, lowerVals]
-    .flat().filter(v => v > 0);
-  const minPrice = Math.min(...allPrices), maxPrice = Math.max(...allPrices);
-
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 460;
-  const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
-  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
-  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
-  const drawW = totalW - marginLeft - marginRight;
-  const priceTop = marginTop, priceBottom = totalH - marginBottom;
-  const priceH = priceBottom - priceTop;
-
-  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
-  const logRange = (logMax - logMin) || 1;
-  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
-  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
-
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yForPrice(t);
-    return y > priceTop - 0.5 && y < priceBottom + 0.5;
-  });
-  const priceGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
-  `).join('');
-
-  function pathFor(getV){
-    let d = '', drawing = false;
-    points.forEach(p => {
-      const v = getV(p);
-      if(v == null || !isFinite(v) || v <= 0){ drawing = false; return; }
-      d += `${drawing ? 'L' : 'M'}${xFor(p.t).toFixed(1)},${yForPrice(v).toFixed(1)} `;
-      drawing = true;
-    });
-    return d.trim();
-  }
-  const btcLine = pathFor(p => p.btc);
-  const blendedLine = pathFor(p => p.blendedCost);
-  const treasuryLine = pathFor(p => p.treasuryCost);
-  const etfLine = pathFor(p => p.etfCost);
-  const upperLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(upperVals[i]).toFixed(1)}`).join(' ');
-  const lowerLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yForPrice(lowerVals[i]).toFixed(1)}`).join(' ');
-
-  // zonas sombreadas entre cada linea de costo base y su banda - solo sobre el tramo donde
-  // ambos bordes existen (antes de ene-2024 no hay ETFs todavia, asi que no hay zona verde ahi)
-  function areaBetween(getTop, getBottom){
-    let startIdx = -1, endIdx = -1;
-    for(let i = 0; i < points.length; i++){
-      const t = getTop(i), b = getBottom(i);
-      if(t != null && isFinite(t) && t > 0 && b != null && isFinite(b) && b > 0){
-        if(startIdx === -1) startIdx = i;
-        endIdx = i;
-      }
-    }
-    if(startIdx === -1) return '';
-    let d = '';
-    for(let i = startIdx; i <= endIdx; i++) d += `${i === startIdx ? 'M' : 'L'}${xFor(points[i].t).toFixed(1)},${yForPrice(getTop(i)).toFixed(1)} `;
-    for(let i = endIdx; i >= startIdx; i--) d += `L${xFor(points[i].t).toFixed(1)},${yForPrice(getBottom(i)).toFixed(1)} `;
-    return d + 'Z';
-  }
-  const upperAreaD = areaBetween(i => upperVals[i], i => points[i].treasuryCost);
-  const lowerAreaD = areaBetween(i => points[i].etfCost, i => lowerVals[i]);
-
-  const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
-  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-  const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${priceBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
-  `;
-  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
-  const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
-  `;
-
-  wrap.innerHTML = `
-    <div style="position:relative">
-      <svg class="fng-chart-svg" id="treascbChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-        ${chartWatermarkHtml(totalW, totalH)}
-        ${priceGridHtml}
-        <path d="${upperAreaD}" fill="rgba(255,47,79,.14)" stroke="none"/>
-        <path d="${lowerAreaD}" fill="rgba(34,197,94,.14)" stroke="none"/>
-        <path d="${upperLine}" fill="none" stroke="rgba(255,47,79,.55)" stroke-width="1" stroke-dasharray="5,3"/>
-        <path d="${lowerLine}" fill="none" stroke="rgba(34,197,94,.55)" stroke-width="1" stroke-dasharray="5,3"/>
-        <path d="${treasuryLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${etfLine}" fill="none" stroke="#2ecc71" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${blendedLine}" fill="none" stroke="#3fa9f5" stroke-width="${isMobileChart ? 1.2 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        ${xLabelsHtml}
-        ${todayMarkerHtml}
-        <line id="treascbHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="treascbHoverDot" r="6" fill="#fff" style="display:none"/>
-        <rect id="treascbHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="treascbHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="treascbHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
-      </svg>
-      <div id="treascbTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-    </div>
-  `;
-
-  const treascbSvg = document.getElementById('treascbChartSvg');
-  wireChartHover({
-    svg: treascbSvg, catcherId: 'treascbHoverCatcher', lineId: 'treascbHoverLine', dotId: 'treascbHoverDot',
-    dateLabelId: 'treascbHoverDateLabel', dateBgId: 'treascbHoverDateBg', tooltipId: 'treascbTooltip',
-    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForPrice(points[i].btc),
-    tooltipHtml: i => {
-      const p = points[i];
-      let html = `<b>${fmtHalvingPrice(p.btc)}</b>`;
-      html += `<br><span style="color:#3fa9f5">Institucional: ${fmtHalvingPrice(p.blendedCost)}</span>`;
-      html += `<br><span style="color:#f0b23d">Treasuries: ${fmtHalvingPrice(p.treasuryCost)}</span>`;
-      if(p.etfCost != null) html += `<br><span style="color:#2ecc71">ETFs: ${fmtHalvingPrice(p.etfCost)}</span>`;
-      return html;
-    },
-  });
-
-  legendEl.innerHTML = `
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#3fa9f5"></span>Institucional (combinado)</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#f0b23d"></span>Treasuries corporativas</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:#2ecc71"></span>ETFs spot</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(255,47,79,.55)"></span>Banda superior ±0.37σ</span>
-    <span class="perk-chip"><span class="perk-chip-dot" style="background:rgba(34,197,94,.55)"></span>Banda inferior ±0.37σ</span>
-  `;
-
-  const last = points[points.length - 1];
+  const last = fullPoints[fullPoints.length - 1];
   const premiumPct = (last.btc / last.blendedCost - 1) * 100;
   statsEl.innerHTML = `
     <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(last.btc)}</div></div>
@@ -18889,19 +18703,6 @@ async function loadTreasCostBasisDetail(){
 }
 let treasCbLoadedOnce = false;
 function ensureTreasCostBasisLoaded(){ if(!treasCbLoadedOnce){ treasCbLoadedOnce = true; loadTreasCostBasisDetail(); } }
-window.addEventListener('resize', () => {
-  if(document.querySelector('.indic-panel[data-indic="treascb"]').style.display !== 'none') renderTreasCostBasisChart();
-});
-document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.classList.contains('active')) return;
-    document.querySelectorAll('#treascbRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    treasCbActiveRange = btn.dataset.range;
-    treasCbCustomRange = null;
-    renderTreasCostBasisChart();
-  });
-});
 /* ---- Media Móvil de 4 Años: índice = precio de cierre ÷ promedio de los últimos 1460 días
    (~4 años), sobre el mismo historial diario compartido que ya usan Halving/RSI Mensual/etc.
    (fetchHalvingHistory). Los primeros ~4 años usan una ventana que va creciendo (no hay 1460
