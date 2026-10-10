@@ -1709,11 +1709,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
-      <button class="sb-item" data-indic-jump="whitepaper">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
-      </button>
       <button class="sb-item" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
+      <button class="sb-item" data-indic-jump="whitepaper">
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
       </button>
       <button class="sb-item" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
@@ -2011,11 +2011,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whitepaper">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
-      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whitepaper">
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
@@ -7938,7 +7938,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
@@ -20635,6 +20635,7 @@ function ensureMacroGuiaLoaded(){
 // definición, sin combinador. Dominancia y Altcoins sí describen un mismo fenómeno (hacia dónde
 // rota el capital) y sí combinan con sentido, así que llevan el mismo combinador que Macro.
 const BITCOIN_GUIA_INDICATORS = [
+  { id: 'whitepaper', icon: '📜', label: 'Whitepaper de Bitcoin', def: 'El documento original de 2008 donde Satoshi Nakamoto describe Bitcoin — traducido al español, con sus diagramas, integrado directamente en esta página.' },
   { id: 'halving', icon: '⏳', label: 'Ciclos de Halving', def: 'Cuenta el tiempo desde el último halving (el evento que reduce a la mitad la recompensa de minería cada ~4 años) — históricamente marca el ritmo de los ciclos alcistas y bajistas de BTC.' },
   { id: 'btcmacro', icon: '🏛', label: 'BTC + Datos Macroeconómicos', def: 'El precio de BTC con PMI, inflación, tasas de interés y/o el balance de la Fed superpuestos — activa los que quieras ver y compara su forma contra el precio.' },
   { id: 'pisomercado', icon: '⚓', label: 'Pulso de Fondo', def: 'Un modelo estadístico de "piso" de mercado — qué tan cerca o lejos está el precio de zonas históricas donde BTC tocó fondo.' },
