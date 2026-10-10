@@ -1763,6 +1763,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="treascb">
         <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
       </button>
+      <button class="sb-item" data-indic-jump="epochpl">
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en Pérdida por Época</span>
+      </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button class="sb-item" data-indic-jump="ethereumguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
@@ -2064,6 +2067,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treascb">
         <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="epochpl">
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en Pérdida por Época</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethereumguia">
@@ -5038,6 +5044,52 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
         </div>
 
+        <div class="indic-panel" data-indic="epochpl" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title">% Supply en Pérdida por Época de Halving</h2>
+              </div>
+
+              <div class="tf-pill-row" id="epochplRangeFilter">
+                <button type="button" class="tf-pill active" data-range="todo">Todo</button>
+                <button type="button" class="tf-pill" data-range="10a">10 años</button>
+                <button type="button" class="tf-pill" data-range="5a">5 años</button>
+                <button type="button" class="tf-pill" data-range="2a">2 años</button>
+              </div>
+
+              <div class="indic-chart-body" id="epochplChartBody">
+                <div class="indic-chart-soon" id="epochplLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando historial…</div>
+                  <div class="indic-placeholder-text">Calculando qué porcentaje del supply de cada época de halving está en pérdida.</div>
+                </div>
+                <div class="indic-chart-soon" id="epochplError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el historial</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+                <div id="epochplChartWrap" class="chart-breakout" style="display:none"></div>
+                <div id="epochplDateSlider" class="date-range-slider"></div>
+              </div>
+              <div class="partner-perks" id="epochplLegend" style="display:none;margin-bottom:18px"></div>
+              <div class="chart-stats-grid" id="epochplStats" style="display:none"></div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🪙 Cada línea es el <b>% del BTC acuñado en esa época de halving que sigue sin moverse y hoy vale menos de lo que costó</b> (está "en pérdida"). Las épocas son los 5 tramos reales entre halvings: Época 0 (03-ene-2009 a 28-nov-2012), Época 1 (28-nov-2012 a 09-jul-2016), Época 2 (09-jul-2016 a 11-may-2020), Época 3 (11-may-2020 a 20-abr-2024), Época 4 (20-abr-2024 en adelante).<br>
+                📉 Las monedas más viejas casi siempre están en ganancia a precio de hoy (se compraron muy baratas); la época más reciente es la que más fluctúa, porque se compró a precios de ciclo más altos.<br>
+                🔎 Fuente de datos: <a href="https://bitview.space" target="_blank" rel="noopener">Bitview / Bitcoin Research Kit</a> (histórico completo, calculado desde un nodo Bitcoin Core independiente) — series reales <code>epoch_N_supply</code> / <code>epoch_N_supply_in_loss</code>, el porcentaje se calcula aquí mismo dividiendo una entre la otra.<br>
+                📊 Inspirado en <b>"Cycle Percent Supply in Profit"</b> de <a href="https://checkonchain.com" target="_blank" rel="noopener">checkonchain.com</a>, pero usando las épocas reales de halving en vez de sus propios cortes de año (metodología no publicada).<br>
+                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="indic-panel" data-indic="treascb" style="display:none">
           <div class="indic-chart-card">
             <div class="calc">
@@ -7914,7 +7966,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }, { id: 'epochpl', label: '% Supply en Pérdida por Época' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
   trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
@@ -7954,7 +8006,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -8091,6 +8143,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'btcaapl') ensureBtcAaplLoaded();
       if(btn.dataset.indic === 'btcreturns') ensureBtcReturnsLoaded();
       if(btn.dataset.indic === 'sthmvrv') ensureSthMvrvLoaded();
+      if(btn.dataset.indic === 'epochpl') ensureEpochPlLoaded();
       if(btn.dataset.indic === 'ethreturns') ensureEthReturnsLoaded();
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
@@ -8150,6 +8203,7 @@ function jumpToIndicator(id){
     if(id === 'btcaapl') ensureBtcAaplLoaded();
     if(id === 'btcreturns') ensureBtcReturnsLoaded();
     if(id === 'sthmvrv') ensureSthMvrvLoaded();
+    if(id === 'epochpl') ensureEpochPlLoaded();
     if(id === 'ethreturns') ensureEthReturnsLoaded();
     if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'optionsoi') ensureOptionsOiLoaded();
@@ -18555,6 +18609,258 @@ document.querySelectorAll('#sthmvrvRangeFilter .tf-pill').forEach(btn => {
     renderSthMvrvChart();
   });
 });
+/* ---- % Supply en Pérdida por Época de Halving: equivalente real (datos verificables) al
+   "Cycle Percent Supply in Profit" de checkonchain, pero usando las 5 épocas REALES entre
+   halvings en vez de los cortes de año propios (no publicados) de checkonchain. Datos desde
+   Supabase (tabla epoch_profit_loss_daily), alimentada por update_epoch_profit_loss_daily.py
+   (fuente: Bitview/Bitcoin Research Kit - series reales epoch_N_supply / epoch_N_supply_in_loss,
+   confirmadas en su codigo fuente publico bitcoinresearchkit/brk). */
+const EPOCH_DEFS = [
+  { n: 0, label: 'Época 0 (2009-2012)', color: '#f0b23d' },
+  { n: 1, label: 'Época 1 (2012-2016)', color: '#ec4899' },
+  { n: 2, label: 'Época 2 (2016-2020)', color: '#3fa9f5' },
+  { n: 3, label: 'Época 3 (2020-2024)', color: '#2ecc71' },
+  { n: 4, label: 'Época 4 (2024-hoy)', color: '#a855f7' },
+];
+let epochPlRawCache = null;
+async function fetchEpochPlHistory(){
+  if(epochPlRawCache) return epochPlRawCache;
+  const cols = ['date', ...EPOCH_DEFS.flatMap(e => [`epoch${e.n}_supply_btc`, `epoch${e.n}_pct_in_loss`])].join(',');
+  const rows = [];
+  const pageSize = 1000;
+  for(let from = 0; ; from += pageSize){
+    const { data, error } = await withRetry(() => sbClient
+      .from('epoch_profit_loss_daily')
+      .select(cols)
+      .order('date', { ascending: true })
+      .range(from, from + pageSize - 1), 3, 500);
+    if(error) throw error;
+    if(!data || data.length === 0) break;
+    rows.push(...data);
+    if(data.length < pageSize) break;
+  }
+  epochPlRawCache = rows;
+  return rows;
+}
+let epochPlMergedCache = null;
+async function fetchEpochPlMergedSeries(){
+  if(epochPlMergedCache) return epochPlMergedCache;
+  const [btcHistory, epochRows] = await Promise.all([fetchHalvingHistory(), fetchEpochPlHistory()]);
+  const byDay = new Map();
+  epochRows.forEach(r => byDay.set(r.date, r));
+  const merged = [];
+  btcHistory.forEach(p => {
+    const key = new Date(p.t).toISOString().slice(0, 10);
+    const r = byDay.get(key);
+    if(!r) return;
+    const pt = { t: p.t, btc: p.c };
+    let any = false;
+    EPOCH_DEFS.forEach(e => {
+      const v = r[`epoch${e.n}_pct_in_loss`];
+      pt[`epoch${e.n}`] = v != null ? Number(v) : null;
+      if(v != null) any = true;
+    });
+    if(any) merged.push(pt);
+  });
+  epochPlMergedCache = merged;
+  return merged;
+}
+const EPOCHPL_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
+let epochPlActiveRange = 'todo';
+let epochPlCustomRange = null;
+let epochPlSlider = null;
+function renderEpochPlChart(){
+  const loadingEl = document.getElementById('epochplLoading');
+  const errorEl = document.getElementById('epochplError');
+  const wrap = document.getElementById('epochplChartWrap');
+  const legendEl = document.getElementById('epochplLegend');
+  const statsEl = document.getElementById('epochplStats');
+  const fullPoints = epochPlMergedCache;
+  if(!fullPoints || fullPoints.length < 30){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    wrap.style.display = 'none';
+    legendEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    return;
+  }
+  loadingEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  wrap.style.display = 'block';
+  legendEl.style.display = 'flex';
+  statsEl.style.display = '';
+
+  const fullStartMs = fullPoints[0].t, fullEndMs = fullPoints[fullPoints.length - 1].t;
+  let fromMs, toMs;
+  if(epochPlCustomRange){
+    fromMs = epochPlCustomRange.fromMs;
+    toMs = epochPlCustomRange.toMs;
+  } else {
+    const rangeYears = EPOCHPL_RANGE_YEARS[epochPlActiveRange];
+    fromMs = rangeYears ? fullEndMs - rangeYears * 365 * 86400000 : fullStartMs;
+    toMs = fullEndMs;
+  }
+  const points = fullPoints.filter(p => p.t >= fromMs && p.t <= toMs);
+  if(!points.length) return;
+
+  if(epochPlSlider) epochPlSlider.setRange(fromMs, toMs);
+  else{
+    epochPlSlider = createDateRangeSlider('epochplDateSlider', fullStartMs, fullEndMs, fromMs, toMs, (f, t) => {
+      epochPlCustomRange = { fromMs: f, toMs: t };
+      document.querySelectorAll('#epochplRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+      renderEpochPlChart();
+    });
+  }
+
+  const startMs = points[0].t, endMs = points[points.length - 1].t;
+  const spanMs = (endMs - startMs) || 1;
+  const prices = points.map(p => p.btc).filter(v => v > 0);
+  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+
+  const isMobileChart = window.innerWidth <= 640;
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 480 : 540;
+  const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
+  const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
+  const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
+  const panelGap = 22;
+  const drawW = totalW - marginLeft - marginRight;
+  const drawHTotal = totalH - marginTop - marginBottom - panelGap;
+  const priceH = Math.round(drawHTotal * 0.55);
+  const pctH = drawHTotal - priceH;
+  const priceTop = marginTop, priceBottom = marginTop + priceH;
+  const pctTop = priceBottom + panelGap, pctBottom = pctTop + pctH;
+  const dividerY = priceBottom + panelGap / 2;
+
+  const logMin = Math.log10(minPrice), logMax = Math.log10(maxPrice);
+  const logRange = (logMax - logMin) || 1;
+  const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
+  const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
+  const yForPct = v => pctBottom - (v / 100) * pctH;
+
+  const priceTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
+    const y = yForPrice(t);
+    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+  });
+  const priceGridHtml = priceTicks.map(t => `
+    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  `).join('');
+  const pctGridHtml = [0, 25, 50, 75, 100].map(v => `
+    <line x1="${marginLeft}" y1="${yForPct(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPct(v).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <text x="${marginLeft - 8}" y="${(yForPct(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v}%</text>
+  `).join('');
+
+  function pathFor(getV, yForFn){
+    let d = '', drawing = false;
+    points.forEach(p => {
+      const v = getV(p);
+      if(v == null || !isFinite(v)){ drawing = false; return; }
+      d += `${drawing ? 'L' : 'M'}${xFor(p.t).toFixed(1)},${yForFn(v).toFixed(1)} `;
+      drawing = true;
+    });
+    return d.trim();
+  }
+  const btcLine = pathFor(p => p.btc, yForPrice);
+  const epochLines = EPOCH_DEFS.map(e => ({ ...e, d: pathFor(p => p[`epoch${e.n}`], yForPct) }));
+
+  const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
+  const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const todayMarkerHtml = `
+    <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${pctBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+  `;
+  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
+  const xLabelsHtml = `
+    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+  `;
+
+  wrap.innerHTML = `
+    <div style="position:relative">
+      <svg class="fng-chart-svg" id="epochplChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+        ${chartWatermarkHtml(totalW, totalH)}
+        ${priceGridHtml}
+        ${pctGridHtml}
+        <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+        <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
+        ${epochLines.map(e => `<path d="${e.d}" fill="none" stroke="${e.color}" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
+        ${xLabelsHtml}
+        ${todayMarkerHtml}
+        <line id="epochplPriceHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="epochplPriceHoverDot" r="6" fill="#fff" style="display:none"/>
+        <rect id="epochplPriceHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="epochplPriceHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="epochplPriceHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
+        <line id="epochplPctHoverLine" x1="0" y1="${pctTop}" x2="0" y2="${pctBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="epochplPctHoverDot" r="6" fill="#a855f7" style="display:none"/>
+        <rect id="epochplPctHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="epochplPctHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="epochplPctHoverCatcher" x="${marginLeft}" y="${pctTop}" width="${drawW}" height="${pctBottom - pctTop}" fill="transparent" style="cursor:crosshair"/>
+      </svg>
+      <div id="epochplPriceTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+      <div id="epochplPctTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+    </div>
+  `;
+
+  const epochplSvg = document.getElementById('epochplChartSvg');
+  wireChartHover({
+    svg: epochplSvg, catcherId: 'epochplPriceHoverCatcher', lineId: 'epochplPriceHoverLine', dotId: 'epochplPriceHoverDot',
+    dateLabelId: 'epochplPriceHoverDateLabel', dateBgId: 'epochplPriceHoverDateBg', tooltipId: 'epochplPriceTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => yForPrice(points[i].btc),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].btc)}</b>`,
+  });
+  wireChartHover({
+    svg: epochplSvg, catcherId: 'epochplPctHoverCatcher', lineId: 'epochplPctHoverLine', dotId: 'epochplPctHoverDot',
+    dateLabelId: 'epochplPctHoverDateLabel', dateBgId: 'epochplPctHoverDateBg', tooltipId: 'epochplPctTooltip',
+    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
+    yForIdx: i => {
+      const vals = EPOCH_DEFS.map(e => points[i][`epoch${e.n}`]).filter(v => v != null);
+      return vals.length ? yForPct(vals.reduce((a, b) => a + b, 0) / vals.length) : pctBottom;
+    },
+    tooltipHtml: i => {
+      const p = points[i];
+      return EPOCH_DEFS.map(e => {
+        const v = p[`epoch${e.n}`];
+        return v != null ? `<span style="color:${e.color}">${e.label}: ${v.toFixed(1)}%</span>` : '';
+      }).filter(Boolean).join('<br>');
+    },
+  });
+
+  legendEl.innerHTML = `
+    <span class="perk-chip"><span class="perk-chip-dot" style="background:#fff"></span>Precio BTC</span>
+    ${EPOCH_DEFS.map(e => `<span class="perk-chip"><span class="perk-chip-dot" style="background:${e.color}"></span>${e.label}</span>`).join('')}
+  `;
+
+  const last = points[points.length - 1];
+  statsEl.innerHTML = `
+    <div class="res-card"><div class="r-label">Precio actual</div><div class="r-val">${fmtHalvingPrice(last.btc)}</div></div>
+    ${EPOCH_DEFS.map(e => {
+      const v = last[`epoch${e.n}`];
+      return `<div class="res-card"><div class="r-label" style="color:${e.color}">${e.label}</div><div class="r-val">${v != null ? v.toFixed(1) + '%' : '—'}</div></div>`;
+    }).join('')}
+  `;
+}
+async function loadEpochPlDetail(){
+  try{ await fetchEpochPlMergedSeries(); } catch(err){ /* renderEpochPlChart muestra el estado de error si no hay datos */ }
+  renderEpochPlChart();
+}
+let epochPlLoadedOnce = false;
+function ensureEpochPlLoaded(){ if(!epochPlLoadedOnce){ epochPlLoadedOnce = true; loadEpochPlDetail(); } }
+window.addEventListener('resize', () => {
+  if(document.querySelector('.indic-panel[data-indic="epochpl"]').style.display !== 'none') renderEpochPlChart();
+});
+document.querySelectorAll('#epochplRangeFilter .tf-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('#epochplRangeFilter .tf-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    epochPlActiveRange = btn.dataset.range;
+    epochPlCustomRange = null;
+    renderEpochPlChart();
+  });
+});
 /* ---- Media Móvil de 4 Años: índice = precio de cierre ÷ promedio de los últimos 1460 días
    (~4 años), sobre el mismo historial diario compartido que ya usan Halving/RSI Mensual/etc.
    (fetchHalvingHistory). Los primeros ~4 años usan una ventana que va creciendo (no hay 1460
@@ -20305,6 +20611,7 @@ const BITCOIN_GUIA_INDICATORS = [
   { id: 'btcreturns', icon: '📅', label: 'Retornos de Bitcoin', def: 'Cómo le ha ido a BTC por año, trimestre, mes o semana — en pestañas, para ver de un vistazo si hay estacionalidad (ej. "septiembre rojo").' },
   { id: 'sthmvrv', icon: '⚓', label: 'STH-MVRV', def: 'El precio de BTC frente al costo base promedio de quien compró hace menos de 150 días — por encima de 1 ese holder está en ganancia, por debajo en pérdida. Útil para ver capitulaciones y euforia de corto plazo.' },
   { id: 'treascb', icon: '💎', label: 'Costo Base Institucional', def: 'El precio promedio al que compraron BTC los grandes holders institucionales — empresas públicas (Strategy/MicroStrategy, etc.) y ETFs spot (IBIT, FBTC, etc.) combinados, más cada uno por separado.' },
+  { id: 'epochpl', icon: '🪙', label: '% Supply en Pérdida por Época', def: 'Qué porcentaje del BTC acuñado en cada época de halving sigue sin moverse y hoy vale menos de lo que costó — las monedas viejas casi siempre ganan, la época más reciente es la que fluctúa.' },
 ];
 const ETHEREUM_GUIA_INDICATORS = [
   { id: 'ethlogreg', icon: '🌈', label: 'Bandas Log de ETH', def: 'El mismo concepto del Rainbow Chart de BTC, pero para Ethereum — bandas de regresión logarítmica de barato a caro.' },
