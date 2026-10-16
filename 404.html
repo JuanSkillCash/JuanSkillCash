@@ -4,6 +4,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSP de defensa en profundidad: aunque el HTML se vea entero (es un sitio estatico), esto
+     evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
+     a un servidor que no sea uno de los que ya usamos - connect-src es una lista blanca exacta
+     de las APIs que esta pagina realmente llama, nada mas puede recibir una peticion del navegador -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com https://api.blockchain.info https://api.bybit.com https://api.coingecko.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://api.twelvedata.com https://fapi.binance.com https://min-api.cryptocompare.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>SkillCash Tools – Herramientas</title>
 <meta name="description" content="Herramientas SkillCash: calculadora de trading de futuros y más recursos para operar con criterio.">
 <meta property="og:type" content="website">
