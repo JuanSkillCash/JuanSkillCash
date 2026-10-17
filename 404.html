@@ -1257,6 +1257,11 @@ img[src=""]{display:none}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
 .auth-note{font-size:12.5px;color:var(--muted);line-height:1.7;border:1px dashed var(--border2);border-radius:10px;padding:12px 14px;max-width:420px}
 .auth-link-btn{background:none;border:none;color:var(--muted2);font-size:12px;font-weight:600;cursor:pointer;padding:8px 0 0;text-align:left;text-decoration:underline;text-underline-offset:2px}
+.legal-footer-link{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.legal-footer-link:hover{color:var(--red)}
+.auth-terms-check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+.auth-terms-check input{margin-top:2px;flex-shrink:0}
+.auth-terms-check a{color:var(--muted2);text-decoration:underline;text-underline-offset:2px}
 .auth-link-btn:hover{color:var(--red)}
 
 .portfolio-user-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:12px 15px;margin-bottom:18px;font-size:12.5px;color:var(--muted2)}
@@ -5551,6 +5556,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
       <div class="site-footer-bottom">
         <span>© <span id="footerYear"></span> SkillCash. Todos los derechos reservados.</span>
+        <span>·</span>
+        <a href="#" class="legal-footer-link" data-legal="terminos">Términos y Condiciones</a>
+        <span>·</span>
+        <a href="#" class="legal-footer-link" data-legal="privacidad">Política de Privacidad</a>
+        <span>·</span>
+        <a href="#" class="legal-footer-link" data-legal="cookies">Política de Cookies</a>
       </div>
       <p class="site-footer-note">SkillCash Tools es contenido educativo. Nada de lo que encuentres aquí constituye asesoría financiera, de inversión ni una recomendación de compra o venta — opera siempre bajo tu propio criterio y asumiendo tu propio riesgo.</p>
     </footer>
@@ -7511,6 +7522,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <label for="authPassword" id="authPasswordLabel">Contraseña</label>
           <input type="password" id="authPassword" placeholder="Mínimo 6 caracteres" autocomplete="current-password">
         </div>
+        <label class="auth-terms-check" id="f-auth-terms" style="display:none">
+          <input type="checkbox" id="authAcceptTerms">
+          <span>Acepto los <a href="#" class="legal-inline-link" data-legal="terminos">Términos y Condiciones</a> y la <a href="#" class="legal-inline-link" data-legal="privacidad">Política de Tratamiento de Datos</a>.</span>
+        </label>
         <button type="button" id="forgotPasswordLink" class="auth-link-btn">¿Olvidaste tu contraseña?</button>
         <button type="button" id="backToLoginLink" class="auth-link-btn" style="display:none">← Volver a iniciar sesión</button>
 
@@ -7560,6 +7575,63 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" id="profileChangePasswordLink" class="auth-link-btn" style="margin-top:14px">Cambiar mi contraseña →</button>
 
       <p class="auth-note" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: LEGAL (Términos, Privacidad, Cookies) ===== -->
+<div class="modal-overlay" id="legalModal">
+  <button class="modal-close" id="closeLegal" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="legalTitleEl">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="legalTitleEl" style="font-size:22px">Legal</h2>
+        <p class="calc-sub">Términos, privacidad y cookies</p>
+      </div>
+
+      <div class="auth-tabs" id="legalTabs">
+        <button class="auth-tab active" data-legal="terminos">Términos</button>
+        <button class="auth-tab" data-legal="privacidad">Privacidad</button>
+        <button class="auth-tab" data-legal="cookies">Cookies</button>
+      </div>
+
+      <div class="wp-section" id="legalPanelTerminos">
+        <h3>Términos y Condiciones de Uso</h3>
+        <p><b>1. Quién opera esto.</b> SkillCash Tools (juanskillcash.com) es operado por Juan, persona natural domiciliada en Colombia ("SkillCash", "nosotros"). Al usar esta página aceptas estos términos.</p>
+        <p><b>2. Qué es esto.</b> Contenido 100% educativo — calculadoras, simuladores, indicadores de mercado y una guía de términos. Nada de lo que encuentres aquí es asesoría financiera, de inversión ni una recomendación de compra o venta. El trading y las criptomonedas conllevan un riesgo alto, incluida la pérdida total del capital — tú decides y asumes tu propio riesgo.</p>
+        <p><b>3. Datos de mercado.</b> Los precios, indicadores y gráficos se arman con datos de terceros (Supabase, Bitview/Bitcoin Research Kit, FRED, CoinGecko, Binance, Bybit, TradingView, entre otros) mostrados "tal cual". No garantizamos que estén libres de errores, retrasos o interrupciones.</p>
+        <p><b>4. Cuenta y Simulador de Portafolio.</b> Algunas herramientas, como el Simulador de Portafolio, requieren una cuenta. Eres responsable de la confidencialidad de tu contraseña y de lo que registres ahí. El simulador es solo de seguimiento personal — no ejecuta operaciones reales ni se conecta a ningún exchange.</p>
+        <p><b>5. Contenido patrocinado.</b> Los banners o links hacia Bitunix (u otros aliados) son contenido patrocinado/de afiliado — si te registras por ese link, SkillCash puede recibir una comisión. Eso no cambia nuestra recomendación de operar siempre bajo tu propio criterio.</p>
+        <p><b>6. Propiedad.</b> El código, diseño, textos e indicadores de esta página son propiedad de SkillCash. No está autorizado copiarlos o redistribuirlos sin permiso escrito.</p>
+        <p><b>7. Cambios.</b> Podemos modificar o descontinuar cualquier herramienta, o estos términos, en cualquier momento y sin previo aviso.</p>
+        <p><b>8. Ley aplicable.</b> Estos términos se rigen por las leyes de la República de Colombia. Contacto: <b>contacto@juanskillcash.com</b></p>
+      </div>
+
+      <div class="wp-section" id="legalPanelPrivacidad" style="display:none">
+        <h3>Política de Tratamiento de Datos Personales</h3>
+        <p>En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013 (régimen colombiano de protección de datos personales / Habeas Data):</p>
+        <p><b>1. Responsable del tratamiento.</b> Juan, persona natural, operador de SkillCash Tools. Contacto: <b>contacto@juanskillcash.com</b></p>
+        <p><b>2. Qué datos recogemos.</b> Solo si creas una cuenta: tu correo, el nombre de usuario que elijas y, si usas el Simulador de Portafolio, los datos de holdings/movimientos que ingreses ahí. Si inicias sesión con Google, recibimos tu nombre y correo asociados a esa cuenta. El resto de la página (indicadores, calculadoras, guías) no requiere cuenta y no recoge ningún dato personal.</p>
+        <p><b>3. Para qué los usamos.</b> Únicamente para darte acceso a tu cuenta y sincronizar tus herramientas entre dispositivos. Nunca vendemos ni compartimos tu correo con terceros para publicidad.</p>
+        <p><b>4. Dónde se almacenan.</b> Tu cuenta y tus datos del simulador se guardan en Supabase, protegidos con Row Level Security: solo tu propia cuenta puede leer tus propios datos — nosotros no los consultamos manualmente salvo que nos escribas pidiendo soporte.</p>
+        <p><b>5. Encargados del tratamiento.</b> Supabase (almacenamiento) y Google (si inicias sesión con Google) procesan datos por nuestra cuenta, bajo sus propias políticas de seguridad.</p>
+        <p><b>6. Tus derechos (Habeas Data).</b> Puedes conocer, actualizar, rectificar y pedir la eliminación de tus datos, o revocar tu autorización, en cualquier momento — escríbenos a <b>contacto@juanskillcash.com</b> o elimina tu cuenta desde "Mi perfil".</p>
+        <p><b>7. Menores de edad.</b> Esta página no está dirigida a menores de 18 años y no recogemos intencionalmente datos de menores.</p>
+        <p><b>8. Vigencia.</b> Esta política aplica desde la fecha de su publicación — te recomendamos revisarla de vez en cuando.</p>
+      </div>
+
+      <div class="wp-section" id="legalPanelCookies" style="display:none">
+        <h3>Política de Cookies</h3>
+        <p>Esta página <b>no usa cookies</b> de rastreo, publicidad ni analítica de ningún tipo — no tenemos Google Analytics, píxel de Facebook ni nada parecido instalado.</p>
+        <p>Lo que sí usamos es almacenamiento local de tu navegador (<i>localStorage</i>), que no es una cookie y nunca sale de tu dispositivo hacia nosotros, para:</p>
+        <p>• Mantener tu sesión iniciada si creaste una cuenta (lo gestiona Supabase Auth).<br>• Recordar tu perfil de riesgo y otras preferencias dentro de las calculadoras, para que no tengas que configurarlas cada vez.</p>
+        <p>Como no usamos cookies de rastreo ni publicidad, no necesitamos pedirte que "aceptes cookies" — no hay nada de eso que aceptar. Si igual quieres borrar lo guardado localmente, puedes hacerlo desde la configuración de tu navegador ("borrar datos de este sitio"), sin que afecte tu cuenta (que vive en nuestros servidores, no en tu navegador).</p>
+        <p>Algunos elementos incrustados (como el widget de gráficos de TradingView o el iframe de Crypto Bubbles) pueden tener sus propias políticas dentro de su propio contenido — no las controlamos.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -9813,12 +9885,14 @@ function setAuthMode(mode){
   const backLink = document.getElementById('backToLoginLink');
   const googleBtn = document.getElementById('googleSignInBtn');
   const divider = document.getElementById('authDivider');
+  const termsField = document.getElementById('f-auth-terms');
 
   document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
   document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
 
   tabs.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
   usernameField.style.display = mode === 'signup' ? 'block' : 'none';
+  termsField.style.display = mode === 'signup' ? 'flex' : 'none';
   googleBtn.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
   divider.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
   forgotLink.style.display = mode === 'login' ? 'block' : 'none';
@@ -9923,6 +9997,7 @@ authSubmitBtn.addEventListener('click', async () => {
 
   if(!email || !password){ showAuthError('Completa correo y contraseña.'); return; }
   if(authMode === 'signup' && !username){ showAuthError('Elige un nombre de usuario.'); return; }
+  if(authMode === 'signup' && !document.getElementById('authAcceptTerms').checked){ showAuthError('Debes aceptar los Términos y la Política de Tratamiento de Datos para crear tu cuenta.'); return; }
   authSubmitBtn.disabled = true;
   const original = authSubmitBtn.textContent;
   authSubmitBtn.textContent = 'Un momento...';
@@ -9946,6 +10021,7 @@ authSubmitBtn.addEventListener('click', async () => {
 });
 
 document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+  if(authMode === 'signup' && !document.getElementById('authAcceptTerms').checked){ showAuthError('Debes aceptar los Términos y la Política de Tratamiento de Datos para crear tu cuenta.'); return; }
   const cleanUrl = window.location.origin + window.location.pathname;
   const { error } = await sbClient.auth.signInWithOAuth({
     provider: 'google',
@@ -10054,6 +10130,36 @@ closeProfile.addEventListener('click', closeProfileModal);
 profileModal.addEventListener('click', (e) => { if(e.target === profileModal) closeProfileModal(); });
 document.getElementById('sbSessionProfileBtn').addEventListener('click', openProfileModal);
 document.getElementById('accountBarProfileBtn').addEventListener('click', openProfileModal);
+
+/* ---- modal legal (terminos, privacidad, cookies) ---- */
+const legalModal = document.getElementById('legalModal');
+const legalPanel = legalModal.querySelector('.modal-panel');
+const closeLegal = document.getElementById('closeLegal');
+const LEGAL_TABS = ['terminos', 'privacidad', 'cookies'];
+function setLegalTab(tab){
+  document.querySelectorAll('#legalTabs .auth-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.legal === tab));
+  LEGAL_TABS.forEach(id => {
+    const panel = document.getElementById('legalPanel' + id.charAt(0).toUpperCase() + id.slice(1));
+    if(panel) panel.style.display = (id === tab) ? 'block' : 'none';
+  });
+  legalPanel.scrollTop = 0;
+}
+function openLegalModal(tab){
+  setLegalTab(tab || 'terminos');
+  openModalGeneric(legalModal, legalPanel, closeLegal);
+}
+function closeLegalModal(){ closeModalGeneric(legalModal); }
+closeLegal.addEventListener('click', closeLegalModal);
+legalModal.addEventListener('click', (e) => { if(e.target === legalModal) closeLegalModal(); });
+document.querySelectorAll('#legalTabs .auth-tab').forEach(btn => {
+  btn.addEventListener('click', () => setLegalTab(btn.dataset.legal));
+});
+document.querySelectorAll('.legal-footer-link, .legal-inline-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    openLegalModal(link.dataset.legal);
+  });
+});
 
 document.getElementById('profileSaveBtn').addEventListener('click', async () => {
   const newUsername = document.getElementById('profileUsernameInput').value.trim();
