@@ -7575,6 +7575,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" id="profileChangePasswordLink" class="auth-link-btn" style="margin-top:14px">Cambiar mi contraseña →</button>
 
       <p class="auth-note" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b></p>
+
+      <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border)">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Zona de peligro</p>
+        <button type="button" id="profileDeleteBtn" class="auth-link-btn" style="color:var(--red)">🗑️ Eliminar mi cuenta</button>
+        <div id="profileDeleteConfirm" style="display:none;margin-top:12px;padding:12px 14px;border:1px dashed var(--red);border-radius:10px">
+          <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:10px">Esto borra permanentemente todos tus portafolios guardados. No se puede deshacer.</p>
+          <div class="auth-error" id="profileDeleteError" style="margin-bottom:10px"></div>
+          <button type="button" id="profileDeleteConfirmBtn" class="btn-block" style="background:var(--red);color:#fff">Sí, eliminar todo</button>
+          <button type="button" id="profileDeleteCancelBtn" class="auth-link-btn" style="margin-top:8px">Cancelar</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -10192,6 +10203,59 @@ document.getElementById('profileChangePasswordLink').addEventListener('click', (
   setAuthMode('forgot');
   authEmail.value = currentUser ? currentUser.email : '';
   openAuthModal();
+});
+
+/* ---- eliminar cuenta: borra todos los datos del usuario (sus portafolios) de forma
+   autoservida, ya mismo, con las mismas politicas de RLS que ya usa el simulador para
+   que cada quien solo pueda tocar lo suyo. El registro de acceso (correo/contraseña en
+   auth.users) solo lo puede borrar la service_role key, que nunca vive en el navegador
+   por seguridad - por eso, si existe la funcion Edge "delete-account" (ver
+   supabase/functions/delete-account/) la llama para terminar de cerrarlo del todo; si
+   esa funcion aun no esta desplegada, los datos igual quedan borrados y se le pide al
+   usuario escribir para cerrar el acceso manualmente. */
+document.getElementById('profileDeleteBtn').addEventListener('click', () => {
+  document.getElementById('profileDeleteConfirm').style.display = 'block';
+  document.getElementById('profileDeleteError').classList.remove('show');
+});
+document.getElementById('profileDeleteCancelBtn').addEventListener('click', () => {
+  document.getElementById('profileDeleteConfirm').style.display = 'none';
+});
+document.getElementById('profileDeleteConfirmBtn').addEventListener('click', async () => {
+  if(!currentUser) return;
+  const btn = document.getElementById('profileDeleteConfirmBtn');
+  const errEl = document.getElementById('profileDeleteError');
+  errEl.classList.remove('show');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Eliminando...';
+  try{
+    const { data: userPortfolios, error: listErr } = await sbClient.from('portfolios').select('id').eq('user_id', currentUser.id);
+    if(listErr) throw listErr;
+    const ids = (userPortfolios || []).map(p => p.id);
+    if(ids.length){
+      const { error: itemsErr } = await sbClient.from('portfolio_items').delete().in('portfolio_id', ids);
+      if(itemsErr) throw itemsErr;
+      const { error: portErr } = await sbClient.from('portfolios').delete().eq('user_id', currentUser.id);
+      if(portErr) throw portErr;
+    }
+    let authClosed = false;
+    try{
+      const { error: fnErr } = await sbClient.functions.invoke('delete-account');
+      authClosed = !fnErr;
+    } catch(fnEx){ authClosed = false; }
+    await sbClient.auth.signOut();
+    closeProfileModal();
+    if(authClosed){
+      alert('Listo — tu cuenta y todos tus datos fueron eliminados.');
+    } else {
+      alert('Tus portafolios y datos ya se borraron. Para cerrar también tu acceso (correo y contraseña), escríbenos a contacto@juanskillcash.com.');
+    }
+  } catch(err){
+    errEl.textContent = translateAuthError(err.message);
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 });
 
 sbClient.auth.onAuthStateChange((event, session) => {
