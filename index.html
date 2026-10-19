@@ -8,7 +8,7 @@
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
      a un servidor que no sea uno de los que ya usamos - connect-src es una lista blanca exacta
      de las APIs que esta pagina realmente llama, nada mas puede recibir una peticion del navegador -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com https://api.blockchain.info https://api.bybit.com https://api.coingecko.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://api.twelvedata.com https://fapi.binance.com https://min-api.cryptocompare.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>SkillCash Tools – Herramientas</title>
 <meta name="description" content="Herramientas SkillCash: calculadora de trading de futuros y más recursos para operar con criterio.">
@@ -9469,21 +9469,19 @@ sbSearchInput.addEventListener('input', () => {
   if(currentLabel) currentLabel.style.display = labelHasVisibleItem ? '' : 'none';
 });
 
-/* ---- API keys ---- */
-const COINGECKO_API_KEY = 'CG-B17Pfy5LygHBnhQCoxkh2U2W';
-const TWELVE_DATA_API_KEY = '9a29593d7a534876afbf043270133831';
-const CRYPTOCOMPARE_API_KEY = '67012918682ea6d4d2877d6f5200bf9950e4521a888b9a7c48173ab417e9c3d5';
+/* ---- proxy de API keys: CoinGecko/Twelve Data/CryptoCompare se llaman a traves de un
+   Cloudflare Worker (skillcash-api-proxy) que guarda las claves del lado del servidor -
+   el navegador nunca las ve. El worker solo reescribe el host, el path y los parametros
+   de busqueda quedan igual, por eso aqui solo se cambia el origen de la URL. ---- */
+const API_PROXY = 'https://skillcash-api-proxy.juanchodigital86.workers.dev';
 function cgUrl(url){
-  const sep = url.includes('?') ? '&' : '?';
-  return url + sep + 'x_cg_demo_api_key=' + COINGECKO_API_KEY;
+  return url.replace('https://api.coingecko.com', API_PROXY + '/coingecko');
 }
 function tdUrl(url){
-  const sep = url.includes('?') ? '&' : '?';
-  return url + sep + 'apikey=' + TWELVE_DATA_API_KEY;
+  return url.replace('https://api.twelvedata.com', API_PROXY + '/twelvedata');
 }
 function ccUrl(url){
-  const sep = url.includes('?') ? '&' : '?';
-  return url + sep + 'api_key=' + CRYPTOCOMPARE_API_KEY;
+  return url.replace('https://min-api.cryptocompare.com', API_PROXY + '/cryptocompare');
 }
 /* ---- precio en USD de un solo activo cripto, con CoinGecko como fuente principal y
    CryptoCompare como respaldo automático si CoinGecko falla o no responde el precio ---- */
