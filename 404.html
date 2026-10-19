@@ -16820,6 +16820,19 @@ function renderEthLogRegChart(){
     <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
 
+  // etiquetas fijas con el precio de cada banda pegadas al borde derecho - para que el
+  // valor de cada linea de color se vea siempre, sin tener que pasar el mouse por encima
+  const bandEndLabel = (value, color) => {
+    const y = Math.min(Math.max(yFor(value), marginTop + 8), marginTop + drawH - 8);
+    const label = fmtEthAxisPrice(value);
+    const labelW = (isMobileChart ? 5.5 : 6.5) * label.length + 10;
+    return `
+      <rect x="${(totalW - marginRight - labelW).toFixed(1)}" y="${(y - 8).toFixed(1)}" width="${labelW.toFixed(1)}" height="16" rx="3" fill="${color}"/>
+      <text x="${(totalW - marginRight - labelW / 2).toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" font-size="${yFontSize}" font-weight="700" fill="#08080c" font-family="'Space Mono',monospace">${label}</text>
+    `;
+  };
+  const bandEndLabelsHtml = bandEndLabel(lastUpper, '#ff2f4f') + bandEndLabel(lastMain, '#60a5fa') + bandEndLabel(lastLower, '#2ecc71');
+
   wrap.innerHTML = `
     <div style="position:relative">
       <svg class="fng-chart-svg" id="ethlogregChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
@@ -16832,6 +16845,7 @@ function renderEthLogRegChart(){
         <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
+        ${bandEndLabelsHtml}
         <line id="ethlogregHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
         <circle id="ethlogregHoverDot" r="6" fill="#fff" style="display:none"/>
         <rect id="ethlogregHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
