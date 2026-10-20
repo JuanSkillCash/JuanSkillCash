@@ -1,9 +1,8 @@
-"""Kraken: HTML server-rendered, sin API de anuncios. Toda la seccion "Delistings" (+ su
-archivo) son avisos de deslistado, no hace falta filtrar por categoria. A diferencia de los
-demas exchanges, los tickers NO estan en el titulo del aviso (titulos tipo "Asset delistings
-- October 2026", sin simbolos) sino listados en prosa dentro del cuerpo - se buscan como la
-corrida mas larga de tokens tipo-ticker separados por comas (patron real confirmado en la
-investigacion: "BMB, ELX, APU, BDXN, DUCK, BOS, U, OBOL, IDEX, FIS, UXLINK, ALTHEA, NOBODY")."""
+"""Kraken: HTML server-rendered, sin API de anuncios (segun la investigacion) - pero la URL
+exacta que probaron dio 404 en una corrida real, asi que primero se prueban varias rutas
+candidatas (incluida la posibilidad de que el soporte de Kraken tambien corra sobre Zendesk,
+como Bitunix/BingX, mucho mas confiable que adivinar HTML) y se usa la primera que responda
+200, dejando un log de que paso con cada una para poder ajustar con datos reales."""
 
 from __future__ import annotations
 
@@ -22,8 +21,15 @@ from .common import (
 log = logging.getLogger("delistings.kraken")
 
 EXCHANGE = "kraken"
-SECTION_URL = "https://support.kraken.com/en/sections/delistings"
-ARCHIVE_URL = "https://support.kraken.com/en/sections/delistings-archive"
+
+_CANDIDATE_SECTION_URLS = [
+    "https://support.kraken.com/en/sections/delistings",
+    "https://support.kraken.com/hc/en-us/sections/delistings",
+    "https://support.kraken.com/en-us/sections/delistings",
+    "https://support.kraken.com/sections/delistings",
+]
+_ZENDESK_CATEGORIES_URL = "https://support.kraken.com/api/v2/help_center/en-us/categories.json"
+_ZENDESK_SECTIONS_URL = "https://support.kraken.com/api/v2/help_center/en-us/sections.json"
 
 _TICKER_RUN_RE = re.compile(
     r"\b[A-Z][A-Z0-9]{0,9}\b(?:\s*,\s*\b[A-Z][A-Z0-9]{0,9}\b){1,}"
@@ -35,14 +41,49 @@ _EXTRA_STOPWORDS = {"UTC", "FAQ", "API", "EEA", "UAE", "USD", "USDT", "USDC", "K
 
 
 def _extract_ticker_run(text: str) -> list[str]:
-    """La lista real de tickers del aviso: la corrida mas larga de tokens separados por
-    comas (asi se evita confundir siglas sueltas tipo "UTC"/"FAQ" con una lista real)."""
     best: list[str] = []
     for m in _TICKER_RUN_RE.finditer(text):
         tokens = [t for t in _TICKER_TOKEN_RE.findall(m.group(0)) if t not in _EXTRA_STOPWORDS]
         if len(tokens) > len(best):
             best = tokens
     return best
+
+
+def _find_working_section_url() -> str | None:
+    for url in _CANDIDATE_SECTION_URLS:
+        try:
+            resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=20)
+        except requests.RequestException as e:
+            log.info(f"[kraken] DEBUG {url} fallo: {e}")
+            continue
+        log.info(f"[kraken] DEBUG {url} -> {resp.status_code}")
+        if resp.status_code == 200:
+            return url
+    return None
+
+
+def _probe_zendesk() -> None:
+    """Solo diagnostico: si support.kraken.com corre sobre Zendesk (como Bitunix/BingX),
+    esto lo confirma y lista las secciones reales para encontrar el id de 'Delistings'."""
+    try:
+        resp = requests.get(_ZENDESK_CATEGORIES_URL, headers=DEFAULT_HEADERS, timeout=20)
+    except requests.RequestException as e:
+        log.info(f"[kraken] DEBUG zendesk categories.json fallo: {e}")
+        return
+    log.info(f"[kraken] DEBUG zendesk categories.json -> {resp.status_code}")
+    if resp.status_code != 200:
+        return
+    try:
+        resp2 = requests.get(_ZENDESK_SECTIONS_URL, headers=DEFAULT_HEADERS, timeout=20,
+                              params={"per_page": 100})
+        data = resp2.json()
+        sections = [(s.get("id"), s.get("name")) for s in data.get("sections", [])]
+        delisting_sections = [s for s in sections if "delist" in (s[1] or "").lower()]
+        log.info(f"[kraken] DEBUG zendesk SI corre aca - secciones con 'delist' en el nombre: {delisting_sections}")
+        if not delisting_sections:
+            log.info(f"[kraken] DEBUG primeras 20 secciones (para ubicar 'Delistings' a mano): {sections[:20]}")
+    except Exception as e:
+        log.info(f"[kraken] DEBUG fallo listando secciones zendesk: {e}")
 
 
 def _fetch_article_links(list_url: str) -> list[tuple[str, str]]:
@@ -53,7 +94,7 @@ def _fetch_article_links(list_url: str) -> list[tuple[str, str]]:
     soup = BeautifulSoup(resp.text, "html.parser")
     links: list[tuple[str, str]] = []
     seen = set()
-    for a in soup.select('a[href*="/en/articles/"]'):
+    for a in soup.select('a[href*="/articles/"]'):
         href = a.get("href", "")
         title = a.get_text(strip=True)
         if not href or not title or href in seen:
@@ -61,13 +102,6 @@ def _fetch_article_links(list_url: str) -> list[tuple[str, str]]:
         seen.add(href)
         url = href if href.startswith("http") else "https://support.kraken.com" + href
         links.append((title, url))
-
-    if not links:
-        log.warning(f"[kraken] no se encontro ningun link de articulo en {list_url}")
-        ids = re.findall(r'<a[^>]*href="([^"]+)"', resp.text)[:40]
-        log.info(f"[kraken] DEBUG titulo <title>: {(soup.title.string if soup.title else None)!r}")
-        log.info(f"[kraken] DEBUG primeros hrefs encontrados: {ids}")
-
     return links
 
 
@@ -84,7 +118,14 @@ def _fetch_article_text(url: str) -> str:
 
 
 def fetch(max_articles: int = 15) -> list[Row]:
-    links = _fetch_article_links(SECTION_URL)
+    section_url = _find_working_section_url()
+    if not section_url:
+        log.warning("[kraken] ninguna URL candidata respondio 200 - probando si el soporte corre sobre Zendesk")
+        _probe_zendesk()
+        return []
+
+    log.info(f"[kraken] usando {section_url}")
+    links = _fetch_article_links(section_url)
     log.info(f"[kraken] {len(links)} articulos en la seccion actual")
 
     rows: list[Row] = []
@@ -98,8 +139,6 @@ def fetch(max_articles: int = 15) -> list[Row]:
 
         tickers = _extract_ticker_run(body_text)
         if not tickers:
-            # algunos avisos son de un solo activo (ej "RAIN Delisting") - sin lista en
-            # prosa, pero el titulo puede traer el ticker igual que en otros exchanges
             tickers = extract_tickers(title) or extract_tickers(body_text[:500])
         if not tickers:
             log.warning(f"[kraken] no se pudieron sacar tickers de: {title!r} ({url})")
