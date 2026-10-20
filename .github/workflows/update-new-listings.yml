@@ -1,0 +1,36 @@
+name: Radar de Nuevos Listados (BingX, OKX, Bitget, KuCoin, Binance, MEXC)
+
+# Misma cadencia horaria que el Radar de Deslistados. Bitunix y Kraken quedan afuera -
+# el sondeo confirmo que ninguno tiene una categoria de "nuevos listados" usable (ver
+# scripts/update_new_listings.py).
+on:
+  schedule:
+    - cron: "15 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-new-listings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests beautifulsoup4 python-dateutil playwright
+          playwright install --with-deps chromium
+
+      - name: Actualizar Radar de Nuevos Listados
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_new_listings.py

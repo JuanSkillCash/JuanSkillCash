@@ -1,0 +1,68 @@
+"""
+Radar de Nuevos Listados: junta avisos de nuevos listados (cripto, acciones, indices y
+commodities que los exchanges listan en futuros perpetuos, estilo xStock/bStocks) de varios
+exchanges y los guarda en Supabase (tabla exchange_new_listings). Hermano de
+update_exchange_delistings.py - mismos exchanges, misma disciplina, categoria distinta.
+
+Bitunix y Kraken quedan afuera: el sondeo confirmo que Bitunix no tiene una categoria de
+"nuevos listados" util (su seccion "New Listings" en Zendesk es puro marketing/eventos) y
+Kraken no tiene ninguna seccion de nuevos listados localizable (solo "Delistings" funciona).
+
+Variables de entorno requeridas:
+    SUPABASE_URL
+    SUPABASE_SERVICE_ROLE_KEY
+"""
+
+import logging
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))  # para que "newlistings" se importe como paquete
+
+from newlistings import bingx, okx, bitget, kucoin, binance, mexc
+from newlistings.common import upsert_rows, Row
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+log = logging.getLogger("update_new_listings")
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+
+FETCHERS = {
+    "bingx": bingx.fetch,
+    "okx": okx.fetch,
+    "bitget": bitget.fetch,
+    "kucoin": kucoin.fetch,
+    "binance": binance.fetch,
+    "mexc": mexc.fetch,
+}
+
+
+def main():
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
+        sys.exit(1)
+
+    all_rows: list[Row] = []
+    failures = []
+
+    for name, fetcher in FETCHERS.items():
+        log.info(f"=== {name} ===")
+        try:
+            rows = fetcher()
+            log.info(f"{name}: {len(rows)} filas")
+            all_rows.extend(rows)
+        except Exception as e:
+            log.exception(f"{name} fallo, se sigue con los demas: {e}")
+            failures.append(name)
+
+    log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
+    upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
+    log.info(f"{len(all_rows)} filas subidas ({len(FETCHERS) - len(failures)}/{len(FETCHERS)} exchanges OK)")
+
+    if failures:
+        log.warning(f"Exchanges que fallaron esta corrida: {', '.join(failures)}")
+
+
+if __name__ == "__main__":
+    main()
