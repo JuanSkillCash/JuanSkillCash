@@ -1,0 +1,17 @@
+name: Diagnostico de acceso Bybit/Gate (manual)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --no-cache-dir requests beautifulsoup4 playwright
+      - run: playwright install --with-deps chromium
+      - name: Diagnostico
+        run: python scripts/debug_bybit_gate_access.py

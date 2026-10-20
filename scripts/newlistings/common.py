@@ -79,7 +79,17 @@ def fetch_html_with_fallback(url: str, validate=None, wait_selector: str | None 
         browser = pw.chromium.launch()
         page = browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+            try:
+                # wait_until="networkidle" DIRECTO en el goto (no domcontentloaded seguido de
+                # un wait aparte) - es la forma exacta que ya funciona en delistings/gate.py
+                # contra un challenge real de Cloudflare: el challenge dispara sus propias
+                # peticiones de red, y goto() con networkidle espera a que esas tambien
+                # terminen, antes de devolver el control.
+                page.goto(url, wait_until="networkidle", timeout=timeout * 1000)
+            except Exception:
+                # paginas con polling/analytics constante nunca llegan a "idle" - si el goto
+                # entero se cae por eso, nos conformamos con domcontentloaded
+                page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
             if wait_selector:
                 try:
                     # state="attached" alcanza con que exista en el DOM - no todas las
@@ -88,12 +98,7 @@ def fetch_html_with_fallback(url: str, validate=None, wait_selector: str | None 
                 except Exception:
                     pass  # mejor usar lo que haya cargado que tirar toda la corrida
             else:
-                try:
-                    # espera a que la pagina termine de hidratar/pedir sus XHR - mas
-                    # confiable que un sleep fijo para contenido armado client-side.
-                    page.wait_for_load_state("networkidle", timeout=timeout * 1000)
-                except Exception:
-                    page.wait_for_timeout(3000)
+                page.wait_for_timeout(1000)
             html_out = page.content()
         finally:
             browser.close()
