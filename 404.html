@@ -2226,6 +2226,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="optionsoi">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
       </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="delistradar">
+        <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
+      </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
       </button>
@@ -20949,6 +20952,7 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'cbpremium', icon: '🏦', label: 'Coinbase Premium', def: 'La diferencia de precio de BTC entre Coinbase (EEUU) y Binance. Positivo y alto = instituciones/EEUU comprando fuerte. Negativo = vendiendo o poca demanda institucional.' },
   { id: 'longshort', icon: '⚖️', label: 'Ratio Largo/Corto', def: 'Cuántos traders apuestan a que sube (largo) contra cuántos a que baja (corto) en futuros. Lecturas muy extremas en cualquier dirección suelen ser señal de un mercado "sobre-apalancado", con riesgo de liquidaciones en cadena.' },
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
+  { id: 'delistradar', icon: '🚨', label: 'Radar de Deslistados', def: 'Avisos reales de deslistado (cuándo una moneda deja de poderse comprar/vender) de 8 exchanges, con cuenta regresiva y filtro por exchange — para enterarte antes de que te agarre con la guardia baja.' },
   { id: 'tvchart', icon: '🕯️', label: 'Gráfico Avanzado', def: 'Gráfico de velas en vivo con indicadores técnicos reales, cambio de símbolo libre y herramientas de dibujo — un gráfico de trading de verdad, no un modelo propio.' },
 ];
 // las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
