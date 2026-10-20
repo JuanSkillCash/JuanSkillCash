@@ -170,11 +170,20 @@ def probe_mexc_playwright():
 def probe_kraken_candidates():
     log.info("\n=== Kraken: URLs candidatas para 'nuevos listados' ===")
     candidates = [
+        "https://support.kraken.com/en/sections/delistings",
+        "https://support.kraken.com/hc/en-us/sections/delistings",
+        "https://support.kraken.com/en-us/sections/delistings",
+        "https://support.kraken.com/sections/delistings",
         "https://support.kraken.com/en/sections/new-listings",
-        "https://support.kraken.com/en/sections/new-asset-listings",
-        "https://support.kraken.com/en/sections/asset-listings",
         "https://support.kraken.com/hc/en-us/sections/new-listings",
-        "https://support.kraken.com/en/sections/delistings",  # control: sabemos que esta SI existe
+        "https://support.kraken.com/en-us/sections/new-listings",
+        "https://support.kraken.com/sections/new-listings",
+        "https://support.kraken.com/en/sections/new-asset-listings",
+        "https://support.kraken.com/en-us/sections/new-asset-listings",
+        "https://support.kraken.com/en/sections/asset-listings",
+        "https://support.kraken.com/en-us/sections/asset-listings",
+        "https://support.kraken.com/en/sections/listings",
+        "https://support.kraken.com/en-us/sections/listings",
     ]
     for url in candidates:
         try:
@@ -192,11 +201,4 @@ def probe_kraken_candidates():
 
 
 if __name__ == "__main__":
-    probe_bitunix_new_listings()
-    probe_bingx_listing_sections()
-    probe_okx_more()
-    probe_bitget_more()
-    probe_kucoin_more()
-    probe_binance_more()
-    probe_mexc_playwright()
     probe_kraken_candidates()
