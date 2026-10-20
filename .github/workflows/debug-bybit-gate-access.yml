@@ -15,3 +15,5 @@ jobs:
       - run: playwright install --with-deps chromium
       - name: Diagnostico
         run: python scripts/debug_bybit_gate_access.py
+      - name: Diagnostico estructura Bybit
+        run: python scripts/debug_bybit_page_structure.py
