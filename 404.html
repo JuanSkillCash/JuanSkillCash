@@ -1512,6 +1512,11 @@ img[src=""]{display:none}
 .fng-legend-lines i{width:14px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0}
 .fng-share-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 #fngCaptureAll .calc-title{background:none;-webkit-text-fill-color:var(--white);color:var(--white)}
+/* el degradado de .calc-title (background-clip:text + text-fill-color:transparent) tambien
+   "despinta" los emojis del titulo, dejandolos en blanco y negro en vez de a color - este span
+   envuelve SOLO el emoji inicial (lo pone wrapTitleEmojis() en runtime) para sacarlo del clip
+   del degradado y que el navegador dibuje su glifo de emoji normal, a color */
+.calc-title-emoji{background:none;-webkit-background-clip:unset;background-clip:unset;-webkit-text-fill-color:initial;color:initial}
 .chart-breakout{margin:0 -52px;padding:0 8px}
 @media(max-width:900px){ .chart-breakout{margin:0 -38px;padding:0 4px} }
 .tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 20px}
@@ -2890,7 +2895,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Predicciones de Precio</h2>
+                <h2 class="calc-title">🔮 Predicciones de Precio</h2>
                 <p class="calc-sub">Predicciones públicas de precio, con la fecha exacta en que las hice — y el resultado real, tal como salió. Nada se edita después del hecho: si falla, queda marcada como fallida.</p>
               </div>
 
@@ -3149,7 +3154,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Burbujas Cripto</h2>
+                <h2 class="calc-title">🫧 Burbujas Cripto</h2>
               </div>
 
               <div class="bubbles-iframe-wrap chart-breakout">
@@ -3173,7 +3178,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                     <img src="/logo-skillcash-600.png" alt="SkillCash">
                     <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                   </div>
-                  <h2 class="calc-title" id="fngDetailTitleEl">Índice de Miedo y Codicia</h2>
+                  <h2 class="calc-title" id="fngDetailTitleEl">😐 Índice de Miedo y Codicia</h2>
                 </div>
 
                 <div id="fngDetailLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando historial…</div>
@@ -3265,7 +3270,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Whitepaper de Bitcoin</h2>
+                <h2 class="calc-title">📜 Whitepaper de Bitcoin</h2>
               </div>
 
               <div class="wp-article">
@@ -3620,7 +3625,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Ciclos de Halving de Bitcoin</h2>
+                <h2 class="calc-title">⏳ Ciclos de Halving de Bitcoin</h2>
               </div>
 
               <div class="indic-chart-controls" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
@@ -3761,7 +3766,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Rainbow Chart de Bitcoin</h2>
+                <h2 class="calc-title">🌈 Rainbow Chart de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="rainbowRangeFilter">
@@ -3806,7 +3811,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Bandas Logarítmicas de Ethereum</h2>
+                <h2 class="calc-title">Ξ Bandas Logarítmicas de Ethereum</h2>
               </div>
 
               <div class="tf-pill-row" id="ethlogregRangeFilter">
@@ -3849,7 +3854,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">VWAP Anclado de Ethereum</h2>
+                <h2 class="calc-title">📍 VWAP Anclado de Ethereum</h2>
               </div>
 
               <div class="tf-pill-row" id="ethvwapRangeFilter">
@@ -3938,7 +3943,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">TOTAL2 con EMA 200 Semanal</h2>
+                <h2 class="calc-title">🥈 TOTAL2 con EMA 200 Semanal</h2>
               </div>
 
               <div class="tf-pill-row" id="total2RangeFilter">
@@ -3983,7 +3988,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">OTHERS con EMA 200 Semanal</h2>
+                <h2 class="calc-title">🌱 OTHERS con EMA 200 Semanal</h2>
               </div>
 
               <div class="tf-pill-row" id="othersRangeFilter">
@@ -4028,7 +4033,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Techo Pi Cycle de Bitcoin</h2>
+                <h2 class="calc-title">📐 Techo Pi Cycle de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="picycleRangeFilter">
@@ -4071,7 +4076,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Media Móvil de 4 Años de Bitcoin</h2>
+                <h2 class="calc-title">📏 Media Móvil de 4 Años de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="ma4yRangeFilter">
@@ -4115,7 +4120,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Pulso de Fondo de Bitcoin</h2>
+                <h2 class="calc-title">⚓ Pulso de Fondo de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="mfloorRangeFilter">
@@ -4161,7 +4166,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Medias Móviles 200 de Bitcoin</h2>
+                <h2 class="calc-title">📉 Medias Móviles 200 de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="ema200RangeFilter">
@@ -4204,7 +4209,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Techo Anterior como Soporte</h2>
+                <h2 class="calc-title">🪜 Techo Anterior como Soporte</h2>
               </div>
 
               <div class="tf-pill-row" id="ciclosoporteRangeFilter">
@@ -4247,7 +4252,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">RSI Mensual de Bitcoin</h2>
+                <h2 class="calc-title">📶 RSI Mensual de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="rsiRangeFilter">
@@ -4293,7 +4298,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Coinbase Premium</h2>
+                <h2 class="calc-title">♾️ Coinbase Premium</h2>
               </div>
 
               <div class="tf-pill-row" id="cbpTfRow">
@@ -4341,7 +4346,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Ratio Largo/Corto (BTC)</h2>
+                <h2 class="calc-title">⚖️ Ratio Largo/Corto (BTC)</h2>
               </div>
 
               <div class="ls-vol-card">
@@ -4402,7 +4407,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title" style="margin-bottom:2px">Interés Abierto en Opciones</h2>
+                <h2 class="calc-title" style="margin-bottom:2px">📐 Interés Abierto en Opciones</h2>
               </div>
 
               <div class="tf-pill-row" id="optionsoiCurrencyRow" style="margin:4px 0 12px">
@@ -4503,7 +4508,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Gráfico Avanzado</h2>
+                <h2 class="calc-title">🕯️ Gráfico Avanzado</h2>
               </div>
 
               <div class="tv-chart-wrap chart-breakout">
@@ -4529,7 +4534,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Bitcoin en Balances Corporativos</h2>
+                <h2 class="calc-title">🏢 Bitcoin en Balances Corporativos</h2>
               </div>
 
               <div id="treasLoading" style="text-align:center;padding:40px 0;color:var(--muted)">Cargando datos…</div>
@@ -4566,7 +4571,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Reservas Gubernamentales de Bitcoin</h2>
+                <h2 class="calc-title">🏛️ Reservas Gubernamentales de Bitcoin</h2>
               </div>
 
               <div class="chart-stats-grid">
@@ -4599,7 +4604,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Rotación ETH.D/BTC.D</h2>
+                <h2 class="calc-title">🔄 Rotación ETH.D/BTC.D</h2>
               </div>
 
               <div class="indic-chart-body" id="domratioChartBody">
@@ -4637,7 +4642,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Descompresión Cripto</h2>
+                <h2 class="calc-title">🗜️ Descompresión Cripto</h2>
               </div>
 
               <div class="tf-pill-row" id="domallRangeFilter">
@@ -4708,7 +4713,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Dominancia BTC</h2>
+                <h2 class="calc-title">₿ Dominancia BTC</h2>
               </div>
 
               <div class="tf-pill-row" id="dombtcRangeFilter">
@@ -4755,7 +4760,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Dominancia USDT</h2>
+                <h2 class="calc-title">💵 Dominancia USDT</h2>
               </div>
 
               <div class="tf-pill-row" id="domusdtRangeFilter">
@@ -4804,7 +4809,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">OTHERS/BTC</h2>
+                <h2 class="calc-title">🪙 OTHERS/BTC</h2>
               </div>
 
               <div class="indic-chart-body" id="othersbtcChartBody">
@@ -4854,7 +4859,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">ETH/BTC</h2>
+                <h2 class="calc-title">🔁 ETH/BTC</h2>
               </div>
 
               <div class="indic-chart-body" id="ethbtcChartBody">
@@ -4902,7 +4907,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Euforia de Altcoins</h2>
+                <h2 class="calc-title">🔥 Euforia de Altcoins</h2>
               </div>
 
               <div class="indic-chart-body" id="altfeverChartBody">
@@ -4940,7 +4945,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Valoración Relativa ETH vs Altcoins</h2>
+                <h2 class="calc-title">⚖️ Valoración Relativa ETH vs Altcoins</h2>
               </div>
 
 
@@ -5024,7 +5029,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Calendario Económico</h2>
+                <h2 class="calc-title">📅 Calendario Económico</h2>
               </div>
 
               <div class="tv-chart-wrap chart-breakout">
@@ -5049,7 +5054,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">BTC/XAU</h2>
+                <h2 class="calc-title">🥇 BTC/XAU</h2>
               </div>
 
               <div class="tf-pill-row" id="btcxauRangeFilter">
@@ -5092,7 +5097,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">BTC/AAPL</h2>
+                <h2 class="calc-title">🍎 BTC/AAPL</h2>
               </div>
 
               <div class="tf-pill-row" id="btcaaplRangeFilter">
@@ -5136,7 +5141,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Retornos de Bitcoin</h2>
+                <h2 class="calc-title">📅 Retornos de Bitcoin</h2>
               </div>
 
               <div class="tf-pill-row" id="btcreturnsGranularityFilter">
@@ -5177,7 +5182,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">MVRV de Holders de Corto Plazo (STH-MVRV)</h2>
+                <h2 class="calc-title">⚓ MVRV de Holders de Corto Plazo (STH-MVRV)</h2>
               </div>
 
               <div class="tf-pill-row" id="sthmvrvRangeFilter">
@@ -5223,7 +5228,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">% Supply en Pérdida por Época de Halving</h2>
+                <h2 class="calc-title">🪙 % Supply en Pérdida por Época de Halving</h2>
               </div>
 
               <div class="tf-pill-row" id="epochplRangeFilter">
@@ -5269,7 +5274,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Costo Base Institucional</h2>
+                <h2 class="calc-title">💎 Costo Base Institucional</h2>
               </div>
 
               <div class="calc-disclaimer">
@@ -5291,7 +5296,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <img src="/logo-skillcash-600.png" alt="SkillCash">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
-                <h2 class="calc-title">Retornos de Ethereum</h2>
+                <h2 class="calc-title">📅 Retornos de Ethereum</h2>
               </div>
 
               <div class="tf-pill-row" id="ethreturnsGranularityFilter">
@@ -5740,7 +5745,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="calcTitleEl">Calculadora de Trading</h2>
+        <h2 class="calc-title" id="calcTitleEl">🧮 Calculadora de Trading</h2>
         <p class="calc-sub">Entrada · Liquidación · SL · TP · Riesgo y beneficio</p>
       </div>
 
@@ -5908,7 +5913,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="profitTitleEl">Calculadora de Rentabilidad</h2>
+        <h2 class="calc-title" id="profitTitleEl">📈 Calculadora de Rentabilidad</h2>
         <p class="calc-sub">Compra · Venta · Ganancia · Rentabilidad</p>
       </div>
 
@@ -6026,7 +6031,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="breakevenTitleEl">Calculadora de Break-even</h2>
+        <h2 class="calc-title" id="breakevenTitleEl">⚖️ Calculadora de Break-even</h2>
         <p class="calc-sub">Cuánto debe moverse el precio solo para cubrir comisiones</p>
       </div>
 
@@ -6152,7 +6157,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="dcaTitleEl">Simulador de DCA de Compra</h2>
+        <h2 class="calc-title" id="dcaTitleEl">🪙 Simulador de DCA de Compra</h2>
         <p class="calc-sub">Simula cuánto acumularías comprando un monto fijo cada cierto tiempo, en vez de intentar acertarle al mejor momento para comprar todo de una vez.</p>
       </div>
 
@@ -6275,7 +6280,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="mcapCompareTitleEl">Comparador de Market Cap</h2>
+        <h2 class="calc-title" id="mcapCompareTitleEl">⚖️ Comparador de Market Cap</h2>
         <p class="calc-sub">¿Y si Moneda A tuviera la capitalización de Moneda B?</p>
       </div>
 
@@ -6404,7 +6409,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="fiFreedomTitleEl">Tiempo hasta la Libertad Financiera</h2>
+        <h2 class="calc-title" id="fiFreedomTitleEl">🏝️ Tiempo hasta la Libertad Financiera</h2>
         <p class="calc-sub">Cuánto tardarías en llegar a tu meta, con aportes constantes</p>
       </div>
 
@@ -6509,7 +6514,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="unitConverterTitleEl">Conversor de Unidades</h2>
+        <h2 class="calc-title" id="unitConverterTitleEl">🔁 Conversor de Unidades</h2>
         <p class="calc-sub">Sats, gwei, wei — todo en un solo lugar</p>
       </div>
 
@@ -6574,7 +6579,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="pctCalcTitleEl">Calculadora de Porcentajes</h2>
+        <h2 class="calc-title" id="pctCalcTitleEl">📐 Calculadora de Porcentajes</h2>
         <p class="calc-sub">Las cuentas de porcentaje que se buscan todo el tiempo</p>
       </div>
 
@@ -6688,7 +6693,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="tzClockTitleEl">Reloj de Zona Horaria</h2>
+        <h2 class="calc-title" id="tzClockTitleEl">🕐 Reloj de Zona Horaria</h2>
         <p class="calc-sub">Compara la hora de dos países, en vivo</p>
       </div>
 
@@ -6786,7 +6791,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="coinmTitleEl">Calculadora Coin-M</h2>
+        <h2 class="calc-title" id="coinmTitleEl">₿ Calculadora Coin-M</h2>
         <p class="calc-sub">Para futuros con margen en la propia moneda (inversos). Aquí ganas — o pierdes — por el trade apalancado <strong>y</strong> por la revalorización de tu margen, algo que la calculadora normal (USDT-M) no muestra.</p>
       </div>
 
@@ -6964,7 +6969,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="feesTitleEl">Calculadora de Comisiones</h2>
+        <h2 class="calc-title" id="feesTitleEl">🧾 Calculadora de Comisiones</h2>
         <p class="calc-sub">Cuánto te está cobrando realmente el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
         <div class="estimate-banner">⚠️ <b>Esto es un estimado</b> — no tenemos el detalle real de cada una de tus operaciones, así que el resultado depende de qué tan bien elijas el reparto Maker/Taker y las comisiones de abajo. Para el número exacto, revisa el historial de comisiones de tu propio exchange.</div>
       </div>
@@ -7086,7 +7091,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="quizTitleEl">Perfil de Riesgo</h2>
+        <h2 class="calc-title" id="quizTitleEl">🎯 Perfil de Riesgo</h2>
         <p class="calc-sub">6 preguntas · Descubre tu perfil como inversor</p>
       </div>
 
@@ -7146,7 +7151,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="correlationTitleEl">Monitor de Correlación</h2>
+        <h2 class="calc-title" id="correlationTitleEl">🔗 Monitor de Correlación</h2>
         <p class="calc-sub">¿Tus monedas se mueven juntas, o realmente estás diversificado?</p>
       </div>
 
@@ -7202,7 +7207,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="glossaryTitleEl">Glosario Cripto</h2>
+        <h2 class="calc-title" id="glossaryTitleEl">📖 Glosario Cripto</h2>
         <p class="calc-sub">Términos claros, sin jerga — desde principiante hasta avanzado</p>
       </div>
 
@@ -7242,7 +7247,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="dcaExitTitleEl">Simulador de DCA de Venta</h2>
+        <h2 class="calc-title" id="dcaExitTitleEl">📤 Simulador de DCA de Venta</h2>
         <p class="calc-sub">Retira ganancias por partes, en vez de vender todo de una sola vez</p>
       </div>
 
@@ -7348,7 +7353,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="mistakesTitleEl">Biblioteca de errores comunes</h2>
+        <h2 class="calc-title" id="mistakesTitleEl">⚠️ Biblioteca de errores comunes</h2>
         <p class="calc-sub">Casos reales de cómo se pierde dinero en cripto — y la lección de cada uno</p>
       </div>
 
@@ -7388,7 +7393,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="walletCompareTitleEl">Comparador de Wallets</h2>
+        <h2 class="calc-title" id="walletCompareTitleEl">👛 Comparador de Wallets</h2>
         <p class="calc-sub">Hot vs Cold — cuál te conviene según tu situación</p>
       </div>
 
@@ -7464,7 +7469,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="approvalsTitleEl">Verificar Aprobaciones</h2>
+        <h2 class="calc-title" id="approvalsTitleEl">✅ Verificar Aprobaciones</h2>
         <p class="calc-sub">Revisa y revoca los permisos que le diste a contratos inteligentes</p>
       </div>
 
@@ -7512,7 +7517,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="inheritanceTitleEl">Herencia Digital</h2>
+        <h2 class="calc-title" id="inheritanceTitleEl">👨‍👩‍👧 Herencia Digital</h2>
         <p class="calc-sub">Qué le dejarías a tu familia si te pasa algo</p>
       </div>
 
@@ -7560,7 +7565,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="tokenScannerTitleEl">Analizador de Token</h2>
+        <h2 class="calc-title" id="tokenScannerTitleEl">🔎 Analizador de Token</h2>
         <p class="calc-sub">Busca cualquier token por nombre, símbolo o dirección de contrato — seguridad, liquidez, impuestos, sector y desbloqueos pendientes, todo con datos reales y su fuente.</p>
       </div>
 
@@ -7614,7 +7619,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="checklistTitleEl">Checklist de Seguridad</h2>
+        <h2 class="calc-title" id="checklistTitleEl">🛡️ Checklist de Seguridad</h2>
         <p class="calc-sub">Cuenta · Wallet · Phishing · Dispositivos</p>
       </div>
 
@@ -7660,7 +7665,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="authTitleEl" style="font-size:22px">Tu cuenta</h2>
+        <h2 class="calc-title" id="authTitleEl" style="font-size:22px">🔐 Tu cuenta</h2>
         <p class="calc-sub">Necesaria para herramientas que guardan tus datos</p>
       </div>
 
@@ -7718,7 +7723,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="profileTitleEl" style="font-size:22px">Mi perfil</h2>
+        <h2 class="calc-title" id="profileTitleEl" style="font-size:22px">👤 Mi perfil</h2>
         <p class="calc-sub">Edita tu nombre de usuario</p>
       </div>
 
@@ -7760,7 +7765,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="legalTitleEl" style="font-size:22px">Legal</h2>
+        <h2 class="calc-title" id="legalTitleEl" style="font-size:22px">📄 Legal</h2>
         <p class="calc-sub">Términos, privacidad y cookies</p>
       </div>
 
@@ -7849,7 +7854,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <img src="/logo-skillcash-600.png" alt="SkillCash">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
-        <h2 class="calc-title" id="portfolioTitleEl">Simulador de Portafolio</h2>
+        <h2 class="calc-title" id="portfolioTitleEl">📊 Simulador de Portafolio</h2>
         <p class="calc-sub">Plan de asignación · Holdings reales · Valor en vivo</p>
       </div>
 
@@ -24153,6 +24158,30 @@ setInterval(updateMarketSessions, 1000);
   });
   if(iosHintClose) iosHintClose.addEventListener('click', function(){
     iosHint.style.display = 'none';
+  });
+})();
+</script>
+<script>
+(function(){
+  // .calc-title usa un degradado de texto (background-clip:text + text-fill-color:transparent)
+  // para el efecto visual del titulo - pero eso tambien "despinta" el emoji inicial de muchos
+  // titulos ("🔍 BTC + Google Trends", etc.), dejandolo en blanco y negro en vez de a color.
+  // En vez de arreglarlo a mano titulo por titulo (71 en el archivo, y cualquier titulo nuevo
+  // que se agregue despues tendria el mismo problema), esto envuelve automaticamente el emoji
+  // inicial de cada .calc-title en un span que sale del degradado - corre una sola vez, los
+  // titulos son estaticos en el HTML, ninguno se arma con JS despues de cargar la pagina.
+  var EMOJI_LEAD_RE = /^(\p{Extended_Pictographic}(?:‍\p{Extended_Pictographic})*️?)(\s*)/u;
+  document.querySelectorAll('.calc-title').forEach(function(el){
+    var firstNode = el.firstChild;
+    if(!firstNode || firstNode.nodeType !== Node.TEXT_NODE) return;
+    var m = EMOJI_LEAD_RE.exec(firstNode.textContent);
+    if(!m) return;
+    var span = document.createElement('span');
+    span.className = 'calc-title-emoji';
+    span.textContent = m[1];
+    firstNode.textContent = firstNode.textContent.slice(m[0].length);
+    if(m[2]) el.insertBefore(document.createTextNode(m[2]), firstNode);
+    el.insertBefore(span, el.firstChild);
   });
 })();
 </script>
