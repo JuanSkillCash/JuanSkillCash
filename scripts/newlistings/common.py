@@ -81,9 +81,19 @@ def fetch_html_with_fallback(url: str, validate=None, wait_selector: str | None 
         try:
             page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
             if wait_selector:
-                page.wait_for_selector(wait_selector, timeout=timeout * 1000)
+                try:
+                    # state="attached" alcanza con que exista en el DOM - no todas las
+                    # paginas lo hacen visible (ej. un <script id="__NEXT_DATA__">).
+                    page.wait_for_selector(wait_selector, timeout=timeout * 1000, state="attached")
+                except Exception:
+                    pass  # mejor usar lo que haya cargado que tirar toda la corrida
             else:
-                page.wait_for_timeout(1500)
+                try:
+                    # espera a que la pagina termine de hidratar/pedir sus XHR - mas
+                    # confiable que un sleep fijo para contenido armado client-side.
+                    page.wait_for_load_state("networkidle", timeout=timeout * 1000)
+                except Exception:
+                    page.wait_for_timeout(3000)
             html_out = page.content()
         finally:
             browser.close()

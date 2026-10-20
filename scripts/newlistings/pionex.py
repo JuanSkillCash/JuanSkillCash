@@ -28,14 +28,19 @@ _PIONEX_NOISE_RE = re.compile(
     re.IGNORECASE,
 )
 
-_MEME_GURU_RE = re.compile(r"MEME Guru New Coin Listing:\s*([A-Za-z0-9]{1,15})", re.IGNORECASE)
-# "Pionex has/had Launched the ..." cubre tres formas vistas en produccion:
+# "MEME Guru New Coin Listing: ANI" (un ticker) o "...: 修仙、MEMERUSH and PUP" / "...:
+# 币安人生, PALU, and GIGGLE" (lista mixta china/ascii, separador a veces es "、" no coma) -
+# se captura toda la cola y se tokeniza igual que un "Has Listed", los tokens en chino se
+# descartan solos mas abajo (no pasan el filtro ascii final).
+_MEME_GURU_RE = re.compile(r"MEME Guru New Coin Listing:\s*(.+)$", re.IGNORECASE)
+# "Pionex has/had Launched [the] ..." cubre cuatro formas vistas en produccion:
 #   singular sufijo:  "...the ERAUSDT Margined Perpetual Futures"
 #   plural con ':':    "...the Margined Perpetual Futures: ERAUSDT 1-25x Leverage, DNAUSDT ..."
 #   prefijo USDT:      "...the USDTPEPE 1-50x Leverage Margined Perpetual Futures"
-# en los tres casos alcanza con aislar el tramo entre "Launched the" y el final/":"  y
+#   sin "the":         "Has Launched KITEUSDT, PIGGYUSDT, ATUSDT, OLUSDT Perpetual Futures"
+# en los cuatro casos alcanza con aislar el tramo entre "Launched" y el final/":" y
 # tokenizar por comas - _strip_quote_any() se encarga de pelar el USDT este antes o despues.
-_LAUNCHED_TAIL_RE = re.compile(r"(?:has|had)\s+Launched the\s+(.+)$", re.IGNORECASE)
+_LAUNCHED_TAIL_RE = re.compile(r"(?:has|had)\s+Launched\s+(?:the\s+)?(.+)$", re.IGNORECASE)
 _TRAILING_FUTURES_RE = re.compile(r"\s*Margined Perpetual Futures\b.*$", re.IGNORECASE)
 _PAREN_TICKER_RE = re.compile(r"\b([A-Za-z0-9一-鿿]{1,15})\s*\(")
 _HAS_LISTED_RE = re.compile(r"(?:[Hh]as|had)\s+[Ll]isted\s+(.+)$")
@@ -61,10 +66,11 @@ def _first_token(segment: str) -> str | None:
 
 
 def _split_ticker_run(segment: str) -> list[str]:
-    """Separa listas tipo "A, B and C" / "A, B, and C" tolerando basura al final de cada
-    parte (leverage, "Tokenized Stocks", "RWA", etc.) - solo se queda con el primer token
+    """Separa listas tipo "A, B and C" / "A, B, and C" / "A、B and C" (el separador chino
+    "、" aparece en algunos titulos de MEME Guru) tolerando basura al final de cada parte
+    (leverage, "Tokenized Stocks", "RWA", etc.) - solo se queda con el primer token
     alfanumerico de cada tramo."""
-    parts = re.split(r",|\band\b", segment, flags=re.IGNORECASE)
+    parts = re.split(r",|，|、|\band\b", segment, flags=re.IGNORECASE)
     out = []
     for p in parts:
         tok = _first_token(p)
@@ -91,7 +97,9 @@ def _launched_tickers(title: str) -> list[str]:
 def _extract_tickers(title: str) -> list[str]:
     m = _MEME_GURU_RE.search(title)
     if m:
-        return [m.group(1).upper()]
+        tickers = _split_ticker_run(m.group(1))
+        if tickers:
+            return tickers
 
     tickers = _launched_tickers(title)
     if tickers:

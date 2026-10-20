@@ -28,7 +28,9 @@ _NEXT_DATA_RE = re.compile(
 
 def _fetch_page(page: int) -> list[dict]:
     url = LIST_URL_TMPL.format(page=page)
-    html, method = fetch_html_with_fallback(url, validate=lambda h: "__NEXT_DATA__" in h)
+    html, method = fetch_html_with_fallback(
+        url, validate=lambda h: "__NEXT_DATA__" in h, wait_selector="script#__NEXT_DATA__",
+    )
     log.info(f"[gate] pagina {page} - metodo usado: {method}")
     m = _NEXT_DATA_RE.search(html)
     if not m:
