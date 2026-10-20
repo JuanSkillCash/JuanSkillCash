@@ -317,7 +317,7 @@ def extract_tickers(title: str) -> list[str]:
     # por comas/"and"
     segment = re.sub(
         r"\b(perpetual|futures?|contracts?|pairs?|trading|market|service|services|spot|"
-        r"related|standard|usdt-m|usd1-m|other|assets?|multiple|tokens?|including|"
+        r"related|standard|usdt-m|usd1-m|other|assets?|multiple|tokens?|coins?|including|"
         r"buys?\s*backs?)\b",
         "", segment, flags=re.IGNORECASE,
     )
