@@ -369,7 +369,16 @@ def upsert_rows(supabase_url: str, supabase_key: str, rows: list[Row]):
         "Content-Type": "application/json",
         "Prefer": "resolution=merge-duplicates,return=minimal",
     }
-    payload = [r.to_api_dict() for r in rows]
+
+    # Postgres rechaza el batch entero si dos filas del mismo POST comparten la clave de
+    # conflicto (exchange,symbol,source_url) - "ON CONFLICT DO UPDATE command cannot affect
+    # row a second time" (confirmado con MEXC: una pagina listada dos veces produjo la misma
+    # fila repetida). Deduplicar aca, a nivel de infraestructura, protege contra esto sin
+    # importar que exchange lo cause.
+    deduped: dict[tuple, dict] = {}
+    for r in rows:
+        deduped[(r.exchange, r.symbol, r.source_url)] = r.to_api_dict()
+    payload = list(deduped.values())
     BATCH = 500
     for i in range(0, len(payload), BATCH):
         batch = payload[i:i + BATCH]
