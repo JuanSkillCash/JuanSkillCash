@@ -10,8 +10,8 @@ import logging
 import re
 import time
 
-import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 from .common import (
     Row, DEFAULT_HEADERS, extract_tickers, detect_market, is_noise, parse_delist_datetime,
@@ -28,20 +28,33 @@ _HEADER_SEL = '[class*="SearchResultItem_header-community"]'
 
 
 def fetch(max_pages: int = 3) -> list[Row]:
+    # requests simple da 403 (confirmado en una corrida real) - mismo patron que Farside/Gate,
+    # se usa un navegador de verdad para que el challenge de Cloudflare se resuelva solo
     rows: list[Row] = []
-    for page in range(1, max_pages + 1):
-        resp = requests.get(LIST_URL_TMPL.format(page=page), headers=DEFAULT_HEADERS, timeout=30)
-        if resp.status_code != 200:
-            log.warning(f"[mexc] pagina {page} respondio {resp.status_code}")
-            break
-        soup = BeautifulSoup(resp.text, "html.parser")
+    htmls: list[str] = []
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page_obj = browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
+        for page in range(1, max_pages + 1):
+            try:
+                page_obj.goto(LIST_URL_TMPL.format(page=page), wait_until="networkidle", timeout=45000)
+            except Exception as e:
+                log.warning(f"[mexc] pagina {page} fallo: {e}")
+                break
+            htmls.append(page_obj.content())
+            time.sleep(0.5)
+        browser.close()
+
+    for i, html in enumerate(htmls, start=1):
+        page = i
+        soup = BeautifulSoup(html, "html.parser")
         cards = soup.select(_ITEM_SEL)
         if not cards:
             if page == 1:
                 log.warning("[mexc] no se encontro ningun item con el selector esperado")
-                ids = re.findall(r'<script[^>]*\bid="([^"]+)"', resp.text)
+                ids = re.findall(r'<script[^>]*\bid="([^"]+)"', html)
                 log.info(f"[mexc] DEBUG titulo <title>: {(soup.title.string if soup.title else None)!r}")
-                log.info(f"[mexc] DEBUG primeros 1500 chars del HTML: {resp.text[:1500]!r}")
+                log.info(f"[mexc] DEBUG primeros 1500 chars del HTML: {html[:1500]!r}")
                 log.info(f"[mexc] DEBUG ids de <script> encontrados: {ids}")
             break
 
