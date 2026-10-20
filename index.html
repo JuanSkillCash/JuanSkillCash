@@ -18442,36 +18442,27 @@ function renderRsiChart(){
         <path d="${rsiLine}" fill="none" stroke="#60a5fa" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="rsiPriceHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="rsiPriceHoverDot" r="6" fill="#fff" style="display:none"/>
-        <rect id="rsiPriceHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="rsiPriceHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="rsiPriceHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
-        <line id="rsiOscHoverLine" x1="0" y1="${rsiTop}" x2="0" y2="${rsiBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="rsiOscHoverDot" r="6" fill="#60a5fa" style="display:none"/>
-        <rect id="rsiOscHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="rsiOscHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="rsiOscHoverCatcher" x="${marginLeft}" y="${rsiTop}" width="${drawW}" height="${rsiBottom - rsiTop}" fill="transparent" style="cursor:crosshair"/>
+        <line id="rsiHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${rsiBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="rsiHoverDotUpper" r="6" fill="#fff" style="display:none"/>
+        <circle id="rsiHoverDotLower" r="5" fill="#60a5fa" style="display:none"/>
+        <rect id="rsiHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="rsiHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="rsiHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${rsiBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
       </svg>
-      <div id="rsiPriceTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-      <div id="rsiOscTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+      <div id="rsiTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const rsiSvg = document.getElementById('rsiChartSvg');
-  wireChartHover({
-    svg: rsiSvg, catcherId: 'rsiPriceHoverCatcher', lineId: 'rsiPriceHoverLine', dotId: 'rsiPriceHoverDot',
-    dateLabelId: 'rsiPriceHoverDateLabel', dateBgId: 'rsiPriceHoverDateBg', tooltipId: 'rsiPriceTooltip',
+  // un solo hover que cubre los dos paneles a la vez - ver nota en renderEpochPlChart
+  wireDualPanelHover({
+    svg: rsiSvg, catcherId: 'rsiHoverCatcher', lineId: 'rsiHoverLine',
+    dotUpperId: 'rsiHoverDotUpper', dotLowerId: 'rsiHoverDotLower',
+    dateLabelId: 'rsiHoverDateLabel', dateBgId: 'rsiHoverDateBg', tooltipId: 'rsiTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForPrice(points[i].c),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b>`,
-  });
-  wireChartHover({
-    svg: rsiSvg, catcherId: 'rsiOscHoverCatcher', lineId: 'rsiOscHoverLine', dotId: 'rsiOscHoverDot',
-    dateLabelId: 'rsiOscHoverDateLabel', dateBgId: 'rsiOscHoverDateBg', tooltipId: 'rsiOscTooltip',
-    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForRsi(rsi[i]),
-    tooltipHtml: i => `<b style="color:#60a5fa">RSI ${rsi[i].toFixed(1)}</b>`,
+    yForUpperIdx: i => yForPrice(points[i].c),
+    yForLowerIdx: i => yForRsi(rsi[i]),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].c)}</b><br><span style="color:#60a5fa">RSI ${rsi[i].toFixed(1)}</span>`,
   });
 
   legendEl.innerHTML = `
@@ -18728,36 +18719,27 @@ function renderSthMvrvChart(){
         ${xLabelsHtml}
         ${todayMarkerHtml}
         ${oscHtml}
-        <line id="sthmvrvPriceHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${priceBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="sthmvrvPriceHoverDot" r="6" fill="#fff" style="display:none"/>
-        <rect id="sthmvrvPriceHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="sthmvrvPriceHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="sthmvrvPriceHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${priceBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
-        <line id="sthmvrvOscHoverLine" x1="0" y1="${oscTop}" x2="0" y2="${oscBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="sthmvrvOscHoverDot" r="6" fill="#22c55e" style="display:none"/>
-        <rect id="sthmvrvOscHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
-        <text id="sthmvrvOscHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="sthmvrvOscHoverCatcher" x="${marginLeft}" y="${oscTop}" width="${drawW}" height="${oscBottom - oscTop}" fill="transparent" style="cursor:crosshair"/>
+        <line id="sthmvrvHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${oscBottom}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
+        <circle id="sthmvrvHoverDotUpper" r="6" fill="#fff" style="display:none"/>
+        <circle id="sthmvrvHoverDotLower" r="5" fill="#22c55e" style="display:none"/>
+        <rect id="sthmvrvHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#080c20" style="display:none"/>
+        <text id="sthmvrvHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <rect id="sthmvrvHoverCatcher" x="${marginLeft}" y="${priceTop}" width="${drawW}" height="${oscBottom - priceTop}" fill="transparent" style="cursor:crosshair"/>
       </svg>
-      <div id="sthmvrvPriceTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
-      <div id="sthmvrvOscTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
+      <div id="sthmvrvTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const sthmvrvSvg = document.getElementById('sthmvrvChartSvg');
-  wireChartHover({
-    svg: sthmvrvSvg, catcherId: 'sthmvrvPriceHoverCatcher', lineId: 'sthmvrvPriceHoverLine', dotId: 'sthmvrvPriceHoverDot',
-    dateLabelId: 'sthmvrvPriceHoverDateLabel', dateBgId: 'sthmvrvPriceHoverDateBg', tooltipId: 'sthmvrvPriceTooltip',
+  // un solo hover que cubre los dos paneles a la vez - ver nota en renderEpochPlChart
+  wireDualPanelHover({
+    svg: sthmvrvSvg, catcherId: 'sthmvrvHoverCatcher', lineId: 'sthmvrvHoverLine',
+    dotUpperId: 'sthmvrvHoverDotUpper', dotLowerId: 'sthmvrvHoverDotLower',
+    dateLabelId: 'sthmvrvHoverDateLabel', dateBgId: 'sthmvrvHoverDateBg', tooltipId: 'sthmvrvTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForPrice(points[i].btc),
-    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].btc)}</b><br><span style="color:#f0b23d">Costo base STH: ${fmtHalvingPrice(points[i].realizedPrice)}</span>`,
-  });
-  wireChartHover({
-    svg: sthmvrvSvg, catcherId: 'sthmvrvOscHoverCatcher', lineId: 'sthmvrvOscHoverLine', dotId: 'sthmvrvOscHoverDot',
-    dateLabelId: 'sthmvrvOscHoverDateLabel', dateBgId: 'sthmvrvOscHoverDateBg', tooltipId: 'sthmvrvOscTooltip',
-    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yForMvrv(points[i].mvrv),
-    tooltipHtml: i => `<b style="color:${points[i].mvrv >= 1 ? '#22c55e' : '#ff2f4f'}">STH-MVRV ${points[i].mvrv.toFixed(2)}</b>`,
+    yForUpperIdx: i => yForPrice(points[i].btc),
+    yForLowerIdx: i => yForMvrv(points[i].mvrv),
+    tooltipHtml: i => `<b>${fmtHalvingPrice(points[i].btc)}</b><br><span style="color:#f0b23d">Costo base STH: ${fmtHalvingPrice(points[i].realizedPrice)}</span><br><span style="color:${points[i].mvrv >= 1 ? '#22c55e' : '#ff2f4f'}">STH-MVRV ${points[i].mvrv.toFixed(2)}</span>`,
   });
 
   legendEl.innerHTML = `
