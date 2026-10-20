@@ -78,6 +78,10 @@ def fetch(max_pages: int = 2) -> list[Row]:
             data = _extract_next_data(html)
             if not data:
                 log.warning(f"[gate] no se encontro __NEXT_DATA__ en la pagina {p}")
+                log.info(f"[gate] DEBUG titulo de la pagina: {page.title()!r}")
+                log.info(f"[gate] DEBUG primeros 1500 chars del HTML: {html[:1500]!r}")
+                ids = re.findall(r'<script[^>]*\bid="([^"]+)"', html)
+                log.info(f"[gate] DEBUG ids de <script> encontrados: {ids}")
                 break
             try:
                 batch = data["props"]["pageProps"]["listData"]["list"]
