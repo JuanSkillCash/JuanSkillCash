@@ -1698,6 +1698,25 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 }
 #pwaInstallBtn svg{width:19px;height:19px;flex-shrink:0}
 @media(min-width:641px){ #pwaInstallBtn{ display:none !important; } }
+
+/* Tarjeta de instrucciones para iPhone/iPad: Safari no soporta beforeinstallprompt, así que no
+   hay instalación automática — el botón, en vez de instalar, explica los 2 toques manuales. */
+#pwaIosHint{
+  display:none;position:fixed;left:16px;right:16px;bottom:78px;z-index:9999;
+  background:#11162c;border:1px solid var(--border);border-radius:14px;
+  padding:16px 16px 14px;box-shadow:0 12px 30px rgba(0,0,0,.45);
+  color:var(--white);font-size:14px;line-height:1.55;
+}
+#pwaIosHint::after{
+  content:'';position:absolute;left:50%;bottom:-8px;transform:translateX(-50%) rotate(45deg);
+  width:16px;height:16px;background:#11162c;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+#pwaIosHint b{color:var(--red)}
+#pwaIosHint .pwa-ios-step{display:flex;align-items:center;gap:10px;margin-top:8px}
+#pwaIosHint .pwa-ios-step:first-of-type{margin-top:10px}
+#pwaIosHint .pwa-ios-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+#pwaIosHint .pwa-ios-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted2);font-size:18px;line-height:1;cursor:pointer;padding:4px}
+@media(min-width:641px){ #pwaIosHint{ display:none !important; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
@@ -1707,6 +1726,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
   Instalar App
 </button>
+<div id="pwaIosHint" role="dialog" aria-label="Cómo instalar en iPhone">
+  <button type="button" class="pwa-ios-close" id="pwaIosHintClose" aria-label="Cerrar">&times;</button>
+  <b>Agregar SkillCash a tu inicio:</b>
+  <div class="pwa-ios-step"><span class="pwa-ios-num">1</span><span>Toca el ícono de <b>Compartir</b> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 2v13"/><path d="m8 6 4-4 4 4"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg> en la barra de Safari</span></div>
+  <div class="pwa-ios-step"><span class="pwa-ios-num">2</span><span>Elige <b>"Agregar a pantalla de inicio"</b></span></div>
+</div>
 
 <div class="app">
 
@@ -23788,9 +23813,28 @@ setInterval(updateMarketSessions, 1000);
     });
   }
   var btn = document.getElementById('pwaInstallBtn');
+  var iosHint = document.getElementById('pwaIosHint');
+  var iosHintClose = document.getElementById('pwaIosHintClose');
   if(!btn) return;
   var deferredPrompt = null;
   function isMobile(){ return window.innerWidth <= 640; }
+  function isIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+  function isStandalone(){
+    return window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  }
+
+  /* Safari/iOS nunca dispara beforeinstallprompt: no hay forma de detectar si ya es "instalable"
+     como en Chrome/Android, así que ahí mostramos el botón apenas carga (si es celular y no está
+     ya instalado) y, al tocarlo, explicamos los 2 pasos manuales en vez de instalar. */
+  if(isMobile() && isIOS() && !isStandalone()){
+    btn.dataset.mode = 'ios';
+    btn.style.display = 'flex';
+  }
+
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferredPrompt = e;
@@ -23801,12 +23845,19 @@ setInterval(updateMarketSessions, 1000);
     btn.style.display = 'none';
   });
   btn.addEventListener('click', function(){
+    if(btn.dataset.mode === 'ios'){
+      if(iosHint) iosHint.style.display = iosHint.style.display === 'block' ? 'none' : 'block';
+      return;
+    }
     if(!deferredPrompt) return;
     deferredPrompt.prompt();
     deferredPrompt.userChoice.finally(function(){
       deferredPrompt = null;
       btn.style.display = 'none';
     });
+  });
+  if(iosHintClose) iosHintClose.addEventListener('click', function(){
+    iosHint.style.display = 'none';
   });
 })();
 </script>
