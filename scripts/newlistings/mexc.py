@@ -5,12 +5,16 @@ exacto de /announcements/delistings que ya usa el otro scraper)."""
 from __future__ import annotations
 
 import logging
+import re
 import time
 
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
-from .common import Row, DEFAULT_HEADERS, classify_asset_class, detect_market, extract_tickers, is_noise
+from .common import (
+    Row, DEFAULT_HEADERS, classify_asset_class, detect_market, extract_tickers, is_noise,
+    split_run, _strip_quote_suffix,
+)
 
 log = logging.getLogger("newlistings.mexc")
 
@@ -19,6 +23,26 @@ BASE = "https://www.mexc.com"
 LIST_URL_TMPL = "https://www.mexc.com/announcements/new-listings?page={page}"
 
 _ARTICLE_HREF_SEL = 'a[href*="/announcements/article/"]'
+
+# "First in Market: MEXC to List PH, WM, KMI and MDLZ Stock Futures Trading on Oct 20"
+_COMMA_STOCK_FUTURES_RE = re.compile(
+    r"to [Ll]ist\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*(?:,?\s*and\s+[A-Z0-9]+)?)\s+Stock Futures Trading",
+)
+# "MEXC to List MPLXUSDT Futures in Innovation Zone..." / "MEXC to List GTCUSDT Futures on..."
+_TICKER_FUTURES_RE = re.compile(r"to [Ll]ist\s+([A-Z0-9]{2,15})\s+Futures\b")
+
+
+def _mexc_tickers(title: str) -> list[str]:
+    tickers = extract_tickers(title)
+    if tickers:
+        return tickers
+    m = _COMMA_STOCK_FUTURES_RE.search(title)
+    if m:
+        return split_run(m.group(1))
+    m = _TICKER_FUTURES_RE.search(title)
+    if m:
+        return [_strip_quote_suffix(m.group(1))]
+    return []
 
 
 def fetch(max_pages: int = 3) -> list[Row]:
@@ -58,7 +82,7 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 continue
             seen_urls.add(url)
 
-            tickers = extract_tickers(title)
+            tickers = _mexc_tickers(title)
             if not tickers:
                 log.warning(f"[mexc] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue

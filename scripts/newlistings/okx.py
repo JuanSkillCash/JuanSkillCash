@@ -1,44 +1,23 @@
 """OKX: misma API v5 oficial que delistings/okx.py, categoria confirmada en el sondeo:
-annType=announcements-new-listings. El ticker en OKX siempre va ANTES del separador ("to
-list TICKER (Name)" / "will launch TICKER/USD"), al reves que la mayoria de los otros
-exchanges (donde va DENTRO del parentesis) - por eso usa su propio extractor en vez del
-generico de common.py (que asumiria mal "to list MON (Monad)" -> "MONAD")."""
+annType=announcements-new-listings. El extractor compartido (common.extract_tickers) ya
+resuelve tanto "will launch TICKER/USD" como "to list TICKER (Name)" / "to list Name
+(TICKER)" (la ambiguedad ticker-antes-o-dentro-del-parentesis la resuelve _pick_ticker)."""
 
 from __future__ import annotations
 
 import logging
-import re
 import time
 from datetime import datetime, timezone
 
 import requests
 
-from .common import Row, DEFAULT_HEADERS, classify_asset_class, detect_market, is_noise, split_run
+from .common import Row, DEFAULT_HEADERS, classify_asset_class, detect_market, extract_tickers, is_noise
 
 log = logging.getLogger("newlistings.okx")
 
 EXCHANGE = "okx"
 LIST_URL = "https://www.okx.com/api/v5/support/announcements"
 ANN_TYPE = "announcements-new-listings"
-
-_LAUNCH_SLASH_RE = re.compile(r"will launch\s+([A-Z][A-Z0-9]{1,14})/", re.IGNORECASE)
-_LIST_BEFORE_SLASH_RE = re.compile(r"to list\s+([A-Z][A-Z0-9]{1,14})/", re.IGNORECASE)
-_LIST_BEFORE_PAREN_RE = re.compile(r"to list\s+([A-Z][A-Za-z0-9]{1,14})\s*\(", re.IGNORECASE)
-_LIST_COMMA_RE = re.compile(
-    r"to list\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*(?:,?\s*and\s+[A-Z0-9]+)?)\s+for\s+spot\s+trading",
-    re.IGNORECASE,
-)
-
-
-def _extract_okx_tickers(title: str) -> list[str]:
-    for rx in (_LAUNCH_SLASH_RE, _LIST_BEFORE_SLASH_RE, _LIST_BEFORE_PAREN_RE):
-        m = rx.search(title)
-        if m:
-            return [m.group(1).upper()]
-    m = _LIST_COMMA_RE.search(title)
-    if m:
-        return split_run(m.group(1))
-    return []
 
 
 def _epoch_ms_to_dt(s) -> datetime | None:
@@ -83,7 +62,7 @@ def fetch(max_pages: int = 5) -> list[Row]:
             continue
         announced_at = _epoch_ms_to_dt(item.get("businessPTime") or item.get("pTime"))
 
-        tickers = _extract_okx_tickers(title)
+        tickers = extract_tickers(title)
         if not tickers:
             log.warning(f"[okx] no se pudieron sacar tickers de: {title!r} ({url})")
             continue

@@ -139,8 +139,36 @@ def _strip_quote_suffix(tok: str) -> str:
 
 _PERP_CONTRACT_SINGULAR_RE = re.compile(r"\bperpetual contracts?\b", re.IGNORECASE)
 _TICKER_QUOTE_RE = re.compile(r"\b([A-Z0-9]{2,15})(?:USDT|USDC|USD)\b")
-_SLASH_QUOTE_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,14})/(?:USDT|USDC|USD)(?:[Ⓢⓒ])?\b")
-_TO_LIST_SINGLE_PAREN_RE = re.compile(r"to list\s+([A-Z][A-Za-z0-9]{1,14})\s*\(", re.IGNORECASE)
+_SLASH_QUOTE_RE = re.compile(r"\b([A-Z0-9][A-Z0-9]{1,14})/(?:USDT|USDC|USD)(?:[Ⓢⓒ])?\b")
+
+# "to list X (Y)" / "lists X (Y)" / "listed X (Y)": distintos exchanges ponen el ticker real
+# ANTES del parentesis (OKX: "to list MON (Monad)") o DENTRO (Bitget: "to list Axis Robotics
+# (AXIS)") segun si el nombre completo cabe en una palabra o no - no hay forma de saberlo sin
+# mirar ambos lados. _pick_ticker se queda con el candidato que esta todo en mayusculas (asi
+# se escriben los tickers reales en estos titulos) y sin espacios (un nombre descriptivo como
+# "Tether Gold" o "Virtuals Protocol" nunca lo es).
+_VERB_PAREN_RE = re.compile(
+    r"\blist(?:s|ed)?\s+([A-Za-z0-9][A-Za-z0-9 ]{0,30}?)\s*\(([A-Za-z0-9][A-Za-z0-9 ]{0,30}?)\)",
+    re.IGNORECASE,
+)
+
+
+def _pick_ticker(pre: str, inside: str) -> str:
+    pre, inside = pre.strip(), inside.strip()
+    pre_tok, inside_tok = " " not in pre, " " not in inside
+    pre_upper = pre_tok and pre.isupper()
+    inside_upper = inside_tok and inside.isupper()
+    if pre_upper and not inside_upper:
+        return pre
+    if inside_upper and not pre_upper:
+        return inside
+    if pre_tok and not inside_tok:
+        return pre
+    if inside_tok and not pre_tok:
+        return inside
+    return pre if len(pre) <= len(inside) else inside
+
+
 _TO_LIST_COMMA_RE = re.compile(
     r"to list\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*(?:,?\s*and\s+[A-Z0-9]+)?)\s+for\s+spot\s+trading",
     re.IGNORECASE,
@@ -181,15 +209,20 @@ def extract_tickers(title: str) -> list[str]:
             return [m.group(1).upper()]
 
     parens = paren_tickers(t)
-    if parens:
+    if len(parens) >= 2:
+        return parens
+
+    m = _VERB_PAREN_RE.search(t)
+    if m:
+        picked = _pick_ticker(m.group(1), m.group(2)).upper()
+        if picked and " " not in picked and picked not in _FILLER_WORDS:
+            return [picked]
+
+    if len(parens) == 1:
         return parens
 
     m = _SLASH_QUOTE_RE.search(t)
     if m:
-        return [m.group(1).upper()]
-
-    m = _TO_LIST_SINGLE_PAREN_RE.search(t)
-    if m and m.group(1).upper() not in _FILLER_WORDS:
         return [m.group(1).upper()]
 
     m = _TO_LIST_COMMA_RE.search(t)
@@ -216,12 +249,21 @@ def extract_tickers(title: str) -> list[str]:
 # ---------------------------------------------------------------------------------------
 
 _NOISE_PATTERNS = [
-    re.compile(r"copy trading now supports", re.IGNORECASE),
+    re.compile(r"copy trad\w* now supports", re.IGNORECASE),
     re.compile(r"completed? .*(token )?migration", re.IGNORECASE),
     re.compile(r"cash dividend distribution", re.IGNORECASE),
     re.compile(r"collateral ratio|collateral index price", re.IGNORECASE),
     re.compile(r"\bpromotion\b|\bgiveaway\b|\bcampaign\b|prize pool", re.IGNORECASE),
     re.compile(r"trading challenge|trading competition|trading carnival", re.IGNORECASE),
+    re.compile(r"regarding the delay|will delay|delay the listing", re.IGNORECASE),
+    re.compile(r"\bairdrop\b", re.IGNORECASE),
+    re.compile(r"\beventx\b", re.IGNORECASE),
+    re.compile(r"pre-market trading|pre-market deliver", re.IGNORECASE),
+    re.compile(r"beginner'?s guide", re.IGNORECASE),
+    re.compile(r"\bcashback\b|\bshards\b", re.IGNORECASE),
+    re.compile(r"\d{4} review\b", re.IGNORECASE),
+    re.compile(r"\btrade \d+ usdt\b", re.IGNORECASE),
+    re.compile(r"handles existing", re.IGNORECASE),
     re.compile(r"vip (trip|night)|blockchain week|token2049|after-?party", re.IGNORECASE),
 ]
 

@@ -30,9 +30,16 @@ SECTIONS = [
 ]
 
 _SPOT_RE = re.compile(
-    r"\(([A-Za-z0-9]{1,15})\)\s*Coin (?:Gets Listed|Will Be Listed) on BingX Spot", re.IGNORECASE,
+    r"\(([A-Za-z0-9]{1,15})\)\s*(?:Coin\s+)?(?:Gets Listed|Will Be Listed) on BingX Spot", re.IGNORECASE,
 )
+_SPOT_MULTI_RE = re.compile(
+    r"^(?:\[[^\]]*\]\s*)*(.*?)\s+Coins Get Listed on BingX Spot", re.IGNORECASE,
+)
+_MIGRATION_RE = re.compile(r"^(?:\[[^\]]*\]\s*)*([A-Z][A-Z0-9]{0,14})\s+Migration to BingX Spot")
 _FUTURES_RE = re.compile(r"BingX Adds\s+(.*?)\s+for Perpetual Futures", re.IGNORECASE)
+_FUTURES_WILL_LIST_RE = re.compile(
+    r"BingX Perpetual Futures Will List\s+(.*?)(?:,?\s*and\s+More)?\s*$", re.IGNORECASE,
+)
 _FUTURES_STOPWORDS = {"MORE", "AND"}
 
 
@@ -76,10 +83,22 @@ def fetch(max_pages: int = 3) -> list[Row]:
 
             if market == "spot":
                 m = _SPOT_RE.search(title)
-                tickers = [m.group(1).upper()] if m else []
+                if m:
+                    tickers = [m.group(1).upper()]
+                else:
+                    m = _SPOT_MULTI_RE.search(title)
+                    if m:
+                        tickers = _futures_tickers(m.group(1))
+                    else:
+                        m = _MIGRATION_RE.search(title)
+                        tickers = [m.group(1).upper()] if m else []
             else:
                 m = _FUTURES_RE.search(title)
-                tickers = _futures_tickers(m.group(1)) if m else []
+                if m:
+                    tickers = _futures_tickers(m.group(1))
+                else:
+                    m = _FUTURES_WILL_LIST_RE.search(title)
+                    tickers = _futures_tickers(m.group(1)) if m else []
 
             if not tickers:
                 log.warning(f"[bingx] no se pudieron sacar tickers de: {title!r} ({source_url})")
