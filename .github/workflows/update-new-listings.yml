@@ -1,8 +1,7 @@
-name: Radar de Nuevos Listados (BingX, OKX, Bitget, KuCoin, Binance, MEXC)
+name: Radar de Nuevos Listados (15 exchanges)
 
-# Misma cadencia horaria que el Radar de Deslistados. Bitunix y Kraken quedan afuera -
-# el sondeo confirmo que ninguno tiene una categoria de "nuevos listados" usable (ver
-# scripts/update_new_listings.py).
+# Misma cadencia horaria que el Radar de Deslistados. Lista completa de exchanges y sus
+# fuentes en scripts/update_new_listings.py.
 on:
   schedule:
     - cron: "15 * * * *"

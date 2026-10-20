@@ -36,6 +36,73 @@ log = logging.getLogger("newlistings")
 
 TABLE = "exchange_new_listings"
 
+_STOCK_TICKERS_PATH = os.path.join(os.path.dirname(__file__), "stock_tickers.txt")
+
+
+def _load_stock_tickers() -> set[str]:
+    try:
+        with open(_STOCK_TICKERS_PATH, encoding="utf-8") as f:
+            return {
+                line.strip().upper() for line in f
+                if line.strip() and not line.strip().startswith("#")
+            }
+    except FileNotFoundError:
+        return set()
+
+
+STOCK_TICKERS = _load_stock_tickers()
+
+
+def fetch_html_with_fallback(url: str, validate=None, wait_selector: str | None = None, timeout: int = 30) -> tuple[str, str]:
+    """`requests` primero (rapido, sin dependencias pesadas); si responde con algo que huele
+    a bloqueo de bot (403/429/503/521, challenge de Cloudflare) o `validate(html)` dice que
+    el contenido no sirve (ej. no trae ningun link de articulo), cae a Playwright (navegador
+    real, mas lento pero pasa casi cualquier antibot basado en TLS fingerprint). Devuelve
+    (html, metodo) para poder loguear cual funciono en cada corrida - importante porque la
+    investigacion que encontro estas fuentes la hizo desde un navegador real, no desde
+    `requests`, asi que no hay garantia de que esta ultima pase el antibot en la IP del
+    runner de GitHub Actions."""
+    try:
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=timeout)
+        looks_blocked = (
+            resp.status_code in (403, 429, 503, 521)
+            or "checking your browser" in resp.text.lower()
+            or "cf-browser-verification" in resp.text.lower()
+        )
+        if not looks_blocked and resp.status_code == 200 and (validate is None or validate(resp.text)):
+            return resp.text, "requests"
+    except requests.RequestException:
+        pass
+
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
+        try:
+            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+            if wait_selector:
+                page.wait_for_selector(wait_selector, timeout=timeout * 1000)
+            else:
+                page.wait_for_timeout(1500)
+            html_out = page.content()
+        finally:
+            browser.close()
+    return html_out, "playwright"
+
+
+def classify_asset_class_or_ticker(title: str, ticker: str) -> str:
+    """Como classify_asset_class, pero con un fallback: si el titulo no trae ningun
+    marcador explicito (ni "stock"/"index"/"commodity"/etc.), revisa si el ticker esta en
+    stock_tickers.txt (mantenido a mano) antes de resignarse a 'crypto'. Util para
+    exchanges donde el aviso de acciones se ve identico al de cripto (Blofin, Bitunix
+    futuros, CoinW futuros)."""
+    result = classify_asset_class(title)
+    if result != "crypto":
+        return result
+    if (ticker or "").upper() in STOCK_TICKERS:
+        return "stock"
+    return "crypto"
+
 
 @dataclass
 class Row:
@@ -257,6 +324,10 @@ _NOISE_PATTERNS = [
     re.compile(r"\d{4} review\b", re.IGNORECASE),
     re.compile(r"\btrade \d+ usdt\b", re.IGNORECASE),
     re.compile(r"handles existing", re.IGNORECASE),
+    re.compile(r"token splash|prize pool", re.IGNORECASE),
+    re.compile(r"dividend|resumed trading|due to stock split", re.IGNORECASE),
+    re.compile(r"pre-market trading", re.IGNORECASE),
+    re.compile(r"\bupcoming listing\b", re.IGNORECASE),
     re.compile(r"vip (trip|night)|blockchain week|token2049|after-?party", re.IGNORECASE),
 ]
 
@@ -299,6 +370,8 @@ def upsert_rows(supabase_url: str, supabase_key: str, rows: list[Row]):
 
 __all__ = [
     "Row", "TABLE", "DEFAULT_HEADERS", "html_to_text", "parse_delist_datetime",
-    "classify_asset_class", "paren_tickers", "extract_tickers", "split_run", "is_noise",
+    "classify_asset_class", "classify_asset_class_or_ticker", "STOCK_TICKERS",
+    "fetch_html_with_fallback",
+    "paren_tickers", "extract_tickers", "split_run", "is_noise",
     "detect_market", "upsert_rows",
 ]

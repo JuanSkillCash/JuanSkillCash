@@ -4,9 +4,11 @@ commodities que los exchanges listan en futuros perpetuos, estilo xStock/bStocks
 exchanges y los guarda en Supabase (tabla exchange_new_listings). Hermano de
 update_exchange_delistings.py - mismos exchanges, misma disciplina, categoria distinta.
 
-Bitunix y Kraken quedan afuera: el sondeo confirmo que Bitunix no tiene una categoria de
-"nuevos listados" util (su seccion "New Listings" en Zendesk es puro marketing/eventos) y
-Kraken no tiene ninguna seccion de nuevos listados localizable (solo "Delistings" funciona).
+Investigacion inicial (confirmada en GitHub Actions): BingX, OKX, Bitget, KuCoin, Binance,
+MEXC. Investigacion de 9 exchanges mas (confirmada via navegador real, 2026-10-20): Bybit,
+Gate, LBank, Pionex, CoinW, Weex, Blofin, y se corrigio la seccion real de Bitunix (la
+original era "Events and Activities", no listados) y se encontro una fuente para Kraken
+(su blog oficial, no el centro de ayuda).
 
 Variables de entorno requeridas:
     SUPABASE_URL
@@ -19,7 +21,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))  # para que "newlistings" se importe como paquete
 
-from newlistings import bingx, okx, bitget, kucoin, binance, mexc
+from newlistings import (
+    bingx, okx, bitget, kucoin, binance, mexc,
+    bybit, gate, lbank, pionex, coinw, weex, blofin, bitunix, kraken,
+)
 from newlistings.common import upsert_rows, Row
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -35,6 +40,15 @@ FETCHERS = {
     "kucoin": kucoin.fetch,
     "binance": binance.fetch,
     "mexc": mexc.fetch,
+    "bybit": bybit.fetch,
+    "gate": gate.fetch,
+    "lbank": lbank.fetch,
+    "pionex": pionex.fetch,
+    "coinw": coinw.fetch,
+    "weex": weex.fetch,
+    "blofin": blofin.fetch,
+    "bitunix": bitunix.fetch,
+    "kraken": kraken.fetch,
 }
 
 
