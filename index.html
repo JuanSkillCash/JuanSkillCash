@@ -4553,7 +4553,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="newListRadarLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando nuevos listados…</div>
-                  <div class="indic-placeholder-text">Consultando BingX, OKX, Bitget, KuCoin, Binance y MEXC.</div>
+                  <div class="indic-placeholder-text">Consultando Binance, OKX, Bybit, Bitget, Gate, KuCoin, MEXC, BingX, Kraken, LBank, Pionex, CoinW, Weex, Bitunix y Blofin.</div>
                 </div>
                 <div class="indic-chart-soon" id="newListRadarError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -4584,7 +4584,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🆕 Avisos <b>reales</b> de nuevo listado (cripto, y también acciones/índices/oro cuando el exchange los lista en futuros perpetuos, estilo xStock/bStocks) recolectados cada hora directo del centro de anuncios público de cada uno: <b>BingX, OKX, Bitget, KuCoin, Binance y MEXC</b>. Bitunix y Kraken no tienen una categoría propia de nuevos listados confiable, por eso no están.<br>
+                🆕 Avisos <b>reales</b> de nuevo listado (cripto, y también acciones/índices/oro cuando el exchange los lista en futuros perpetuos, estilo xStock/bStocks) recolectados cada hora directo del centro de anuncios público de cada uno: <b>Binance, OKX, Bybit, Bitget, Gate, KuCoin, MEXC, BingX, Kraken, LBank, Pionex, CoinW, Weex, Bitunix y Blofin</b>. Si algún intercambio aparece en gris es porque en este momento no tiene avisos que mostrar con el filtro elegido (o su fuente está temporalmente bloqueada) — no porque falte integrarlo.<br>
                 📈📊🥇 Usa el filtro para ver solo acciones, índices u oro/commodities tokenizados — lo que no tiene ícono es cripto normal.<br>
                 🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
                 <strong>Un aviso de nuevo listado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -23358,6 +23358,15 @@ const NEWLIST_EXCHANGES = [
   { id: 'kucoin',   label: 'KuCoin',   color: '#2ecc71' },
   { id: 'binance',  label: 'Binance',  color: '#f0b90b' },
   { id: 'mexc',     label: 'MEXC',     color: '#4d7cfe' },
+  { id: 'bybit',    label: 'Bybit',    color: '#f7a600' },
+  { id: 'gate',     label: 'Gate',     color: '#e63946' },
+  { id: 'lbank',    label: 'LBank',    color: '#00b4d8' },
+  { id: 'pionex',   label: 'Pionex',   color: '#8338ec' },
+  { id: 'coinw',    label: 'CoinW',    color: '#06d6a0' },
+  { id: 'weex',     label: 'Weex',     color: '#ff6b6b' },
+  { id: 'blofin',   label: 'Blofin',   color: '#9b5de5' },
+  { id: 'bitunix',  label: 'Bitunix',  color: '#00c2a8' },
+  { id: 'kraken',   label: 'Kraken',   color: '#5841d8' },
 ];
 const NEWLIST_EX_BY_ID = Object.fromEntries(NEWLIST_EXCHANGES.map(e => [e.id, e]));
 
@@ -23378,7 +23387,7 @@ async function loadNewListRadar(){
       .from('exchange_new_listings')
       .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
       .order('announced_at', { ascending: false, nullsFirst: false })
-      .limit(500);
+      .limit(3000);
     if(error) throw error;
     newListRadarRows = data || [];
     if(!newListRadarActiveExchanges){
