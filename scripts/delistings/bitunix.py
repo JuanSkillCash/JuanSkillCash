@@ -10,6 +10,7 @@ from . import zendesk
 from .common import (
     Row, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, is_completion_notice, is_delay_notice,
+    classify_asset_class,
 )
 
 log = logging.getLogger("delistings.bitunix")
@@ -53,7 +54,7 @@ def fetch(max_pages: int = 5) -> list[Row]:
         for base in tickers:
             rows.append(Row(
                 exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=source_url, title=title,
+                source_url=source_url, title=title, asset_class=classify_asset_class(title),
                 announced_at=created_at, delist_at=delist_at, market=market,
             ))
 

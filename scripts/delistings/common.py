@@ -41,6 +41,7 @@ class Row:
     announced_at: Optional[datetime] = None
     delist_at: Optional[datetime] = None
     market: Optional[str] = None    # 'spot' | 'futures' | None (no se pudo determinar)
+    asset_class: str = "crypto"     # 'crypto' | 'stock' | 'index' | 'commodity'
 
     def status(self, now: Optional[datetime] = None) -> str:
         now = now or datetime.now(timezone.utc)
@@ -54,6 +55,7 @@ class Row:
             "symbol": self.symbol,
             "pair_base": self.pair_base,
             "market": self.market,
+            "asset_class": self.asset_class,
             "announced_at": self.announced_at.isoformat() if self.announced_at else None,
             "delist_at": self.delist_at.isoformat() if self.delist_at else None,
             "title": self.title,
@@ -239,6 +241,36 @@ def detect_market(title: str) -> Optional[str]:
 
 
 # ---------------------------------------------------------------------------------------
+# Clasificacion de asset_class - compartida con newlistings/common.py (ese modulo la
+# importa de aca). Heuristica por palabras clave vistas en la investigacion (xStocks/
+# bStocks, "Stock Index Perpetual", acciones taiwanesas, XAUT/oro). Todo lo que no
+# matchee una de estas categorias queda como 'crypto' (default) - nunca se inventa un
+# activo tradicional que el titulo no mencione.
+# ---------------------------------------------------------------------------------------
+
+_COMMODITY_RE = re.compile(
+    r"\bgold\b|\bsilver\b|\bgoldx?\b|\bxau\w*\b|\bxag\w*\b|\boil\b|\bwti\b|\bcommodit",
+    re.IGNORECASE,
+)
+_INDEX_RE = re.compile(r"\bstock index\b|\bindices?\b|\bindex\b", re.IGNORECASE)
+_STOCK_RE = re.compile(
+    r"\bstocks?\b|\bbstocks?\b|\bxstocks?\b|\(adr\)|tokenized securit|\bhot stock\b|\bstock perps?\b",
+    re.IGNORECASE,
+)
+
+
+def classify_asset_class(title: str) -> str:
+    t = title or ""
+    if _COMMODITY_RE.search(t):
+        return "commodity"
+    if _INDEX_RE.search(t):
+        return "index"
+    if _STOCK_RE.search(t):
+        return "stock"
+    return "crypto"
+
+
+# ---------------------------------------------------------------------------------------
 # Ruido a excluir dentro de la categoria "Delisting" (regla comun #5) - devuelve True si
 # el anuncio debe IGNORARSE por completo (no es un delisting real de un par).
 # ---------------------------------------------------------------------------------------
@@ -366,11 +398,12 @@ def rows_from_title(
 ) -> list[Row]:
     """Atajo comun: construye una Row por cada ticker detectado en el titulo."""
     market = detect_market(title)
+    asset_class = classify_asset_class(title)
     rows = []
     for base in extract_tickers(title):
         rows.append(Row(
             exchange=exchange, symbol=f"{base}{quote}", pair_base=base,
-            source_url=source_url, title=title,
+            source_url=source_url, title=title, asset_class=asset_class,
             announced_at=announced_at, delist_at=delist_at, market=market,
         ))
     return rows

@@ -16,6 +16,7 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, html_to_text, parse_delist_datetime,
+    classify_asset_class,
 )
 
 log = logging.getLogger("delistings.binance")
@@ -130,7 +131,7 @@ def fetch(max_pages: int = 5) -> list[Row]:
         for base in tickers:
             rows.append(Row(
                 exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=url or f"binance:{code}", title=title,
+                source_url=url or f"binance:{code}", title=title, asset_class=classify_asset_class(title),
                 announced_at=announced_at, delist_at=delist_at, market=market,
             ))
         time.sleep(0.4)

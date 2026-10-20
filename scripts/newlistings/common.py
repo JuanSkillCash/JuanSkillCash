@@ -28,7 +28,9 @@ from typing import Optional
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # repo scripts/ en sys.path
-from delistings.common import DEFAULT_HEADERS, html_to_text, parse_delist_datetime  # noqa: E402
+from delistings.common import (  # noqa: E402
+    DEFAULT_HEADERS, html_to_text, parse_delist_datetime, classify_asset_class,
+)
 
 log = logging.getLogger("newlistings")
 
@@ -68,34 +70,8 @@ class Row:
         }
 
 
-# ---------------------------------------------------------------------------------------
-# Clasificacion de asset_class - heuristica por palabras clave vistas en la investigacion
-# (xStocks/bStocks de Binance y BingX, "Stock Index Perpetual" de KuCoin, acciones taiwanesas
-# de Bitget, XAUT/oro de OKX y BingX). Por diseno, nunca inventa un activo tradicional que no
-# se mencione: todo lo que no matchee una de estas categorias queda como 'crypto' (default).
-# ---------------------------------------------------------------------------------------
-
-_COMMODITY_RE = re.compile(
-    r"\bgold\b|\bsilver\b|\bgoldx?\b|\bxau\w*\b|\bxag\w*\b|\boil\b|\bwti\b|\bcommodit",
-    re.IGNORECASE,
-)
-_INDEX_RE = re.compile(r"\bstock index\b|\bindices?\b|\bindex\b", re.IGNORECASE)
-_STOCK_RE = re.compile(
-    r"\bstocks?\b|\bbstocks?\b|\bxstocks?\b|\(adr\)|tokenized securit|\bhot stock\b|\bstock perps?\b",
-    re.IGNORECASE,
-)
-
-
-def classify_asset_class(title: str) -> str:
-    t = title or ""
-    if _COMMODITY_RE.search(t):
-        return "commodity"
-    if _INDEX_RE.search(t):
-        return "index"
-    if _STOCK_RE.search(t):
-        return "stock"
-    return "crypto"
-
+# classify_asset_class vive ahora en delistings/common.py (compartida por los dos radares,
+# importada arriba) - aca solo queda lo que es genuinamente propio de "nuevos listados".
 
 # ---------------------------------------------------------------------------------------
 # Tickers entre parentesis: "Axis Robotics (AXIS)" / "Metaplex (MPLX)" - el nombre largo no

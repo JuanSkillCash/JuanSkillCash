@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, html_to_text,
+    classify_asset_class,
 )
 
 log = logging.getLogger("delistings.kraken")
@@ -150,7 +151,7 @@ def fetch(max_articles: int = 15) -> list[Row]:
         for base in tickers:
             rows.append(Row(
                 exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=url, title=title,
+                source_url=url, title=title, asset_class=classify_asset_class(title),
                 announced_at=None, delist_at=delist_at, market=market,
             ))
 

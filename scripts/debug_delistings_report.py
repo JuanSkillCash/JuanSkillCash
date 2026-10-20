@@ -21,7 +21,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
 
 def fetch_all_rows():
-    url = f"{SUPABASE_URL}/rest/v1/exchange_delistings?select=exchange,symbol,pair_base,market,announced_at,delist_at,title,status,source_url&order=id.asc"
+    url = f"{SUPABASE_URL}/rest/v1/exchange_delistings?select=exchange,symbol,pair_base,market,asset_class,announced_at,delist_at,title,status,source_url&order=id.asc"
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
     rows = []
     offset = 0
@@ -54,6 +54,15 @@ def main():
 
     by_status = Counter(r["status"] for r in rows)
     print("\nPor status:", dict(by_status))
+
+    by_asset_class = Counter(r.get("asset_class") for r in rows)
+    print("Por asset_class:", dict(by_asset_class))
+
+    print("\n--- Muestra de activos NO cripto (stock/index/commodity) ---")
+    non_crypto = [r for r in rows if r.get("asset_class") != "crypto"]
+    for r in non_crypto[:30]:
+        print(f"  [{r['exchange']}] {r['asset_class']:10} {r['symbol']:15}  <-  {r['title']!r}")
+    print(f"  ({len(non_crypto)} en total)")
 
     with_delist_at = sum(1 for r in rows if r.get("delist_at"))
     print(f"\nCon delist_at resuelto: {with_delist_at}/{len(rows)} ({100 * with_delist_at / len(rows):.1f}%)")

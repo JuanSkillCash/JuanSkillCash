@@ -18,6 +18,7 @@ from playwright.sync_api import sync_playwright
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, is_completion_notice, html_to_text, parse_delist_datetime,
+    classify_asset_class,
 )
 from datetime import datetime, timezone
 
@@ -138,7 +139,7 @@ def fetch(max_pages: int = 2) -> list[Row]:
         for base in tickers:
             rows.append(Row(
                 exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=url, title=title,
+                source_url=url, title=title, asset_class=classify_asset_class(title),
                 announced_at=announced_at, delist_at=delist_at, market=market,
             ))
 

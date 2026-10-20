@@ -17,6 +17,7 @@ from playwright.sync_api import sync_playwright
 
 from .common import (
     Row, DEFAULT_HEADERS, extract_tickers, detect_market, is_noise, parse_delist_datetime,
+    classify_asset_class,
 )
 
 log = logging.getLogger("delistings.mexc")
@@ -79,7 +80,7 @@ def fetch(max_pages: int = 3) -> list[Row]:
             for base in tickers:
                 rows.append(Row(
                     exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                    source_url=url, title=title,
+                    source_url=url, title=title, asset_class=classify_asset_class(title),
                     announced_at=None, delist_at=delist_at, market=market,
                 ))
         time.sleep(1)
