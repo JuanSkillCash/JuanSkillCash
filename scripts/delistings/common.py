@@ -71,9 +71,9 @@ _MONTHS = {
     "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
 }
 
-# "2026-10-28 03:00 (UTC)"  -> Binance, Bitunix
+# "2026-10-28 03:00 (UTC)" (Binance, Bitunix) o "2026-10-23 14:00 UTC" sin parentesis (Kraken)
 _RE_ISO_HM_UTC = re.compile(
-    r"(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})(?::\d{2})?\s*(?:AM|PM)?\s*\(UTC\)",
+    r"(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})(?::\d{2})?\s*(?:AM|PM)?\s*\(?UTC\)?",
     re.IGNORECASE,
 )
 
@@ -103,10 +103,12 @@ def _month_num(name: str) -> Optional[int]:
     return _MONTHS.get(name.strip().lower()[:3])
 
 
-def parse_delist_datetime(text: str) -> Optional[datetime]:
+def parse_delist_datetime(text: str, strict: bool = False) -> Optional[datetime]:
     """Intenta sacar una fecha/hora UTC de un texto (titulo o cuerpo), probando los
     formatos documentados en la investigacion, del mas especifico (con hora) al menos
-    especifico (solo fecha, sin hora -> queda a medianoche UTC)."""
+    especifico (solo fecha, sin hora -> queda a medianoche UTC). strict=True desactiva el
+    fallback de dateutil (ver nota abajo: ese fallback puede "inventar" un dia 1 de un
+    texto que solo trae mes y anio, como el titulo "... - October 2026")."""
     if not text:
         return None
 
@@ -144,7 +146,15 @@ def parse_delist_datetime(text: str) -> Optional[datetime]:
         except ValueError:
             return None
 
-    # ultimo recurso: dateutil tolera prosa rara que los regex de arriba no cubren
+    if strict:
+        return None
+
+    # ultimo recurso: dateutil tolera prosa rara que los regex de arriba no cubren - pero
+    # tambien "adivina" un dia 1 de un texto que solo trae mes+anio sin dia real (confirmado
+    # con Kraken: el titulo "... - October 2026" se colaba como si fuera 2026-10-01, pisando
+    # la fecha real y precisa que si estaba en el cuerpo) - por eso extract_delist_date_from_body
+    # SIEMPRE llama primero en modo strict a todos los candidatos, y solo usa este fallback
+    # como ultimo recurso si NINGUN chunk del texto completo trajo una fecha con formato exacto
     try:
         from dateutil import parser as dateutil_parser
         dt = dateutil_parser.parse(text, fuzzy=True, default=datetime(1970, 1, 1, tzinfo=timezone.utc))
@@ -178,20 +188,31 @@ def extract_delist_date_from_body(body_html: str, created_at: Optional[datetime]
     una fecha equivocada - el caller debe caer entonces al fallback del titulo."""
     text = html_to_text(body_html)
     chunks = re.split(r"(?<=[.!?])\s+|\n+", text)
-    best_dt, best_score = None, None
-    for chunk in chunks:
-        dt = parse_delist_datetime(chunk)
-        if not dt:
-            continue
-        score = 0
-        if _PRIMARY_DATE_CTX.search(chunk):
-            score += 2
-        if _SECONDARY_DATE_CTX.search(chunk):
-            score += 1
-        if _EXCLUDE_DATE_CTX.search(chunk):
-            score -= 3
-        if best_score is None or score > best_score:
-            best_score, best_dt = score, dt
+
+    def _scan(strict: bool):
+        best_dt, best_score = None, None
+        for chunk in chunks:
+            dt = parse_delist_datetime(chunk, strict=strict)
+            if not dt:
+                continue
+            score = 0
+            if _PRIMARY_DATE_CTX.search(chunk):
+                score += 2
+            if _SECONDARY_DATE_CTX.search(chunk):
+                score += 1
+            if _EXCLUDE_DATE_CTX.search(chunk):
+                score -= 3
+            if best_score is None or score > best_score:
+                best_score, best_dt = score, dt
+        return best_dt, best_score
+
+    # dos pasadas: primero solo fechas con formato EXACTO (strict=True) en todos los chunks;
+    # el fallback de dateutil (fuzzy) solo se intenta si NINGUN chunk del texto completo trajo
+    # una fecha exacta - evita que un "... - October 2026" del titulo (sin dia real) le gane a
+    # la fecha precisa que si esta en el cuerpo, solo por tener mejor contexto (caso Kraken)
+    best_dt, best_score = _scan(strict=True)
+    if best_dt is None:
+        best_dt, best_score = _scan(strict=False)
     if best_score is None or best_score < 0:
         return None
     if best_dt and created_at and abs((best_dt - created_at).days) > 400:
