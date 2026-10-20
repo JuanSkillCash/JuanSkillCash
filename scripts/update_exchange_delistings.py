@@ -19,7 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))  # para que "delistings" se importe como paquete
 
-from delistings import bitunix, bingx, okx, bitget, kucoin
+from delistings import bitunix, bingx, okx, bitget, kucoin, bybit
 from delistings.common import upsert_rows, Row
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -37,6 +37,7 @@ FETCHERS = {
     "okx": okx.fetch,
     "bitget": bitget.fetch,
     "kucoin": kucoin.fetch,
+    "bybit": bybit.fetch,
 }
 
 
