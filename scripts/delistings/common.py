@@ -260,11 +260,33 @@ _STOPWORDS = {
 }
 
 
+_PAREN_TICKER_RE = re.compile(r"\(([A-Za-z][A-Za-z0-9]{1,9})\)")
+_PAREN_EXCLUDE = {"UTC", "AM", "PM", "US", "UK", "EU", "USDT", "USDC", "USD"}
+
+
+def _paren_tickers(text: str) -> list[str]:
+    """'Game by Virtual (GAME)' / 'Alpaca Finance (ALPACA) and Hifi Finance (HIFI)': el
+    nombre largo del proyecto no es el ticker, el que va entre parentesis si. Excluye
+    fechas ('(2026-10-28)' no matchea por empezar con digito) y palabras sueltas como
+    '(UTC)' que a veces quedan en el mismo titulo."""
+    out = []
+    for m in _PAREN_TICKER_RE.finditer(text or ""):
+        tok = m.group(1).upper()
+        if tok in _PAREN_EXCLUDE or tok in _STOPWORDS:
+            continue
+        if tok not in out:
+            out.append(tok)
+    return out
+
+
 def extract_tickers(title: str) -> list[str]:
     """Saca la lista de simbolos base de un titulo de aviso. Busca el tramo entre un verbo
     de delisting ('Delist'/'Delisting of'/'Will Remove') y el primer 'on'/'from'/'for'/'['
     que le siga, y separa por comas/'and'. Si el titulo trae un symbol pegado tipo
-    'WLUSDT Perpetual Contract', le quita el sufijo USDT/USDC/USD."""
+    'WLUSDT Perpetual Contract', le quita el sufijo USDT/USDC/USD. Si el titulo no tiene
+    ninguno de esos verbos, no es un aviso de deslistado reconocible - no se inventan
+    tickers partiendo el titulo entero en palabras (eso generaba basura con anuncios de
+    otro tema, ej. suspensiones de margen, que por error terminaban en la categoria)."""
     if not title:
         return []
 
@@ -276,14 +298,27 @@ def extract_tickers(title: str) -> list[str]:
         r"(?:delist\w*(?:\s+of)?|will remove)\s+(?:the\s+)?(.*?)(?:\s+(?:on|from|for)\s|\s*\[|\s*\(|$)",
         t, re.IGNORECASE,
     )
-    segment = m.group(1) if m else t
+
+    paren_tickers = _paren_tickers(t)
+    if not m:
+        return paren_tickers
+    if paren_tickers:
+        return paren_tickers
+
+    segment = m.group(1)
+
+    # numero suelto al inicio ("8 Assets Including NoLimit, ..." -> "8" quedaba pegado al
+    # primer ticker si no se saca aparte)
+    segment = re.sub(r"^\s*\d+\s*", "", segment)
 
     # corta ruido que queda pegado al tramo capturado: sufijos de mercado/par ("Perpetual
-    # Futures Pairs", "USDT-M"), y texto de relleno ("and related services") que si no se
-    # quita deja basura como token suelto despues de separar por comas/"and"
+    # Futures Pairs", "USDT-M"), frases de relleno ("and related services", "Buy Back",
+    # "Including") que si no se quitan dejan basura como token suelto despues de separar
+    # por comas/"and"
     segment = re.sub(
         r"\b(perpetual|futures?|contracts?|pairs?|trading|market|service|services|spot|"
-        r"related|standard|usdt-m|usd1-m|other|assets?|multiple|tokens?)\b",
+        r"related|standard|usdt-m|usd1-m|other|assets?|multiple|tokens?|including|"
+        r"buys?\s+backs?)\b",
         "", segment, flags=re.IGNORECASE,
     )
 
