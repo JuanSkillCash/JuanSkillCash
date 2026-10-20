@@ -298,9 +298,17 @@ button{font-family:inherit;color:inherit}
 .session-card{
   background:#080c20;
   border:1px solid rgba(34,211,238,.22);
-  padding:9px 13px;display:flex;flex-direction:column;gap:4px
+  padding:9px 13px;display:flex;flex-direction:column;gap:4px;position:relative
 }
-.session-card-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted2)}
+.session-card-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted2);padding-right:20px}
+.session-bell-btn{
+  position:absolute;top:7px;right:7px;background:none;border:none;padding:4px;margin:0;
+  color:var(--muted);cursor:pointer;line-height:0;border-radius:7px;flex-shrink:0;
+  transition:color var(--dur-fast) var(--ease-out),background var(--dur-fast) var(--ease-out)
+}
+.session-bell-btn:hover{background:rgba(255,255,255,.07)}
+.session-bell-btn.active{color:var(--gold)}
+.session-bell-btn.active:hover{background:rgba(240,178,61,.12)}
 .session-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 1.4s infinite}
 .session-dot.open{background:var(--green);box-shadow:0 0 6px rgba(46,204,113,.6)}
 .session-dot.closed{background:var(--red);box-shadow:0 0 6px rgba(255,47,79,.5)}
@@ -2388,12 +2396,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <span id="dominanceUpdatedText">Dominancia — cargando…</span>
     </div>
 
-    <div class="market-sessions-title" style="display:flex;align-items:center;justify-content:space-between"><span><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="10" cy="10" r="7"/><line x1="3" y1="10" x2="17" y2="10"/><path d="M10 3c2.2 2 3.5 4.5 3.5 7s-1.3 5-3.5 7c-2.2-2-3.5-4.5-3.5-7s1.3-5 3.5-7z"/></svg>Sesiones de mercado</span>
-      <button id="bellToggleBtn" type="button" aria-label="Activar sonido de campana" title="Sonido al abrir/cerrar un mercado" style="background:none;border:1px solid var(--border2);border-radius:20px;padding:5px 10px 5px 8px;display:inline-flex;align-items:center;gap:6px;color:var(--muted);cursor:pointer;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out)">
-        <svg id="bellIcon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/></svg>
-        <span id="bellStatusLabel" style="font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Sonido apagado</span>
-      </button>
-    </div>
+    <div class="market-sessions-title"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="10" cy="10" r="7"/><line x1="3" y1="10" x2="17" y2="10"/><path d="M10 3c2.2 2 3.5 4.5 3.5 7s-1.3 5-3.5 7c-2.2-2-3.5-4.5-3.5-7s1.3-5 3.5-7z"/></svg>Sesiones de mercado <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">— toca la 🔔 de la que te importa</span></div>
     <div class="market-sessions-row" id="marketSessionsRow"></div>
     <div class="market-sessions-footer" id="marketSessionsFooter">Calculando tu hora local…</div>
 
@@ -23506,12 +23509,23 @@ function renderMarketSessions(){
       const card = document.createElement('div');
       card.className = 'session-card';
       card.innerHTML =
+        '<button type="button" class="session-bell-btn" id="bell-' + session.id + '" aria-label="Avisarme cuando ' + session.name + ' abra o cierre" title="Sonido solo cuando ' + session.name + ' abre o cierra">' +
+          '<svg id="bellIcon-' + session.id + '" width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/></svg>' +
+        '</button>' +
         '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span>' + session.name + '</div>' +
         '<div class="session-time" id="time-' + session.id + '">—</div>' +
         '<div class="session-time-label">Hora local</div>' +
         '<div class="session-status-row"><span class="session-status" id="status-' + session.id + '">—</span></div>' +
         '<div class="session-countdown" id="countdown-' + session.id + '">—</div>';
       row.appendChild(card);
+
+      const bellBtn = card.querySelector('#bell-' + session.id);
+      bellBtn.addEventListener('click', () => {
+        setBellEnabled(session.id, !isBellEnabled(session.id));
+        refreshBellButton(session.id);
+        if(isBellEnabled(session.id)) playBellChime(5); // probadita corta al activarla, para que sepas cómo suena
+      });
+      refreshBellButton(session.id);
     });
   }
   updateMarketSessions();
@@ -23530,41 +23544,43 @@ function formatTime12hWithSeconds(hour, minute, second){
   return h12 + ':' + String(minute).padStart(2, '0') + ':' + String(second).padStart(2, '0') + ' ' + period;
 }
 
-/* ---- campana de apertura/cierre de mercado (audio real incrustado) ---- */
-const BELL_STORAGE_KEY = 'skillcash_bell_enabled';
+/* ---- campana de apertura/cierre de mercado (audio real incrustado) ----
+   Una campana POR sesión (Asia/Europa/EE.UU.), no un interruptor único global - pedido
+   explícito: a alguien solo le importa Nueva York, no tiene sentido que le suene con
+   las otras dos. Se guardan como un objeto {tokyo:bool, london:bool, ny:bool} en una
+   sola llave de localStorage. */
+const BELL_STORAGE_KEY = 'skillcash_bell_enabled_sessions';
 const marketSessionPrevState = {}; // recuerda si cada sesión estaba abierta o cerrada en el último chequeo
 
-function isBellEnabled(){
-  try{ return localStorage.getItem(BELL_STORAGE_KEY) === '1'; } catch(err){ return false; }
+function _readBellPrefs(){
+  try{
+    const raw = localStorage.getItem(BELL_STORAGE_KEY);
+    const obj = raw ? JSON.parse(raw) : {};
+    return (obj && typeof obj === 'object') ? obj : {};
+  } catch(err){ return {}; }
 }
-function setBellEnabled(enabled){
-  try{ localStorage.setItem(BELL_STORAGE_KEY, enabled ? '1' : '0'); } catch(err){ /* sin almacenamiento */ }
+function isBellEnabled(sessionId){
+  return !!_readBellPrefs()[sessionId];
 }
-function refreshBellButton(){
-  const btn = document.getElementById('bellToggleBtn');
-  const icon = document.getElementById('bellIcon');
-  const label = document.getElementById('bellStatusLabel');
+function setBellEnabled(sessionId, enabled){
+  try{
+    const obj = _readBellPrefs();
+    obj[sessionId] = enabled;
+    localStorage.setItem(BELL_STORAGE_KEY, JSON.stringify(obj));
+  } catch(err){ /* sin almacenamiento */ }
+}
+function refreshBellButton(sessionId){
+  const btn = document.getElementById('bell-' + sessionId);
+  const icon = document.getElementById('bellIcon-' + sessionId);
   if(!btn) return;
-  const enabled = isBellEnabled();
-  btn.style.color = enabled ? 'var(--gold)' : 'var(--muted)';
-  btn.style.borderColor = enabled ? 'rgba(240,178,61,.45)' : 'var(--border2)';
-  btn.style.background = enabled ? 'rgba(240,178,61,.12)' : 'none';
-  btn.setAttribute('aria-label', enabled ? 'Desactivar sonido de campana' : 'Activar sonido de campana');
+  const enabled = isBellEnabled(sessionId);
+  btn.classList.toggle('active', enabled);
+  btn.setAttribute('aria-label', (enabled ? 'Desactivar' : 'Activar') + ' sonido para esta sesión');
   if(icon){
     icon.innerHTML = enabled
       ? '<path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/>'
       : '<path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/><line x1="2.5" y1="2.5" x2="17.5" y2="17.5"/>';
   }
-  if(label) label.textContent = enabled ? 'Sonido activado' : 'Sonido apagado';
-}
-const bellToggleBtn = document.getElementById('bellToggleBtn');
-if(bellToggleBtn){
-  bellToggleBtn.addEventListener('click', () => {
-    setBellEnabled(!isBellEnabled());
-    refreshBellButton();
-    if(isBellEnabled()) playBellChime(5); // una probadita corta al activarlo, para que sepas cómo suena
-  });
-  refreshBellButton();
 }
 
 let bellAudioCtx = null;
@@ -23641,7 +23657,7 @@ function updateMarketSessions(){
     const todayIsValid = isMarketDayOpen(session, now); // ya revisa fin de semana Y festivos de esa bolsa
     const isOpen = todayIsValid && totalSeconds >= session.openSec && totalSeconds < session.closeSec;
 
-    if(marketSessionPrevState[session.id] !== undefined && marketSessionPrevState[session.id] !== isOpen && isBellEnabled()){
+    if(marketSessionPrevState[session.id] !== undefined && marketSessionPrevState[session.id] !== isOpen && isBellEnabled(session.id)){
       playBellChime(7);
     }
     marketSessionPrevState[session.id] = isOpen;
