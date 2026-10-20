@@ -24,6 +24,7 @@ _FUTURES_CATE_ID = 37
 _NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S,
 )
+_TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.S | re.IGNORECASE)
 
 
 def _fetch_page(page: int) -> list[dict]:
@@ -34,7 +35,15 @@ def _fetch_page(page: int) -> list[dict]:
     log.info(f"[gate] pagina {page} - metodo usado: {method}")
     m = _NEXT_DATA_RE.search(html)
     if not m:
-        log.warning(f"[gate] no se encontro __NEXT_DATA__ en pagina {page}")
+        # diagnostico: no sabemos todavia por que Playwright no trae el __NEXT_DATA__ (bloqueo
+        # de bot, challenge, pagina distinta) - logueamos titulo+largo para no tener que
+        # adivinar en la proxima corrida.
+        title_m = _TITLE_RE.search(html)
+        title = title_m.group(1).strip() if title_m else "(sin <title>)"
+        log.warning(
+            f"[gate] no se encontro __NEXT_DATA__ en pagina {page} "
+            f"(titulo={title!r}, largo html={len(html)})"
+        )
         return []
     try:
         data = json.loads(m.group(1))
