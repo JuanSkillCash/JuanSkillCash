@@ -183,6 +183,15 @@ _LISTED_PERPS_RUN_RE = re.compile(
     re.IGNORECASE,
 )
 _LISTING_OF_RE = re.compile(r"[Ll]isting of\s+([A-Z0-9]{2,15})\b")
+# "KuCoin Spot to List Tokenized Stocks: AAPLX, HOODX, MSTRX and SPCXX"
+_TOKENIZED_STOCKS_RE = re.compile(
+    r"Tokenized Stocks:\s*([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*(?:,?\s*and\s+[A-Z0-9]+)?)", re.IGNORECASE,
+)
+# "Binance Adds ANTA, CBRS, DISK, FOTO, KMEM, QNT and STRC on Binance Stock Trading"
+_ADDS_STOCK_TRADING_RE = re.compile(
+    r"\bAdds\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*(?:,?\s*and\s+[A-Z0-9]+)?)\s+on\s+\w+\s+Stock Trading",
+    re.IGNORECASE,
+)
 
 
 def split_run(segment: str) -> list[str]:
@@ -240,6 +249,14 @@ def extract_tickers(title: str) -> list[str]:
     m = _LISTING_OF_RE.search(t)
     if m:
         return [_strip_quote_suffix(m.group(1))]
+
+    m = _TOKENIZED_STOCKS_RE.search(t)
+    if m:
+        return split_run(m.group(1))
+
+    m = _ADDS_STOCK_TRADING_RE.search(t)
+    if m:
+        return split_run(m.group(1))
 
     return []
 
