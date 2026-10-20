@@ -36,10 +36,15 @@ def fetch(max_pages: int = 3) -> list[Row]:
         browser = pw.chromium.launch()
         page_obj = browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
         for page in range(1, max_pages + 1):
+            # "networkidle" nunca se cumple en MEXC (trafico de fondo constante - confirmado,
+            # dio timeout de 45s sin resolver el challenge) - igual que Farside, se espera a
+            # que el selector real aparezca en vez del estado de red
             try:
-                page_obj.goto(LIST_URL_TMPL.format(page=page), wait_until="networkidle", timeout=45000)
+                page_obj.goto(LIST_URL_TMPL.format(page=page), wait_until="domcontentloaded", timeout=45000)
+                page_obj.wait_for_selector(_ITEM_SEL, timeout=20000)
             except Exception as e:
-                log.warning(f"[mexc] pagina {page} fallo: {e}")
+                log.warning(f"[mexc] pagina {page} fallo esperando el selector: {e}")
+                htmls.append(page_obj.content())  # igual se guarda lo que haya, para el volcado de diagnostico
                 break
             htmls.append(page_obj.content())
             time.sleep(0.5)
