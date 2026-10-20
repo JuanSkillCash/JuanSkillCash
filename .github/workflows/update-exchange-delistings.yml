@@ -1,0 +1,35 @@
+name: Radar de Deslistados (Bitunix, BingX, OKX, Bitget)
+
+# Cadencia horaria (igual que el "se actualiza cada hora" del dashboard de referencia que se
+# investigo para esto). Fase 1: solo los 4 exchanges de menor riesgo (API oficial o Zendesk
+# publico, sin bloqueo de IP conocido en la investigacion) - el resto se va sumando a
+# scripts/update_exchange_delistings.py a medida que cada uno se valida por separado.
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-exchange-delistings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests beautifulsoup4 python-dateutil
+
+      - name: Actualizar Radar de Deslistados
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_exchange_delistings.py
