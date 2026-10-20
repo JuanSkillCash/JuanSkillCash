@@ -24,6 +24,9 @@
 <meta name="twitter:description" content="Calculadora de trading de futuros y más recursos gratuitos para operar con criterio.">
 <meta name="twitter:image" content="https://juanskillcash.com/og-image.png">
 <link rel="icon" type="image/png" href="/logo-skillcash-600.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ff2f4f">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1681,11 +1684,29 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 .main-head h1 em,
 .hero-mascot-title .ht-tools
 { font-family:'Caveat', cursive !important; }
+
+/* Botón "Instalar App" — solo celular (pedido por Juan, igual a algotrend.gonovi.app): agrega
+   un acceso directo a la pantalla de inicio, no es una instalación real. Oculto por completo
+   arriba de 640px y hasta que el navegador dispare beforeinstallprompt. */
+#pwaInstallBtn{
+  display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;
+  align-items:center;justify-content:center;gap:8px;
+  padding:13px 18px;border:none;border-radius:14px;
+  background:var(--red);color:#fff;font-weight:700;font-size:14.5px;
+  box-shadow:0 8px 24px rgba(255,47,79,.35);
+  cursor:pointer;
+}
+#pwaInstallBtn svg{width:19px;height:19px;flex-shrink:0}
+@media(min-width:641px){ #pwaInstallBtn{ display:none !important; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
 <body data-skillcash-adn="skillcash-forge" data-origen="Charly19">
 <span aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">skillcash-huella · origen-skillcash-tools</span>
+<button type="button" id="pwaInstallBtn" aria-label="Instalar app SkillCash Tools">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+  Instalar App
+</button>
 
 <div class="app">
 
@@ -23757,6 +23778,36 @@ setInterval(updateMarketSessions, 1000);
   } else {
     init();
   }
+})();
+</script>
+<script>
+(function(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+  var btn = document.getElementById('pwaInstallBtn');
+  if(!btn) return;
+  var deferredPrompt = null;
+  function isMobile(){ return window.innerWidth <= 640; }
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    if(isMobile()) btn.style.display = 'flex';
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    btn.style.display = 'none';
+  });
+  btn.addEventListener('click', function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.finally(function(){
+      deferredPrompt = null;
+      btn.style.display = 'none';
+    });
+  });
 })();
 </script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
