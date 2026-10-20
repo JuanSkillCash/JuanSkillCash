@@ -27,13 +27,14 @@ def main():
         sys.exit(1)
 
     now_iso = datetime.now(timezone.utc).isoformat()
-    url = (
-        f"{SUPABASE_URL}/rest/v1/exchange_delistings"
-        f"?select=exchange,symbol,market,delist_at,title,source_url"
-        f"&delist_at=gte.{now_iso}&order=delist_at.asc"
-    )
+    url = f"{SUPABASE_URL}/rest/v1/exchange_delistings"
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
-    resp = requests.get(url, headers=headers, timeout=60)
+    params = {
+        "select": "exchange,symbol,market,delist_at,title,source_url",
+        "delist_at": f"gte.{now_iso}",
+        "order": "delist_at.asc",
+    }
+    resp = requests.get(url, headers=headers, params=params, timeout=60)
     if resp.status_code != 200:
         raise RuntimeError(f"Supabase respondio {resp.status_code}: {resp.text[:300]}")
     rows = resp.json()
