@@ -33,9 +33,23 @@ _SPOT_PAIRS_RE = re.compile(
     re.IGNORECASE,
 )
 _INCLUDE_VERBS_RE = re.compile(r"Launches|Will List|Will Soon Launch|Trading Pairs Will Be Launched", re.IGNORECASE)
+# "CoinW Launches CMOC(CMOC), DIS(Walt Disney), WUXIAPPTEC (WuXi AppTec)... USDT-TradFi
+# Perpetual Futures" - varios pares TICKER(Nombre), el ticker real siempre va antes del
+# parentesis (a veces pegado, a veces con espacio).
+_FUTURES_TRADFI_MULTI_RE = re.compile(r"Launches\s+(.+?)\s+USDT-TradFi Perpetual Futures", re.IGNORECASE)
+_TICKER_BEFORE_PAREN_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,14})\s*\(")
 
 
 def _extract_tickers(title: str) -> tuple[list[str], str]:
+    m = _FUTURES_TRADFI_MULTI_RE.search(title)
+    if m:
+        tickers = []
+        for t in _TICKER_BEFORE_PAREN_RE.findall(m.group(1)):
+            t = t.upper()
+            if t not in tickers:
+                tickers.append(t)
+        if tickers:
+            return tickers, "futures"
     m = _FUTURES_LAUNCH_RE.search(title)
     if m:
         return split_run(m.group(1)), "futures"

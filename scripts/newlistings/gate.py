@@ -12,9 +12,7 @@ import re
 import time
 from datetime import datetime, timezone
 
-import requests
-
-from .common import Row, DEFAULT_HEADERS, classify_asset_class_or_ticker, is_noise
+from .common import Row, classify_asset_class_or_ticker, fetch_html_with_fallback, is_noise
 
 log = logging.getLogger("newlistings.gate")
 
@@ -29,11 +27,10 @@ _NEXT_DATA_RE = re.compile(
 
 
 def _fetch_page(page: int) -> list[dict]:
-    resp = requests.get(LIST_URL_TMPL.format(page=page), headers=DEFAULT_HEADERS, timeout=30)
-    if resp.status_code != 200:
-        log.warning(f"[gate] pagina {page} respondio {resp.status_code}")
-        return []
-    m = _NEXT_DATA_RE.search(resp.text)
+    url = LIST_URL_TMPL.format(page=page)
+    html, method = fetch_html_with_fallback(url, validate=lambda h: "__NEXT_DATA__" in h)
+    log.info(f"[gate] pagina {page} - metodo usado: {method}")
+    m = _NEXT_DATA_RE.search(html)
     if not m:
         log.warning(f"[gate] no se encontro __NEXT_DATA__ en pagina {page}")
         return []

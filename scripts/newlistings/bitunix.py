@@ -19,12 +19,14 @@ BASE_URL = "https://support.bitunix.com"
 SECTION_ID = "13762037166105"
 LOCALE = "en-us"
 
-_SPOT_RE = re.compile(r"Will List\s+\w[\w\s]*?\(([A-Z0-9]{1,15})\)", re.IGNORECASE)
+_SPOT_RE = re.compile(r"Will List\s+[^()]+?\(([A-Z0-9]{1,15})\)", re.IGNORECASE)
+_GETS_LISTED_RE = re.compile(r"\(([A-Za-z0-9]{1,15})\)\s*Gets Listed on Bitunix", re.IGNORECASE)
 _FUTURES_COMMA_RE = re.compile(
     r"to Launch\s+([A-Z0-9]+(?:USDT)?(?:\s*,\s*[A-Z0-9]+(?:USDT)?)*)\s+(?:in\s+)?Perpetual Futures",
     re.IGNORECASE,
 )
 _FUTURES_SINGLE_RE = re.compile(r"to Launch\s+([A-Z0-9]{2,15})\s+Pre-IPO Perpetual Futures", re.IGNORECASE)
+_FUTURES_SLASH_RE = re.compile(r"to Launch\s+([A-Z0-9]{1,15})/(?:USDT|USDC)\s+in\s+Perpetual Futures", re.IGNORECASE)
 
 
 def _strip_quote(tok: str) -> str:
@@ -48,7 +50,13 @@ def _extract_tickers(title: str) -> tuple[list[str], str]:
     m = _SPOT_RE.search(title)
     if m:
         return [m.group(1).upper()], "spot"
+    m = _GETS_LISTED_RE.search(title)
+    if m:
+        return [m.group(1).upper()], "spot"
     m = _FUTURES_SINGLE_RE.search(title)
+    if m:
+        return [_strip_quote(m.group(1))], "futures"
+    m = _FUTURES_SLASH_RE.search(title)
     if m:
         return [_strip_quote(m.group(1))], "futures"
     m = _FUTURES_COMMA_RE.search(title)

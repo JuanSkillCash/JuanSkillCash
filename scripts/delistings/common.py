@@ -255,7 +255,7 @@ _COMMODITY_RE = re.compile(
 _INDEX_RE = re.compile(r"\bstock index\b|\bindices?\b|\bindex\b", re.IGNORECASE)
 _STOCK_RE = re.compile(
     r"\bstocks?\b|\bbstocks?\b|\bxstocks?\b|\(adr\)|tokenized securit|\bhot stock\b|\bstock perps?\b|"
-    r"\bpre-ipo\b",
+    r"\bpre-ipo\b|\btradfi\b",
     re.IGNORECASE,
 )
 

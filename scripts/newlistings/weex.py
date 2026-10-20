@@ -9,7 +9,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from .common import Row, classify_asset_class_or_ticker, fetch_html_with_fallback, is_noise, split_run
+from .common import Row, _pick_ticker, classify_asset_class_or_ticker, fetch_html_with_fallback, is_noise, split_run
 
 log = logging.getLogger("newlistings.weex")
 
@@ -20,16 +20,42 @@ SECTIONS = [
 ]
 _ARTICLE_HREF_SEL = 'a[href*="/help/articles/"]'
 
-_SPOT_PAREN_RE = re.compile(r"\(([A-Z0-9]{1,15})\)\s+now available for spot trading", re.IGNORECASE)
+# Paginas de footer (Terminos, Privacidad, etc.) que aparecen listadas junto a los avisos
+# reales en ambas secciones, y avisos "teaser" que solo anuncian una fecha sin decir el
+# ticker todavia (ese se confirma despues en un aviso aparte que si matchea algun patron de
+# abajo) - ninguno de los dos trae datos reales que extraer.
+_WEEX_NOISE_RE = re.compile(
+    r"^(?:Legal Statement|Risk Disclosure|Terms and Policies|Privacy Policy|"
+    r"Whistleblower Notice|AML/CTF Policy|Law Enforcement|VIP Program|Affiliate T&C)$"
+    r"|launch\s+USDT-M\s+(?:TradFi|Stock)\s+futures\s+on"
+    r"|will be available on WEEX soon",
+    re.IGNORECASE,
+)
+
+_SPOT_LISTING_RE = re.compile(
+    r"(?:new|initial)\s+listing:?\s+(.+?)\s*\(([^()]{1,30})\)\s+now available", re.IGNORECASE,
+)
+_WILL_LIST_PAREN_RE = re.compile(r"Will List\s+(.+?)\s*\(([^()]{1,30})\)", re.IGNORECASE)
 _FUTURES_SINGLE_RE = re.compile(r"to launch\s+([A-Z0-9]{2,15})\s+TradFi futures", re.IGNORECASE)
-_FUTURES_LIST_RE = re.compile(r"[Nn]ew listing:\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*)\s+futures", re.IGNORECASE)
+_FUTURES_STOCK_SINGLE_RE = re.compile(r"to launch\s+([A-Z0-9]{2,15})\s+stock futures", re.IGNORECASE)
+_FUTURES_LIST_RE = re.compile(
+    r"[Nn]ew listing:\s+([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*).{0,40}?\bfutures\b", re.IGNORECASE | re.DOTALL,
+)
 
 
 def _extract_tickers(title: str, market: str) -> list[str]:
     if market == "spot":
-        m = _SPOT_PAREN_RE.search(title)
-        return [m.group(1).upper()] if m else []
+        for pattern in (_SPOT_LISTING_RE, _WILL_LIST_PAREN_RE):
+            m = pattern.search(title)
+            if m:
+                picked = _pick_ticker(m.group(1), m.group(2)).upper()
+                if re.fullmatch(r"[A-Za-z0-9]{1,15}", picked):
+                    return [picked]
+        return []
     m = _FUTURES_SINGLE_RE.search(title)
+    if m:
+        return [m.group(1).upper()]
+    m = _FUTURES_STOCK_SINGLE_RE.search(title)
     if m:
         return [m.group(1).upper()]
     m = _FUTURES_LIST_RE.search(title)
@@ -64,7 +90,7 @@ def fetch(max_pages: int = 1) -> list[Row]:
 
             title = a.get_text(strip=True)
             title = re.sub(r"^Featured\s*", "", title).strip()
-            if not title or is_noise(title):
+            if not title or is_noise(title) or _WEEX_NOISE_RE.search(title):
                 continue
 
             tickers = _extract_tickers(title, market)

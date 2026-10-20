@@ -20,21 +20,91 @@ EXCHANGE = "pionex"
 LIST_URL = "https://intercom.help/pionex/en/collections/19449941-new-listings"
 _ARTICLE_HREF_SEL = 'a[href*="/en/articles/"]'
 
-_LAUNCHED_USDT_RE = re.compile(r"has Launched the\s+(\S+?)USDT\b", re.IGNORECASE)
+# Los avisos de deslistado (y algun producto no relacionado) se cuelan en la misma
+# coleccion de Intercom de "New listings" - esto es propio de como Pionex organiza su
+# centro de ayuda, no vale compartirlo con otros exchanges.
+_PIONEX_NOISE_RE = re.compile(
+    r"Will Delist|Notice of Removal of (?:Spot )?Trading Pairs|Dual Investment Upgrade",
+    re.IGNORECASE,
+)
+
+_MEME_GURU_RE = re.compile(r"MEME Guru New Coin Listing:\s*([A-Za-z0-9]{1,15})", re.IGNORECASE)
+# "Pionex has/had Launched the ..." cubre tres formas vistas en produccion:
+#   singular sufijo:  "...the ERAUSDT Margined Perpetual Futures"
+#   plural con ':':    "...the Margined Perpetual Futures: ERAUSDT 1-25x Leverage, DNAUSDT ..."
+#   prefijo USDT:      "...the USDTPEPE 1-50x Leverage Margined Perpetual Futures"
+# en los tres casos alcanza con aislar el tramo entre "Launched the" y el final/":"  y
+# tokenizar por comas - _strip_quote_any() se encarga de pelar el USDT este antes o despues.
+_LAUNCHED_TAIL_RE = re.compile(r"(?:has|had)\s+Launched the\s+(.+)$", re.IGNORECASE)
+_TRAILING_FUTURES_RE = re.compile(r"\s*Margined Perpetual Futures\b.*$", re.IGNORECASE)
 _PAREN_TICKER_RE = re.compile(r"\b([A-Za-z0-9一-鿿]{1,15})\s*\(")
-_BARE_LISTED_RE = re.compile(r"[Hh]as [Ll]isted\s+([A-Za-z0-9一-鿿]{1,15})\s*$")
+_HAS_LISTED_RE = re.compile(r"(?:[Hh]as|had)\s+[Ll]isted\s+(.+)$")
+
+_QUOTE_PREFIX_RE = re.compile(r"^(USDT|USDC|USD)([A-Z0-9]{2,15})$")
+_QUOTE_SUFFIXES = ("USDT", "USDC", "USD", "BNB", "BTC")
+
+
+def _strip_quote_any(tok: str) -> str:
+    tok = tok.upper()
+    m = _QUOTE_PREFIX_RE.match(tok)
+    if m:
+        return m.group(2)
+    for q in _QUOTE_SUFFIXES:
+        if tok.endswith(q) and len(tok) > len(q) + 1:
+            return tok[: -len(q)]
+    return tok
+
+
+def _first_token(segment: str) -> str | None:
+    m = re.match(r"\s*([A-Za-z0-9一-鿿]{1,15})", segment)
+    return m.group(1) if m else None
+
+
+def _split_ticker_run(segment: str) -> list[str]:
+    """Separa listas tipo "A, B and C" / "A, B, and C" tolerando basura al final de cada
+    parte (leverage, "Tokenized Stocks", "RWA", etc.) - solo se queda con el primer token
+    alfanumerico de cada tramo."""
+    parts = re.split(r",|\band\b", segment, flags=re.IGNORECASE)
+    out = []
+    for p in parts:
+        tok = _first_token(p)
+        if not tok:
+            continue
+        tok = _strip_quote_any(tok)
+        if tok and tok not in out:
+            out.append(tok)
+    return out
+
+
+def _launched_tickers(title: str) -> list[str]:
+    m = _LAUNCHED_TAIL_RE.search(title)
+    if not m:
+        return []
+    tail = m.group(1)
+    if ":" in tail:
+        tail = tail.split(":", 1)[1]
+    else:
+        tail = _TRAILING_FUTURES_RE.sub("", tail)
+    return _split_ticker_run(tail)
 
 
 def _extract_tickers(title: str) -> list[str]:
-    m = _LAUNCHED_USDT_RE.search(title)
+    m = _MEME_GURU_RE.search(title)
     if m:
         return [m.group(1).upper()]
+
+    tickers = _launched_tickers(title)
+    if tickers:
+        return tickers
+
     parens = [m.group(1).upper() for m in _PAREN_TICKER_RE.finditer(title)]
     if parens:
         return parens
-    m = _BARE_LISTED_RE.search(title)
+
+    m = _HAS_LISTED_RE.search(title)
     if m:
-        return [m.group(1).upper()]
+        return _split_ticker_run(m.group(1))
+
     return []
 
 
@@ -53,7 +123,7 @@ def fetch(max_pages: int = 1) -> list[Row]:
     for a in links:
         title = a.get_text(strip=True)
         href = a.get("href", "")
-        if not href or not title or is_noise(title):
+        if not href or not title or is_noise(title) or _PIONEX_NOISE_RE.search(title):
             continue
         url = href if href.startswith("http") else "https://intercom.help" + href
         if url in seen_urls:

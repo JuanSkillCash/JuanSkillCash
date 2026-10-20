@@ -33,6 +33,22 @@ def _parse_date_gmt(s: str) -> datetime | None:
         return None
 
 
+def _get_with_retries(params: dict, max_retries: int = 3):
+    resp = None
+    for attempt in range(max_retries):
+        resp = requests.get(LIST_URL, params=params, headers=DEFAULT_HEADERS, timeout=30)
+        if resp.status_code != 429:
+            return resp
+        wait = resp.headers.get("Retry-After")
+        try:
+            wait = float(wait)
+        except (TypeError, ValueError):
+            wait = 2 ** (attempt + 2)  # 4s, 8s, 16s
+        log.warning(f"[kraken] 429, esperando {wait}s antes de reintentar (intento {attempt + 1}/{max_retries})")
+        time.sleep(wait)
+    return resp
+
+
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
     for page in range(1, max_pages + 1):
@@ -40,7 +56,7 @@ def fetch(max_pages: int = 3) -> list[Row]:
             "categories": CATEGORY_ID, "per_page": 50, "page": page,
             "_fields": "date_gmt,title,link",
         }
-        resp = requests.get(LIST_URL, params=params, headers=DEFAULT_HEADERS, timeout=30)
+        resp = _get_with_retries(params)
         if resp.status_code != 200:
             log.warning(f"[kraken] pagina {page} respondio {resp.status_code}: {resp.text[:300]}")
             break

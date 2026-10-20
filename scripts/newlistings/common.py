@@ -329,6 +329,9 @@ _NOISE_PATTERNS = [
     re.compile(r"pre-market trading", re.IGNORECASE),
     re.compile(r"\bupcoming listing\b", re.IGNORECASE),
     re.compile(r"vip (trip|night)|blockchain week|token2049|after-?party", re.IGNORECASE),
+    re.compile(r"\d+\s+New\s+(?:USDC-M|Coin-M|USDT-M)\s+Perpetual Futures Trading Pairs", re.IGNORECASE),
+    re.compile(r"Perpetual Futures Trading Is Now Live on", re.IGNORECASE),
+    re.compile(r"\bCFD Trading Pairs\b", re.IGNORECASE),
 ]
 
 

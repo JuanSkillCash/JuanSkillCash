@@ -24,8 +24,9 @@ SECTIONS = [
 
 _NEXT_DATA_RE = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
 _FUTURES_LIST_RE = re.compile(r"to List\s+(.*?)\s*:", re.IGNORECASE)
+_FUTURES_PREIPO_PREFIX_RE = re.compile(r"^([A-Z0-9]{1,15})USDT\s+Pre-IPO", re.IGNORECASE)
 _SPOT_RE = re.compile(
-    r"to List\s+([A-Z0-9]{1,15})/(?:USDT|USD|USDC)\s+for Spot Trading\s*(?:\((\d{4})-(\d{1,2})-(\d{1,2})\))?",
+    r"to List\s+([A-Z0-9]{1,15})/(?:USDT|USD|USDC)\s+for (?:xStocks\s+)?Spot Trading\s*(?:\((\d{4})-(\d{1,2})-(\d{1,2})\))?",
     re.IGNORECASE,
 )
 
@@ -77,7 +78,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
 
                 if market == "futures":
                     m = _FUTURES_LIST_RE.search(title)
-                    tickers = split_run(m.group(1)) if m else []
+                    if m:
+                        tickers = split_run(m.group(1))
+                    else:
+                        m2 = _FUTURES_PREIPO_PREFIX_RE.search(title)
+                        tickers = [m2.group(1).upper()] if m2 else []
                     listed_at = None
                 else:
                     m = _SPOT_RE.search(title)
