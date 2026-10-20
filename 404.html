@@ -1589,13 +1589,34 @@ img[src=""]{display:none}
 .delist-ex-card:hover{transform:translateY(-2px)}
 .delist-ex-card.active{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
 .delist-ex-card:not(.active){opacity:.38}
+.delist-ex-card.empty{opacity:.3;cursor:default;pointer-events:none}
+.delist-ex-card.empty .delist-ex-dot{background:var(--muted);box-shadow:none}
 .delist-ex-dot{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 7px var(--c)}
 .delist-ex-name{font-size:11px;font-weight:700;color:var(--white);white-space:nowrap}
 .delist-ex-count{font-family:'Space Mono',monospace;font-size:17px;font-weight:900;color:var(--c)}
+.delist-ex-card.empty .delist-ex-count{color:var(--muted);font-size:10px}
 .delist-ex-count-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 .delist-ex-toolbar{display:flex;justify-content:flex-end;gap:10px;margin:-10px 0 10px;font-family:'Space Mono',monospace;font-size:10.5px}
 .delist-ex-toolbar button{background:none;border:none;color:var(--muted2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:2px}
 .delist-ex-toolbar button:hover{color:var(--white)}
+
+.radar-tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:0}
+.radar-tab{appearance:none;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;background:none;border:none;color:var(--muted);padding:8px 4px;cursor:pointer;position:relative;transition:color var(--dur-fast) var(--ease-out)}
+.radar-tab:hover{color:var(--muted2)}
+.radar-tab.active{color:var(--white)}
+.radar-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold);border-radius:2px}
+.radar-tab + .radar-tab{margin-left:8px}
+
+.radar-asset-filter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.radar-asset-chip{
+  appearance:none;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted2);border-radius:20px;
+  padding:6px 13px;cursor:pointer;transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),background var(--dur-fast) var(--ease-out)
+}
+.radar-asset-chip:hover{color:var(--white)}
+.radar-asset-chip.active{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)}
+
+.delist-row-asset{font-size:11px;flex-shrink:0;line-height:1}
 
 .delist-list{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:4px;margin:-4px -4px 0 0}
 .delist-row{
@@ -1926,6 +1947,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item" data-indic-jump="delistradar">
         <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
       </button>
+      <button class="sb-item" data-indic-jump="newlistradar">
+        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de Nuevos Listados</span>
+      </button>
       <button class="sb-item" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
       </button>
@@ -2233,6 +2257,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="delistradar">
         <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
+      </button>
+      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="newlistradar">
+        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de Nuevos Listados</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
@@ -4476,6 +4503,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
 
                 <div id="delistRadarWrap" style="display:none">
+                  <div class="radar-tabs" id="delistRadarTabs">
+                    <button type="button" class="radar-tab active" data-tab="upcoming">Próximos</button>
+                    <button type="button" class="radar-tab" data-tab="history">Historial</button>
+                  </div>
+                  <div class="radar-asset-filter" id="delistRadarAssetFilter">
+                    <button type="button" class="radar-asset-chip active" data-asset="all">Todos</button>
+                    <button type="button" class="radar-asset-chip" data-asset="crypto">Cripto</button>
+                    <button type="button" class="radar-asset-chip" data-asset="stock">Acciones</button>
+                    <button type="button" class="radar-asset-chip" data-asset="index">Índices</button>
+                    <button type="button" class="radar-asset-chip" data-asset="commodity">Commodities</button>
+                  </div>
                   <div class="delist-hero" id="delistRadarHero"></div>
                   <div class="delist-exchange-grid" id="delistRadarExchanges"></div>
                   <div class="delist-ex-toolbar">
@@ -4495,6 +4533,61 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 📅 La fecha es la de <b>cese de trading spot</b> (no de futuros, ni de depósitos/retiros, que suelen tener fechas distintas) cuando el aviso lo distingue.<br>
                 🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
                 <strong>Un aviso de deslistado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="indic-panel" data-indic="newlistradar" style="display:none">
+          <div class="indic-chart-card">
+            <div class="calc">
+              <div class="calc-head" style="padding-bottom:8px;margin-bottom:14px">
+                <div class="calc-eyebrow">
+                  <img src="/logo-skillcash-600.png" alt="SkillCash">
+                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+                </div>
+                <h2 class="calc-title" style="margin-bottom:2px">🆕 Radar de Nuevos Listados</h2>
+              </div>
+
+              <div class="indic-chart-body" id="newListRadarBody">
+                <div class="indic-chart-soon" id="newListRadarLoading">
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
+                  <div class="indic-placeholder-title">Cargando nuevos listados…</div>
+                  <div class="indic-placeholder-text">Consultando BingX, OKX, Bitget, KuCoin, Binance y MEXC.</div>
+                </div>
+                <div class="indic-chart-soon" id="newListRadarError" style="display:none">
+                  <div class="indic-placeholder-icon">⚠️</div>
+                  <div class="indic-placeholder-title">No se pudo cargar el dato</div>
+                  <div class="indic-placeholder-text">Revisa tu conexión e intenta de nuevo en unos segundos.</div>
+                </div>
+
+                <div id="newListRadarWrap" style="display:none">
+                  <div class="radar-asset-filter" id="newListRadarAssetFilter">
+                    <button type="button" class="radar-asset-chip active" data-asset="all">Todos</button>
+                    <button type="button" class="radar-asset-chip" data-asset="crypto">Cripto</button>
+                    <button type="button" class="radar-asset-chip" data-asset="stock">Acciones</button>
+                    <button type="button" class="radar-asset-chip" data-asset="index">Índices</button>
+                    <button type="button" class="radar-asset-chip" data-asset="commodity">Commodities</button>
+                  </div>
+                  <div class="delist-hero" id="newListRadarHero"></div>
+                  <div class="delist-exchange-grid" id="newListRadarExchanges"></div>
+                  <div class="delist-ex-toolbar">
+                    <button type="button" id="newListRadarSelectAll">Todos</button>
+                    <button type="button" id="newListRadarSelectNone">Ninguno</button>
+                  </div>
+                  <div class="delist-list" id="newListRadarList"></div>
+                  <div class="indic-chart-soon" id="newListRadarEmpty" style="display:none">
+                    <div class="indic-placeholder-icon">🔍</div>
+                    <div class="indic-placeholder-title">No hay nuevos listados para lo que elegiste</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="calc-disclaimer" style="margin-top:18px">
+                🆕 Avisos <b>reales</b> de nuevo listado (cripto, y también acciones/índices/oro cuando el exchange los lista en futuros perpetuos, estilo xStock/bStocks) recolectados cada hora directo del centro de anuncios público de cada uno: <b>BingX, OKX, Bitget, KuCoin, Binance y MEXC</b>. Bitunix y Kraken no tienen una categoría propia de nuevos listados confiable, por eso no están.<br>
+                📈📊🥇 Usa el filtro para ver solo acciones, índices u oro/commodities tokenizados — lo que no tiene ícono es cripto normal.<br>
+                🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
+                <strong>Un aviso de nuevo listado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -8222,7 +8315,7 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }, { id: 'epochpl', label: '% Supply en Pérdida por Época' }],
   ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
-  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'delistradar', label: 'Radar de Deslistados' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
+  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'delistradar', label: 'Radar de Deslistados' }, { id: 'newlistradar', label: 'Radar de Nuevos Listados' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
   mineria: [],
   macro: [
@@ -8260,7 +8353,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', newlistradar: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -8402,6 +8495,7 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'longshort') ensureLongShortLoaded();
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
       if(btn.dataset.indic === 'delistradar') ensureDelistRadarLoaded();
+      if(btn.dataset.indic === 'newlistradar') ensureNewListRadarLoaded();
       if(btn.dataset.indic === 'tvchart') ensureTvChartLoaded();
       if(btn.dataset.indic === 'econcalendar') ensureTvCalendarLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
@@ -8463,6 +8557,7 @@ function jumpToIndicator(id){
     if(id === 'longshort') ensureLongShortLoaded();
     if(id === 'optionsoi') ensureOptionsOiLoaded();
     if(id === 'delistradar') ensureDelistRadarLoaded();
+    if(id === 'newlistradar') ensureNewListRadarLoaded();
     if(id === 'tvchart') ensureTvChartLoaded();
     if(id === 'econcalendar') ensureTvCalendarLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
@@ -20957,7 +21052,8 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'cbpremium', icon: '🏦', label: 'Coinbase Premium', def: 'La diferencia de precio de BTC entre Coinbase (EEUU) y Binance. Positivo y alto = instituciones/EEUU comprando fuerte. Negativo = vendiendo o poca demanda institucional.' },
   { id: 'longshort', icon: '⚖️', label: 'Ratio Largo/Corto', def: 'Cuántos traders apuestan a que sube (largo) contra cuántos a que baja (corto) en futuros. Lecturas muy extremas en cualquier dirección suelen ser señal de un mercado "sobre-apalancado", con riesgo de liquidaciones en cadena.' },
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
-  { id: 'delistradar', icon: '🚨', label: 'Radar de Deslistados', def: 'Avisos reales de deslistado (cuándo una moneda deja de poderse comprar/vender) de 8 exchanges, con cuenta regresiva y filtro por exchange — para enterarte antes de que te agarre con la guardia baja.' },
+  { id: 'delistradar', icon: '🚨', label: 'Radar de Deslistados', def: 'Avisos reales de deslistado (cuándo una moneda deja de poderse comprar/vender) de 8 exchanges, con cuenta regresiva, historial y filtro por exchange y tipo de activo — para enterarte antes de que te agarre con la guardia baja.' },
+  { id: 'newlistradar', icon: '🆕', label: 'Radar de Nuevos Listados', def: 'Avisos reales de nuevo listado (cripto, y también acciones/índices/oro cuando el exchange los lista en futuros perpetuos) de 6 exchanges, con filtro por exchange y tipo de activo.' },
   { id: 'tvchart', icon: '🕯️', label: 'Gráfico Avanzado', def: 'Gráfico de velas en vivo con indicadores técnicos reales, cambio de símbolo libre y herramientas de dibujo — un gráfico de trading de verdad, no un modelo propio.' },
 ];
 // las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
@@ -23014,9 +23110,15 @@ const DELIST_EXCHANGES = [
 ];
 const DELIST_EX_BY_ID = Object.fromEntries(DELIST_EXCHANGES.map(e => [e.id, e]));
 
+const ASSET_CLASS_ICON = { stock: '📈', index: '📊', commodity: '🥇' };
+
 let delistRadarLoadedOnce = false;
-let delistRadarRows = [];              // filas "upcoming" ya ordenadas por fecha, tal como llegaron de Supabase
+let delistRadarUpcoming = [];          // filas con delist_at futuro, ascendente
+let delistRadarHistory = null;         // filas con delist_at pasado, descendente — null hasta pedir la pestaña (lazy)
+let delistRadarHistoryLoading = false;
 let delistRadarActiveExchanges = null; // Set<string> — null hasta el primer load (ahi se llena con "todos los que trajeron datos")
+let delistRadarTab = 'upcoming';       // 'upcoming' | 'history'
+let delistRadarAssetClass = 'all';     // 'all' | 'crypto' | 'stock' | 'index' | 'commodity'
 
 function formatDelistCountdown(targetDate){
   const ms = targetDate.getTime() - Date.now();
@@ -23031,6 +23133,18 @@ function formatDelistCountdown(targetDate){
   return String(mins).padStart(2, '0') + 'm ' + String(secs).padStart(2, '0') + 's';
 }
 
+function formatElapsedSince(pastDate){
+  const ms = Date.now() - pastDate.getTime();
+  if(ms <= 0) return 'Recién';
+  const totalSec = Math.floor(ms / 1000);
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  if(days > 0) return 'hace ' + days + 'd';
+  if(hours > 0) return 'hace ' + hours + 'h';
+  return 'hace ' + Math.max(mins, 1) + 'm';
+}
+
 async function loadDelistRadar(){
   const loadingEl = document.getElementById('delistRadarLoading');
   const errorEl = document.getElementById('delistRadarError');
@@ -23042,14 +23156,14 @@ async function loadDelistRadar(){
     const nowIso = new Date().toISOString();
     const { data, error } = await sbClient
       .from('exchange_delistings')
-      .select('exchange,symbol,pair_base,market,delist_at,title,source_url')
+      .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
       .gte('delist_at', nowIso)
       .order('delist_at', { ascending: true })
       .limit(500);
     if(error) throw error;
-    delistRadarRows = data || [];
+    delistRadarUpcoming = data || [];
     if(!delistRadarActiveExchanges){
-      delistRadarActiveExchanges = new Set([...new Set(delistRadarRows.map(r => r.exchange))]);
+      delistRadarActiveExchanges = new Set([...new Set(delistRadarUpcoming.map(r => r.exchange))]);
     }
     loadingEl.style.display = 'none';
     wrapEl.style.display = 'block';
@@ -23061,20 +23175,55 @@ async function loadDelistRadar(){
   }
 }
 
+async function loadDelistHistoryIfNeeded(){
+  if(delistRadarHistory !== null || delistRadarHistoryLoading) return;
+  delistRadarHistoryLoading = true;
+  try{
+    const nowIso = new Date().toISOString();
+    const { data, error } = await sbClient
+      .from('exchange_delistings')
+      .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
+      .lt('delist_at', nowIso)
+      .order('delist_at', { ascending: false })
+      .limit(300);
+    if(error) throw error;
+    delistRadarHistory = data || [];
+  } catch(err){
+    delistRadarHistory = [];
+  }
+  // un exchange que solo aparece en el historial (nunca tuvo algo "próximo") nunca tuvo
+  // oportunidad de entrar al set de activos - sin esto, su tarjeta se veria "apagada" y
+  // la lista parece vacia aunque si haya datos
+  delistRadarHistory.forEach(r => delistRadarActiveExchanges.add(r.exchange));
+  delistRadarHistoryLoading = false;
+}
+
+function delistCurrentRows(){
+  return delistRadarTab === 'history' ? (delistRadarHistory || []) : delistRadarUpcoming;
+}
+
+function delistAssetMatches(r){
+  return delistRadarAssetClass === 'all' || r.asset_class === delistRadarAssetClass;
+}
+
 function renderDelistExchangeCards(){
   const grid = document.getElementById('delistRadarExchanges');
+  const rows = delistCurrentRows().filter(delistAssetMatches);
   const countsByEx = {};
-  delistRadarRows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
-  const present = DELIST_EXCHANGES.filter(ex => countsByEx[ex.id] > 0);
-  grid.innerHTML = present.map(ex =>
-    '<button type="button" class="delist-ex-card' + (delistRadarActiveExchanges.has(ex.id) ? ' active' : '') + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '">' +
+  rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
+  const countLabel = delistRadarTab === 'history' ? 'Recientes' : 'Próximos';
+  grid.innerHTML = DELIST_EXCHANGES.map(ex => {
+    const n = countsByEx[ex.id] || 0;
+    const isEmpty = n === 0;
+    const isActive = delistRadarActiveExchanges.has(ex.id);
+    return '<button type="button" class="delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '">' +
       '<span class="delist-ex-dot"></span>' +
       '<span class="delist-ex-name">' + ex.label + '</span>' +
-      '<span class="delist-ex-count">' + countsByEx[ex.id] + '</span>' +
-      '<span class="delist-ex-count-label">Próximos</span>' +
-    '</button>'
-  ).join('');
-  grid.querySelectorAll('.delist-ex-card').forEach(card => {
+      '<span class="delist-ex-count">' + (isEmpty ? 'Sin ' + countLabel.toLowerCase() : n) + '</span>' +
+      (isEmpty ? '' : '<span class="delist-ex-count-label">' + countLabel + '</span>') +
+    '</button>';
+  }).join('');
+  grid.querySelectorAll('.delist-ex-card:not(.empty)').forEach(card => {
     card.addEventListener('click', () => {
       const id = card.dataset.ex;
       if(delistRadarActiveExchanges.has(id)) delistRadarActiveExchanges.delete(id);
@@ -23089,12 +23238,17 @@ function renderDelistList(){
   const listEl = document.getElementById('delistRadarList');
   const heroEl = document.getElementById('delistRadarHero');
   const emptyEl = document.getElementById('delistRadarEmpty');
-  const filtered = delistRadarRows.filter(r => delistRadarActiveExchanges.has(r.exchange));
+  const isHistory = delistRadarTab === 'history';
+  const filtered = delistCurrentRows().filter(r => delistRadarActiveExchanges.has(r.exchange) && delistAssetMatches(r));
 
   if(filtered.length === 0){
     heroEl.style.display = 'none';
+    heroEl.innerHTML = '';
     listEl.style.display = 'none';
+    listEl.innerHTML = '';
     emptyEl.style.display = 'flex';
+    emptyEl.querySelector('.indic-placeholder-title').textContent =
+      isHistory ? 'No hay historial para lo que elegiste' : 'No hay deslistados próximos en los exchanges que elegiste';
     return;
   }
   emptyEl.style.display = 'none';
@@ -23104,16 +23258,16 @@ function renderDelistList(){
   const next = filtered[0];
   const nextEx = DELIST_EX_BY_ID[next.exchange];
   heroEl.innerHTML =
-    '<div class="delist-hero-icon">⏰</div>' +
+    '<div class="delist-hero-icon">' + (isHistory ? '🗂️' : '⏰') + '</div>' +
     '<div class="delist-hero-mid">' +
-      '<div class="delist-hero-label">El más próximo</div>' +
+      '<div class="delist-hero-label">' + (isHistory ? 'El más reciente' : 'El más próximo') + '</div>' +
       '<div class="delist-hero-coin">' + next.pair_base + '</div>' +
       '<div class="delist-hero-ex" style="color:' + (nextEx ? nextEx.color : 'inherit') + '">' + (nextEx ? nextEx.label : next.exchange) + '</div>' +
     '</div>' +
-    '<div class="delist-hero-countdown">' +
-      '<div class="delist-hero-countdown-val" data-countdown="' + next.delist_at + '">' + formatDelistCountdown(new Date(next.delist_at)) + '</div>' +
-      '<div class="delist-hero-countdown-label">Cuenta regresiva</div>' +
-    '</div>';
+    (isHistory
+      ? '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" style="color:var(--muted2)">' + formatElapsedSince(new Date(next.delist_at)) + '</div><div class="delist-hero-countdown-label">Ya deslistado</div></div>'
+      : '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" data-countdown="' + next.delist_at + '">' + formatDelistCountdown(new Date(next.delist_at)) + '</div><div class="delist-hero-countdown-label">Cuenta regresiva</div></div>'
+    );
 
   listEl.innerHTML = filtered.map(r => {
     const ex = DELIST_EX_BY_ID[r.exchange];
@@ -23122,13 +23276,18 @@ function renderDelistList(){
     const dt = new Date(r.delist_at);
     const dateStr = dt.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const marketLabel = r.market === 'futures' ? 'Futuros' : 'Spot';
+    const assetIcon = ASSET_CLASS_ICON[r.asset_class] || '';
+    const countdownHtml = isHistory
+      ? '<div class="delist-row-countdown-val" style="color:var(--muted)">' + formatElapsedSince(dt) + '</div>'
+      : '<div class="delist-row-countdown-val" data-countdown="' + r.delist_at + '">' + formatDelistCountdown(dt) + '</div>';
     return (
       '<a class="delist-row" href="' + (r.source_url || '#') + '" target="_blank" rel="noopener noreferrer">' +
+        (assetIcon ? '<div class="delist-row-asset" title="' + r.asset_class + '">' + assetIcon + '</div>' : '') +
         '<div class="delist-row-coin">' + r.pair_base + '</div>' +
         '<div class="delist-row-ex" style="--c:' + exColor + '">' + exLabel + '</div>' +
         '<div class="delist-row-market">' + marketLabel + '</div>' +
         '<div class="delist-row-mid"><div class="delist-row-date">' + dateStr + '</div></div>' +
-        '<div class="delist-row-countdown"><div class="delist-row-countdown-val" data-countdown="' + r.delist_at + '">' + formatDelistCountdown(dt) + '</div></div>' +
+        '<div class="delist-row-countdown">' + countdownHtml + '</div>' +
         '<div class="delist-row-link"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5h7v7"/><path d="M15 5L5 15"/></svg></div>' +
       '</a>'
     );
@@ -23136,7 +23295,10 @@ function renderDelistList(){
 }
 
 function tickDelistCountdowns(){
-  document.querySelectorAll('#delistRadarHero [data-countdown], #delistRadarList [data-countdown]').forEach(el => {
+  document.querySelectorAll(
+    '#delistRadarHero [data-countdown], #delistRadarList [data-countdown], ' +
+    '#newListRadarHero [data-countdown], #newListRadarList [data-countdown]'
+  ).forEach(el => {
     const target = new Date(el.dataset.countdown);
     const label = formatDelistCountdown(target);
     el.textContent = label;
@@ -23151,13 +23313,198 @@ function ensureDelistRadarLoaded(){
   loadDelistRadar();
   document.getElementById('delistRadarSelectAll').addEventListener('click', () => {
     delistRadarActiveExchanges = new Set(DELIST_EXCHANGES.map(ex => ex.id));
-    document.querySelectorAll('#delistRadarExchanges .delist-ex-card').forEach(c => c.classList.add('active'));
+    renderDelistExchangeCards();
     renderDelistList();
   });
   document.getElementById('delistRadarSelectNone').addEventListener('click', () => {
     delistRadarActiveExchanges = new Set();
-    document.querySelectorAll('#delistRadarExchanges .delist-ex-card').forEach(c => c.classList.remove('active'));
+    renderDelistExchangeCards();
     renderDelistList();
+  });
+  document.getElementById('delistRadarTabs').querySelectorAll('.radar-tab').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      if(tab.dataset.tab === delistRadarTab) return;
+      delistRadarTab = tab.dataset.tab;
+      document.getElementById('delistRadarTabs').querySelectorAll('.radar-tab').forEach(t => t.classList.toggle('active', t === tab));
+      if(delistRadarTab === 'history'){
+        document.getElementById('delistRadarLoading').style.display = 'flex';
+        document.getElementById('delistRadarWrap').style.display = 'none';
+        await loadDelistHistoryIfNeeded();
+        document.getElementById('delistRadarLoading').style.display = 'none';
+        document.getElementById('delistRadarWrap').style.display = 'block';
+      }
+      renderDelistExchangeCards();
+      renderDelistList();
+    });
+  });
+  document.getElementById('delistRadarAssetFilter').querySelectorAll('.radar-asset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      delistRadarAssetClass = chip.dataset.asset;
+      document.getElementById('delistRadarAssetFilter').querySelectorAll('.radar-asset-chip').forEach(c => c.classList.toggle('active', c === chip));
+      renderDelistExchangeCards();
+      renderDelistList();
+    });
+  });
+}
+
+/* ---- Radar de Nuevos Listados: mismo lenguaje visual que el Radar de Deslistados, pero sin
+   cuenta regresiva central (la mayoria de los avisos ya estan "live" al anunciarse) - el hero y
+   la lista muestran "hace Xh" desde el anuncio, salvo que el aviso traiga una fecha de inicio
+   futura (listed_at), caso en el que sí se usa cuenta regresiva real. */
+const NEWLIST_EXCHANGES = [
+  { id: 'bingx',    label: 'BingX',    color: '#2f6bff' },
+  { id: 'okx',      label: 'OKX',      color: '#b9bdc7' },
+  { id: 'bitget',   label: 'Bitget',   color: '#00d4b5' },
+  { id: 'kucoin',   label: 'KuCoin',   color: '#2ecc71' },
+  { id: 'binance',  label: 'Binance',  color: '#f0b90b' },
+  { id: 'mexc',     label: 'MEXC',     color: '#4d7cfe' },
+];
+const NEWLIST_EX_BY_ID = Object.fromEntries(NEWLIST_EXCHANGES.map(e => [e.id, e]));
+
+let newListRadarLoadedOnce = false;
+let newListRadarRows = [];
+let newListRadarActiveExchanges = null;
+let newListRadarAssetClass = 'all';
+
+async function loadNewListRadar(){
+  const loadingEl = document.getElementById('newListRadarLoading');
+  const errorEl = document.getElementById('newListRadarError');
+  const wrapEl = document.getElementById('newListRadarWrap');
+  loadingEl.style.display = 'flex';
+  errorEl.style.display = 'none';
+  wrapEl.style.display = 'none';
+  try{
+    const { data, error } = await sbClient
+      .from('exchange_new_listings')
+      .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
+      .order('announced_at', { ascending: false, nullsFirst: false })
+      .limit(500);
+    if(error) throw error;
+    newListRadarRows = data || [];
+    if(!newListRadarActiveExchanges){
+      newListRadarActiveExchanges = new Set([...new Set(newListRadarRows.map(r => r.exchange))]);
+    }
+    loadingEl.style.display = 'none';
+    wrapEl.style.display = 'block';
+    renderNewListExchangeCards();
+    renderNewListList();
+  } catch(err){
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+  }
+}
+
+function newListAssetMatches(r){
+  return newListRadarAssetClass === 'all' || r.asset_class === newListRadarAssetClass;
+}
+
+function renderNewListExchangeCards(){
+  const grid = document.getElementById('newListRadarExchanges');
+  const rows = newListRadarRows.filter(newListAssetMatches);
+  const countsByEx = {};
+  rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
+  grid.innerHTML = NEWLIST_EXCHANGES.map(ex => {
+    const n = countsByEx[ex.id] || 0;
+    const isEmpty = n === 0;
+    const isActive = newListRadarActiveExchanges.has(ex.id);
+    return '<button type="button" class="delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '">' +
+      '<span class="delist-ex-dot"></span>' +
+      '<span class="delist-ex-name">' + ex.label + '</span>' +
+      '<span class="delist-ex-count">' + (isEmpty ? 'Sin recientes' : n) + '</span>' +
+      (isEmpty ? '' : '<span class="delist-ex-count-label">Recientes</span>') +
+    '</button>';
+  }).join('');
+  grid.querySelectorAll('.delist-ex-card:not(.empty)').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.ex;
+      if(newListRadarActiveExchanges.has(id)) newListRadarActiveExchanges.delete(id);
+      else newListRadarActiveExchanges.add(id);
+      card.classList.toggle('active');
+      renderNewListList();
+    });
+  });
+}
+
+function renderNewListList(){
+  const listEl = document.getElementById('newListRadarList');
+  const heroEl = document.getElementById('newListRadarHero');
+  const emptyEl = document.getElementById('newListRadarEmpty');
+  const filtered = newListRadarRows.filter(r => newListRadarActiveExchanges.has(r.exchange) && newListAssetMatches(r));
+
+  if(filtered.length === 0){
+    heroEl.style.display = 'none';
+    heroEl.innerHTML = '';
+    listEl.style.display = 'none';
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.style.display = 'flex';
+  heroEl.style.display = 'flex';
+
+  const next = filtered[0];
+  const nextEx = NEWLIST_EX_BY_ID[next.exchange];
+  const nextIsFuture = next.listed_at && new Date(next.listed_at).getTime() > Date.now();
+  heroEl.innerHTML =
+    '<div class="delist-hero-icon">🆕</div>' +
+    '<div class="delist-hero-mid">' +
+      '<div class="delist-hero-label">Lo más reciente</div>' +
+      '<div class="delist-hero-coin">' + next.pair_base + '</div>' +
+      '<div class="delist-hero-ex" style="color:' + (nextEx ? nextEx.color : 'inherit') + '">' + (nextEx ? nextEx.label : next.exchange) + '</div>' +
+    '</div>' +
+    (nextIsFuture
+      ? '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" data-countdown="' + next.listed_at + '">' + formatDelistCountdown(new Date(next.listed_at)) + '</div><div class="delist-hero-countdown-label">Empieza a operar en</div></div>'
+      : '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" style="color:var(--green)">' + (next.announced_at ? formatElapsedSince(new Date(next.announced_at)) : 'Disponible') + '</div><div class="delist-hero-countdown-label">Ya disponible</div></div>'
+    );
+
+  listEl.innerHTML = filtered.map(r => {
+    const ex = NEWLIST_EX_BY_ID[r.exchange];
+    const exLabel = ex ? ex.label : r.exchange;
+    const exColor = ex ? ex.color : '#8890ac';
+    const isFuture = r.listed_at && new Date(r.listed_at).getTime() > Date.now();
+    const dt = r.announced_at ? new Date(r.announced_at) : null;
+    const dateStr = dt ? dt.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+    const marketLabel = r.market === 'futures' ? 'Futuros' : 'Spot';
+    const assetIcon = ASSET_CLASS_ICON[r.asset_class] || '';
+    const countdownHtml = isFuture
+      ? '<div class="delist-row-countdown-val" data-countdown="' + r.listed_at + '">' + formatDelistCountdown(new Date(r.listed_at)) + '</div>'
+      : '<div class="delist-row-countdown-val" style="color:var(--green)">' + (dt ? formatElapsedSince(dt) : 'Disponible') + '</div>';
+    return (
+      '<a class="delist-row" href="' + (r.source_url || '#') + '" target="_blank" rel="noopener noreferrer">' +
+        (assetIcon ? '<div class="delist-row-asset" title="' + r.asset_class + '">' + assetIcon + '</div>' : '') +
+        '<div class="delist-row-coin">' + r.pair_base + '</div>' +
+        '<div class="delist-row-ex" style="--c:' + exColor + '">' + exLabel + '</div>' +
+        '<div class="delist-row-market">' + marketLabel + '</div>' +
+        '<div class="delist-row-mid"><div class="delist-row-date">' + dateStr + '</div></div>' +
+        '<div class="delist-row-countdown">' + countdownHtml + '</div>' +
+        '<div class="delist-row-link"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5h7v7"/><path d="M15 5L5 15"/></svg></div>' +
+      '</a>'
+    );
+  }).join('');
+}
+
+function ensureNewListRadarLoaded(){
+  if(newListRadarLoadedOnce) return;
+  newListRadarLoadedOnce = true;
+  loadNewListRadar();
+  document.getElementById('newListRadarSelectAll').addEventListener('click', () => {
+    newListRadarActiveExchanges = new Set(NEWLIST_EXCHANGES.map(ex => ex.id));
+    renderNewListExchangeCards();
+    renderNewListList();
+  });
+  document.getElementById('newListRadarSelectNone').addEventListener('click', () => {
+    newListRadarActiveExchanges = new Set();
+    renderNewListExchangeCards();
+    renderNewListList();
+  });
+  document.getElementById('newListRadarAssetFilter').querySelectorAll('.radar-asset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      newListRadarAssetClass = chip.dataset.asset;
+      document.getElementById('newListRadarAssetFilter').querySelectorAll('.radar-asset-chip').forEach(c => c.classList.toggle('active', c === chip));
+      renderNewListExchangeCards();
+      renderNewListList();
+    });
   });
 }
 
