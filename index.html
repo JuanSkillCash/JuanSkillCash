@@ -380,6 +380,9 @@ button{font-family:inherit;color:inherit}
 .watchlist-item .wli-remove{margin-left:auto}
 .wl-pending{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px}
 .wl-pending select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:8px;color:var(--white);font-size:12.5px;margin:8px 0}
+.wl-ex-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wl-ex-chip{padding:7px 12px;border-radius:20px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--muted2);font-size:11.5px;font-weight:700;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.wl-ex-chip.active{background:rgba(255,47,79,.14);border-color:var(--red);color:var(--white)}
 
 /* TOOL GRID */
 .tool-section{margin-bottom:28px}
@@ -24770,25 +24773,43 @@ function initWatchlistWidget(cfg){
     const symbol = coin.symbol.toUpperCase();
     const pending = document.createElement('div');
     pending.className = 'wl-pending';
-    const options = ['<option value="any">Cualquier exchange</option>']
-      .concat(cfg.exchanges.map(e => '<option value="' + e.id + '">' + e.label + '</option>'))
+    const chips = ['<button type="button" class="wl-ex-chip" data-ex="any">Cualquier exchange</button>']
+      .concat(cfg.exchanges.map(e => '<button type="button" class="wl-ex-chip" data-ex="' + e.id + '">' + e.label + '</button>'))
       .join('');
     pending.innerHTML =
-      'Seguir <b>' + escapeHtml(symbol) + '</b> en:' +
-      '<select class="wl-pending-exchange">' + options + '</select>' +
+      'Seguir <b>' + escapeHtml(symbol) + '</b> en (puedes elegir varios si la tienes repartida):' +
+      '<div class="wl-ex-chip-row">' + chips + '</div>' +
       '<div class="calc-actions"><button class="a-btn wl-pending-confirm" type="button">Agregar a Mi Lista</button>' +
       '<button class="a-btn wl-pending-cancel" type="button">Cancelar</button></div>';
     pendingBox.innerHTML = '';
     pendingBox.appendChild(pending);
+
+    pending.querySelectorAll('.wl-ex-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if(chip.dataset.ex === 'any'){
+          // "cualquiera" es excluyente con exchanges puntuales - no tiene sentido combinarlos
+          pending.querySelectorAll('.wl-ex-chip').forEach(c => { if(c !== chip) c.classList.remove('active'); });
+          chip.classList.toggle('active');
+        } else {
+          pending.querySelector('.wl-ex-chip[data-ex="any"]').classList.remove('active');
+          chip.classList.toggle('active');
+        }
+      });
+    });
+
     pending.querySelector('.wl-pending-cancel').addEventListener('click', () => { pendingBox.innerHTML = ''; });
     pending.querySelector('.wl-pending-confirm').addEventListener('click', async () => {
-      const exchange = pending.querySelector('.wl-pending-exchange').value;
-      const { error } = await sbClient.from('user_watchlist')
-        .insert({ user_id: currentUser.id, symbol, exchange, radar: cfg.radar });
-      if(error && error.code !== '23505'){ // 23505 = unique_violation (ya la seguia aqui) - no es un error real para el usuario
-        alert(friendlyErrMsg(error));
-        pendingBox.innerHTML = '';
+      const exchanges = Array.from(pending.querySelectorAll('.wl-ex-chip.active')).map(c => c.dataset.ex);
+      if(exchanges.length === 0){
+        alert('Elige al menos un exchange (o "Cualquier exchange").');
         return;
+      }
+      for(const exchange of exchanges){
+        const { error } = await sbClient.from('user_watchlist')
+          .insert({ user_id: currentUser.id, symbol, exchange, radar: cfg.radar });
+        if(error && error.code !== '23505'){ // 23505 = unique_violation (ya la seguia ahi) - no es un error real para el usuario
+          alert(friendlyErrMsg(error));
+        }
       }
       pendingBox.innerHTML = '';
       load();
