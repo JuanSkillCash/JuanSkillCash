@@ -348,6 +348,13 @@ button{font-family:inherit;color:inherit}
 .account-bar-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0}
 #accountBarSession{flex-direction:column;align-items:stretch;gap:0}
 
+/* PILDORAS DE CONEXION (Telegram, exchanges) - barra superior */
+.exchange-pill{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--bg);color:var(--muted2);font-size:11.5px;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s;flex-shrink:0;white-space:nowrap}
+.exchange-pill:hover{border-color:var(--red);color:var(--white)}
+.exchange-pill .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.exchange-pill.connected .pill-dot{background:var(--green);box-shadow:0 0 5px var(--green)}
+.exchange-pill.connected{color:var(--white)}
+
 /* NOTIFICACIONES (campanita) */
 .notif-mini-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .notif-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
@@ -708,12 +715,7 @@ button{font-family:inherit;color:inherit}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
-.tool-section[data-category="trading"] .tool-card{--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)}
-.tool-section[data-category="inversion"] .tool-card{--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)}
-.tool-section[data-category="portafolio"] .tool-card{--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)}
-.tool-section[data-category="seguridad"] .tool-card{--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)}
-.tool-section[data-category="aprender"] .tool-card{--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)}
-.tool-section[data-category="utilidades"] .tool-card{--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)}
+.tool-card:hover{--bc:rgba(255,47,79,.35)}
 .tool-status{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 13px;border-radius:20px}
 .tool-status.open{display:none}
 .tool-status.soon{background:rgba(240,178,61,.08);color:var(--gold);border:1px solid rgba(240,178,61,.3)}
@@ -734,10 +736,10 @@ button{font-family:inherit;color:inherit}
 /* ===== HERRAMIENTA ABIERTA "EN LÍNEA" (dentro de su categoría, no como popup) ===== */
 #toolDetailSlot{margin-bottom:28px}
 .tool-detail-card{
-  --bc:rgba(59,130,246,.45);--tint:rgba(59,130,246,.14);
+  --bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07);
   border-radius:18px;border:1px solid var(--bc);
   background:#080c20;
-  box-shadow:0 0 32px rgba(59,130,246,.1);
+  box-shadow:0 0 32px rgba(255,47,79,.06);
 }
 .modal-overlay.inline-mode{position:relative;inset:auto;display:block;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:auto;padding:0;overflow:visible}
 .modal-overlay.inline-mode .modal-panel{max-width:none;width:100%;margin:0;opacity:1;transform:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none}
@@ -2462,6 +2464,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
       </nav>
 
+      <button class="exchange-pill" id="openTelegramPillBtn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
+        Telegram
+      </button>
+
       <div class="notif-mini" id="notifMini">
         <button class="notif-mini-btn" id="notifMiniBtn" type="button" aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">
           🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span>
@@ -2618,7 +2625,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <div class="cat-flip-outer big">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card big cat-flip-front" data-category="indicadores" style="--c:#3b82f6;--bc:rgba(59,130,246,.28);--tint:rgba(59,130,246,.12)">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="indicadores" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">1</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M3 17V10M8 17V4M13 17V12M18 17V7"/></svg><span>Indicadores de Mercado</span></div>
@@ -2648,13 +2655,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="indicadores" style="--c:#3b82f6;--bc:rgba(59,130,246,.28);--tint:rgba(59,130,246,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Indicadores de Mercado</div><div class="cat-flip-back-eyebrow">PESTAÑAS REALES</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Bitcoin</li><li><span class="cat-flip-back-check">✓</span>Ethereum</li><li><span class="cat-flip-back-check">✓</span>Trading</li><li><span class="cat-flip-back-check">✓</span>Sentimiento</li><li><span class="cat-flip-back-check">✓</span>Macro</li><li><span class="cat-flip-back-check">✓</span>Dominancia</li><li><span class="cat-flip-back-check">✓</span>Altcoins</li></ul><div class="cat-flip-back-cta">Explorar →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="indicadores" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Indicadores de Mercado</div><div class="cat-flip-back-eyebrow">PESTAÑAS REALES</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Bitcoin</li><li><span class="cat-flip-back-check">✓</span>Ethereum</li><li><span class="cat-flip-back-check">✓</span>Trading</li><li><span class="cat-flip-back-check">✓</span>Sentimiento</li><li><span class="cat-flip-back-check">✓</span>Macro</li><li><span class="cat-flip-back-check">✓</span>Dominancia</li><li><span class="cat-flip-back-check">✓</span>Altcoins</li></ul><div class="cat-flip-back-cta">Explorar →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer big">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card big cat-flip-front" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="partners" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">2</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><circle cx="7" cy="10" r="5"/><circle cx="13" cy="10" r="5"/></svg><span>Partners</span></div>
@@ -2682,7 +2689,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="partners" style="--c:#f0b23d;--bc:rgba(240,178,61,.32);--tint:rgba(240,178,61,.14)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Partners</div><div class="cat-flip-back-eyebrow">LO QUE NEGOCIÉ PARA TI</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Comisión reducida en Bitunix</li><li><span class="cat-flip-back-check">✓</span>Bono de bienvenida exclusivo</li><li><span class="cat-flip-back-check">✓</span>Mentoría 1:1 incluida</li><li><span class="cat-flip-back-check">✓</span>Sin letra pequeña</li></ul><div class="cat-flip-back-cta">Ver alianzas →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="partners" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Partners</div><div class="cat-flip-back-eyebrow">LO QUE NEGOCIÉ PARA TI</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Comisión reducida en Bitunix</li><li><span class="cat-flip-back-check">✓</span>Bono de bienvenida exclusivo</li><li><span class="cat-flip-back-check">✓</span>Mentoría 1:1 incluida</li><li><span class="cat-flip-back-check">✓</span>Sin letra pequeña</li></ul><div class="cat-flip-back-cta">Ver alianzas →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
@@ -2691,7 +2698,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="portafolio" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">3</div>
           <div class="cat-overview-title">💼 Simulador de Portafolio</div>
@@ -2731,13 +2738,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="portafolio" style="--c:#22d3ee;--bc:rgba(34,211,238,.28);--tint:rgba(34,211,238,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Simulador de Portafolio</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Perfil de Riesgo</li><li><span class="cat-flip-back-check">✓</span>Simulador de Portafolio</li><li><span class="cat-flip-back-check">✓</span>Monitor de Correlación</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="portafolio" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Simulador de Portafolio</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Perfil de Riesgo</li><li><span class="cat-flip-back-check">✓</span>Simulador de Portafolio</li><li><span class="cat-flip-back-check">✓</span>Monitor de Correlación</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">4</div>
           <div class="cat-overview-title">📈 Calculadoras de Trading</div>
@@ -2784,13 +2791,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="trading" style="--c:#ff8a3d;--bc:rgba(255,138,61,.28);--tint:rgba(255,138,61,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Calculadoras de Trading</div><div class="cat-flip-back-eyebrow">LAS 4 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Calculadora de Trading</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Break-even</li><li><span class="cat-flip-back-check">✓</span>Calculadora Coin-M</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Comisiones</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="trading" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Calculadoras de Trading</div><div class="cat-flip-back-eyebrow">LAS 4 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Calculadora de Trading</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Break-even</li><li><span class="cat-flip-back-check">✓</span>Calculadora Coin-M</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Comisiones</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="inversion" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">5</div>
           <div class="cat-overview-title">🪙 Calculadoras de Inversión</div>
@@ -2821,13 +2828,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="inversion" style="--c:#a855f7;--bc:rgba(168,85,247,.28);--tint:rgba(168,85,247,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Calculadoras de Inversión</div><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Calculadora de Rentabilidad</li><li><span class="cat-flip-back-check">✓</span>Simulador de DCA de Compra</li><li><span class="cat-flip-back-check">✓</span>Simulador de DCA de Venta</li><li><span class="cat-flip-back-check">✓</span>Comparador de Market Cap</li><li><span class="cat-flip-back-check">✓</span>Tiempo hasta la Libertad Financiera</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="inversion" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Calculadoras de Inversión</div><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Calculadora de Rentabilidad</li><li><span class="cat-flip-back-check">✓</span>Simulador de DCA de Compra</li><li><span class="cat-flip-back-check">✓</span>Simulador de DCA de Venta</li><li><span class="cat-flip-back-check">✓</span>Comparador de Market Cap</li><li><span class="cat-flip-back-check">✓</span>Tiempo hasta la Libertad Financiera</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="seguridad" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">6</div>
           <div class="cat-overview-title">🛡️ Checklists de Seguridad</div>
@@ -2873,13 +2880,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="seguridad" style="--c:#7c7ff5;--bc:rgba(124,127,245,.28);--tint:rgba(124,127,245,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Checklists de Seguridad</div><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Checklist de Seguridad</li><li><span class="cat-flip-back-check">✓</span>Comparador de Wallets</li><li><span class="cat-flip-back-check">✓</span>Verificar Aprobaciones</li><li><span class="cat-flip-back-check">✓</span>Herencia Digital</li><li><span class="cat-flip-back-check">✓</span>Analizador de Token</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="seguridad" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Checklists de Seguridad</div><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Checklist de Seguridad</li><li><span class="cat-flip-back-check">✓</span>Comparador de Wallets</li><li><span class="cat-flip-back-check">✓</span>Verificar Aprobaciones</li><li><span class="cat-flip-back-check">✓</span>Herencia Digital</li><li><span class="cat-flip-back-check">✓</span>Analizador de Token</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">7</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M10 5.5c-1.5-1.3-3.5-2-6-2v11c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2v-11c-2.5 0-4.5.7-6 2z"/><path d="M10 5.5v11"/></svg><span>Guías y Glosario</span></div>
@@ -2904,13 +2911,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="aprender" style="--c:#ec4899;--bc:rgba(236,72,153,.28);--tint:rgba(236,72,153,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Guías y Glosario</div><div class="cat-flip-back-eyebrow">LAS 2 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Glosario Cripto</li><li><span class="cat-flip-back-check">✓</span>Biblioteca de Errores Comunes</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="aprender" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Guías y Glosario</div><div class="cat-flip-back-eyebrow">LAS 2 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Glosario Cripto</li><li><span class="cat-flip-back-check">✓</span>Biblioteca de Errores Comunes</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
       <div class="cat-flip-outer">
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="utilidades" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">8</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M13.4 3.4a3.8 3.8 0 00-5.1 4.6L3.5 12.7v3.8h3.8l4.7-4.8a3.8 3.8 0 004.6-5.1l-2.5 2.5-1.9-1.9 2.5-2.5z"/></svg><span>Herramientas Rápidas</span></div>
@@ -2935,7 +2942,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
-      <div class="cat-flip-back" data-category="utilidades" style="--c:#2dd4bf;--bc:rgba(45,212,191,.28);--tint:rgba(45,212,191,.12)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Herramientas Rápidas</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conversor de Unidades</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Porcentajes</li><li><span class="cat-flip-back-check">✓</span>Reloj de Zona Horaria</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      <div class="cat-flip-back" data-category="utilidades" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Herramientas Rápidas</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conversor de Unidades</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Porcentajes</li><li><span class="cat-flip-back-check">✓</span>Reloj de Zona Horaria</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
@@ -7963,19 +7970,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <p class="auth-note" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b></p>
 
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border)">
-        <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Notificaciones por Telegram</p>
-        <div id="telegramNotConnected">
-          <p class="auth-note" style="margin-bottom:10px">Conecta tu cuenta para recibir ahí los avisos de "Mi Lista" (Deslistados y Nuevos Listados), además de la campanita del sitio.</p>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <a class="a-btn" id="telegramConnectBtn" href="#" style="display:inline-flex;width:auto;padding:10px 18px;text-decoration:none">🔗 Conectar Telegram</a>
-            <button type="button" id="telegramCheckBtn" class="auth-link-btn" style="display:none">Ya le di Start, revisar →</button>
-          </div>
-          <p class="auth-note" id="telegramCheckMsg" style="margin-top:8px"></p>
-        </div>
-        <div id="telegramConnected" style="display:none">
-          <p class="auth-note">✅ Telegram conectado — ya vas a recibir los avisos ahí.</p>
-          <button type="button" id="telegramDisconnectBtn" class="auth-link-btn" style="color:var(--red)">Desconectar Telegram</button>
-        </div>
+        <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Conexiones</p>
+        <button type="button" id="openTelegramFromProfileBtn" class="auth-link-btn">📲 Telegram y notificaciones →</button>
       </div>
 
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border)">
@@ -7987,6 +7983,36 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <button type="button" id="profileDeleteConfirmBtn" class="btn-block" style="background:var(--red);color:#fff">Sí, eliminar todo</button>
           <button type="button" id="profileDeleteCancelBtn" class="auth-link-btn" style="margin-top:8px">Cancelar</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: TELEGRAM (conectar/gestionar notificaciones) ===== -->
+<div class="modal-overlay" id="telegramModal">
+  <button class="modal-close" id="closeTelegram" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="telegramTitleEl" style="max-width:420px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="telegramTitleEl" style="font-size:22px">📲 Telegram</h2>
+        <p class="calc-sub">Notificaciones al instante</p>
+      </div>
+
+      <div id="telegramNotConnected">
+        <p class="auth-note" style="margin-bottom:10px">Conecta tu cuenta para recibir ahí los avisos de "Mi Lista" (Deslistados y Nuevos Listados), además de la campanita del sitio.</p>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <a class="a-btn" id="telegramConnectBtn" href="#" style="display:inline-flex;width:auto;padding:10px 18px;text-decoration:none">🔗 Conectar Telegram</a>
+          <button type="button" id="telegramCheckBtn" class="auth-link-btn" style="display:none">Ya le di Start, revisar →</button>
+        </div>
+        <p class="auth-note" id="telegramCheckMsg" style="margin-top:8px"></p>
+      </div>
+      <div id="telegramConnected" style="display:none">
+        <p class="auth-note">✅ Telegram conectado — ya vas a recibir los avisos ahí.</p>
+        <button type="button" id="telegramDisconnectBtn" class="auth-link-btn" style="color:var(--red)">Desconectar Telegram</button>
       </div>
     </div>
   </div>
@@ -10542,11 +10568,28 @@ function openProfileModal(){
   document.getElementById('profileEmailDisplay').textContent = currentUser ? currentUser.email : '—';
   document.getElementById('profileError').classList.remove('show');
   document.getElementById('profileSuccess').classList.remove('show');
-  if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   openModalGeneric(profileModal, profilePanel, closeProfile);
 }
 function closeProfileModal(){ closeModalGeneric(profileModal); }
 closeProfile.addEventListener('click', closeProfileModal);
+
+/* ---- modal de Telegram (conectar/gestionar) - se abre desde Mi perfil o desde la
+   pildora "Telegram" de la barra superior ---- */
+const telegramModal = document.getElementById('telegramModal');
+const telegramPanel = telegramModal.querySelector('.modal-panel');
+const closeTelegram = document.getElementById('closeTelegram');
+function openTelegramModal(){
+  if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  openModalGeneric(telegramModal, telegramPanel, closeTelegram);
+}
+function closeTelegramModal(){ closeModalGeneric(telegramModal); }
+closeTelegram.addEventListener('click', closeTelegramModal);
+telegramModal.addEventListener('click', (e) => { if(e.target === telegramModal) closeTelegramModal(); });
+document.getElementById('openTelegramPillBtn').addEventListener('click', openTelegramModal);
+document.getElementById('openTelegramFromProfileBtn').addEventListener('click', () => {
+  closeProfileModal();
+  setTimeout(openTelegramModal, 200);
+});
 profileModal.addEventListener('click', (e) => { if(e.target === profileModal) closeProfileModal(); });
 document.getElementById('sbSessionProfileBtn').addEventListener('click', openProfileModal);
 document.getElementById('accountBarProfileBtn').addEventListener('click', openProfileModal);
