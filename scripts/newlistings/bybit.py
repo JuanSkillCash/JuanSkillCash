@@ -41,6 +41,10 @@ _TITLE_DATE_RE = re.compile(
 )
 _LISTING_OF_RE = re.compile(r"Listing of\s+([A-Z0-9]{2,15})\s+on Bybit", re.IGNORECASE)
 _TO_LIST_PAREN_RE = re.compile(r"to List\s+\w+\s*\(([A-Z0-9]{1,15})\)\s+on Spot", re.IGNORECASE)
+# "New listing: CTUSDT Perpetual Contract, with up to 20x leverage" / "...TLTUSDT TradFi
+# Perpetual Contract..." - formato sin "Listing of X on Bybit", el ticker va pegado antes
+# de "USDT" directo despues de "New listing:".
+_NEW_LISTING_USDT_RE = re.compile(r"New listing:\s+([A-Z0-9]{1,15})USDT\s+(?:TradFi\s+)?Perpetual Contract", re.IGNORECASE)
 
 
 def _parse_listed_at(title: str) -> datetime | None:
@@ -72,6 +76,9 @@ def _extract_ticker(title: str) -> str | None:
     m = _LISTING_OF_RE.search(title)
     if m:
         return _strip_quote(m.group(1))
+    m = _NEW_LISTING_USDT_RE.search(title)
+    if m:
+        return m.group(1).upper()
     m = _TO_LIST_PAREN_RE.search(title)
     if m:
         return m.group(1).upper()
