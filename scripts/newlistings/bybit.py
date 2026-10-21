@@ -1,11 +1,18 @@
-"""Bybit: misma API v5 oficial que delistings/bybit.py (bloquea IPs de datacenter - ya
-documentado ahi), categoria confirmada en la investigacion: type=new_crypto. Se filtra
-por tag en vez de adivinar por palabras ("Spot Listings" -> spot, "Derivatives" -> futures).
-"TradFi" marca un activo no cripto pero no dice CUAL (accion/indice/commodity) - se resuelve
-con la lista stock_tickers.txt via classify_asset_class_or_ticker."""
+"""Bybit: la API oficial (api.bybit.com/v5/announcements/index) esta bloqueada por
+CloudFront ("configured to block access from your country") desde el runner de GitHub
+Actions - confirmado con requests Y con Playwright, es un bloqueo geografico de borde, no
+un challenge de bot. La pagina publica de anuncios (announcements.bybit.com) SI responde
+200 normal, es Next.js con __NEXT_DATA__ (mismo patron que otros exchanges), y trae los
+avisos en props.pageProps.articleInitEntity.list. Categoria confirmada navegando
+pageEntry.categoryConnection: "New Listings" = key "new_crypto" (coincide con el "type"
+que ya usaba la API vieja). /en/ es el locale principal (mas avisos, ~1800 vs ~1200 en
+/es-MX/); /es-MX/ solo se usa de respaldo si /en/ falla del todo - la url relativa del
+articulo es identica entre locales, asi que el upsert (dedupea por source_url) no duplica
+nada si alguna vez se usan los dos."""
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
@@ -18,7 +25,11 @@ from .common import Row, DEFAULT_HEADERS, classify_asset_class_or_ticker, is_noi
 log = logging.getLogger("newlistings.bybit")
 
 EXCHANGE = "bybit"
-LIST_URL = "https://api.bybit.com/v5/announcements/index"
+BASE = "https://announcements.bybit.com"
+LOCALES = ["en", "es-MX"]  # es-MX solo como respaldo
+CATEGORY = "new_crypto"  # "New Listings" en pageEntry.categoryConnection
+
+_NEXT_DATA_RE = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
 
 _MONTHS = {
     "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
@@ -67,58 +78,91 @@ def _extract_ticker(title: str) -> str | None:
     return None
 
 
-def fetch(max_pages: int = 5) -> list[Row]:
+def _fetch_page(locale: str, page: int) -> tuple[list[dict], bool]:
+    """Devuelve (items, ok). ok=False corta la paginacion de este locale (403/bloqueo/
+    __NEXT_DATA__ ausente) en vez de reintentar a ciegas."""
+    params = {"category": CATEGORY}
+    if page > 1:
+        params["page"] = page
+    resp = requests.get(f"{BASE}/{locale}/", params=params, headers=DEFAULT_HEADERS, timeout=30)
+    if resp.status_code != 200:
+        log.warning(f"[bybit] {locale} pagina {page} respondio {resp.status_code}")
+        return [], False
+    m = _NEXT_DATA_RE.search(resp.text)
+    if not m:
+        log.warning(f"[bybit] {locale} pagina {page}: no se encontro __NEXT_DATA__")
+        return [], False
+    try:
+        data = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        log.warning(f"[bybit] {locale} pagina {page}: __NEXT_DATA__ invalido")
+        return [], False
+    page_props = (data.get("props") or {}).get("pageProps") or {}
+    items = (page_props.get("articleInitEntity") or {}).get("list") or []
+    return items, True
+
+
+def fetch(max_pages: int = 10) -> list[Row]:
     rows: list[Row] = []
-    for page in range(1, max_pages + 1):
-        params = {"locale": "en-US", "type": "new_crypto", "limit": 20, "page": page}
-        resp = requests.get(LIST_URL, params=params, headers=DEFAULT_HEADERS, timeout=30)
-        if resp.status_code != 200:
-            log.warning(f"[bybit] pagina {page} respondio {resp.status_code}: {resp.text[:300]}")
-            break
-        payload = resp.json()
-        if payload.get("retCode") != 0:
-            log.warning(f"[bybit] retCode!=0: {payload.get('retMsg')}")
-            break
-        items = (payload.get("result") or {}).get("list") or []
-        if not items:
-            break
+    seen_urls: set[str] = set()
 
-        for item in items:
-            title = (item.get("title") or "").strip()
-            if not title or is_noise(title):
-                continue
-            url = item.get("url", "")
-            tags = item.get("tags") or []
-            announced_ms = item.get("publishTime") or item.get("dateTimestamp")
-            try:
-                announced_at = datetime.fromtimestamp(int(announced_ms) / 1000, tz=timezone.utc)
-            except (TypeError, ValueError):
-                announced_at = None
+    for locale in LOCALES:
+        locale_rows: list[Row] = []
+        locale_ok = False
 
-            base = _extract_ticker(title)
-            if not base:
-                log.warning(f"[bybit] no se pudieron sacar tickers de: {title!r} ({url})")
-                continue
+        for page in range(1, max_pages + 1):
+            items, ok = _fetch_page(locale, page)
+            if not ok:
+                break
+            if not items:
+                break
+            locale_ok = True
 
-            if "Derivatives" in tags or "perpetual" in title.lower():
-                market = "futures"
-            elif "Spot Listings" in tags or "Spot" in tags:
-                market = "spot"
-            else:
-                market = None
+            for item in items:
+                if (item.get("category") or {}).get("key") != CATEGORY:
+                    continue
+                title = (item.get("title") or "").strip()
+                if not title or is_noise(title):
+                    continue
+                rel_url = item.get("url") or ""
+                if not rel_url or rel_url in seen_urls:
+                    continue
 
-            listed_at = _parse_listed_at(title)
-            asset_class = classify_asset_class_or_ticker(title, base)
+                base = _extract_ticker(title)
+                if not base:
+                    log.warning(f"[bybit] no se pudieron sacar tickers de: {title!r} ({rel_url})")
+                    continue
+                seen_urls.add(rel_url)
 
-            rows.append(Row(
-                exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=url, title=title, asset_class=asset_class,
-                announced_at=announced_at, listed_at=listed_at, market=market,
-            ))
+                full_url = BASE + rel_url if rel_url.startswith("/") else rel_url
+                try:
+                    announced_at = datetime.fromtimestamp(int(item.get("publish_time")), tz=timezone.utc)
+                except (TypeError, ValueError):
+                    announced_at = None
 
-        if len(items) < 20:
-            break
-        time.sleep(0.5)
+                topics = item.get("topics") or []
+                if "Derivatives" in topics or "perpetual" in title.lower():
+                    market = "futures"
+                elif "Spot Listings" in topics or "Spot" in topics:
+                    market = "spot"
+                else:
+                    market = None
+
+                listed_at = _parse_listed_at(title)
+                asset_class = classify_asset_class_or_ticker(title, base)
+
+                locale_rows.append(Row(
+                    exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
+                    source_url=full_url, title=title, asset_class=asset_class,
+                    announced_at=announced_at, listed_at=listed_at, market=market,
+                ))
+
+            time.sleep(0.5)
+
+        log.info(f"[bybit] locale {locale}: {len(locale_rows)} filas")
+        rows.extend(locale_rows)
+        if locale_ok:
+            break  # el locale principal funciono, no hace falta el de respaldo
 
     log.info(f"[bybit] {len(rows)} filas")
     return rows
