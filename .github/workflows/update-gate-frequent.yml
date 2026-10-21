@@ -1,0 +1,41 @@
+name: Radar Gate (deslistados + nuevos listados, frecuencia alta)
+
+# Gate es el unico exchange con hueco de cobertura: su WebSocket de respaldo (la pagina
+# completa esta bloqueada por Akamai para la IP de GitHub Actions) solo entrega el ultimo
+# anuncio en cache al conectarse, no un historial - si se publican 2+ avisos entre corridas,
+# los mas viejos se pierden para siempre. Este workflow corre SOLO Gate cada 15 min (en vez
+# de cada hora, como el resto de exchanges en update-exchange-delistings.yml /
+# update-new-listings.yml) para achicar esa ventana, sin aumentar la carga sobre los otros
+# 14 exchanges que ya tienen cobertura completa via sus APIs oficiales.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-gate-frequent
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --no-cache-dir requests beautifulsoup4 python-dateutil playwright websocket-client
+          playwright install --with-deps chromium
+
+      - name: Actualizar Gate (deslistados + nuevos listados)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_gate_frequent.py
