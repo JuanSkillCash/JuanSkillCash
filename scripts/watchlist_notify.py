@@ -5,6 +5,12 @@ alguna coincide con lo que algun usuario tiene marcado en su "Mi Lista" (tabla
 user_watchlist) y, si es asi, crea una fila en user_notifications para que la vea en el
 apartado de Notificaciones del sitio.
 
+"Mi Lista" vive DENTRO de cada radar en el frontend (Deslistados / Nuevos Listados), no en
+un solo lugar compartido - cada fila de user_watchlist tiene su propia columna "radar"
+('delistings' | 'new_listings'), asi que un symbol+exchange que el usuario sigue desde
+Deslistados NO dispara una notificacion de Nuevos Listados ni viceversa, aunque sea la misma
+moneda. Por eso el match de mas abajo exige ademas que w['radar'] == radar.
+
 Corre con la SERVICE ROLE KEY (la misma que ya usan los robots para subir filas) porque
 necesita leer la lista de TODOS los usuarios, algo que un usuario normal no puede hacer por
 RLS - por diseno, el usuario solo puede leer/crear SU PROPIA fila de user_watchlist desde el
@@ -45,7 +51,7 @@ def notify_watchlist_matches(supabase_url: str, supabase_key: str, radar: str, r
     try:
         resp = requests.get(
             f"{supabase_url}/rest/v1/{WATCHLIST_TABLE}",
-            params={"select": "user_id,symbol,exchange"},
+            params={"select": "user_id,symbol,exchange,radar", "radar": f"eq.{radar}"},
             headers=headers, timeout=20,
         )
         if resp.status_code != 200:
