@@ -13,13 +13,14 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, is_delay_notice, html_to_text, parse_delist_datetime,
-    classify_asset_class,
+    classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.bitget")
 
 EXCHANGE = "bitget"
 LIST_URL = "https://api.bitget.com/api/v2/public/annoucements"  # typo real de la API
+MAX_BODY_FETCHES = 15
 
 
 def _epoch_ms_to_dt(s) -> datetime | None:
@@ -31,7 +32,7 @@ def _epoch_ms_to_dt(s) -> datetime | None:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             log.warning(f"[bitget] articulo {url} respondio {resp.status_code}")
             return ""
@@ -45,6 +46,8 @@ def fetch(max_requests: int = 10) -> list[Row]:
     rows: list[Row] = []
     cursor = None
     n_requests = 0
+    body_fetches_left = MAX_BODY_FETCHES
+    known_dates = fetch_known_delist_dates(EXCHANGE)
 
     while n_requests < max_requests:
         params = {"language": "en_US", "annType": "symbol_delisting", "limit": 10}
@@ -70,6 +73,7 @@ def fetch(max_requests: int = 10) -> list[Row]:
                 continue
             url = item.get("annUrl", "")
             ann_id = item.get("annId")
+            source_url = url or f"bitget:{ann_id}"
             announced_at = _epoch_ms_to_dt(item.get("cTime"))
 
             if is_delay_notice(title):
@@ -80,8 +84,13 @@ def fetch(max_requests: int = 10) -> list[Row]:
                 # porque source_url es distinto; se deja registrado para revisar a mano)
                 log.info(f"[bitget] aviso de retraso de deslistado (revisar a mano): {title!r}")
 
-            body_text = _fetch_article_text(url) if url else ""
-            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            delist_at = known_dates.get(source_url)
+            fetched_body = False
+            if delist_at is None and url and source_url not in known_dates and body_fetches_left > 0:
+                body_fetches_left -= 1
+                fetched_body = True
+                body_text = _fetch_article_text(url)
+                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
 
@@ -94,10 +103,11 @@ def fetch(max_requests: int = 10) -> list[Row]:
             for base in tickers:
                 rows.append(Row(
                     exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                    source_url=url or f"bitget:{ann_id}", title=title, asset_class=classify_asset_class(title),
+                    source_url=source_url, title=title, asset_class=classify_asset_class(title),
                     announced_at=announced_at, delist_at=delist_at, market=market,
                 ))
-            time.sleep(0.5)
+            if fetched_body:
+                time.sleep(0.5)
 
         cursor = str(items[-1].get("annId", "")) if len(items) == 10 else None
         if not cursor:

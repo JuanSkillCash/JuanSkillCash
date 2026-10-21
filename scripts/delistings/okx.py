@@ -12,14 +12,14 @@ import requests
 
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
-    is_noise, html_to_text,
-    classify_asset_class,
+    is_noise, html_to_text, classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.okx")
 
 EXCHANGE = "okx"
 LIST_URL = "https://www.okx.com/api/v5/support/announcements"
+MAX_BODY_FETCHES = 15
 
 
 def _epoch_ms_to_dt(s) -> datetime | None:
@@ -31,7 +31,7 @@ def _epoch_ms_to_dt(s) -> datetime | None:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             log.warning(f"[okx] articulo {url} respondio {resp.status_code}")
             return ""
@@ -70,6 +70,8 @@ def fetch(max_pages: int = 5) -> list[Row]:
 
     log.info(f"[okx] {len(items)} anuncios en {page - 1} pagina(s) (totalPage={total_page})")
 
+    known_dates = fetch_known_delist_dates(EXCHANGE)
+    body_fetches_left = MAX_BODY_FETCHES
     for item in items:
         title = item.get("title", "")
         url = item.get("url", "")
@@ -77,12 +79,17 @@ def fetch(max_pages: int = 5) -> list[Row]:
             continue
         announced_at = _epoch_ms_to_dt(item.get("businessPTime") or item.get("pTime"))
 
-        body_text = _fetch_article_text(url) if url else ""
-        delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
-        if delist_at is None and body_text:
-            # sin contexto spot/delist claro en el cuerpo, probar con el titulo como ultimo recurso
-            from .common import parse_delist_datetime
-            delist_at = parse_delist_datetime(title)
+        delist_at = known_dates.get(url)
+        fetched_body = False
+        if delist_at is None and url and url not in known_dates and body_fetches_left > 0:
+            body_fetches_left -= 1
+            fetched_body = True
+            body_text = _fetch_article_text(url)
+            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            if delist_at is None and body_text:
+                # sin contexto spot/delist claro en el cuerpo, probar con el titulo como ultimo recurso
+                from .common import parse_delist_datetime
+                delist_at = parse_delist_datetime(title)
 
         market = detect_market(title)
         tickers = extract_tickers(title)
@@ -96,7 +103,8 @@ def fetch(max_pages: int = 5) -> list[Row]:
                 source_url=url, title=title, asset_class=classify_asset_class(title),
                 announced_at=announced_at, delist_at=delist_at, market=market,
             ))
-        time.sleep(0.5)  # una peticion extra por articulo (detalle) - no saturar
+        if fetched_body:
+            time.sleep(0.5)  # una peticion extra por articulo (detalle) - no saturar
 
     log.info(f"[okx] {len(rows)} filas")
     return rows

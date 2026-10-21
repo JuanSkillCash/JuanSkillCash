@@ -13,7 +13,7 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, html_to_text, parse_delist_datetime,
-    classify_asset_class,
+    classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.kucoin")
@@ -24,6 +24,7 @@ LIST_URL = "https://api.kucoin.com/api/v3/announcements"
 # ventana de la corrida normal (no backfill): cubre lo reciente + lo ya anunciado a futuro.
 WINDOW_PAST_DAYS = 45
 WINDOW_FUTURE_DAYS = 30
+MAX_BODY_FETCHES = 15
 
 
 def _epoch_ms_to_dt(s) -> datetime | None:
@@ -35,7 +36,7 @@ def _epoch_ms_to_dt(s) -> datetime | None:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             log.warning(f"[kucoin] articulo {url} respondio {resp.status_code}")
             return ""
@@ -77,17 +78,25 @@ def fetch(max_pages: int = 5) -> list[Row]:
 
     log.info(f"[kucoin] {len(items)} anuncios en ventana de {WINDOW_PAST_DAYS}d atras / {WINDOW_FUTURE_DAYS}d adelante")
 
+    body_fetches_left = MAX_BODY_FETCHES
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     for item in items:
         title = (item.get("annTitle") or "").strip()
         if not title or is_noise(title):
             continue
         url = item.get("annUrl", "")
+        source_url = url or f"kucoin:{item.get('annId')}"
         announced_at = _epoch_ms_to_dt(item.get("cTime"))
         ann_types = item.get("annType") or []
         is_futures = "futures-announcements" in ann_types
 
-        body_text = _fetch_article_text(url) if url else ""
-        delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+        delist_at = known_dates.get(source_url)
+        fetched_body = False
+        if delist_at is None and url and source_url not in known_dates and body_fetches_left > 0:
+            body_fetches_left -= 1
+            fetched_body = True
+            body_text = _fetch_article_text(url)
+            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
         if delist_at is None:
             delist_at = parse_delist_datetime(title)
 
@@ -100,10 +109,11 @@ def fetch(max_pages: int = 5) -> list[Row]:
         for base in tickers:
             rows.append(Row(
                 exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                source_url=url or f"kucoin:{item.get('annId')}", title=title, asset_class=classify_asset_class(title),
+                source_url=source_url, title=title, asset_class=classify_asset_class(title),
                 announced_at=announced_at, delist_at=delist_at, market=market,
             ))
-        time.sleep(0.4)
+        if fetched_body:
+            time.sleep(0.4)
 
     log.info(f"[kucoin] {len(rows)} filas")
     return rows

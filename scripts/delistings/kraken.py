@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from .common import (
     Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
     is_noise, html_to_text,
-    classify_asset_class,
+    classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.kraken")
@@ -108,7 +108,7 @@ def _fetch_article_links(list_url: str) -> list[tuple[str, str]]:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             log.warning(f"[kraken] articulo {url} respondio {resp.status_code}")
             return ""
@@ -129,9 +129,16 @@ def fetch(max_articles: int = 15) -> list[Row]:
     links = _fetch_article_links(section_url)
     log.info(f"[kraken] {len(links)} articulos en la seccion actual")
 
+    # a diferencia de los demas exchanges, aca el ticker tambien sale del cuerpo del
+    # articulo (no solo la fecha) - asi que un articulo ya resuelto antes (con fecha o sin
+    # ella) se salta por completo: su fila ya quedo guardada en Supabase la primera vez, no
+    # hace falta volver a pedir el cuerpo solo para repetir el mismo ticker.
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     rows: list[Row] = []
     for title, url in links[:max_articles]:
         if not title or is_noise(title):
+            continue
+        if url in known_dates:
             continue
         time.sleep(0.5)
         body_text = _fetch_article_text(url)
