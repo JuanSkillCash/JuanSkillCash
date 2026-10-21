@@ -24724,7 +24724,11 @@ renderNotifAuthState();
    Una sola funcion generica initWatchlistWidget(cfg) arma los dos widgets (son identicos en
    comportamiento, solo cambian los ids de sus elementos, el radar y el array de exchanges).
    =================================================================================== */
-const WATCHLIST_TELEGRAM_FN_URL = SUPABASE_URL + '/functions/v1/watchlist-telegram-notify';
+// el editor de Supabase desplego la funcion con el slug real "bright-worker" (el nombre
+// "watchlist-telegram-notify" quedo solo como etiqueta visible en el listado, no como la
+// ruta de verdad) - se deja anotado aca por si algun dia se vuelve a desplegar con el slug
+// correcto y hay que actualizar esto
+const WATCHLIST_TELEGRAM_FN_URL = SUPABASE_URL + '/functions/v1/bright-worker';
 async function notifyTelegramWatchlistChange(action, symbol, exchanges, radar){
   // best-effort: si el usuario no tiene Telegram conectado, o la funcion no esta desplegada
   // todavia, o falla la red, esto NUNCA debe romper el flujo de agregar/quitar de Mi Lista
@@ -24732,12 +24736,13 @@ async function notifyTelegramWatchlistChange(action, symbol, exchanges, radar){
     const { data } = await sbClient.auth.getSession();
     const token = data.session && data.session.access_token;
     if(!token) return;
-    await fetch(WATCHLIST_TELEGRAM_FN_URL, {
+    const resp = await fetch(WATCHLIST_TELEGRAM_FN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action, symbol, exchanges, radar }),
     });
-  } catch(err){ /* silencioso a proposito */ }
+    if(!resp.ok) console.warn('aviso de Telegram no se pudo mandar', resp.status, await resp.text());
+  } catch(err){ console.warn('aviso de Telegram fallo', err); }
 }
 
 function initWatchlistWidget(cfg){
