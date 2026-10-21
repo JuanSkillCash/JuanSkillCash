@@ -23262,9 +23262,12 @@ function delistAssetMatches(r){
 
 function delistSearchMatches(r){
   if(!delistRadarSearch) return true;
+  // solo contra la moneda/par de ESTA fila, nunca contra el titulo completo del aviso: un
+  // mismo anuncio puede listar/deslistar varias monedas juntas ("Pionex Has Launched NETX,
+  // FLARE... Perpetual Futures"), y comparar contra el titulo hacia que buscar "FLARE"
+  // tambien trajera la fila de NETX por compartir el mismo titulo
   return (r.pair_base || '').toLowerCase().includes(delistRadarSearch) ||
-    (r.symbol || '').toLowerCase().includes(delistRadarSearch) ||
-    (r.title || '').toLowerCase().includes(delistRadarSearch);
+    (r.symbol || '').toLowerCase().includes(delistRadarSearch);
 }
 
 function renderDelistExchangeCards(){
@@ -23511,9 +23514,12 @@ function newListAssetMatches(r){
 
 function newListSearchMatches(r){
   if(!newListRadarSearch) return true;
+  // solo contra la moneda/par de ESTA fila, nunca contra el titulo completo del aviso: un
+  // mismo anuncio puede listar varias monedas juntas ("Pionex Has Launched NETX, FLARE...
+  // Perpetual Futures"), y comparar contra el titulo hacia que buscar "FLARE" tambien
+  // trajera la fila de NETX por compartir el mismo titulo
   return (r.pair_base || '').toLowerCase().includes(newListRadarSearch) ||
-    (r.symbol || '').toLowerCase().includes(newListRadarSearch) ||
-    (r.title || '').toLowerCase().includes(newListRadarSearch);
+    (r.symbol || '').toLowerCase().includes(newListRadarSearch);
 }
 
 function renderNewListExchangeCards(){
