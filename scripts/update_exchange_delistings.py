@@ -13,10 +13,10 @@ Variables de entorno requeridas:
     SUPABASE_SERVICE_ROLE_KEY
 """
 
-import concurrent.futures
 import logging
 import os
 import sys
+import threading
 
 sys.path.insert(0, os.path.dirname(__file__))  # para que "delistings" se importe como paquete
 
@@ -58,9 +58,36 @@ FETCHERS = {
 # de 25 minutos por acumular timeouts de red reales en varios articulos de los scrapers
 # nuevos) - eso bloquea igual toda la corrida (y, por la concurrency del workflow sin
 # cancel-in-progress, hasta las corridas horarias siguientes). Se corre cada fetch() en su
-# propio hilo daemon con un limite de tiempo: si se pasa, se cuenta como "blocked" y se
-# sigue con el resto sin esperar a que ese hilo termine solo.
+# propio hilo con threading.Thread(daemon=True) - NO con ThreadPoolExecutor: sus hilos se
+# unen (join sin timeout) en un hook de atexit del propio modulo concurrent.futures al
+# cerrar el interprete, pase lo que pase con shutdown(wait=False) en la instancia - eso tumbo
+# una corrida real mas de 15 minutos aun con el limite de 120s ya puesto, porque el proceso
+# quedaba esperando a un hilo colgado en una llamada de red sin que nada lo pudiera cortar.
+# Un hilo daemon en cambio se abandona solo al terminar el hilo principal, sin bloquear nada.
 FETCH_TIMEOUT_SECONDS = 120
+
+
+def _run_with_timeout(fn, timeout: int):
+    """Corre fn() en un hilo daemon y espera hasta timeout segundos. Devuelve (resultado,
+    excepcion) - si se paso el tiempo, excepcion es TimeoutError y el hilo se abandona
+    (sigue corriendo en el fondo, pero nunca bloquea el cierre del proceso)."""
+    result: list = [None]
+    error: list = [None]
+
+    def _runner():
+        try:
+            result[0] = fn()
+        except BaseException as e:  # noqa: BLE001 - se reempaqueta para el hilo principal
+            error[0] = e
+
+    thread = threading.Thread(target=_runner, daemon=True)
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        return None, TimeoutError(f"excedio el limite de {timeout}s")
+    if error[0] is not None:
+        return None, error[0]
+    return result[0], None
 
 
 def main():
@@ -72,28 +99,25 @@ def main():
     failures = []
     statuses: dict[str, tuple[str, str | None]] = {}
 
-    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="fetcher")
     for name, fetcher in FETCHERS.items():
         log.info(f"=== {name} ===")
-        future = executor.submit(fetcher)
-        try:
-            rows = future.result(timeout=FETCH_TIMEOUT_SECONDS)
+        rows, error = _run_with_timeout(fetcher, FETCH_TIMEOUT_SECONDS)
+        if error is None:
             log.info(f"{name}: {len(rows)} filas")
             all_rows.extend(rows)
             statuses[name] = ("ok", None)
-        except concurrent.futures.TimeoutError:
-            log.warning(f"{name} se paso de {FETCH_TIMEOUT_SECONDS}s, se sigue con los demas (el hilo se abandona solo)")
+        elif isinstance(error, TimeoutError):
+            log.warning(f"{name} {error} , se sigue con los demas (el hilo se abandona solo)")
             failures.append(name)
-            statuses[name] = ("blocked", f"excedio el limite de {FETCH_TIMEOUT_SECONDS}s")
-        except ExchangeBlocked as e:
-            log.warning(f"{name} bloqueado esta corrida: {e}")
+            statuses[name] = ("blocked", str(error))
+        elif isinstance(error, ExchangeBlocked):
+            log.warning(f"{name} bloqueado esta corrida: {error}")
             failures.append(name)
-            statuses[name] = ("blocked", str(e))
-        except Exception as e:
-            log.exception(f"{name} fallo, se sigue con los demas: {e}")
+            statuses[name] = ("blocked", str(error))
+        else:
+            log.exception(f"{name} fallo, se sigue con los demas: {error}", exc_info=error)
             failures.append(name)
-            statuses[name] = ("blocked", f"error inesperado: {e}")
-    executor.shutdown(wait=False, cancel_futures=False)
+            statuses[name] = ("blocked", f"error inesperado: {error}")
 
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
@@ -113,3 +137,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # os._exit en vez de dejar que Python termine solo: una corrida real quedo colgada mas
+    # de 15 minutos con hilos daemon abandonados que SI deberian dejar salir al proceso, pero
+    # alguna libreria (Playwright) puede registrar su propio hilo/recurso no-daemon por
+    # debajo - esto garantiza el cierre inmediato una vez que main() ya subio todo lo que
+    # tenia que subir, sin esperar a nada que haya quedado atras.
+    os._exit(0)
