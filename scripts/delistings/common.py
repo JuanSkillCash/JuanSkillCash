@@ -475,3 +475,56 @@ def upsert_scraper_status(supabase_url: str, supabase_key: str, radar: str, stat
     resp = requests.post(url, json=payload, headers=headers, timeout=30)
     if resp.status_code >= 300:
         raise RuntimeError(f"Supabase ({STATUS_TABLE}) respondio {resp.status_code}: {resp.text[:500]}")
+
+
+# ---------------------------------------------------------------------------------------
+# WebSocket oficial de anuncios de Gate (wss://api.gateio.ws/ws/v4/ann) - fuente alternativa
+# a www.gate.com, bloqueado por Akamai (403 "Access Denied") desde la IP compartida de los
+# runners de GitHub Actions. Confirmado con un diagnostico real que este WebSocket (API de
+# trading, infraestructura separada de la del sitio web) SI es alcanzable desde el runner:
+# conecta y responde al instante. Al suscribirse, el servidor manda primero el ULTIMO aviso
+# cacheado de ese canal (no historial completo) y despues empuja los nuevos mientras la
+# conexion siga abierta - con la cadencia horaria de este proyecto alcanza con escuchar una
+# ventana corta cada corrida; lo que se pierda en un hueco raro de mas de un aviso por hora
+# para el mismo canal se acepta igual que el resto de los scrapers de este proyecto (ningun
+# otro trae historial completo tampoco, todos son snapshots horarios acumulados).
+GATE_WS_URL = "wss://api.gateio.ws/ws/v4/ann"
+
+
+def fetch_gate_ws_items(channel: str, listen_seconds: int = 30) -> list[dict]:
+    """Se conecta al WebSocket, se suscribe a un solo canal (ej. "announcement.summary_listing"
+    o "announcement.summary_delisting") y devuelve la lista de `result` de cada mensaje tipo
+    "update" recibido en esa ventana (el aviso cacheado inicial + cualquier push nuevo)."""
+    import json
+    import time as _time
+
+    import websocket
+
+    try:
+        ws = websocket.create_connection(GATE_WS_URL, timeout=15)
+    except Exception as e:
+        raise ExchangeBlocked(f"[gate-ws] no se pudo conectar a {GATE_WS_URL}: {e}")
+
+    items: list[dict] = []
+    try:
+        ws.send(json.dumps({
+            "time": int(_time.time()), "channel": channel, "event": "subscribe", "payload": ["en"],
+        }))
+        deadline = _time.time() + listen_seconds
+        while _time.time() < deadline:
+            remaining = deadline - _time.time()
+            ws.settimeout(max(1, remaining))
+            try:
+                raw = ws.recv()
+            except Exception:
+                break
+            try:
+                msg = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            if msg.get("channel") == channel and msg.get("event") == "update" and isinstance(msg.get("result"), dict):
+                items.append(msg["result"])
+    finally:
+        ws.close()
+
+    return items

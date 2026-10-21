@@ -27,7 +27,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install --no-cache-dir requests beautifulsoup4 python-dateutil playwright
+          pip install --no-cache-dir requests beautifulsoup4 python-dateutil playwright websocket-client
           playwright install --with-deps chromium
 
       - name: Actualizar Radar de Deslistados
