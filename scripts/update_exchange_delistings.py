@@ -25,6 +25,7 @@ from delistings import (
     lbank, pionex, coinw, weex, blofin,
 )
 from delistings.common import upsert_rows, upsert_scraper_status, ExchangeBlocked, Row
+from watchlist_notify import notify_watchlist_matches
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("update_exchange_delistings")
@@ -121,6 +122,10 @@ def main():
 
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
+    try:
+        notify_watchlist_matches(SUPABASE_URL, SUPABASE_KEY, "delistings", all_rows)
+    except Exception as e:
+        log.warning(f"no se pudo revisar Mi Lista / notificaciones: {e}")
     try:
         upsert_scraper_status(SUPABASE_URL, SUPABASE_KEY, "delistings", statuses)
     except Exception as e:
