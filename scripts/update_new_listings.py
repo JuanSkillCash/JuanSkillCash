@@ -33,6 +33,7 @@ log = logging.getLogger("update_new_listings")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
 FETCHERS = {
     "bingx": bingx.fetch,
@@ -81,7 +82,7 @@ def main():
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
     try:
-        notify_watchlist_matches(SUPABASE_URL, SUPABASE_KEY, "new_listings", all_rows)
+        notify_watchlist_matches(SUPABASE_URL, SUPABASE_KEY, "new_listings", all_rows, telegram_bot_token=TELEGRAM_BOT_TOKEN)
     except Exception as e:
         log.warning(f"no se pudo revisar Mi Lista / notificaciones: {e}")
     try:

@@ -28,13 +28,18 @@ from typing import Any
 
 import requests
 
+from telegram_notify import send_telegram_message
+
 log = logging.getLogger("watchlist_notify")
 
 WATCHLIST_TABLE = "user_watchlist"
 NOTIFICATIONS_TABLE = "user_notifications"
+TELEGRAM_LINKS_TABLE = "user_telegram_links"
 
 
-def notify_watchlist_matches(supabase_url: str, supabase_key: str, radar: str, rows: list) -> int:
+def notify_watchlist_matches(
+    supabase_url: str, supabase_key: str, radar: str, rows: list, telegram_bot_token: str = "",
+) -> int:
     """rows: lista de Row (de delistings.common o newlistings.common - ambas tienen
     exchange/symbol/pair_base/source_url/title, y una de delist_at/listed_at/announced_at).
     Devuelve cuantas notificaciones nuevas se crearon (0 si no hubo match o algo fallo)."""
@@ -96,15 +101,63 @@ def notify_watchlist_matches(supabase_url: str, supabase_key: str, radar: str, r
         resp = requests.post(
             f"{supabase_url}/rest/v1/{NOTIFICATIONS_TABLE}?on_conflict=user_id,source_url",
             json=payload,
-            headers={**headers, "Prefer": "resolution=ignore-duplicates,return=minimal"},
+            # return=representation (no "minimal"): con resolution=ignore-duplicates esto
+            # devuelve SOLO las filas que de verdad se insertaron (las que ya existian se
+            # omiten de la respuesta, no solo del insert) - asi se sabe cuales son avisos
+            # nuevos de verdad y no se manda el mismo mensaje de Telegram cada corrida para
+            # el mismo match de siempre (las filas del radar no desaparecen de "rows" solo
+            # porque ya se vieron antes, asi que sin esto se reenviaria para siempre)
+            headers={**headers, "Prefer": "resolution=ignore-duplicates,return=representation"},
             timeout=30,
         )
         if resp.status_code >= 300:
             log.warning(f"no se pudo escribir {NOTIFICATIONS_TABLE} ({resp.status_code}): {resp.text[:300]}")
             return 0
+        inserted = resp.json()
     except requests.RequestException as e:
         log.warning(f"fallo escribiendo {NOTIFICATIONS_TABLE}: {e}")
         return 0
 
-    log.info(f"[watchlist] {len(payload)} notificacion(es) candidata(s) subida(s) ({radar}, duplicados ignorados)")
-    return len(payload)
+    log.info(f"[watchlist] {len(inserted)} notificacion(es) nueva(s) de {len(payload)} candidata(s) ({radar})")
+
+    if inserted and telegram_bot_token:
+        _send_telegram_for_new_matches(supabase_url, supabase_key, telegram_bot_token, inserted)
+
+    return len(inserted)
+
+
+def _send_telegram_for_new_matches(supabase_url: str, supabase_key: str, bot_token: str, notifications: list[dict]) -> None:
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+    }
+    user_ids = sorted({n["user_id"] for n in notifications})
+    try:
+        resp = requests.get(
+            f"{supabase_url}/rest/v1/{TELEGRAM_LINKS_TABLE}",
+            params={"select": "user_id,chat_id", "chat_id": "not.is.null", "user_id": f"in.({','.join(user_ids)})"},
+            headers=headers, timeout=20,
+        )
+        if resp.status_code != 200:
+            log.warning(f"no se pudo leer {TELEGRAM_LINKS_TABLE} ({resp.status_code}): {resp.text[:300]}")
+            return
+        chat_by_user = {link["user_id"]: link["chat_id"] for link in resp.json()}
+    except requests.RequestException as e:
+        log.warning(f"fallo leyendo {TELEGRAM_LINKS_TABLE}: {e}")
+        return
+
+    if not chat_by_user:
+        return
+
+    sent = 0
+    for n in notifications:
+        chat_id = chat_by_user.get(n["user_id"])
+        if not chat_id:
+            continue
+        kind_label = "🔴 Deslistado" if n["radar"] == "delistings" else "🟢 Nuevo listado"
+        text = f"{kind_label} · {n['symbol']} en {n['exchange']}\n{n['title']}\n{n['source_url']}"
+        if send_telegram_message(bot_token, chat_id, text):
+            sent += 1
+    if sent:
+        log.info(f"[watchlist] {sent} mensaje(s) de Telegram enviado(s)")
