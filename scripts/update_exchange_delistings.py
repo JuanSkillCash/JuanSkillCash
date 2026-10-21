@@ -72,7 +72,12 @@ def main():
 
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
-    upsert_scraper_status(SUPABASE_URL, SUPABASE_KEY, "delistings", statuses)
+    try:
+        upsert_scraper_status(SUPABASE_URL, SUPABASE_KEY, "delistings", statuses)
+    except Exception as e:
+        # el aviso de "problema de red" es un extra (ej. la tabla exchange_scraper_status
+        # todavia no existe) - nunca debe tumbar una corrida que ya subio datos reales
+        log.warning(f"no se pudo subir exchange_scraper_status: {e}")
     log.info(f"{len(all_rows)} filas subidas ({len(FETCHERS) - len(failures)}/{len(FETCHERS)} exchanges OK)")
 
     if failures:
