@@ -334,8 +334,9 @@ button{font-family:inherit;color:inherit}
   .topbar-links a{color:var(--muted2);text-decoration:none;transition:color .2s}
   .topbar-links a:hover{color:var(--white)}
 }
-.account-mini{position:relative;margin-left:auto;flex-shrink:0}
-@media(min-width:861px){ .account-mini{margin-left:24px} }
+.notif-mini{position:relative;margin-left:auto;flex-shrink:0}
+@media(min-width:861px){ .notif-mini{margin-left:24px} }
+.account-mini{position:relative;margin-left:14px;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .account-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
 .account-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid var(--border2);border-radius:14px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
@@ -346,6 +347,30 @@ button{font-family:inherit;color:inherit}
 .account-mini-user{display:flex;align-items:center;gap:8px;padding:6px 4px 10px;font-size:12px;color:var(--muted2);border-bottom:1px solid var(--border);margin-bottom:6px;word-break:break-all}
 .account-bar-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0}
 #accountBarSession{flex-direction:column;align-items:stretch;gap:0}
+
+/* MI LISTA + NOTIFICACIONES */
+.notif-mini-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
+.notif-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
+.notif-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--red);color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;box-shadow:0 0 0 2px var(--bg)}
+.notif-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid var(--border2);border-radius:14px;padding:14px;width:320px;max-width:calc(100vw - 32px);max-height:420px;overflow-y:auto;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
+.notif-mini-dropdown.open{display:block}
+.notif-tabs-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.notif-tabs-row .cat-tabs{margin-bottom:0;flex-wrap:nowrap}
+.notif-mark-all{background:none;border:none;color:var(--muted2);font-size:10.5px;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0;white-space:nowrap}
+.notif-mark-all:hover{color:var(--red)}
+.notif-list{display:flex;flex-direction:column;gap:8px}
+.notif-item{display:block;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 11px;text-decoration:none;transition:border-color .2s}
+.notif-item:hover{border-color:var(--red)}
+.notif-item.unread{border-left:3px solid var(--red)}
+.notif-item-top{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;font-family:'Space Mono',monospace}
+.notif-item-title{font-size:12.5px;color:var(--white);line-height:1.4}
+.notif-item-date{font-size:10px;color:var(--muted);margin-top:4px}
+.watchlist-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:9px 11px;font-size:12.5px}
+.watchlist-item .wli-symbol{font-weight:700;color:var(--white)}
+.watchlist-item .wli-exchange{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--gold);border:1px solid rgba(240,178,61,.3);padding:2px 8px;border-radius:20px;flex-shrink:0;text-transform:capitalize}
+.watchlist-item .wli-remove{margin-left:auto}
+#watchlistPendingBox .wl-pending{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px}
+#watchlistPendingBox select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:8px;color:var(--white);font-size:12.5px;margin:8px 0}
 
 /* TOOL GRID */
 .tool-section{margin-bottom:28px}
@@ -2424,6 +2449,41 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <a href="https://t.me/juanskll" target="_blank" rel="noopener">Comunidad</a>
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
       </nav>
+
+      <div class="notif-mini" id="notifMini">
+        <button class="notif-mini-btn" id="notifMiniBtn" type="button" aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">
+          🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span>
+        </button>
+        <div class="notif-mini-dropdown" id="notifMiniDropdown">
+          <div id="notifLoggedOut">
+            <div class="asset-empty">🔒 Inicia sesión para usar Mi Lista y las notificaciones.</div>
+          </div>
+          <div id="notifLoggedIn" style="display:none">
+            <div class="notif-tabs-row">
+              <div class="cat-tabs">
+                <button class="cat-tab active" data-notiftab="alerts" type="button">🔔 Notificaciones</button>
+                <button class="cat-tab" data-notiftab="watchlist" type="button">⭐ Mi Lista</button>
+              </div>
+              <button class="notif-mark-all" id="notifMarkAllBtn" type="button">Marcar leídas</button>
+            </div>
+
+            <div id="notifPaneAlerts">
+              <div class="notif-list" id="notifList"></div>
+              <div class="portfolio-empty" id="notifEmptyMsg" style="display:none">No tienes notificaciones todavía. Agrega monedas en "Mi Lista" para recibir avisos.</div>
+            </div>
+
+            <div id="notifPaneWatchlist" style="display:none">
+              <div class="asset-search" id="watchlistSearchWrap">
+                <input type="text" id="watchlistSearchInput" class="search-highlight" placeholder="Busca una moneda para seguir..." autocomplete="off">
+                <div class="asset-dropdown" id="watchlistAssetDropdown"></div>
+              </div>
+              <div id="watchlistPendingBox"></div>
+              <div class="notif-list" id="watchlistList"></div>
+              <div class="portfolio-empty" id="watchlistEmptyMsg" style="display:none">Aún no sigues ninguna moneda.</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="account-mini" id="accountMini">
         <button class="account-mini-btn" id="accountMiniBtn" type="button" aria-label="Cuenta" aria-haspopup="true" aria-expanded="false">👤</button>
@@ -10351,6 +10411,7 @@ function renderAuthState(){
     accountBarSession.style.display = 'flex';
     accountBarEmail.textContent = getDisplayName(currentUser);
     loadPortfolios();
+    if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(authModal.classList.contains('open')) closeAuthModal();
   } else {
     authGate.style.display = 'block';
@@ -10360,6 +10421,7 @@ function renderAuthState(){
     sbSession.style.display = 'none';
     accountLoginBtn.style.display = 'block';
     accountBarSession.style.display = 'none';
+    if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
   }
 }
 document.getElementById('sbSessionLogout').addEventListener('click', async () => {
@@ -24495,6 +24557,223 @@ setInterval(updateMarketSessions, 1000);
   if(path === '/') return;
   applyRoute(path);
 })();
+
+/* ===================================================================================
+   MI LISTA + NOTIFICACIONES: el usuario marca que moneda sigue (y en que exchange, o
+   "cualquiera") y recibe un aviso dentro del sitio cuando esa moneda aparece en el Radar
+   de Deslistados o de Nuevos Listados. Las notificaciones las crea el robot (scripts/
+   watchlist_notify.py) con la service role key despues de cada corrida - aca el usuario
+   solo lee/marca como leidas las suyas (RLS: auth.uid() = user_id), nunca escribe en
+   user_notifications directo.
+   =================================================================================== */
+const notifMiniBtn = document.getElementById('notifMiniBtn');
+const notifMiniDropdown = document.getElementById('notifMiniDropdown');
+const notifBadge = document.getElementById('notifBadge');
+const notifLoggedOut = document.getElementById('notifLoggedOut');
+const notifLoggedIn = document.getElementById('notifLoggedIn');
+const notifList = document.getElementById('notifList');
+const notifEmptyMsg = document.getElementById('notifEmptyMsg');
+const notifMarkAllBtn = document.getElementById('notifMarkAllBtn');
+const watchlistList = document.getElementById('watchlistList');
+const watchlistEmptyMsg = document.getElementById('watchlistEmptyMsg');
+const watchlistSearchInput = document.getElementById('watchlistSearchInput');
+const watchlistAssetDropdown = document.getElementById('watchlistAssetDropdown');
+const watchlistPendingBox = document.getElementById('watchlistPendingBox');
+
+notifMiniBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = notifMiniDropdown.classList.toggle('open');
+  notifMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+document.addEventListener('click', (e) => {
+  if(notifMiniDropdown.classList.contains('open') && !notifMiniDropdown.contains(e.target) && e.target !== notifMiniBtn){
+    notifMiniDropdown.classList.remove('open');
+    notifMiniBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.querySelectorAll('#notifLoggedIn .cat-tab[data-notiftab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#notifLoggedIn .cat-tab[data-notiftab]').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.notiftab;
+    document.getElementById('notifPaneAlerts').style.display = target === 'alerts' ? 'block' : 'none';
+    document.getElementById('notifPaneWatchlist').style.display = target === 'watchlist' ? 'block' : 'none';
+  });
+});
+
+function watchlistExchangeLabel(id){
+  if(id === 'any') return 'cualquiera';
+  return (DELIST_EX_BY_ID[id] && DELIST_EX_BY_ID[id].label) || id;
+}
+
+function notifTimeAgoShort(iso){
+  if(!iso) return '';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if(mins < 1) return 'ahora';
+  if(mins < 60) return 'hace ' + mins + 'm';
+  const hrs = Math.floor(mins / 60);
+  if(hrs < 24) return 'hace ' + hrs + 'h';
+  const days = Math.floor(hrs / 24);
+  return 'hace ' + days + 'd';
+}
+
+async function loadNotifications(){
+  if(!currentUser) return;
+  const { data, error } = await sbClient.from('user_notifications')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false }).limit(40);
+  if(error){ console.warn('no se pudieron cargar notificaciones', error); return; }
+  const rows = data || [];
+  const unreadCount = rows.filter(r => !r.read_at).length;
+  notifBadge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+  notifBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+  notifEmptyMsg.style.display = rows.length === 0 ? 'block' : 'none';
+  notifList.innerHTML = '';
+  rows.forEach(r => {
+    const a = document.createElement('a');
+    a.className = 'notif-item' + (r.read_at ? '' : ' unread');
+    a.href = r.source_url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    const kindLabel = r.radar === 'delistings' ? '🔴 Deslistado' : '🟢 Nuevo listado';
+    a.innerHTML =
+      '<div class="notif-item-top"><span>' + kindLabel + '</span><span>·</span><span>' + escapeHtml(watchlistExchangeLabel(r.exchange)) + '</span></div>' +
+      '<div class="notif-item-title">' + escapeHtml(r.symbol) + ' — ' + escapeHtml(r.title) + '</div>' +
+      '<div class="notif-item-date">' + notifTimeAgoShort(r.created_at) + '</div>';
+    a.addEventListener('click', () => { if(!r.read_at) markNotificationRead(r.id); });
+    notifList.appendChild(a);
+  });
+}
+
+async function markNotificationRead(id){
+  await sbClient.from('user_notifications').update({ read_at: new Date().toISOString() }).eq('id', id);
+  loadNotifications();
+}
+
+notifMarkAllBtn.addEventListener('click', async () => {
+  if(!currentUser) return;
+  await sbClient.from('user_notifications').update({ read_at: new Date().toISOString() }).eq('user_id', currentUser.id).is('read_at', null);
+  loadNotifications();
+});
+
+async function loadWatchlist(){
+  if(!currentUser) return;
+  const { data, error } = await sbClient.from('user_watchlist')
+    .select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  if(error){ console.warn('no se pudo cargar Mi Lista', error); return; }
+  const rows = data || [];
+  watchlistEmptyMsg.style.display = rows.length === 0 ? 'block' : 'none';
+  watchlistList.innerHTML = '';
+  rows.forEach(w => {
+    const item = document.createElement('div');
+    item.className = 'watchlist-item';
+    item.innerHTML =
+      '<span class="wli-symbol">' + escapeHtml(w.symbol) + '</span>' +
+      '<span class="wli-exchange">' + escapeHtml(watchlistExchangeLabel(w.exchange)) + '</span>' +
+      '<button class="portfolio-del-btn wli-remove" title="Dejar de seguir" type="button">🗑</button>';
+    item.querySelector('.wli-remove').addEventListener('click', async () => {
+      await sbClient.from('user_watchlist').delete().eq('id', w.id);
+      loadWatchlist();
+    });
+    watchlistList.appendChild(item);
+  });
+}
+
+let watchlistSearchDebounce = null;
+let watchlistSearchAbort = null;
+watchlistSearchInput.addEventListener('input', () => {
+  const q = watchlistSearchInput.value.trim();
+  clearTimeout(watchlistSearchDebounce);
+  if(q.length < 2){ watchlistAssetDropdown.classList.remove('show'); return; }
+  watchlistSearchDebounce = setTimeout(() => runWatchlistSearch(q), 320);
+});
+document.addEventListener('click', (e) => {
+  if(!watchlistAssetDropdown.contains(e.target) && e.target !== watchlistSearchInput){
+    watchlistAssetDropdown.classList.remove('show');
+  }
+});
+
+async function runWatchlistSearch(query){
+  if(watchlistSearchAbort) watchlistSearchAbort.abort();
+  watchlistSearchAbort = new AbortController();
+  watchlistAssetDropdown.innerHTML = '<div class="asset-loading">Buscando…</div>';
+  watchlistAssetDropdown.classList.add('show');
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(query)), { signal: watchlistSearchAbort.signal });
+    const data = await res.json();
+    const coins = (data.coins || []).slice(0, 8);
+    if(coins.length === 0){
+      watchlistAssetDropdown.innerHTML = '<div class="asset-empty">No se encontraron resultados</div>';
+      return;
+    }
+    watchlistAssetDropdown.innerHTML = '';
+    coins.forEach(c => {
+      const opt = document.createElement('div');
+      opt.className = 'asset-option';
+      const img = document.createElement('img');
+      img.src = c.thumb; img.alt = '';
+      const name = document.createElement('span');
+      name.className = 'asset-option-name'; name.textContent = c.name;
+      const sym = document.createElement('span');
+      sym.className = 'asset-option-sym'; sym.textContent = c.symbol;
+      opt.append(img, name, sym);
+      opt.addEventListener('click', () => showWatchlistPending(c));
+      watchlistAssetDropdown.appendChild(opt);
+    });
+  } catch(err){
+    if(err.name === 'AbortError') return;
+    watchlistAssetDropdown.innerHTML = '<div class="asset-empty">No se pudo conectar. Intenta de nuevo.</div>';
+  }
+}
+
+function showWatchlistPending(coin){
+  watchlistAssetDropdown.classList.remove('show');
+  watchlistSearchInput.value = '';
+  const symbol = coin.symbol.toUpperCase();
+  const box = document.createElement('div');
+  box.className = 'wl-pending';
+  const options = ['<option value="any">Cualquier exchange</option>']
+    .concat(DELIST_EXCHANGES.map(e => '<option value="' + e.id + '">' + e.label + '</option>'))
+    .join('');
+  box.innerHTML =
+    'Seguir <b>' + escapeHtml(symbol) + '</b> en:' +
+    '<select id="wlPendingExchange">' + options + '</select>' +
+    '<div class="calc-actions"><button class="a-btn" id="wlPendingConfirm" type="button">Agregar a Mi Lista</button>' +
+    '<button class="a-btn" id="wlPendingCancel" type="button">Cancelar</button></div>';
+  watchlistPendingBox.innerHTML = '';
+  watchlistPendingBox.appendChild(box);
+  box.querySelector('#wlPendingCancel').addEventListener('click', () => { watchlistPendingBox.innerHTML = ''; });
+  box.querySelector('#wlPendingConfirm').addEventListener('click', async () => {
+    const exchange = box.querySelector('#wlPendingExchange').value;
+    const { error } = await sbClient.from('user_watchlist').insert({ user_id: currentUser.id, symbol, exchange });
+    if(error && error.code !== '23505'){ // 23505 = unique_violation (ya la seguia) - no es un error real para el usuario
+      alert(friendlyErrMsg(error));
+      watchlistPendingBox.innerHTML = '';
+      return;
+    }
+    watchlistPendingBox.innerHTML = '';
+    loadWatchlist();
+  });
+}
+
+function renderNotifAuthState(){
+  if(currentUser){
+    notifLoggedOut.style.display = 'none';
+    notifLoggedIn.style.display = 'block';
+    loadNotifications();
+    loadWatchlist();
+  } else {
+    notifLoggedOut.style.display = 'block';
+    notifLoggedIn.style.display = 'none';
+    notifBadge.style.display = 'none';
+    notifList.innerHTML = '';
+    watchlistList.innerHTML = '';
+    watchlistPendingBox.innerHTML = '';
+  }
+}
+renderNotifAuthState();
 </script>
 <script>
 (function(){
