@@ -1619,6 +1619,17 @@ img[src=""]{display:none}
 .radar-asset-chip:hover{color:var(--white)}
 .radar-asset-chip.active{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)}
 
+.radar-search{position:relative;margin-bottom:14px}
+.radar-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.radar-search input{
+  width:100%;box-sizing:border-box;appearance:none;font-family:inherit;font-size:13px;
+  padding:9px 14px 9px 36px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,.03);color:var(--white);
+  transition:border-color var(--dur-fast) var(--ease-out)
+}
+.radar-search input::placeholder{color:var(--muted)}
+.radar-search input:focus{outline:none;border-color:var(--gold)}
+
 .delist-row-asset{font-size:11px;flex-shrink:0;line-height:1}
 
 .delist-list{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:4px;margin:-4px -4px 0 0}
@@ -4497,7 +4508,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="delistRadarLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando avisos de deslistado…</div>
-                  <div class="indic-placeholder-text">Consultando Bitunix, BingX, OKX, Bitget, KuCoin, Binance, MEXC y Kraken.</div>
+                  <div class="indic-placeholder-text">Consultando Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC y Kraken.</div>
                 </div>
                 <div class="indic-chart-soon" id="delistRadarError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -4517,6 +4528,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                     <button type="button" class="radar-asset-chip" data-asset="index">Índices</button>
                     <button type="button" class="radar-asset-chip" data-asset="commodity">Commodities</button>
                   </div>
+                  <div class="radar-search">
+                    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="6.5"/><path d="M18 18l-4.5-4.5"/></svg>
+                    <input type="text" id="delistRadarSearchInput" placeholder="Buscar moneda o par (ej. BTC)…" autocomplete="off">
+                  </div>
                   <div class="delist-hero" id="delistRadarHero"></div>
                   <div class="delist-exchange-grid" id="delistRadarExchanges"></div>
                   <div class="delist-ex-toolbar">
@@ -4532,7 +4547,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🚨 Avisos <b>reales</b> de deslistado (cuándo una moneda deja de poderse comprar/vender en un exchange) recolectados cada hora directo del centro de anuncios público de cada uno — no es una lista completa de "todos los exchanges del mundo", solo los que logramos leer de forma confiable: <b>Bitunix, BingX, OKX, Bitget, KuCoin, Binance, MEXC y Kraken</b>.<br>
+                🚨 Avisos <b>reales</b> de deslistado (cuándo una moneda deja de poderse comprar/vender en un exchange) recolectados cada hora directo del centro de anuncios público de cada uno — no es una lista completa de "todos los exchanges del mundo", solo los que logramos leer de forma confiable: <b>Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC y Kraken</b>. Si algún intercambio aparece en gris es porque en este momento no tiene avisos que mostrar con el filtro elegido (o su fuente está temporalmente bloqueada) — no porque falte integrarlo.<br>
                 📅 La fecha es la de <b>cese de trading spot</b> (no de futuros, ni de depósitos/retiros, que suelen tener fechas distintas) cuando el aviso lo distingue.<br>
                 🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
                 <strong>Un aviso de deslistado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -4565,12 +4580,20 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
 
                 <div id="newListRadarWrap" style="display:none">
+                  <div class="radar-tabs" id="newListRadarTabs">
+                    <button type="button" class="radar-tab" data-tab="upcoming">Próximos</button>
+                    <button type="button" class="radar-tab active" data-tab="history">Historial</button>
+                  </div>
                   <div class="radar-asset-filter" id="newListRadarAssetFilter">
                     <button type="button" class="radar-asset-chip active" data-asset="all">Todos</button>
                     <button type="button" class="radar-asset-chip" data-asset="crypto">Cripto</button>
                     <button type="button" class="radar-asset-chip" data-asset="stock">Acciones</button>
                     <button type="button" class="radar-asset-chip" data-asset="index">Índices</button>
                     <button type="button" class="radar-asset-chip" data-asset="commodity">Commodities</button>
+                  </div>
+                  <div class="radar-search">
+                    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="6.5"/><path d="M18 18l-4.5-4.5"/></svg>
+                    <input type="text" id="newListRadarSearchInput" placeholder="Buscar moneda o par (ej. BTC)…" autocomplete="off">
                   </div>
                   <div class="delist-hero" id="newListRadarHero"></div>
                   <div class="delist-exchange-grid" id="newListRadarExchanges"></div>
@@ -23107,7 +23130,9 @@ const DELIST_EXCHANGES = [
   { id: 'okx',      label: 'OKX',      color: '#b9bdc7' },
   { id: 'bitget',   label: 'Bitget',   color: '#00d4b5' },
   { id: 'kucoin',   label: 'KuCoin',   color: '#2ecc71' },
+  { id: 'bybit',    label: 'Bybit',    color: '#f7a600' },
   { id: 'binance',  label: 'Binance',  color: '#f0b90b' },
+  { id: 'gate',     label: 'Gate',     color: '#e63946' },
   { id: 'mexc',     label: 'MEXC',     color: '#4d7cfe' },
   { id: 'kraken',   label: 'Kraken',   color: '#a970ff' },
 ];
@@ -23123,6 +23148,9 @@ let delistRadarActiveExchanges = null; // Set<string> — null hasta el primer l
 let delistRadarTab = 'upcoming';       // 'upcoming' | 'history'
 let delistRadarAssetClass = 'all';     // 'all' | 'crypto' | 'stock' | 'index' | 'commodity'
 let delistRadarBlockedExchanges = new Set(); // exchanges cuyo scraper no se pudo revisar en la ultima corrida (no es "sin datos")
+let delistRadarSearch = '';            // texto de busqueda (moneda/par), en minusculas
+
+const DELIST_PER_EX_LIMIT = 300; // tope por EXCHANGE (no global) - asi ningun exchange se queda afuera por el volumen de otro
 
 function formatDelistCountdown(targetDate){
   const ms = targetDate.getTime() - Date.now();
@@ -23158,19 +23186,26 @@ async function loadDelistRadar(){
   wrapEl.style.display = 'none';
   try{
     const nowIso = new Date().toISOString();
-    const [mainRes, statusRes] = await Promise.all([
-      sbClient.from('exchange_delistings')
-        .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
-        .gte('delist_at', nowIso)
-        .order('delist_at', { ascending: true })
-        .limit(500),
+    // fetch POR exchange (no un limit() global): un exchange con mucho volumen propio (ej.
+    // BingX) no debe poder "empujar afuera" a otro con menos avisos recientes - cada uno
+    // trae su propia porcion acotada, sin competir por un cupo compartido.
+    const [exResults, statusRes] = await Promise.all([
+      Promise.all(DELIST_EXCHANGES.map(ex =>
+        sbClient.from('exchange_delistings')
+          .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
+          .eq('exchange', ex.id)
+          .gte('delist_at', nowIso)
+          .order('delist_at', { ascending: true })
+          .limit(DELIST_PER_EX_LIMIT)
+      )),
       sbClient.from('exchange_scraper_status')
         .select('exchange')
         .eq('radar', 'delistings')
         .eq('status', 'blocked'),
     ]);
-    if(mainRes.error) throw mainRes.error;
-    delistRadarUpcoming = mainRes.data || [];
+    // un error puntual de un exchange no debe tumbar todo el panel - ese exchange queda "sin datos"
+    delistRadarUpcoming = exResults.flatMap(r => r.error ? [] : (r.data || []))
+      .sort((a, b) => new Date(a.delist_at) - new Date(b.delist_at));
     // statusRes.error se ignora a proposito - el aviso de "problema de red" es un extra, no
     // puede tumbar la carga de los datos principales si esa tabla/columna fallara
     delistRadarBlockedExchanges = new Set((statusRes.data || []).map(r => r.exchange));
@@ -23192,14 +23227,16 @@ async function loadDelistHistoryIfNeeded(){
   delistRadarHistoryLoading = true;
   try{
     const nowIso = new Date().toISOString();
-    const { data, error } = await sbClient
-      .from('exchange_delistings')
-      .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
-      .lt('delist_at', nowIso)
-      .order('delist_at', { ascending: false })
-      .limit(300);
-    if(error) throw error;
-    delistRadarHistory = data || [];
+    const exResults = await Promise.all(DELIST_EXCHANGES.map(ex =>
+      sbClient.from('exchange_delistings')
+        .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
+        .eq('exchange', ex.id)
+        .lt('delist_at', nowIso)
+        .order('delist_at', { ascending: false })
+        .limit(DELIST_PER_EX_LIMIT)
+    ));
+    delistRadarHistory = exResults.flatMap(r => r.error ? [] : (r.data || []))
+      .sort((a, b) => new Date(b.delist_at) - new Date(a.delist_at));
   } catch(err){
     delistRadarHistory = [];
   }
@@ -23218,9 +23255,16 @@ function delistAssetMatches(r){
   return delistRadarAssetClass === 'all' || r.asset_class === delistRadarAssetClass;
 }
 
+function delistSearchMatches(r){
+  if(!delistRadarSearch) return true;
+  return (r.pair_base || '').toLowerCase().includes(delistRadarSearch) ||
+    (r.symbol || '').toLowerCase().includes(delistRadarSearch) ||
+    (r.title || '').toLowerCase().includes(delistRadarSearch);
+}
+
 function renderDelistExchangeCards(){
   const grid = document.getElementById('delistRadarExchanges');
-  const rows = delistCurrentRows().filter(delistAssetMatches);
+  const rows = delistCurrentRows().filter(r => delistAssetMatches(r) && delistSearchMatches(r));
   const countsByEx = {};
   rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
   const countLabel = delistRadarTab === 'history' ? 'Recientes' : 'Próximos';
@@ -23255,7 +23299,7 @@ function renderDelistList(){
   const heroEl = document.getElementById('delistRadarHero');
   const emptyEl = document.getElementById('delistRadarEmpty');
   const isHistory = delistRadarTab === 'history';
-  const filtered = delistCurrentRows().filter(r => delistRadarActiveExchanges.has(r.exchange) && delistAssetMatches(r));
+  const filtered = delistCurrentRows().filter(r => delistRadarActiveExchanges.has(r.exchange) && delistAssetMatches(r) && delistSearchMatches(r));
 
   if(filtered.length === 0){
     heroEl.style.display = 'none';
@@ -23361,6 +23405,11 @@ function ensureDelistRadarLoaded(){
       renderDelistList();
     });
   });
+  document.getElementById('delistRadarSearchInput').addEventListener('input', (e) => {
+    delistRadarSearch = e.target.value.trim().toLowerCase();
+    renderDelistExchangeCards();
+    renderDelistList();
+  });
 }
 
 /* ---- Radar de Nuevos Listados: mismo lenguaje visual que el Radar de Deslistados, pero sin
@@ -23391,6 +23440,10 @@ let newListRadarRows = [];
 let newListRadarActiveExchanges = null;
 let newListRadarAssetClass = 'all';
 let newListRadarBlockedExchanges = new Set(); // exchanges cuyo scraper no se pudo revisar en la ultima corrida (no es "sin datos")
+let newListRadarTab = 'history';       // 'upcoming' | 'history' - "Historial" por defecto (el feed principal); "Proximos" suele ser chico, no todos los exchanges dan fecha futura
+let newListRadarSearch = '';           // texto de busqueda (moneda/par), en minusculas
+
+const NEWLIST_PER_EX_LIMIT = 400; // tope por EXCHANGE (no global) - mismo motivo que en Deslistados
 
 async function loadNewListRadar(){
   const loadingEl = document.getElementById('newListRadarLoading');
@@ -23400,18 +23453,30 @@ async function loadNewListRadar(){
   errorEl.style.display = 'none';
   wrapEl.style.display = 'none';
   try{
-    const [mainRes, statusRes] = await Promise.all([
-      sbClient.from('exchange_new_listings')
-        .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
-        .order('announced_at', { ascending: false, nullsFirst: false })
-        .limit(3000),
+    // fetch POR exchange (no un limit() global): un exchange con mucho volumen propio (ej.
+    // BingX) no debe poder "empujar afuera" a otro con menos avisos recientes, y Pionex
+    // (siempre con announced_at=null, ordena al final) no debe quedar afuera solo por eso.
+    const [exResults, statusRes] = await Promise.all([
+      Promise.all(NEWLIST_EXCHANGES.map(ex =>
+        sbClient.from('exchange_new_listings')
+          .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
+          .eq('exchange', ex.id)
+          .order('announced_at', { ascending: false, nullsFirst: false })
+          .limit(NEWLIST_PER_EX_LIMIT)
+      )),
       sbClient.from('exchange_scraper_status')
         .select('exchange')
         .eq('radar', 'new_listings')
         .eq('status', 'blocked'),
     ]);
-    if(mainRes.error) throw mainRes.error;
-    newListRadarRows = mainRes.data || [];
+    // un error puntual de un exchange no debe tumbar todo el panel - ese exchange queda "sin datos"
+    newListRadarRows = exResults.flatMap(r => r.error ? [] : (r.data || []))
+      .sort((a, b) => {
+        if(!a.announced_at && !b.announced_at) return 0;
+        if(!a.announced_at) return 1;
+        if(!b.announced_at) return -1;
+        return new Date(b.announced_at) - new Date(a.announced_at);
+      });
     // statusRes.error se ignora a proposito - el aviso de "problema de red" es un extra, no
     // puede tumbar la carga de los datos principales si esa tabla/columna fallara
     newListRadarBlockedExchanges = new Set((statusRes.data || []).map(r => r.exchange));
@@ -23428,28 +23493,43 @@ async function loadNewListRadar(){
   }
 }
 
+function newListCurrentRows(){
+  const isFuture = r => !!(r.listed_at && new Date(r.listed_at).getTime() > Date.now());
+  return newListRadarTab === 'upcoming'
+    ? newListRadarRows.filter(isFuture)
+    : newListRadarRows.filter(r => !isFuture(r));
+}
+
 function newListAssetMatches(r){
   return newListRadarAssetClass === 'all' || r.asset_class === newListRadarAssetClass;
 }
 
+function newListSearchMatches(r){
+  if(!newListRadarSearch) return true;
+  return (r.pair_base || '').toLowerCase().includes(newListRadarSearch) ||
+    (r.symbol || '').toLowerCase().includes(newListRadarSearch) ||
+    (r.title || '').toLowerCase().includes(newListRadarSearch);
+}
+
 function renderNewListExchangeCards(){
   const grid = document.getElementById('newListRadarExchanges');
-  const rows = newListRadarRows.filter(newListAssetMatches);
+  const rows = newListCurrentRows().filter(r => newListAssetMatches(r) && newListSearchMatches(r));
   const countsByEx = {};
   rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
+  const countLabel = newListRadarTab === 'upcoming' ? 'Próximos' : 'Recientes';
   grid.innerHTML = NEWLIST_EXCHANGES.map(ex => {
     const n = countsByEx[ex.id] || 0;
     const isEmpty = n === 0;
     const isActive = newListRadarActiveExchanges.has(ex.id);
     const isBlocked = newListRadarBlockedExchanges.has(ex.id);
     const cls = 'delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + (isBlocked && isEmpty ? ' blocked' : '');
-    const countHtml = (isBlocked && isEmpty) ? '⚠️ Problema de red' : (isEmpty ? 'Sin recientes' : n);
+    const countHtml = (isBlocked && isEmpty) ? '⚠️ Problema de red' : (isEmpty ? 'Sin ' + countLabel.toLowerCase() : n);
     return '<button type="button" class="' + cls + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '"' +
       (isBlocked ? ' title="No se pudo revisar este intercambio en la última actualización (problema de red)"' : '') + '>' +
       '<span class="delist-ex-dot"></span>' +
       '<span class="delist-ex-name">' + ex.label + (isBlocked && !isEmpty ? ' ⚠️' : '') + '</span>' +
       '<span class="delist-ex-count">' + countHtml + '</span>' +
-      (isEmpty ? '' : '<span class="delist-ex-count-label">Recientes</span>') +
+      (isEmpty ? '' : '<span class="delist-ex-count-label">' + countLabel + '</span>') +
     '</button>';
   }).join('');
   grid.querySelectorAll('.delist-ex-card:not(.empty)').forEach(card => {
@@ -23467,7 +23547,8 @@ function renderNewListList(){
   const listEl = document.getElementById('newListRadarList');
   const heroEl = document.getElementById('newListRadarHero');
   const emptyEl = document.getElementById('newListRadarEmpty');
-  const filtered = newListRadarRows.filter(r => newListRadarActiveExchanges.has(r.exchange) && newListAssetMatches(r));
+  const isUpcoming = newListRadarTab === 'upcoming';
+  const filtered = newListCurrentRows().filter(r => newListRadarActiveExchanges.has(r.exchange) && newListAssetMatches(r) && newListSearchMatches(r));
 
   if(filtered.length === 0){
     heroEl.style.display = 'none';
@@ -23475,6 +23556,8 @@ function renderNewListList(){
     listEl.style.display = 'none';
     listEl.innerHTML = '';
     emptyEl.style.display = 'flex';
+    emptyEl.querySelector('.indic-placeholder-title').textContent =
+      isUpcoming ? 'No hay próximos listados para lo que elegiste' : 'No hay nuevos listados para lo que elegiste';
     return;
   }
   emptyEl.style.display = 'none';
@@ -23487,7 +23570,7 @@ function renderNewListList(){
   heroEl.innerHTML =
     '<div class="delist-hero-icon">🆕</div>' +
     '<div class="delist-hero-mid">' +
-      '<div class="delist-hero-label">Lo más reciente</div>' +
+      '<div class="delist-hero-label">' + (isUpcoming ? 'El más próximo' : 'Lo más reciente') + '</div>' +
       '<div class="delist-hero-coin">' + next.pair_base + '</div>' +
       '<div class="delist-hero-ex" style="color:' + (nextEx ? nextEx.color : 'inherit') + '">' + (nextEx ? nextEx.label : next.exchange) + '</div>' +
     '</div>' +
@@ -23543,6 +23626,20 @@ function ensureNewListRadarLoaded(){
       renderNewListExchangeCards();
       renderNewListList();
     });
+  });
+  document.getElementById('newListRadarTabs').querySelectorAll('.radar-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      if(tab.dataset.tab === newListRadarTab) return;
+      newListRadarTab = tab.dataset.tab;
+      document.getElementById('newListRadarTabs').querySelectorAll('.radar-tab').forEach(t => t.classList.toggle('active', t === tab));
+      renderNewListExchangeCards();
+      renderNewListList();
+    });
+  });
+  document.getElementById('newListRadarSearchInput').addEventListener('input', (e) => {
+    newListRadarSearch = e.target.value.trim().toLowerCase();
+    renderNewListExchangeCards();
+    renderNewListList();
   });
 }
 
