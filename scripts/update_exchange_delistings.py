@@ -19,7 +19,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))  # para que "delistings" se importe como paquete
 
-from delistings import bitunix, bingx, okx, bitget, kucoin, bybit, binance, gate, mexc, kraken
+from delistings import (
+    bitunix, bingx, okx, bitget, kucoin, bybit, binance, gate, mexc, kraken,
+    lbank, pionex, coinw, weex, blofin,
+)
 from delistings.common import upsert_rows, upsert_scraper_status, ExchangeBlocked, Row
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -42,6 +45,11 @@ FETCHERS = {
     "gate": gate.fetch,
     "mexc": mexc.fetch,
     "kraken": kraken.fetch,
+    "lbank": lbank.fetch,
+    "pionex": pionex.fetch,
+    "coinw": coinw.fetch,
+    "weex": weex.fetch,
+    "blofin": blofin.fetch,
 }
 
 

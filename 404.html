@@ -4508,7 +4508,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="indic-chart-soon" id="delistRadarLoading">
                   <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.png" alt=""></div>
                   <div class="indic-placeholder-title">Cargando avisos de deslistado…</div>
-                  <div class="indic-placeholder-text">Consultando Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC y Kraken.</div>
+                  <div class="indic-placeholder-text">Consultando Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC, Kraken, LBank, Pionex, CoinW, Weex y Blofin.</div>
                 </div>
                 <div class="indic-chart-soon" id="delistRadarError" style="display:none">
                   <div class="indic-placeholder-icon">⚠️</div>
@@ -4547,7 +4547,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
-                🚨 Avisos <b>reales</b> de deslistado (cuándo una moneda deja de poderse comprar/vender en un exchange) recolectados cada hora directo del centro de anuncios público de cada uno — no es una lista completa de "todos los exchanges del mundo", solo los que logramos leer de forma confiable: <b>Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC y Kraken</b>. Si algún intercambio aparece en gris es porque en este momento no tiene avisos que mostrar con el filtro elegido (o su fuente está temporalmente bloqueada) — no porque falte integrarlo.<br>
+                🚨 Avisos <b>reales</b> de deslistado (cuándo una moneda deja de poderse comprar/vender en un exchange) recolectados cada hora directo del centro de anuncios público de cada uno — no es una lista completa de "todos los exchanges del mundo", solo los que logramos leer de forma confiable: <b>Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC, Kraken, LBank, Pionex, CoinW, Weex y Blofin</b>. Si algún intercambio aparece en gris es porque en este momento no tiene avisos que mostrar con el filtro elegido (o su fuente está temporalmente bloqueada) — no porque falte integrarlo.<br>
                 📅 La fecha es la de <b>cese de trading spot</b> (no de futuros, ni de depósitos/retiros, que suelen tener fechas distintas) cuando el aviso lo distingue.<br>
                 🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
                 <strong>Un aviso de deslistado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
@@ -23135,6 +23135,11 @@ const DELIST_EXCHANGES = [
   { id: 'gate',     label: 'Gate',     color: '#e63946' },
   { id: 'mexc',     label: 'MEXC',     color: '#4d7cfe' },
   { id: 'kraken',   label: 'Kraken',   color: '#a970ff' },
+  { id: 'lbank',    label: 'LBank',    color: '#00b4d8' },
+  { id: 'pionex',   label: 'Pionex',   color: '#8338ec' },
+  { id: 'coinw',    label: 'CoinW',    color: '#06d6a0' },
+  { id: 'weex',     label: 'Weex',     color: '#ff6b6b' },
+  { id: 'blofin',   label: 'Blofin',   color: '#9b5de5' },
 ];
 const DELIST_EX_BY_ID = Object.fromEntries(DELIST_EXCHANGES.map(e => [e.id, e]));
 
