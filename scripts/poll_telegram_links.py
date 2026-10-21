@@ -133,16 +133,26 @@ def main() -> None:
             continue
         parts = text.split(maxsplit=1)
         if len(parts) < 2:
-            _send(chat_id, "Abre este bot desde el botón \"Conectar Telegram\" en Mi perfil del sitio para vincular tu cuenta.")
+            _send(
+                chat_id,
+                "👋 ¡Hola! Soy el bot de avisos de SkillCash Tools.\n\n"
+                "Para conectarte, entra a juanskillcash.com → inicia sesión → Mi perfil → "
+                "\"Conectar Telegram\". Desde ahí te traigo de vuelta aquí con el link correcto.",
+            )
             continue
         code = parts[1].strip()
         user_id = _find_pending_link(code)
         if not user_id:
-            _send(chat_id, "Ese código no es válido o ya se usó. Genera uno nuevo en Mi perfil del sitio.")
+            _send(chat_id, "⚠️ Ese código no es válido o ya se usó. Genera uno nuevo en Mi perfil del sitio (juanskillcash.com).")
             continue
         if _complete_link(user_id, chat_id):
             linked += 1
-            _send(chat_id, "✅ Cuenta conectada. Ya vas a recibir aquí los avisos de tu Mi Lista (Deslistados y Nuevos Listados).")
+            _send(
+                chat_id,
+                "✅ ¡Cuenta conectada! A partir de ahora te aviso aquí cuando una moneda de tu "
+                "Mi Lista aparezca en el Radar de Deslistados o de Nuevos Listados.\n\n"
+                "Para dejar de seguir alguna, hazlo desde el mismo radar en juanskillcash.com.",
+            )
         else:
             _send(chat_id, "No se pudo completar la conexión. Intenta de nuevo en unos minutos.")
 

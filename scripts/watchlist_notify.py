@@ -156,7 +156,12 @@ def _send_telegram_for_new_matches(supabase_url: str, supabase_key: str, bot_tok
         if not chat_id:
             continue
         kind_label = "🔴 Deslistado" if n["radar"] == "delistings" else "🟢 Nuevo listado"
-        text = f"{kind_label} · {n['symbol']} en {n['exchange']}\n{n['title']}\n{n['source_url']}"
+        text = (
+            f"{kind_label}\n"
+            f"Moneda: {n['symbol']}\n"
+            f"Exchange: {n['exchange']}\n\n"
+            f"{n['title']}\n{n['source_url']}"
+        )
         if send_telegram_message(bot_token, chat_id, text):
             sent += 1
     if sent:
