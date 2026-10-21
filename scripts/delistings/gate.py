@@ -82,15 +82,26 @@ def fetch(max_pages: int = 2) -> list[Row]:
             data = _extract_next_data(html)
             if not data:
                 title_dbg = page.title()
-                html_snippet = html[:300]
-                ids = re.findall(r'<script[^>]*\bid="([^"]+)"', html)
+                # bloqueo de Akamai (reputacion de IP del runner, confirmado que no es un
+                # cambio del sitio: desde una IP residencial real responde 200 normal) -
+                # distinguirlo del caso generico da un mensaje mas util en el panel que un
+                # "estructura distinta a la esperada"
+                akamai_blocked = "access denied" in html.lower() or "edgesuite.net" in html.lower()
+                ref_match = re.search(r"Reference #([\w.]+)", html)
+                if akamai_blocked:
+                    detail = f"[gate] bloqueado por Akamai (403 Access Denied, IP del runner)"
+                    if ref_match:
+                        detail += f" - Reference #{ref_match.group(1)}"
+                else:
+                    ids = re.findall(r'<script[^>]*\bid="([^"]+)"', html)
+                    detail = (
+                        f"[gate] no se encontro __NEXT_DATA__ en la pagina {p} "
+                        f"(titulo={title_dbg!r}, ids de script={ids}, html={html[:300]!r})"
+                    )
                 if p == 1:
                     browser.close()
-                    raise ExchangeBlocked(
-                        f"[gate] no se encontro __NEXT_DATA__ en la pagina {p} "
-                        f"(titulo={title_dbg!r}, ids de script={ids}, html={html_snippet!r})"
-                    )
-                log.warning(f"[gate] no se encontro __NEXT_DATA__ en la pagina {p} (titulo={title_dbg!r})")
+                    raise ExchangeBlocked(detail)
+                log.warning(detail)
                 break
             try:
                 batch = data["props"]["pageProps"]["listData"]["list"]

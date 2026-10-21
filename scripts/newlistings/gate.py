@@ -36,6 +36,15 @@ def _fetch_page(page: int) -> list[dict]:
     log.info(f"[gate] pagina {page} - metodo usado: {method}")
     m = _NEXT_DATA_RE.search(html)
     if not m:
+        # bloqueo de Akamai (reputacion de IP del runner, no un cambio del sitio - desde una
+        # IP residencial real www.gate.com responde 200 normal) - distinguirlo del caso
+        # generico da un mensaje mas util en el panel que un "no se encontro __NEXT_DATA__"
+        if "access denied" in html.lower() or "edgesuite.net" in html.lower():
+            ref_match = re.search(r"Reference #([\w.]+)", html)
+            detail = "[gate] bloqueado por Akamai (403 Access Denied, IP del runner)"
+            if ref_match:
+                detail += f" - Reference #{ref_match.group(1)}"
+            raise ExchangeBlocked(detail)
         # titulo+largo quedan en el detalle de ExchangeBlocked para no tener que adivinar en
         # la proxima corrida si fue un challenge, un "Access Denied" de WAF, u otra cosa.
         title_m = _TITLE_RE.search(html)

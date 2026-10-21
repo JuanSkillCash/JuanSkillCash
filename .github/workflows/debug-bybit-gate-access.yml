@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install --no-cache-dir requests beautifulsoup4 playwright
+      - run: pip install --no-cache-dir requests beautifulsoup4 playwright websocket-client
       - run: playwright install --with-deps chromium
       - name: Diagnostico
         run: python scripts/debug_bybit_gate_access.py
@@ -23,3 +23,5 @@ jobs:
         run: python scripts/debug_delisting_sources.py
       - name: Diagnostico fuentes de deslistados - ronda 2 (LBank/Weex/CoinW)
         run: python scripts/debug_delisting_sources2.py
+      - name: Diagnostico WebSocket de anuncios de Gate (alternativa a www.gate.com)
+        run: python scripts/debug_gate_websocket.py

@@ -13,6 +13,7 @@ Variables de entorno requeridas:
     SUPABASE_SERVICE_ROLE_KEY
 """
 
+import concurrent.futures
 import logging
 import os
 import sys
@@ -52,6 +53,15 @@ FETCHERS = {
     "blofin": blofin.fetch,
 }
 
+# Presupuesto duro de reloj por exchange: el try/except ya evita que UNO se caiga y tumbe a
+# los demas, pero no evitaba que uno se quedara COLGADO (ej. una corrida real se fue a mas
+# de 25 minutos por acumular timeouts de red reales en varios articulos de los scrapers
+# nuevos) - eso bloquea igual toda la corrida (y, por la concurrency del workflow sin
+# cancel-in-progress, hasta las corridas horarias siguientes). Se corre cada fetch() en su
+# propio hilo daemon con un limite de tiempo: si se pasa, se cuenta como "blocked" y se
+# sigue con el resto sin esperar a que ese hilo termine solo.
+FETCH_TIMEOUT_SECONDS = 120
+
 
 def main():
     if not SUPABASE_URL or not SUPABASE_KEY:
@@ -62,13 +72,19 @@ def main():
     failures = []
     statuses: dict[str, tuple[str, str | None]] = {}
 
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="fetcher")
     for name, fetcher in FETCHERS.items():
         log.info(f"=== {name} ===")
+        future = executor.submit(fetcher)
         try:
-            rows = fetcher()
+            rows = future.result(timeout=FETCH_TIMEOUT_SECONDS)
             log.info(f"{name}: {len(rows)} filas")
             all_rows.extend(rows)
             statuses[name] = ("ok", None)
+        except concurrent.futures.TimeoutError:
+            log.warning(f"{name} se paso de {FETCH_TIMEOUT_SECONDS}s, se sigue con los demas (el hilo se abandona solo)")
+            failures.append(name)
+            statuses[name] = ("blocked", f"excedio el limite de {FETCH_TIMEOUT_SECONDS}s")
         except ExchangeBlocked as e:
             log.warning(f"{name} bloqueado esta corrida: {e}")
             failures.append(name)
@@ -77,6 +93,7 @@ def main():
             log.exception(f"{name} fallo, se sigue con los demas: {e}")
             failures.append(name)
             statuses[name] = ("blocked", f"error inesperado: {e}")
+    executor.shutdown(wait=False, cancel_futures=False)
 
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
