@@ -19,6 +19,7 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body,
     detect_market, html_to_text, is_noise, parse_delist_datetime, classify_asset_class,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.lbank")
@@ -68,6 +69,7 @@ def _fetch_article_text(code) -> str:
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
     body_fetches_left = 15
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     for page in range(1, max_pages + 1):
         body = {"categoryCode": CATEGORY_CODE, "pageNo": page, "pageSize": 20}
         resp = requests.post(LIST_URL, json=body, headers=DEFAULT_HEADERS, timeout=30)
@@ -88,6 +90,7 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 continue
             code = item.get("code") or item.get("noticeId")
             url = ARTICLE_URL_TMPL.format(code=code) if code else ""
+            source_url = url or f"lbank:{code}"
             try:
                 announced_at = datetime.fromtimestamp(int(item.get("contentShowTime")) / 1000, tz=timezone.utc)
             except (TypeError, ValueError):
@@ -98,9 +101,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 log.warning(f"[lbank] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue
 
-            delist_at = None
-            if body_fetches_left > 0:
+            delist_at = known_dates.get(source_url)
+            fetched_body = False
+            if delist_at is None and source_url not in known_dates and body_fetches_left > 0:
                 body_fetches_left -= 1
+                fetched_body = True
                 body_text = _fetch_article_text(code)
                 delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
@@ -110,10 +115,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
             for base in tickers:
                 rows.append(Row(
                     exchange=EXCHANGE, symbol=f"{base}USDT", pair_base=base,
-                    source_url=url or f"lbank:{code}", title=title, asset_class=classify_asset_class(title),
+                    source_url=source_url, title=title, asset_class=classify_asset_class(title),
                     announced_at=announced_at, delist_at=delist_at, market=market,
                 ))
-            time.sleep(0.3)
+            if fetched_body:
+                time.sleep(0.3)
 
         if len(items) < 20:
             break

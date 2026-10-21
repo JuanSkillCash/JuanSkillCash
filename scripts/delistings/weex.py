@@ -26,7 +26,7 @@ from newlistings.common import DEFAULT_HEADERS, fetch_html_with_fallback  # noqa
 
 from .common import (
     Row, ExchangeBlocked, extract_delist_date_from_body, html_to_text,
-    is_noise, parse_delist_datetime, classify_asset_class,
+    is_noise, parse_delist_datetime, classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.weex")
@@ -100,6 +100,7 @@ def fetch(max_pages: int = 1) -> list[Row]:
     rows: list[Row] = []
     any_section_ok = False
     body_fetches_left = MAX_BODY_FETCHES
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     for url, market in SECTIONS:
         try:
             html, method = fetch_html_with_fallback(
@@ -136,9 +137,11 @@ def fetch(max_pages: int = 1) -> list[Row]:
                 log.warning(f"[weex] no se pudieron sacar tickers de: {title!r} ({full_url})")
                 continue
 
-            delist_at = None
-            if body_fetches_left > 0:
+            delist_at = known_dates.get(full_url)
+            fetched_body = False
+            if delist_at is None and full_url not in known_dates and body_fetches_left > 0:
                 body_fetches_left -= 1
+                fetched_body = True
                 body_text = _fetch_article_text(full_url)
                 delist_at = extract_delist_date_from_body(body_text) if body_text else None
             if delist_at is None:
@@ -150,7 +153,8 @@ def fetch(max_pages: int = 1) -> list[Row]:
                     source_url=full_url, title=title, asset_class=classify_asset_class(title),
                     announced_at=None, delist_at=delist_at, market=market,
                 ))
-            time.sleep(0.3)
+            if fetched_body:
+                time.sleep(0.3)
 
     if not any_section_ok and not rows:
         raise ExchangeBlocked("[weex] ninguna de las 2 secciones de deslistado cargo articulos")

@@ -21,6 +21,7 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body,
     detect_market, html_to_text, is_noise, parse_delist_datetime, classify_asset_class,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.blofin")
@@ -92,6 +93,7 @@ def _fetch_article_text(url: str) -> str:
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
     body_fetches_left = 15
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     page = 1
     total_pages = 1
     while page <= total_pages and page <= max_pages:
@@ -117,9 +119,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 log.warning(f"[blofin] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue
 
-            delist_at = None
-            if body_fetches_left > 0:
+            delist_at = known_dates.get(url)
+            fetched_body = False
+            if delist_at is None and url not in known_dates and body_fetches_left > 0:
                 body_fetches_left -= 1
+                fetched_body = True
                 body_text = _fetch_article_text(url)
                 delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
@@ -132,7 +136,8 @@ def fetch(max_pages: int = 3) -> list[Row]:
                     source_url=url, title=title, asset_class=classify_asset_class(title),
                     announced_at=announced_at, delist_at=delist_at, market=market,
                 ))
-            time.sleep(0.3)
+            if fetched_body:
+                time.sleep(0.3)
 
         page += 1
         if page <= total_pages and page <= max_pages:

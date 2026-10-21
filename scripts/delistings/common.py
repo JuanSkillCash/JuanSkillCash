@@ -11,6 +11,7 @@ Variables de entorno requeridas (las lee update_exchange_delistings.py, no este 
 from __future__ import annotations
 
 import logging
+import os
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -417,6 +418,48 @@ def rows_from_title(
             announced_at=announced_at, delist_at=delist_at, market=market,
         ))
     return rows
+
+
+# ---------------------------------------------------------------------------------------
+# Cache de fechas ya conocidas - evita volver a abrir el cuerpo de un articulo viejo en
+# cada corrida horaria solo para sacar una fecha que YA tenemos guardada y que no cambia
+# (la fecha de cese de un deslistado pasado es fija). Los scrapers que abren el cuerpo de
+# cada aviso para extraer delist_at (bybit, blofin, lbank, coinw, weex, pionex) la usan para
+# saltarse el fetch cuando el articulo ya esta en Supabase con una fecha resuelta - el
+# presupuesto de cuerpos-por-corrida queda entonces solo para avisos genuinamente nuevos.
+# ---------------------------------------------------------------------------------------
+
+def fetch_known_delist_dates(exchange: str) -> dict[str, Optional[datetime]]:
+    """{source_url: delist_at} de lo que ya esta guardado para este exchange. Nunca debe
+    tumbar una corrida: si Supabase no responde bien (tabla recien creada, credenciales
+    faltantes, etc.) devuelve {} y el scraper simplemente vuelve a pedir los cuerpos como
+    antes - mas lento esta vez, pero nunca mas filas perdidas."""
+    supabase_url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    if not supabase_url or not supabase_key:
+        return {}
+    try:
+        url = f"{supabase_url}/rest/v1/{TABLE}?exchange=eq.{exchange}&select=source_url,delist_at&limit=5000"
+        headers = {"apikey": supabase_key, "Authorization": f"Bearer {supabase_key}"}
+        resp = requests.get(url, headers=headers, timeout=20)
+        if resp.status_code != 200:
+            return {}
+        out: dict[str, Optional[datetime]] = {}
+        for row in resp.json():
+            source_url = row.get("source_url")
+            if not source_url:
+                continue
+            delist_at_raw = row.get("delist_at")
+            if delist_at_raw:
+                try:
+                    out[source_url] = datetime.fromisoformat(delist_at_raw.replace("Z", "+00:00"))
+                except ValueError:
+                    out[source_url] = None
+            else:
+                out.setdefault(source_url, None)
+        return out
+    except requests.RequestException:
+        return {}
 
 
 # ---------------------------------------------------------------------------------------

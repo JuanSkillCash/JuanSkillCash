@@ -25,7 +25,7 @@ from bs4 import BeautifulSoup
 
 from .common import (
     Row, ExchangeBlocked, extract_delist_date_from_body, detect_market,
-    is_noise, classify_asset_class, parse_delist_datetime,
+    is_noise, classify_asset_class, parse_delist_datetime, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.pionex")
@@ -76,6 +76,7 @@ def fetch(max_pages: int = 1) -> list[Row]:
     rows: list[Row] = []
     seen_urls = set()
     body_fetches_left = 15
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     for a in links:
         title = a.get_text(strip=True)
         href = a.get("href", "")
@@ -91,9 +92,11 @@ def fetch(max_pages: int = 1) -> list[Row]:
             log.warning(f"[pionex] no se pudieron sacar tickers de: {title!r} ({url})")
             continue
 
-        delist_at = None
-        if body_fetches_left > 0:
+        delist_at = known_dates.get(url)
+        fetched_body = False
+        if delist_at is None and url not in known_dates and body_fetches_left > 0:
             body_fetches_left -= 1
+            fetched_body = True
             try:
                 art_html, _ = fetch_html_with_fallback(url, timeout=12)
                 art_text = BeautifulSoup(art_html, "html.parser").get_text(separator="\n")
@@ -110,7 +113,8 @@ def fetch(max_pages: int = 1) -> list[Row]:
                 source_url=url, title=title, asset_class=classify_asset_class(title),
                 announced_at=None, delist_at=delist_at, market=market,
             ))
-        time.sleep(0.3)
+        if fetched_body:
+            time.sleep(0.3)
 
     log.info(f"[pionex] {len(rows)} filas")
     return rows

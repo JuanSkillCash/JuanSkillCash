@@ -20,6 +20,7 @@ import requests
 from .common import (
     Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body, extract_tickers,
     detect_market, is_noise, html_to_text, parse_delist_datetime, classify_asset_class,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.bybit")
@@ -80,6 +81,7 @@ def fetch(max_pages: int = 10) -> list[Row]:
     seen_urls: set[str] = set()
     blocked_errors: list[ExchangeBlocked] = []
     body_fetches_left = MAX_BODY_FETCHES
+    known_dates = fetch_known_delist_dates(EXCHANGE)
 
     for locale in LOCALES:
         locale_rows: list[Row] = []
@@ -115,9 +117,9 @@ def fetch(max_pages: int = 10) -> list[Row]:
                 full_url = BASE + rel_url if rel_url.startswith("/") else rel_url
                 announced_at = _epoch_s_to_dt(item.get("publish_time"))
 
-                delist_at = None
+                delist_at = known_dates.get(full_url)
                 fetched_body = False
-                if body_fetches_left > 0:
+                if delist_at is None and full_url not in known_dates and body_fetches_left > 0:
                     body_fetches_left -= 1
                     fetched_body = True
                     body_text = _fetch_article_text(full_url)

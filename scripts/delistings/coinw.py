@@ -25,7 +25,7 @@ from newlistings.common import DEFAULT_HEADERS, fetch_html_with_fallback  # noqa
 
 from .common import (
     Row, ExchangeBlocked, extract_delist_date_from_body, detect_market, html_to_text,
-    is_noise, parse_delist_datetime, classify_asset_class,
+    is_noise, parse_delist_datetime, classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.coinw")
@@ -64,6 +64,7 @@ def _fetch_article_text(url: str) -> str:
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
     body_fetches_left = MAX_BODY_FETCHES
+    known_dates = fetch_known_delist_dates(EXCHANGE)
     for page in range(1, max_pages + 1):
         url = LIST_URL if page == 1 else f"{LIST_URL}?page={page}"
         try:
@@ -100,9 +101,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 y, mo, d = (int(x) for x in dm.groups())
                 announced_at = datetime(y, mo, d, tzinfo=timezone.utc)
 
-            delist_at = None
-            if body_fetches_left > 0:
+            delist_at = known_dates.get(url_full)
+            fetched_body = False
+            if delist_at is None and url_full not in known_dates and body_fetches_left > 0:
                 body_fetches_left -= 1
+                fetched_body = True
                 body_text = _fetch_article_text(url_full)
                 delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
@@ -115,7 +118,8 @@ def fetch(max_pages: int = 3) -> list[Row]:
                     source_url=url_full, title=title, asset_class=classify_asset_class(title),
                     announced_at=announced_at, delist_at=delist_at, market=market,
                 ))
-            time.sleep(0.3)
+            if fetched_body:
+                time.sleep(0.3)
 
         time.sleep(0.5)
 
