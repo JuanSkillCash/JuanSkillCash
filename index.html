@@ -367,8 +367,9 @@ button{font-family:inherit;color:inherit}
 .notif-item-date{font-size:10px;color:var(--muted);margin-top:4px}
 
 /* MI LISTA (dentro de cada radar) */
-.watchlist-box{margin:14px 0;border:1px solid var(--border2);border-radius:12px;overflow:hidden}
-.watchlist-box-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;font-weight:700;font-size:13px;color:var(--white);background:rgba(255,255,255,.03)}
+.watchlist-box{margin:14px 0;border:1px solid var(--border2);border-radius:12px}
+.watchlist-box-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;font-weight:700;font-size:13px;color:var(--white);background:rgba(255,255,255,.03);border-radius:12px}
+.watchlist-box.open .watchlist-box-head{border-radius:12px 12px 0 0}
 .watchlist-box-arrow{color:var(--muted2);transition:transform .2s}
 .watchlist-box.open .watchlist-box-arrow{transform:rotate(180deg)}
 .watchlist-box-body{padding:14px;border-top:1px solid var(--border2)}

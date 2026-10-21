@@ -34,3 +34,14 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python scripts/update_new_listings.py
+
+      # el cron propio de cada 5 min de poll-telegram-links.yml nunca disparo solo (ver ese
+      # workflow) - este paso aqui es el respaldo que de verdad corre solo, aprovechando que
+      # este cron horario si dispara de forma confiable
+      - name: Revisar vinculos de Telegram pendientes
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/poll_telegram_links.py

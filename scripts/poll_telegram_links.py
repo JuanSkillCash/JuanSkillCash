@@ -108,6 +108,18 @@ def main() -> None:
         log.error("Faltan TELEGRAM_BOT_TOKEN, SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
         sys.exit(1)
 
+    # este script ahora tambien se llama como un paso mas al final de los robots horarios
+    # (ver update_exchange_delistings.py / update_new_listings.py) porque el cron propio de
+    # cada 5 min de este workflow nunca disparo solo ni una vez (confirmado revisando el
+    # historial real) - una falla de red aca NUNCA debe tumbar esa corrida, que ya subio
+    # datos reales del radar antes de llegar a esto
+    try:
+        _poll_once()
+    except requests.RequestException as e:
+        log.warning(f"fallo revisando mensajes de Telegram, se sigue de largo: {e}")
+
+
+def _poll_once() -> None:
     last_update_id = _get_last_update_id()
     resp = requests.get(
         TELEGRAM_API.format(token=BOT_TOKEN, method="getUpdates"),
