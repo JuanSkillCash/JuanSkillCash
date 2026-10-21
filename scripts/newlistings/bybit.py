@@ -30,6 +30,9 @@ LOCALES = ["en", "es-MX"]  # es-MX solo como respaldo
 CATEGORY = "new_crypto"  # "New Listings" en pageEntry.categoryConnection
 
 _NEXT_DATA_RE = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
+# "TradFi stock listing: 10 stock CFDs now live on Bybit TradFi!" - resumen generico sin
+# decir cuales son los 10, no un aviso de un ticker puntual.
+_BYBIT_NOISE_RE = re.compile(r"\d+\s+stock CFDs now live", re.IGNORECASE)
 
 _MONTHS = {
     "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
@@ -45,6 +48,11 @@ _TO_LIST_PAREN_RE = re.compile(r"to List\s+\w+\s*\(([A-Z0-9]{1,15})\)\s+on Spot"
 # Perpetual Contract..." - formato sin "Listing of X on Bybit", el ticker va pegado antes
 # de "USDT" directo despues de "New listing:".
 _NEW_LISTING_USDT_RE = re.compile(r"New listing:\s+([A-Z0-9]{1,15})USDT\s+(?:TradFi\s+)?Perpetual Contract", re.IGNORECASE)
+# "New listing: MOONSHOT Pre-IPO Perpetual Contract on Bybit at Aug, 7, 2026 11am UTC" -
+# Pre-IPO no lleva "USDT" pegado al ticker.
+_PREIPO_BARE_RE = re.compile(r"New listing:\s+([A-Z0-9]{1,15})\s+Pre-IPO Perpetual Contract", re.IGNORECASE)
+# "Bybit to convert SHEINUSDT Pre-Market Perpetual Contract to standard Perpetual Contract"
+_CONVERT_PREMARKET_RE = re.compile(r"to convert\s+([A-Z0-9]{1,15})USDT\s+Pre-Market", re.IGNORECASE)
 
 
 def _parse_listed_at(title: str) -> datetime | None:
@@ -77,6 +85,12 @@ def _extract_ticker(title: str) -> str | None:
     if m:
         return _strip_quote(m.group(1))
     m = _NEW_LISTING_USDT_RE.search(title)
+    if m:
+        return m.group(1).upper()
+    m = _PREIPO_BARE_RE.search(title)
+    if m:
+        return m.group(1).upper()
+    m = _CONVERT_PREMARKET_RE.search(title)
     if m:
         return m.group(1).upper()
     m = _TO_LIST_PAREN_RE.search(title)
@@ -129,7 +143,7 @@ def fetch(max_pages: int = 10) -> list[Row]:
                 if (item.get("category") or {}).get("key") != CATEGORY:
                     continue
                 title = (item.get("title") or "").strip()
-                if not title or is_noise(title):
+                if not title or is_noise(title) or _BYBIT_NOISE_RE.search(title):
                     continue
                 rel_url = item.get("url") or ""
                 if not rel_url or rel_url in seen_urls:
