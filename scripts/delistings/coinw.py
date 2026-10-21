@@ -37,6 +37,8 @@ _HREF_DATE_RE = re.compile(r"/more/(\d{4})-(\d{2})-(\d{2})/")
 _DELISTING_OF_TAIL_RE = re.compile(r"Delisting of\s+(?:the\s+)?(.+?)(?:\s+USDT-M Perpetual Futures\b|\s+Trading Pairs?\b|$)", re.IGNORECASE)
 _CAPS_TOKEN_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,14})\b")
 
+MAX_BODY_FETCHES = 15
+
 
 def _extract_tickers(title: str) -> list[str]:
     m = _DELISTING_OF_TAIL_RE.search(title)
@@ -52,7 +54,7 @@ def _extract_tickers(title: str) -> list[str]:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        html, _ = fetch_html_with_fallback(url)
+        html, _ = fetch_html_with_fallback(url, timeout=12)
         return html_to_text(html)
     except Exception as e:
         log.warning(f"[coinw] fallo trayendo articulo {url}: {e}")
@@ -61,6 +63,7 @@ def _fetch_article_text(url: str) -> str:
 
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
+    body_fetches_left = MAX_BODY_FETCHES
     for page in range(1, max_pages + 1):
         url = LIST_URL if page == 1 else f"{LIST_URL}?page={page}"
         try:
@@ -97,8 +100,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 y, mo, d = (int(x) for x in dm.groups())
                 announced_at = datetime(y, mo, d, tzinfo=timezone.utc)
 
-            body_text = _fetch_article_text(url_full)
-            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            delist_at = None
+            if body_fetches_left > 0:
+                body_fetches_left -= 1
+                body_text = _fetch_article_text(url_full)
+                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
 

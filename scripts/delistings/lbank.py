@@ -56,7 +56,7 @@ def _fetch_article_text(code) -> str:
     if not code:
         return ""
     try:
-        resp = requests.get(ARTICLE_URL_TMPL.format(code=code), headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(ARTICLE_URL_TMPL.format(code=code), headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             return ""
         return html_to_text(resp.text)
@@ -67,6 +67,7 @@ def _fetch_article_text(code) -> str:
 
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
+    body_fetches_left = 15
     for page in range(1, max_pages + 1):
         body = {"categoryCode": CATEGORY_CODE, "pageNo": page, "pageSize": 20}
         resp = requests.post(LIST_URL, json=body, headers=DEFAULT_HEADERS, timeout=30)
@@ -97,8 +98,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 log.warning(f"[lbank] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue
 
-            body_text = _fetch_article_text(code)
-            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            delist_at = None
+            if body_fetches_left > 0:
+                body_fetches_left -= 1
+                body_text = _fetch_article_text(code)
+                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
 

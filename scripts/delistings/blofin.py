@@ -80,7 +80,7 @@ def _fetch_page(page: int) -> tuple[list[dict], int]:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             return ""
         return html_to_text(resp.text)
@@ -91,6 +91,7 @@ def _fetch_article_text(url: str) -> str:
 
 def fetch(max_pages: int = 3) -> list[Row]:
     rows: list[Row] = []
+    body_fetches_left = 15
     page = 1
     total_pages = 1
     while page <= total_pages and page <= max_pages:
@@ -116,8 +117,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 log.warning(f"[blofin] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue
 
-            body_text = _fetch_article_text(url)
-            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            delist_at = None
+            if body_fetches_left > 0:
+                body_fetches_left -= 1
+                body_text = _fetch_article_text(url)
+                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
 

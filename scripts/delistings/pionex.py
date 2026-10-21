@@ -75,6 +75,7 @@ def fetch(max_pages: int = 1) -> list[Row]:
 
     rows: list[Row] = []
     seen_urls = set()
+    body_fetches_left = 15
     for a in links:
         title = a.get_text(strip=True)
         href = a.get("href", "")
@@ -91,12 +92,14 @@ def fetch(max_pages: int = 1) -> list[Row]:
             continue
 
         delist_at = None
-        try:
-            art_html, _ = fetch_html_with_fallback(url)
-            art_text = BeautifulSoup(art_html, "html.parser").get_text(separator="\n")
-            delist_at = extract_delist_date_from_body(art_text)
-        except Exception as e:
-            log.warning(f"[pionex] no se pudo leer el articulo {url}: {e}")
+        if body_fetches_left > 0:
+            body_fetches_left -= 1
+            try:
+                art_html, _ = fetch_html_with_fallback(url, timeout=12)
+                art_text = BeautifulSoup(art_html, "html.parser").get_text(separator="\n")
+                delist_at = extract_delist_date_from_body(art_text)
+            except Exception as e:
+                log.warning(f"[pionex] no se pudo leer el articulo {url}: {e}")
         if delist_at is None:
             delist_at = parse_delist_datetime(title)
 

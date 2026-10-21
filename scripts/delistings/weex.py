@@ -45,6 +45,12 @@ _DELISTS_SLASH_RE = re.compile(r"[Dd]elists?\s+([A-Z0-9/]+)\s+Trading Pairs?", r
 _PREFIX_LIST_RE = re.compile(r"^(.+?)\s+Spot Trading Pairs?\s+Delisting Announcement$", re.IGNORECASE)
 _CAPS_TOKEN_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,14})\b")
 
+# acota cuantos cuerpos de articulo se van a pedir en una sola corrida - estas secciones
+# acumulan meses/anios de avisos y pedir el cuerpo de CADA uno (con posible caida a
+# Playwright por articulo) podria tardar demasiado; alcanza con los mas recientes, la
+# corrida horaria siguiente cubre lo que falte
+MAX_BODY_FETCHES = 15
+
 
 def _tickers_from_slash_group(seg: str) -> list[str]:
     parts = [p.strip().upper() for p in seg.split("/") if p.strip()]
@@ -83,7 +89,7 @@ def _extract_tickers(title: str) -> list[str]:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        html, _ = fetch_html_with_fallback(url)
+        html, _ = fetch_html_with_fallback(url, timeout=12)
         return html_to_text(html)
     except Exception as e:
         log.warning(f"[weex] fallo trayendo articulo {url}: {e}")
@@ -93,6 +99,7 @@ def _fetch_article_text(url: str) -> str:
 def fetch(max_pages: int = 1) -> list[Row]:
     rows: list[Row] = []
     any_section_ok = False
+    body_fetches_left = MAX_BODY_FETCHES
     for url, market in SECTIONS:
         try:
             html, method = fetch_html_with_fallback(
@@ -129,8 +136,11 @@ def fetch(max_pages: int = 1) -> list[Row]:
                 log.warning(f"[weex] no se pudieron sacar tickers de: {title!r} ({full_url})")
                 continue
 
-            body_text = _fetch_article_text(full_url)
-            delist_at = extract_delist_date_from_body(body_text) if body_text else None
+            delist_at = None
+            if body_fetches_left > 0:
+                body_fetches_left -= 1
+                body_text = _fetch_article_text(full_url)
+                delist_at = extract_delist_date_from_body(body_text) if body_text else None
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
 
