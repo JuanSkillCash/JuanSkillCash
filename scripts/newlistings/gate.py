@@ -12,7 +12,7 @@ import re
 import time
 from datetime import datetime, timezone
 
-from .common import Row, classify_asset_class_or_ticker, fetch_html_with_fallback, is_noise
+from .common import Row, ExchangeBlocked, classify_asset_class_or_ticker, fetch_html_with_fallback, is_noise
 
 log = logging.getLogger("newlistings.gate")
 
@@ -36,21 +36,18 @@ def _fetch_page(page: int) -> list[dict]:
     log.info(f"[gate] pagina {page} - metodo usado: {method}")
     m = _NEXT_DATA_RE.search(html)
     if not m:
-        # diagnostico: no sabemos todavia por que Playwright no trae el __NEXT_DATA__ (bloqueo
-        # de bot, challenge, pagina distinta) - logueamos titulo+largo para no tener que
-        # adivinar en la proxima corrida.
+        # titulo+largo quedan en el detalle de ExchangeBlocked para no tener que adivinar en
+        # la proxima corrida si fue un challenge, un "Access Denied" de WAF, u otra cosa.
         title_m = _TITLE_RE.search(html)
         title = title_m.group(1).strip() if title_m else "(sin <title>)"
-        log.warning(
+        raise ExchangeBlocked(
             f"[gate] no se encontro __NEXT_DATA__ en pagina {page} "
             f"(titulo={title!r}, largo html={len(html)})"
         )
-        return []
     try:
         data = json.loads(m.group(1))
     except json.JSONDecodeError:
-        log.warning(f"[gate] __NEXT_DATA__ invalido en pagina {page}")
-        return []
+        raise ExchangeBlocked(f"[gate] __NEXT_DATA__ invalido en pagina {page}")
     list_data = (((data.get("props") or {}).get("pageProps") or {}).get("listData") or {})
     return list_data.get("list") or []
 
@@ -58,7 +55,12 @@ def _fetch_page(page: int) -> list[dict]:
 def fetch(max_pages: int = 5) -> list[Row]:
     rows: list[Row] = []
     for page in range(1, max_pages + 1):
-        items = _fetch_page(page)
+        try:
+            items = _fetch_page(page)
+        except ExchangeBlocked:
+            if page == 1:
+                raise
+            break  # ya hay filas de paginas anteriores, no es un bloqueo total de la corrida
         if not items:
             break
 

@@ -20,7 +20,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))  # para que "delistings" se importe como paquete
 
 from delistings import bitunix, bingx, okx, bitget, kucoin, bybit, binance, gate, mexc, kraken
-from delistings.common import upsert_rows, Row
+from delistings.common import upsert_rows, upsert_scraper_status, ExchangeBlocked, Row
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("update_exchange_delistings")
@@ -52,6 +52,7 @@ def main():
 
     all_rows: list[Row] = []
     failures = []
+    statuses: dict[str, tuple[str, str | None]] = {}
 
     for name, fetcher in FETCHERS.items():
         log.info(f"=== {name} ===")
@@ -59,12 +60,19 @@ def main():
             rows = fetcher()
             log.info(f"{name}: {len(rows)} filas")
             all_rows.extend(rows)
+            statuses[name] = ("ok", None)
+        except ExchangeBlocked as e:
+            log.warning(f"{name} bloqueado esta corrida: {e}")
+            failures.append(name)
+            statuses[name] = ("blocked", str(e))
         except Exception as e:
             log.exception(f"{name} fallo, se sigue con los demas: {e}")
             failures.append(name)
+            statuses[name] = ("blocked", f"error inesperado: {e}")
 
     log.info(f"Subiendo {len(all_rows)} filas en total a Supabase...")
     upsert_rows(SUPABASE_URL, SUPABASE_KEY, all_rows)
+    upsert_scraper_status(SUPABASE_URL, SUPABASE_KEY, "delistings", statuses)
     log.info(f"{len(all_rows)} filas subidas ({len(FETCHERS) - len(failures)}/{len(FETCHERS)} exchanges OK)")
 
     if failures:

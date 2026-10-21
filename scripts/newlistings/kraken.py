@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from .common import Row, DEFAULT_HEADERS, is_noise
+from .common import Row, DEFAULT_HEADERS, ExchangeBlocked, is_noise
 
 log = logging.getLogger("newlistings.kraken")
 
@@ -58,6 +58,8 @@ def fetch(max_pages: int = 3) -> list[Row]:
         }
         resp = _get_with_retries(params)
         if resp.status_code != 200:
+            if page == 1:
+                raise ExchangeBlocked(f"[kraken] pagina {page} respondio {resp.status_code}: {resp.text[:300]}")
             log.warning(f"[kraken] pagina {page} respondio {resp.status_code}: {resp.text[:300]}")
             break
         items = resp.json()

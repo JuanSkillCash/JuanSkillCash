@@ -1591,6 +1591,9 @@ img[src=""]{display:none}
 .delist-ex-card:not(.active){opacity:.38}
 .delist-ex-card.empty{opacity:.3;cursor:default;pointer-events:none}
 .delist-ex-card.empty .delist-ex-dot{background:var(--muted);box-shadow:none}
+.delist-ex-card.blocked{opacity:.65;border-color:#e8a33d55;background:rgba(232,163,61,.07)}
+.delist-ex-card.blocked .delist-ex-dot{background:#e8a33d;box-shadow:0 0 7px #e8a33d}
+.delist-ex-card.blocked .delist-ex-count{color:#e8a33d;font-size:9.5px}
 .delist-ex-dot{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 7px var(--c)}
 .delist-ex-name{font-size:11px;font-weight:700;color:var(--white);white-space:nowrap}
 .delist-ex-count{font-family:'Space Mono',monospace;font-size:17px;font-weight:900;color:var(--c)}
@@ -23119,6 +23122,7 @@ let delistRadarHistoryLoading = false;
 let delistRadarActiveExchanges = null; // Set<string> — null hasta el primer load (ahi se llena con "todos los que trajeron datos")
 let delistRadarTab = 'upcoming';       // 'upcoming' | 'history'
 let delistRadarAssetClass = 'all';     // 'all' | 'crypto' | 'stock' | 'index' | 'commodity'
+let delistRadarBlockedExchanges = new Set(); // exchanges cuyo scraper no se pudo revisar en la ultima corrida (no es "sin datos")
 
 function formatDelistCountdown(targetDate){
   const ms = targetDate.getTime() - Date.now();
@@ -23154,14 +23158,22 @@ async function loadDelistRadar(){
   wrapEl.style.display = 'none';
   try{
     const nowIso = new Date().toISOString();
-    const { data, error } = await sbClient
-      .from('exchange_delistings')
-      .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
-      .gte('delist_at', nowIso)
-      .order('delist_at', { ascending: true })
-      .limit(500);
-    if(error) throw error;
-    delistRadarUpcoming = data || [];
+    const [mainRes, statusRes] = await Promise.all([
+      sbClient.from('exchange_delistings')
+        .select('exchange,symbol,pair_base,market,asset_class,delist_at,title,source_url')
+        .gte('delist_at', nowIso)
+        .order('delist_at', { ascending: true })
+        .limit(500),
+      sbClient.from('exchange_scraper_status')
+        .select('exchange')
+        .eq('radar', 'delistings')
+        .eq('status', 'blocked'),
+    ]);
+    if(mainRes.error) throw mainRes.error;
+    delistRadarUpcoming = mainRes.data || [];
+    // statusRes.error se ignora a proposito - el aviso de "problema de red" es un extra, no
+    // puede tumbar la carga de los datos principales si esa tabla/columna fallara
+    delistRadarBlockedExchanges = new Set((statusRes.data || []).map(r => r.exchange));
     if(!delistRadarActiveExchanges){
       delistRadarActiveExchanges = new Set([...new Set(delistRadarUpcoming.map(r => r.exchange))]);
     }
@@ -23216,10 +23228,14 @@ function renderDelistExchangeCards(){
     const n = countsByEx[ex.id] || 0;
     const isEmpty = n === 0;
     const isActive = delistRadarActiveExchanges.has(ex.id);
-    return '<button type="button" class="delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '">' +
+    const isBlocked = delistRadarBlockedExchanges.has(ex.id);
+    const cls = 'delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + (isBlocked && isEmpty ? ' blocked' : '');
+    const countHtml = (isBlocked && isEmpty) ? '⚠️ Problema de red' : (isEmpty ? 'Sin ' + countLabel.toLowerCase() : n);
+    return '<button type="button" class="' + cls + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '"' +
+      (isBlocked ? ' title="No se pudo revisar este intercambio en la última actualización (problema de red)"' : '') + '>' +
       '<span class="delist-ex-dot"></span>' +
-      '<span class="delist-ex-name">' + ex.label + '</span>' +
-      '<span class="delist-ex-count">' + (isEmpty ? 'Sin ' + countLabel.toLowerCase() : n) + '</span>' +
+      '<span class="delist-ex-name">' + ex.label + (isBlocked && !isEmpty ? ' ⚠️' : '') + '</span>' +
+      '<span class="delist-ex-count">' + countHtml + '</span>' +
       (isEmpty ? '' : '<span class="delist-ex-count-label">' + countLabel + '</span>') +
     '</button>';
   }).join('');
@@ -23374,6 +23390,7 @@ let newListRadarLoadedOnce = false;
 let newListRadarRows = [];
 let newListRadarActiveExchanges = null;
 let newListRadarAssetClass = 'all';
+let newListRadarBlockedExchanges = new Set(); // exchanges cuyo scraper no se pudo revisar en la ultima corrida (no es "sin datos")
 
 async function loadNewListRadar(){
   const loadingEl = document.getElementById('newListRadarLoading');
@@ -23383,13 +23400,21 @@ async function loadNewListRadar(){
   errorEl.style.display = 'none';
   wrapEl.style.display = 'none';
   try{
-    const { data, error } = await sbClient
-      .from('exchange_new_listings')
-      .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
-      .order('announced_at', { ascending: false, nullsFirst: false })
-      .limit(3000);
-    if(error) throw error;
-    newListRadarRows = data || [];
+    const [mainRes, statusRes] = await Promise.all([
+      sbClient.from('exchange_new_listings')
+        .select('exchange,symbol,pair_base,market,asset_class,announced_at,listed_at,title,source_url')
+        .order('announced_at', { ascending: false, nullsFirst: false })
+        .limit(3000),
+      sbClient.from('exchange_scraper_status')
+        .select('exchange')
+        .eq('radar', 'new_listings')
+        .eq('status', 'blocked'),
+    ]);
+    if(mainRes.error) throw mainRes.error;
+    newListRadarRows = mainRes.data || [];
+    // statusRes.error se ignora a proposito - el aviso de "problema de red" es un extra, no
+    // puede tumbar la carga de los datos principales si esa tabla/columna fallara
+    newListRadarBlockedExchanges = new Set((statusRes.data || []).map(r => r.exchange));
     if(!newListRadarActiveExchanges){
       newListRadarActiveExchanges = new Set([...new Set(newListRadarRows.map(r => r.exchange))]);
     }
@@ -23416,10 +23441,14 @@ function renderNewListExchangeCards(){
     const n = countsByEx[ex.id] || 0;
     const isEmpty = n === 0;
     const isActive = newListRadarActiveExchanges.has(ex.id);
-    return '<button type="button" class="delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '">' +
+    const isBlocked = newListRadarBlockedExchanges.has(ex.id);
+    const cls = 'delist-ex-card' + (isActive && !isEmpty ? ' active' : '') + (isEmpty ? ' empty' : '') + (isBlocked && isEmpty ? ' blocked' : '');
+    const countHtml = (isBlocked && isEmpty) ? '⚠️ Problema de red' : (isEmpty ? 'Sin recientes' : n);
+    return '<button type="button" class="' + cls + '" style="--c:' + ex.color + '" data-ex="' + ex.id + '"' +
+      (isBlocked ? ' title="No se pudo revisar este intercambio en la última actualización (problema de red)"' : '') + '>' +
       '<span class="delist-ex-dot"></span>' +
-      '<span class="delist-ex-name">' + ex.label + '</span>' +
-      '<span class="delist-ex-count">' + (isEmpty ? 'Sin recientes' : n) + '</span>' +
+      '<span class="delist-ex-name">' + ex.label + (isBlocked && !isEmpty ? ' ⚠️' : '') + '</span>' +
+      '<span class="delist-ex-count">' + countHtml + '</span>' +
       (isEmpty ? '' : '<span class="delist-ex-count-label">Recientes</span>') +
     '</button>';
   }).join('');

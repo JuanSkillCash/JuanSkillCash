@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from .common import Row, DEFAULT_HEADERS, classify_asset_class_or_ticker, is_noise
+from .common import Row, DEFAULT_HEADERS, ExchangeBlocked, classify_asset_class_or_ticker, is_noise
 
 log = logging.getLogger("newlistings.bybit")
 
@@ -99,41 +99,41 @@ def _extract_ticker(title: str) -> str | None:
     return None
 
 
-def _fetch_page(locale: str, page: int) -> tuple[list[dict], bool]:
-    """Devuelve (items, ok). ok=False corta la paginacion de este locale (403/bloqueo/
-    __NEXT_DATA__ ausente) en vez de reintentar a ciegas."""
+def _fetch_page(locale: str, page: int) -> list[dict]:
+    """Levanta ExchangeBlocked (403/bloqueo/__NEXT_DATA__ ausente) en vez de devolver
+    vacio a ciegas - fetch() decide si eso corta solo este locale o toda la corrida."""
     params = {"category": CATEGORY}
     if page > 1:
         params["page"] = page
     resp = requests.get(f"{BASE}/{locale}/", params=params, headers=DEFAULT_HEADERS, timeout=30)
     if resp.status_code != 200:
-        log.warning(f"[bybit] {locale} pagina {page} respondio {resp.status_code}")
-        return [], False
+        raise ExchangeBlocked(f"[bybit] {locale} pagina {page} respondio {resp.status_code}")
     m = _NEXT_DATA_RE.search(resp.text)
     if not m:
-        log.warning(f"[bybit] {locale} pagina {page}: no se encontro __NEXT_DATA__")
-        return [], False
+        raise ExchangeBlocked(f"[bybit] {locale} pagina {page}: no se encontro __NEXT_DATA__")
     try:
         data = json.loads(m.group(1))
     except json.JSONDecodeError:
-        log.warning(f"[bybit] {locale} pagina {page}: __NEXT_DATA__ invalido")
-        return [], False
+        raise ExchangeBlocked(f"[bybit] {locale} pagina {page}: __NEXT_DATA__ invalido")
     page_props = (data.get("props") or {}).get("pageProps") or {}
-    items = (page_props.get("articleInitEntity") or {}).get("list") or []
-    return items, True
+    return (page_props.get("articleInitEntity") or {}).get("list") or []
 
 
 def fetch(max_pages: int = 10) -> list[Row]:
     rows: list[Row] = []
     seen_urls: set[str] = set()
+    blocked_errors: list[ExchangeBlocked] = []
 
     for locale in LOCALES:
         locale_rows: list[Row] = []
         locale_ok = False
 
         for page in range(1, max_pages + 1):
-            items, ok = _fetch_page(locale, page)
-            if not ok:
+            try:
+                items = _fetch_page(locale, page)
+            except ExchangeBlocked as e:
+                if page == 1:
+                    blocked_errors.append(e)
                 break
             if not items:
                 break
@@ -184,6 +184,9 @@ def fetch(max_pages: int = 10) -> list[Row]:
         rows.extend(locale_rows)
         if locale_ok:
             break  # el locale principal funciono, no hace falta el de respaldo
+
+    if not rows and blocked_errors:
+        raise blocked_errors[0]
 
     log.info(f"[bybit] {len(rows)} filas")
     return rows

@@ -31,6 +31,15 @@ DEFAULT_HEADERS = {
 }
 
 
+class ExchangeBlocked(Exception):
+    """El scraper detecto una respuesta de bloqueo real (403/429 persistente despues de
+    reintentar, "Access Denied" de un WAF, CloudFront geo-bloqueado, etc.) - distinto de
+    "no hay nada nuevo que mostrar". El orquestador la distingue de un 0 filas comun para
+    marcar el exchange como "problema de red" en vez de "sin datos" (el usuario pidio
+    poder diferenciar ambos casos en el panel)."""
+    pass
+
+
 @dataclass
 class Row:
     exchange: str
@@ -440,3 +449,29 @@ def upsert_rows(supabase_url: str, supabase_key: str, rows: list[Row]):
         resp = requests.post(url, json=batch, headers=headers, timeout=60)
         if resp.status_code >= 300:
             raise RuntimeError(f"Supabase respondio {resp.status_code}: {resp.text[:500]}")
+
+
+STATUS_TABLE = "exchange_scraper_status"
+
+
+def upsert_scraper_status(supabase_url: str, supabase_key: str, radar: str, statuses: dict[str, tuple[str, Optional[str]]]):
+    """statuses: {exchange: (status, detail)} con status 'ok' | 'blocked'. Un registro por
+    (exchange, radar), siempre pisando el anterior - el panel solo le interesa el estado de
+    la corrida MAS RECIENTE, no un historial."""
+    if not statuses:
+        return
+    url = f"{supabase_url.rstrip('/')}/rest/v1/{STATUS_TABLE}?on_conflict=exchange,radar"
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates,return=minimal",
+    }
+    checked_at = datetime.now(timezone.utc).isoformat()
+    payload = [
+        {"exchange": exchange, "radar": radar, "status": status, "detail": (detail or "")[:500], "checked_at": checked_at}
+        for exchange, (status, detail) in statuses.items()
+    ]
+    resp = requests.post(url, json=payload, headers=headers, timeout=30)
+    if resp.status_code >= 300:
+        raise RuntimeError(f"Supabase ({STATUS_TABLE}) respondio {resp.status_code}: {resp.text[:500]}")

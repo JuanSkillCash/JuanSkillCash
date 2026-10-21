@@ -16,8 +16,8 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
 from .common import (
-    Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
-    is_noise, is_completion_notice, html_to_text, parse_delist_datetime,
+    Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body, extract_tickers,
+    detect_market, is_noise, is_completion_notice, html_to_text, parse_delist_datetime,
     classify_asset_class,
 )
 from datetime import datetime, timezone
@@ -74,19 +74,30 @@ def fetch(max_pages: int = 2) -> list[Row]:
             try:
                 html = _goto_html(page, url)
             except Exception as e:
+                if p == 1:
+                    browser.close()
+                    raise ExchangeBlocked(f"[gate] listado pagina {p} fallo: {e}")
                 log.warning(f"[gate] listado pagina {p} fallo: {e}")
                 break
             data = _extract_next_data(html)
             if not data:
-                log.warning(f"[gate] no se encontro __NEXT_DATA__ en la pagina {p}")
-                log.info(f"[gate] DEBUG titulo de la pagina: {page.title()!r}")
-                log.info(f"[gate] DEBUG primeros 1500 chars del HTML: {html[:1500]!r}")
+                title_dbg = page.title()
+                html_snippet = html[:300]
                 ids = re.findall(r'<script[^>]*\bid="([^"]+)"', html)
-                log.info(f"[gate] DEBUG ids de <script> encontrados: {ids}")
+                if p == 1:
+                    browser.close()
+                    raise ExchangeBlocked(
+                        f"[gate] no se encontro __NEXT_DATA__ en la pagina {p} "
+                        f"(titulo={title_dbg!r}, ids de script={ids}, html={html_snippet!r})"
+                    )
+                log.warning(f"[gate] no se encontro __NEXT_DATA__ en la pagina {p} (titulo={title_dbg!r})")
                 break
             try:
                 batch = data["props"]["pageProps"]["listData"]["list"]
             except (KeyError, TypeError):
+                if p == 1:
+                    browser.close()
+                    raise ExchangeBlocked(f"[gate] estructura de __NEXT_DATA__ distinta a la esperada en la pagina {p}")
                 log.warning(f"[gate] estructura de __NEXT_DATA__ distinta a la esperada en la pagina {p}")
                 break
             if not batch:

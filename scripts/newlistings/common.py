@@ -30,6 +30,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # repo scripts/ en sys.path
 from delistings.common import (  # noqa: E402
     DEFAULT_HEADERS, html_to_text, parse_delist_datetime, classify_asset_class,
+    ExchangeBlocked, STATUS_TABLE, upsert_scraper_status,
 )
 
 log = logging.getLogger("newlistings")
@@ -392,4 +393,5 @@ __all__ = [
     "fetch_html_with_fallback",
     "paren_tickers", "extract_tickers", "split_run", "is_noise",
     "detect_market", "upsert_rows",
+    "ExchangeBlocked", "STATUS_TABLE", "upsert_scraper_status",
 ]
