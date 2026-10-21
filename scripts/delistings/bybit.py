@@ -31,6 +31,12 @@ CATEGORY = "delistings"
 
 _NEXT_DATA_RE = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
 
+# acota cuantos cuerpos de articulo se piden en una sola corrida - Bybit acumula cientos de
+# avisos historicos (258 en una corrida real) y pedir el cuerpo de CADA uno sin limite hizo
+# que el orquestador cortara el exchange entero a los 120s (su propio presupuesto de tiempo
+# por exchange), perdiendo TODAS las filas de esa corrida en vez de solo las mas viejas
+MAX_BODY_FETCHES = 15
+
 
 def _epoch_s_to_dt(s) -> datetime | None:
     try:
@@ -41,7 +47,7 @@ def _epoch_s_to_dt(s) -> datetime | None:
 
 def _fetch_article_text(url: str) -> str:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=30)
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
         if resp.status_code != 200:
             log.warning(f"[bybit] articulo {url} respondio {resp.status_code}")
             return ""
@@ -73,6 +79,7 @@ def fetch(max_pages: int = 10) -> list[Row]:
     rows: list[Row] = []
     seen_urls: set[str] = set()
     blocked_errors: list[ExchangeBlocked] = []
+    body_fetches_left = MAX_BODY_FETCHES
 
     for locale in LOCALES:
         locale_rows: list[Row] = []
@@ -108,8 +115,13 @@ def fetch(max_pages: int = 10) -> list[Row]:
                 full_url = BASE + rel_url if rel_url.startswith("/") else rel_url
                 announced_at = _epoch_s_to_dt(item.get("publish_time"))
 
-                body_text = _fetch_article_text(full_url)
-                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                delist_at = None
+                fetched_body = False
+                if body_fetches_left > 0:
+                    body_fetches_left -= 1
+                    fetched_body = True
+                    body_text = _fetch_article_text(full_url)
+                    delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
                 if delist_at is None:
                     delist_at = extract_delist_date_from_body(item.get("description", ""), announced_at)
                 if delist_at is None:
@@ -122,7 +134,8 @@ def fetch(max_pages: int = 10) -> list[Row]:
                         source_url=full_url, title=title, asset_class=classify_asset_class(title),
                         announced_at=announced_at, delist_at=delist_at, market=market,
                     ))
-                time.sleep(0.3)
+                if fetched_body:
+                    time.sleep(0.3)
 
             time.sleep(0.5)
 
