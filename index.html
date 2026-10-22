@@ -213,10 +213,13 @@ button{font-family:inherit;color:inherit}
 .sb-item-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.03em;color:var(--gold);border:1px solid rgba(240,178,61,.35);padding:3px 8px;border-radius:20px;flex-shrink:0}
 /* subitem dentro de un grupo del sidebar (ej. las guias bajo "BTC"/"ETH" en Indicadores) -
    rayita + punto en vez de icono propio, para que se vea la jerarquia de un vistazo */
-.sb-item--sub{padding-left:32px;position:relative}
-.sb-item--sub::before{content:'';position:absolute;left:14px;top:50%;width:8px;height:1px;background:var(--border2);transform:translateY(-50%)}
-.sb-item--sub .sb-item-icon{position:absolute;left:22px;top:50%;width:4px;height:4px;min-width:0;border-radius:50%;background:var(--muted);font-size:0;transform:translateY(-50%)}
-.sb-item--sub.active .sb-item-icon{background:var(--red)}
+.sb-item--sub{padding-left:40px;position:relative}
+.sb-item--sub::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:var(--border2)}
+.sb-item--sub.sb-item--sub-first::before{top:50%}
+.sb-item--sub.sb-item--sub-last::before{bottom:50%}
+.sb-item--sub::after{content:'';position:absolute;left:20px;top:50%;width:10px;height:1px;background:var(--border2);transform:translateY(-50%)}
+.sb-item--sub .sb-item-icon{width:20px;height:20px;font-size:12px}
+.sb-item--sub.active::after{background:var(--red)}
 .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-item-badge{display:none}
 .sidebar.collapsed .sb-item{justify-content:center}
 .sb-bottom{margin-top:auto;padding:16px 18px;border-top:1px solid var(--border)}
@@ -357,9 +360,12 @@ button{font-family:inherit;color:inherit}
 /* PILDORAS DE CONEXION (Telegram, exchanges) - barra superior */
 .exchange-pill{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--bg);color:var(--muted2);font-size:11.5px;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s;flex-shrink:0;white-space:nowrap}
 .exchange-pill:hover{border-color:var(--red);color:var(--white)}
-.exchange-pill .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-.exchange-pill.connected .pill-dot{background:var(--green);box-shadow:0 0 5px var(--green)}
+.exchange-pill .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;opacity:.5}
+.exchange-pill.connected .pill-dot{background:var(--green);box-shadow:0 0 5px var(--green);opacity:1;animation:pillDotPulse 1.6s ease-in-out infinite}
+.exchange-pill.pending .pill-dot{background:#f0b23d;box-shadow:0 0 5px rgba(240,178,61,.55);opacity:1}
+.exchange-pill.rejected .pill-dot{background:var(--red);box-shadow:0 0 5px rgba(255,47,79,.5);opacity:1}
 .exchange-pill.connected{color:var(--white)}
+@keyframes pillDotPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
@@ -2492,6 +2498,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="exchange-pill" id="openBitunixPillBtn" type="button">
         <img src="data:image/png;base64,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" alt="" width="18" height="14" style="object-fit:contain">
         Bitunix
+      <span class="pill-dot" id="bitunixPillDot"></span>
       </button>
 
       <button class="exchange-pill" id="openTelegramPillBtn" type="button">
@@ -25250,16 +25257,24 @@ function bitunixShowState(state){
   bitunixRejected.style.display = (state === 'rejected') ? 'block' : 'none';
 }
 
+const openBitunixPillBtnEl = document.getElementById('openBitunixPillBtn');
+function updateBitunixPillStatus(status){
+  openBitunixPillBtnEl.classList.remove('connected', 'pending', 'rejected');
+  if(status) openBitunixPillBtnEl.classList.add(status);
+}
+
 async function loadBitunixStatus(){
-  if(!currentUser) return;
+  if(!currentUser){ updateBitunixPillStatus(null); return; }
   bitunixErrorEl.style.display = 'none';
   const { data, error } = await sbClient.from('user_exchange_connections')
     .select('connect_path,uid,status,review_note').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
   if(error){ console.warn('no se pudo revisar el estado de Bitunix', error); return; }
   if(!data){
     bitunixShowState('form');
+    updateBitunixPillStatus(null);
     return;
   }
+  updateBitunixPillStatus(data.status);
   if(data.status === 'connected'){
     document.getElementById('bitunixConnectedUid').textContent = data.uid;
     bitunixShowState('connected');
@@ -25366,6 +25381,7 @@ async function loadRankStatus(){
   const { data, error } = await sbClient.from('user_exchange_connections')
     .select('status,uid').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
   if(error){ console.warn('no se pudo revisar el estado de Bitunix para el rango', error); return; }
+  updateBitunixPillStatus(data ? data.status : null);
   if(!data){
     rankStatusText.textContent = 'Conecta tu cuenta de Bitunix para empezar a sumar rango.';
     rankConnectBitunixBtn.style.display = 'inline-flex';
@@ -25578,6 +25594,31 @@ document.querySelector('.cat-overview-card[data-category="rangos"]').addEventLis
     if(m[2]) el.insertBefore(document.createTextNode(m[2]), firstNode);
     el.insertBefore(span, el.firstChild);
   });
+})();
+</script>
+<script>
+(function(){
+  // marca el primer y ultimo item de cada "corrida" seguida de .sb-item--sub (los indicadores
+  // bajo un subgrupo como "₿ BTC" o "Ξ ETH") con sb-item--sub-first/-last, para que la rayita
+  // vertical del arbol (ver .sb-item--sub::before en el CSS) no se salga del grupo ni quede
+  // flotando - se calcula en JS (no a mano en el HTML) para que funcione solo si se agregan o
+  // quitan indicadores despues, sin tener que acordarse de re-marcar nada.
+  var items = document.querySelectorAll(
+    '.sb-nav .sb-item:not(.sb-item--sub), .sb-nav .sb-item--sub, .sb-nav .sb-cat-label, .sb-nav .indic-cat-label'
+  );
+  var run = [];
+  function flushRun(){
+    if(run.length){
+      run[0].classList.add('sb-item--sub-first');
+      run[run.length - 1].classList.add('sb-item--sub-last');
+    }
+    run = [];
+  }
+  items.forEach(function(el){
+    if(el.classList.contains('sb-item--sub')) run.push(el);
+    else flushRun();
+  });
+  flushRun();
 })();
 </script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
