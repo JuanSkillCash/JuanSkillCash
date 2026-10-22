@@ -2470,6 +2470,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">Bitunix</a>
       </nav>
 
+      <button class="exchange-pill" id="openBitunixPillBtn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        Bitunix
+      </button>
+
       <button class="exchange-pill" id="openTelegramPillBtn" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
         Telegram
@@ -8019,6 +8024,68 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div id="telegramConnected" style="display:none">
         <p class="auth-note">✅ Telegram conectado — ya vas a recibir los avisos ahí.</p>
         <button type="button" id="telegramDisconnectBtn" class="auth-link-btn" style="color:var(--red)">Desconectar Telegram</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: BITUNIX (conectar cuenta por UID, sin API key) ===== -->
+<div class="modal-overlay" id="bitunixModal">
+  <button class="modal-close" id="closeBitunix" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="bitunixTitleEl" style="max-width:460px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="bitunixTitleEl" style="font-size:22px">🦈 Bitunix</h2>
+        <p class="calc-sub">Conecta tu cuenta por UID — nunca una API key</p>
+      </div>
+
+      <div id="bitunixNotConnected">
+        <p class="auth-note" style="margin-bottom:14px">Vinculamos tu cuenta de Bitunix a mi red por tu <b>UID público</b> — el mismo número que Bitunix ya usa para su propio sistema de afiliados. Nunca pedimos una API key ni tu contraseña.</p>
+
+        <div class="auth-tabs" id="bitunixPathTabs">
+          <button type="button" class="auth-tab active" data-bitunix-path="referral_new">Soy nuevo en Bitunix</button>
+          <button type="button" class="auth-tab" data-bitunix-path="transfer_existing">Ya tengo cuenta</button>
+        </div>
+
+        <div id="bitunixPathReferral">
+          <p class="auth-note" style="margin-bottom:12px">1. Regístrate con mi link (se abre en una pestaña nueva).<br>2. Busca tu UID en Bitunix: Perfil → junto a tu correo, arriba.<br>3. Pégalo aquí abajo y envíalo.</p>
+          <a class="a-btn" href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" style="display:inline-flex;width:auto;padding:10px 18px;text-decoration:none;margin-bottom:14px">🔗 Registrarme en Bitunix</a>
+        </div>
+
+        <div id="bitunixPathTransfer" style="display:none">
+          <p class="auth-note" style="margin-bottom:12px">Pega tu UID y sube una captura de tu panel de cuenta donde se vea. El propio equipo de soporte de Bitunix revisa la captura y traslada tu cuenta a mi red de afiliados — nosotros nunca tocamos tu cuenta.</p>
+        </div>
+
+        <div class="field" id="f-bitunix-uid">
+          <label for="bitunixUidInput">Tu UID de Bitunix</label>
+          <input type="text" id="bitunixUidInput" placeholder="Ej: 123456789" inputmode="numeric" autocomplete="off">
+        </div>
+
+        <div class="field" id="f-bitunix-screenshot" style="display:none;margin-top:10px">
+          <label for="bitunixScreenshotInput">Captura de tu panel (con el UID visible)</label>
+          <input type="file" id="bitunixScreenshotInput" accept="image/*">
+        </div>
+
+        <button type="button" class="a-btn" id="bitunixSubmitBtn" style="width:auto;padding:10px 18px;margin-top:14px">Enviar solicitud</button>
+        <p class="auth-note" id="bitunixError" style="display:none;margin-top:10px;border-color:var(--red);color:var(--red)"></p>
+      </div>
+
+      <div id="bitunixPending" style="display:none">
+        <p class="auth-note">⏳ Tu solicitud está en revisión — UID <b id="bitunixPendingUid"></b>.<br><span id="bitunixPendingWhat"></span></p>
+        <button type="button" id="bitunixCancelBtn" class="auth-link-btn" style="color:var(--red)">Cancelar solicitud</button>
+      </div>
+
+      <div id="bitunixConnected" style="display:none">
+        <p class="auth-note">✅ Bitunix conectado — UID <b id="bitunixConnectedUid"></b>.</p>
+      </div>
+
+      <div id="bitunixRejected" style="display:none">
+        <p class="auth-note" style="border-color:var(--red)">⚠️ Tu solicitud anterior no se pudo validar<span id="bitunixRejectedNote"></span>. Puedes intentar de nuevo.</p>
+        <button type="button" id="bitunixRetryBtn" class="auth-link-btn">Intentar de nuevo →</button>
       </div>
     </div>
   </div>
@@ -25036,6 +25103,144 @@ telegramDisconnectBtn.addEventListener('click', async () => {
   await sbClient.from('user_telegram_links').delete().eq('user_id', currentUser.id);
   loadTelegramStatus();
 });
+
+/* ===================================================================================
+   BITUNIX: conectar la cuenta por UID publico (nunca una API key). Dos caminos posibles
+   (bitunixPath): 'referral_new' (se registra de cero con el link de afiliado) o
+   'transfer_existing' (ya tenia cuenta, pide traslado manual con UID + captura, lo revisa
+   el propio soporte de Bitunix). El cambio de pending -> connected/rejected lo hace Juan a
+   mano desde Supabase - esto solo crea la solicitud y muestra el estado.
+   =================================================================================== */
+const bitunixNotConnected = document.getElementById('bitunixNotConnected');
+const bitunixPending = document.getElementById('bitunixPending');
+const bitunixConnected = document.getElementById('bitunixConnected');
+const bitunixRejected = document.getElementById('bitunixRejected');
+const bitunixPathReferral = document.getElementById('bitunixPathReferral');
+const bitunixPathTransfer = document.getElementById('bitunixPathTransfer');
+const bitunixScreenshotField = document.getElementById('f-bitunix-screenshot');
+const bitunixUidInput = document.getElementById('bitunixUidInput');
+const bitunixScreenshotInput = document.getElementById('bitunixScreenshotInput');
+const bitunixSubmitBtn = document.getElementById('bitunixSubmitBtn');
+const bitunixErrorEl = document.getElementById('bitunixError');
+let bitunixPath = 'referral_new';
+
+document.querySelectorAll('#bitunixPathTabs .auth-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    bitunixPath = btn.dataset.bitunixPath;
+    document.querySelectorAll('#bitunixPathTabs .auth-tab').forEach(b => b.classList.toggle('active', b === btn));
+    bitunixPathReferral.style.display = (bitunixPath === 'referral_new') ? 'block' : 'none';
+    bitunixPathTransfer.style.display = (bitunixPath === 'transfer_existing') ? 'block' : 'none';
+    bitunixScreenshotField.style.display = (bitunixPath === 'transfer_existing') ? 'block' : 'none';
+  });
+});
+
+function bitunixShowState(state){
+  bitunixNotConnected.style.display = (state === 'form') ? 'block' : 'none';
+  bitunixPending.style.display = (state === 'pending') ? 'block' : 'none';
+  bitunixConnected.style.display = (state === 'connected') ? 'block' : 'none';
+  bitunixRejected.style.display = (state === 'rejected') ? 'block' : 'none';
+}
+
+async function loadBitunixStatus(){
+  if(!currentUser) return;
+  bitunixErrorEl.style.display = 'none';
+  const { data, error } = await sbClient.from('user_exchange_connections')
+    .select('connect_path,uid,status,review_note').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
+  if(error){ console.warn('no se pudo revisar el estado de Bitunix', error); return; }
+  if(!data){
+    bitunixShowState('form');
+    return;
+  }
+  if(data.status === 'connected'){
+    document.getElementById('bitunixConnectedUid').textContent = data.uid;
+    bitunixShowState('connected');
+  } else if(data.status === 'rejected'){
+    document.getElementById('bitunixRejectedNote').textContent = data.review_note ? (': ' + data.review_note) : '';
+    bitunixShowState('rejected');
+  } else {
+    document.getElementById('bitunixPendingUid').textContent = data.uid;
+    document.getElementById('bitunixPendingWhat').textContent = (data.connect_path === 'transfer_existing')
+      ? 'Bitunix está revisando tu captura para trasladar tu cuenta a mi red.'
+      : 'En cuanto Bitunix confirme tu registro con mi link, quedas conectado.';
+    bitunixShowState('pending');
+  }
+}
+
+async function bitunixDeleteOwnRow(){
+  await sbClient.from('user_exchange_connections').delete().eq('user_id', currentUser.id).eq('exchange', 'bitunix');
+}
+
+bitunixSubmitBtn.addEventListener('click', async () => {
+  if(!currentUser) return;
+  const uid = bitunixUidInput.value.trim();
+  bitunixErrorEl.style.display = 'none';
+  if(!uid){
+    bitunixErrorEl.textContent = 'Escribe tu UID de Bitunix.';
+    bitunixErrorEl.style.display = 'block';
+    return;
+  }
+  let screenshotPath = null;
+  if(bitunixPath === 'transfer_existing'){
+    const file = bitunixScreenshotInput.files[0];
+    if(!file){
+      bitunixErrorEl.textContent = 'Sube una captura de tu panel con el UID visible.';
+      bitunixErrorEl.style.display = 'block';
+      return;
+    }
+    screenshotPath = currentUser.id + '/' + Date.now() + '-' + file.name.replace(/[^a-z0-9.\-_]/gi, '_');
+    const { error: upErr } = await sbClient.storage.from('exchange-screenshots').upload(screenshotPath, file);
+    if(upErr){
+      bitunixErrorEl.textContent = friendlyErrMsg(upErr);
+      bitunixErrorEl.style.display = 'block';
+      return;
+    }
+  }
+  const original = bitunixSubmitBtn.textContent;
+  bitunixSubmitBtn.disabled = true;
+  bitunixSubmitBtn.textContent = 'Enviando...';
+  await bitunixDeleteOwnRow(); // por si quedo un intento anterior rechazado/pendiente sin terminar
+  const { error } = await sbClient.from('user_exchange_connections').insert({
+    user_id: currentUser.id,
+    exchange: 'bitunix',
+    connect_path: bitunixPath,
+    uid: uid,
+    screenshot_path: screenshotPath,
+  });
+  bitunixSubmitBtn.disabled = false;
+  bitunixSubmitBtn.textContent = original;
+  if(error){
+    bitunixErrorEl.textContent = friendlyErrMsg(error);
+    bitunixErrorEl.style.display = 'block';
+    return;
+  }
+  loadBitunixStatus();
+});
+
+document.getElementById('bitunixCancelBtn').addEventListener('click', async () => {
+  if(!currentUser) return;
+  await bitunixDeleteOwnRow();
+  loadBitunixStatus();
+});
+
+document.getElementById('bitunixRetryBtn').addEventListener('click', async () => {
+  if(!currentUser) return;
+  await bitunixDeleteOwnRow();
+  bitunixUidInput.value = '';
+  bitunixScreenshotInput.value = '';
+  bitunixShowState('form');
+});
+
+const bitunixModal = document.getElementById('bitunixModal');
+const bitunixPanel = bitunixModal.querySelector('.modal-panel');
+const closeBitunix = document.getElementById('closeBitunix');
+function openBitunixModal(){
+  loadBitunixStatus();
+  openModalGeneric(bitunixModal, bitunixPanel, closeBitunix);
+}
+function closeBitunixModal(){ closeModalGeneric(bitunixModal); }
+closeBitunix.addEventListener('click', closeBitunixModal);
+bitunixModal.addEventListener('click', (e) => { if(e.target === bitunixModal) closeBitunixModal(); });
+document.getElementById('openBitunixPillBtn').addEventListener('click', openBitunixModal);
 </script>
 <script>
 (function(){
