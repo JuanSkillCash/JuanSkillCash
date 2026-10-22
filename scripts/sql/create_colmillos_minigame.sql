@@ -107,6 +107,16 @@ as $$
 $$;
 grant execute on function increment_global_taps() to anon, authenticated;
 
+-- 7) Ruleta: solo diversion, sin relacion con dinero real (se apuestan y ganan/pierden los
+-- mismos Colmillos, nunca dinero). Las apuestas van de 5 a 50 Colmillos pagando hasta 3x, asi
+-- que una ganancia puede superar el tope de +20 que tenian los eventos de "usar la plataforma"
+-- (ese tope era anti-trampa solo para esos eventos especificos) - se amplia el rango otra vez.
+-- Si ya corriste este archivo antes, correrlo de nuevo no rompe nada (los pasos de arriba son
+-- idempotentes) - esto solo actualiza la restriccion del monto.
+alter table user_colmillos_events drop constraint if exists user_colmillos_events_amount_check;
+alter table user_colmillos_events add constraint user_colmillos_events_amount_check
+    check (amount <> 0 and amount between -500 and 500);
+
 -- 4) Qué tiene equipado cada usuario ahora mismo (null = el default gratis de cada categoria).
 --    No es un ledger - es estado mutable, por eso es una tabla aparte que el usuario puede
 --    actualizar libremente (siempre y cuando sea algo que ya "compro" segun el ledger - eso lo

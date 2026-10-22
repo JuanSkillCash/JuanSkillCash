@@ -479,6 +479,16 @@ button{font-family:inherit;color:inherit}
 .colm-shop-item-btn.owned{background:rgba(255,255,255,.06);color:var(--muted2);cursor:default}
 .colm-shop-item-btn.equipped{background:#4ade80;color:#0b2715}
 .colm-shop-item-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ruleta - solo diversion, sin relacion con dinero real (ver nota en el panel) */
+.colm-roulette-wrap{position:relative;display:flex;justify-content:center;padding:10px 0 20px}
+.colm-roulette-wheel{width:220px;height:220px;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #0b0d18,0 10px 30px rgba(0,0,0,.5);transition:transform 3.6s cubic-bezier(.12,.67,.08,1)}
+.colm-roulette-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:22px;color:var(--gold);z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.colm-roulette-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.colm-roulette-controls label{font-size:12px;font-weight:700;color:var(--muted2)}
+.colm-roulette-controls input{width:72px;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--white);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;text-align:center}
+.colm-roulette-spin-btn{font-size:13px;padding:10px 22px;animation:none}
+.colm-roulette-spin-btn:disabled{opacity:.6;cursor:not-allowed;animation:none}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(min-width:860px){
   /* en pantallas anchas no tiene sentido una sola columna angosta y centrada con medio
@@ -6215,6 +6225,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
             <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuego</button>
             <button type="button" class="colm-tab" data-tab="tienda">🛒 Tienda</button>
+            <button type="button" class="colm-tab" data-tab="ruleta">🎰 Ruleta</button>
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="inicio">
@@ -6262,7 +6273,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </div>
 
             <div class="colm-section-label">🏆 PARA QUÉ SIRVEN</div>
-            <p class="auth-note">Son para <b>presumir</b>, para <b>personalizar tu tiburón</b> en la tienda (skins, accesorios, fondos del minijuego), y para cambiarlos por <b>boletos de sorteos</b> con premios reales. Nunca se ganan por volumen de trading, y son totalmente aparte de tu rango en "Rango de Manada" — eso evita que te empujen a operar más solo por subir un número.</p>
+            <p class="auth-note">Son para <b>presumir</b>, para <b>personalizar tu tiburón</b> en la tienda (skins, accesorios, fondos del minijuego), para probar suerte en la <b>ruleta</b> (solo diversión, sin relación con dinero real), y para cambiarlos por <b>boletos de sorteos</b> con premios reales. Nunca se ganan por volumen de trading, y son totalmente aparte de tu rango en "Rango de Manada" — eso evita que te empujen a operar más solo por subir un número.</p>
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="trivia" style="display:none">
@@ -6303,6 +6314,19 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-shop-grid" id="colmillosShopRaffle"></div>
               <p class="auth-note" id="colmillosRaffleCount">Tenés 0 boletos.</p>
             </div>
+          </div>
+
+          <div class="colm-tabpanel" data-tabpanel="ruleta" style="display:none">
+            <div class="colm-roulette-wrap">
+              <div class="colm-roulette-pointer">▼</div>
+              <div class="colm-roulette-wheel" id="colmRouletteWheel"></div>
+            </div>
+            <div class="colm-roulette-controls">
+              <label for="colmRouletteBet">Apuesta</label>
+              <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
+              <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
+            </div>
+            <p class="colm-game-hint" id="colmRouletteResult">Apostá Colmillos y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Colmillos por tirada.</p>
           </div>
          </div>
         </div>
@@ -26239,11 +26263,80 @@ function endColmGame(){
 }
 
 /* ---- pestañas internas de la pagina (Inicio/Trivia/Minijuego/Tienda) ---- */
+/* ---- ruleta: solo diversion, apuesta y gana/pierde Colmillos al azar. Valor esperado
+   neutro (ni favorece a la casa ni al jugador) - 4 de 8 segmentos pierden la apuesta, los
+   otros 4 pagan 1.5x/2x/3x, promediando exactamente 1x. Usa el mismo ledger de siempre
+   (event_type='casino_spin', period_key aleatorio porque se puede jugar muchas veces) ---- */
+const ROULETTE_SEGMENTS = [
+  { mult: 0, color: '#2c2140', label: '0x' },
+  { mult: 1.5, color: '#d9a441', label: '1.5x' },
+  { mult: 0, color: '#2c2140', label: '0x' },
+  { mult: 2, color: '#c23b4a', label: '2x' },
+  { mult: 0, color: '#2c2140', label: '0x' },
+  { mult: 1.5, color: '#d9a441', label: '1.5x' },
+  { mult: 3, color: '#4ade80', label: '3x' },
+  { mult: 0, color: '#2c2140', label: '0x' },
+];
+let colmRouletteSpinning = false;
+let colmRouletteTotalRotation = 0;
+function initColmRouletteWheel(){
+  const wheelEl = document.getElementById('colmRouletteWheel');
+  if(!wheelEl || wheelEl.dataset.ready) return;
+  const segDeg = 360 / ROULETTE_SEGMENTS.length;
+  const stops = ROULETTE_SEGMENTS.map((seg, i) => seg.color + ' ' + (i * segDeg) + 'deg ' + ((i + 1) * segDeg) + 'deg').join(',');
+  wheelEl.style.background = 'conic-gradient(' + stops + ')';
+  wheelEl.dataset.ready = '1';
+}
+async function spinColmRoulette(){
+  if(colmRouletteSpinning || !currentUser) return;
+  const betInput = document.getElementById('colmRouletteBet');
+  const resultEl = document.getElementById('colmRouletteResult');
+  let bet = Math.max(5, Math.min(50, parseInt(betInput.value, 10) || 0));
+  bet = Math.round(bet / 5) * 5;
+  betInput.value = bet;
+  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
+  if(balance < bet){ resultEl.textContent = 'No tenés suficientes Colmillos para esa apuesta.'; return; }
+  colmRouletteSpinning = true;
+  const spinBtn = document.getElementById('colmRouletteSpinBtn');
+  spinBtn.disabled = true;
+  betInput.disabled = true;
+  const segDeg = 360 / ROULETTE_SEGMENTS.length;
+  const segIndex = Math.floor(Math.random() * ROULETTE_SEGMENTS.length);
+  const segment = ROULETTE_SEGMENTS[segIndex];
+  const wheelEl = document.getElementById('colmRouletteWheel');
+  const extraSpins = 4 + Math.floor(Math.random() * 3);
+  const targetAngle = 360 * extraSpins + (360 - (segIndex * segDeg + segDeg / 2));
+  colmRouletteTotalRotation += targetAngle;
+  wheelEl.style.transform = 'rotate(' + colmRouletteTotalRotation + 'deg)';
+  resultEl.textContent = 'Girando...';
+  setTimeout(async () => {
+    const net = Math.round(bet * segment.mult) - bet;
+    if(net !== 0){
+      await sbClient.from('user_colmillos_events').insert({
+        user_id: currentUser.id, event_type: 'casino_spin',
+        period_key: (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random())),
+        amount: net,
+      });
+    }
+    resultEl.textContent = segment.mult === 0
+      ? ('😬 Salió 0x — perdiste ' + bet + ' Colmillos. ¡Otra vez!')
+      : ('🎉 ¡Salió ' + segment.label + '! Ganaste ' + net + ' Colmillos.');
+    loadColmillosBalance(true);
+    refreshColmillosPageContent();
+    colmRouletteSpinning = false;
+    spinBtn.disabled = false;
+    betInput.disabled = false;
+  }, 3700);
+}
+document.getElementById('colmRouletteSpinBtn').addEventListener('click', spinColmRoulette);
+
 function switchColmillosTab(tab){
   document.querySelectorAll('#colmillosTabs .colm-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.colm-tabpanel').forEach(p => { p.style.display = (p.dataset.tabpanel === tab) ? 'block' : 'none'; });
   if(tab === 'trivia') loadDailyTrivia();
   if(tab === 'tienda') loadColmillosShop();
+  if(tab === 'ruleta') initColmRouletteWheel();
   if(tab === 'juego'){
     initColmGameOnce();
     let best = 0;
