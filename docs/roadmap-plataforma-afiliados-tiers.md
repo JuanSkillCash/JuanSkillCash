@@ -55,19 +55,31 @@ las herramientas gratis" en "gente operando por el link de afiliado de Juan".
    normalmente deja verificar esto con su propio sistema de afiliados/VIP
    code, no hay que inventarlo desde cero.
 
-## Rangos definidos (decidido en sesion del 2026-10-22)
+## Rangos definidos (decidido en sesion del 2026-10-22, corregido el mismo dia)
 
-5 rangos, por volumen de trading ACUMULADO DE POR VIDA (no ventana movil -
-mas simple de construir, y nadie "baja" de rango por dejar de operar una
-semana):
+5 rangos, por volumen de trading DEL MES EN CURSO (se reinicia cada mes -
+decision explicita de Juan: "necesito que la gente haga volumen... que no
+pierdan su rango y si dejan de operar, siguen usando mi plataforma, y yo no
+gano". Sin reinicio mensual, con el tiempo todo el mundo termina en Alfa sin
+seguir operando, y el sistema deja de cumplir su proposito):
 
-| Rango        | Volumen acumulado |
-|--------------|--------------------|
-| 🐣 Cria       | $0 (todos entran aqui) |
-| 🐟 Explorador | $5,000  |
-| 🦈 Cazador    | $25,000 |
-| 🐬 Depredador | $100,000 |
-| 👑 Alfa       | $500,000 |
+| Rango        | Condicion dentro del mes en curso |
+|--------------|-------------------------------------|
+| 🐣 Cria       | Al menos 1 operacion real (no hace falta volumen minimo) |
+| 🐟 Explorador | $10,000 de volumen |
+| 🦈 Cazador    | $50,000 de volumen |
+| 🐬 Depredador | $150,000 de volumen |
+| 👑 Alfa       | $500,000 de volumen |
+
+Antes de la primera operacion del mes, el usuario no tiene ningun rango
+todavia (ni siquiera Cria) - Cria se desbloquea, no es el estado por
+defecto.
+
+Implementacion: en vez de acumular volumen de por vida, cada corrida del
+robot (scripts/update_bitunix_volume.py) vuelve a sumar desde el dia 1 del
+mes en curso (UTC) hasta ahora - como nunca pasa de ~31 dias, siempre cabe
+en el limite de 180 dias por llamada de la API de Bitunix, y el "reinicio"
+pasa solo, sin ningun cron especial, en cuanto cambia el mes.
 
 Ya estan puestos como shell visual en la cajita "Rango de Manada" de
 index.html (sin logica real de calculo de volumen conectada todavia).
