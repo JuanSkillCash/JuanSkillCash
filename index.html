@@ -211,6 +211,12 @@ button{font-family:inherit;color:inherit}
 .sb-item.locked{cursor:default;opacity:.6}
 .sb-item.locked:hover{background:none;color:var(--muted2)}
 .sb-item-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.03em;color:var(--gold);border:1px solid rgba(240,178,61,.35);padding:3px 8px;border-radius:20px;flex-shrink:0}
+/* subitem dentro de un grupo del sidebar (ej. las guias bajo "BTC"/"ETH" en Indicadores) -
+   rayita + punto en vez de icono propio, para que se vea la jerarquia de un vistazo */
+.sb-item--sub{padding-left:32px;position:relative}
+.sb-item--sub::before{content:'';position:absolute;left:14px;top:50%;width:8px;height:1px;background:var(--border2);transform:translateY(-50%)}
+.sb-item--sub .sb-item-icon{position:absolute;left:22px;top:50%;width:4px;height:4px;min-width:0;border-radius:50%;background:var(--muted);font-size:0;transform:translateY(-50%)}
+.sb-item--sub.active .sb-item-icon{background:var(--red)}
 .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-item-badge{display:none}
 .sidebar.collapsed .sb-item{justify-content:center}
 .sb-bottom{margin-top:auto;padding:16px 18px;border-top:1px solid var(--border)}
@@ -1911,205 +1917,205 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
       </button>
       <div class="indic-cat-label">₿ BTC</div>
-      <button class="sb-item" data-indic-jump="bitcoinguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="bitcoinguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="whitepaper">
+      <button class="sb-item sb-item--sub" data-indic-jump="whitepaper">
         <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
       </button>
-      <button class="sb-item" data-indic-jump="halving">
+      <button class="sb-item sb-item--sub" data-indic-jump="halving">
         <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcmacro">
+      <button class="sb-item sb-item--sub" data-indic-jump="btcmacro">
         <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + Datos Macroeconómicos</span>
       </button>
-      <button class="sb-item" data-indic-jump="pisomercado">
+      <button class="sb-item sb-item--sub" data-indic-jump="pisomercado">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
       </button>
-      <button class="sb-item" data-indic-jump="rsimensual">
+      <button class="sb-item sb-item--sub" data-indic-jump="rsimensual">
         <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
       </button>
-      <button class="sb-item" data-indic-jump="ciclosoporte">
+      <button class="sb-item sb-item--sub" data-indic-jump="ciclosoporte">
         <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
       </button>
-      <button class="sb-item" data-indic-jump="rainbow">
+      <button class="sb-item sb-item--sub" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
       </button>
-      <button class="sb-item" data-indic-jump="picycle">
+      <button class="sb-item sb-item--sub" data-indic-jump="picycle">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
-      <button class="sb-item" data-indic-jump="ma4y">
+      <button class="sb-item sb-item--sub" data-indic-jump="ma4y">
         <span class="sb-item-icon">📏</span><span class="sb-item-label">Media Móvil de 4 Años</span>
       </button>
-      <button class="sb-item" data-indic-jump="ema200">
+      <button class="sb-item sb-item--sub" data-indic-jump="ema200">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
       </button>
-      <button class="sb-item" data-indic-jump="treasuries">
+      <button class="sb-item sb-item--sub" data-indic-jump="treasuries">
         <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
       </button>
-      <button class="sb-item" data-indic-jump="govtreasuries">
+      <button class="sb-item sb-item--sub" data-indic-jump="govtreasuries">
         <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas Gubernamentales</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcxau">
+      <button class="sb-item sb-item--sub" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcaapl">
+      <button class="sb-item sb-item--sub" data-indic-jump="btcaapl">
         <span class="sb-item-icon">🍎</span><span class="sb-item-label">BTC/AAPL</span>
       </button>
-      <button class="sb-item" data-indic-jump="btcreturns">
+      <button class="sb-item sb-item--sub" data-indic-jump="btcreturns">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Bitcoin</span>
       </button>
-      <button class="sb-item" data-indic-jump="sthmvrv">
+      <button class="sb-item sb-item--sub" data-indic-jump="sthmvrv">
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">STH-MVRV</span>
       </button>
-      <button class="sb-item" data-indic-jump="treascb">
+      <button class="sb-item sb-item--sub" data-indic-jump="treascb">
         <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
       </button>
-      <button class="sb-item" data-indic-jump="epochpl">
+      <button class="sb-item sb-item--sub" data-indic-jump="epochpl">
         <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en Pérdida por Época</span>
       </button>
       <div class="indic-cat-label">Ξ ETH</div>
-      <button class="sb-item" data-indic-jump="ethereumguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethereumguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethlogreg">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethlogreg">
         <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethvwap">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethvwap">
         <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethpmi">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethpmi">
         <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethreturns">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethreturns">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Ethereum</span>
       </button>
       <div class="indic-cat-label">💹 Trading</div>
-      <button class="sb-item" data-indic-jump="tradingguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="tradingguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="cbpremium">
+      <button class="sb-item sb-item--sub" data-indic-jump="cbpremium">
         <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
-      <button class="sb-item" data-indic-jump="longshort">
+      <button class="sb-item sb-item--sub" data-indic-jump="longshort">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
       </button>
-      <button class="sb-item" data-indic-jump="optionsoi">
+      <button class="sb-item sb-item--sub" data-indic-jump="optionsoi">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
       </button>
-      <button class="sb-item" data-indic-jump="delistradar">
+      <button class="sb-item sb-item--sub" data-indic-jump="delistradar">
         <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
       </button>
-      <button class="sb-item" data-indic-jump="newlistradar">
+      <button class="sb-item sb-item--sub" data-indic-jump="newlistradar">
         <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de Nuevos Listados</span>
       </button>
-      <button class="sb-item" data-indic-jump="tvchart">
+      <button class="sb-item sb-item--sub" data-indic-jump="tvchart">
         <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
-      <button class="sb-item" data-indic-jump="fng">
+      <button class="sb-item sb-item--sub" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
       </button>
-      <button class="sb-item" data-indic-jump="btctrends">
+      <button class="sb-item sb-item--sub" data-indic-jump="btctrends">
         <span class="sb-item-icon">🔍</span><span class="sb-item-label">BTC + Google Trends</span>
       </button>
-      <button class="sb-item" data-indic-jump="cryptobubbles">
+      <button class="sb-item sb-item--sub" data-indic-jump="cryptobubbles">
         <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
-      <button class="sb-item" data-indic-jump="dominanciaguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="dominanciaguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="domratio">
+      <button class="sb-item sb-item--sub" data-indic-jump="domratio">
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
-      <button class="sb-item" data-indic-jump="domall">
+      <button class="sb-item sb-item--sub" data-indic-jump="domall">
         <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión Cripto</span>
       </button>
-      <button class="sb-item" data-indic-jump="dombtc">
+      <button class="sb-item sb-item--sub" data-indic-jump="dombtc">
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
       </button>
-      <button class="sb-item" data-indic-jump="domusdt">
+      <button class="sb-item sb-item--sub" data-indic-jump="domusdt">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Dominancia USDT</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethbtc">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethbtc">
         <span class="sb-item-icon">🔁</span><span class="sb-item-label">ETH/BTC</span>
       </button>
       <div class="indic-cat-label">🪙 Altcoins</div>
-      <button class="sb-item" data-indic-jump="altcoinsguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="altcoinsguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="othersbtc">
+      <button class="sb-item sb-item--sub" data-indic-jump="othersbtc">
         <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
       </button>
-      <button class="sb-item" data-indic-jump="altfever">
+      <button class="sb-item sb-item--sub" data-indic-jump="altfever">
         <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de Altcoins</span>
       </button>
-      <button class="sb-item" data-indic-jump="ethvsalt">
+      <button class="sb-item sb-item--sub" data-indic-jump="ethvsalt">
         <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
       </button>
-      <button class="sb-item" data-indic-jump="total2">
+      <button class="sb-item sb-item--sub" data-indic-jump="total2">
         <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
       </button>
-      <button class="sb-item" data-indic-jump="others">
+      <button class="sb-item sb-item--sub" data-indic-jump="others">
         <span class="sb-item-icon">🌱</span><span class="sb-item-label">OTHERS EMA200</span>
       </button>
       <div class="indic-cat-label">🏛 Macro</div>
-      <button class="sb-item" data-indic-jump="macroguia">
+      <button class="sb-item sb-item--sub" data-indic-jump="macroguia">
         <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
       </button>
-      <button class="sb-item" data-indic-jump="econcalendar">
+      <button class="sb-item sb-item--sub" data-indic-jump="econcalendar">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
       </button>
-      <button class="sb-item" data-indic-jump="dxy">
+      <button class="sb-item sb-item--sub" data-indic-jump="dxy">
         <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
       </button>
-      <button class="sb-item" data-indic-jump="pmius">
+      <button class="sb-item sb-item--sub" data-indic-jump="pmius">
         <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI Manufacturero de EEUU</span>
       </button>
-      <button class="sb-item" data-indic-jump="payrolls">
+      <button class="sb-item sb-item--sub" data-indic-jump="payrolls">
         <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina No Agrícola</span>
       </button>
-      <button class="sb-item" data-indic-jump="unrate">
+      <button class="sb-item sb-item--sub" data-indic-jump="unrate">
         <span class="sb-item-icon">📉</span><span class="sb-item-label">Tasa de Desempleo</span>
       </button>
-      <button class="sb-item" data-indic-jump="icsa">
+      <button class="sb-item sb-item--sub" data-indic-jump="icsa">
         <span class="sb-item-icon">🧾</span><span class="sb-item-label">Solicitudes de Desempleo</span>
       </button>
-      <button class="sb-item" data-indic-jump="cpi">
+      <button class="sb-item sb-item--sub" data-indic-jump="cpi">
         <span class="sb-item-icon">🛒</span><span class="sb-item-label">Inflación CPI</span>
       </button>
-      <button class="sb-item" data-indic-jump="cpiyoy">
+      <button class="sb-item sb-item--sub" data-indic-jump="cpiyoy">
         <span class="sb-item-icon">📈</span><span class="sb-item-label">Inflación Interanual (CPI YoY)</span>
       </button>
-      <button class="sb-item" data-indic-jump="pce">
+      <button class="sb-item sb-item--sub" data-indic-jump="pce">
         <span class="sb-item-icon">💳</span><span class="sb-item-label">PCE</span>
       </button>
-      <button class="sb-item" data-indic-jump="ppi">
+      <button class="sb-item sb-item--sub" data-indic-jump="ppi">
         <span class="sb-item-icon">🏗️</span><span class="sb-item-label">PPI</span>
       </button>
-      <button class="sb-item" data-indic-jump="fedfundsrate">
+      <button class="sb-item sb-item--sub" data-indic-jump="fedfundsrate">
         <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de Interés de la Fed</span>
       </button>
-      <button class="sb-item" data-indic-jump="treasuryyields">
+      <button class="sb-item sb-item--sub" data-indic-jump="treasuryyields">
         <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del Tesoro</span>
       </button>
-      <button class="sb-item" data-indic-jump="yieldcurve">
+      <button class="sb-item sb-item--sub" data-indic-jump="yieldcurve">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Curva 10Y-2Y</span>
       </button>
-      <button class="sb-item" data-indic-jump="m2supply">
+      <button class="sb-item sb-item--sub" data-indic-jump="m2supply">
         <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (Oferta Monetaria)</span>
       </button>
-      <button class="sb-item" data-indic-jump="vixindex">
+      <button class="sb-item sb-item--sub" data-indic-jump="vixindex">
         <span class="sb-item-icon">😨</span><span class="sb-item-label">VIX</span>
       </button>
-      <button class="sb-item" data-indic-jump="netliquidity">
+      <button class="sb-item sb-item--sub" data-indic-jump="netliquidity">
         <span class="sb-item-icon">🌊</span><span class="sb-item-label">Liquidez Neta</span>
       </button>
-      <button class="sb-item" data-indic-jump="gdpgrowth">
+      <button class="sb-item sb-item--sub" data-indic-jump="gdpgrowth">
         <span class="sb-item-icon">📊</span><span class="sb-item-label">PIB (Crecimiento Real)</span>
       </button>
-      <button class="sb-item" data-indic-jump="fedbalance">
+      <button class="sb-item sb-item--sub" data-indic-jump="fedbalance">
         <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Balance de la Fed</span>
       </button>
 
