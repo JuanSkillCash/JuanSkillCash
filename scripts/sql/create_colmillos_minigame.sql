@@ -74,12 +74,23 @@ insert into colmillos_shop_items (id, category, name, price) values
     ('skin_ice', 'skin', 'Tiburón Hielo', 60),
     ('skin_lime', 'skin', 'Tiburón Lima', 65),
     ('skin_violet', 'skin', 'Tiburón Violeta', 70),
+    ('skin_camo', 'skin', 'Tiburón Camuflaje', 90),
+    ('skin_tiger', 'skin', 'Tiburón Tigre', 90),
+    ('skin_galaxy', 'skin', 'Tiburón Galaxia', 100),
     ('acc_cap', 'accessory', 'Gorra de Capitán', 40),
     ('acc_shades', 'accessory', 'Gafas de Sol', 40),
     ('acc_chain', 'accessory', 'Cadena de Oro', 70),
+    ('acc_scuba', 'accessory', 'Casco de Buzo', 55),
+    ('acc_scarf', 'accessory', 'Bufanda', 35),
+    ('acc_headphones', 'accessory', 'Audífonos Gamer', 55),
+    ('acc_crown', 'accessory', 'Corona Dorada', 85),
+    ('acc_cape', 'accessory', 'Capa de Pirata', 75),
     ('bg_reef', 'background', 'Arrecife', 50),
     ('bg_abyss', 'background', 'Abismo', 50),
     ('bg_surface', 'background', 'Superficie', 50),
+    ('bg_sunken_city', 'background', 'Ciudad Hundida', 70),
+    ('bg_volcano', 'background', 'Volcán Submarino', 70),
+    ('bg_night', 'background', 'Noche Estrellada', 70),
     ('raffle_ticket', 'raffle', 'Boleto de Sorteo', 25)
 on conflict do nothing;
 

@@ -405,19 +405,25 @@ button{font-family:inherit;color:inherit}
 @keyframes colmLoadFill{to{width:100%}}
 .colm-loading-text{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--gold);animation:colmBlink 1s steps(2) infinite}
 @keyframes colmBlink{50%{opacity:.3}}
-.colm-hero{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:12px;padding:18px 14px;position:relative;border-radius:18px;margin-bottom:22px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
-.colm-hero-char{flex-shrink:0;width:clamp(86px,30vw,150px)}
+.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:4px;padding:14px 14px 18px;position:relative;border-radius:18px;margin-bottom:22px;min-height:300px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
+.colm-hero.has-bg{background-color:#0b0d18}
+.colm-hero.has-bg::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0px,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.3))}
+.colm-hero-hud{position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.colm-hero-lives{flex-shrink:0;font-size:clamp(12px,3.6vw,16px);filter:drop-shadow(0 2px 2px rgba(0,0,0,.7));padding-top:2px}
+.colm-hero-username{flex:1;min-width:0;text-align:center;font-family:'Bungee',cursive;font-size:clamp(11px,3.4vw,16px);color:#fff;text-shadow:0 2px 5px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:4px 6px 0;text-transform:uppercase}
+.colm-hero-menu-btn{position:relative;z-index:2;align-self:flex-start;font-family:'Space Mono',monospace;font-weight:700;font-size:10.5px;letter-spacing:.04em;color:#1a1306;background:linear-gradient(180deg,#b9e26b,#6fae2e);border:none;border-radius:8px;padding:6px 14px;cursor:pointer;box-shadow:0 3px 0 #4d7a1e,0 6px 10px rgba(0,0,0,.35);margin:6px 0 2px}
+.colm-hero-menu-btn:active{transform:translateY(3px);box-shadow:0 0 0 #4d7a1e,0 2px 4px rgba(0,0,0,.35)}
+.colm-hero-char{flex-shrink:0;width:clamp(140px,52vw,230px);margin:2px auto;position:relative;z-index:1}
 .colm-hero-char > div{width:100% !important;height:auto !important}
-.colm-hero-char img{filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
-.colm-hero-stats{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.colm-hero-char img{filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
+.colm-hero-footer{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:auto;padding-top:4px}
 .colm-coin{cursor:pointer;filter:drop-shadow(0 6px 14px rgba(240,178,61,.35));transition:transform .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
-.colm-coin svg{width:clamp(34px,11vw,52px);height:auto;display:block}
+.colm-coin svg{width:clamp(30px,9vw,44px);height:auto;display:block}
 .colm-coin:active{transform:scale(.92)}
 .colm-coin.spin{animation:colmCoinSpin .7s cubic-bezier(.3,.1,.3,1)}
 @keyframes colmCoinSpin{0%{transform:rotateY(0) scale(1)}40%{transform:rotateY(540deg) scale(1.15)}100%{transform:rotateY(720deg) scale(1)}}
 .colm-balance-display{font-family:'Bungee',cursive;font-size:clamp(22px,8vw,34px);color:var(--gold);text-shadow:0 0 18px rgba(240,178,61,.55),0 2px 0 #7a5a12;letter-spacing:.02em;line-height:1;margin-top:6px}
 .colm-balance-caption{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.22em;color:var(--muted2);font-weight:700}
-.colm-player-name{margin-top:8px;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--white);background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;text-transform:uppercase;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .colm-tap-hint{margin:6px 0 0;font-size:9.5px;color:var(--muted);animation:colmBlink 1.4s steps(2) infinite}
 .colm-section-label{font-family:'Bungee',cursive;font-size:13px;color:var(--white);letter-spacing:.01em;margin:18px 0 10px}
 .colm-spark{position:absolute;pointer-events:none;font-size:18px;z-index:5;animation:colmSparkFloat .85s ease-out forwards}
@@ -495,12 +501,10 @@ button{font-family:inherit;color:inherit}
 .colm-roulette-spin-btn:disabled{opacity:.6;cursor:not-allowed;animation:none}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(min-width:860px){
-  /* en pantallas anchas no tiene sentido una sola columna angosta y centrada con medio
-     monitor vacio a los lados - la moneda/saldo va fija a la izquierda y las pestañas con
-     su contenido (que se acomoda en cuadritos) van a la derecha, estilo panel de juego */
+  /* en pantallas anchas la pantalla grande del tiburon (estilo "game screen") sigue arriba
+     a todo el ancho, y las pestañas (trivia/minijuego/tienda/ruleta) van debajo - solo se
+     amplia el ancho general y los cuadritos de la tienda se acomodan en mas columnas */
   .colm-arcade{max-width:980px}
-  .colm-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start}
-  .colm-left{position:sticky;top:20px}
   .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
   .colm-shop-grid{grid-template-columns:repeat(3,1fr)}
 }
@@ -6199,9 +6203,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div id="colmillosContent" style="display:none">
         <div class="colm-grid">
          <div class="colm-left">
-          <div class="colm-hero">
-            <div class="colm-hero-char" id="colmillosHeroShark"></div>
-            <div class="colm-hero-stats">
+          <div class="colm-hero" id="colmillosHero">
+            <div class="colm-hero-hud">
+              <div class="colm-hero-lives" title="Vidas (próximamente)">❤️❤️❤️</div>
+              <div class="colm-hero-username" id="colmillosPlayerName">JUGADOR</div>
               <div class="colm-coin" id="colmillosBigCoin">
                 <svg width="92" height="115" viewBox="0 0 120 150">
                   <defs>
@@ -6217,9 +6222,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <circle cx="60" cy="37" r="1.6" fill="#a9916a" opacity=".7"/>
                 </svg>
               </div>
+            </div>
+            <button type="button" class="colm-hero-menu-btn" data-goto-tab="tienda">☰ MENÚ</button>
+            <div class="colm-hero-char" id="colmillosHeroShark"></div>
+            <div class="colm-hero-footer">
               <div class="colm-balance-display" id="colmillosBigBalance">0</div>
               <div class="colm-balance-caption">COLMILLOS</div>
-              <div class="colm-player-name" id="colmillosPlayerName">JUGADOR</div>
               <p class="colm-tap-hint">👆 Tócala</p>
               <div class="colm-global-taps">🌍 Manada: <b id="colmillosGlobalTaps">0</b></div>
             </div>
@@ -25888,6 +25896,17 @@ const SHARK_IMG_PATHS = {
   skin_ice: 'assets/mascot/variants/shark_skin_ice.png',
   skin_lime: 'assets/mascot/variants/shark_skin_lime.png',
   skin_violet: 'assets/mascot/variants/shark_skin_violet.png',
+  skin_camo: 'assets/mascot/variants/shark_skin_camo.png',
+  skin_tiger: 'assets/mascot/variants/shark_skin_tiger.png',
+  skin_galaxy: 'assets/mascot/variants/shark_skin_galaxy.png',
+};
+const BG_IMG_PATHS = {
+  bg_reef: 'assets/mascot/backgrounds/bg_reef.png',
+  bg_abyss: 'assets/mascot/backgrounds/bg_abyss.png',
+  bg_surface: 'assets/mascot/backgrounds/bg_surface.png',
+  bg_sunken_city: 'assets/mascot/backgrounds/bg_sunken_city.png',
+  bg_volcano: 'assets/mascot/backgrounds/bg_volcano.png',
+  bg_night: 'assets/mascot/backgrounds/bg_night.png',
 };
 const sharkImgCache = {};
 function getSharkImg(skinId){
@@ -25899,10 +25918,25 @@ function getSharkImg(skinId){
   }
   return sharkImgCache[key];
 }
+const bgImgCache = {};
+function getBgImg(backgroundId){
+  if(!backgroundId || !BG_IMG_PATHS[backgroundId]) return null;
+  if(!bgImgCache[backgroundId]){
+    const img = new Image();
+    img.src = BG_IMG_PATHS[backgroundId];
+    bgImgCache[backgroundId] = img;
+  }
+  return bgImgCache[backgroundId];
+}
 const ACC_IMG_PATHS = {
   acc_cap: 'assets/mascot/accessories/acc_cap.png',
   acc_shades: 'assets/mascot/accessories/acc_shades.png',
   acc_chain: 'assets/mascot/accessories/acc_chain.png',
+  acc_scuba: 'assets/mascot/accessories/acc_scuba.png',
+  acc_scarf: 'assets/mascot/accessories/acc_scarf.png',
+  acc_headphones: 'assets/mascot/accessories/acc_headphones.png',
+  acc_crown: 'assets/mascot/accessories/acc_crown.png',
+  acc_cape: 'assets/mascot/accessories/acc_cape.png',
 };
 function sharkAccessoryOverlayHtml(accessoryId){
   const src = accessoryId && ACC_IMG_PATHS[accessoryId];
@@ -25942,7 +25976,15 @@ function renderSharkPreviews(){
   const heroEl = document.getElementById('colmillosHeroShark');
   if(miniEl) miniEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 62);
   if(bigEl) bigEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 170);
-  if(heroEl) heroEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 150);
+  if(heroEl) heroEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 220);
+  renderColmHeroBackground();
+}
+function renderColmHeroBackground(){
+  const hero = document.getElementById('colmillosHero');
+  if(!hero) return;
+  const src = BG_IMG_PATHS[colmillosEquippedState.background_id];
+  hero.style.backgroundImage = src ? ("url('" + src + "')") : '';
+  hero.classList.toggle('has-bg', !!src);
 }
 
 const COLM_DAILY_EVENT_TYPES = ['daily_visit', 'trivia_correct', 'minigame_played'];
@@ -26068,7 +26110,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
    user_colmillos_events (period_key='once' para cosmeticos, un uuid por boleto para que los
    boletos de sorteo si se puedan comprar varias veces); equipar = fila en
    user_colmillos_equipped. Ver scripts/sql/create_colmillos_minigame.sql ---- */
-const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', raffle_ticket: '🎟️' };
+const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', skin_camo: '🦈', skin_tiger: '🦈', skin_galaxy: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', acc_scuba: '🤿', acc_scarf: '🧣', acc_headphones: '🎧', acc_crown: '👑', acc_cape: '🏴‍☠️', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', bg_sunken_city: '🏛️', bg_volcano: '🌋', bg_night: '🌙', raffle_ticket: '🎟️' };
 const COLM_EQUIP_FIELD = { skin: 'skin_id', accessory: 'accessory_id', background: 'background_id' };
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
 async function loadColmillosShop(){
@@ -26127,6 +26169,13 @@ function renderColmillosShopGrids(balance){
       if(cat === 'skin'){
         swatch.innerHTML = sharkImgMarkup(item.id, null, 44);
         swatch.style.background = 'none';
+      } else if(cat === 'accessory'){
+        swatch.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, item.id, 44);
+        swatch.style.background = 'none';
+      } else if(cat === 'background' && BG_IMG_PATHS[item.id]){
+        swatch.style.backgroundImage = "url('" + BG_IMG_PATHS[item.id] + "')";
+        swatch.style.backgroundSize = 'cover';
+        swatch.style.backgroundPosition = 'center';
       } else {
         swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
       }
@@ -26251,12 +26300,15 @@ function colmGameLoop(){
 }
 function drawColmGame(){
   const { ctx, canvas } = colmGame;
-  const bgColors = { bg_reef: ['#0d2b28', '#124a3f'], bg_abyss: ['#070512', '#1a0f2e'], bg_surface: ['#1a2f4a', '#2f5d85'] };
-  const [c1, c2] = bgColors[colmillosEquippedState.background_id] || ['#0b0d18', '#121533'];
-  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  grad.addColorStop(0, c1); grad.addColorStop(1, c2);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const bgImg = getBgImg(colmillosEquippedState.background_id);
+  if(bgImg && bgImg.complete && bgImg.naturalWidth){
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  } else {
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, '#0b0d18'); grad.addColorStop(1, '#121533');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
   ctx.strokeStyle = 'rgba(240,178,61,.5)';
   ctx.lineWidth = 2;
   ctx.beginPath();
