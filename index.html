@@ -6368,6 +6368,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="face">😎 Cara</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="body">👔 Cuerpo</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="hands">✊ Manos</button>
+              <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="feet">👟 Pies</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="background">🌊 Fondos</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="raffle">🎟️ Sorteos</button>
             </div>
@@ -25980,6 +25981,12 @@ const BG_IMG_PATHS = {
   bg_playa: 'assets/mascot/backgrounds/bg_playa.png',
   bg_laboratorio: 'assets/mascot/backgrounds/bg_laboratorio.png',
   bg_atardecer: 'assets/mascot/backgrounds/bg_atardecer.png',
+  bg_selva: 'assets/mascot/backgrounds/bg_selva.png',
+  bg_cueva: 'assets/mascot/backgrounds/bg_cueva.png',
+  bg_neon: 'assets/mascot/backgrounds/bg_neon.png',
+  bg_pradera: 'assets/mascot/backgrounds/bg_pradera.png',
+  bg_nieve: 'assets/mascot/backgrounds/bg_nieve.png',
+  bg_desierto: 'assets/mascot/backgrounds/bg_desierto.png',
 };
 const sharkImgCache = {};
 function getSharkImg(skinId){
@@ -26017,6 +26024,18 @@ const ACC_IMG_PATHS = {
   acc_paraguas: 'assets/mascot/accessories/acc_paraguas.png',
   acc_guantes: 'assets/mascot/accessories/acc_guantes.png',
   acc_microfono: 'assets/mascot/accessories/acc_microfono.png',
+  acc_bate: 'assets/mascot/accessories/acc_bate.png',
+  acc_escudo: 'assets/mascot/accessories/acc_escudo.png',
+  acc_espada: 'assets/mascot/accessories/acc_espada.png',
+  acc_mazo: 'assets/mascot/accessories/acc_mazo.png',
+  acc_raqueta: 'assets/mascot/accessories/acc_raqueta.png',
+  acc_varita: 'assets/mascot/accessories/acc_varita.png',
+  acc_aletasbuceo: 'assets/mascot/accessories/acc_aletasbuceo.png',
+  acc_botasnieve: 'assets/mascot/accessories/acc_botasnieve.png',
+  acc_botaspirata: 'assets/mascot/accessories/acc_botaspirata.png',
+  acc_patines: 'assets/mascot/accessories/acc_patines.png',
+  acc_sandalias: 'assets/mascot/accessories/acc_sandalias.png',
+  acc_tenis: 'assets/mascot/accessories/acc_tenis.png',
 };
 /* accessoryIds: un arreglo (0 a 4 ids, uno por cada "parte del cuerpo" - cabeza/cara/cuerpo/
    manos) para poder llevar puesto un gorro Y gafas Y cadena Y algo en la mano, todo a la vez -
@@ -26053,11 +26072,11 @@ function animateColmBalance(target){
   }
   window._colmBalanceRaf = requestAnimationFrame(tick);
 }
-/* 4 "partes del cuerpo" para accesorios - cada una es su propia columna en
+/* 5 "partes del cuerpo" para accesorios - cada una es su propia columna en
    user_colmillos_equipped (accessory_head_id, accessory_face_id, ...) para que se puedan
    llevar puestas al mismo tiempo sin que una se quite a la otra */
-const ACC_SLOTS = ['head', 'face', 'body', 'hands'];
-const COLM_EQUIPPED_DEFAULT = { skin_id: null, accessory_head_id: null, accessory_face_id: null, accessory_body_id: null, accessory_hands_id: null, background_id: null };
+const ACC_SLOTS = ['head', 'face', 'body', 'hands', 'feet'];
+const COLM_EQUIPPED_DEFAULT = { skin_id: null, accessory_head_id: null, accessory_face_id: null, accessory_body_id: null, accessory_hands_id: null, accessory_feet_id: null, background_id: null };
 let colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
 let colmillosOwnedItemIds = new Set();
 let colmillosShopItemsCache = [];
@@ -26251,7 +26270,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
    user_colmillos_events (period_key='once' para cosmeticos, un uuid por boleto para que los
    boletos de sorteo si se puedan comprar varias veces); equipar = fila en
    user_colmillos_equipped. Ver scripts/sql/create_colmillos_minigame.sql ---- */
-const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', skin_camo: '🦈', skin_tiger: '🦈', skin_galaxy: '🦈', skin_arcoiris: '🦈', skin_oroliquido: '🦈', skin_neon: '🦈', skin_dragon: '🦈', skin_martillo: '🦈', skin_rayosx: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', acc_scuba: '🤿', acc_scarf: '🧣', acc_headphones: '🎧', acc_crown: '👑', acc_cape: '🏴‍☠️', acc_sombrero: '🪄', acc_antifaz: '🦸', acc_aletarobot: '🤖', acc_collar: '🌺', acc_paraguas: '☂️', acc_guantes: '🥊', acc_microfono: '🎤', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', bg_sunken_city: '🏛️', bg_volcano: '🌋', bg_night: '🌙', bg_nave: '🛸', bg_tormenta: '⛈️', bg_playa: '🏖️', bg_laboratorio: '🧪', bg_atardecer: '🌅', raffle_ticket: '🎟️' };
+const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', skin_camo: '🦈', skin_tiger: '🦈', skin_galaxy: '🦈', skin_arcoiris: '🦈', skin_oroliquido: '🦈', skin_neon: '🦈', skin_dragon: '🦈', skin_martillo: '🦈', skin_rayosx: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', acc_scuba: '🤿', acc_scarf: '🧣', acc_headphones: '🎧', acc_crown: '👑', acc_cape: '🏴‍☠️', acc_sombrero: '🪄', acc_antifaz: '🦸', acc_aletarobot: '🤖', acc_collar: '🌺', acc_paraguas: '☂️', acc_guantes: '🥊', acc_microfono: '🎤', acc_bate: '⚾', acc_escudo: '🛡️', acc_espada: '⚔️', acc_mazo: '🔨', acc_raqueta: '🎾', acc_varita: '🪄', acc_aletasbuceo: '🤿', acc_botasnieve: '🥾', acc_botaspirata: '👢', acc_patines: '⛸️', acc_sandalias: '🩴', acc_tenis: '👟', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', bg_sunken_city: '🏛️', bg_volcano: '🌋', bg_night: '🌙', bg_nave: '🛸', bg_tormenta: '⛈️', bg_playa: '🏖️', bg_laboratorio: '🧪', bg_atardecer: '🌅', bg_selva: '🌴', bg_cueva: '💎', bg_neon: '🌃', bg_pradera: '🌼', bg_nieve: '❄️', bg_desierto: '🏜️', raffle_ticket: '🎟️' };
 const COLM_EQUIP_FIELD = { skin: 'skin_id', background: 'background_id' };
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
 async function loadColmillosShop(){
@@ -26276,7 +26295,7 @@ async function loadColmillosShop(){
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
   const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
-    .select('skin_id,accessory_head_id,accessory_face_id,accessory_body_id,accessory_hands_id,background_id').eq('user_id', currentUser.id).maybeSingle();
+    .select('skin_id,accessory_head_id,accessory_face_id,accessory_body_id,accessory_hands_id,accessory_feet_id,background_id').eq('user_id', currentUser.id).maybeSingle();
   colmillosEquippedState = equippedRow || { ...COLM_EQUIPPED_DEFAULT };
   renderSharkPreviews();
   renderColmillosShopGrids(balance);
@@ -26290,7 +26309,8 @@ const ACC_SLOT_MAP = {
   acc_cap: 'head', acc_crown: 'head', acc_sombrero: 'head', acc_headphones: 'head', acc_scuba: 'head',
   acc_shades: 'face', acc_antifaz: 'face',
   acc_chain: 'body', acc_scarf: 'body', acc_cape: 'body', acc_collar: 'body', acc_aletarobot: 'body',
-  acc_microfono: 'hands', acc_guantes: 'hands', acc_paraguas: 'hands',
+  acc_microfono: 'hands', acc_guantes: 'hands', acc_paraguas: 'hands', acc_bate: 'hands', acc_escudo: 'hands', acc_espada: 'hands', acc_mazo: 'hands', acc_raqueta: 'hands', acc_varita: 'hands',
+  acc_aletasbuceo: 'feet', acc_botasnieve: 'feet', acc_botaspirata: 'feet', acc_patines: 'feet', acc_sandalias: 'feet', acc_tenis: 'feet',
 };
 function colmAccessoryFieldFor(itemId){ return 'accessory_' + (ACC_SLOT_MAP[itemId] || 'body') + '_id'; }
 function renderColmillosShopGrids(balance){
@@ -26442,6 +26462,7 @@ async function equipColmillosItem(field, itemId){
     accessory_face_id: colmillosEquippedState.accessory_face_id,
     accessory_body_id: colmillosEquippedState.accessory_body_id,
     accessory_hands_id: colmillosEquippedState.accessory_hands_id,
+    accessory_feet_id: colmillosEquippedState.accessory_feet_id,
     background_id: colmillosEquippedState.background_id,
     updated_at: new Date().toISOString(),
   };
@@ -26678,7 +26699,7 @@ document.querySelectorAll('[data-goto-tab]').forEach(el => {
    una categoria a la vez. Cabeza/Cara/Cuerpo/Manos comparten la misma categoria real
    "accessory" (ACC_SLOT_MAP) - no hace falta una columna nueva en la base de datos, el
    agrupamiento por "parte del cuerpo" es solo visual */
-const COLM_SLOT_LABELS = { head: '🎩 ACCESORIOS DE CABEZA', face: '😎 ACCESORIOS DE CARA', body: '👔 ACCESORIOS DE CUERPO', hands: '✊ ACCESORIOS PARA LAS MANOS' };
+const COLM_SLOT_LABELS = { head: '🎩 ACCESORIOS DE CABEZA', face: '😎 ACCESORIOS DE CARA', body: '👔 ACCESORIOS DE CUERPO', hands: '✊ ACCESORIOS PARA LAS MANOS', feet: '👟 ACCESORIOS DE PIES' };
 function applyColmShopSubtabFilter(){
   const activeBtn = document.querySelector('.colm-shop-subtab.active');
   if(!activeBtn) return;

@@ -98,6 +98,18 @@ insert into colmillos_shop_items (id, category, name, price) values
     ('acc_paraguas', 'accessory', 'Paraguas Pequeño', 40),
     ('acc_guantes', 'accessory', 'Guantes de Boxeo', 50),
     ('acc_microfono', 'accessory', 'Micrófono de Rapero', 50),
+    ('acc_bate', 'accessory', 'Bate de Béisbol', 50),
+    ('acc_escudo', 'accessory', 'Escudo Medieval', 60),
+    ('acc_espada', 'accessory', 'Espada de Juguete', 50),
+    ('acc_mazo', 'accessory', 'Mazo de Juguete', 45),
+    ('acc_raqueta', 'accessory', 'Raqueta de Tenis', 45),
+    ('acc_varita', 'accessory', 'Varita Mágica', 55),
+    ('acc_aletasbuceo', 'accessory', 'Aletas de Buceo', 40),
+    ('acc_botasnieve', 'accessory', 'Botas de Nieve', 40),
+    ('acc_botaspirata', 'accessory', 'Botas de Pirata', 50),
+    ('acc_patines', 'accessory', 'Patines de Ruedas', 55),
+    ('acc_sandalias', 'accessory', 'Sandalias de Playa', 30),
+    ('acc_tenis', 'accessory', 'Tenis Deportivos', 40),
     ('bg_reef', 'background', 'Arrecife', 50),
     ('bg_abyss', 'background', 'Abismo', 50),
     ('bg_surface', 'background', 'Superficie', 50),
@@ -109,6 +121,12 @@ insert into colmillos_shop_items (id, category, name, price) values
     ('bg_playa', 'background', 'Playa Tropical', 70),
     ('bg_laboratorio', 'background', 'Laboratorio Submarino', 85),
     ('bg_atardecer', 'background', 'Atardecer Dorado', 75),
+    ('bg_selva', 'background', 'Selva', 70),
+    ('bg_cueva', 'background', 'Cueva de Cristales', 85),
+    ('bg_neon', 'background', 'Ciudad Neón', 90),
+    ('bg_pradera', 'background', 'Pradera de Flores', 65),
+    ('bg_nieve', 'background', 'Nieve / Polo', 70),
+    ('bg_desierto', 'background', 'Desierto', 70),
     ('raffle_ticket', 'raffle', 'Boleto de Sorteo', 25)
 on conflict do nothing;
 
@@ -211,3 +229,7 @@ begin
         alter table user_colmillos_equipped drop column accessory_id;
     end if;
 end $$;
+
+-- 9) Quinta parte del cuerpo: pies (zapatos/calzado) - categoria nueva, no habia nada que
+--    migrar, solo se agrega la columna.
+alter table user_colmillos_equipped add column if not exists accessory_feet_id text references colmillos_shop_items(id);
