@@ -361,6 +361,26 @@ button{font-family:inherit;color:inherit}
 .exchange-pill.connected .pill-dot{background:var(--green);box-shadow:0 0 5px var(--green)}
 .exchange-pill.connected{color:var(--white)}
 
+/* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
+   contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
+.rank-status-box{border:1px dashed var(--border2);border-radius:var(--r-md);padding:16px 18px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.rank-status-box .a-btn{flex:none;width:auto;padding:10px 18px}
+.rank-ruler{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:26px;overflow-x:auto;padding-bottom:4px}
+.rank-step{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:76px;flex:1;position:relative}
+.rank-step::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--border2);z-index:0}
+.rank-step:first-child::before{content:none}
+.rank-step-dot{width:26px;height:26px;border-radius:50%;background:var(--bg);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1}
+.rank-step.active .rank-step-dot{border-color:var(--red);background:rgba(255,47,79,.14)}
+.rank-step-name{font-size:10.5px;font-weight:700;color:var(--muted2);text-align:center}
+.rank-step.active .rank-step-name{color:var(--white)}
+.rank-step-vol{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
+.locked-tools-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.locked-tools-counter{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:20px;padding:5px 14px}
+.locked-tool-card{border:1px solid var(--border2);border-radius:var(--r-md);padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;background:rgba(255,255,255,.015);opacity:.6}
+.locked-tool-icon{font-size:22px}
+.locked-tool-card h3{font-size:13px;color:var(--muted2);font-weight:700;margin:0}
+.locked-tool-card p{font-size:11.5px;color:var(--muted);margin:0}
+
 /* NOTIFICACIONES (campanita) */
 .notif-mini-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .notif-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
@@ -2954,6 +2974,36 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
       <div class="cat-flip-back" data-category="utilidades" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Kit de Caza</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conversor de Unidades</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Porcentajes</li><li><span class="cat-flip-back-check">✓</span>Reloj de Zona Horaria</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
+
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">9</div>
+          <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M4 13l6-5 6 5"/><path d="M4 8l6-5 6 5"/></svg><span>Rango de Manada</span></div>
+          <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
+        </div>
+        <div class="cat-overview-sub">DESBLOQUEA CON VOLUMEN REAL</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <line x1="20" y1="60" x2="280" y2="60" stroke="var(--border2)" stroke-width="2"/>
+            <circle cx="40" cy="60" r="9" fill="rgba(255,47,79,.16)" stroke="var(--red)" stroke-width="2"/>
+            <circle cx="110" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <circle cx="180" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <circle cx="250" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <path d="M34 60l4 4 8-8" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M104 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+            <path d="M174 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+            <path d="M244 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Tu volumen de trading real a través de mi link de afiliado te va subiendo de rango y desbloqueando herramientas — no son puntos cosméticos, son ayuda real para operar mejor.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </button>
+      <div class="cat-flip-back" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Rango de Manada</div><div class="cat-flip-back-eyebrow">EN CONSTRUCCIÓN</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conecta tu cuenta por UID</li><li><span class="cat-flip-back-check">✓</span>Escala de rangos por volumen</li><li><span class="cat-flip-back-check">✓</span>Herramientas reales al subir de rango</li></ul><div class="cat-flip-back-cta">Ver cómo va →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
@@ -5774,6 +5824,63 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
     </div>
 
+    <div class="tool-section" data-category="rangos">
+      <div class="tool-cat-label">🏅 Rango de Manada</div>
+      <div class="section-intro-title">Bienvenido a Rango de Manada</div>
+      <p class="section-intro-text">Tu volumen de trading real a través de mi link de afiliado te va subiendo de rango — cada rango desbloquea herramientas reales para operar mejor, no puntos para gastar en cosméticos. Todavía estamos construyendo esta parte: por ahora puedes conectar tu cuenta y ver cómo va quedando la escala.</p>
+
+      <div class="rank-status-box" id="rankStatusBox">
+        <p class="auth-note" style="border:none;padding:0;margin:0" id="rankStatusText">Inicia sesión y conecta tu cuenta de Bitunix para empezar a sumar rango.</p>
+        <button type="button" class="a-btn" id="rankConnectBitunixBtn">🦈 Conectar Bitunix</button>
+      </div>
+
+      <div class="rank-ruler">
+        <div class="rank-step active" id="rankStepCria">
+          <div class="rank-step-dot">🐣</div>
+          <div class="rank-step-name">Cría</div>
+          <div class="rank-step-vol">$0</div>
+        </div>
+        <div class="rank-step">
+          <div class="rank-step-dot">🐟</div>
+          <div class="rank-step-name">Explorador</div>
+          <div class="rank-step-vol">Próx.</div>
+        </div>
+        <div class="rank-step">
+          <div class="rank-step-dot">🦈</div>
+          <div class="rank-step-name">Cazador</div>
+          <div class="rank-step-vol">Próx.</div>
+        </div>
+        <div class="rank-step">
+          <div class="rank-step-dot">🐬</div>
+          <div class="rank-step-name">Depredador</div>
+          <div class="rank-step-vol">Próx.</div>
+        </div>
+        <div class="rank-step">
+          <div class="rank-step-dot">👑</div>
+          <div class="rank-step-name">Alfa</div>
+          <div class="rank-step-vol">Próx.</div>
+        </div>
+      </div>
+
+      <div class="locked-tools-head">
+        <h3 style="margin:0;font-size:15px;color:var(--white)">Herramientas por desbloquear</h3>
+        <div class="locked-tools-counter">0 / 7 desbloqueadas</div>
+      </div>
+      <div class="tool-grid">
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #1</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #2</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #3</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #4</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #5</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #6</h3><p>Se revela al definir los rangos.</p></div>
+        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #7</h3><p>Se revela al definir los rangos.</p></div>
+      </div>
+
+      <div class="calc-disclaimer" style="margin-top:18px">
+        🚧 Estamos construyendo esta sección en vivo — primero va conectar las cuentas, después definimos qué desbloquea cada rango. Todavía no hay ninguna herramienta real aquí adentro.
+      </div>
+    </div>
+
     <div class="tool-section" data-category="partners">
       <div class="tool-cat-label">🤝 Aliados de Manada</div>
 
@@ -8435,7 +8542,7 @@ function renderCatPillTabs(cat){
       indicJump: btn.dataset.indicJump,
       onClick: () => jumpToIndicator(btn.dataset.indicJump),
     }));
-  } else if(cat && cat !== 'partners'){
+  } else if(cat && cat !== 'partners' && cat !== 'rangos'){
     items = [{ label: 'Panorama', catHome: cat, onClick: () => showCategoryGrid(cat) }].concat(
       [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
         label: card.querySelector('h3').textContent,
@@ -10785,6 +10892,7 @@ document.getElementById('profileDeleteConfirmBtn').addEventListener('click', asy
 
 sbClient.auth.onAuthStateChange((event, session) => {
   currentUser = session ? session.user : null;
+  if(typeof loadRankStatus === 'function') loadRankStatus();
   if(event === 'PASSWORD_RECOVERY'){
     setAuthMode('reset');
     openAuthModal();
@@ -10795,6 +10903,7 @@ sbClient.auth.onAuthStateChange((event, session) => {
 sbClient.auth.getSession().then(({ data }) => {
   currentUser = data.session ? data.session.user : null;
   renderAuthState();
+  if(typeof loadRankStatus === 'function') loadRankStatus();
 });
 
 /* ---- portafolios ---- */
@@ -25241,6 +25350,41 @@ function closeBitunixModal(){ closeModalGeneric(bitunixModal); }
 closeBitunix.addEventListener('click', closeBitunixModal);
 bitunixModal.addEventListener('click', (e) => { if(e.target === bitunixModal) closeBitunixModal(); });
 document.getElementById('openBitunixPillBtn').addEventListener('click', openBitunixModal);
+
+/* ---- caja de estado dentro de la cajita "Rango de Manada" (Fase 3, shell vacio) - reusa la
+   misma conexion de Bitunix de arriba, todavia sin lectura de volumen real (Fase 2 pendiente
+   de si Bitunix ofrece una API para su panel de afiliados) ---- */
+const rankStatusText = document.getElementById('rankStatusText');
+const rankConnectBitunixBtn = document.getElementById('rankConnectBitunixBtn');
+async function loadRankStatus(){
+  if(!currentUser){
+    rankStatusText.textContent = 'Inicia sesión y conecta tu cuenta de Bitunix para empezar a sumar rango.';
+    rankConnectBitunixBtn.style.display = 'inline-flex';
+    rankConnectBitunixBtn.textContent = '🦈 Conectar Bitunix';
+    return;
+  }
+  const { data, error } = await sbClient.from('user_exchange_connections')
+    .select('status,uid').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
+  if(error){ console.warn('no se pudo revisar el estado de Bitunix para el rango', error); return; }
+  if(!data){
+    rankStatusText.textContent = 'Conecta tu cuenta de Bitunix para empezar a sumar rango.';
+    rankConnectBitunixBtn.style.display = 'inline-flex';
+    rankConnectBitunixBtn.textContent = '🦈 Conectar Bitunix';
+  } else if(data.status === 'connected'){
+    rankStatusText.textContent = '✅ Bitunix conectado (UID ' + data.uid + ') — en cuanto definamos la escala, tu volumen empieza a contar.';
+    rankConnectBitunixBtn.style.display = 'none';
+  } else if(data.status === 'rejected'){
+    rankStatusText.textContent = '⚠️ Tu solicitud de conexión no se pudo validar.';
+    rankConnectBitunixBtn.style.display = 'inline-flex';
+    rankConnectBitunixBtn.textContent = 'Revisar en Bitunix →';
+  } else {
+    rankStatusText.textContent = '⏳ Tu conexión con Bitunix está en revisión.';
+    rankConnectBitunixBtn.style.display = 'inline-flex';
+    rankConnectBitunixBtn.textContent = 'Ver estado →';
+  }
+}
+rankConnectBitunixBtn.addEventListener('click', openBitunixModal);
+document.querySelector('.cat-overview-card[data-category="rangos"]').addEventListener('click', loadRankStatus);
 </script>
 <script>
 (function(){
