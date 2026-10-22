@@ -454,7 +454,7 @@ button{font-family:inherit;color:inherit}
 .colm-balance-caption{font-family:'Press Start 2P',cursive;font-size:9px;letter-spacing:.14em;color:var(--muted2);margin-top:6px}
 .colm-tap-hint{font-family:'Press Start 2P',cursive;margin:8px 0 0;font-size:9px;color:var(--muted);animation:colmBlink 1.4s steps(2) infinite;text-align:center}
 .colm-global-taps{font-size:8px;white-space:nowrap}
-/* pestaña propia de Megadientes - una sola cosa grande (el diente para tocar + el saldo +
+/* pestaña propia de Filos - una sola cosa grande (el diente para tocar + el saldo +
    datos del jugador), no una pildora chiquita metida en otro lado */
 .colm-wallet-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px}
 .colm-coin-big svg{width:clamp(90px,26vw,150px);height:auto}
@@ -2742,7 +2742,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="pill-dot" id="telegramPillDot"></span>
       </button>
 
-      <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Megadientes — se ganan usando la plataforma" style="display:none">
+      <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Filos — se ganan usando la plataforma" style="display:none">
         <svg width="12" height="15" viewBox="0 0 120 150">
           <path d="M20,45 C20,25 30,12 38,18 C45,22 50,30 60,30 C70,30 75,22 82,18 C90,12 100,25 100,45 L98,57 L88,69 L88,81 L78,93 L77.5,105 L68,117 L67,129 L60,145 L53,129 L52,117 L42.5,105 L42,93 L32,81 L32,69 L22,57 Z" fill="var(--gold)"/>
         </svg>
@@ -6266,7 +6266,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="colm-tabs" id="colmillosTabs" style="display:none">
           <button type="button" class="colm-tab active" data-tab="inicio">🏠 Inicio</button>
           <button type="button" class="colm-tab" data-tab="tienda">🛒 Tienda</button>
-          <button type="button" class="colm-tab" data-tab="megadientes">🦷 Megadientes</button>
+          <button type="button" class="colm-tab" data-tab="megadientes">🦷 Filos</button>
           <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuego</button>
           <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
           <button type="button" class="colm-tab" data-tab="ruleta">🎰 Ruleta</button>
@@ -6304,7 +6304,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="colm-fighter-row">
                     <div class="colm-fighter-idblock">
                       <div class="colm-fighter-portrait coin">🦷</div>
-                      <div class="colm-fighter-name gold" id="colmillosCurrencyLabel">MEGADIENTES</div>
+                      <div class="colm-fighter-name gold" id="colmillosCurrencyLabel">FILOS</div>
                     </div>
                     <div class="colm-fighter-bar currency"><div class="colm-fighter-bar-fill" id="colmillosCurrencyFill"></div><span class="colm-fighter-bar-num" id="colmillosFighterBalance">0</span></div>
                   </div>
@@ -6434,7 +6434,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
               <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
             </div>
-            <p class="colm-game-hint" id="colmRouletteResult">Apostá Megadientes y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Megadientes por tirada.</p>
+            <p class="colm-game-hint" id="colmRouletteResult">Apostá Filos y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Filos por tirada.</p>
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="megadientes" style="display:none">
@@ -6456,7 +6456,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
-              <div class="colm-balance-caption colm-balance-caption-big">MEGADIENTES</div>
+              <div class="colm-balance-caption colm-balance-caption-big">FILOS</div>
               <div class="colm-wallet-stats-row">
                 <div class="colm-wallet-stat">
                   <div class="colm-wallet-stat-num"><b id="colmillosGlobalTaps">0</b></div>
@@ -26392,7 +26392,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
   const resultEl = document.getElementById('colmillosTriviaResult');
   if(chosenIndex === correctIndex){
     buttons.forEach((b, i) => { b.classList.add('disabled'); if(i === correctIndex) b.classList.add('correct'); });
-    resultEl.textContent = '✓ ¡Correcto! +8 Megadientes';
+    resultEl.textContent = '✓ ¡Correcto! +8 Filos';
     resultEl.classList.add('done');
     await awardColmillos('trivia_correct', todayKeyUTC(), 8);
     refreshColmillosPageContent();
@@ -26756,7 +26756,7 @@ async function spinColmRoulette(){
   betInput.value = bet;
   const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
-  if(balance < bet){ resultEl.textContent = 'No tenés suficientes Megadientes para esa apuesta.'; return; }
+  if(balance < bet){ resultEl.textContent = 'No tenés suficientes Filos para esa apuesta.'; return; }
   colmRouletteSpinning = true;
   const spinBtn = document.getElementById('colmRouletteSpinBtn');
   spinBtn.disabled = true;
@@ -26780,8 +26780,8 @@ async function spinColmRoulette(){
       });
     }
     resultEl.textContent = segment.mult === 0
-      ? ('😬 Salió 0x — perdiste ' + bet + ' Megadientes. ¡Otra vez!')
-      : ('🎉 ¡Salió ' + segment.label + '! Ganaste ' + net + ' Megadientes.');
+      ? ('😬 Salió 0x — perdiste ' + bet + ' Filos. ¡Otra vez!')
+      : ('🎉 ¡Salió ' + segment.label + '! Ganaste ' + net + ' Filos.');
     loadColmillosBalance(true);
     refreshColmillosPageContent();
     colmRouletteSpinning = false;
@@ -26801,7 +26801,7 @@ function switchColmillosTab(tab){
   const heroOverlay = document.getElementById('colmillosHeroOverlay');
   const tiendaPanel = document.querySelector('.colm-tabpanel[data-tabpanel="tienda"]');
   const tiendaSlot = document.getElementById('colmillosTiendaSlot');
-  // la pestaña de Megadientes es una pantalla propia, sola - ni el escenario del tiburon ni
+  // la pestaña de Filos es una pantalla propia, sola - ni el escenario del tiburon ni
   // el HUD tienen nada que hacer ahi, por eso se oculta el recuadro grande completo
   const heroCol = document.querySelector('.colm-left');
   if(heroCol) heroCol.style.display = (tab === 'megadientes') ? 'none' : '';
