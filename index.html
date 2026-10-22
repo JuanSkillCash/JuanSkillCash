@@ -346,6 +346,8 @@ button{font-family:inherit;color:inherit}
 @media(min-width:861px){ .notif-mini{margin-left:24px} }
 .account-mini{position:relative;margin-left:14px;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
+.profile-avatar-row{display:flex;flex-direction:column;align-items:center;gap:8px;margin:2px 0 18px}
+.profile-avatar-circle{width:76px;height:76px;border-radius:50%;background-color:var(--bg);border:2px solid var(--border2);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
 .account-mini-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
 .account-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid var(--border2);border-radius:14px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
 .account-mini-dropdown.open{display:block}
@@ -8516,6 +8518,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <p class="calc-sub">Edita tu nombre de usuario</p>
       </div>
 
+      <div class="profile-avatar-row">
+        <div class="profile-avatar-circle" id="profileAvatarCircle"></div>
+        <button type="button" class="auth-link-btn" id="profileChangeAvatarBtn">🦈 Cambiar imagen →</button>
+      </div>
+
       <div class="field" id="f-profile-username">
         <label for="profileUsernameInput">Nombre de usuario</label>
         <input type="text" id="profileUsernameInput" placeholder="Ej. JuanTrader" autocomplete="off">
@@ -11231,10 +11238,15 @@ function openProfileModal(){
   document.getElementById('profileEmailDisplay').textContent = currentUser ? currentUser.email : '—';
   document.getElementById('profileError').classList.remove('show');
   document.getElementById('profileSuccess').classList.remove('show');
+  if(typeof renderAccountMiniAvatar === 'function') renderAccountMiniAvatar();
   openModalGeneric(profileModal, profilePanel, closeProfile);
 }
 function closeProfileModal(){ closeModalGeneric(profileModal); }
 closeProfile.addEventListener('click', closeProfileModal);
+document.getElementById('profileChangeAvatarBtn').addEventListener('click', () => {
+  closeProfileModal();
+  setTimeout(() => { if(typeof showColmillosPage === 'function') showColmillosPage(); }, 200);
+});
 
 /* ---- modal de Telegram (conectar/gestionar) - se abre desde Mi perfil o desde la
    pildora "Telegram" de la barra superior ---- */
@@ -26198,29 +26210,39 @@ function renderColmillosShopPreview(){
   bigEl.style.backgroundImage = src ? ("url('" + src + "')") : '';
   bigEl.classList.toggle('has-bg', !!src);
 }
-/* avatarcito del tiburon en el botoncito de cuenta (arriba a la derecha) - en vez del emoji
-   generico de siempre, para que se sienta que de verdad es "tu" tiburon en todos lados.
-   Todo el mundo ve al menos el diseño basico (aunque no haya tocado la tienda todavia), y se
-   recorta de la cintura para arriba (en vez del cuerpo completico) para que se note mas grande
-   dentro del circulito chiquito - el recorte (x14-74,y8-68 del lienzo de 96x96) se logra con
-   background-size/position en vez de un <img>, asi el mismo calculo sirve para cualquier
-   tamaño de boton (38px en escritorio, 34px en celular) */
-function renderAccountMiniAvatar(){
-  const btn = document.getElementById('accountMiniBtn');
-  if(!btn) return;
+/* avatarcito del tiburon - se usa tanto en el botoncito de cuenta (arriba a la derecha) como
+   en el circulo grande de "Mi perfil", en vez del emoji generico de siempre, para que se
+   sienta que de verdad es "tu" tiburon (con sus accesorios, no solo el color base) en todos
+   lados. Todo el mundo ve al menos el diseño basico (aunque no haya tocado la tienda
+   todavia), y se recorta de la cintura para arriba (en vez del cuerpo completico) para que
+   se note mas grande dentro del circulito - el recorte (x14-74,y8-68 del lienzo de 96x96) se
+   logra con background-size/position en vez de un <img>, asi el mismo calculo sirve para
+   cualquier tamaño de circulo. Los accesorios se apilan como capas de background adicionales
+   (todas comparten el mismo recorte, por eso un solo size/position alcanza para todas) */
+function applySharkAvatarCrop(el){
+  if(!el) return;
   const skinId = colmillosEquippedState.skin_id;
-  const src = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
-  btn.textContent = '';
-  btn.style.backgroundImage = "url('" + src + "')";
-  btn.style.backgroundSize = '160% 160%';
-  btn.style.backgroundPosition = '38.9% 22.2%';
-  btn.style.backgroundRepeat = 'no-repeat';
-  btn.style.imageRendering = 'pixelated';
+  const skinSrc = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
+  const accessoryIds = colmEquippedAccessoryIds(colmillosEquippedState);
+  const layers = accessoryIds.slice().reverse().map(id => ACC_IMG_PATHS[id]).filter(Boolean);
+  layers.push(skinSrc);
+  el.textContent = '';
+  el.style.backgroundImage = layers.map(src => "url('" + src + "')").join(', ');
+  el.style.backgroundSize = '160% 160%';
+  el.style.backgroundPosition = '38.9% 22.2%';
+  el.style.backgroundRepeat = 'no-repeat';
+  el.style.imageRendering = 'pixelated';
+}
+function renderAccountMiniAvatar(){
+  applySharkAvatarCrop(document.getElementById('accountMiniBtn'));
+  applySharkAvatarCrop(document.getElementById('profileAvatarCircle'));
 }
 async function loadAccountMiniAvatar(){
-  if(!currentUser){ renderAccountMiniAvatar(); return; }
-  const { data } = await sbClient.from('user_colmillos_equipped').select('skin_id').eq('user_id', currentUser.id).maybeSingle();
-  colmillosEquippedState.skin_id = data ? data.skin_id : null;
+  if(!currentUser){ colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT }; renderAccountMiniAvatar(); return; }
+  const { data } = await sbClient.from('user_colmillos_equipped')
+    .select('skin_id,accessory_head_id,accessory_face_id,accessory_body_id,accessory_hands_id,accessory_feet_id,background_id')
+    .eq('user_id', currentUser.id).maybeSingle();
+  colmillosEquippedState = data || { ...COLM_EQUIPPED_DEFAULT };
   renderAccountMiniAvatar();
 }
 function renderColmHeroBackground(){
