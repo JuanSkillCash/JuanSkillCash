@@ -370,11 +370,29 @@ button{font-family:inherit;color:inherit}
 #openTelegramPillBtn.connected{color:#54c3f5}
 #openTelegramPillBtn.connected svg{color:#29a9eb}
 #openTelegramPillBtn.connected .pill-dot{background:#29a9eb;box-shadow:0 0 5px rgba(41,169,235,.6);animation:pillDotPulse 1.6s ease-in-out infinite}
-.colmillos-pill{border-color:rgba(240,178,61,.35);color:var(--gold);font-family:'Space Mono',monospace;cursor:default}
+.colmillos-pill{border-color:rgba(240,178,61,.35);color:var(--gold);font-family:'Space Mono',monospace}
 .colmillos-pill:hover{border-color:var(--gold)}
 .colmillos-pill svg{opacity:1}
 .colmillos-pill.bump{animation:colmillosBump .5s var(--ease-out)}
 @keyframes colmillosBump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
+.wip-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#13162a;border:1px solid var(--border2);color:var(--white);font-size:13px;font-weight:600;padding:12px 20px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+.wip-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.cat-overview-card.wip-locked,.cat-flip-back.wip-locked{filter:grayscale(.5);opacity:.72}
+.cat-overview-card.wip-locked .cat-overview-btn::after,.cat-flip-back.wip-locked .cat-flip-back-cta::after{content:' 🔒'}
+.colmillos-balance-hero{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(240,178,61,.14),rgba(240,178,61,.03));border:1px solid rgba(240,178,61,.3);margin-bottom:20px}
+.colmillos-balance-num{font-family:'Space Mono',monospace;font-size:26px;font-weight:800;color:var(--gold);line-height:1.1}
+.colmillos-balance-label{font-size:11px;color:var(--muted2);font-weight:600}
+.colmillos-section-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--white);margin:18px 0 10px;text-transform:uppercase}
+.colmillos-quest-list{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.colmillos-quest{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02)}
+.colmillos-quest-icon{font-size:18px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.colmillos-quest-body{flex:1;min-width:0}
+.colmillos-quest-body h4{margin:0 0 2px;font-size:13px;color:var(--white);font-weight:700}
+.colmillos-quest-body p{margin:0;font-size:11px;color:var(--muted)}
+.colmillos-quest-status{font-size:11px;font-weight:700;flex-shrink:0;padding:4px 9px;border-radius:20px;white-space:nowrap}
+.colmillos-quest-status.done{color:#4ade80;background:rgba(74,222,128,.12)}
+.colmillos-quest-status.pending{color:var(--muted2);background:rgba(255,255,255,.04)}
+.colmillos-quest-soon{opacity:.6}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
@@ -725,8 +743,9 @@ button{font-family:inherit;color:inherit}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
 .cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
 
-.cat-overview-featured{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-@media(max-width:900px){ .cat-overview-featured{grid-template-columns:1fr} }
+.cat-overview-featured{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:1100px){ .cat-overview-featured{grid-template-columns:1fr 1fr} }
+@media(max-width:600px){ .cat-overview-featured{grid-template-columns:1fr} }
 .cat-overview-card.big{padding:26px}
 .cat-overview-card.big .cat-overview-num{width:28px;height:28px;font-size:12.5px}
 .cat-overview-card.big .cat-overview-title{font-size:18px;gap:9px}
@@ -2752,6 +2771,36 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
       </div>
 
+      <div class="cat-flip-outer big">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">3</div>
+          <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M4 13l6-5 6 5"/><path d="M4 8l6-5 6 5"/></svg><span>Rango de Manada</span></div>
+          <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
+        </div>
+        <div class="cat-overview-sub">DESBLOQUEA CON VOLUMEN REAL</div>
+        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <line x1="20" y1="60" x2="280" y2="60" stroke="var(--border2)" stroke-width="2"/>
+            <circle cx="40" cy="60" r="9" fill="rgba(255,47,79,.16)" stroke="var(--red)" stroke-width="2"/>
+            <circle cx="110" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <circle cx="180" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <circle cx="250" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
+            <path d="M34 60l4 4 8-8" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M104 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+            <path d="M174 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+            <path d="M244 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Tu volumen de trading real a través de mi link de afiliado te va subiendo de rango y desbloqueando herramientas — no son puntos cosméticos, son ayuda real para operar mejor.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </button>
+      <div class="cat-flip-back" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Rango de Manada</div><div class="cat-flip-back-eyebrow">EN CONSTRUCCIÓN</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conecta tu cuenta por UID</li><li><span class="cat-flip-back-check">✓</span>Escala de rangos por volumen</li><li><span class="cat-flip-back-check">✓</span>Herramientas reales al subir de rango</li></ul><div class="cat-flip-back-cta">Ver cómo va →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
+
     </div>
     <div class="cat-overview-grid">
 
@@ -2759,7 +2808,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="portafolio" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">3</div>
+          <div class="cat-overview-num">4</div>
           <div class="cat-overview-title">🐠 Mi Arrecife</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -2805,7 +2854,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">4</div>
+          <div class="cat-overview-num">5</div>
           <div class="cat-overview-title">🦈 Zona de Caza</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -2858,7 +2907,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="inversion" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">5</div>
+          <div class="cat-overview-num">6</div>
           <div class="cat-overview-title">🐟 Reserva de Presas</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -2895,7 +2944,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="seguridad" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">6</div>
+          <div class="cat-overview-num">7</div>
           <div class="cat-overview-title">🛡️ Blindaje</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -2947,7 +2996,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">7</div>
+          <div class="cat-overview-num">8</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M10 5.5c-1.5-1.3-3.5-2-6-2v11c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2v-11c-2.5 0-4.5.7-6 2z"/><path d="M10 5.5v11"/></svg><span>Manual del Depredador</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -2978,7 +3027,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="utilidades" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
-          <div class="cat-overview-num">8</div>
+          <div class="cat-overview-num">9</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M13.4 3.4a3.8 3.8 0 00-5.1 4.6L3.5 12.7v3.8h3.8l4.7-4.8a3.8 3.8 0 004.6-5.1l-2.5 2.5-1.9-1.9 2.5-2.5z"/></svg><span>Kit de Caza</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
@@ -3002,36 +3051,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
       <div class="cat-flip-back" data-category="utilidades" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Kit de Caza</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conversor de Unidades</li><li><span class="cat-flip-back-check">✓</span>Calculadora de Porcentajes</li><li><span class="cat-flip-back-check">✓</span>Reloj de Zona Horaria</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-      </div>
-      </div>
-
-      <div class="cat-flip-outer">
-      <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
-        <div class="cat-overview-head">
-          <div class="cat-overview-num">9</div>
-          <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M4 13l6-5 6 5"/><path d="M4 8l6-5 6 5"/></svg><span>Rango de Manada</span></div>
-          <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
-        </div>
-        <div class="cat-overview-sub">DESBLOQUEA CON VOLUMEN REAL</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <line x1="20" y1="60" x2="280" y2="60" stroke="var(--border2)" stroke-width="2"/>
-            <circle cx="40" cy="60" r="9" fill="rgba(255,47,79,.16)" stroke="var(--red)" stroke-width="2"/>
-            <circle cx="110" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <circle cx="180" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <circle cx="250" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <path d="M34 60l4 4 8-8" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M104 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-            <path d="M174 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-            <path d="M244 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-          </svg>
-        </div>
-        <div class="cat-overview-desc">Tu volumen de trading real a través de mi link de afiliado te va subiendo de rango y desbloqueando herramientas — no son puntos cosméticos, son ayuda real para operar mejor.</div>
-        <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
-      </button>
-      <div class="cat-flip-back" data-category="rangos" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Rango de Manada</div><div class="cat-flip-back-eyebrow">EN CONSTRUCCIÓN</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Conecta tu cuenta por UID</li><li><span class="cat-flip-back-check">✓</span>Escala de rangos por volumen</li><li><span class="cat-flip-back-check">✓</span>Herramientas reales al subir de rango</li></ul><div class="cat-flip-back-cta">Ver cómo va →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#080c20"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
 
@@ -8227,6 +8246,65 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
   </div>
 </div>
 
+<!-- ===== MODAL: COLMILLOS (moneda de coleccion - como se gana, para que sirve) ===== -->
+<div class="modal-overlay" id="colmillosModal">
+  <button class="modal-close" id="closeColmillos" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmillosTitleEl" style="max-width:480px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="colmillosTitleEl" style="font-size:22px">🦷 Colmillos</h2>
+        <p class="calc-sub">Tu progreso en la manada</p>
+      </div>
+
+      <div class="colmillos-balance-hero">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9.5" fill="rgba(240,178,61,.15)" stroke="var(--gold)" stroke-width="1.4"/>
+          <path d="M12 6.4c-2.1 0-3.3 2-2.9 4 .3 1.5 1.3 3.4 2.2 5.1.3.6 1.1.6 1.4 0 .9-1.7 1.9-3.6 2.2-5.1.4-2-.8-4-2.9-4Z" fill="var(--gold)"/>
+        </svg>
+        <div>
+          <div class="colmillos-balance-num" id="colmillosModalBalance">0</div>
+          <div class="colmillos-balance-label">Colmillos acumulados</div>
+        </div>
+      </div>
+
+      <div class="colmillos-section-label">⚔️ Cómo se ganan</div>
+      <div class="colmillos-quest-list" id="colmillosQuestList">
+        <div class="colmillos-quest" data-event="daily_visit">
+          <div class="colmillos-quest-icon">📅</div>
+          <div class="colmillos-quest-body"><h4>Visitar la plataforma</h4><p>+5 cada día que entras</p></div>
+          <div class="colmillos-quest-status"></div>
+        </div>
+        <div class="colmillos-quest" data-event="telegram_connected">
+          <div class="colmillos-quest-icon">📲</div>
+          <div class="colmillos-quest-body"><h4>Conectar Telegram</h4><p>+15 (una sola vez)</p></div>
+          <div class="colmillos-quest-status"></div>
+        </div>
+        <div class="colmillos-quest" data-event="bitunix_connected">
+          <div class="colmillos-quest-icon">🦈</div>
+          <div class="colmillos-quest-body"><h4>Conectar Bitunix</h4><p>+15 (una sola vez)</p></div>
+          <div class="colmillos-quest-status"></div>
+        </div>
+        <div class="colmillos-quest" data-event="profile_completed">
+          <div class="colmillos-quest-icon">👤</div>
+          <div class="colmillos-quest-body"><h4>Completar tu perfil</h4><p>+5 (una sola vez)</p></div>
+          <div class="colmillos-quest-status"></div>
+        </div>
+        <div class="colmillos-quest colmillos-quest-soon">
+          <div class="colmillos-quest-icon">🔮</div>
+          <div class="colmillos-quest-body"><h4>Más formas de ganar</h4><p>Vienen pronto — usar calculadoras, leer guías, invitar gente a la comunidad.</p></div>
+        </div>
+      </div>
+
+      <div class="colmillos-section-label">🏆 Para qué sirven</div>
+      <p class="auth-note">Por ahora son para <b>presumir</b> — vas a poder verlos en una tabla de posiciones de la comunidad (próximamente). Nunca se ganan por volumen de trading, y son totalmente aparte de tu rango en "Rango de Manada" — eso evita que te empujen a operar más solo por subir un número. Cuando haya herramientas reales que desbloquear, los Colmillos podrán servir para eso también.</p>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL: LEGAL (Términos, Privacidad, Cookies) ===== -->
 <div class="modal-overlay" id="legalModal">
   <button class="modal-close" id="closeLegal" aria-label="Cerrar">✕</button>
@@ -8601,7 +8679,42 @@ function renderCatPillTabs(cat){
     }, 300);
   }
 }
+// cajitas marcadas "PRÓXIMAMENTE" que Juan quiere seguir probando el solo antes de abrirlas a
+// toda la comunidad - mientras un data-category este en esta lista, SOLO su propia cuenta
+// (OWNER_USER_ID) puede entrar, sin importar si alguien ya cumple el rango/volumen: el candado
+// es por estado de construccion, no por permiso ganado. Se revisa aca mismo (no solo al hacer
+// clic en la cajita) para que tambien bloquee un link directo a la ruta.
+const WIP_OWNER_ONLY_CATEGORIES = ['rangos'];
+function isWipLockedForCurrentUser(cat){
+  return WIP_OWNER_ONLY_CATEGORIES.includes(cat) && (!currentUser || currentUser.id !== 'e4309251-6078-4233-aab3-6ab8d6c624e1');
+}
+function showWipToast(text){
+  let el = document.getElementById('wipToast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'wipToast';
+    el.className = 'wip-toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(el._wipTimer);
+  el._wipTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function updateWipLockVisuals(){
+  WIP_OWNER_ONLY_CATEGORIES.forEach(cat => {
+    const locked = isWipLockedForCurrentUser(cat);
+    document.querySelectorAll('.cat-overview-card[data-category="' + cat + '"], .cat-flip-back[data-category="' + cat + '"]').forEach(el => {
+      el.classList.toggle('wip-locked', locked);
+    });
+  });
+}
+
 function showCategoryDetail(cat){
+  if(isWipLockedForCurrentUser(cat)){
+    showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
+    return;
+  }
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   closeAnyOpenToolInline();
   setCatLabelToolOpen(false);
@@ -10926,6 +11039,7 @@ sbClient.auth.onAuthStateChange((event, session) => {
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
   if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
+  if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
   if(event === 'PASSWORD_RECOVERY'){
     setAuthMode('reset');
     openAuthModal();
@@ -10940,6 +11054,7 @@ sbClient.auth.getSession().then(({ data }) => {
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
   if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
+  if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
 });
 
 /* ---- portafolios ---- */
@@ -25517,6 +25632,50 @@ async function awardColmillos(eventType, periodKey, amount){
   }
   if(data && data.length) loadColmillosBalance(true);
 }
+
+/* ---- modal de Colmillos: explica como se ganan (estilo "logros" de videojuego) y para que
+   sirven por ahora - se abre al picarle a la pildora de la billetera ---- */
+const colmillosModal = document.getElementById('colmillosModal');
+const colmillosPanel = colmillosModal.querySelector('.modal-panel');
+const closeColmillos = document.getElementById('closeColmillos');
+
+async function refreshColmillosModalContent(){
+  const balEl = document.getElementById('colmillosModalBalance');
+  const questCards = document.querySelectorAll('#colmillosQuestList .colmillos-quest[data-event]');
+  if(!currentUser){
+    balEl.textContent = '0';
+    questCards.forEach(card => {
+      const statusEl = card.querySelector('.colmillos-quest-status');
+      statusEl.textContent = 'Inicia sesión';
+      statusEl.className = 'colmillos-quest-status pending';
+    });
+    return;
+  }
+  const { data, error } = await sbClient.from('user_colmillos_events').select('event_type,amount,period_key');
+  if(error){ console.warn('no se pudo leer colmillos para el modal', error); return; }
+  const rows = data || [];
+  const total = rows.reduce((sum, r) => sum + r.amount, 0);
+  balEl.textContent = total.toLocaleString('es-CO');
+  const today = todayKeyUTC();
+  questCards.forEach(card => {
+    const type = card.dataset.event;
+    const statusEl = card.querySelector('.colmillos-quest-status');
+    const done = type === 'daily_visit'
+      ? rows.some(r => r.event_type === 'daily_visit' && r.period_key === today)
+      : rows.some(r => r.event_type === type);
+    statusEl.textContent = done ? '✓ Listo' : (type === 'daily_visit' ? 'Hoy pendiente' : 'Pendiente');
+    statusEl.className = 'colmillos-quest-status ' + (done ? 'done' : 'pending');
+  });
+}
+
+async function openColmillosModal(){
+  await refreshColmillosModalContent();
+  openModalGeneric(colmillosModal, colmillosPanel, closeColmillos);
+}
+function closeColmillosModal(){ closeModalGeneric(colmillosModal); }
+closeColmillos.addEventListener('click', closeColmillosModal);
+colmillosModal.addEventListener('click', (e) => { if(e.target === colmillosModal) closeColmillosModal(); });
+colmillosWalletBtn.addEventListener('click', openColmillosModal);
 </script>
 <script>
 (function(){
