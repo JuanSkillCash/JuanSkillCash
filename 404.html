@@ -370,19 +370,28 @@ button{font-family:inherit;color:inherit}
 #openTelegramPillBtn.connected{color:#54c3f5}
 #openTelegramPillBtn.connected svg{color:#29a9eb}
 #openTelegramPillBtn.connected .pill-dot{background:#29a9eb;box-shadow:0 0 5px rgba(41,169,235,.6);animation:pillDotPulse 1.6s ease-in-out infinite}
+.colmillos-pill{border-color:rgba(240,178,61,.35);color:var(--gold);font-family:'Space Mono',monospace;cursor:default}
+.colmillos-pill:hover{border-color:var(--gold)}
+.colmillos-pill svg{opacity:1}
+.colmillos-pill.bump{animation:colmillosBump .5s var(--ease-out)}
+@keyframes colmillosBump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
-.rank-status-box{border:1px dashed var(--border2);border-radius:var(--r-md);padding:16px 18px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.rank-status-box{border:1px solid rgba(240,178,61,.25);border-radius:var(--r-md);padding:16px 18px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(240,178,61,.07),rgba(255,47,79,.04))}
 .rank-status-box .a-btn{flex:none;width:auto;padding:10px 18px}
-.rank-ruler{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:26px;overflow-x:auto;padding-bottom:4px}
-.rank-step{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:76px;flex:1;position:relative}
-.rank-step::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--border2);z-index:0}
-.rank-step:first-child::before{content:none}
-.rank-step-dot{width:26px;height:26px;border-radius:50%;background:var(--bg);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1}
-.rank-step.active .rank-step-dot{border-color:var(--red);background:rgba(255,47,79,.14)}
+.rank-ruler{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:4px;margin-bottom:26px;padding:24px 16px 14px;overflow-x:auto;border-radius:16px;border:1px solid var(--border2);background:linear-gradient(100deg,rgba(56,189,248,.12),rgba(10,12,22,.55) 55%,rgba(5,6,12,.85))}
+.rank-ruler::before{content:'';position:absolute;left:16px;right:16px;top:38px;height:2px;background:linear-gradient(90deg,rgba(125,211,252,.55),var(--gold) 55%,var(--red));border-radius:2px;opacity:.7}
+.rank-step{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:70px;flex:1;position:relative;z-index:1}
+.rank-step-dot{width:28px;height:28px;border-radius:50%;background:var(--bg);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .25s var(--ease-out),box-shadow .25s var(--ease-out),border-color .25s}
+.rank-step:nth-child(2) .rank-step-dot{width:32px;height:32px;font-size:14.5px}
+.rank-step:nth-child(3) .rank-step-dot{width:36px;height:36px;font-size:16px}
+.rank-step:nth-child(4) .rank-step-dot{width:40px;height:40px;font-size:18px}
+.rank-step:nth-child(5) .rank-step-dot{width:44px;height:44px;font-size:20px}
+.rank-step.active .rank-step-dot{border-color:var(--gold);background:radial-gradient(circle,rgba(240,178,61,.35),rgba(240,178,61,.08));transform:scale(1.1);animation:rankDotPulse 2s ease-in-out infinite}
+@keyframes rankDotPulse{0%,100%{box-shadow:0 0 10px rgba(240,178,61,.4)}50%{box-shadow:0 0 22px rgba(240,178,61,.75)}}
 .rank-step-name{font-size:10.5px;font-weight:700;color:var(--muted2);text-align:center}
-.rank-step.active .rank-step-name{color:var(--white)}
+.rank-step.active .rank-step-name{color:var(--gold)}
 .rank-step-vol{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
 .locked-tools-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
 .locked-tools-counter{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:20px;padding:5px 14px}
@@ -2509,6 +2518,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
         Telegram
         <span class="pill-dot" id="telegramPillDot"></span>
+      </button>
+
+      <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Colmillos — se ganan usando la plataforma" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9.5" fill="rgba(240,178,61,.12)" stroke="var(--gold)" stroke-width="1.4"/>
+          <path d="M12 6.4c-2.1 0-3.3 2-2.9 4 .3 1.5 1.3 3.4 2.2 5.1.3.6 1.1.6 1.4 0 .9-1.7 1.9-3.6 2.2-5.1.4-2-.8-4-2.9-4Z" fill="var(--gold)"/>
+        </svg>
+        <span id="colmillosWalletBalance">0</span>
       </button>
 
       <div class="notif-mini" id="notifMini">
@@ -10831,6 +10848,7 @@ document.getElementById('profileSaveBtn').addEventListener('click', async () => 
     if(error) throw error;
     currentUser = data.user;
     renderAuthState();
+    if(typeof awardColmillos === 'function') awardColmillos('profile_completed', 'once', 5);
     okEl.textContent = 'Nombre de usuario actualizado.';
     okEl.classList.add('show');
   } catch(err){
@@ -10906,6 +10924,8 @@ sbClient.auth.onAuthStateChange((event, session) => {
   currentUser = session ? session.user : null;
   if(typeof loadRankStatus === 'function') loadRankStatus();
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
+  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
   if(event === 'PASSWORD_RECOVERY'){
     setAuthMode('reset');
     openAuthModal();
@@ -10918,6 +10938,8 @@ sbClient.auth.getSession().then(({ data }) => {
   renderAuthState();
   if(typeof loadRankStatus === 'function') loadRankStatus();
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
+  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
 });
 
 /* ---- portafolios ---- */
@@ -25188,6 +25210,7 @@ async function loadTelegramStatus(){
   if(data && data.linked_at){
     telegramNotConnected.style.display = 'none';
     telegramConnected.style.display = 'block';
+    if(typeof awardColmillos === 'function') awardColmillos('telegram_connected', 'once', 15);
     return;
   }
   telegramNotConnected.style.display = 'block';
@@ -25310,6 +25333,7 @@ async function loadBitunixStatus(){
   if(data.status === 'connected'){
     document.getElementById('bitunixConnectedUid').textContent = data.uid;
     bitunixShowState('connected');
+    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 15);
   } else if(data.status === 'rejected'){
     document.getElementById('bitunixRejectedNote').textContent = data.review_note ? (': ' + data.review_note) : '';
     bitunixShowState('rejected');
@@ -25454,6 +25478,45 @@ async function loadRankStatus(){
 }
 rankConnectBitunixBtn.addEventListener('click', openBitunixModal);
 document.querySelector('.cat-overview-card[data-category="rangos"]').addEventListener('click', loadRankStatus);
+
+/* ===================================================================================
+   COLMILLOS: moneda de coleccion por USAR la plataforma (visitar, conectar Telegram/
+   Bitunix, completar el perfil) - a proposito NUNCA por volumen de trading, para no repetir
+   el error de BCD de empujar a sobreoperar por puntos (ver docs/referencia-bcd-dashboard.md).
+   Totalmente aparte del rango de "Rango de Manada". Ledger append-only en
+   user_colmillos_events (ver scripts/sql/create_colmillos.sql) - el saldo es la suma de las
+   filas propias; period_key deduplica (fecha para diarios, 'once' para hitos de una sola vez).
+   =================================================================================== */
+const colmillosWalletBtn = document.getElementById('colmillosWalletBtn');
+const colmillosWalletBalance = document.getElementById('colmillosWalletBalance');
+
+function todayKeyUTC(){ return new Date().toISOString().slice(0, 10); }
+
+async function loadColmillosBalance(bump){
+  if(!currentUser){ colmillosWalletBtn.style.display = 'none'; return; }
+  const { data, error } = await sbClient.from('user_colmillos_events').select('amount').eq('user_id', currentUser.id);
+  if(error){ console.warn('no se pudo leer el saldo de colmillos', error); return; }
+  const total = (data || []).reduce((sum, row) => sum + row.amount, 0);
+  colmillosWalletBalance.textContent = total.toLocaleString('es-CO');
+  colmillosWalletBtn.style.display = 'inline-flex';
+  if(bump){
+    colmillosWalletBtn.classList.remove('bump');
+    void colmillosWalletBtn.offsetWidth; // fuerza reflow para que la animacion se pueda repetir
+    colmillosWalletBtn.classList.add('bump');
+  }
+}
+
+async function awardColmillos(eventType, periodKey, amount){
+  if(!currentUser) return;
+  const { data, error } = await sbClient.from('user_colmillos_events')
+    .insert({ user_id: currentUser.id, event_type: eventType, period_key: periodKey, amount })
+    .select();
+  if(error){
+    if(error.code !== '23505') console.warn('no se pudo registrar colmillos de ' + eventType, error); // 23505 = ya se gano (hoy o antes), es normal
+    return;
+  }
+  if(data && data.length) loadColmillosBalance(true);
+}
 </script>
 <script>
 (function(){
