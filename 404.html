@@ -5834,28 +5834,28 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <button type="button" class="a-btn" id="rankConnectBitunixBtn">🦈 Conectar Bitunix</button>
       </div>
 
-      <div class="rank-ruler">
-        <div class="rank-step" id="rankStepCria">
+      <div class="rank-ruler" id="rankRuler">
+        <div class="rank-step" id="rankStepCria" data-rank="cria">
           <div class="rank-step-dot">🐣</div>
           <div class="rank-step-name">Cría</div>
           <div class="rank-step-vol">1ª operación</div>
         </div>
-        <div class="rank-step">
+        <div class="rank-step" data-rank="explorador">
           <div class="rank-step-dot">🐟</div>
           <div class="rank-step-name">Explorador</div>
           <div class="rank-step-vol">$10,000</div>
         </div>
-        <div class="rank-step">
+        <div class="rank-step" data-rank="cazador">
           <div class="rank-step-dot">🦈</div>
           <div class="rank-step-name">Cazador</div>
           <div class="rank-step-vol">$50,000</div>
         </div>
-        <div class="rank-step">
+        <div class="rank-step" data-rank="depredador">
           <div class="rank-step-dot">🐬</div>
           <div class="rank-step-name">Depredador</div>
           <div class="rank-step-vol">$150,000</div>
         </div>
-        <div class="rank-step">
+        <div class="rank-step" data-rank="alfa">
           <div class="rank-step-dot">👑</div>
           <div class="rank-step-name">Alfa</div>
           <div class="rank-step-vol">$500,000</div>
@@ -25372,8 +25372,20 @@ async function loadRankStatus(){
     rankConnectBitunixBtn.style.display = 'inline-flex';
     rankConnectBitunixBtn.textContent = '🦈 Conectar Bitunix';
   } else if(data.status === 'connected'){
-    rankStatusText.textContent = '✅ Bitunix conectado (UID ' + data.uid + ') — en cuanto definamos la escala, tu volumen empieza a contar.';
     rankConnectBitunixBtn.style.display = 'none';
+    const { data: vol, error: volErr } = await sbClient.from('user_exchange_volume')
+      .select('month,trade_count,month_volume_usd,current_rank').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
+    if(volErr) console.warn('no se pudo leer el volumen de Bitunix', volErr);
+    if(vol){
+      const volFmt = Number(vol.month_volume_usd || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 });
+      const rankLabel = { sin_rango: 'Sin rango todavía', cria: 'Cría', explorador: 'Explorador', cazador: 'Cazador', depredador: 'Depredador', alfa: 'Alfa' }[vol.current_rank] || vol.current_rank;
+      rankStatusText.textContent = `✅ Bitunix conectado (UID ${data.uid}) — ${rankLabel} este mes, con $${volFmt} de volumen (${vol.trade_count} operación${vol.trade_count === 1 ? '' : 'es'}).`;
+      document.querySelectorAll('#rankRuler .rank-step').forEach(step => {
+        step.classList.toggle('active', step.dataset.rank === vol.current_rank);
+      });
+    } else {
+      rankStatusText.textContent = '✅ Bitunix conectado (UID ' + data.uid + ') — en cuanto hagas tu primera operación de este mes, tu rango empieza a contar.';
+    }
   } else if(data.status === 'rejected'){
     rankStatusText.textContent = '⚠️ Tu solicitud de conexión no se pudo validar.';
     rankConnectBitunixBtn.style.display = 'inline-flex';

@@ -121,6 +121,40 @@ def trans_amount_list_page(
     )
 
 
+def query_pnl_and_trade_cnt_page(
+    start_time: str, end_time: str, page_no: int, api_key: str, api_secret: str, page_size: int = 100,
+) -> dict | None:
+    """Una pagina de volumen+conteo de operaciones de TODOS los referidos directos de Juan en
+    un rango de fechas (max 180 dias) - un solo llamado cubre a todo el mundo, no hace falta
+    pedir uno por uid. Cada item trae: uid, tradeCnt (operaciones), tradeAmount (volumen en
+    USD), pnl. Formato de fechas: "yyyy-MM-ddTHH:mm:ssZ"."""
+    return call(
+        "GET",
+        "/partner/api/v2/openapi/queryPnlAndTradeCnt",
+        {"startTime": start_time, "endTime": end_time, "pageNo": page_no, "pageSize": page_size},
+        api_key, api_secret,
+    )
+
+
+def query_pnl_and_trade_cnt_all(start_time: str, end_time: str, api_key: str, api_secret: str) -> dict[str, dict] | None:
+    """Junta todas las paginas de query_pnl_and_trade_cnt_page en un dict {uid: {tradeCnt,
+    tradeAmount, pnl, nickName}}. None si alguna pagina fallo."""
+    by_uid: dict[str, dict] = {}
+    page_no = 1
+    while True:
+        result = query_pnl_and_trade_cnt_page(start_time, end_time, page_no, api_key, api_secret)
+        if result is None:
+            return None
+        items = result.get("items") or []
+        for item in items:
+            uid = str(item.get("uid"))
+            by_uid[uid] = item
+        if len(items) < 100 or page_no * 100 >= int(result.get("total") or 0):
+            break
+        page_no += 1
+    return by_uid
+
+
 def sum_volume_usd(uid: str, start_time: str, end_time: str, api_key: str, api_secret: str) -> float | None:
     """Suma transVolumeUsd de todas las paginas/pares de un UID en el rango dado. None si
     alguna pagina fallo (mejor no guardar un numero parcial que subestime el volumen real)."""

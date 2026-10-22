@@ -1,0 +1,46 @@
+name: Rango de Manada (validar conexiones + volumen mensual de Bitunix)
+
+# Cadencia horaria (los crons de cada 5/15 min nunca disparan solos en este repo - ver
+# poll-telegram-links.yml). Dos pasos: primero valida conexiones "pending" contra el Partner
+# API de Bitunix (las pasa a "connected" si de verdad son referidos de Juan), despues calcula
+# el volumen del mes en curso y el rango de cada usuario ya conectado.
+on:
+  schedule:
+    - cron: "20 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-bitunix-rank
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Validar conexiones pendientes de Bitunix
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BITUNIX_API_KEY: ${{ secrets.BITUNIX_API_KEY }}
+          BITUNIX_API_SECRET: ${{ secrets.BITUNIX_API_SECRET }}
+        run: python scripts/update_bitunix_connections.py
+
+      - name: Calcular volumen y rango del mes en curso
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BITUNIX_API_KEY: ${{ secrets.BITUNIX_API_KEY }}
+          BITUNIX_API_SECRET: ${{ secrets.BITUNIX_API_SECRET }}
+        run: python scripts/update_bitunix_volume.py
