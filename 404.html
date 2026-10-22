@@ -405,7 +405,7 @@ button{font-family:inherit;color:inherit}
 @keyframes colmLoadFill{to{width:100%}}
 .colm-loading-text{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--gold);animation:colmBlink 1s steps(2) infinite}
 @keyframes colmBlink{50%{opacity:.3}}
-.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:10px 10px 3px;position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
+.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:10px 10px 3px;position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center bottom;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
 .colm-hero.has-bg{background-color:#0b0d18}
 .colm-hero.has-bg::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0px,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.3))}
 .colm-hero.menu-open .colm-hero-hud,.colm-hero.menu-open .colm-hero-stage,.colm-hero.menu-open .colm-hero-panel{visibility:hidden}
@@ -416,7 +416,8 @@ button{font-family:inherit;color:inherit}
 .colm-hero-menu-btn:active{transform:translateY(3px);box-shadow:0 0 0 #4d7a1e,0 2px 4px rgba(0,0,0,.35)}
 /* el panel de saldo flota pegado bajo el boton TIENDA (arriba a la derecha), para dejarle
    todo el resto del recuadro libre al tiburon y al fondo (que ya trae su propio piso) */
-.colm-hero-panel{position:absolute;top:44px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:rgba(11,13,24,.85);border:2px solid rgba(240,178,61,.55);box-shadow:0 0 0 1px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.04)}
+.colm-hero-panel{position:absolute;top:46px;right:10px;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:12px;background:rgba(11,13,24,.88);border:2px solid rgba(240,178,61,.55);box-shadow:0 0 0 1px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.04)}
+.colm-hero-panel-coin-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .colm-hero-panel-stats{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 .colm-hero-stage{position:relative;flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center}
 /* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
@@ -426,13 +427,13 @@ button{font-family:inherit;color:inherit}
 .colm-hero-char > div{width:100% !important;height:auto !important}
 .colm-hero-char img{filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
 .colm-coin{cursor:pointer;filter:drop-shadow(0 6px 14px rgba(240,178,61,.35));transition:transform .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
-.colm-coin svg{width:clamp(22px,6vw,30px);height:auto;display:block}
+.colm-coin svg{width:clamp(30px,8vw,42px);height:auto;display:block}
 .colm-coin:active{transform:scale(.92)}
 .colm-coin.spin{animation:colmCoinSpin .7s cubic-bezier(.3,.1,.3,1)}
 @keyframes colmCoinSpin{0%{transform:rotateY(0) scale(1)}40%{transform:rotateY(540deg) scale(1.15)}100%{transform:rotateY(720deg) scale(1)}}
-.colm-balance-display{font-family:'Press Start 2P',cursive;font-size:clamp(13px,4vw,18px);color:var(--gold);text-shadow:0 0 18px rgba(240,178,61,.55),0 2px 0 #7a5a12;line-height:1}
-.colm-balance-caption{font-family:'Press Start 2P',cursive;font-size:6px;letter-spacing:.14em;color:var(--muted2);margin-top:4px}
-.colm-tap-hint{font-family:'Press Start 2P',cursive;margin:5px 0 0;font-size:6px;color:var(--muted);animation:colmBlink 1.4s steps(2) infinite}
+.colm-balance-display{font-family:'Press Start 2P',cursive;font-size:clamp(17px,5vw,23px);color:var(--gold);text-shadow:0 0 18px rgba(240,178,61,.55),0 2px 0 #7a5a12;line-height:1}
+.colm-balance-caption{font-family:'Press Start 2P',cursive;font-size:7.5px;letter-spacing:.14em;color:var(--muted2);margin-top:5px}
+.colm-tap-hint{font-family:'Press Start 2P',cursive;margin:5px 0 0;font-size:7px;color:var(--muted);animation:colmBlink 1.4s steps(2) infinite;text-align:center}
 .colm-hero-overlay{position:absolute;inset:0;z-index:10;background:rgba(6,7,14,.97);border-radius:16px;overflow-y:auto;padding:14px 12px 20px;-webkit-overflow-scrolling:touch}
 .colm-hero-overlay-close{position:sticky;top:0;z-index:1;margin-bottom:10px;font-family:'Press Start 2P',cursive;font-size:9px;color:#1a1306;background:var(--gold);border:none;border-radius:8px;padding:9px 14px;cursor:pointer}
 .colm-shop-subtabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -464,10 +465,12 @@ button{font-family:inherit;color:inherit}
 @keyframes colmTabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* personaje (tiburon personalizable) */
-.colm-char-preview{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:14px;background:radial-gradient(circle at 50% 30%,rgba(240,178,61,.1),transparent 65%),#0b0d18;border:1px solid var(--border2);margin-bottom:12px;position:relative;overflow:hidden}
+.colm-char-preview{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:14px;background:radial-gradient(circle at 50% 30%,rgba(240,178,61,.1),transparent 65%),#0b0d18;background-size:cover;background-position:center bottom;border:1px solid var(--border2);margin-bottom:12px;position:relative;overflow:hidden}
 .colm-char-preview svg{filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
 .colm-char-mini-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);margin-bottom:6px}
 .colm-char-mini-row .colm-char-preview{flex-shrink:0;width:92px;height:72px;min-height:0;margin-bottom:0}
+#colmillosCharPreviewBig{min-height:220px;padding:10px 0}
+#colmillosCharPreviewBig::after{content:'👆 Tocá una cajita de abajo para ver cómo se vería';position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.55);pointer-events:none}
 .colm-char-mini-text{flex:1;min-width:0}
 .colm-char-mini-text h4{margin:0 0 4px;font-size:13px;color:var(--white);font-weight:700}
 .colm-char-mini-text p{margin:0 0 8px;font-size:11px;color:var(--muted)}
@@ -495,9 +498,15 @@ button{font-family:inherit;color:inherit}
 
 /* tienda / marketplace */
 .colm-shop-section{margin-bottom:6px}
-.colm-shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
-.colm-shop-item{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 8px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);text-align:center}
-.colm-shop-item-swatch{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.04)}
+.colm-shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.colm-shop-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);text-align:center}
+.colm-shop-item-swatch{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;background:rgba(255,255,255,.04)}
+/* fondos: tarjeta rectangular grande (aspecto 8:5, igual que el PNG original) en vez del
+   circulito chiquito - asi si se alcanza a ver la escena completa antes de comprarla */
+.colm-shop-bg-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.colm-shop-bg-item{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:14px;border:1px solid var(--border2);background:rgba(255,255,255,.02)}
+.colm-shop-bg-swatch{width:100%;aspect-ratio:8/5;border-radius:10px;background:rgba(255,255,255,.04);background-size:cover;background-position:center bottom;display:flex;align-items:center;justify-content:center;font-size:34px}
+.colm-shop-bg-name{font-size:12px;font-weight:700;color:var(--white);text-align:center}
 .colm-shop-item-name{font-size:11px;font-weight:700;color:var(--white)}
 .colm-shop-item-btn{width:100%;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;border-radius:20px;padding:7px 10px;cursor:pointer;border:none;background:var(--gold);color:#1a1306}
 .colm-shop-item-btn.owned{background:rgba(255,255,255,.06);color:var(--muted2);cursor:default}
@@ -516,11 +525,13 @@ button{font-family:inherit;color:inherit}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(min-width:860px){
   /* en pantallas anchas la pantalla grande del tiburon (estilo "game screen") sigue arriba
-     a todo el ancho, y las pestañas (trivia/minijuego/tienda/ruleta) van debajo - solo se
-     amplia el ancho general y los cuadritos de la tienda se acomodan en mas columnas */
-  .colm-arcade{max-width:980px}
+     a todo el ancho, y las pestañas (trivia/minijuego/tienda/ruleta) van debajo - se usa
+     casi todo el ancho disponible del panel (nada de margenes enormes a los lados) y los
+     cuadritos de la tienda se acomodan en mas columnas */
+  .colm-arcade{max-width:1500px}
   .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
-  .colm-shop-grid{grid-template-columns:repeat(3,1fr)}
+  .colm-shop-grid{grid-template-columns:repeat(4,1fr)}
+  .colm-shop-bg-grid{display:grid;grid-template-columns:repeat(2,1fr)}
 }
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
@@ -6224,25 +6235,27 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <button type="button" class="colm-hero-menu-btn" data-goto-tab="tienda">🛒 TIENDA</button>
             </div>
             <div class="colm-hero-panel">
-              <div class="colm-coin" id="colmillosBigCoin">
-                <svg width="92" height="115" viewBox="0 0 120 150">
-                  <defs>
-                    <linearGradient id="toothGradBig" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#fffdf6"/>
-                      <stop offset="70%" stop-color="#f3e9cf"/>
-                      <stop offset="100%" stop-color="#e3d2a8"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M20,45 C20,25 30,12 38,18 C45,22 50,30 60,30 C70,30 75,22 82,18 C90,12 100,25 100,45 L98,57 L88,69 L88,81 L78,93 L77.5,105 L68,117 L67,129 L60,145 L53,129 L52,117 L42.5,105 L42,93 L32,81 L32,69 L22,57 Z"
-                    fill="url(#toothGradBig)" stroke="#9c8a63" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M22,48 C35,54 85,54 98,48" fill="none" stroke="#c9b683" stroke-width="1.3" opacity=".6"/>
-                  <circle cx="60" cy="37" r="1.6" fill="#a9916a" opacity=".7"/>
-                </svg>
+              <div class="colm-hero-panel-coin-col">
+                <div class="colm-coin" id="colmillosBigCoin">
+                  <svg width="92" height="115" viewBox="0 0 120 150">
+                    <defs>
+                      <linearGradient id="toothGradBig" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fffdf6"/>
+                        <stop offset="70%" stop-color="#f3e9cf"/>
+                        <stop offset="100%" stop-color="#e3d2a8"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M20,45 C20,25 30,12 38,18 C45,22 50,30 60,30 C70,30 75,22 82,18 C90,12 100,25 100,45 L98,57 L88,69 L88,81 L78,93 L77.5,105 L68,117 L67,129 L60,145 L53,129 L52,117 L42.5,105 L42,93 L32,81 L32,69 L22,57 Z"
+                      fill="url(#toothGradBig)" stroke="#9c8a63" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M22,48 C35,54 85,54 98,48" fill="none" stroke="#c9b683" stroke-width="1.3" opacity=".6"/>
+                    <circle cx="60" cy="37" r="1.6" fill="#a9916a" opacity=".7"/>
+                  </svg>
+                </div>
+                <p class="colm-tap-hint">👆 Tócala</p>
               </div>
               <div class="colm-hero-panel-stats">
                 <div class="colm-balance-display" id="colmillosBigBalance">0</div>
                 <div class="colm-balance-caption">COLMILLOS</div>
-                <p class="colm-tap-hint">👆 Tócala</p>
                 <div class="colm-global-taps">🌍 Manada: <b id="colmillosGlobalTaps">0</b></div>
               </div>
             </div>
@@ -6336,7 +6349,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-char-preview" id="colmillosCharPreviewBig"></div>
             <div class="colm-shop-subtabs" id="colmillosShopSubtabs">
               <button type="button" class="colm-shop-subtab active" data-shopcat="skin">🎨 Colores</button>
-              <button type="button" class="colm-shop-subtab" data-shopcat="accessory">🕶️ Accesorios</button>
+              <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="head">🎩 Cabeza</button>
+              <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="face">😎 Cara</button>
+              <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="body">👔 Cuerpo</button>
+              <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="hands">✊ Manos</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="background">🌊 Fondos</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="raffle">🎟️ Sorteos</button>
             </div>
@@ -6345,7 +6361,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-shop-grid" id="colmillosShopSkins"></div>
             </div>
             <div class="colm-shop-section" data-cat="accessory" style="display:none">
-              <div class="colm-section-label">🕶️ ACCESORIOS</div>
+              <div class="colm-section-label" id="colmillosAccSectionLabel">🕶️ ACCESORIOS</div>
               <div class="colm-shop-grid" id="colmillosShopAccessories"></div>
             </div>
             <div class="colm-shop-section" data-cat="background" style="display:none">
@@ -26016,14 +26032,29 @@ function animateColmBalance(target){
 let colmillosEquippedState = { skin_id: null, accessory_id: null, background_id: null };
 let colmillosOwnedItemIds = new Set();
 let colmillosShopItemsCache = [];
+/* vista previa "para ver como se veria" dentro de la tienda - NO es lo realmente equipado,
+   solo cambia lo que se ve en colmillosCharPreviewBig al tocar una cajita. Se limpia (vuelve
+   a mostrar lo que el usuario ya tiene puesto de verdad) cada vez que se entra a la tienda o
+   se confirma un equipar/comprar */
+let colmillosShopPreview = {};
 function renderSharkPreviews(){
   const miniEl = document.getElementById('colmillosCharPreviewMini');
-  const bigEl = document.getElementById('colmillosCharPreviewBig');
   const heroEl = document.getElementById('colmillosHeroShark');
   if(miniEl) miniEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 62);
-  if(bigEl) bigEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 170);
   if(heroEl) heroEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 220);
   renderColmHeroBackground();
+  renderColmillosShopPreview();
+}
+function renderColmillosShopPreview(){
+  const bigEl = document.getElementById('colmillosCharPreviewBig');
+  if(!bigEl) return;
+  const skin = 'skin_id' in colmillosShopPreview ? colmillosShopPreview.skin_id : colmillosEquippedState.skin_id;
+  const accessory = 'accessory_id' in colmillosShopPreview ? colmillosShopPreview.accessory_id : colmillosEquippedState.accessory_id;
+  const background = 'background_id' in colmillosShopPreview ? colmillosShopPreview.background_id : colmillosEquippedState.background_id;
+  bigEl.innerHTML = sharkImgMarkup(skin, accessory, 190);
+  const src = BG_IMG_PATHS[background];
+  bigEl.style.backgroundImage = src ? ("url('" + src + "')") : '';
+  bigEl.classList.toggle('has-bg', !!src);
 }
 function renderColmHeroBackground(){
   const hero = document.getElementById('colmillosHero');
@@ -26161,6 +26192,7 @@ const COLM_EQUIP_FIELD = { skin: 'skin_id', accessory: 'accessory_id', backgroun
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
 async function loadColmillosShop(){
   if(!currentUser) return;
+  colmillosShopPreview = {};
   if(!colmillosShopItemsCache.length){
     const { data: items, error: itemsErr } = await sbClient.from('colmillos_shop_items').select('id,category,name,price').order('price');
     if(itemsErr){ console.warn('no se pudo leer la tienda de colmillos', itemsErr); return; }
@@ -26187,46 +26219,79 @@ async function loadColmillosShop(){
   const raffleEl = document.getElementById('colmillosRaffleCount');
   if(raffleEl) raffleEl.textContent = 'Tenés ' + raffleTickets + ' boleto' + (raffleTickets === 1 ? '' : 's') + '. Juan elige al ganador en los sorteos que anuncia en Telegram.';
 }
+/* a que "parte del cuerpo" va cada accesorio - solo es un agrupamiento visual del lado del
+   cliente (la categoria real en la base de datos sigue siendo "accessory" para todos, asi
+   no hace falta tocar la tabla/el SQL cada vez que se agrega uno nuevo) */
+const ACC_SLOT_MAP = {
+  acc_cap: 'head', acc_crown: 'head', acc_sombrero: 'head', acc_headphones: 'head', acc_scuba: 'head',
+  acc_shades: 'face', acc_antifaz: 'face',
+  acc_chain: 'body', acc_scarf: 'body', acc_cape: 'body', acc_collar: 'body', acc_aletarobot: 'body',
+  acc_microfono: 'hands', acc_guantes: 'hands', acc_paraguas: 'hands',
+};
 function renderColmillosShopGrids(balance){
   ['skin', 'accessory', 'background', 'raffle'].forEach(cat => {
     const grid = document.getElementById(COLM_GRID_EL[cat]);
     if(!grid) return;
     grid.innerHTML = '';
+    grid.classList.toggle('colm-shop-bg-grid', cat === 'background');
     if(cat === 'accessory' || cat === 'background'){
       const equipField = COLM_EQUIP_FIELD[cat];
       const isDefaultEquipped = !colmillosEquippedState[equipField];
       const card = document.createElement('div');
-      card.className = 'colm-shop-item';
-      card.innerHTML = '<div class="colm-shop-item-swatch">' + (cat === 'accessory' ? '🚫' : '🌊') + '</div><div class="colm-shop-item-name">' + (cat === 'accessory' ? 'Ninguno' : 'Default') + '</div>';
+      card.className = cat === 'background' ? 'colm-shop-bg-item' : 'colm-shop-item';
+      if(cat === 'accessory') card.dataset.slot = 'none';
+      const swatch = document.createElement('div');
+      swatch.className = cat === 'background' ? 'colm-shop-bg-swatch' : 'colm-shop-item-swatch';
+      swatch.textContent = cat === 'accessory' ? '🚫' : '🌊';
+      swatch.style.cursor = 'pointer';
+      swatch.title = 'Ver cómo se ve';
+      swatch.addEventListener('click', () => {
+        colmillosShopPreview[equipField] = null;
+        renderColmillosShopPreview();
+      });
+      const name = document.createElement('div');
+      name.className = cat === 'background' ? 'colm-shop-bg-name' : 'colm-shop-item-name';
+      name.textContent = cat === 'accessory' ? 'Ninguno' : 'Default';
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'colm-shop-item-btn' + (isDefaultEquipped ? ' equipped' : ' owned');
       btn.textContent = isDefaultEquipped ? '✓ Equipado' : 'Equipar';
       btn.disabled = isDefaultEquipped;
       if(!isDefaultEquipped) btn.addEventListener('click', () => equipColmillosItem(cat, null));
-      card.appendChild(btn);
+      card.appendChild(swatch); card.appendChild(name); card.appendChild(btn);
       grid.appendChild(card);
     }
     colmillosShopItemsCache.filter(it => it.category === cat).forEach(item => {
+      const isBg = cat === 'background';
       const card = document.createElement('div');
-      card.className = 'colm-shop-item';
+      card.className = isBg ? 'colm-shop-bg-item' : 'colm-shop-item';
+      if(cat === 'accessory') card.dataset.slot = ACC_SLOT_MAP[item.id] || 'body';
       const swatch = document.createElement('div');
-      swatch.className = 'colm-shop-item-swatch';
+      swatch.className = isBg ? 'colm-shop-bg-swatch' : 'colm-shop-item-swatch';
+      swatch.style.cursor = 'pointer';
+      swatch.title = 'Ver cómo se ve';
+      const equipField = COLM_EQUIP_FIELD[cat];
       if(cat === 'skin'){
-        swatch.innerHTML = sharkImgMarkup(item.id, null, 44);
+        swatch.innerHTML = sharkImgMarkup(item.id, null, 64);
         swatch.style.background = 'none';
       } else if(cat === 'accessory'){
-        swatch.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, item.id, 44);
+        swatch.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, item.id, 64);
         swatch.style.background = 'none';
-      } else if(cat === 'background' && BG_IMG_PATHS[item.id]){
+      } else if(isBg && BG_IMG_PATHS[item.id]){
         swatch.style.backgroundImage = "url('" + BG_IMG_PATHS[item.id] + "')";
         swatch.style.backgroundSize = 'cover';
-        swatch.style.backgroundPosition = 'center';
+        swatch.style.backgroundPosition = 'center bottom';
       } else {
         swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
       }
+      if(cat !== 'raffle'){
+        swatch.addEventListener('click', () => {
+          colmillosShopPreview[equipField] = item.id;
+          renderColmillosShopPreview();
+        });
+      }
       const name = document.createElement('div');
-      name.className = 'colm-shop-item-name';
+      name.className = isBg ? 'colm-shop-bg-name' : 'colm-shop-item-name';
       name.textContent = item.name;
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -26238,7 +26303,6 @@ function renderColmillosShopGrids(balance){
         btn.addEventListener('click', () => buyColmillosItem(item));
       } else {
         const owned = colmillosOwnedItemIds.has(item.id);
-        const equipField = COLM_EQUIP_FIELD[cat];
         const isEquipped = owned && colmillosEquippedState[equipField] === item.id;
         if(isEquipped){
           btn.textContent = '✓ Equipado';
@@ -26257,6 +26321,7 @@ function renderColmillosShopGrids(balance){
       grid.appendChild(card);
     });
   });
+  applyColmShopSubtabFilter();
 }
 async function buyColmillosItem(item){
   if(!currentUser) return;
@@ -26511,15 +26576,31 @@ document.getElementById('colmillosTabs').addEventListener('click', (e) => {
 document.querySelectorAll('[data-goto-tab]').forEach(el => {
   el.addEventListener('click', () => switchColmillosTab(el.dataset.gotoTab));
 });
-/* sub-pestañas DENTRO de la tienda (Colores/Accesorios/Fondos/Sorteos) - antes todo estaba en
-   una sola columna larga y tocaba bajar mucho scroll; ahora solo se muestra una categoria a
-   la vez, reutilizando los mismos data-cat que ya tenian las secciones de la tienda */
+/* sub-pestañas DENTRO de la tienda (Colores/Cabeza/Cara/Cuerpo/Manos/Fondos/Sorteos) - antes
+   todo estaba en una sola columna larga y tocaba bajar mucho scroll; ahora solo se muestra
+   una categoria a la vez. Cabeza/Cara/Cuerpo/Manos comparten la misma categoria real
+   "accessory" (ACC_SLOT_MAP) - no hace falta una columna nueva en la base de datos, el
+   agrupamiento por "parte del cuerpo" es solo visual */
+const COLM_SLOT_LABELS = { head: '🎩 ACCESORIOS DE CABEZA', face: '😎 ACCESORIOS DE CARA', body: '👔 ACCESORIOS DE CUERPO', hands: '✊ ACCESORIOS PARA LAS MANOS' };
+function applyColmShopSubtabFilter(){
+  const activeBtn = document.querySelector('.colm-shop-subtab.active');
+  if(!activeBtn) return;
+  const cat = activeBtn.dataset.shopcat;
+  const slot = activeBtn.dataset.slot || null;
+  document.querySelectorAll('.colm-shop-section').forEach(s => { s.style.display = (s.dataset.cat === cat) ? 'block' : 'none'; });
+  if(cat === 'accessory'){
+    document.querySelectorAll('#colmillosShopAccessories .colm-shop-item, #colmillosShopAccessories .colm-shop-bg-item').forEach(card => {
+      card.style.display = (!slot || card.dataset.slot === slot || card.dataset.slot === 'none') ? 'flex' : 'none';
+    });
+    const label = document.getElementById('colmillosAccSectionLabel');
+    if(label && slot) label.textContent = COLM_SLOT_LABELS[slot] || '🕶️ ACCESORIOS';
+  }
+}
 document.getElementById('colmillosShopSubtabs').addEventListener('click', (e) => {
   const btn = e.target.closest('.colm-shop-subtab');
   if(!btn) return;
   document.querySelectorAll('.colm-shop-subtab').forEach(b => b.classList.toggle('active', b === btn));
-  const cat = btn.dataset.shopcat;
-  document.querySelectorAll('.colm-shop-section').forEach(s => { s.style.display = (s.dataset.cat === cat) ? 'block' : 'none'; });
+  applyColmShopSubtabFilter();
 });
 
 /* ---- pagina propia (no modal flotante) con su ruta /colmillos, igual que un indicador -
