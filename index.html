@@ -54,7 +54,7 @@
   --muted:#847e93;
   --muted2:#f7f6fb;
   --r:16px;
-  --sidebar-w:232px;
+  --sidebar-w:258px;
   --sidebar-w-collapsed:74px;
 
   /* ---- sistema de diseño: escala consistente ---- */
@@ -205,7 +205,7 @@ button{font-family:inherit;color:inherit}
 .sidebar.indic-active .indic-mobile-nav{display:flex}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;color:var(--muted2);text-decoration:none;font-size:13px;line-height:1.3;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s;white-space:nowrap;overflow:hidden;background:none;width:100%;text-align:left}
 .sb-item-icon{font-size:15px;flex-shrink:0;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:var(--muted2);transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);filter:grayscale(.72) opacity(.88)}
-.sb-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;padding-right:18px;font-size:11px}
+.sb-item-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;padding-right:18px;font-size:12.5px}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--white)}
 .sb-item.active{background:none;border-color:var(--red);color:var(--white)}
 .sb-item.locked{cursor:default;opacity:.6}
@@ -227,7 +227,7 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed .sb-back span{display:none}
 
 /* MAIN */
-.main{flex:1;min-width:0;padding:22px 44px 60px}
+.main{flex:1;min-width:0;padding:22px 30px 60px}
 .main-head{margin-bottom:32px}
 .mh-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:14px;border:1px solid rgba(255,47,79,.3);padding:6px 16px;border-radius:50px}
 .mh-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red)}
@@ -2091,29 +2091,29 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
       <button class="sb-item" data-indic-jump="predicciones">
-        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
+        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de precio</span>
       </button>
       <div class="indic-cat-label">BTC</div>
       <button class="sb-item sb-item--sub" data-indic-jump="bitcoinguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="whitepaper">
         <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de halving</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="btcmacro">
-        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + Datos Macroeconómicos</span>
+        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + datos macroeconómicos</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="pisomercado">
-        <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
+        <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de fondo</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="rsimensual">
-        <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
+        <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI mensual</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
+        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo anterior</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
@@ -2122,16 +2122,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ma4y">
-        <span class="sb-item-icon">📏</span><span class="sb-item-label">Media Móvil de 4 Años</span>
+        <span class="sb-item-icon">📏</span><span class="sb-item-label">Media móvil de 4 años</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ema200">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias móviles 200</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="treasuries">
-        <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
+        <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances corporativos</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="govtreasuries">
-        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas Gubernamentales</span>
+        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas gubernamentales</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
@@ -2146,68 +2146,68 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">STH-MVRV</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="treascb">
-        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
+        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo base institucional</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="epochpl">
-        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en Pérdida por Época</span>
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en pérdida por época</span>
       </button>
       <div class="indic-cat-label">ETH</div>
       <button class="sb-item sb-item--sub" data-indic-jump="ethereumguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ethlogreg">
-        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
+        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas log de ETH</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ethvwap">
-        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP anclado de ETH</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ethpmi">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI manufacturero</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ethreturns">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Ethereum</span>
       </button>
       <div class="indic-cat-label">Derivados</div>
       <button class="sb-item sb-item--sub" data-indic-jump="tradingguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="cbpremium">
         <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="longshort">
-        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio largo/corto</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="optionsoi">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés abierto en opciones</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="delistradar">
-        <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
+        <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de deslistados</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="newlistradar">
-        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de Nuevos Listados</span>
+        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de nuevos listados</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="tvchart">
-        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
+        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico avanzado</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item sb-item--sub" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de miedo y codicia</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="btctrends">
         <span class="sb-item-icon">🔍</span><span class="sb-item-label">BTC + Google Trends</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="cryptobubbles">
-        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas cripto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button class="sb-item sb-item--sub" data-indic-jump="dominanciaguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="domratio">
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="domall">
-        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión Cripto</span>
+        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión cripto</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="dombtc">
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
@@ -2220,16 +2220,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <div class="indic-cat-label">Altcoins</div>
       <button class="sb-item sb-item--sub" data-indic-jump="altcoinsguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="othersbtc">
         <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="altfever">
-        <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de Altcoins</span>
+        <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de altcoins</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="ethvsalt">
-        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración relativa ETH vs altcoins</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="total2">
         <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
@@ -2239,31 +2239,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <div class="indic-cat-label">Macro</div>
       <button class="sb-item sb-item--sub" data-indic-jump="macroguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="econcalendar">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario económico</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="dxy">
-        <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
+        <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del dólar (DXY)</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="pmius">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI Manufacturero de EEUU</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI manufacturero de EEUU</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="payrolls">
-        <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina No Agrícola</span>
+        <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina no agrícola</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="unrate">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Tasa de Desempleo</span>
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Tasa de desempleo</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="icsa">
-        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Solicitudes de Desempleo</span>
+        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Solicitudes de desempleo</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="cpi">
         <span class="sb-item-icon">🛒</span><span class="sb-item-label">Inflación CPI</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="cpiyoy">
-        <span class="sb-item-icon">📈</span><span class="sb-item-label">Inflación Interanual (CPI YoY)</span>
+        <span class="sb-item-icon">📈</span><span class="sb-item-label">Inflación interanual (CPI YoY)</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="pce">
         <span class="sb-item-icon">💳</span><span class="sb-item-label">PCE</span>
@@ -2272,25 +2272,25 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🏗️</span><span class="sb-item-label">PPI</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="fedfundsrate">
-        <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de Interés de la Fed</span>
+        <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de interés de la Fed</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="treasuryyields">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del Tesoro</span>
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del tesoro</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="yieldcurve">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Curva 10Y-2Y</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="m2supply">
-        <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (Oferta Monetaria)</span>
+        <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (oferta monetaria)</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="vixindex">
         <span class="sb-item-icon">😨</span><span class="sb-item-label">VIX</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="netliquidity">
-        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Liquidez Neta</span>
+        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Liquidez neta</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="gdpgrowth">
-        <span class="sb-item-icon">📊</span><span class="sb-item-label">PIB (Crecimiento Real)</span>
+        <span class="sb-item-icon">📊</span><span class="sb-item-label">PIB (crecimiento real)</span>
       </button>
       <button class="sb-item sb-item--sub" data-indic-jump="fedbalance">
         <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Balance de la Fed</span>
@@ -2324,7 +2324,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Calculadora Coin-M</span>
       </button>
       <button class="sb-item" data-tool="fees">
-        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de Comisiones</span>
+        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Calculadora de comisiones</span>
       </button>
 
       <div class="sb-cat-label" data-category="inversion">Inversión y Acumulación</div>
@@ -2335,16 +2335,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📈</span><span class="sb-item-label">Rentabilidad</span>
       </button>
       <button class="sb-item" data-tool="dca">
-        <span class="sb-item-icon">🪙</span><span class="sb-item-label">Simulador de DCA de Compra</span>
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">Simulador de DCA de compra</span>
       </button>
       <button class="sb-item" data-tool="dcaexit">
-        <span class="sb-item-icon">📤</span><span class="sb-item-label">Simulador de DCA de Venta</span>
+        <span class="sb-item-icon">📤</span><span class="sb-item-label">Simulador de DCA de venta</span>
       </button>
       <button class="sb-item" data-tool="mcapcompare">
-        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Comparador Market Cap</span>
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Comparador market cap</span>
       </button>
       <button class="sb-item" data-tool="fifreedom">
-        <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad Financiera</span>
+        <span class="sb-item-icon">🏝️</span><span class="sb-item-label">Libertad financiera</span>
       </button>
 
       <div class="sb-cat-label" data-category="seguridad">Seguridad</div>
@@ -2364,7 +2364,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">👨‍👩‍👧</span><span class="sb-item-label">Herencia digital</span>
       </button>
       <button class="sb-item" data-tool="tokenscanner">
-        <span class="sb-item-icon">🔎</span><span class="sb-item-label">Analizador de Token</span>
+        <span class="sb-item-icon">🔎</span><span class="sb-item-label">Analizador de token</span>
       </button>
 
       <div class="sb-cat-label" data-category="aprender">Aprender</div>
@@ -2372,7 +2372,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
       <button class="sb-item" data-tool="glosario">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario Cripto</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario cripto</span>
       </button>
       <button class="sb-item" data-tool="mistakes">
         <span class="sb-item-icon">⚠️</span><span class="sb-item-label">Errores comunes</span>
@@ -2402,29 +2402,29 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="predicciones">
-        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de Precio</span>
+        <span class="sb-item-icon">🔮</span><span class="sb-item-label">Predicciones de precio</span>
       </button>
       <div class="indic-cat-label">BTC</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="bitcoinguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="whitepaper">
         <span class="sb-item-icon">📜</span><span class="sb-item-label">Whitepaper de Bitcoin</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="halving">
-        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de Halving</span>
+        <span class="sb-item-icon">⏳</span><span class="sb-item-label">Ciclos de halving</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcmacro">
-        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + Datos Macroeconómicos</span>
+        <span class="sb-item-icon">🏛</span><span class="sb-item-label">BTC + datos macroeconómicos</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pisomercado">
-        <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de Fondo</span>
+        <span class="sb-item-icon">⚓</span><span class="sb-item-label">Pulso de fondo</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rsimensual">
-        <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI Mensual</span>
+        <span class="sb-item-icon">📶</span><span class="sb-item-label">RSI mensual</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ciclosoporte">
-        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo Anterior</span>
+        <span class="sb-item-icon">🪜</span><span class="sb-item-label">Techo anterior</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="rainbow">
         <span class="sb-item-icon">🌈</span><span class="sb-item-label">Rainbow Chart</span>
@@ -2433,16 +2433,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Techo Pi Cycle</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ma4y">
-        <span class="sb-item-icon">📏</span><span class="sb-item-label">Media Móvil de 4 Años</span>
+        <span class="sb-item-icon">📏</span><span class="sb-item-label">Media móvil de 4 años</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ema200">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias Móviles 200</span>
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Medias móviles 200</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuries">
-        <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances Corporativos</span>
+        <span class="sb-item-icon">🏢</span><span class="sb-item-label">Balances corporativos</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="govtreasuries">
-        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas Gubernamentales</span>
+        <span class="sb-item-icon">🏛️</span><span class="sb-item-label">Reservas gubernamentales</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btcxau">
         <span class="sb-item-icon">🥇</span><span class="sb-item-label">BTC/XAU</span>
@@ -2457,68 +2457,68 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">⚓</span><span class="sb-item-label">STH-MVRV</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treascb">
-        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo Base Institucional</span>
+        <span class="sb-item-icon">💎</span><span class="sb-item-label">Costo base institucional</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="epochpl">
-        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en Pérdida por Época</span>
+        <span class="sb-item-icon">🪙</span><span class="sb-item-label">% Supply en pérdida por época</span>
       </button>
       <div class="indic-cat-label">ETH</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethereumguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethlogreg">
-        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas Log de ETH</span>
+        <span class="sb-item-icon">Ξ</span><span class="sb-item-label">Bandas log de ETH</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvwap">
-        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP Anclado de ETH</span>
+        <span class="sb-item-icon">📍</span><span class="sb-item-label">VWAP anclado de ETH</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethpmi">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI Manufacturero</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">Precio de ETH + PMI manufacturero</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethreturns">
         <span class="sb-item-icon">📅</span><span class="sb-item-label">Retornos de Ethereum</span>
       </button>
       <div class="indic-cat-label">Derivados</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tradingguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cbpremium">
         <span class="sb-item-icon">♾️</span><span class="sb-item-label">Coinbase Premium</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="longshort">
-        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio Largo/Corto</span>
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Ratio largo/corto</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="optionsoi">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés Abierto en Opciones</span>
+        <span class="sb-item-icon">📐</span><span class="sb-item-label">Interés abierto en opciones</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="delistradar">
-        <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de Deslistados</span>
+        <span class="sb-item-icon">🚨</span><span class="sb-item-label">Radar de deslistados</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="newlistradar">
-        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de Nuevos Listados</span>
+        <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de nuevos listados</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tvchart">
-        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico Avanzado</span>
+        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico avanzado</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
-        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de Miedo y Codicia</span>
+        <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de miedo y codicia</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="btctrends">
         <span class="sb-item-icon">🔍</span><span class="sb-item-label">BTC + Google Trends</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cryptobubbles">
-        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas Cripto</span>
+        <span class="sb-item-icon">🫧</span><span class="sb-item-label">Burbujas cripto</span>
       </button>
       <div class="indic-cat-label">Dominancia</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dominanciaguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domratio">
         <span class="sb-item-icon">🔄</span><span class="sb-item-label">Rotación ETH.D/BTC.D</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="domall">
-        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión Cripto</span>
+        <span class="sb-item-icon">🗜️</span><span class="sb-item-label">Descompresión cripto</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dombtc">
         <span class="sb-item-icon">₿</span><span class="sb-item-label">Dominancia BTC</span>
@@ -2531,16 +2531,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <div class="indic-cat-label">Altcoins</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="altcoinsguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="othersbtc">
         <span class="sb-item-icon">🪙</span><span class="sb-item-label">OTHERS/BTC</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="altfever">
-        <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de Altcoins</span>
+        <span class="sb-item-icon">🔥</span><span class="sb-item-label">Euforia de altcoins</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="ethvsalt">
-        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración Relativa ETH vs Altcoins</span>
+        <span class="sb-item-icon">⚖️</span><span class="sb-item-label">Valoración relativa ETH vs altcoins</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="total2">
         <span class="sb-item-icon">🥈</span><span class="sb-item-label">TOTAL2 EMA200</span>
@@ -2550,31 +2550,31 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <div class="indic-cat-label">Macro</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="macroguia">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo Leer los Indicadores?</span>
+        <span class="sb-item-icon">📖</span><span class="sb-item-label">Guía: ¿Cómo leer los indicadores?</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="econcalendar">
-        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario económico</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="dxy">
-        <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del Dólar (DXY)</span>
+        <span class="sb-item-icon">💵</span><span class="sb-item-label">Índice del dólar (DXY)</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pmius">
-        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI Manufacturero de EEUU</span>
+        <span class="sb-item-icon">🏭</span><span class="sb-item-label">PMI manufacturero de EEUU</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="payrolls">
-        <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina No Agrícola</span>
+        <span class="sb-item-icon">👷</span><span class="sb-item-label">Nómina no agrícola</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="unrate">
-        <span class="sb-item-icon">📉</span><span class="sb-item-label">Tasa de Desempleo</span>
+        <span class="sb-item-icon">📉</span><span class="sb-item-label">Tasa de desempleo</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="icsa">
-        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Solicitudes de Desempleo</span>
+        <span class="sb-item-icon">🧾</span><span class="sb-item-label">Solicitudes de desempleo</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cpi">
         <span class="sb-item-icon">🛒</span><span class="sb-item-label">Inflación CPI</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="cpiyoy">
-        <span class="sb-item-icon">📈</span><span class="sb-item-label">Inflación Interanual (CPI YoY)</span>
+        <span class="sb-item-icon">📈</span><span class="sb-item-label">Inflación interanual (CPI YoY)</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="pce">
         <span class="sb-item-icon">💳</span><span class="sb-item-label">PCE</span>
@@ -2583,25 +2583,25 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="sb-item-icon">🏗️</span><span class="sb-item-label">PPI</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fedfundsrate">
-        <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de Interés de la Fed</span>
+        <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de interés de la Fed</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuryyields">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del Tesoro</span>
+        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del tesoro</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="yieldcurve">
         <span class="sb-item-icon">📐</span><span class="sb-item-label">Curva 10Y-2Y</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="m2supply">
-        <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (Oferta Monetaria)</span>
+        <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (oferta monetaria)</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="vixindex">
         <span class="sb-item-icon">😨</span><span class="sb-item-label">VIX</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="netliquidity">
-        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Liquidez Neta</span>
+        <span class="sb-item-icon">🌊</span><span class="sb-item-label">Liquidez neta</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="gdpgrowth">
-        <span class="sb-item-icon">📊</span><span class="sb-item-label">PIB (Crecimiento Real)</span>
+        <span class="sb-item-icon">📊</span><span class="sb-item-label">PIB (crecimiento real)</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fedbalance">
         <span class="sb-item-icon">🌡️</span><span class="sb-item-label">Balance de la Fed</span>
@@ -9023,35 +9023,35 @@ document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de Halving' }, { id: 'btcmacro', label: 'BTC + Datos Macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de Fondo' }, { id: 'rsimensual', label: 'RSI Mensual' }, { id: 'ciclosoporte', label: 'Techo Anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media Móvil de 4 Años' }, { id: 'ema200', label: 'Medias Móviles 200' }, { id: 'treasuries', label: 'Balances Corporativos' }, { id: 'govtreasuries', label: 'Reservas Gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo Base Institucional' }, { id: 'epochpl', label: '% Supply en Pérdida por Época' }],
-  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas Log de ETH' }, { id: 'ethvwap', label: 'VWAP Anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI Manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
-  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio Largo/Corto' }, { id: 'optionsoi', label: 'Interés Abierto en Opciones' }, { id: 'delistradar', label: 'Radar de Deslistados' }, { id: 'newlistradar', label: 'Radar de Nuevos Listados' }, { id: 'tvchart', label: 'Gráfico Avanzado' }],
-  sentimiento: [{ id: 'fng', label: 'Índice de Miedo y Codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas Cripto' }],
+  bitcoin: [{ id: 'bitcoinguia', label: '📖 Guía: ¿Cómo leer los indicadores de BTC?' }, { id: 'whitepaper', label: '📜 Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de halving' }, { id: 'btcmacro', label: 'BTC + datos macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de fondo' }, { id: 'rsimensual', label: 'RSI mensual' }, { id: 'ciclosoporte', label: 'Techo anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media móvil de 4 años' }, { id: 'ema200', label: 'Medias móviles 200' }, { id: 'treasuries', label: 'Balances corporativos' }, { id: 'govtreasuries', label: 'Reservas gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo base institucional' }, { id: 'epochpl', label: '% Supply en pérdida por época' }],
+  ethereum: [{ id: 'ethereumguia', label: '📖 Guía: ¿Cómo leer los indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas log de ETH' }, { id: 'ethvwap', label: 'VWAP anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
+  trading: [{ id: 'tradingguia', label: '📖 Guía: ¿Cómo leer los indicadores de trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio largo/corto' }, { id: 'optionsoi', label: 'Interés abierto en opciones' }, { id: 'delistradar', label: 'Radar de deslistados' }, { id: 'newlistradar', label: 'Radar de nuevos listados' }, { id: 'tvchart', label: 'Gráfico avanzado' }],
+  sentimiento: [{ id: 'fng', label: 'Índice de miedo y codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas cripto' }],
   mineria: [],
   macro: [
-    { id: 'macroguia', label: '📖 Guía: ¿Cómo Leer los Indicadores?' },
-    { id: 'dxy', label: 'Índice del Dólar (DXY)' },
-    { id: 'pmius', label: 'PMI Manufacturero de EEUU' },
-    { id: 'payrolls', label: 'Nómina No Agrícola' },
-    { id: 'unrate', label: 'Tasa de Desempleo' },
-    { id: 'icsa', label: 'Solicitudes Semanales de Desempleo' },
-    { id: 'cpi', label: 'Inflación CPI (General y Núcleo)' },
-    { id: 'cpiyoy', label: 'Inflación Interanual (CPI YoY)' },
+    { id: 'macroguia', label: '📖 Guía: ¿Cómo leer los indicadores?' },
+    { id: 'dxy', label: 'Índice del dólar (DXY)' },
+    { id: 'pmius', label: 'PMI manufacturero de EEUU' },
+    { id: 'payrolls', label: 'Nómina no agrícola' },
+    { id: 'unrate', label: 'Tasa de desempleo' },
+    { id: 'icsa', label: 'Solicitudes semanales de desempleo' },
+    { id: 'cpi', label: 'Inflación CPI (general y núcleo)' },
+    { id: 'cpiyoy', label: 'Inflación interanual (CPI YoY)' },
     { id: 'pce', label: 'PCE' },
     { id: 'ppi', label: 'PPI' },
-    { id: 'fedfundsrate', label: 'Tasa de Interés de la Fed' },
-    { id: 'treasuryyields', label: 'Rendimientos del Tesoro de EEUU' },
+    { id: 'fedfundsrate', label: 'Tasa de interés de la Fed' },
+    { id: 'treasuryyields', label: 'Rendimientos del tesoro de EEUU' },
     { id: 'yieldcurve', label: 'Curva 10Y-2Y' },
-    { id: 'm2supply', label: 'M2 (Oferta Monetaria)' },
-    { id: 'vixindex', label: 'VIX (Índice del Miedo)' },
-    { id: 'netliquidity', label: 'Liquidez Neta' },
-    { id: 'gdpgrowth', label: 'PIB (Crecimiento Real)' },
+    { id: 'm2supply', label: 'M2 (oferta monetaria)' },
+    { id: 'vixindex', label: 'VIX (índice del miedo)' },
+    { id: 'netliquidity', label: 'Liquidez neta' },
+    { id: 'gdpgrowth', label: 'PIB (crecimiento real)' },
     { id: 'fedbalance', label: 'Balance de la Reserva Federal' },
-    { id: 'econcalendar', label: 'Calendario Económico' },
+    { id: 'econcalendar', label: 'Calendario económico' },
   ],
   onchain: [],
-  dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión Cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
-  altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo Leer los Indicadores de Altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de Altcoins' }, { id: 'ethvsalt', label: 'Valoración Relativa ETH vs Altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
+  dominancia: [{ id: 'dominanciaguia', label: '📖 Guía: ¿Cómo leer los indicadores de dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
+  altcoins: [{ id: 'altcoinsguia', label: '📖 Guía: ¿Cómo leer los indicadores de altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de altcoins' }, { id: 'ethvsalt', label: 'Valoración relativa ETH vs altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
 // el numero en la tarjeta de "Indicadores de Mercado" (panorama de categorias) se calcula solo
 // a partir de INDIC_GROUPS - asi nunca se vuelve a desactualizar cuando se agregue/quite un
