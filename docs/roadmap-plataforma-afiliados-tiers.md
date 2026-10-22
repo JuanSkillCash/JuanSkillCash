@@ -55,14 +55,30 @@ las herramientas gratis" en "gente operando por el link de afiliado de Juan".
    normalmente deja verificar esto con su propio sistema de afiliados/VIP
    code, no hay que inventarlo desde cero.
 
+## Rangos definidos (decidido en sesion del 2026-10-22)
+
+5 rangos, por volumen de trading ACUMULADO DE POR VIDA (no ventana movil -
+mas simple de construir, y nadie "baja" de rango por dejar de operar una
+semana):
+
+| Rango        | Volumen acumulado |
+|--------------|--------------------|
+| 🐣 Cria       | $0 (todos entran aqui) |
+| 🐟 Explorador | $5,000  |
+| 🦈 Cazador    | $25,000 |
+| 🐬 Depredador | $100,000 |
+| 👑 Alfa       | $500,000 |
+
+Ya estan puestos como shell visual en la cajita "Rango de Manada" de
+index.html (sin logica real de calculo de volumen conectada todavia).
+
 ## Preguntas abiertas (resolver antes de construir, no ahora)
 
 - ¿Solo Bitunix al principio, o multi-exchange desde el día uno?
-- ¿Qué herramientas específicas valen la pena reservar detrás de un tier, y
-  cuáles se quedan gratis para todos (para no perder el valor educativo
-  abierto que ya tiene el sitio)?
-- ¿Volumen acumulado de por vida, o ventana móvil (ej. últimos 30 días), para
-  que un tier se pueda "bajar" si alguien deja de operar?
+- ¿Qué herramientas específicas valen la pena reservar detrás de cada rango
+  (y cuántas en total), y cuáles se quedan gratis para todos (para no perder
+  el valor educativo abierto que ya tiene el sitio)? Pendiente hasta que
+  existan herramientas que desbloquear.
 - ¿Qué pasa si alguien ya tenía cuenta en Bitunix antes de usar el link de
   Juan? ¿Cuenta su volumen viejo o solo el nuevo?
 
