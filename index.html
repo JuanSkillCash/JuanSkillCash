@@ -443,7 +443,6 @@ button{font-family:inherit;color:inherit}
 .colm-char-preview svg{filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
 .colm-char-mini-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);margin-bottom:6px}
 .colm-char-mini-row .colm-char-preview{flex-shrink:0;width:92px;height:72px;min-height:0;margin-bottom:0}
-.colm-char-mini-row .colm-char-preview svg{width:62px;height:auto}
 .colm-char-mini-text{flex:1;min-width:0}
 .colm-char-mini-text h4{margin:0 0 4px;font-size:13px;color:var(--white);font-weight:700}
 .colm-char-mini-text p{margin:0 0 8px;font-size:11px;color:var(--muted)}
@@ -25864,27 +25863,53 @@ const colmillosContent = document.getElementById('colmillosContent');
 const colmillosBackBtn = document.getElementById('colmillosBackBtn');
 const colmillosBigCoin = document.getElementById('colmillosBigCoin');
 
-/* ---- personaje: el mismo trazado de tiburon (SHARK_BODY_PATH) se usa como <path> de SVG
-   para las vistas previas (Inicio/Tienda) y como Path2D dentro del canvas del minijuego -
-   un solo dibujo, dos formas de pintarlo ---- */
-const SHARK_BODY_PATH = 'M10,52 C14,36 30,22 55,24 L62,8 L74,26 C92,22 118,28 136,38 L186,16 L172,52 L186,88 L136,66 C118,76 92,82 74,78 L62,96 L55,80 C30,82 14,68 10,52 Z';
-const SHARK_SKIN_COLORS = { default: '#6b7b8c', skin_gold: '#d9a441', skin_red: '#c23b4a', skin_abyss: '#2c2140' };
-function sharkSvgMarkup(skinId, accessoryId, width){
-  const fill = SHARK_SKIN_COLORS[skinId] || SHARK_SKIN_COLORS.default;
-  const w = width || 150;
-  const h = Math.round(w * 100 / 200);
-  let accessory = '';
-  if(accessoryId === 'acc_cap'){
-    accessory = '<path d="M48,18 C56,6 72,6 78,18 L80,26 L46,26 Z" fill="#c23b4a" stroke="#7a1f28" stroke-width="1.5"/>';
-  } else if(accessoryId === 'acc_shades'){
-    accessory = '<rect x="44" y="30" width="15" height="9" rx="3" fill="#111" opacity=".88"/><rect x="63" y="30" width="15" height="9" rx="3" fill="#111" opacity=".88"/><line x1="59" y1="34" x2="63" y2="34" stroke="#111" stroke-width="2"/>';
-  } else if(accessoryId === 'acc_chain'){
-    accessory = '<path d="M40,60 Q62,80 90,60" fill="none" stroke="#f0b23d" stroke-width="3.5" stroke-linecap="round"/>';
+/* ---- personaje: sprite real en pixel art (generado con PixelLab, ver assets/mascot/) -
+   el mismo PNG se usa como <img> en las vistas previas (Inicio/Tienda) y se dibuja con
+   drawImage dentro del canvas del minijuego. Los accesorios (gorra/gafas/cadena) todavia
+   no tienen arte propio, asi que se superponen como formas simples por encima del sprite -
+   se reemplazan por capas PNG reales cuando existan, sin tocar el resto del codigo ---- */
+const SHARK_IMG_PATHS = {
+  default: 'assets/mascot/source/base_original.png',
+  skin_gold: 'assets/mascot/variants/shark_skin_gold.png',
+  skin_red: 'assets/mascot/variants/shark_skin_red.png',
+  skin_abyss: 'assets/mascot/variants/shark_skin_abyss.png',
+  skin_emerald: 'assets/mascot/variants/shark_skin_emerald.png',
+  skin_cyan: 'assets/mascot/variants/shark_skin_cyan.png',
+  skin_pink: 'assets/mascot/variants/shark_skin_pink.png',
+  skin_orange: 'assets/mascot/variants/shark_skin_orange.png',
+  skin_ice: 'assets/mascot/variants/shark_skin_ice.png',
+  skin_lime: 'assets/mascot/variants/shark_skin_lime.png',
+  skin_violet: 'assets/mascot/variants/shark_skin_violet.png',
+};
+const sharkImgCache = {};
+function getSharkImg(skinId){
+  const key = (skinId && SHARK_IMG_PATHS[skinId]) ? skinId : 'default';
+  if(!sharkImgCache[key]){
+    const img = new Image();
+    img.src = SHARK_IMG_PATHS[key];
+    sharkImgCache[key] = img;
   }
-  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 200 100">' +
-    '<path d="' + SHARK_BODY_PATH + '" fill="' + fill + '" stroke="rgba(0,0,0,.35)" stroke-width="2"/>' +
-    '<circle cx="34" cy="46" r="2.6" fill="#fff"/><path d="M18,56 L30,58 L18,60 Z" fill="#fff" opacity=".85"/>' +
-    accessory + '</svg>';
+  return sharkImgCache[key];
+}
+function sharkAccessoryOverlayHtml(accessoryId){
+  if(accessoryId === 'acc_cap'){
+    return '<div style="position:absolute;left:26%;top:0%;width:48%;height:22%;background:#c23b4a;border:2px solid #7a1f28;border-radius:50% 50% 15% 15%"></div>';
+  }
+  if(accessoryId === 'acc_shades'){
+    return '<div style="position:absolute;left:22%;top:34%;width:56%;height:11%;background:#111;opacity:.85;border-radius:25%"></div>';
+  }
+  if(accessoryId === 'acc_chain'){
+    return '<div style="position:absolute;left:28%;top:62%;width:44%;height:7%;border:3px solid #f0b23d;border-top:none;border-radius:0 0 50% 50%"></div>';
+  }
+  return '';
+}
+function sharkImgMarkup(skinId, accessoryId, width){
+  const src = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
+  const w = width || 150;
+  return '<div style="position:relative;width:' + w + 'px;height:' + w + 'px;margin:0 auto">' +
+    '<img src="' + src + '" alt="" style="width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">' +
+    sharkAccessoryOverlayHtml(accessoryId) +
+    '</div>';
 }
 /* saldo grande siempre arranca en 0 y sube contando hasta el total real - se ve mas vivo que
    un numero que aparece de golpe */
@@ -25908,8 +25933,8 @@ let colmillosShopItemsCache = [];
 function renderSharkPreviews(){
   const miniEl = document.getElementById('colmillosCharPreviewMini');
   const bigEl = document.getElementById('colmillosCharPreviewBig');
-  if(miniEl) miniEl.innerHTML = sharkSvgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 90);
-  if(bigEl) bigEl.innerHTML = sharkSvgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 170);
+  if(miniEl) miniEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 62);
+  if(bigEl) bigEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 170);
 }
 
 const COLM_DAILY_EVENT_TYPES = ['daily_visit', 'trivia_correct', 'minigame_played'];
@@ -26034,7 +26059,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
    user_colmillos_events (period_key='once' para cosmeticos, un uuid por boleto para que los
    boletos de sorteo si se puedan comprar varias veces); equipar = fila en
    user_colmillos_equipped. Ver scripts/sql/create_colmillos_minigame.sql ---- */
-const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', raffle_ticket: '🎟️' };
+const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', raffle_ticket: '🎟️' };
 const COLM_EQUIP_FIELD = { skin: 'skin_id', accessory: 'accessory_id', background: 'background_id' };
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
 async function loadColmillosShop(){
@@ -26086,7 +26111,12 @@ function renderColmillosShopGrids(balance){
       card.className = 'colm-shop-item';
       const swatch = document.createElement('div');
       swatch.className = 'colm-shop-item-swatch';
-      swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
+      if(cat === 'skin'){
+        swatch.innerHTML = sharkImgMarkup(item.id, null, 44);
+        swatch.style.background = 'none';
+      } else {
+        swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
+      }
       const name = document.createElement('div');
       name.className = 'colm-shop-item-name';
       name.textContent = item.name;
@@ -26152,14 +26182,14 @@ async function equipColmillosItem(cat, itemId){
 }
 
 /* ---- minijuego: version propia del "dinosaurio" de Chrome, con el tiburon saltando rocas -
-   dibujado 100% en canvas con vectores (el mismo SHARK_BODY_PATH de arriba como Path2D), sin
-   sprites ni imagenes externas. +3 Colmillos una vez al dia si se llega a 150 puntos. ---- */
-const colmGame = { canvas: null, ctx: null, sharkPath: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0 };
+   el fondo/obstaculos siguen en vectores, pero el personaje ahora es el sprite real de
+   assets/mascot/ dibujado con drawImage. +3 Colmillos una vez al dia si se llega a 150. ---- */
+const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0 };
 function initColmGameOnce(){
   if(colmGame.canvas) return;
   colmGame.canvas = document.getElementById('colmillosGameCanvas');
   colmGame.ctx = colmGame.canvas.getContext('2d');
-  colmGame.sharkPath = new Path2D(SHARK_BODY_PATH);
+  colmGame.ctx.imageSmoothingEnabled = false;
   const jump = () => {
     if(colmGame.state === 'idle' || colmGame.state === 'over'){ startColmGame(); return; }
     if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = -8.6; }
@@ -26222,12 +26252,11 @@ function drawColmGame(){
   ctx.stroke();
   ctx.fillStyle = '#d14b5a';
   colmGame.obstacles.forEach(o => { ctx.fillRect(o.x, canvas.height - 14 - o.h, o.w, o.h); });
-  ctx.save();
-  ctx.translate(16, colmGame.sharkY - 38);
-  ctx.scale(0.42, 0.42);
-  ctx.fillStyle = SHARK_SKIN_COLORS[colmillosEquippedState.skin_id] || SHARK_SKIN_COLORS.default;
-  ctx.fill(colmGame.sharkPath);
-  ctx.restore();
+  const sharkImg = getSharkImg(colmillosEquippedState.skin_id);
+  const sharkSize = 46;
+  if(sharkImg.complete && sharkImg.naturalWidth){
+    ctx.drawImage(sharkImg, 14, colmGame.sharkY - sharkSize + 8, sharkSize, sharkSize);
+  }
   if(colmGame.state === 'idle'){
     ctx.fillStyle = 'rgba(255,255,255,.85)';
     ctx.font = 'bold 13px monospace';

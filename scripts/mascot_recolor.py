@@ -18,11 +18,19 @@ SOURCE = ROOT / "assets/mascot/source/base_original.png"
 OUT_DIR = ROOT / "assets/mascot/variants"
 
 # hue en grados (0-360). gold y red calculados de las variables --gold/--red del sitio
-# para que combinen con la marca; abyss es un morado oscuro elegido a mano.
+# para que combinen con la marca; el resto son 10 tonos repartidos por toda la rueda de
+# color para que la tienda tenga variedad real.
 VARIANTS = {
     "skin_gold": 39,
     "skin_red": 351,
     "skin_abyss": 265,
+    "skin_emerald": 150,
+    "skin_cyan": 188,
+    "skin_pink": 325,
+    "skin_orange": 25,
+    "skin_ice": 205,
+    "skin_lime": 95,
+    "skin_violet": 290,
 }
 
 NEUTRAL_SATURATION_THRESHOLD = 0.12
