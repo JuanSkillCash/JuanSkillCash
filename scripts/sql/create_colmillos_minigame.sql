@@ -25,6 +25,7 @@ create table if not exists colmillos_trivia_questions (
     active boolean not null default true
 );
 alter table colmillos_trivia_questions enable row level security;
+drop policy if exists "catalogo publico de trivia" on colmillos_trivia_questions;
 create policy "catalogo publico de trivia"
     on colmillos_trivia_questions for select
     using (active);
@@ -57,6 +58,7 @@ create table if not exists colmillos_shop_items (
     price integer not null check (price > 0)
 );
 alter table colmillos_shop_items enable row level security;
+drop policy if exists "catalogo publico de la tienda" on colmillos_shop_items;
 create policy "catalogo publico de la tienda"
     on colmillos_shop_items for select
     using (true);
@@ -93,6 +95,7 @@ create table if not exists colmillos_global_taps (
 );
 insert into colmillos_global_taps (id, total) values (true, 0) on conflict do nothing;
 alter table colmillos_global_taps enable row level security;
+drop policy if exists "todos ven el contador global de toques" on colmillos_global_taps;
 create policy "todos ven el contador global de toques"
     on colmillos_global_taps for select
     using (true);
@@ -130,12 +133,15 @@ create table if not exists user_colmillos_equipped (
     updated_at timestamptz not null default now()
 );
 alter table user_colmillos_equipped enable row level security;
+drop policy if exists "usuario ve su equipo" on user_colmillos_equipped;
 create policy "usuario ve su equipo"
     on user_colmillos_equipped for select
     using (auth.uid() = user_id);
+drop policy if exists "usuario crea su equipo" on user_colmillos_equipped;
 create policy "usuario crea su equipo"
     on user_colmillos_equipped for insert
     with check (auth.uid() = user_id);
+drop policy if exists "usuario cambia su equipo" on user_colmillos_equipped;
 create policy "usuario cambia su equipo"
     on user_colmillos_equipped for update
     using (auth.uid() = user_id);
