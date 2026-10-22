@@ -25258,13 +25258,31 @@ function bitunixShowState(state){
 }
 
 const openBitunixPillBtnEl = document.getElementById('openBitunixPillBtn');
+const BITUNIX_PILL_TITLES = {
+  connected: '🟢 Bitunix conectado',
+  pending: '🟡 Conexión con Bitunix pendiente de revisión',
+  rejected: '🔴 La conexión con Bitunix no se pudo validar',
+};
 function updateBitunixPillStatus(status){
   openBitunixPillBtnEl.classList.remove('connected', 'pending', 'rejected');
   if(status) openBitunixPillBtnEl.classList.add(status);
+  openBitunixPillBtnEl.title = BITUNIX_PILL_TITLES[status] || '⚪ Bitunix desconectado — haz clic para conectar';
 }
+
+// cuenta del dueño (Juan): el Partner API de Bitunix solo reporta volumen de SUS REFERIDOS,
+// nunca de la cuenta del propio socio - por diseño de Bitunix, nunca va a aparecer en
+// queryPnlAndTradeCnt. Por eso esta cuenta especifica se muestra siempre conectada/Alfa sin
+// pasar por user_exchange_connections/user_exchange_volume, para que el robot nunca la toque.
+const OWNER_USER_ID = 'e4309251-6078-4233-aab3-6ab8d6c624e1';
 
 async function loadBitunixStatus(){
   if(!currentUser){ updateBitunixPillStatus(null); return; }
+  if(currentUser.id === OWNER_USER_ID){
+    updateBitunixPillStatus('connected');
+    document.getElementById('bitunixConnectedUid').textContent = 'tu cuenta';
+    bitunixShowState('connected');
+    return;
+  }
   bitunixErrorEl.style.display = 'none';
   const { data, error } = await sbClient.from('user_exchange_connections')
     .select('connect_path,uid,status,review_note').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
@@ -25376,6 +25394,15 @@ async function loadRankStatus(){
     rankStatusText.textContent = 'Inicia sesión y conecta tu cuenta de Bitunix para empezar a sumar rango.';
     rankConnectBitunixBtn.style.display = 'inline-flex';
     rankConnectBitunixBtn.textContent = '🦈 Conectar Bitunix';
+    return;
+  }
+  if(currentUser.id === OWNER_USER_ID){
+    updateBitunixPillStatus('connected');
+    rankConnectBitunixBtn.style.display = 'none';
+    rankStatusText.textContent = '✅ Bitunix conectado — Alfa (cuenta del dueño).';
+    document.querySelectorAll('#rankRuler .rank-step').forEach(step => {
+      step.classList.toggle('active', step.dataset.rank === 'alfa');
+    });
     return;
   }
   const { data, error } = await sbClient.from('user_exchange_connections')
