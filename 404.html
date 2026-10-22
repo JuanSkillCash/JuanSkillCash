@@ -405,7 +405,7 @@ button{font-family:inherit;color:inherit}
 @keyframes colmLoadFill{to{width:100%}}
 .colm-loading-text{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--gold);animation:colmBlink 1s steps(2) infinite}
 @keyframes colmBlink{50%{opacity:.3}}
-.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:10px 10px 0;position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
+.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:10px 10px 3px;position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset;overflow:hidden}
 .colm-hero.has-bg{background-color:#0b0d18}
 .colm-hero.has-bg::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0px,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.3))}
 .colm-hero.menu-open .colm-hero-hud,.colm-hero.menu-open .colm-hero-stage,.colm-hero.menu-open .colm-hero-panel{visibility:hidden}
@@ -418,8 +418,11 @@ button{font-family:inherit;color:inherit}
    todo el resto del recuadro libre al tiburon y al fondo (que ya trae su propio piso) */
 .colm-hero-panel{position:absolute;top:44px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:rgba(11,13,24,.85);border:2px solid rgba(240,178,61,.55);box-shadow:0 0 0 1px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.04)}
 .colm-hero-panel-stats{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
-.colm-hero-stage{position:relative;flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4%}
-.colm-hero-char{flex-shrink:0;width:min(72%,360px);position:relative;z-index:1}
+.colm-hero-stage{position:relative;flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center}
+/* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
+   transparente abajo de las patas) - sin este empujoncito se veria flotando aunque el propio
+   div ya este pegado al fondo del escenario */
+.colm-hero-char{flex-shrink:0;width:min(72%,360px);transform:translateY(16.6%);position:relative;z-index:1}
 .colm-hero-char > div{width:100% !important;height:auto !important}
 .colm-hero-char img{filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
 .colm-coin{cursor:pointer;filter:drop-shadow(0 6px 14px rgba(240,178,61,.35));transition:transform .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
