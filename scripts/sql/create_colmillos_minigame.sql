@@ -181,3 +181,33 @@ drop policy if exists "usuario cambia su equipo" on user_colmillos_equipped;
 create policy "usuario cambia su equipo"
     on user_colmillos_equipped for update
     using (auth.uid() = user_id);
+
+-- 8) Accesorios independientes por "parte del cuerpo": antes existia una sola columna
+--    accessory_id, asi que ponerte una cosa de la cabeza quitaba lo que tenias en la cara (o
+--    donde fuera) porque todo competia por la misma columna. Se reemplaza por 4 columnas, una
+--    por cada parte (cabeza/cara/cuerpo/manos), para poder combinarlos todos a la vez. Lo que
+--    ya estaba equipado en la columna vieja se migra a la columna nueva que le corresponda -
+--    todo este bloque es seguro de correr mas de una vez (revisa si accessory_id todavia
+--    existe antes de migrar/borrarla).
+alter table user_colmillos_equipped add column if not exists accessory_head_id text references colmillos_shop_items(id);
+alter table user_colmillos_equipped add column if not exists accessory_face_id text references colmillos_shop_items(id);
+alter table user_colmillos_equipped add column if not exists accessory_body_id text references colmillos_shop_items(id);
+alter table user_colmillos_equipped add column if not exists accessory_hands_id text references colmillos_shop_items(id);
+
+do $$
+begin
+    if exists (
+        select 1 from information_schema.columns
+        where table_name = 'user_colmillos_equipped' and column_name = 'accessory_id'
+    ) then
+        update user_colmillos_equipped set accessory_head_id = accessory_id
+            where accessory_id in ('acc_cap', 'acc_crown', 'acc_sombrero', 'acc_headphones', 'acc_scuba');
+        update user_colmillos_equipped set accessory_face_id = accessory_id
+            where accessory_id in ('acc_shades', 'acc_antifaz');
+        update user_colmillos_equipped set accessory_body_id = accessory_id
+            where accessory_id in ('acc_chain', 'acc_scarf', 'acc_cape', 'acc_collar', 'acc_aletarobot');
+        update user_colmillos_equipped set accessory_hands_id = accessory_id
+            where accessory_id in ('acc_microfono', 'acc_guantes', 'acc_paraguas');
+        alter table user_colmillos_equipped drop column accessory_id;
+    end if;
+end $$;
