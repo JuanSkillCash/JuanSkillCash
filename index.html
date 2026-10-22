@@ -532,6 +532,12 @@ button{font-family:inherit;color:inherit}
   .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
   .colm-shop-grid{grid-template-columns:repeat(4,1fr)}
   .colm-shop-bg-grid{display:grid;grid-template-columns:repeat(2,1fr)}
+  /* en pantallas anchas el recuadro ya usa casi todo el ancho disponible - si se queda con
+     la misma altura fija de antes, el fondo (que es 320x200, bastante "cuadrado") se recorta
+     muchisimo y se pierde la mayor parte de la escena. Se deja crecer de alto tambien, en la
+     misma proporcion que el propio arte, para que se vea completo - no importa si empuja el
+     resto del contenido (pestañas, trivia, etc.) mas abajo y toca scrollear para verlo */
+  .colm-hero{min-height:0;aspect-ratio:8/5}
 }
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
