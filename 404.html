@@ -26199,16 +26199,23 @@ function renderColmillosShopPreview(){
   bigEl.classList.toggle('has-bg', !!src);
 }
 /* avatarcito del tiburon en el botoncito de cuenta (arriba a la derecha) - en vez del emoji
-   generico de siempre, para que se sienta que de verdad es "tu" tiburon en todos lados */
+   generico de siempre, para que se sienta que de verdad es "tu" tiburon en todos lados.
+   Todo el mundo ve al menos el diseño basico (aunque no haya tocado la tienda todavia), y se
+   recorta de la cintura para arriba (en vez del cuerpo completico) para que se note mas grande
+   dentro del circulito chiquito - el recorte (x14-74,y8-68 del lienzo de 96x96) se logra con
+   background-size/position en vez de un <img>, asi el mismo calculo sirve para cualquier
+   tamaño de boton (38px en escritorio, 34px en celular) */
 function renderAccountMiniAvatar(){
   const btn = document.getElementById('accountMiniBtn');
   if(!btn) return;
   const skinId = colmillosEquippedState.skin_id;
-  if(skinId && SHARK_IMG_PATHS[skinId]){
-    btn.innerHTML = '<img src="' + SHARK_IMG_PATHS[skinId] + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;image-rendering:pixelated;image-rendering:crisp-edges">';
-  } else {
-    btn.textContent = '👤';
-  }
+  const src = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
+  btn.textContent = '';
+  btn.style.backgroundImage = "url('" + src + "')";
+  btn.style.backgroundSize = '160% 160%';
+  btn.style.backgroundPosition = '38.9% 22.2%';
+  btn.style.backgroundRepeat = 'no-repeat';
+  btn.style.imageRendering = 'pixelated';
 }
 async function loadAccountMiniAvatar(){
   if(!currentUser){ renderAccountMiniAvatar(); return; }
