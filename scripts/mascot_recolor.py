@@ -26,9 +26,12 @@ VARIANTS = {
 }
 
 NEUTRAL_SATURATION_THRESHOLD = 0.12
+# la base tiene saturacion baja (azul apagado) - se sube para que el dorado/rojo/morado
+# se vean vivos en vez de quedar como tonos tierra lavados
+SATURATION_BOOST = 1.6
 
 
-def recolor(img: Image.Image, hue_deg: float) -> Image.Image:
+def recolor(img: Image.Image, hue_deg: float, saturation_boost: float = SATURATION_BOOST) -> Image.Image:
     target_hue = (hue_deg % 360) / 360.0
     img = img.convert("RGBA")
     out = img.copy()
@@ -42,7 +45,8 @@ def recolor(img: Image.Image, hue_deg: float) -> Image.Image:
             h, l, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
             if s < NEUTRAL_SATURATION_THRESHOLD:
                 continue
-            nr, ng, nb = colorsys.hls_to_rgb(target_hue, l, s)
+            new_s = min(1.0, s * saturation_boost)
+            nr, ng, nb = colorsys.hls_to_rgb(target_hue, l, new_s)
             px_out[x, y] = (round(nr * 255), round(ng * 255), round(nb * 255), a)
     return out
 
