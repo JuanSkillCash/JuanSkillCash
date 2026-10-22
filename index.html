@@ -366,6 +366,11 @@ button{font-family:inherit;color:inherit}
 .exchange-pill.rejected .pill-dot{background:var(--red);box-shadow:0 0 5px rgba(255,47,79,.5);opacity:1}
 .exchange-pill.connected{color:var(--white)}
 @keyframes pillDotPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.exchange-pill img,.exchange-pill svg{opacity:.4;transition:opacity .2s ease}
+.exchange-pill.connected img,.exchange-pill.connected svg{opacity:1}
+#openTelegramPillBtn.connected{color:#54c3f5}
+#openTelegramPillBtn.connected svg{color:#29a9eb}
+#openTelegramPillBtn.connected .pill-dot{background:#29a9eb;box-shadow:0 0 5px rgba(41,169,235,.6);animation:pillDotPulse 1.6s ease-in-out infinite}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
@@ -2504,6 +2509,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="exchange-pill" id="openTelegramPillBtn" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
         Telegram
+        <span class="pill-dot" id="telegramPillDot"></span>
       </button>
 
       <div class="notif-mini" id="notifMini">
@@ -10900,6 +10906,7 @@ document.getElementById('profileDeleteConfirmBtn').addEventListener('click', asy
 sbClient.auth.onAuthStateChange((event, session) => {
   currentUser = session ? session.user : null;
   if(typeof loadRankStatus === 'function') loadRankStatus();
+  if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   if(event === 'PASSWORD_RECOVERY'){
     setAuthMode('reset');
     openAuthModal();
@@ -10911,6 +10918,7 @@ sbClient.auth.getSession().then(({ data }) => {
   currentUser = data.session ? data.session.user : null;
   renderAuthState();
   if(typeof loadRankStatus === 'function') loadRankStatus();
+  if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
 });
 
 /* ---- portafolios ---- */
@@ -25166,11 +25174,18 @@ const telegramCheckBtn = document.getElementById('telegramCheckBtn');
 const telegramCheckMsg = document.getElementById('telegramCheckMsg');
 const telegramDisconnectBtn = document.getElementById('telegramDisconnectBtn');
 
+const openTelegramPillBtnEl = document.getElementById('openTelegramPillBtn');
+function updateTelegramPillStatus(connected){
+  openTelegramPillBtnEl.classList.toggle('connected', !!connected);
+  openTelegramPillBtnEl.title = connected ? '🔵 Telegram conectado' : '⚪ Telegram desconectado — haz clic para conectar';
+}
+
 async function loadTelegramStatus(){
-  if(!currentUser) return;
+  if(!currentUser){ updateTelegramPillStatus(false); return; }
   const { data, error } = await sbClient.from('user_telegram_links')
     .select('link_code,linked_at').eq('user_id', currentUser.id).maybeSingle();
   if(error){ console.warn('no se pudo revisar el estado de Telegram', error); return; }
+  updateTelegramPillStatus(!!(data && data.linked_at));
   if(data && data.linked_at){
     telegramNotConnected.style.display = 'none';
     telegramConnected.style.display = 'block';
