@@ -480,6 +480,16 @@ button{font-family:inherit;color:inherit}
 .colm-shop-item-btn.equipped{background:#4ade80;color:#0b2715}
 .colm-shop-item-btn:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
+@media(min-width:860px){
+  /* en pantallas anchas no tiene sentido una sola columna angosta y centrada con medio
+     monitor vacio a los lados - la moneda/saldo va fija a la izquierda y las pestañas con
+     su contenido (que se acomoda en cuadritos) van a la derecha, estilo panel de juego */
+  .colm-arcade{max-width:980px}
+  .colm-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start}
+  .colm-left{position:sticky;top:20px}
+  .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
+  .colm-shop-grid{grid-template-columns:repeat(3,1fr)}
+}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
@@ -6173,6 +6183,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         </div>
 
         <div id="colmillosContent" style="display:none">
+        <div class="colm-grid">
+         <div class="colm-left">
           <div class="colm-hero">
             <div class="colm-coin" id="colmillosBigCoin">
               <svg width="92" height="115" viewBox="0 0 120 150">
@@ -6195,7 +6207,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <p class="colm-tap-hint">👆 Tócala</p>
             <div class="colm-global-taps">🌍 Toques de toda la manada: <b id="colmillosGlobalTaps">0</b></div>
           </div>
+         </div>
 
+         <div class="colm-right">
           <div class="colm-tabs" id="colmillosTabs">
             <button type="button" class="colm-tab active" data-tab="inicio">🏠 Inicio</button>
             <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
@@ -6290,6 +6304,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <p class="auth-note" id="colmillosRaffleCount">Tenés 0 boletos.</p>
             </div>
           </div>
+         </div>
+        </div>
         </div>
       </div>
     </div>
@@ -25846,6 +25862,22 @@ function sharkSvgMarkup(skinId, accessoryId, width){
     '<circle cx="34" cy="46" r="2.6" fill="#fff"/><path d="M18,56 L30,58 L18,60 Z" fill="#fff" opacity=".85"/>' +
     accessory + '</svg>';
 }
+/* saldo grande siempre arranca en 0 y sube contando hasta el total real - se ve mas vivo que
+   un numero que aparece de golpe */
+function animateColmBalance(target){
+  const el = document.getElementById('colmillosBigBalance');
+  if(!el) return;
+  cancelAnimationFrame(window._colmBalanceRaf);
+  const duration = 900;
+  const startTime = performance.now();
+  function tick(now){
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(target * eased).toLocaleString('es-CO');
+    if(progress < 1) window._colmBalanceRaf = requestAnimationFrame(tick);
+  }
+  window._colmBalanceRaf = requestAnimationFrame(tick);
+}
 let colmillosEquippedState = { skin_id: null, accessory_id: null, background_id: null };
 let colmillosOwnedItemIds = new Set();
 let colmillosShopItemsCache = [];
@@ -25877,7 +25909,7 @@ async function refreshColmillosPageContent(){
   if(error){ console.warn('no se pudo leer colmillos para la pagina', error); return; }
   const rows = data || [];
   const total = rows.reduce((sum, r) => sum + r.amount, 0);
-  balEl.textContent = total.toLocaleString('es-CO');
+  animateColmBalance(total);
   const today = todayKeyUTC();
   questCards.forEach(card => {
     const type = card.dataset.event;
