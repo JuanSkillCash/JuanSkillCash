@@ -417,6 +417,69 @@ button{font-family:inherit;color:inherit}
 .colm-section-label{font-family:'Bungee',cursive;font-size:13px;color:var(--white);letter-spacing:.01em;margin:18px 0 10px}
 .colm-spark{position:absolute;pointer-events:none;font-size:18px;z-index:5;animation:colmSparkFloat .85s ease-out forwards}
 @keyframes colmSparkFloat{to{transform:translateY(-46px) scale(1.3);opacity:0}}
+.colm-global-taps{margin-top:14px;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted2)}
+.colm-global-taps b{color:var(--gold);font-variant-numeric:tabular-nums}
+
+/* boton JUGAR - pantalla previa antes de cargar nada */
+.colm-start{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:360px;text-align:center;padding:20px}
+.colm-start-shark{font-size:58px;animation:colmSharkSwim 1.6s ease-in-out infinite}
+.colm-start-title{font-family:'Bungee',cursive;font-size:30px;color:var(--gold);text-shadow:0 0 20px rgba(240,178,61,.5),0 2px 0 #7a5a12;letter-spacing:.02em}
+.colm-start-sub{margin:0;font-size:12px;color:var(--muted2);max-width:260px}
+.colm-play-btn{margin-top:8px;font-family:'Bungee',cursive;font-size:16px;color:#1a1306;background:linear-gradient(180deg,#ffe082,var(--gold));border:none;border-radius:10px;padding:14px 34px;cursor:pointer;box-shadow:0 0 0 2px rgba(240,178,61,.35),0 8px 0 #8a6610,0 14px 20px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;animation:colmPlayPulse 1.6s ease-in-out infinite}
+.colm-play-btn:active{transform:translateY(6px);box-shadow:0 0 0 2px rgba(240,178,61,.35),0 2px 0 #8a6610,0 4px 10px rgba(0,0,0,.4)}
+@keyframes colmPlayPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+
+/* pestañas internas (Inicio / Trivia / Minijuego / Tienda) */
+.colm-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.colm-tabs::-webkit-scrollbar{display:none}
+.colm-tab{flex-shrink:0;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--muted2);background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:20px;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
+.colm-tab:hover{color:var(--white)}
+.colm-tab.active{color:#1a1306;background:var(--gold);border-color:var(--gold)}
+.colm-tabpanel{animation:colmTabIn .2s ease-out}
+@keyframes colmTabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* personaje (tiburon personalizable) */
+.colm-char-preview{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:14px;background:radial-gradient(circle at 50% 30%,rgba(240,178,61,.1),transparent 65%),#0b0d18;border:1px solid var(--border2);margin-bottom:12px;position:relative;overflow:hidden}
+.colm-char-preview svg{filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
+.colm-char-mini-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);margin-bottom:6px}
+.colm-char-mini-row .colm-char-preview{flex-shrink:0;width:92px;height:72px;min-height:0;margin-bottom:0}
+.colm-char-mini-row .colm-char-preview svg{width:62px;height:auto}
+.colm-char-mini-text{flex:1;min-width:0}
+.colm-char-mini-text h4{margin:0 0 4px;font-size:13px;color:var(--white);font-weight:700}
+.colm-char-mini-text p{margin:0 0 8px;font-size:11px;color:var(--muted)}
+.colm-goto-shop-btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#1a1306;background:var(--gold);border:none;border-radius:20px;padding:7px 14px;cursor:pointer}
+
+/* trivia diaria */
+.colm-trivia-card{padding:18px 16px;border-radius:14px;border:1px solid var(--border2);background:rgba(255,255,255,.02)}
+.colm-trivia-q{font-size:14px;font-weight:700;color:var(--white);margin-bottom:14px;line-height:1.4}
+.colm-trivia-options{display:flex;flex-direction:column;gap:8px}
+.colm-trivia-opt{text-align:left;font-size:12.5px;font-weight:600;color:var(--white);background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+.colm-trivia-opt:hover{border-color:var(--gold)}
+.colm-trivia-opt.correct{border-color:#4ade80;background:rgba(74,222,128,.12);color:#4ade80}
+.colm-trivia-opt.wrong{border-color:var(--red);background:rgba(255,47,79,.1);animation:colmShake .3s}
+.colm-trivia-opt.disabled{pointer-events:none;opacity:.55}
+@keyframes colmShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.colm-trivia-result{margin-top:12px;font-size:12px;font-weight:700}
+.colm-trivia-result.done{color:#4ade80}
+
+/* minijuego */
+.colm-game-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.colm-game-wrap canvas{width:100%;max-width:400px;height:150px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#0b0d18;cursor:pointer;touch-action:manipulation}
+.colm-game-hud{display:flex;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
+.colm-game-hud b{color:var(--gold)}
+.colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
+
+/* tienda / marketplace */
+.colm-shop-section{margin-bottom:6px}
+.colm-shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.colm-shop-item{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 8px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);text-align:center}
+.colm-shop-item-swatch{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.04)}
+.colm-shop-item-name{font-size:11px;font-weight:700;color:var(--white)}
+.colm-shop-item-btn{width:100%;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;border-radius:20px;padding:7px 10px;cursor:pointer;border:none;background:var(--gold);color:#1a1306}
+.colm-shop-item-btn.owned{background:rgba(255,255,255,.06);color:var(--muted2);cursor:default}
+.colm-shop-item-btn.equipped{background:#4ade80;color:#0b2715}
+.colm-shop-item-btn:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
    contador de herramientas bloqueadas; ver .locked-tool-card para el estado "por desbloquear" */
@@ -1846,6 +1909,18 @@ img[src=""]{display:none}
   .modal-panel{border-radius:0;min-height:100vh}
   .scroll-fade{margin:0 -18px -1px}
   .promo-note-foot{flex-wrap:wrap}
+  /* las píldoras (Bitunix/Telegram/Colmillos) + campana + cuenta no caben con el texto
+     completo junto a la hamburguesa en celular - se quita la etiqueta de texto y se
+     comprime todo para que quede en una sola fila sin encimarse */
+  .mobile-topbar{gap:6px}
+  .exchange-pill{padding:6px 8px;gap:4px;font-size:0}
+  .exchange-pill .pill-dot{font-size:0}
+  .exchange-pill-label{display:none}
+  .exchange-pill img,.exchange-pill svg{width:16px;height:16px}
+  .colmillos-pill{font-size:11.5px}
+  .colmillos-pill span#colmillosWalletBalance{font-size:11.5px}
+  .notif-mini-btn,.account-mini-btn{width:34px;height:34px;font-size:15px}
+  .account-mini{margin-left:6px}
 }
 @media(min-width:861px){
   .topbar-brand{display:none}
@@ -2553,13 +2628,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <button class="exchange-pill" id="openBitunixPillBtn" type="button">
         <img src="data:image/png;base64,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" alt="" width="18" height="14" style="object-fit:contain">
-        Bitunix
+        <span class="exchange-pill-label">Bitunix</span>
       <span class="pill-dot" id="bitunixPillDot"></span>
       </button>
 
       <button class="exchange-pill" id="openTelegramPillBtn" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
-        Telegram
+        <span class="exchange-pill-label">Telegram</span>
         <span class="pill-dot" id="telegramPillDot"></span>
       </button>
 
@@ -6084,7 +6159,14 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button type="button" class="cat-back-btn" id="colmillosBackBtn">← Volver</button>
 
       <div class="colm-arcade">
-        <div class="colm-loading" id="colmillosLoading">
+        <div class="colm-start" id="colmillosStart">
+          <div class="colm-start-shark">🦈</div>
+          <div class="colm-start-title">COLMILLOS</div>
+          <p class="colm-start-sub">Gana, juega una trivia, saltá obstáculos y personalizá tu tiburón.</p>
+          <button type="button" class="colm-play-btn" id="colmillosPlayBtn">▶ JUGAR</button>
+        </div>
+
+        <div class="colm-loading" id="colmillosLoading" style="display:none">
           <div class="colm-loading-shark">🦈</div>
           <div class="colm-loading-bar"><div class="colm-loading-fill"></div></div>
           <div class="colm-loading-text">CARGANDO COLMILLOS...</div>
@@ -6111,38 +6193,103 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-balance-caption">COLMILLOS</div>
             <div class="colm-player-name" id="colmillosPlayerName">JUGADOR</div>
             <p class="colm-tap-hint">👆 Tócala</p>
+            <div class="colm-global-taps">🌍 Toques de toda la manada: <b id="colmillosGlobalTaps">0</b></div>
           </div>
 
-          <div class="colm-section-label">⚔️ CÓMO SE GANAN</div>
-          <div class="colmillos-quest-list" id="colmillosQuestList">
-            <div class="colmillos-quest" data-event="daily_visit">
-              <div class="colmillos-quest-icon">📅</div>
-              <div class="colmillos-quest-body"><h4>Visitar la plataforma</h4><p>+5 cada día que entras</p></div>
-              <div class="colmillos-quest-status"></div>
+          <div class="colm-tabs" id="colmillosTabs">
+            <button type="button" class="colm-tab active" data-tab="inicio">🏠 Inicio</button>
+            <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
+            <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuego</button>
+            <button type="button" class="colm-tab" data-tab="tienda">🛒 Tienda</button>
+          </div>
+
+          <div class="colm-tabpanel" data-tabpanel="inicio">
+            <div class="colm-char-mini-row">
+              <div class="colm-char-preview" id="colmillosCharPreviewMini"></div>
+              <div class="colm-char-mini-text">
+                <h4>Tu tiburón</h4>
+                <p>Personalizalo con skins, accesorios y fondos en la tienda.</p>
+                <button type="button" class="colm-goto-shop-btn" data-goto-tab="tienda">Ir a la tienda 🛒</button>
+              </div>
             </div>
-            <div class="colmillos-quest" data-event="telegram_connected">
-              <div class="colmillos-quest-icon">📲</div>
-              <div class="colmillos-quest-body"><h4>Conectar Telegram</h4><p>+15 (una sola vez)</p></div>
-              <div class="colmillos-quest-status"></div>
+
+            <div class="colm-section-label">⚔️ CÓMO SE GANAN</div>
+            <div class="colmillos-quest-list" id="colmillosQuestList">
+              <div class="colmillos-quest" data-event="daily_visit">
+                <div class="colmillos-quest-icon">📅</div>
+                <div class="colmillos-quest-body"><h4>Visitar la plataforma</h4><p>+5 cada día que entras</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
+              <div class="colmillos-quest" data-event="telegram_connected">
+                <div class="colmillos-quest-icon">📲</div>
+                <div class="colmillos-quest-body"><h4>Conectar Telegram</h4><p>+15 (una sola vez)</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
+              <div class="colmillos-quest" data-event="bitunix_connected">
+                <div class="colmillos-quest-icon">🦈</div>
+                <div class="colmillos-quest-body"><h4>Conectar Bitunix</h4><p>+15 (una sola vez)</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
+              <div class="colmillos-quest" data-event="profile_completed">
+                <div class="colmillos-quest-icon">👤</div>
+                <div class="colmillos-quest-body"><h4>Completar tu perfil</h4><p>+5 (una sola vez)</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
+              <div class="colmillos-quest" data-event="trivia_correct">
+                <div class="colmillos-quest-icon">🎯</div>
+                <div class="colmillos-quest-body"><h4>Acertar la trivia diaria</h4><p>+8 cada día que aciertas</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
+              <div class="colmillos-quest" data-event="minigame_played">
+                <div class="colmillos-quest-icon">🕹️</div>
+                <div class="colmillos-quest-body"><h4>Jugar el minijuego</h4><p>+3 cada día que llegas a 150 puntos</p></div>
+                <div class="colmillos-quest-status"></div>
+              </div>
             </div>
-            <div class="colmillos-quest" data-event="bitunix_connected">
-              <div class="colmillos-quest-icon">🦈</div>
-              <div class="colmillos-quest-body"><h4>Conectar Bitunix</h4><p>+15 (una sola vez)</p></div>
-              <div class="colmillos-quest-status"></div>
-            </div>
-            <div class="colmillos-quest" data-event="profile_completed">
-              <div class="colmillos-quest-icon">👤</div>
-              <div class="colmillos-quest-body"><h4>Completar tu perfil</h4><p>+5 (una sola vez)</p></div>
-              <div class="colmillos-quest-status"></div>
-            </div>
-            <div class="colmillos-quest colmillos-quest-soon">
-              <div class="colmillos-quest-icon">🔮</div>
-              <div class="colmillos-quest-body"><h4>Más formas de ganar</h4><p>Vienen pronto — usar calculadoras, leer guías, invitar gente a la comunidad.</p></div>
+
+            <div class="colm-section-label">🏆 PARA QUÉ SIRVEN</div>
+            <p class="auth-note">Son para <b>presumir</b>, para <b>personalizar tu tiburón</b> en la tienda (skins, accesorios, fondos del minijuego), y para cambiarlos por <b>boletos de sorteos</b> con premios reales. Nunca se ganan por volumen de trading, y son totalmente aparte de tu rango en "Rango de Manada" — eso evita que te empujen a operar más solo por subir un número.</p>
+          </div>
+
+          <div class="colm-tabpanel" data-tabpanel="trivia" style="display:none">
+            <div class="colm-trivia-card">
+              <div class="colm-trivia-q" id="colmillosTriviaQuestion">Cargando pregunta…</div>
+              <div class="colm-trivia-options" id="colmillosTriviaOptions"></div>
+              <div class="colm-trivia-result" id="colmillosTriviaResult"></div>
             </div>
           </div>
 
-          <div class="colm-section-label">🏆 PARA QUÉ SIRVEN</div>
-          <p class="auth-note">Por ahora son para <b>presumir</b> — vas a poder verlos en una tabla de posiciones de la comunidad (próximamente). Nunca se ganan por volumen de trading, y son totalmente aparte de tu rango en "Rango de Manada" — eso evita que te empujen a operar más solo por subir un número. Cuando haya herramientas reales que desbloquear, los Colmillos podrán servir para eso también.</p>
+          <div class="colm-tabpanel" data-tabpanel="juego" style="display:none">
+            <div class="colm-game-wrap">
+              <canvas id="colmillosGameCanvas" width="400" height="150"></canvas>
+              <div class="colm-game-hud">
+                <span>Puntaje: <b id="colmillosGameScore">0</b></span>
+                <span>Mejor hoy: <b id="colmillosGameBest">0</b></span>
+              </div>
+              <p class="colm-game-hint" id="colmillosGameHint">Tocá el juego o presioná ESPACIO para empezar y saltar</p>
+            </div>
+          </div>
+
+          <div class="colm-tabpanel" data-tabpanel="tienda" style="display:none">
+            <div class="colm-char-preview" id="colmillosCharPreviewBig"></div>
+            <div class="colm-shop-section" data-cat="skin">
+              <div class="colm-section-label">🎨 SKINS</div>
+              <div class="colm-shop-grid" id="colmillosShopSkins"></div>
+            </div>
+            <div class="colm-shop-section" data-cat="accessory">
+              <div class="colm-section-label">🕶️ ACCESORIOS</div>
+              <div class="colm-shop-grid" id="colmillosShopAccessories"></div>
+            </div>
+            <div class="colm-shop-section" data-cat="background">
+              <div class="colm-section-label">🌊 FONDOS DEL MINIJUEGO</div>
+              <div class="colm-shop-grid" id="colmillosShopBackgrounds"></div>
+            </div>
+            <div class="colm-shop-section" data-cat="raffle">
+              <div class="colm-section-label">🎟️ SORTEOS</div>
+              <div class="colm-shop-grid" id="colmillosShopRaffle"></div>
+              <p class="auth-note" id="colmillosRaffleCount">Tenés 0 boletos.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -11070,6 +11217,7 @@ sbClient.auth.onAuthStateChange((event, session) => {
   currentUser = session ? session.user : null;
   if(typeof loadRankStatus === 'function') loadRankStatus();
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  if(typeof loadBitunixStatus === 'function') loadBitunixStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
   if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
   if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
@@ -11085,6 +11233,7 @@ sbClient.auth.getSession().then(({ data }) => {
   renderAuthState();
   if(typeof loadRankStatus === 'function') loadRankStatus();
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  if(typeof loadBitunixStatus === 'function') loadBitunixStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
   if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
   if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
@@ -25466,6 +25615,7 @@ async function loadBitunixStatus(){
     updateBitunixPillStatus('connected');
     document.getElementById('bitunixConnectedUid').textContent = 'tu cuenta';
     bitunixShowState('connected');
+    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 15);
     return;
   }
   bitunixErrorEl.style.display = 'none';
@@ -25674,6 +25824,39 @@ const colmillosContent = document.getElementById('colmillosContent');
 const colmillosBackBtn = document.getElementById('colmillosBackBtn');
 const colmillosBigCoin = document.getElementById('colmillosBigCoin');
 
+/* ---- personaje: el mismo trazado de tiburon (SHARK_BODY_PATH) se usa como <path> de SVG
+   para las vistas previas (Inicio/Tienda) y como Path2D dentro del canvas del minijuego -
+   un solo dibujo, dos formas de pintarlo ---- */
+const SHARK_BODY_PATH = 'M10,52 C14,36 30,22 55,24 L62,8 L74,26 C92,22 118,28 136,38 L186,16 L172,52 L186,88 L136,66 C118,76 92,82 74,78 L62,96 L55,80 C30,82 14,68 10,52 Z';
+const SHARK_SKIN_COLORS = { default: '#6b7b8c', skin_gold: '#d9a441', skin_red: '#c23b4a', skin_abyss: '#2c2140' };
+function sharkSvgMarkup(skinId, accessoryId, width){
+  const fill = SHARK_SKIN_COLORS[skinId] || SHARK_SKIN_COLORS.default;
+  const w = width || 150;
+  const h = Math.round(w * 100 / 200);
+  let accessory = '';
+  if(accessoryId === 'acc_cap'){
+    accessory = '<path d="M48,18 C56,6 72,6 78,18 L80,26 L46,26 Z" fill="#c23b4a" stroke="#7a1f28" stroke-width="1.5"/>';
+  } else if(accessoryId === 'acc_shades'){
+    accessory = '<rect x="44" y="30" width="15" height="9" rx="3" fill="#111" opacity=".88"/><rect x="63" y="30" width="15" height="9" rx="3" fill="#111" opacity=".88"/><line x1="59" y1="34" x2="63" y2="34" stroke="#111" stroke-width="2"/>';
+  } else if(accessoryId === 'acc_chain'){
+    accessory = '<path d="M40,60 Q62,80 90,60" fill="none" stroke="#f0b23d" stroke-width="3.5" stroke-linecap="round"/>';
+  }
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 200 100">' +
+    '<path d="' + SHARK_BODY_PATH + '" fill="' + fill + '" stroke="rgba(0,0,0,.35)" stroke-width="2"/>' +
+    '<circle cx="34" cy="46" r="2.6" fill="#fff"/><path d="M18,56 L30,58 L18,60 Z" fill="#fff" opacity=".85"/>' +
+    accessory + '</svg>';
+}
+let colmillosEquippedState = { skin_id: null, accessory_id: null, background_id: null };
+let colmillosOwnedItemIds = new Set();
+let colmillosShopItemsCache = [];
+function renderSharkPreviews(){
+  const miniEl = document.getElementById('colmillosCharPreviewMini');
+  const bigEl = document.getElementById('colmillosCharPreviewBig');
+  if(miniEl) miniEl.innerHTML = sharkSvgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 90);
+  if(bigEl) bigEl.innerHTML = sharkSvgMarkup(colmillosEquippedState.skin_id, colmillosEquippedState.accessory_id, 170);
+}
+
+const COLM_DAILY_EVENT_TYPES = ['daily_visit', 'trivia_correct', 'minigame_played'];
 async function refreshColmillosPageContent(){
   const balEl = document.getElementById('colmillosBigBalance');
   const nameEl = document.getElementById('colmillosPlayerName');
@@ -25699,17 +25882,360 @@ async function refreshColmillosPageContent(){
   questCards.forEach(card => {
     const type = card.dataset.event;
     const statusEl = card.querySelector('.colmillos-quest-status');
-    const done = type === 'daily_visit'
-      ? rows.some(r => r.event_type === 'daily_visit' && r.period_key === today)
+    const isDaily = COLM_DAILY_EVENT_TYPES.includes(type);
+    const done = isDaily
+      ? rows.some(r => r.event_type === type && r.period_key === today)
       : rows.some(r => r.event_type === type);
-    statusEl.textContent = done ? '✓ Listo' : (type === 'daily_visit' ? 'Hoy pendiente' : 'Pendiente');
+    statusEl.textContent = done ? (isDaily ? '✓ Listo hoy' : '✓ Listo') : (isDaily ? 'Hoy pendiente' : 'Pendiente');
     statusEl.className = 'colmillos-quest-status ' + (done ? 'done' : 'pending');
   });
+  renderSharkPreviews();
 }
+
+/* ---- contador global de toques - una curiosidad compartida entre toda la comunidad, no
+   otorga Colmillos. Usa una funcion de Postgres con incremento atomico (increment_global_taps,
+   ver scripts/sql/create_colmillos_minigame.sql) para que no se pierdan toques si dos personas
+   le dan clic a la moneda al mismo tiempo ---- */
+async function loadGlobalTaps(){
+  const { data, error } = await sbClient.from('colmillos_global_taps').select('total').eq('id', true).maybeSingle();
+  if(error){ console.warn('no se pudo leer el contador global de toques', error); return; }
+  const el = document.getElementById('colmillosGlobalTaps');
+  if(el) el.textContent = (data ? data.total : 0).toLocaleString('es-CO');
+}
+async function bumpGlobalTaps(){
+  const { data, error } = await sbClient.rpc('increment_global_taps');
+  if(error){ console.warn('no se pudo sumar al contador global de toques', error); return; }
+  const el = document.getElementById('colmillosGlobalTaps');
+  if(el && typeof data === 'number') el.textContent = data.toLocaleString('es-CO');
+}
+
+/* ---- trivia diaria: todo el mundo ve la MISMA pregunta el mismo dia (se elige con un hash de
+   la fecha UTC sobre el banco de preguntas, sin necesitar una tabla de "pregunta de hoy").
+   NOTA: igual que el resto de Colmillos, la respuesta correcta viaja al navegador junto con la
+   pregunta (no hay Edge Function de por medio) - alguien muy necio podria verla en el inspector,
+   pero no tiene sentido real hacerlo por una moneda de coleccion ---- */
+let colmillosTriviaQuestions = [];
+function simpleHashStr(str){
+  let h = 0;
+  for(let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) | 0; }
+  return Math.abs(h);
+}
+async function loadDailyTrivia(){
+  if(!currentUser) return;
+  if(!colmillosTriviaQuestions.length){
+    const { data, error } = await sbClient.from('colmillos_trivia_questions').select('id,question,options,correct_index').eq('active', true);
+    if(error){ console.warn('no se pudo leer la trivia', error); return; }
+    colmillosTriviaQuestions = data || [];
+  }
+  if(!colmillosTriviaQuestions.length) return;
+  const today = todayKeyUTC();
+  const q = colmillosTriviaQuestions[simpleHashStr(today) % colmillosTriviaQuestions.length];
+  const qEl = document.getElementById('colmillosTriviaQuestion');
+  const optsEl = document.getElementById('colmillosTriviaOptions');
+  const resultEl = document.getElementById('colmillosTriviaResult');
+  qEl.textContent = q.question;
+  optsEl.innerHTML = '';
+  resultEl.textContent = '';
+  resultEl.className = 'colm-trivia-result';
+  const { data: existing } = await sbClient.from('user_colmillos_events')
+    .select('id').eq('event_type', 'trivia_correct').eq('period_key', today).maybeSingle();
+  const alreadyAnswered = !!existing;
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'colm-trivia-opt';
+    btn.textContent = opt;
+    if(alreadyAnswered){
+      btn.classList.add('disabled');
+      if(i === q.correct_index) btn.classList.add('correct');
+    } else {
+      btn.addEventListener('click', () => answerDailyTrivia(i, q.correct_index, optsEl));
+    }
+    optsEl.appendChild(btn);
+  });
+  if(alreadyAnswered){
+    resultEl.textContent = '✓ Ya respondiste hoy — vuelve mañana por una pregunta nueva.';
+    resultEl.classList.add('done');
+  }
+}
+async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
+  const buttons = optsEl.querySelectorAll('.colm-trivia-opt');
+  const resultEl = document.getElementById('colmillosTriviaResult');
+  if(chosenIndex === correctIndex){
+    buttons.forEach((b, i) => { b.classList.add('disabled'); if(i === correctIndex) b.classList.add('correct'); });
+    resultEl.textContent = '✓ ¡Correcto! +8 Colmillos';
+    resultEl.classList.add('done');
+    await awardColmillos('trivia_correct', todayKeyUTC(), 8);
+    refreshColmillosPageContent();
+  } else {
+    buttons[chosenIndex].classList.add('wrong');
+    resultEl.textContent = 'Esa no es — intenta de nuevo.';
+    setTimeout(() => buttons[chosenIndex].classList.remove('wrong'), 350);
+  }
+}
+
+/* ---- tienda / marketplace: comprar = una fila negativa en el mismo ledger de
+   user_colmillos_events (period_key='once' para cosmeticos, un uuid por boleto para que los
+   boletos de sorteo si se puedan comprar varias veces); equipar = fila en
+   user_colmillos_equipped. Ver scripts/sql/create_colmillos_minigame.sql ---- */
+const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', raffle_ticket: '🎟️' };
+const COLM_EQUIP_FIELD = { skin: 'skin_id', accessory: 'accessory_id', background: 'background_id' };
+const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
+async function loadColmillosShop(){
+  if(!currentUser) return;
+  if(!colmillosShopItemsCache.length){
+    const { data: items, error: itemsErr } = await sbClient.from('colmillos_shop_items').select('id,category,name,price').order('price');
+    if(itemsErr){ console.warn('no se pudo leer la tienda de colmillos', itemsErr); return; }
+    colmillosShopItemsCache = items || [];
+  }
+  const { data: ledgerRows, error: ledgerErr } = await sbClient.from('user_colmillos_events').select('event_type,amount');
+  if(ledgerErr){ console.warn('no se pudo leer el saldo para la tienda', ledgerErr); return; }
+  const rows = ledgerRows || [];
+  colmillosOwnedItemIds = new Set(
+    rows.filter(r => r.event_type.indexOf('purchase_') === 0 && r.event_type !== 'purchase_raffle_ticket')
+        .map(r => r.event_type.slice('purchase_'.length))
+  );
+  const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
+  const balance = rows.reduce((sum, r) => sum + r.amount, 0);
+  const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
+    .select('skin_id,accessory_id,background_id').eq('user_id', currentUser.id).maybeSingle();
+  colmillosEquippedState = equippedRow || { skin_id: null, accessory_id: null, background_id: null };
+  renderSharkPreviews();
+  renderColmillosShopGrids(balance);
+  const raffleEl = document.getElementById('colmillosRaffleCount');
+  if(raffleEl) raffleEl.textContent = 'Tenés ' + raffleTickets + ' boleto' + (raffleTickets === 1 ? '' : 's') + '. Juan elige al ganador en los sorteos que anuncia en Telegram.';
+}
+function renderColmillosShopGrids(balance){
+  ['skin', 'accessory', 'background', 'raffle'].forEach(cat => {
+    const grid = document.getElementById(COLM_GRID_EL[cat]);
+    if(!grid) return;
+    grid.innerHTML = '';
+    if(cat === 'accessory' || cat === 'background'){
+      const equipField = COLM_EQUIP_FIELD[cat];
+      const isDefaultEquipped = !colmillosEquippedState[equipField];
+      const card = document.createElement('div');
+      card.className = 'colm-shop-item';
+      card.innerHTML = '<div class="colm-shop-item-swatch">' + (cat === 'accessory' ? '🚫' : '🌊') + '</div><div class="colm-shop-item-name">' + (cat === 'accessory' ? 'Ninguno' : 'Default') + '</div>';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'colm-shop-item-btn' + (isDefaultEquipped ? ' equipped' : ' owned');
+      btn.textContent = isDefaultEquipped ? '✓ Equipado' : 'Equipar';
+      btn.disabled = isDefaultEquipped;
+      if(!isDefaultEquipped) btn.addEventListener('click', () => equipColmillosItem(cat, null));
+      card.appendChild(btn);
+      grid.appendChild(card);
+    }
+    colmillosShopItemsCache.filter(it => it.category === cat).forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'colm-shop-item';
+      const swatch = document.createElement('div');
+      swatch.className = 'colm-shop-item-swatch';
+      swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
+      const name = document.createElement('div');
+      name.className = 'colm-shop-item-name';
+      name.textContent = item.name;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'colm-shop-item-btn';
+      card.appendChild(swatch); card.appendChild(name); card.appendChild(btn);
+      if(cat === 'raffle'){
+        btn.textContent = item.price + ' 🦷 comprar boleto';
+        btn.disabled = balance < item.price;
+        btn.addEventListener('click', () => buyColmillosItem(item));
+      } else {
+        const owned = colmillosOwnedItemIds.has(item.id);
+        const equipField = COLM_EQUIP_FIELD[cat];
+        const isEquipped = owned && colmillosEquippedState[equipField] === item.id;
+        if(isEquipped){
+          btn.textContent = '✓ Equipado';
+          btn.classList.add('equipped');
+          btn.disabled = true;
+        } else if(owned){
+          btn.textContent = 'Equipar';
+          btn.classList.add('owned');
+          btn.addEventListener('click', () => equipColmillosItem(cat, item.id));
+        } else {
+          btn.textContent = item.price + ' 🦷 comprar';
+          btn.disabled = balance < item.price;
+          btn.addEventListener('click', () => buyColmillosItem(item));
+        }
+      }
+      grid.appendChild(card);
+    });
+  });
+}
+async function buyColmillosItem(item){
+  if(!currentUser) return;
+  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
+  if(balance < item.price){ loadColmillosShop(); return; }
+  const isRaffle = item.category === 'raffle';
+  const eventType = isRaffle ? 'purchase_raffle_ticket' : ('purchase_' + item.id);
+  const periodKey = isRaffle ? (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random())) : 'once';
+  const { error } = await sbClient.from('user_colmillos_events').insert({
+    user_id: currentUser.id, event_type: eventType, period_key: periodKey, amount: -item.price,
+  });
+  if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
+  await loadColmillosShop();
+  loadColmillosBalance(true);
+}
+async function equipColmillosItem(cat, itemId){
+  if(!currentUser) return;
+  const equipField = COLM_EQUIP_FIELD[cat];
+  const payload = {
+    user_id: currentUser.id,
+    skin_id: colmillosEquippedState.skin_id,
+    accessory_id: colmillosEquippedState.accessory_id,
+    background_id: colmillosEquippedState.background_id,
+    updated_at: new Date().toISOString(),
+  };
+  payload[equipField] = itemId;
+  const { error } = await sbClient.from('user_colmillos_equipped').upsert(payload, { onConflict: 'user_id' });
+  if(error){ console.warn('no se pudo equipar', error); return; }
+  await loadColmillosShop();
+}
+
+/* ---- minijuego: version propia del "dinosaurio" de Chrome, con el tiburon saltando rocas -
+   dibujado 100% en canvas con vectores (el mismo SHARK_BODY_PATH de arriba como Path2D), sin
+   sprites ni imagenes externas. +3 Colmillos una vez al dia si se llega a 150 puntos. ---- */
+const colmGame = { canvas: null, ctx: null, sharkPath: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0 };
+function initColmGameOnce(){
+  if(colmGame.canvas) return;
+  colmGame.canvas = document.getElementById('colmillosGameCanvas');
+  colmGame.ctx = colmGame.canvas.getContext('2d');
+  colmGame.sharkPath = new Path2D(SHARK_BODY_PATH);
+  const jump = () => {
+    if(colmGame.state === 'idle' || colmGame.state === 'over'){ startColmGame(); return; }
+    if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = -8.6; }
+  };
+  colmGame.canvas.addEventListener('click', jump);
+  window.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' && colmGame.canvas.offsetParent !== null){ e.preventDefault(); jump(); }
+  });
+}
+function startColmGame(){
+  colmGame.state = 'playing';
+  colmGame.sharkY = colmGame.groundY;
+  colmGame.sharkVY = 0;
+  colmGame.jumping = false;
+  colmGame.obstacles = [];
+  colmGame.speed = 4.2;
+  colmGame.score = 0;
+  colmGame.frame = 0;
+  colmGame.lastSpawn = 0;
+  document.getElementById('colmillosGameHint').textContent = 'Saltá tocando el juego o con ESPACIO';
+  cancelAnimationFrame(colmGame.raf);
+  colmGameLoop();
+}
+function colmGameLoop(){
+  colmGame.frame++;
+  colmGame.sharkVY += 0.55;
+  colmGame.sharkY += colmGame.sharkVY;
+  if(colmGame.sharkY >= colmGame.groundY){ colmGame.sharkY = colmGame.groundY; colmGame.sharkVY = 0; colmGame.jumping = false; }
+  if(colmGame.frame - colmGame.lastSpawn > Math.max(45, 90 - colmGame.score / 8)){
+    colmGame.lastSpawn = colmGame.frame;
+    colmGame.obstacles.push({ x: colmGame.canvas.width, w: 14 + Math.random() * 10, h: 20 + Math.random() * 18 });
+  }
+  colmGame.obstacles.forEach(o => { o.x -= colmGame.speed; });
+  colmGame.obstacles = colmGame.obstacles.filter(o => o.x + o.w > 0);
+  colmGame.speed += 0.0025;
+  colmGame.score++;
+  document.getElementById('colmillosGameScore').textContent = colmGame.score;
+  const sharkBox = { x: 36, y: colmGame.sharkY - 24, w: 60, h: 28 };
+  const hit = colmGame.obstacles.some(o => {
+    const oBox = { x: o.x, y: colmGame.canvas.height - 14 - o.h, w: o.w, h: o.h };
+    return sharkBox.x < oBox.x + oBox.w && sharkBox.x + sharkBox.w > oBox.x && sharkBox.y < oBox.y + oBox.h && sharkBox.y + sharkBox.h > oBox.y;
+  });
+  if(hit){ endColmGame(); return; }
+  drawColmGame();
+  colmGame.raf = requestAnimationFrame(colmGameLoop);
+}
+function drawColmGame(){
+  const { ctx, canvas } = colmGame;
+  const bgColors = { bg_reef: ['#0d2b28', '#124a3f'], bg_abyss: ['#070512', '#1a0f2e'], bg_surface: ['#1a2f4a', '#2f5d85'] };
+  const [c1, c2] = bgColors[colmillosEquippedState.background_id] || ['#0b0d18', '#121533'];
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = 'rgba(240,178,61,.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height - 14);
+  ctx.lineTo(canvas.width, canvas.height - 14);
+  ctx.stroke();
+  ctx.fillStyle = '#d14b5a';
+  colmGame.obstacles.forEach(o => { ctx.fillRect(o.x, canvas.height - 14 - o.h, o.w, o.h); });
+  ctx.save();
+  ctx.translate(16, colmGame.sharkY - 38);
+  ctx.scale(0.42, 0.42);
+  ctx.fillStyle = SHARK_SKIN_COLORS[colmillosEquippedState.skin_id] || SHARK_SKIN_COLORS.default;
+  ctx.fill(colmGame.sharkPath);
+  ctx.restore();
+  if(colmGame.state === 'idle'){
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('TOCÁ PARA EMPEZAR', canvas.width / 2, canvas.height / 2);
+  }
+}
+function endColmGame(){
+  colmGame.state = 'over';
+  cancelAnimationFrame(colmGame.raf);
+  const bestKey = 'colm_best_' + todayKeyUTC();
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(bestKey) || '0', 10) || 0; } catch(e){}
+  if(colmGame.score > best){
+    best = colmGame.score;
+    try { localStorage.setItem(bestKey, String(best)); } catch(e){}
+  }
+  document.getElementById('colmillosGameBest').textContent = best;
+  document.getElementById('colmillosGameHint').textContent = 'Te chocaste — puntaje ' + colmGame.score + '. Tocá para volver a intentar.';
+  drawColmGame();
+  const { ctx, canvas } = colmGame;
+  ctx.fillStyle = 'rgba(0,0,0,.45)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 15px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 6);
+  ctx.font = '11px monospace';
+  ctx.fillText('toca para reintentar', canvas.width / 2, canvas.height / 2 + 14);
+  if(colmGame.score >= 150 && typeof awardColmillos === 'function'){
+    awardColmillos('minigame_played', todayKeyUTC(), 3).then(() => refreshColmillosPageContent());
+  }
+}
+
+/* ---- pestañas internas de la pagina (Inicio/Trivia/Minijuego/Tienda) ---- */
+function switchColmillosTab(tab){
+  document.querySelectorAll('#colmillosTabs .colm-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.colm-tabpanel').forEach(p => { p.style.display = (p.dataset.tabpanel === tab) ? 'block' : 'none'; });
+  if(tab === 'trivia') loadDailyTrivia();
+  if(tab === 'tienda') loadColmillosShop();
+  if(tab === 'juego'){
+    initColmGameOnce();
+    let best = 0;
+    try { best = parseInt(localStorage.getItem('colm_best_' + todayKeyUTC()) || '0', 10) || 0; } catch(e){}
+    document.getElementById('colmillosGameBest').textContent = best;
+    if(colmGame.state !== 'playing') drawColmGame();
+  } else if(colmGame.state === 'playing'){
+    cancelAnimationFrame(colmGame.raf);
+    colmGame.state = 'idle';
+  }
+}
+document.getElementById('colmillosTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.colm-tab');
+  if(btn) switchColmillosTab(btn.dataset.tab);
+});
+document.querySelectorAll('[data-goto-tab]').forEach(el => {
+  el.addEventListener('click', () => switchColmillosTab(el.dataset.gotoTab));
+});
 
 /* ---- pagina propia (no modal flotante) con su ruta /colmillos, igual que un indicador -
    mismo patron de mostrar/ocultar que showCategoryOverview()/showCategoryDetail() pero
-   aislado del sistema de categorias para no interferir con su propio manejo de historial ---- */
+   aislado del sistema de categorias para no interferir con su propio manejo de historial.
+   Siempre arranca en la pantalla de "JUGAR" - como un cabinet de arcade de verdad, no se
+   salta directo al contenido ---- */
 function showColmillosPage(){
   closeAnyOpenToolInline();
   categoryOverviewGrid.style.display = 'none';
@@ -25724,6 +26250,15 @@ function showColmillosPage(){
   setPageTitle('Colmillos');
   pushRoute({ skillcashDepth: 'colmillos' }, '/colmillos');
   colmillosContent.style.display = 'none';
+  colmillosLoading.style.display = 'none';
+  colmillosLoading.classList.remove('run');
+  document.getElementById('colmillosStart').style.display = 'flex';
+  switchColmillosTab('inicio');
+  loadGlobalTaps();
+  colmillosPageView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function startColmillosLoadSequence(){
+  document.getElementById('colmillosStart').style.display = 'none';
   colmillosLoading.style.display = 'flex';
   colmillosLoading.classList.remove('run');
   void colmillosLoading.offsetWidth;
@@ -25733,11 +26268,12 @@ function showColmillosPage(){
     colmillosLoading.style.display = 'none';
     colmillosContent.style.display = 'block';
     refreshColmillosPageContent();
+    loadColmillosShop();
   }, 1150);
-  colmillosPageView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function hideColmillosPage(){
   const wasInColmillos = colmillosPageView.style.display === 'block';
+  if(colmGame.state === 'playing'){ cancelAnimationFrame(colmGame.raf); colmGame.state = 'idle'; }
   colmillosPageView.style.display = 'none';
   categoryOverviewGrid.style.display = 'grid';
   document.getElementById('marketDashboardBlock').style.display = 'block';
@@ -25757,6 +26293,7 @@ function hideColmillosPage(){
 }
 colmillosBackBtn.addEventListener('click', hideColmillosPage);
 colmillosWalletBtn.addEventListener('click', showColmillosPage);
+document.getElementById('colmillosPlayBtn').addEventListener('click', startColmillosLoadSequence);
 colmillosBigCoin.addEventListener('click', (e) => {
   const coin = e.currentTarget;
   coin.classList.remove('spin');
@@ -25769,6 +26306,7 @@ colmillosBigCoin.addEventListener('click', (e) => {
   spark.style.top = '28%';
   coin.closest('.colm-hero').appendChild(spark);
   setTimeout(() => spark.remove(), 900);
+  bumpGlobalTaps();
 });
 </script>
 <script>
