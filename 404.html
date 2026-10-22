@@ -448,8 +448,14 @@ button{font-family:inherit;color:inherit}
 .colm-global-taps b{color:var(--gold);font-variant-numeric:tabular-nums}
 
 /* boton JUGAR - pantalla previa antes de cargar nada */
-.colm-start{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:360px;text-align:center;padding:20px}
-.colm-start-shark{font-size:58px;animation:colmSharkSwim 1.6s ease-in-out infinite}
+.colm-start{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:380px;text-align:center;padding:38px 24px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 14%,rgba(240,178,61,.22),transparent 55%),radial-gradient(circle at 12% 88%,rgba(94,170,255,.12),transparent 50%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 40px rgba(240,178,61,.12) inset}
+.colm-start::before,.colm-start::after{content:'✦';position:absolute;font-size:14px;color:rgba(240,178,61,.45);animation:colmBlink 2.4s steps(2) infinite}
+.colm-start::before{top:16px;left:20px}
+.colm-start::after{top:30px;right:24px;animation-delay:.7s}
+.colm-start-badge{font-family:'Press Start 2P',cursive;font-size:8px;letter-spacing:.12em;color:#1a1306;background:var(--gold);border-radius:20px;padding:6px 12px;box-shadow:0 3px 0 #8a6610}
+.colm-start-shark-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:120px;height:120px}
+.colm-start-shark-wrap::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(240,178,61,.32),transparent 70%)}
+.colm-start-shark{position:relative;font-size:58px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
 .colm-start-title{font-family:'Bungee',cursive;font-size:30px;color:var(--gold);text-shadow:0 0 20px rgba(240,178,61,.5),0 2px 0 #7a5a12;letter-spacing:.02em}
 .colm-start-sub{margin:0;font-size:12px;color:var(--muted2);max-width:260px}
 .colm-play-btn{margin-top:8px;font-family:'Bungee',cursive;font-size:16px;color:#1a1306;background:linear-gradient(180deg,#ffe082,var(--gold));border:none;border-radius:10px;padding:14px 34px;cursor:pointer;box-shadow:0 0 0 2px rgba(240,178,61,.35),0 8px 0 #8a6610,0 14px 20px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;animation:colmPlayPulse 1.6s ease-in-out infinite}
@@ -6226,7 +6232,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <div class="colm-arcade">
         <div class="colm-start" id="colmillosStart">
-          <div class="colm-start-shark">🦈</div>
+          <div class="colm-start-badge">🎮 ARCADE</div>
+          <div class="colm-start-shark-wrap">
+            <div class="colm-start-shark">🦈</div>
+          </div>
           <div class="colm-start-title">COLMILLOS</div>
           <p class="colm-start-sub">Gana, juega una trivia, saltá obstáculos y personalizá tu tiburón.</p>
           <button type="button" class="colm-play-btn" id="colmillosPlayBtn">▶ JUGAR</button>
