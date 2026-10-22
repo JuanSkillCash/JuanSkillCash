@@ -454,7 +454,7 @@ button{font-family:inherit;color:inherit}
 .colm-balance-caption{font-family:'Press Start 2P',cursive;font-size:9px;letter-spacing:.14em;color:var(--muted2);margin-top:6px}
 .colm-tap-hint{font-family:'Press Start 2P',cursive;margin:8px 0 0;font-size:9px;color:var(--muted);animation:colmBlink 1.4s steps(2) infinite;text-align:center}
 .colm-global-taps{font-size:8px;white-space:nowrap}
-/* pestaña propia de Charcoins - una sola cosa grande (el diente para tocar + el saldo +
+/* pestaña propia de Sharkoins - una sola cosa grande (el diente para tocar + el saldo +
    datos del jugador), no una pildora chiquita metida en otro lado */
 .colm-wallet-page{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px}
 .colm-coin-big svg,.colm-coin-big img{width:clamp(90px,26vw,150px);height:auto}
@@ -2748,7 +2748,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <span class="pill-dot" id="telegramPillDot"></span>
       </button>
 
-      <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Charcoins — se ganan usando la plataforma" style="display:none">
+      <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Sharkoins — se ganan usando la plataforma" style="display:none">
         <img src="assets/mascot/coin_tooth.png" alt="" width="22" height="22" style="image-rendering:pixelated;image-rendering:crisp-edges;margin:-2px 0">
         <span id="colmillosWalletBalance">0</span>
       </button>
@@ -6431,7 +6431,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
               <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
             </div>
-            <p class="colm-game-hint" id="colmRouletteResult">Apostá Charcoins y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Charcoins por tirada.</p>
+            <p class="colm-game-hint" id="colmRouletteResult">Apostá Sharkoins y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Sharkoins por tirada.</p>
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="megadientes" style="display:none">
@@ -6441,7 +6441,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
-              <div class="colm-balance-caption colm-balance-caption-big">CHARCOINS</div>
+              <div class="colm-balance-caption colm-balance-caption-big">SHARKOINS</div>
               <div class="colm-wallet-stats-row">
                 <div class="colm-wallet-stat">
                   <div class="colm-wallet-stat-num"><b id="colmillosGlobalTaps">0</b></div>
@@ -26377,7 +26377,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
   const resultEl = document.getElementById('colmillosTriviaResult');
   if(chosenIndex === correctIndex){
     buttons.forEach((b, i) => { b.classList.add('disabled'); if(i === correctIndex) b.classList.add('correct'); });
-    resultEl.textContent = '✓ ¡Correcto! +8 Charcoins';
+    resultEl.textContent = '✓ ¡Correcto! +8 Sharkoins';
     resultEl.classList.add('done');
     await awardColmillos('trivia_correct', todayKeyUTC(), 8);
     refreshColmillosPageContent();
@@ -26741,7 +26741,7 @@ async function spinColmRoulette(){
   betInput.value = bet;
   const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
-  if(balance < bet){ resultEl.textContent = 'No tenés suficientes Charcoins para esa apuesta.'; return; }
+  if(balance < bet){ resultEl.textContent = 'No tenés suficientes Sharkoins para esa apuesta.'; return; }
   colmRouletteSpinning = true;
   const spinBtn = document.getElementById('colmRouletteSpinBtn');
   spinBtn.disabled = true;
@@ -26765,8 +26765,8 @@ async function spinColmRoulette(){
       });
     }
     resultEl.textContent = segment.mult === 0
-      ? ('😬 Salió 0x — perdiste ' + bet + ' Charcoins. ¡Otra vez!')
-      : ('🎉 ¡Salió ' + segment.label + '! Ganaste ' + net + ' Charcoins.');
+      ? ('😬 Salió 0x — perdiste ' + bet + ' Sharkoins. ¡Otra vez!')
+      : ('🎉 ¡Salió ' + segment.label + '! Ganaste ' + net + ' Sharkoins.');
     loadColmillosBalance(true);
     refreshColmillosPageContent();
     colmRouletteSpinning = false;
@@ -26786,7 +26786,7 @@ function switchColmillosTab(tab){
   const heroOverlay = document.getElementById('colmillosHeroOverlay');
   const tiendaPanel = document.querySelector('.colm-tabpanel[data-tabpanel="tienda"]');
   const tiendaSlot = document.getElementById('colmillosTiendaSlot');
-  // la pestaña de Charcoins es una pantalla propia, sola - ni el escenario del tiburon ni
+  // la pestaña de Sharkoins es una pantalla propia, sola - ni el escenario del tiburon ni
   // el HUD tienen nada que hacer ahi, por eso se oculta el recuadro grande completo
   const heroCol = document.querySelector('.colm-left');
   if(heroCol) heroCol.style.display = (tab === 'megadientes') ? 'none' : '';
@@ -26940,7 +26940,7 @@ colmillosBigCoin.addEventListener('click', (e) => {
   const sparkHost = coin.closest('.colm-wallet-page') || coin.closest('.colm-hero') || coin.parentElement;
   if(sparkHost) sparkHost.appendChild(spark);
   setTimeout(() => spark.remove(), 900);
-  // la moneda tiene dos caras (el diente y el logo CC de Charcoins) - al girar cae en una
+  // la moneda tiene dos caras (el diente y el logo CC de Sharkoins) - al girar cae en una
   // al azar, como una moneda real. El cambio de imagen pasa a la mitad del giro (de canto,
   // invisible) para que se sienta como que en verdad cambio de cara
   const coinImg = coin.querySelector('img');
