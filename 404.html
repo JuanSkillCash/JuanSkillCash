@@ -446,7 +446,7 @@ button{font-family:inherit;color:inherit}
 .colm-hero-char > div{width:100% !important;height:auto !important}
 .colm-hero-char img{filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
 .colm-coin{cursor:pointer;filter:drop-shadow(0 6px 14px rgba(240,178,61,.35));transition:transform .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
-.colm-coin svg{width:clamp(38px,9vw,60px);height:auto;display:block}
+.colm-coin svg,.colm-coin img{width:clamp(38px,9vw,60px);height:auto;display:block}
 .colm-coin:active{transform:scale(.92)}
 .colm-coin.spin{animation:colmCoinSpin .7s cubic-bezier(.3,.1,.3,1)}
 @keyframes colmCoinSpin{0%{transform:rotateY(0) scale(1)}40%{transform:rotateY(540deg) scale(1.15)}100%{transform:rotateY(720deg) scale(1)}}
@@ -456,8 +456,8 @@ button{font-family:inherit;color:inherit}
 .colm-global-taps{font-size:8px;white-space:nowrap}
 /* pestaña propia de Sharkoins - una sola cosa grande (el diente para tocar + el saldo +
    datos del jugador), no una pildora chiquita metida en otro lado */
-.colm-wallet-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px}
-.colm-coin-big svg{width:clamp(90px,26vw,150px);height:auto}
+.colm-wallet-page{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px}
+.colm-coin-big svg,.colm-coin-big img{width:clamp(90px,26vw,150px);height:auto}
 .colm-tap-hint-big{font-size:13px;margin-top:14px}
 .colm-balance-display-big{font-size:clamp(40px,12vw,64px);margin-top:18px}
 .colm-balance-caption-big{font-size:13px;margin-top:10px}
@@ -567,6 +567,12 @@ button{font-family:inherit;color:inherit}
   .colm-hero-timer-label{font-size:5px}
   .colm-hero-timer-digits{font-size:11px}
   .colm-hero-timer-box{padding:2px 6px}
+  /* en celular el recuadro (y por lo tanto tambien la tienda, que reusa esta misma caja
+     como overlay) se sentia chiquito con mucho espacio desperdiciado alrededor - se deja
+     crecer bastante mas alto para aprovechar casi toda la pantalla */
+  .colm-arcade{padding-left:0;padding-right:0}
+  .colm-hero{min-height:min(720px,78vh);border-radius:12px}
+  .colm-hero-char{width:min(92%,560px)}
 }
 @media(min-width:860px){
   /* en pantallas anchas la pantalla grande del tiburon (estilo "game screen") sigue arriba
@@ -2743,9 +2749,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
 
       <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Sharkoins — se ganan usando la plataforma" style="display:none">
-        <svg width="12" height="15" viewBox="0 0 120 150">
-          <path d="M20,45 C20,25 30,12 38,18 C45,22 50,30 60,30 C70,30 75,22 82,18 C90,12 100,25 100,45 L98,57 L88,69 L88,81 L78,93 L77.5,105 L68,117 L67,129 L60,145 L53,129 L52,117 L42.5,105 L42,93 L32,81 L32,69 L22,57 Z" fill="var(--gold)"/>
-        </svg>
+        <img src="assets/mascot/coin_tooth.png" alt="" width="15" height="15" style="image-rendering:pixelated;image-rendering:crisp-edges">
         <span id="colmillosWalletBalance">0</span>
       </button>
 
@@ -6266,7 +6270,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="colm-tabs" id="colmillosTabs" style="display:none">
           <button type="button" class="colm-tab active" data-tab="inicio">🏠 Inicio</button>
           <button type="button" class="colm-tab" data-tab="tienda">🛒 Tienda</button>
-          <button type="button" class="colm-tab" data-tab="megadientes">🦷 Sharkoins</button>
+          <button type="button" class="colm-tab" data-tab="megadientes">💰 Saldo</button>
           <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuego</button>
           <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
           <button type="button" class="colm-tab" data-tab="ruleta">🎰 Ruleta</button>
@@ -6300,13 +6304,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <div class="colm-fighter-name" id="colmillosPlayerName">JUGADOR</div>
                     </div>
                     <div class="colm-fighter-bar life"><div class="colm-fighter-bar-fill" id="colmillosLifeFill"></div></div>
-                  </div>
-                  <div class="colm-fighter-row">
-                    <div class="colm-fighter-idblock">
-                      <div class="colm-fighter-portrait coin">🦷</div>
-                      <div class="colm-fighter-name gold" id="colmillosCurrencyLabel">SHARKOINS</div>
-                    </div>
-                    <div class="colm-fighter-bar currency"><div class="colm-fighter-bar-fill" id="colmillosCurrencyFill"></div><span class="colm-fighter-bar-num" id="colmillosFighterBalance">0</span></div>
                   </div>
                 </div>
                 <div class="colm-hero-timer-box" title="Tiempo en línea">
@@ -6440,19 +6437,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="colm-tabpanel" data-tabpanel="megadientes" style="display:none">
             <div class="colm-wallet-page">
               <div class="colm-coin colm-coin-big" id="colmillosBigCoin">
-                <svg width="150" height="188" viewBox="0 0 120 150">
-                  <defs>
-                    <linearGradient id="toothGradBig" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#fffdf6"/>
-                      <stop offset="70%" stop-color="#f3e9cf"/>
-                      <stop offset="100%" stop-color="#e3d2a8"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M20,45 C20,25 30,12 38,18 C45,22 50,30 60,30 C70,30 75,22 82,18 C90,12 100,25 100,45 L98,57 L88,69 L88,81 L78,93 L77.5,105 L68,117 L67,129 L60,145 L53,129 L52,117 L42.5,105 L42,93 L32,81 L32,69 L22,57 Z"
-                    fill="url(#toothGradBig)" stroke="#9c8a63" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M22,48 C35,54 85,54 98,48" fill="none" stroke="#c9b683" stroke-width="1.3" opacity=".6"/>
-                  <circle cx="60" cy="37" r="1.6" fill="#a9916a" opacity=".7"/>
-                </svg>
+                <img src="assets/mascot/coin_tooth.png" alt="" style="width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
@@ -26952,7 +26937,8 @@ colmillosBigCoin.addEventListener('click', (e) => {
   spark.textContent = ['✨', '🦈', '💰', '⚡'][Math.floor(Math.random() * 4)];
   spark.style.left = (38 + Math.random() * 24) + '%';
   spark.style.top = '28%';
-  coin.closest('.colm-hero').appendChild(spark);
+  const sparkHost = coin.closest('.colm-wallet-page') || coin.closest('.colm-hero') || coin.parentElement;
+  if(sparkHost) sparkHost.appendChild(spark);
   setTimeout(() => spark.remove(), 900);
   bumpGlobalTaps();
 });
