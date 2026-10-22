@@ -25873,9 +25873,9 @@ const colmillosBigCoin = document.getElementById('colmillosBigCoin');
 
 /* ---- personaje: sprite real en pixel art (generado con PixelLab, ver assets/mascot/) -
    el mismo PNG se usa como <img> en las vistas previas (Inicio/Tienda) y se dibuja con
-   drawImage dentro del canvas del minijuego. Los accesorios (gorra/gafas/cadena) todavia
-   no tienen arte propio, asi que se superponen como formas simples por encima del sprite -
-   se reemplazan por capas PNG reales cuando existan, sin tocar el resto del codigo ---- */
+   drawImage dentro del canvas del minijuego. Los accesorios (gorra/gafas/cadena) son PNGs
+   pixel art dibujados a mano (assets/mascot/accessories/, mismo canvas 96x96 que el
+   tiburon) superpuestos encima del sprite ---- */
 const SHARK_IMG_PATHS = {
   default: 'assets/mascot/source/base_original.png',
   skin_gold: 'assets/mascot/variants/shark_skin_gold.png',
@@ -25899,17 +25899,15 @@ function getSharkImg(skinId){
   }
   return sharkImgCache[key];
 }
+const ACC_IMG_PATHS = {
+  acc_cap: 'assets/mascot/accessories/acc_cap.png',
+  acc_shades: 'assets/mascot/accessories/acc_shades.png',
+  acc_chain: 'assets/mascot/accessories/acc_chain.png',
+};
 function sharkAccessoryOverlayHtml(accessoryId){
-  if(accessoryId === 'acc_cap'){
-    return '<div style="position:absolute;left:26%;top:0%;width:48%;height:22%;background:#c23b4a;border:2px solid #7a1f28;border-radius:50% 50% 15% 15%"></div>';
-  }
-  if(accessoryId === 'acc_shades'){
-    return '<div style="position:absolute;left:22%;top:34%;width:56%;height:11%;background:#111;opacity:.85;border-radius:25%"></div>';
-  }
-  if(accessoryId === 'acc_chain'){
-    return '<div style="position:absolute;left:28%;top:62%;width:44%;height:7%;border:3px solid #f0b23d;border-top:none;border-radius:0 0 50% 50%"></div>';
-  }
-  return '';
+  const src = accessoryId && ACC_IMG_PATHS[accessoryId];
+  if(!src) return '';
+  return '<img src="' + src + '" alt="" style="position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">';
 }
 function sharkImgMarkup(skinId, accessoryId, width){
   const src = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
