@@ -285,6 +285,47 @@ function renderSharkPreviews(){
   renderColmillosShopPreview();
   renderColmPowerSheet();
   renderAccountMiniAvatar();
+  renderColmHeroCard();
+}
+/* tarjeta de Heroe en Inicio (.colm-hero-card) - muñeco parado sobre un pedestal + nombre,
+   nivel, estrellas y las 6 habilidades en barras de progreso (llenas segun la rareza de lo
+   que tenes equipado en cada parte) - pedido explicito de Juan, calcada de una carta de
+   personaje de RPG, NO es el HUD chiquito del escenario arcade (eso sigue aparte) */
+function renderColmHeroCard(){
+  const nameEl = document.getElementById('colmillosHCName');
+  if(!nameEl) return;
+  if(currentUser){
+    const meta = currentUser.user_metadata || {};
+    nameEl.textContent = (meta.username || currentUser.email || 'JUGADOR').toUpperCase();
+  } else {
+    nameEl.textContent = 'INVITADO';
+  }
+  const info = computeColmLevelInfo();
+  const powerEl = document.getElementById('colmillosHCPower');
+  if(powerEl) powerEl.textContent = info.points;
+  const starsEl = document.getElementById('colmillosHCStars');
+  if(starsEl){
+    const filled = Math.ceil(info.level / 20);
+    starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
+      '<span class="' + (i < filled ? 'filled' : '') + '">★</span>'
+    ).join('');
+  }
+  const statsEl = document.getElementById('colmillosHCStats');
+  if(statsEl){
+    statsEl.innerHTML = Object.keys(COLM_POWER_BY_SLOT).map(field => {
+      const power = COLM_POWER_BY_SLOT[field];
+      const itemId = colmillosEquippedState[field];
+      const tier = itemId ? (colmillosItemRarity.get(itemId) || 1) : 0;
+      const tierInfo = tier ? COLM_RARITY_TIERS[tier] : null;
+      const pct = tier ? (tier / 5 * 100) : 0;
+      const fillColor = tierInfo ? tierInfo.color : 'rgba(255,255,255,.12)';
+      return '<div class="colm-hero-info-stat-row">' +
+        '<span class="colm-hero-info-stat-icon">' + power.icon + '</span>' +
+        '<span class="colm-hero-info-stat-label">' + power.label + '</span>' +
+        '<span class="colm-hero-info-stat-track"><span class="colm-hero-info-stat-fill" style="width:' + pct + '%;background:' + fillColor + '"></span></span>' +
+        '</div>';
+    }).join('');
+  }
 }
 function renderColmillosShopPreview(){
   const bigEl = document.getElementById('colmillosCharPreviewBig');
@@ -565,6 +606,7 @@ async function loadColmillosShop(){
   // mismo calculo de arriba (ownedItemIds/rarity derivados 100% de su propio ledger), solo que
   // con un saldo bien grande de Sharkoins de prueba (ver scripts/sql/colm_owner_test_reset.sql)
   renderColmLevelHud();
+  renderColmHeroCard();
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
   const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
@@ -1286,6 +1328,10 @@ document.getElementById('colmillosHelpSubtabs').addEventListener('click', (e) =>
   if(btn) switchColmHelpTopic(btn.dataset.helptopic);
 });
 document.getElementById('colmRarityInfoBtn').addEventListener('click', () => {
+  switchColmillosTab('ayuda');
+  switchColmHelpTopic('rareza');
+});
+document.getElementById('colmHeroCardInfoBtn').addEventListener('click', () => {
   switchColmillosTab('ayuda');
   switchColmHelpTopic('rareza');
 });

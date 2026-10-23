@@ -454,7 +454,7 @@ button{font-family:inherit;color:inherit}
 /* "portal" debajo del tiburon - un resplandor ovalado que pulsa suavemente, como si estuviera
    parado sobre un pedestal luminoso (pedido explicito de Juan, inspirado en cartas de heroes
    de otros juegos) - puro CSS, sin imagen nueva */
-.colm-hero-pedestal{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:min(72%,460px);aspect-ratio:3/1;border-radius:50%;background:radial-gradient(ellipse at center,rgba(240,178,61,.5),rgba(240,178,61,.16) 45%,transparent 72%);z-index:0;pointer-events:none;animation:colmPedestalPulse 3.2s ease-in-out infinite}
+.colm-hero-pedestal{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:min(72%,460px);aspect-ratio:3/1;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,200,90,.75),rgba(240,178,61,.3) 45%,transparent 72%);z-index:1;pointer-events:none;animation:colmPedestalPulse 3.2s ease-in-out infinite}
 @keyframes colmPedestalPulse{0%,100%{opacity:.7;transform:translateX(-50%) scale(.96)}50%{opacity:1;transform:translateX(-50%) scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.colm-hero-pedestal{animation:none}}
 /* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
@@ -596,6 +596,33 @@ button{font-family:inherit;color:inherit}
 .colm-power-label{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.03em}
 .colm-power-value{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
 .colm-power-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ---- ficha de Heroe, INTEGRADA en el escenario grande del tiburon (.colm-hero, el mismo
+   que ya muestra el fondo que la persona eligio) - pedido explicito de Juan: que se vea a
+   todo lo ancho de la pantalla, no en una tarjetica aparte y chiquita. Panel semitransparente
+   para que el nombre/stats se lean bien encima de CUALQUIER fondo que la persona haya
+   comprado (oscuro, claro, con texturas, etc.) ---- */
+.colm-hero-info{position:relative;z-index:2;margin-top:8px;padding:12px 16px 16px;border-radius:14px;background:rgba(6,7,14,.78);border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.colm-hero-info-power-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.colm-hero-info-power{font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;text-shadow:0 1px 0 #000;white-space:nowrap}
+.colm-hero-info-power b{color:var(--gold)}
+.colm-hero-info-stars{flex:1;font-size:15px;letter-spacing:2px;color:rgba(255,255,255,.18)}
+.colm-hero-info-stars .filled{color:var(--gold);text-shadow:0 0 5px rgba(240,178,61,.7)}
+.colm-hero-info-btn{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#ffe17a;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.colm-hero-info-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white);letter-spacing:.02em}
+.colm-hero-info-subtitle{margin-top:1px;font-family:'Space Mono',monospace;font-size:10.5px;font-style:italic;color:var(--gold)}
+.colm-hero-info-desc{margin:6px 0 12px;font-size:11.5px;color:var(--muted);line-height:1.5}
+.colm-hero-info-stats{display:flex;flex-direction:column;gap:7px}
+.colm-hero-info-stat-row{display:flex;align-items:center;gap:8px}
+.colm-hero-info-stat-icon{flex-shrink:0;font-size:12px;width:15px;text-align:center}
+.colm-hero-info-stat-label{flex:0 0 76px;font-size:9.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.03em}
+.colm-hero-info-stat-track{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.colm-hero-info-stat-fill{height:100%;border-radius:4px;transition:width .4s ease-out}
+@media(max-width:600px){
+  .colm-hero-info-name{font-size:14px}
+  .colm-hero-info-stat-label{flex-basis:64px;font-size:8.5px}
+}
+@media(max-width:480px){.colm-hero-card{max-width:100%}}
 .colm-rarity-info-btn{display:block;margin:0 auto 12px;background:none;border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted2);cursor:pointer}
 .colm-rarity-info-btn:hover{color:var(--white);border-color:var(--gold)}
 /* "story card": tarjeta ancha tipo pagina de cuento ilustrado (imagen + texto), para las
@@ -696,12 +723,10 @@ button{font-family:inherit;color:inherit}
   .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
   .colm-shop-grid{grid-template-columns:repeat(4,1fr)}
   .colm-shop-bg-grid{display:grid;grid-template-columns:repeat(2,1fr)}
-  /* en pantallas anchas el recuadro ya usa casi todo el ancho disponible - si se queda con
-     la misma altura fija de antes, el fondo (que es 320x200, bastante "cuadrado") se recorta
-     muchisimo y se pierde la mayor parte de la escena. Se deja crecer de alto tambien, en la
-     misma proporcion que el propio arte, para que se vea completo - no importa si empuja el
-     resto del contenido (pestañas, trivia, etc.) mas abajo y toca scrollear para verlo */
-  .colm-hero{min-height:0;aspect-ratio:2/1}
+  /* la ficha de heroe (.colm-hero-info, debajo del escenario) necesita alto libre segun su
+     contenido - se cambia el aspect-ratio fijo de antes por un min-height, para que la caja
+     crezca lo que haga falta en vez de recortar la ficha */
+  .colm-hero{min-height:min(620px,78vh)}
 }
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
@@ -6425,6 +6450,17 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-hero-pedestal" aria-hidden="true"></div>
               <div class="colm-hero-char" id="colmillosHeroShark"></div>
             </div>
+            <div class="colm-hero-info">
+              <div class="colm-hero-info-power-row">
+                <span class="colm-hero-info-power">PODER <b id="colmillosHCPower">0</b></span>
+                <span class="colm-hero-info-stars" id="colmillosHCStars"></span>
+                <button type="button" class="colm-hero-info-btn" id="colmHeroCardInfoBtn" title="¿Cómo funciona el nivel?">❓</button>
+              </div>
+              <div class="colm-hero-info-name" id="colmillosHCName">JUGADOR</div>
+              <div class="colm-hero-info-subtitle">El tiburón de SkillCash</div>
+              <p class="colm-hero-info-desc">Equipado con lo que ya desbloqueaste en la tienda.</p>
+              <div class="colm-hero-info-stats" id="colmillosHCStats"></div>
+            </div>
             <div class="colm-hero-overlay" id="colmillosHeroOverlay" style="display:none">
               <button type="button" class="colm-hero-overlay-close" data-goto-tab="inicio">✕ Cerrar</button>
             </div>
@@ -6433,18 +6469,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
          <div class="colm-right">
           <div class="colm-tabpanel" data-tabpanel="inicio">
-            <div class="colm-char-mini-row">
-              <div class="colm-char-preview" id="colmillosCharPreviewMini"></div>
-              <div class="colm-char-mini-text">
-                <h4>Tu tiburón</h4>
-                <p>Personalizalo con skins, accesorios y fondos en la tienda.</p>
-                <button type="button" class="colm-goto-shop-btn" data-goto-tab="tienda">Ir a la tienda 🛒</button>
-              </div>
-            </div>
-
-            <div class="colm-section-label">🧬 FICHA DEL HÉROE</div>
-            <div class="colm-power-sheet" id="colmillosPowerSheetHero"></div>
-
             <div class="colm-section-label">⚔️ CÓMO SE GANAN</div>
             <div class="colmillos-quest-list" id="colmillosQuestList">
               <div class="colmillos-quest" data-event="daily_visit">
@@ -26780,7 +26804,7 @@ async function awardColmillos(eventType, periodKey, amount){
      algunos navegadores/CDN siguen sirviendo la version vieja del archivo (mismo nombre de
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
-<script src="assets/js/colmillos.js?v=2" defer></script>
+<script src="assets/js/colmillos.js?v=3" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
