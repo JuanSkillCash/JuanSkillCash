@@ -108,7 +108,7 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
     d = ImageDraw.Draw(img)
 
     f_title = ImageFont.truetype(FONT_BOLD, 36 * SCALE)
-    _ctext(d, W / 2, 54 * SCALE, "ÍNDICE DE MIEDO Y CODICIA", f_title, ACCENT)
+    _ctext(d, W / 2, 54 * SCALE, "ÍNDICE DE MIEDO Y CODICIA", f_title, WHITE)
     f_sub = ImageFont.truetype(FONT_REG, 19 * SCALE)
     _ctext(d, W / 2, 90 * SCALE, "SkillCash Tools · Alertas cripto", f_sub, MUTED)
 
@@ -154,11 +154,11 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
         logo_top = 700 * SCALE
         img.alpha_composite(logo, (int(W / 2 - logo_w / 2), int(logo_top)))
         f_foot = ImageFont.truetype(FONT_BOLD, 18 * SCALE)
-        _ctext(d, W / 2, logo_top + logo_h + 26 * SCALE, "juanskillcash.com", f_foot, ACCENT)
+        _ctext(d, W / 2, logo_top + logo_h + 26 * SCALE, "juanskillcash.com", f_foot, WHITE)
     except (FileNotFoundError, OSError) as e:
         log.warning(f"no se pudo cargar el logo ({LOGO_PATH}): {e} - se deja solo el texto")
         f_foot = ImageFont.truetype(FONT_REG, 17 * SCALE)
-        _ctext(d, W / 2, 698 * SCALE, "juanskillcash.com", f_foot, ACCENT)
+        _ctext(d, W / 2, 698 * SCALE, "juanskillcash.com", f_foot, WHITE)
 
     img = img.resize((W // SCALE, H // SCALE), Image.LANCZOS)
     buf = io.BytesIO()

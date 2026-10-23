@@ -46,7 +46,6 @@ MESES = [
 SCALE = 3
 W, H = 1000 * SCALE, 860 * SCALE
 BG = (8, 12, 32, 255)
-ACCENT = (255, 47, 79, 255)  # rojo de marca de SkillCash (--red en index.html) - no dorado
 WHITE = (247, 246, 251, 255)
 MUTED = (132, 126, 147, 255)
 BTC_COLOR = (247, 147, 26, 255)
@@ -103,7 +102,7 @@ def make_dominance_image(btc_pct: float, usdt_pct: float, date_label: str, icons
     icons = icons or {}
 
     f_title = ImageFont.truetype(FONT_BOLD, 34 * SCALE)
-    _ctext(d, W / 2, 54 * SCALE, "DOMINANCIA DEL MERCADO CRIPTO", f_title, ACCENT)
+    _ctext(d, W / 2, 54 * SCALE, "DOMINANCIA DEL MERCADO CRIPTO", f_title, WHITE)
     f_sub = ImageFont.truetype(FONT_REG, 19 * SCALE)
     _ctext(d, W / 2, 90 * SCALE, "SkillCash Tools · Alertas cripto", f_sub, MUTED)
 
@@ -145,11 +144,11 @@ def make_dominance_image(btc_pct: float, usdt_pct: float, date_label: str, icons
         logo_top = y0 + card_h + 98 * SCALE
         img.alpha_composite(logo, (int(W / 2 - logo_w / 2), int(logo_top)))
         f_foot = ImageFont.truetype(FONT_BOLD, 18 * SCALE)
-        _ctext(d, W / 2, logo_top + logo_h + 26 * SCALE, "juanskillcash.com", f_foot, ACCENT)
+        _ctext(d, W / 2, logo_top + logo_h + 26 * SCALE, "juanskillcash.com", f_foot, WHITE)
     except (FileNotFoundError, OSError) as e:
         log.warning(f"no se pudo cargar el logo ({LOGO_PATH}): {e} - se deja solo el texto")
         f_foot = ImageFont.truetype(FONT_REG, 17 * SCALE)
-        _ctext(d, W / 2, y0 + card_h + 110 * SCALE, "juanskillcash.com", f_foot, ACCENT)
+        _ctext(d, W / 2, y0 + card_h + 110 * SCALE, "juanskillcash.com", f_foot, WHITE)
 
     img = img.resize((W // SCALE, H // SCALE), Image.LANCZOS)
     buf = io.BytesIO()
