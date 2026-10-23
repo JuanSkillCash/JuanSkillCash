@@ -520,7 +520,7 @@ button{font-family:inherit;color:inherit}
 
 /* minijuego */
 .colm-game-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.colm-game-wrap canvas{width:100%;max-width:560px;height:210px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#0b0d18;cursor:pointer;touch-action:manipulation}
+.colm-game-wrap canvas{width:100%;max-width:560px;height:210px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#080c20;cursor:pointer;touch-action:manipulation}
 .colm-game-hud{display:flex;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
 .colm-game-hud b{color:var(--gold)}
 .colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
@@ -542,10 +542,17 @@ button{font-family:inherit;color:inherit}
 .colm-shop-item-btn.equipped{background:#4ade80;color:#0b2715}
 .colm-shop-item-btn:disabled{opacity:.5;cursor:not-allowed}
 
-/* ruleta - solo diversion, sin relacion con dinero real (ver nota en el panel) */
+/* ruleta - solo diversion, sin relacion con dinero real (ver nota en el panel). Antes era
+   solo colores en un conic-gradient (no decia que era cada pedazo) - ahora es un SVG con el
+   numero/multiplicador escrito en cada gajo, un aro dorado tipo casino y un centro fijo
+   (el centro NO rota con la rueda, por eso es un elemento aparte encima, no parte del svg) */
 .colm-roulette-wrap{position:relative;display:flex;justify-content:center;padding:10px 0 20px}
-.colm-roulette-wheel{width:220px;height:220px;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #0b0d18,0 10px 30px rgba(0,0,0,.5);transition:transform 3.6s cubic-bezier(.12,.67,.08,1)}
+.colm-roulette-wheel{width:220px;height:220px;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #0b0d18,0 0 0 6px rgba(240,178,61,.25),0 10px 30px rgba(0,0,0,.5);transition:transform 3.6s cubic-bezier(.12,.67,.08,1);display:block}
 .colm-roulette-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:22px;color:var(--gold);z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.colm-roulette-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff27a,var(--gold) 60%,#8a6610);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 0 3px #0b0d18,0 4px 10px rgba(0,0,0,.5);z-index:2}
+.colm-roulette-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin:0 0 14px}
+.colm-roulette-legend-item{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);font-weight:700}
+.colm-roulette-legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
 .colm-roulette-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .colm-roulette-controls label{font-size:12px;font-weight:700;color:var(--muted2)}
 .colm-roulette-controls input{width:72px;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--white);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;text-align:center}
@@ -6411,8 +6418,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div class="colm-tabpanel" data-tabpanel="ruleta" style="display:none">
             <div class="colm-roulette-wrap">
               <div class="colm-roulette-pointer">▼</div>
-              <div class="colm-roulette-wheel" id="colmRouletteWheel"></div>
+              <svg class="colm-roulette-wheel" id="colmRouletteWheel" viewBox="0 0 220 220"></svg>
+              <div class="colm-roulette-hub">🦈</div>
             </div>
+            <div class="colm-roulette-legend" id="colmRouletteLegend"></div>
             <div class="colm-roulette-controls">
               <label for="colmRouletteBet">Apuesta</label>
               <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
@@ -26674,7 +26683,32 @@ async function equipColmillosItem(field, itemId){
 /* ---- minijuego: version propia del "dinosaurio" de Chrome, con el tiburon saltando rocas -
    el fondo/obstaculos siguen en vectores, pero el personaje ahora es el sprite real de
    assets/mascot/ dibujado con drawImage. +3 Colmillos una vez al dia si se llega a 150. ---- */
-const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0 };
+/* sonidos del minijuego sintetizados con el propio navegador (osciladores de Web Audio),
+   sin archivos de audio que descargar - igual que el "beep" del salto y el golpe del dino
+   de Chrome. El AudioContext solo se crea/retoma dentro de un gesto real del usuario (el
+   primer salto), que es justo cuando los navegadores lo permiten */
+let colmAudioCtx = null;
+function colmPlayTone(freq, duration, type, gainStart){
+  try {
+    if(!colmAudioCtx) colmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(colmAudioCtx.state === 'suspended') colmAudioCtx.resume();
+    const osc = colmAudioCtx.createOscillator();
+    const gain = colmAudioCtx.createGain();
+    osc.type = type || 'square';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(gainStart || 0.12, colmAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, colmAudioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(colmAudioCtx.destination);
+    osc.start();
+    osc.stop(colmAudioCtx.currentTime + duration);
+  } catch(e){ /* navegador sin Web Audio o bloqueado - el juego sigue andando sin sonido */ }
+}
+function colmPlayJumpSound(){ colmPlayTone(620, 0.09, 'square', 0.1); }
+function colmPlayMilestoneSound(){ colmPlayTone(880, 0.07, 'sine', 0.08); }
+function colmPlayGameOverSound(){ colmPlayTone(160, 0.35, 'sawtooth', 0.12); }
+
+const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0, lastMilestone: 0 };
 function initColmGameOnce(){
   if(colmGame.canvas) return;
   colmGame.canvas = document.getElementById('colmillosGameCanvas');
@@ -26682,7 +26716,7 @@ function initColmGameOnce(){
   colmGame.ctx.imageSmoothingEnabled = false;
   const jump = () => {
     if(colmGame.state === 'idle' || colmGame.state === 'over'){ startColmGame(); return; }
-    if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = -8.6; }
+    if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = -8.6; colmPlayJumpSound(); }
   };
   colmGame.canvas.addEventListener('click', jump);
   window.addEventListener('keydown', (e) => {
@@ -26699,6 +26733,7 @@ function startColmGame(){
   colmGame.score = 0;
   colmGame.frame = 0;
   colmGame.lastSpawn = 0;
+  colmGame.lastMilestone = 0;
   document.getElementById('colmillosGameHint').textContent = 'Saltá tocando el juego o con ESPACIO';
   cancelAnimationFrame(colmGame.raf);
   colmGameLoop();
@@ -26717,6 +26752,8 @@ function colmGameLoop(){
   colmGame.speed += 0.0025;
   colmGame.score++;
   document.getElementById('colmillosGameScore').textContent = colmGame.score;
+  const milestone = Math.floor(colmGame.score / 100);
+  if(milestone > colmGame.lastMilestone){ colmGame.lastMilestone = milestone; colmPlayMilestoneSound(); }
   const sharkBox = { x: 36, y: colmGame.sharkY - 24, w: 60, h: 28 };
   const hit = colmGame.obstacles.some(o => {
     const oBox = { x: o.x, y: colmGame.canvas.height - 14 - o.h, w: o.w, h: o.h };
@@ -26726,25 +26763,32 @@ function colmGameLoop(){
   drawColmGame();
   colmGame.raf = requestAnimationFrame(colmGameLoop);
 }
+/* estilo "dino de Chrome": mismo fondo plano del sitio (nada de imagen/degradado propio) y
+   obstaculos como siluetas blancas solidas, no cuadros de color - lo unico que cambia frente
+   al dino original es el muñeco, que sigue siendo el tiburon equipado de cada quien */
+function drawColmObstacle(ctx, o, canvas){
+  const baseY = canvas.height - 14;
+  const topY = baseY - o.h;
+  ctx.fillStyle = '#f4f4f4';
+  // "cactus" simple: un cuerpo central mas dos brazos cortos, todo en silueta solida
+  const bodyW = o.w * 0.44;
+  const bodyX = o.x + (o.w - bodyW) / 2;
+  ctx.fillRect(bodyX, topY, bodyW, o.h);
+  const armW = o.w * 0.3, armH = o.h * 0.4;
+  ctx.fillRect(o.x, topY + o.h * 0.18, armW, armH);
+  ctx.fillRect(o.x + o.w - armW, topY + o.h * 0.38, armW, armH);
+}
 function drawColmGame(){
   const { ctx, canvas } = colmGame;
-  const bgImg = getBgImg(colmillosEquippedState.background_id);
-  if(bgImg && bgImg.complete && bgImg.naturalWidth){
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-  } else {
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, '#0b0d18'); grad.addColorStop(1, '#121533');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-  ctx.strokeStyle = 'rgba(240,178,61,.5)';
+  ctx.fillStyle = '#080c20';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = 'rgba(255,255,255,.5)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, canvas.height - 14);
   ctx.lineTo(canvas.width, canvas.height - 14);
   ctx.stroke();
-  ctx.fillStyle = '#d14b5a';
-  colmGame.obstacles.forEach(o => { ctx.fillRect(o.x, canvas.height - 14 - o.h, o.w, o.h); });
+  colmGame.obstacles.forEach(o => drawColmObstacle(ctx, o, canvas));
   const sharkImg = getSharkImg(colmillosEquippedState.skin_id);
   const sharkSize = 46;
   if(sharkImg.complete && sharkImg.naturalWidth){
@@ -26760,6 +26804,7 @@ function drawColmGame(){
 function endColmGame(){
   colmGame.state = 'over';
   cancelAnimationFrame(colmGame.raf);
+  colmPlayGameOverSound();
   const bestKey = 'colm_best_' + todayKeyUTC();
   let best = 0;
   try { best = parseInt(localStorage.getItem(bestKey) || '0', 10) || 0; } catch(e){}
@@ -26801,13 +26846,46 @@ const ROULETTE_SEGMENTS = [
 ];
 let colmRouletteSpinning = false;
 let colmRouletteTotalRotation = 0;
+/* antes la rueda era solo un div con un conic-gradient de colores - no decia en ningun lado
+   que era cada pedazo. Ahora se dibuja como SVG con el multiplicador escrito en cada gajo
+   (texto blanco con borde oscuro, se lee igual de bien sobre cualquier color de fondo) y
+   abajo una leyenda aparte con que gana/pierde cada uno - mismos ROULETTE_SEGMENTS/logica de
+   siempre, esto solo cambia como se dibuja */
 function initColmRouletteWheel(){
   const wheelEl = document.getElementById('colmRouletteWheel');
   if(!wheelEl || wheelEl.dataset.ready) return;
+  const cx = 110, cy = 110, r = 107;
   const segDeg = 360 / ROULETTE_SEGMENTS.length;
-  const stops = ROULETTE_SEGMENTS.map((seg, i) => seg.color + ' ' + (i * segDeg) + 'deg ' + ((i + 1) * segDeg) + 'deg').join(',');
-  wheelEl.style.background = 'conic-gradient(' + stops + ')';
+  const wedges = ROULETTE_SEGMENTS.map((seg, i) => {
+    const start = i * segDeg, end = start + segDeg;
+    const startRad = (start - 90) * Math.PI / 180, endRad = (end - 90) * Math.PI / 180;
+    const x1 = cx + r * Math.cos(startRad), y1 = cy + r * Math.sin(startRad);
+    const x2 = cx + r * Math.cos(endRad), y2 = cy + r * Math.sin(endRad);
+    const path = 'M' + cx + ',' + cy + ' L' + x1.toFixed(2) + ',' + y1.toFixed(2) +
+      ' A' + r + ',' + r + ' 0 0 1 ' + x2.toFixed(2) + ',' + y2.toFixed(2) + ' Z';
+    const midRad = (start + segDeg / 2 - 90) * Math.PI / 180;
+    const tx = (cx + r * 0.64 * Math.cos(midRad)).toFixed(2);
+    const ty = (cy + r * 0.64 * Math.sin(midRad)).toFixed(2);
+    return '<path d="' + path + '" fill="' + seg.color + '" stroke="#0b0d18" stroke-width="2"/>' +
+      '<text x="' + tx + '" y="' + ty + '" text-anchor="middle" dominant-baseline="central" ' +
+      'font-family="Space Mono,monospace" font-weight="800" font-size="15" fill="#fff" ' +
+      'stroke="#0b0d18" stroke-width="3" paint-order="stroke">' + seg.label + '</text>';
+  }).join('');
+  wheelEl.innerHTML = wedges;
   wheelEl.dataset.ready = '1';
+
+  const legendEl = document.getElementById('colmRouletteLegend');
+  if(legendEl){
+    const seen = new Set();
+    legendEl.innerHTML = ROULETTE_SEGMENTS.filter(seg => {
+      if(seen.has(seg.label)) return false;
+      seen.add(seg.label);
+      return true;
+    }).map(seg => {
+      const text = seg.mult === 0 ? 'pierdes la apuesta' : ('ganas ' + seg.label + ' tu apuesta');
+      return '<div class="colm-roulette-legend-item"><span class="colm-roulette-legend-dot" style="background:' + seg.color + '"></span>' + seg.label + ' — ' + text + '</div>';
+    }).join('');
+  }
 }
 async function spinColmRoulette(){
   if(colmRouletteSpinning || !currentUser) return;
