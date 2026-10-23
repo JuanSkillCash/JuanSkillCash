@@ -564,6 +564,8 @@ button{font-family:inherit;color:inherit}
 .colm-shop-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);text-align:center}
 .colm-shop-item-swatch{position:relative;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;background:rgba(255,255,255,.04)}
 .colm-rarity-gem{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 6px rgba(0,0,0,.4)}
+.colm-view-btn{width:100%;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;border-radius:20px;padding:6px 8px;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--muted2)}
+.colm-view-btn:hover{color:var(--white);border-color:var(--gold)}
 .colm-evolve-btn{width:100%;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;border-radius:20px;padding:6px 8px;cursor:pointer;border:1px solid var(--border2);background:rgba(163,53,238,.12);color:var(--white)}
 .colm-evolve-btn:hover:not(:disabled){background:rgba(163,53,238,.22)}
 .colm-evolve-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -26905,6 +26907,18 @@ function renderColmillosShopGrids(balance){
           btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar';
           btn.disabled = balance < item.price;
           btn.addEventListener('click', () => buyColmillosItem(item));
+          // antes la unica forma de "probarselo" era tocar la imagen, nada le decia a la gente
+          // que podian ver como se veria ANTES de comprarlo - ahora hay un boton explicito para
+          // eso, separado del de comprar (mismo mecanismo que ya usaba el click en la imagen)
+          const viewBtn = document.createElement('button');
+          viewBtn.type = 'button';
+          viewBtn.className = 'colm-view-btn';
+          viewBtn.textContent = '👁️ Visualizar';
+          viewBtn.addEventListener('click', () => {
+            colmillosShopPreview[equipField] = item.id;
+            renderColmillosShopPreview();
+          });
+          card.insertBefore(viewBtn, btn);
         }
         if(COLM_RARITY_CATEGORIES.has(cat) && owned){
           // evolucionar: la MISMA pieza sube de rareza (nunca se compra una nueva) - hay que
