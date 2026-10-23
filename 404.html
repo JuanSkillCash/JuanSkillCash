@@ -11430,7 +11430,7 @@ document.getElementById('profileSaveBtn').addEventListener('click', async () => 
     if(error) throw error;
     currentUser = data.user;
     renderAuthState();
-    if(typeof awardColmillos === 'function') awardColmillos('profile_completed', 'once', 5);
+    if(typeof awardColmillos === 'function') awardColmillos('profile_completed', 'once', 30);
     okEl.textContent = 'Nombre de usuario actualizado.';
     okEl.classList.add('show');
   } catch(err){
@@ -25853,7 +25853,7 @@ async function loadTelegramStatus(){
   if(data && data.linked_at){
     telegramNotConnected.style.display = 'none';
     telegramConnected.style.display = 'block';
-    if(typeof awardColmillos === 'function') awardColmillos('telegram_connected', 'once', 15);
+    if(typeof awardColmillos === 'function') awardColmillos('telegram_connected', 'once', 70);
     return;
   }
   telegramNotConnected.style.display = 'block';
@@ -25977,7 +25977,7 @@ async function loadBitunixStatus(){
     updateBitunixPillStatus('connected');
     document.getElementById('bitunixConnectedUid').textContent = 'tu cuenta';
     bitunixShowState('connected');
-    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 15);
+    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
     return;
   }
   bitunixErrorEl.style.display = 'none';
@@ -25993,7 +25993,7 @@ async function loadBitunixStatus(){
   if(data.status === 'connected'){
     document.getElementById('bitunixConnectedUid').textContent = data.uid;
     bitunixShowState('connected');
-    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 15);
+    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
   } else if(data.status === 'rejected'){
     document.getElementById('bitunixRejectedNote').textContent = data.review_note ? (': ' + data.review_note) : '';
     bitunixShowState('rejected');
@@ -26492,7 +26492,7 @@ async function refreshColmillosPageContent(){
     let done = inLedger;
     if(type === 'profile_completed' && !inLedger && meta.username){
       done = true;
-      awardColmillos('profile_completed', 'once', 5).then(() => refreshColmillosPageContent());
+      awardColmillos('profile_completed', 'once', 30).then(() => refreshColmillosPageContent());
     }
     statusEl.textContent = done ? (isDaily ? '✓ Listo hoy' : '✓ Listo') : (isDaily ? 'Hoy pendiente' : 'Pendiente');
     statusEl.className = 'colmillos-quest-status ' + (done ? 'done' : 'pending');
