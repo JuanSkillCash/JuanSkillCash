@@ -1275,14 +1275,15 @@ document.getElementById('colmillosShopSubtabs').addEventListener('click', (e) =>
   applyColmShopSubtabFilter();
 });
 
-/* ---- pagina propia (no modal flotante) con su ruta /colmillos, igual que un indicador -
-   mismo patron de mostrar/ocultar que showCategoryOverview()/showCategoryDetail() pero
-   aislado del sistema de categorias para no interferir con su propio manejo de historial.
-   Siempre arranca en la pantalla de "JUGAR" - como un cabinet de arcade de verdad, no se
-   salta directo al contenido ---- */
+/* ---- pagina propia (no modal flotante) con su ruta /sharkoins (el nombre de la moneda -
+   "colmillos" es solo el nombre interno en variables/funciones, nunca debe verse en pantalla
+   ni en la URL), igual que un indicador - mismo patron de mostrar/ocultar que
+   showCategoryOverview()/showCategoryDetail() pero aislado del sistema de categorias para no
+   interferir con su propio manejo de historial. Siempre arranca en la pantalla de "JUGAR" -
+   como un cabinet de arcade de verdad, no se salta directo al contenido ---- */
 function showColmillosPage(){
-  // candado temporal mientras se termina de construir Colmillos (pedido explicito de Juan) -
-  // nadie mas que su cuenta puede entrar, ni por el boton ni entrando directo a /colmillos
+  // candado temporal mientras se termina de construir Sharkoins (pedido explicito de Juan) -
+  // nadie mas que su cuenta puede entrar, ni por el boton ni entrando directo a /sharkoins
   // (applyRoute tambien llama esta misma funcion, asi que un solo candado cubre los dos casos)
   if(!currentUser || currentUser.id !== OWNER_USER_ID){
     if(typeof showWipToast === 'function') showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
@@ -1299,7 +1300,7 @@ function showColmillosPage(){
   if(ticker) ticker.style.display = 'none';
   colmillosPageView.style.display = 'block';
   setPageTitle('Sharkoins');
-  pushRoute({ skillcashDepth: 'colmillos' }, '/colmillos');
+  pushRoute({ skillcashDepth: 'sharkoins' }, '/sharkoins');
   colmillosContent.style.display = 'none';
   document.getElementById('colmillosTabs').style.display = 'none';
   switchColmillosTab('inicio');
@@ -1341,7 +1342,7 @@ function hideColmillosPage(){
   if(hero) hero.style.display = '';
   if(ticker) ticker.style.display = '';
   setPageTitle(null);
-  if(wasInColmillos && !closingFromPopstate && history.state && history.state.skillcashDepth === 'colmillos'){
+  if(wasInColmillos && !closingFromPopstate && history.state && history.state.skillcashDepth === 'sharkoins'){
     suppressNextPopstate = true;
     history.back();
   } else if(wasInColmillos && !closingFromPopstate){
