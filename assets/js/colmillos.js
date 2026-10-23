@@ -121,14 +121,14 @@ function sharkAccessoryOverlayHtml(accessoryIds){
   return ids.map(id => {
     const src = id && ACC_IMG_PATHS[id];
     if(!src) return '';
-    return '<img src="' + src + '" alt="" style="position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">';
+    return '<img loading="lazy" src="' + src + '" alt="" style="position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">';
   }).join('');
 }
 function sharkImgMarkup(skinId, accessoryIds, width){
   const src = (skinId && SHARK_IMG_PATHS[skinId]) ? SHARK_IMG_PATHS[skinId] : SHARK_IMG_PATHS.default;
   const w = width || 150;
   return '<div style="position:relative;width:' + w + 'px;height:' + w + 'px;margin:0 auto">' +
-    '<img src="' + src + '" alt="" style="width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">' +
+    '<img loading="lazy" src="' + src + '" alt="" style="width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges">' +
     sharkAccessoryOverlayHtml(accessoryIds) +
     '</div>';
 }
