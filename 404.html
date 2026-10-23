@@ -527,6 +527,16 @@ button{font-family:inherit;color:inherit}
 .colm-game-mute-btn:hover{background:rgba(255,255,255,.12)}
 .colm-game-mute-btn.muted{color:var(--muted2);opacity:.75}
 .colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
+/* cajitas de seleccion - cada minijuego vive en su propia ventana emergente (modal), esto
+   solo es la vitrina para elegir cual abrir. Por ahora cada pestaña (Minijuegos/Casino)
+   tiene una sola cajita, pero el grid ya queda listo para cuando se sumen mas */
+.colm-games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:6px 0}
+.colm-game-tile{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:22px 14px;border-radius:16px;border:2px solid rgba(240,178,61,.35);background:linear-gradient(160deg,rgba(240,178,61,.1),rgba(240,178,61,.02));cursor:pointer;transition:transform .15s,border-color .15s}
+.colm-game-tile:hover{transform:translateY(-2px);border-color:var(--gold)}
+.colm-game-tile:active{transform:translateY(0)}
+.colm-game-tile-icon{font-size:40px;line-height:1}
+.colm-game-tile-name{font-family:'Bungee',cursive;font-size:14px;color:var(--white)}
+.colm-game-tile-sub{font-size:11px;color:var(--muted2)}
 
 /* tienda / marketplace */
 .colm-shop-section{margin-bottom:6px}
@@ -6376,14 +6386,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="juego" style="display:none">
-            <div class="colm-game-wrap">
-              <canvas id="colmillosGameCanvas" width="400" height="150"></canvas>
-              <div class="colm-game-hud">
-                <span>Puntaje: <b id="colmillosGameScore">0</b></span>
-                <span>Mejor hoy: <b id="colmillosGameBest">0</b></span>
-                <button type="button" class="colm-game-mute-btn" id="colmGameMuteBtn" title="Silenciar sonido del juego">🔊</button>
-              </div>
-              <p class="colm-game-hint" id="colmillosGameHint">Tocá el juego o presioná ESPACIO para empezar y saltar</p>
+            <div class="colm-games-grid">
+              <button type="button" class="colm-game-tile" id="colmOpenSharkGameBtn">
+                <div class="colm-game-tile-icon">🦈</div>
+                <div class="colm-game-tile-name">Salto del Tiburón</div>
+                <div class="colm-game-tile-sub">Esquivá y sumá puntos</div>
+              </button>
             </div>
           </div>
 
@@ -6420,18 +6428,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="ruleta" style="display:none">
-            <div class="colm-roulette-wrap">
-              <div class="colm-roulette-pointer">▼</div>
-              <svg class="colm-roulette-wheel" id="colmRouletteWheel" viewBox="0 0 220 220"></svg>
-              <div class="colm-roulette-hub">🦈</div>
+            <div class="colm-games-grid">
+              <button type="button" class="colm-game-tile" id="colmOpenRouletteBtn">
+                <div class="colm-game-tile-icon">🎰</div>
+                <div class="colm-game-tile-name">Ruleta</div>
+                <div class="colm-game-tile-sub">Apostá y multiplicá tus Sharkoins</div>
+              </button>
             </div>
-            <div class="colm-roulette-legend" id="colmRouletteLegend"></div>
-            <div class="colm-roulette-controls">
-              <label for="colmRouletteBet">Apuesta</label>
-              <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
-              <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
-            </div>
-            <p class="colm-game-hint" id="colmRouletteResult">Apostá Sharkoins y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Sharkoins por tirada.</p>
           </div>
 
           <div class="colm-tabpanel" data-tabpanel="megadientes" style="display:none">
@@ -8668,6 +8671,64 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
   </div>
 </div>
 
+<!-- ===== MODAL: MINIJUEGOS - Salto del Tiburón - juego independiente, ventana emergente
+     propia (no vive pegado a ninguna pestaña) ===== -->
+<div class="modal-overlay" id="colmGameModal">
+  <button class="modal-close" id="closeColmGame" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmGameTitleEl" style="max-width:460px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="colmGameTitleEl" style="font-size:22px">🦈 Salto del Tiburón</h2>
+        <p class="calc-sub">Esquiva los obstáculos y sumá puntos</p>
+      </div>
+
+      <div class="colm-game-wrap">
+        <canvas id="colmillosGameCanvas" width="400" height="150"></canvas>
+        <div class="colm-game-hud">
+          <span>Puntaje: <b id="colmillosGameScore">0</b></span>
+          <span>Mejor hoy: <b id="colmillosGameBest">0</b></span>
+          <button type="button" class="colm-game-mute-btn" id="colmGameMuteBtn" title="Silenciar sonido del juego">🔊</button>
+        </div>
+        <p class="colm-game-hint" id="colmillosGameHint">Tocá el juego o presioná ESPACIO para empezar y saltar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: CASINO - Ruleta - juego independiente, ventana emergente propia ===== -->
+<div class="modal-overlay" id="colmRouletteModal">
+  <button class="modal-close" id="closeColmRoulette" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmRouletteTitleEl" style="max-width:460px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="colmRouletteTitleEl" style="font-size:22px">🎰 Ruleta</h2>
+        <p class="calc-sub">Apostá Sharkoins y multiplicalos</p>
+      </div>
+
+      <div class="colm-roulette-wrap">
+        <div class="colm-roulette-pointer">▼</div>
+        <svg class="colm-roulette-wheel" id="colmRouletteWheel" viewBox="0 0 220 220"></svg>
+        <div class="colm-roulette-hub">🦈</div>
+      </div>
+      <div class="colm-roulette-legend" id="colmRouletteLegend"></div>
+      <div class="colm-roulette-controls">
+        <label for="colmRouletteBet">Apuesta</label>
+        <input type="number" id="colmRouletteBet" min="5" max="50" step="5" value="10">
+        <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
+      </div>
+      <p class="colm-game-hint" id="colmRouletteResult">Apostá Sharkoins y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Sharkoins por tirada.</p>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL: LEGAL (Términos, Privacidad, Cookies) ===== -->
 <div class="modal-overlay" id="legalModal">
   <button class="modal-close" id="closeLegal" aria-label="Cerrar">✕</button>
@@ -9729,6 +9790,7 @@ window.addEventListener('popstate', () => {
     const isRoutableTool = overlay && TOOL_CATEGORY[overlay.dataset.tool];
     if(overlay && !isRoutableTool){
       if(overlay.id === 'assetDetailModal') closeAssetDetailModal();
+      else if(overlay.id === 'colmGameModal') closeColmGameModal();
       else closeModalGeneric(overlay);
       closingFromPopstate = false;
       return;
@@ -9744,6 +9806,7 @@ document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape'){
     const overlay = activeModalPanel.closest('.modal-overlay');
     if(overlay && overlay.id === 'assetDetailModal') closeAssetDetailModal();
+    else if(overlay && overlay.id === 'colmGameModal') closeColmGameModal();
     else closeModalGeneric(overlay);
     return;
   }
@@ -26996,17 +27059,9 @@ function switchColmillosTab(tab){
   }
   if(tab === 'trivia') loadDailyTrivia();
   if(tab === 'tienda') loadColmillosShop();
-  if(tab === 'ruleta') initColmRouletteWheel();
-  if(tab === 'juego'){
-    initColmGameOnce();
-    let best = 0;
-    try { best = parseInt(localStorage.getItem('colm_best_' + todayKeyUTC()) || '0', 10) || 0; } catch(e){}
-    document.getElementById('colmillosGameBest').textContent = best;
-    if(colmGame.state !== 'playing') drawColmGame();
-  } else if(colmGame.state === 'playing'){
-    cancelAnimationFrame(colmGame.raf);
-    colmGame.state = 'idle';
-  }
+  // el juego y la ruleta ya no arrancan solos al entrar a la pestaña - ahora cada uno vive
+  // en su propia ventana emergente, que se abre al tocar su cajita (ver openColmGameModal /
+  // openColmRouletteModal)
 }
 document.getElementById('colmillosTabs').addEventListener('click', (e) => {
   const btn = e.target.closest('.colm-tab');
@@ -27015,6 +27070,40 @@ document.getElementById('colmillosTabs').addEventListener('click', (e) => {
 document.querySelectorAll('[data-goto-tab]').forEach(el => {
   el.addEventListener('click', () => switchColmillosTab(el.dataset.gotoTab));
 });
+
+/* ---- Minijuegos y Casino: cada juego vive en su propia ventana emergente (mismo sistema
+   de modal que ya usan Telegram/Bitunix), no pegado a la pestaña - se abre al tocar su
+   cajita en el grid y se cierra con la X, clic afuera o ESC (igual que cualquier otro modal) ---- */
+const colmGameModal = document.getElementById('colmGameModal');
+const colmGamePanel = colmGameModal.querySelector('.modal-panel');
+const closeColmGame = document.getElementById('closeColmGame');
+function openColmGameModal(){
+  initColmGameOnce();
+  let best = 0;
+  try { best = parseInt(localStorage.getItem('colm_best_' + todayKeyUTC()) || '0', 10) || 0; } catch(e){}
+  document.getElementById('colmillosGameBest').textContent = best;
+  if(colmGame.state !== 'playing') drawColmGame();
+  openModalGeneric(colmGameModal, colmGamePanel, closeColmGame);
+}
+function closeColmGameModal(){
+  if(colmGame.state === 'playing'){ cancelAnimationFrame(colmGame.raf); colmGame.state = 'idle'; }
+  closeModalGeneric(colmGameModal);
+}
+closeColmGame.addEventListener('click', closeColmGameModal);
+colmGameModal.addEventListener('click', (e) => { if(e.target === colmGameModal) closeColmGameModal(); });
+document.getElementById('colmOpenSharkGameBtn').addEventListener('click', openColmGameModal);
+
+const colmRouletteModal = document.getElementById('colmRouletteModal');
+const colmRoulettePanel = colmRouletteModal.querySelector('.modal-panel');
+const closeColmRoulette = document.getElementById('closeColmRoulette');
+function openColmRouletteModal(){
+  initColmRouletteWheel();
+  openModalGeneric(colmRouletteModal, colmRoulettePanel, closeColmRoulette);
+}
+function closeColmRouletteModal(){ closeModalGeneric(colmRouletteModal); }
+closeColmRoulette.addEventListener('click', closeColmRouletteModal);
+colmRouletteModal.addEventListener('click', (e) => { if(e.target === colmRouletteModal) closeColmRouletteModal(); });
+document.getElementById('colmOpenRouletteBtn').addEventListener('click', openColmRouletteModal);
 /* sub-pestañas DENTRO de la tienda (Colores/Cabeza/Cara/Cuerpo/Manos/Fondos/Sorteos) - antes
    todo estaba en una sola columna larga y tocaba bajar mucho scroll; ahora solo se muestra
    una categoria a la vez. Cabeza/Cara/Cuerpo/Manos comparten la misma categoria real
