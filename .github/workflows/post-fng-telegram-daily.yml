@@ -1,0 +1,32 @@
+name: Postear Miedo y Codicia diario en Telegram
+
+# 1:00 UTC - una hora despues de medianoche UTC, que es cuando CoinMarketCap recalcula su
+# Indice de Miedo y Codicia (confirmado revisando cmc_fng_latest.update_time: 2026-10-23
+# llego a las 00:08 UTC). Esa hora de margen asegura que, para cuando corre esto, el robot
+# que lee el valor en vivo cada hora (update-cmc-fng-latest.yml, "0 * * * *") ya alcanzo a
+# refrescar cmc_fng_latest con el numero nuevo del dia.
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests pillow
+
+      - name: Generar y postear la imagen del indice
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/post_fng_telegram.py
