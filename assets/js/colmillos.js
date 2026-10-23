@@ -301,6 +301,8 @@ function renderColmHeroCard(){
     nameEl.textContent = 'INVITADO';
   }
   const info = computeColmLevelInfo();
+  const lvlEl = document.getElementById('colmillosHCLevel');
+  if(lvlEl) lvlEl.textContent = info.level;
   const powerEl = document.getElementById('colmillosHCPower');
   if(powerEl) powerEl.textContent = info.points;
   const starsEl = document.getElementById('colmillosHCStars');
@@ -396,11 +398,11 @@ async function loadAccountMiniAvatar(){
   renderAccountMiniAvatar();
 }
 function renderColmHeroBackground(){
-  const hero = document.getElementById('colmillosHero');
-  if(!hero) return;
+  const stage = document.getElementById('colmillosHeroStage');
+  if(!stage) return;
   const src = BG_IMG_PATHS[colmillosEquippedState.background_id];
-  hero.style.backgroundImage = src ? ("url('" + src + "')") : '';
-  hero.classList.toggle('has-bg', !!src);
+  stage.style.backgroundImage = src ? ("url('" + src + "')") : '';
+  stage.classList.toggle('has-bg', !!src);
 }
 
 const COLM_DAILY_EVENT_TYPES = ['daily_visit', 'trivia_correct', 'minigame_played'];
