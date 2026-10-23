@@ -92,6 +92,21 @@ Deno.serve(async (req) => {
     const text = String(msg?.text || "").trim();
     const chatId = msg?.chat?.id;
 
+    // diagnostico temporal: cualquier mensaje que llegue desde un GRUPO (no un chat privado
+    // 1-a-1) se loguea completo - sirve para sacar el chat.id y el message_thread_id de un
+    // tema (forum topic) en especifico, pegando un mensaje de prueba ahi y leyendo estos logs
+    // (Edge Functions > telegram-webhook > Logs). No cambia ninguna respuesta ni comportamiento.
+    if (msg?.chat?.type && msg.chat.type !== "private") {
+      console.log("mensaje de grupo recibido:", JSON.stringify({
+        chat_id: msg.chat.id,
+        chat_type: msg.chat.type,
+        chat_title: msg.chat.title,
+        message_thread_id: msg.message_thread_id,
+        is_topic_message: msg.is_topic_message,
+        text: msg.text,
+      }));
+    }
+
     // solo nos interesan mensajes de texto con chat_id - cualquier otro tipo de update
     // (ediciones, reacciones, etc.) se reconoce con 200 y se ignora
     if (!chatId || !text.startsWith("/start")) {
