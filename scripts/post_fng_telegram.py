@@ -200,9 +200,9 @@ def main() -> None:
     image_bytes = make_gauge_image(value, classification_es, date_label)
 
     caption = (
-        f"📊 Índice de Miedo y Codicia — {date_label}\n"
-        f"Valor: {value} ({classification_es})\n\n"
-        f"👉 Consulta el histórico aquí: {INDICATOR_URL}"
+        f"📊 Índice de Miedo y Codicia — {date_label}\n\n"
+        f"😨 Valor: {value} — {classification_es}\n\n"
+        f"🦈 Consulta el histórico aquí: {INDICATOR_URL}"
     )
     send_photo(image_bytes, caption)
     log.info("Imagen publicada en el tema de Análisis Crypto.")

@@ -1,0 +1,27 @@
+name: Postear Dominancia BTC/USDT diario en Telegram
+
+# 12:00 UTC = 7:00 AM hora Colombia (UTC-5). Usa el valor EN VIVO de CoinGecko /global (no el
+# cierre diario de TradingView), para que el dato de las 7am sea el real de ese momento.
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests pillow
+
+      - name: Generar y postear la imagen de dominancia
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/post_dominance_telegram.py
