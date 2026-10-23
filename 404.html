@@ -612,6 +612,8 @@ button{font-family:inherit;color:inherit}
 .colm-help-panel.active{display:block}
 .colm-help-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:4px}
 .colm-help-map-item{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);font-size:11.5px;color:var(--muted)}
+.colm-help-map-item[data-goto-tab]{cursor:pointer;transition:border-color .15s,background .15s}
+.colm-help-map-item[data-goto-tab]:hover{border-color:var(--gold);background:rgba(240,178,61,.06)}
 .colm-help-map-item b{color:var(--white);font-size:12.5px}
 .colm-help-table{display:flex;flex-direction:column;gap:6px;margin:0 0 18px}
 .colm-help-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--border2);font-size:12px;color:var(--muted)}
@@ -6497,16 +6499,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 </div>
               </div>
               <div class="colm-help-map">
-                <div class="colm-help-map-item"><b>🏠 Inicio</b><span>Tu punto de partida: tu tiburón, accesos rápidos y tus misiones.</span></div>
-                <div class="colm-help-map-item"><b>🛒 Tienda</b><span>Comprá y evolucioná skins, accesorios y fondos.</span></div>
-                <div class="colm-help-map-item"><b>💰 Saldo</b><span>Tu billetera, la Manada y de dónde salió todo esto.</span></div>
-                <div class="colm-help-map-item"><b>🕹️ Minijuegos</b><span>El Salto del Tiburón y el Casino (ruleta).</span></div>
-                <div class="colm-help-map-item"><b>🎯 Trivia</b><span>Una pregunta nueva de cripto/trading cada día.</span></div>
+                <div class="colm-help-map-item" data-goto-tab="inicio"><b>🏠 Inicio</b><span>Tu punto de partida: tu tiburón, accesos rápidos y tus misiones.</span></div>
+                <div class="colm-help-map-item" data-goto-tab="tienda"><b>🛒 Tienda</b><span>Comprá y evolucioná skins, accesorios y fondos.</span></div>
+                <div class="colm-help-map-item" data-goto-tab="megadientes"><b>💰 Saldo</b><span>Tu billetera, la Manada y de dónde salió todo esto.</span></div>
+                <div class="colm-help-map-item" data-goto-tab="juego"><b>🕹️ Minijuegos</b><span>El Salto del Tiburón y el Casino (ruleta).</span></div>
+                <div class="colm-help-map-item" data-goto-tab="trivia"><b>🎯 Trivia</b><span>Una pregunta nueva de cripto/trading cada día.</span></div>
                 <div class="colm-help-map-item"><b>❓ Ayuda</b><span>Estás aquí — todo lo que necesitas saber, explicado al detalle.</span></div>
               </div>
             </div>
 
-            <div class="colm-help-panel" data-helppanel="sharkoins" style="display:none">
+            <div class="colm-help-panel" data-helppanel="sharkoins">
               <p class="colm-section-label" style="text-align:center">💰 Cómo ganar Sharkoins</p>
               <div class="colm-help-table">
                 <div class="colm-help-row"><span>Entrar cada día</span><b>+5</b></div>
@@ -6526,7 +6528,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <p class="auth-note" style="margin:14px auto 0">🦈 Los Sharkoins no tienen ningún valor monetario real — son solo para coleccionar y jugar dentro de la plataforma.</p>
             </div>
 
-            <div class="colm-help-panel" data-helppanel="recompensas" style="display:none">
+            <div class="colm-help-panel" data-helppanel="recompensas">
               <p class="colm-section-label" style="text-align:center">🎁 Recompensas diarias y únicas</p>
               <p class="auth-note" style="margin:0 auto 14px">Son las de la pestaña 💰 Sharkoins — entrar, trivia, minijuego (diarias) y perfil/Telegram/Bitunix (una sola vez en la vida).</p>
               <p class="colm-section-label" style="text-align:center">🏆 Ranking semanal del minijuego (Top 10)</p>
@@ -6546,7 +6548,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <p class="auth-note" style="margin:0 auto">🦈 También existe un ranking <b>Histórico</b> que nunca se borra — ese no da premio, es puro salón de la fama.</p>
             </div>
 
-            <div class="colm-help-panel" data-helppanel="rareza" style="display:none">
+            <div class="colm-help-panel" data-helppanel="rareza">
               <div class="colm-rarity-info-tiers">
                 <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#9d9d9d"></span>Común</div>
                 <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#3b82f6"></span>Raro</div>
@@ -6559,7 +6561,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <p class="auth-note" style="border-color:var(--gold);margin:0 auto">✨ Todo esto es 100% para presumir — no le da ninguna ventaja real en el minijuego, la ruleta ni la trivia. Es pura colección.</p>
             </div>
 
-            <div class="colm-help-panel" data-helppanel="poderes" style="display:none">
+            <div class="colm-help-panel" data-helppanel="poderes">
               <p class="auth-note" style="margin:0 auto 16px">El color de tu tiburón y cada una de las 5 partes del cuerpo te dan un poder propio, decorativo — su nivel es la rareza de lo que tengas equipado ahí. Estas son las historias de cada uno:</p>
 
               <div class="colm-story-card">
@@ -6672,7 +6674,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
             </div>
 
-            <div class="colm-help-panel" data-helppanel="fondos" style="display:none">
+            <div class="colm-help-panel" data-helppanel="fondos">
               <p class="auth-note" style="margin:0 auto 14px">Los fondos no tienen rareza ni evolución — son de precio único. Hay normales (temática de mar/fantasía) y 6 especiales de cripto, que son el escalón más caro de toda la tienda.</p>
               <div class="colm-help-bg-grid">
                 <img src="assets/mascot/backgrounds/bg_reef.png" alt="Arrecife" title="Arrecife (normal)">
