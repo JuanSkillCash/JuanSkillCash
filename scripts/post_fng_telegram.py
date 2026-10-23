@@ -61,11 +61,12 @@ MESES = [
 INDICATOR_URL = "https://juanskillcash.com/indicadores/indice-de-miedo-y-codicia"
 LOGO_PATH = Path(__file__).resolve().parent.parent / "logo-skillcash-600.png"
 
-# ---- estilo del gauge (mismos tonos de index.html: --bg, --gold, --white, --muted) ----
+# ---- estilo del gauge (mismos tonos de index.html: --bg, --white, --muted; el acento es
+# --red, el rojo de marca de SkillCash - no dorado, que casi no se usa en la marca) ----
 SCALE = 3
-W, H = 1000 * SCALE, 840 * SCALE
+W, H = 1000 * SCALE, 870 * SCALE
 BG = (8, 12, 32, 255)
-GOLD = (240, 178, 61, 255)
+ACCENT = (255, 47, 79, 255)
 WHITE = (247, 246, 251, 255)
 MUTED = (132, 126, 147, 255)
 SEG_COLORS = [
@@ -106,19 +107,19 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
     img = Image.new("RGBA", (W, H), BG)
     d = ImageDraw.Draw(img)
 
-    f_title = ImageFont.truetype(FONT_BOLD, 32 * SCALE)
-    _ctext(d, W / 2, 50 * SCALE, "ÍNDICE DE MIEDO Y CODICIA", f_title, GOLD)
-    f_sub = ImageFont.truetype(FONT_REG, 17 * SCALE)
-    _ctext(d, W / 2, 84 * SCALE, "SkillCash Tools · Alertas cripto", f_sub, MUTED)
+    f_title = ImageFont.truetype(FONT_BOLD, 36 * SCALE)
+    _ctext(d, W / 2, 54 * SCALE, "ÍNDICE DE MIEDO Y CODICIA", f_title, ACCENT)
+    f_sub = ImageFont.truetype(FONT_REG, 19 * SCALE)
+    _ctext(d, W / 2, 90 * SCALE, "SkillCash Tools · Alertas cripto", f_sub, MUTED)
 
     class_color = SEG_COLORS[min(4, value * 5 // 100)]
 
-    f_num = ImageFont.truetype(FONT_BOLD, 96 * SCALE)
-    _ctext(d, W / 2, 175 * SCALE, str(value), f_num, WHITE)
-    f_class = ImageFont.truetype(FONT_BOLD, 27 * SCALE)
-    _ctext(d, W / 2, 242 * SCALE, classification_es.upper(), f_class, class_color)
+    f_num = ImageFont.truetype(FONT_BOLD, 106 * SCALE)
+    _ctext(d, W / 2, 188 * SCALE, str(value), f_num, WHITE)
+    f_class = ImageFont.truetype(FONT_BOLD, 30 * SCALE)
+    _ctext(d, W / 2, 258 * SCALE, classification_es.upper(), f_class, class_color)
 
-    cx, cy = W / 2, 520 * SCALE
+    cx, cy = W / 2, 528 * SCALE
     R = 200 * SCALE
     THICK = 36 * SCALE
     n_seg = len(SEG_COLORS)
@@ -133,16 +134,16 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
     needle_len = R - THICK / 2 - 8 * SCALE
     nx = cx + needle_len * math.cos(angle_rad)
     ny = cy - needle_len * math.sin(angle_rad)
-    d.line([(cx, cy), (nx, ny)], fill=WHITE, width=int(6 * SCALE))
-    pr = 13 * SCALE
-    d.ellipse([cx - pr, cy - pr, cx + pr, cy + pr], fill=WHITE, outline=GOLD, width=int(3 * SCALE))
+    d.line([(cx, cy), (nx, ny)], fill=WHITE, width=int(7 * SCALE))
+    pr = 14 * SCALE
+    d.ellipse([cx - pr, cy - pr, cx + pr, cy + pr], fill=WHITE, outline=ACCENT, width=int(3 * SCALE))
 
-    f_lbl = ImageFont.truetype(FONT_REG, 15 * SCALE)
+    f_lbl = ImageFont.truetype(FONT_REG, 17 * SCALE)
     d.text((cx - R - 8 * SCALE, cy + 2 * SCALE), "0\nMiedo Extremo", font=f_lbl, fill=MUTED, anchor="rm", align="right")
     d.text((cx + R + 8 * SCALE, cy + 2 * SCALE), "100\nCodicia Extrema", font=f_lbl, fill=MUTED, anchor="lm", align="left")
 
-    f_date = ImageFont.truetype(FONT_REG, 19 * SCALE)
-    _ctext(d, W / 2, 650 * SCALE, date_label, f_date, MUTED)
+    f_date = ImageFont.truetype(FONT_REG, 21 * SCALE)
+    _ctext(d, W / 2, 660 * SCALE, date_label, f_date, MUTED)
 
     # logo real de SkillCash (el mismo que ya usa el sitio) en vez de solo el texto de la url
     try:
@@ -150,14 +151,14 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
         logo_h = 80 * SCALE
         logo_w = int(logo.width * (logo_h / logo.height))
         logo = logo.resize((logo_w, logo_h), Image.LANCZOS)
-        logo_top = 690 * SCALE
+        logo_top = 700 * SCALE
         img.alpha_composite(logo, (int(W / 2 - logo_w / 2), int(logo_top)))
-        f_foot = ImageFont.truetype(FONT_BOLD, 16 * SCALE)
-        _ctext(d, W / 2, logo_top + logo_h + 24 * SCALE, "juanskillcash.com", f_foot, GOLD)
+        f_foot = ImageFont.truetype(FONT_BOLD, 18 * SCALE)
+        _ctext(d, W / 2, logo_top + logo_h + 26 * SCALE, "juanskillcash.com", f_foot, ACCENT)
     except (FileNotFoundError, OSError) as e:
         log.warning(f"no se pudo cargar el logo ({LOGO_PATH}): {e} - se deja solo el texto")
-        f_foot = ImageFont.truetype(FONT_REG, 15 * SCALE)
-        _ctext(d, W / 2, 688 * SCALE, "juanskillcash.com", f_foot, GOLD)
+        f_foot = ImageFont.truetype(FONT_REG, 17 * SCALE)
+        _ctext(d, W / 2, 698 * SCALE, "juanskillcash.com", f_foot, ACCENT)
 
     img = img.resize((W // SCALE, H // SCALE), Image.LANCZOS)
     buf = io.BytesIO()
