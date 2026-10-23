@@ -408,7 +408,7 @@ button{font-family:inherit;color:inherit}
 @keyframes colmSharkSwim{0%,100%{transform:translateX(-16px) scaleX(-1)}50%{transform:translateX(16px) scaleX(-1)}}
 .colm-loading-bar{width:220px;height:10px;border-radius:6px;background:rgba(255,255,255,.08);border:2px solid var(--gold);overflow:hidden}
 .colm-loading-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#fff176)}
-.colm-loading.run .colm-loading-fill{animation:colmLoadFill 1.15s ease-out forwards}
+.colm-loading.run .colm-loading-fill{animation:colmLoadFill 3s ease-out forwards}
 @keyframes colmLoadFill{to{width:100%}}
 .colm-loading-text{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--gold);animation:colmBlink 1s steps(2) infinite}
 @keyframes colmBlink{50%{opacity:.3}}
@@ -423,21 +423,23 @@ button{font-family:inherit;color:inherit}
    lado, y el segundo "jugador" de la referencia se reemplaza por una fila igual pero para la
    moneda). La barra de vida es puramente decorativa/aleatoria, no es una mecanica real */
 .colm-fighter-hud{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.colm-fighter-row{display:flex;align-items:center;gap:6px}
-.colm-fighter-idblock{flex-shrink:0;width:30px;display:flex;flex-direction:column;align-items:center}
-.colm-fighter-portrait{width:28px;height:28px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.06);border:2px solid #caa23a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+.colm-fighter-row{display:flex;align-items:center;gap:12px}
+.colm-fighter-idblock{flex-shrink:0;width:60px;display:flex;flex-direction:column;align-items:center}
+.colm-fighter-portrait{width:56px;height:56px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.06);border:3px solid #caa23a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .colm-fighter-portrait img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;image-rendering:crisp-edges}
 .colm-fighter-portrait.coin{background:#1a1306}
-.colm-fighter-name{margin-top:2px;width:100%;font-family:'Press Start 2P',cursive;font-size:5.5px;color:#ffe17a;text-shadow:0 1px 0 #000;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.colm-fighter-name{margin-top:4px;width:100%;font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;text-shadow:0 1px 0 #000;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .colm-fighter-name.gold{color:var(--gold)}
-.colm-fighter-bar{position:relative;flex:1;height:12px;border-radius:2px;background:#1a0d05;border:2px solid #7a5420;box-shadow:inset 0 0 0 1px #000}
+.colm-fighter-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.colm-fighter-bar-label{font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;letter-spacing:.04em;text-shadow:0 1px 0 #000}
+.colm-fighter-bar{position:relative;width:100%;height:24px;border-radius:4px;background:#1a0d05;border:3px solid #7a5420;box-shadow:inset 0 0 0 1px #000}
 .colm-fighter-bar-fill{height:100%;width:0%;transition:width .5s ease-out}
 .colm-fighter-bar.life .colm-fighter-bar-fill{background:linear-gradient(180deg,#fff27a,#f0b23d 55%,#c98a1f)}
 .colm-fighter-bar.currency .colm-fighter-bar-fill{background:linear-gradient(180deg,#ff8f6b,#e0472f 55%,#9c2a1b)}
-.colm-fighter-bar-num{position:absolute;right:3px;top:50%;transform:translateY(-50%);font-family:'Press Start 2P',cursive;font-size:6.5px;color:#fff;text-shadow:0 1px 1px #000}
-.colm-hero-timer-box{flex-shrink:0;display:flex;flex-direction:column;align-items:center;background:#1a0d05;border:2px solid #7a5420;border-radius:4px;padding:3px 9px;box-shadow:inset 0 0 0 1px #000}
-.colm-hero-timer-label{font-family:'Press Start 2P',cursive;font-size:6px;color:#ffe17a;letter-spacing:.05em}
-.colm-hero-timer-digits{font-family:'Press Start 2P',cursive;font-size:14px;color:#ff5a3c;text-shadow:0 0 6px rgba(255,90,60,.6);line-height:1.25;font-variant-numeric:tabular-nums}
+.colm-fighter-bar-num{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-family:'Press Start 2P',cursive;font-size:11px;color:#fff;text-shadow:0 1px 1px #000}
+.colm-hero-timer-box{flex-shrink:0;display:flex;flex-direction:column;align-items:center;background:#1a0d05;border:3px solid #7a5420;border-radius:6px;padding:6px 16px;box-shadow:inset 0 0 0 1px #000}
+.colm-hero-timer-label{font-family:'Press Start 2P',cursive;font-size:10px;color:#ffe17a;letter-spacing:.05em}
+.colm-hero-timer-digits{font-family:'Press Start 2P',cursive;font-size:26px;color:#ff5a3c;text-shadow:0 0 6px rgba(255,90,60,.6);line-height:1.25;font-variant-numeric:tabular-nums}
 .colm-hero-stage{position:relative;flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 /* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
    transparente abajo de las patas) - sin este empujoncito se veria flotando aunque el propio
@@ -478,16 +480,6 @@ button{font-family:inherit;color:inherit}
 .colm-global-taps{margin-top:8px;font-family:'Press Start 2P',cursive;font-size:7px;color:var(--muted2)}
 .colm-global-taps b{color:var(--gold);font-variant-numeric:tabular-nums}
 
-/* boton JUGAR - pantalla previa antes de cargar nada */
-.colm-start{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:380px;text-align:center;padding:38px 24px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 14%,rgba(240,178,61,.22),transparent 55%),radial-gradient(circle at 12% 88%,rgba(94,170,255,.12),transparent 50%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 40px rgba(240,178,61,.12) inset}
-.colm-start::before,.colm-start::after{content:'✦';position:absolute;font-size:14px;color:rgba(240,178,61,.45);animation:colmBlink 2.4s steps(2) infinite}
-.colm-start::before{top:16px;left:20px}
-.colm-start::after{top:30px;right:24px;animation-delay:.7s}
-.colm-start-badge{font-family:'Press Start 2P',cursive;font-size:8px;letter-spacing:.12em;color:#1a1306;background:var(--gold);border-radius:20px;padding:6px 12px;box-shadow:0 3px 0 #8a6610}
-.colm-start-shark-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:120px;height:120px}
-.colm-start-shark-wrap::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(240,178,61,.32),transparent 70%)}
-.colm-start-shark{position:relative;width:92px;height:92px;font-size:58px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
-.colm-start-title{font-family:'Bungee',cursive;font-size:30px;color:var(--gold);text-shadow:0 0 20px rgba(240,178,61,.5),0 2px 0 #7a5a12;letter-spacing:.02em}
 .colm-play-btn{margin-top:8px;font-family:'Bungee',cursive;font-size:16px;color:#1a1306;background:linear-gradient(180deg,#ffe082,var(--gold));border:none;border-radius:10px;padding:14px 34px;cursor:pointer;box-shadow:0 0 0 2px rgba(240,178,61,.35),0 8px 0 #8a6610,0 14px 20px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;animation:colmPlayPulse 1.6s ease-in-out infinite}
 .colm-play-btn:active{transform:translateY(6px);box-shadow:0 0 0 2px rgba(240,178,61,.35),0 2px 0 #8a6610,0 4px 10px rgba(0,0,0,.4)}
 @keyframes colmPlayPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
@@ -528,7 +520,7 @@ button{font-family:inherit;color:inherit}
 
 /* minijuego */
 .colm-game-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.colm-game-wrap canvas{width:100%;max-width:400px;height:150px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#0b0d18;cursor:pointer;touch-action:manipulation}
+.colm-game-wrap canvas{width:100%;max-width:560px;height:210px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#0b0d18;cursor:pointer;touch-action:manipulation}
 .colm-game-hud{display:flex;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
 .colm-game-hud b{color:var(--gold)}
 .colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
@@ -561,12 +553,14 @@ button{font-family:inherit;color:inherit}
 .colm-roulette-spin-btn:disabled{opacity:.6;cursor:not-allowed;animation:none}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(max-width:600px){
-  .colm-fighter-idblock{width:24px}
-  .colm-fighter-portrait{width:22px;height:22px}
-  .colm-fighter-name{font-size:4.6px}
-  .colm-hero-timer-label{font-size:5px}
-  .colm-hero-timer-digits{font-size:11px}
-  .colm-hero-timer-box{padding:2px 6px}
+  .colm-fighter-idblock{width:48px}
+  .colm-fighter-portrait{width:44px;height:44px}
+  .colm-fighter-name{font-size:7.5px}
+  .colm-fighter-bar-label{font-size:7.5px}
+  .colm-fighter-bar{height:20px}
+  .colm-hero-timer-label{font-size:8px}
+  .colm-hero-timer-digits{font-size:20px}
+  .colm-hero-timer-box{padding:4px 10px}
   /* en celular el recuadro (y por lo tanto tambien la tienda, que reusa esta misma caja
      como overlay) se sentia chiquito con mucho espacio desperdiciado alrededor - se deja
      crecer bastante mas alto para aprovechar casi toda la pantalla */
@@ -6275,15 +6269,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <button type="button" class="colm-tab" data-tab="ruleta">🎰 Ruleta</button>
         </div>
 
-        <div class="colm-start" id="colmillosStart">
-          <div class="colm-start-badge">🎮 ARCADE</div>
-          <div class="colm-start-shark-wrap">
-            <div class="colm-start-shark" id="colmillosStartShark">🦈</div>
-          </div>
-          <div class="colm-start-title">COLMILLOS</div>
-          <button type="button" class="colm-play-btn" id="colmillosPlayBtn">▶ JUGAR</button>
-        </div>
-
         <div class="colm-loading" id="colmillosLoading" style="display:none">
           <div class="colm-loading-shark" id="colmillosLoadingShark">🦈</div>
           <div class="colm-loading-bar"><div class="colm-loading-fill"></div></div>
@@ -6302,7 +6287,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                       <div class="colm-fighter-portrait" id="colmillosFighterPortrait"></div>
                       <div class="colm-fighter-name" id="colmillosPlayerName">JUGADOR</div>
                     </div>
-                    <div class="colm-fighter-bar life"><div class="colm-fighter-bar-fill" id="colmillosLifeFill"></div></div>
+                    <div class="colm-fighter-bar-col">
+                      <div class="colm-fighter-bar-label">🍀 SUERTE</div>
+                      <div class="colm-fighter-bar life"><div class="colm-fighter-bar-fill" id="colmillosLifeFill"></div></div>
+                    </div>
                   </div>
                 </div>
                 <div class="colm-hero-timer-box" title="Tiempo en línea">
@@ -6435,6 +6423,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
           <div class="colm-tabpanel" data-tabpanel="megadientes" style="display:none">
             <div class="colm-wallet-page">
+              <div class="colm-section-label" style="text-align:center">🦈 Tu Billetera Sharkoin</div>
               <div class="colm-coin colm-coin-big" id="colmillosBigCoin">
                 <img src="assets/mascot/coin_tooth.png" alt="" style="width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
               </div>
@@ -6451,6 +6440,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                   <div class="colm-wallet-stat-cap">🦈 Edad del tiburón</div>
                 </div>
               </div>
+              <p class="auth-note" style="text-align:center;margin-top:4px">🌍 "Manada" es cuántas veces, entre TODA la comunidad junta, hemos tocado la moneda — cada toque tuyo también suma a ese número.</p>
+
+              <div class="colm-section-label">📖 De dónde salieron los Sharkoins</div>
+              <p class="auth-note">Cuentan los más viejos de la Manada que, mucho antes de que existiera esta plataforma, un tiburón solitario encontró un arrecife que brillaba distinto a los demás: estaba hecho de monedas con forma de colmillo, doradas y gastadas por el agua. Nadie sabía de dónde habían salido — algunos decían que eran los colmillos que los tiburones más sabios iban dejando atrás cada vez que aprendían algo nuevo del mercado, como quien muda de diente al crecer.</p>
+              <p class="auth-note">El tiburón se dio cuenta de algo curioso: el arrecife solo soltaba una moneda nueva cuando alguien hacía algo que lo hacía un poco mejor — volver a nadar por ahí al día siguiente, acertar hacia dónde se movía la corriente, enseñarle el camino a otro pez perdido. Así empezó la Manada: cada Sharkoin no era un premio por suerte, sino la prueba de que alguien había nadado un poco más lejos que el día anterior.</p>
+              <p class="auth-note">Hoy, cada vez que tocas la moneda y ves subir tu número, estás siguiendo esa misma corriente. (Sí, esto es solo un cuento — pero tus Sharkoins sí son reales 🦈)</p>
             </div>
           </div>
          </div>
@@ -26269,17 +26264,15 @@ function renderSharkPreviews(){
   const miniEl = document.getElementById('colmillosCharPreviewMini');
   const heroEl = document.getElementById('colmillosHeroShark');
   const portraitEl = document.getElementById('colmillosFighterPortrait');
-  const startSharkEl = document.getElementById('colmillosStartShark');
   const loadingSharkEl = document.getElementById('colmillosLoadingShark');
   const accessoryIds = colmEquippedAccessoryIds(colmillosEquippedState);
   if(miniEl) miniEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 62);
   if(heroEl) heroEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 220);
   if(portraitEl) portraitEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 60);
-  // en la pantalla de JUGAR y la de carga tambien se muestra el tiburon que cada quien
-  // configuro (en vez del emoji generico de antes), una vez se sepa su skin
+  // en la pantalla de carga tambien se muestra el tiburon que cada quien configuro (en vez
+  // del emoji generico de antes), una vez se sepa su skin
   const startSrc = (colmillosEquippedState.skin_id && SHARK_IMG_PATHS[colmillosEquippedState.skin_id]) || SHARK_IMG_PATHS.default;
   const startImgHtml = '<img src="' + startSrc + '" alt="" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges">';
-  if(startSharkEl) startSharkEl.innerHTML = startImgHtml;
   if(loadingSharkEl) loadingSharkEl.innerHTML = startImgHtml;
   renderColmHeroBackground();
   renderColmillosShopPreview();
@@ -26870,10 +26863,13 @@ function switchColmillosTab(tab){
   const heroOverlay = document.getElementById('colmillosHeroOverlay');
   const tiendaPanel = document.querySelector('.colm-tabpanel[data-tabpanel="tienda"]');
   const tiendaSlot = document.getElementById('colmillosTiendaSlot');
-  // la pestaña de Sharkoins es una pantalla propia, sola - ni el escenario del tiburon ni
-  // el HUD tienen nada que hacer ahi, por eso se oculta el recuadro grande completo
+  // Sharkoins, Minijuego, Trivia y Ruleta son pantallas propias, cada una sola - ni el
+  // escenario del tiburon ni el HUD tienen nada que hacer ahi (quedaban "pegados" arriba,
+  // empujando el contenido real de cada pestaña a una franja chiquita abajo en celular), por
+  // eso se oculta el recuadro grande completo y esas pestañas usan todo el ancho/alto
   const heroCol = document.querySelector('.colm-left');
-  if(heroCol) heroCol.style.display = (tab === 'megadientes') ? 'none' : '';
+  const HERO_HIDDEN_TABS = ['megadientes', 'juego', 'trivia', 'ruleta'];
+  if(heroCol) heroCol.style.display = HERO_HIDDEN_TABS.includes(tab) ? 'none' : '';
   if(tab === 'tienda'){
     if(heroOverlay && tiendaPanel && tiendaPanel.parentElement !== heroOverlay) heroOverlay.appendChild(tiendaPanel);
     if(heroOverlay) heroOverlay.style.display = 'block';
@@ -26957,18 +26953,15 @@ function showColmillosPage(){
   setPageTitle('Colmillos');
   pushRoute({ skillcashDepth: 'colmillos' }, '/colmillos');
   colmillosContent.style.display = 'none';
-  colmillosLoading.style.display = 'none';
-  colmillosLoading.classList.remove('run');
-  document.getElementById('colmillosStart').style.display = 'flex';
   document.getElementById('colmillosTabs').style.display = 'none';
   switchColmillosTab('inicio');
   loadGlobalTaps();
-  // asi la pantalla de JUGAR ya muestra el tiburon configurado de cada quien (si ya se sabe)
   renderSharkPreviews();
   colmillosPageView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // ya no hay pantalla de "JUGAR" intermedia - entrar a Colmillos pasa derecho por la carga
+  startColmillosLoadSequence();
 }
 function startColmillosLoadSequence(){
-  document.getElementById('colmillosStart').style.display = 'none';
   colmillosLoading.style.display = 'flex';
   colmillosLoading.classList.remove('run');
   void colmillosLoading.offsetWidth;
@@ -26985,7 +26978,7 @@ function startColmillosLoadSequence(){
     clearInterval(window._colmSessionTimerInterval);
     window._colmSessionTimerInterval = setInterval(updateColmSessionTimer, 1000);
     updateColmSessionTimer();
-  }, 1150);
+  }, 3000);
 }
 function hideColmillosPage(){
   const wasInColmillos = colmillosPageView.style.display === 'block';
@@ -27010,7 +27003,6 @@ function hideColmillosPage(){
 }
 colmillosBackBtn.addEventListener('click', hideColmillosPage);
 colmillosWalletBtn.addEventListener('click', showColmillosPage);
-document.getElementById('colmillosPlayBtn').addEventListener('click', startColmillosLoadSequence);
 colmillosBigCoin.addEventListener('click', (e) => {
   const coin = e.currentTarget;
   coin.classList.remove('spin');
