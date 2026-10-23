@@ -464,7 +464,7 @@ button{font-family:inherit;color:inherit}
 /* pestaña propia de Sharkoins - una sola cosa grande (el diente para tocar + el saldo +
    datos del jugador), no una pildora chiquita metida en otro lado */
 .colm-wallet-page{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px}
-.colm-coin-big svg,.colm-coin-big img{width:clamp(90px,26vw,150px);height:auto}
+.colm-coin-big svg,.colm-coin-big img{width:clamp(270px,78vw,450px);height:auto}
 .colm-tap-hint-big{font-size:13px;margin-top:14px}
 .colm-balance-display-big{font-size:clamp(40px,12vw,64px);margin-top:18px}
 .colm-balance-caption-big{font-size:13px;margin-top:10px}
@@ -622,8 +622,13 @@ button{font-family:inherit;color:inherit}
 .colm-help-bg-grid img{width:100%;aspect-ratio:320/200;object-fit:cover;border-radius:12px;border:1px solid var(--border2)}
 .colm-shop-error{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;text-align:center;color:var(--muted)}
 .colm-shop-error p{margin:0;font-size:12.5px}
-.colm-rarity-info-tiers{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:16px}
-.colm-rarity-info-tier{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--white)}
+.colm-rarity-ladder{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;width:100%;padding:20px;border-radius:18px;border:1px solid var(--border2);background:linear-gradient(135deg,rgba(240,178,61,.07),rgba(255,255,255,.02));margin-bottom:16px;box-sizing:border-box}
+.colm-rarity-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:84px;padding:10px 6px}
+.colm-rarity-step-gem{width:34px;height:34px;border-radius:50%;box-shadow:0 0 10px rgba(255,255,255,.1)}
+.colm-rarity-step b{font-size:12px;color:var(--white)}
+.colm-rarity-step span{font-size:10.5px;color:var(--muted2);display:flex;align-items:center;gap:3px}
+.colm-rarity-arrow{color:var(--muted2);font-size:16px;flex-shrink:0}
+.colm-rarity-step-coin{width:12px;height:12px;vertical-align:-1px;image-rendering:pixelated;image-rendering:crisp-edges}
 /* fondos: tarjeta rectangular grande (aspecto 8:5, igual que el PNG original) en vez del
    circulito chiquito - asi si se alcanza a ver la escena completa antes de comprarla */
 .colm-shop-bg-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
@@ -6549,16 +6554,49 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             </div>
 
             <div class="colm-help-panel" data-helppanel="rareza">
-              <div class="colm-rarity-info-tiers">
-                <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#9d9d9d"></span>Común</div>
-                <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#3b82f6"></span>Raro</div>
-                <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#a335ee"></span>Épico</div>
-                <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#f0a020"></span>Legendario</div>
-                <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></span>Mítico</div>
+              <div class="colm-rarity-ladder">
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#9d9d9d"></div><b>Común</b><span>el punto de partida</span></div>
+                <div class="colm-rarity-arrow">→</div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#3b82f6"></div><b>Raro</b><span>150 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-arrow">→</div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#a335ee"></div><b>Épico</b><span>300 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-arrow">→</div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#f0a020"></div><b>Legendario</b><span>550 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-arrow">→</div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>900 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
               </div>
-              <p class="auth-note" style="margin:0 auto 10px">🎨 Cada skin y cada accesorio es su propia "familia". La comprás una vez —siempre arranca en <b>Común</b>— y después la podés <b>evolucionar</b> pagando Sharkoins extra, un escalón a la vez y en orden (no te podés saltar ninguno): Común → Raro → Épico → Legendario → Mítico. Entre más rara, más cara la evolución. Es la MISMA pieza mejorando, nunca comprás una nueva.</p>
-              <p class="auth-note" style="margin:0 auto 10px">🌊 Los fondos y los boletos de sorteo no tienen rareza — son de precio único, como siempre.</p>
-              <p class="auth-note" style="border-color:var(--gold);margin:0 auto">✨ Todo esto es 100% para presumir — no le da ninguna ventaja real en el minijuego, la ruleta ni la trivia. Es pura colección.</p>
+
+              <div class="colm-story-card">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/variants/shark_skin_oroliquido.png" alt="">
+                  <img src="assets/mascot/accessories/acc_crown.png" alt="">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">🎨 Cada skin y cada accesorio, su propia familia</p>
+                  <p class="colm-story-card-text">La comprás una vez —siempre arranca en <b>Común</b>— y después la podés <b>evolucionar</b> pagando Sharkoins extra, un escalón a la vez y en orden (no te podés saltar ninguno): Común → Raro → Épico → Legendario → Mítico. Entre más rara, más cara la evolución. Es la MISMA pieza mejorando, nunca comprás una nueva.</p>
+                </div>
+              </div>
+
+              <div class="colm-story-card reverse">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="" style="width:76px;height:76px">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">🌊 Los fondos y los boletos de sorteo, aparte</p>
+                  <p class="colm-story-card-text">Esos no tienen rareza ni evolución — son de precio único, como siempre. Lo que sí varía muchísimo entre ellos es el precio: los fondos cripto (Bitcoin, Ethereum, Solana...) son el escalón más caro de toda la tienda.</p>
+                </div>
+              </div>
+
+              <div class="colm-story-card" style="border-color:var(--gold)">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/coin_tooth.png" alt="">
+                  <img src="assets/mascot/coin_charcoins.png" alt="">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">✨ 100% para presumir</p>
+                  <p class="colm-story-card-text">Nada de esto da ninguna ventaja real en el minijuego, la ruleta ni la trivia. Es pura colección — un trofeo que se nota, no un atajo.</p>
+                </div>
+              </div>
             </div>
 
             <div class="colm-help-panel" data-helppanel="poderes">
