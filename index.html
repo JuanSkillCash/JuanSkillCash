@@ -26776,7 +26776,11 @@ async function awardColmillos(eventType, periodKey, amount){
   flushRun();
 })();
 </script>
-<script src="assets/js/colmillos.js" defer></script>
+<!-- ?v= es cache-busting manual - SUBIR este numero cada vez que se edite colmillos.js, si no
+     algunos navegadores/CDN siguen sirviendo la version vieja del archivo (mismo nombre de
+     archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
+     usuario fuerce un refresh duro -->
+<script src="assets/js/colmillos.js?v=2" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
