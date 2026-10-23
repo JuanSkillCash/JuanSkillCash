@@ -468,9 +468,15 @@ button{font-family:inherit;color:inherit}
 .colm-tap-hint-big{font-size:13px;margin-top:14px}
 .colm-balance-display-big{font-size:clamp(40px,12vw,64px);margin-top:18px}
 .colm-balance-caption-big{font-size:13px;margin-top:10px}
-.colm-wallet-stats-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:30px;width:100%}
-.colm-wallet-stat{flex:1;min-width:140px;padding:16px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.colm-wallet-stats-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:30px;width:100%;align-items:stretch}
+.colm-wallet-stat-col{flex:1;min-width:150px;display:flex;flex-direction:column;gap:8px}
+.colm-wallet-stat{padding:16px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
 .colm-wallet-stat-num{font-family:'Press Start 2P',cursive;font-size:20px;color:var(--gold)}
+.colm-wallet-stat-num-big{font-size:34px;text-shadow:0 0 16px rgba(240,178,61,.6)}
+.colm-wallet-stat-manada{border-color:rgba(240,178,61,.4);background:linear-gradient(135deg,rgba(240,178,61,.08),rgba(255,255,255,.02))}
+.colm-wallet-stat-live{display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--green);letter-spacing:.05em;margin-bottom:8px}
+.colm-wallet-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:pillDotPulse 1.6s ease-in-out infinite}
+.colm-wallet-stat-note{font-size:11px;color:var(--muted);line-height:1.6;margin:0;padding:10px 12px;border:1px dashed var(--border2);border-radius:10px;background:rgba(255,255,255,.02);flex:1}
 .colm-wallet-stat-num b{color:inherit}
 .colm-wallet-stat-cap{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);margin-top:8px}
 .colm-hero-overlay{position:absolute;inset:0;z-index:10;background:rgba(6,7,14,.97);border-radius:16px;overflow-y:auto;padding:14px 12px 20px;-webkit-overflow-scrolling:touch}
@@ -579,6 +585,26 @@ button{font-family:inherit;color:inherit}
 .colm-power-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .colm-rarity-info-btn{display:block;margin:0 auto 12px;background:none;border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted2);cursor:pointer}
 .colm-rarity-info-btn:hover{color:var(--white);border-color:var(--gold)}
+/* "story card": tarjeta ancha tipo pagina de cuento ilustrado (imagen + texto), para las
+   historias inventadas (origen de los Sharkoins, los 6 poderes) - reemplaza las cajitas
+   chiquitas de auth-note que se sentian muy simples para contar una historia */
+.colm-story-card{display:flex;gap:18px;align-items:center;width:100%;padding:20px;border-radius:18px;border:1px solid var(--border2);background:linear-gradient(135deg,rgba(240,178,61,.07),rgba(255,255,255,.02));margin-bottom:16px;box-sizing:border-box}
+.colm-story-card.reverse{flex-direction:row-reverse}
+.colm-story-card-art{flex-shrink:0;display:flex;gap:6px;align-items:center;justify-content:center}
+.colm-story-card-art img{width:60px;height:60px;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border2);padding:4px;box-sizing:border-box}
+.colm-story-card-art img.small{width:42px;height:42px}
+.colm-story-card-body{flex:1;min-width:0}
+.colm-story-card-eyebrow{font-family:'Bungee',cursive;font-size:13px;color:var(--gold);letter-spacing:.01em;margin:0 0 6px}
+.colm-story-card-text{font-size:12.5px;color:var(--muted);line-height:1.75;margin:0 0 8px}
+.colm-story-card-text:last-child{margin-bottom:0}
+.colm-story-tiers{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.colm-story-tier-chip{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:20px;padding:5px 10px 5px 6px}
+.colm-story-tier-chip b{color:var(--white);font-weight:700}
+@media (max-width:640px){
+  .colm-story-card,.colm-story-card.reverse{flex-direction:column;text-align:center;padding:16px}
+  .colm-story-card-art{flex-wrap:wrap}
+  .colm-story-tiers{justify-content:center}
+}
 .colm-rarity-info-tiers{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:16px}
 .colm-rarity-info-tier{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--white)}
 .colm-power-list{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;font-size:12px;color:var(--muted)}
@@ -6489,21 +6515,52 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
               <div class="colm-balance-caption colm-balance-caption-big">SHARKOINS</div>
               <div class="colm-wallet-stats-row">
-                <div class="colm-wallet-stat">
-                  <div class="colm-wallet-stat-num"><b id="colmillosGlobalTaps">0</b></div>
-                  <div class="colm-wallet-stat-cap">🌍 Manada</div>
+                <div class="colm-wallet-stat-col">
+                  <div class="colm-wallet-stat colm-wallet-stat-manada">
+                    <div class="colm-wallet-stat-live"><span class="colm-wallet-live-dot"></span>EN VIVO</div>
+                    <div class="colm-wallet-stat-num colm-wallet-stat-num-big"><b id="colmillosGlobalTaps">0</b></div>
+                    <div class="colm-wallet-stat-cap">🌍 Manada</div>
+                  </div>
+                  <p class="colm-wallet-stat-note">"Manada" es cuántas veces, entre TODA la comunidad junta, hemos tocado la moneda — cada toque tuyo también suma a ese número.</p>
                 </div>
-                <div class="colm-wallet-stat">
-                  <div class="colm-wallet-stat-num" id="colmillosSharkAge">—</div>
-                  <div class="colm-wallet-stat-cap">🦈 Edad del tiburón</div>
+                <div class="colm-wallet-stat-col">
+                  <div class="colm-wallet-stat">
+                    <div class="colm-wallet-stat-num" id="colmillosSharkAge">—</div>
+                    <div class="colm-wallet-stat-cap">🦈 Edad del tiburón</div>
+                  </div>
+                  <p class="colm-wallet-stat-note">Cuánto tiempo llevas nadando con nosotros — desde que creaste tu cuenta en SkillCash Tools.</p>
                 </div>
               </div>
-              <p class="auth-note" style="text-align:center;margin-top:4px">🌍 "Manada" es cuántas veces, entre TODA la comunidad junta, hemos tocado la moneda — cada toque tuyo también suma a ese número.</p>
 
               <div class="colm-section-label">📖 De dónde salieron los Sharkoins</div>
-              <p class="auth-note">Cuentan los más viejos de la Manada que, mucho antes de que existiera esta plataforma, un tiburón solitario encontró un arrecife que brillaba distinto a los demás: estaba hecho de monedas con forma de colmillo, doradas y gastadas por el agua. Nadie sabía de dónde habían salido — algunos decían que eran los colmillos que los tiburones más sabios iban dejando atrás cada vez que aprendían algo nuevo del mercado, como quien muda de diente al crecer.</p>
-              <p class="auth-note">El tiburón se dio cuenta de algo curioso: el arrecife solo soltaba una moneda nueva cuando alguien hacía algo que lo hacía un poco mejor — volver a nadar por ahí al día siguiente, acertar hacia dónde se movía la corriente, enseñarle el camino a otro pez perdido. Así empezó la Manada: cada Sharkoin no era un premio por suerte, sino la prueba de que alguien había nadado un poco más lejos que el día anterior.</p>
-              <p class="auth-note">Hoy, cada vez que tocas la moneda y ves subir tu número, estás siguiendo esa misma corriente. (Sí, esto es solo un cuento — pero tus Sharkoins sí son reales 🦈)</p>
+              <div class="colm-story-card">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/coin_tooth.png" alt="">
+                  <img src="assets/mascot/coin_charcoins.png" alt="">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">Capítulo 1 — El arrecife que brillaba distinto</p>
+                  <p class="colm-story-card-text">Cuentan los más viejos de la Manada que, mucho antes de que existiera esta plataforma, un tiburón solitario encontró un arrecife que brillaba distinto a los demás: estaba hecho de monedas con forma de colmillo, doradas y gastadas por el agua. Nadie sabía de dónde habían salido — algunos decían que eran los colmillos que los tiburones más sabios iban dejando atrás cada vez que aprendían algo nuevo del mercado, como quien muda de diente al crecer.</p>
+                </div>
+              </div>
+              <div class="colm-story-card reverse">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/backgrounds/bg_reef.png" alt="" style="width:76px;height:76px">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">Capítulo 2 — Nace la Manada</p>
+                  <p class="colm-story-card-text">El tiburón se dio cuenta de algo curioso: el arrecife solo soltaba una moneda nueva cuando alguien hacía algo que lo hacía un poco mejor — volver a nadar por ahí al día siguiente, acertar hacia dónde se movía la corriente, enseñarle el camino a otro pez perdido. Así empezó la Manada: cada Sharkoin no era un premio por suerte, sino la prueba de que alguien había nadado un poco más lejos que el día anterior.</p>
+                </div>
+              </div>
+              <div class="colm-story-card">
+                <div class="colm-story-card-art">
+                  <img src="assets/mascot/variants/shark_skin_gold.png" alt="">
+                </div>
+                <div class="colm-story-card-body">
+                  <p class="colm-story-card-eyebrow">Capítulo 3 — Hoy</p>
+                  <p class="colm-story-card-text">Hoy, cada vez que tocas la moneda y ves subir tu número, estás siguiendo esa misma corriente. (Sí, esto es solo un cuento — pero tus Sharkoins sí son reales 🦈)</p>
+                </div>
+              </div>
             </div>
           </div>
          </div>
