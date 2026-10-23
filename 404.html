@@ -557,7 +557,25 @@ button{font-family:inherit;color:inherit}
 .colm-shop-section{margin-bottom:6px}
 .colm-shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .colm-shop-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);text-align:center}
-.colm-shop-item-swatch{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;background:rgba(255,255,255,.04)}
+.colm-shop-item-swatch{position:relative;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;background:rgba(255,255,255,.04)}
+.colm-rarity-gem{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 6px rgba(0,0,0,.4)}
+.colm-evolve-btn{width:100%;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;border-radius:20px;padding:6px 8px;cursor:pointer;border:1px solid var(--border2);background:rgba(163,53,238,.12);color:var(--white)}
+.colm-evolve-btn:hover:not(:disabled){background:rgba(163,53,238,.22)}
+.colm-evolve-btn:disabled{opacity:.4;cursor:not-allowed}
+.colm-rarity-maxed{width:100%;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-align:center;color:var(--gold);padding:6px 0}
+.colm-power-sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+.colm-power-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.02)}
+.colm-power-icon{font-size:16px;line-height:1}
+.colm-power-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.colm-power-label{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.03em}
+.colm-power-value{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
+.colm-power-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.colm-rarity-info-btn{display:block;margin:0 auto 12px;background:none;border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted2);cursor:pointer}
+.colm-rarity-info-btn:hover{color:var(--white);border-color:var(--gold)}
+.colm-rarity-info-tiers{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:16px}
+.colm-rarity-info-tier{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--white)}
+.colm-power-list{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;font-size:12px;color:var(--muted)}
+.colm-power-list li{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.03)}
 /* fondos: tarjeta rectangular grande (aspecto 8:5, igual que el PNG original) en vez del
    circulito chiquito - asi si se alcanza a ver la escena completa antes de comprarla */
 .colm-shop-bg-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
@@ -6413,6 +6431,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <div id="colmillosTiendaSlot" style="display:none"></div>
           <div class="colm-tabpanel" data-tabpanel="tienda" style="display:none">
             <div class="colm-char-preview" id="colmillosCharPreviewBig"></div>
+            <div class="colm-power-sheet" id="colmillosPowerSheet"></div>
+            <button type="button" class="colm-rarity-info-btn" id="colmRarityInfoBtn">❓ ¿Cómo funciona la rareza?</button>
             <div class="colm-shop-subtabs" id="colmillosShopSubtabs">
               <button type="button" class="colm-shop-subtab active" data-shopcat="skin">🎨 Colores</button>
               <button type="button" class="colm-shop-subtab" data-shopcat="accessory" data-slot="head">🎩 Cabeza</button>
@@ -8754,6 +8774,48 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <button type="button" class="colm-play-btn colm-roulette-spin-btn" id="colmRouletteSpinBtn">GIRAR 🎰</button>
       </div>
       <p class="colm-game-hint" id="colmRouletteResult">Apostá Sharkoins y girá la ruleta — es solo un juego dentro de la plataforma, sin relación con dinero real. Entre 5 y 50 Sharkoins por tirada.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: COLMILLOS - explica el sistema de rareza/evolucion de skins y accesorios ===== -->
+<div class="modal-overlay" id="colmRarityInfoModal">
+  <button class="modal-close" id="closeColmRarityInfo" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmRarityInfoTitleEl" style="max-width:480px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="colmRarityInfoTitleEl" style="font-size:22px">🔮 Rareza y Evolución</h2>
+        <p class="calc-sub">Cómo sube de nivel tu tiburón</p>
+      </div>
+
+      <div class="colm-rarity-info-tiers">
+        <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#9d9d9d"></span>Común</div>
+        <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#3b82f6"></span>Raro</div>
+        <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#a335ee"></span>Épico</div>
+        <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:#f0a020"></span>Legendario</div>
+        <div class="colm-rarity-info-tier"><span class="colm-power-dot" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></span>Mítico</div>
+      </div>
+
+      <p class="auth-note">🎨 Cada skin y cada accesorio es su propia "familia". La comprás una vez —siempre arranca en <b>Común</b>— y después la podés <b>evolucionar</b> pagando Sharkoins extra, un escalón a la vez y en orden (no te podés saltar ninguno): Común → Raro → Épico → Legendario → Mítico. Entre más rara, más cara la evolución. Es la MISMA pieza mejorando, nunca comprás una nueva.</p>
+
+      <p class="auth-note">🌊 Los fondos y los boletos de sorteo no tienen rareza — son de precio único, como siempre.</p>
+
+      <p class="colm-section-label" style="text-align:center">Los 6 poderes</p>
+      <p class="auth-note">El color de tu tiburón y cada una de las 5 partes del cuerpo (cabeza, cara, cuerpo, manos, pies) te dan un poder propio — su nivel es la rareza de lo que tengas equipado ahí:</p>
+      <ul class="colm-power-list">
+        <li>🧬 Color → <b>Instinto</b></li>
+        <li>🧠 Cabeza → <b>Astucia</b></li>
+        <li>👁️ Cara → <b>Visión</b></li>
+        <li>🛡️ Cuerpo → <b>Resistencia</b></li>
+        <li>💪 Manos → <b>Fuerza</b></li>
+        <li>⚡ Pies → <b>Velocidad</b></li>
+      </ul>
+
+      <p class="auth-note" style="border-color:var(--gold)">✨ Todo esto es 100% para presumir — no le da ninguna ventaja real en el minijuego, la ruleta ni la trivia. Es pura colección.</p>
     </div>
   </div>
 </div>
@@ -26369,6 +26431,37 @@ const COLM_EQUIPPED_DEFAULT = { skin_id: null, accessory_head_id: null, accessor
 let colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
 let colmillosOwnedItemIds = new Set();
 let colmillosShopItemsCache = [];
+/* ---- rareza/evolucion de skins y accesorios (NO aplica a fondos ni al boleto - esos siguen
+   con un solo precio): cada skin/accesorio es una "familia" que se compra una vez al precio
+   de catalogo (eso es el tier 1, Común) y despues se puede EVOLUCIONAR pagando Sharkoins
+   extra - Raro, Épico, Legendario, Mítico - sin comprar nada nuevo, es la MISMA pieza
+   mejorando (como las piezas de Axie Infinity). El costo de evolucionar es igual para
+   cualquier familia, y la rareza alcanzada queda guardada como una fila mas del ledger de
+   siempre (event_type='evolve_<item_id>', period_key='tier2'/'tier3'/...) - ver
+   scripts/sql/colm_shop_repricing.sql. Es puramente decorativo/coleccionable: no cambia nada
+   del minijuego, la ruleta ni la trivia. */
+const COLM_RARITY_TIERS = [
+  null, // no existe tier 0
+  { tier: 1, name: 'Común', color: '#9d9d9d' },
+  { tier: 2, name: 'Raro', color: '#3b82f6' },
+  { tier: 3, name: 'Épico', color: '#a335ee' },
+  { tier: 4, name: 'Legendario', color: '#f0a020' },
+  { tier: 5, name: 'Mítico', color: 'linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)' },
+];
+const COLM_EVOLVE_COST = { 2: 150, 3: 300, 4: 550, 5: 900 };
+const COLM_RARITY_CATEGORIES = new Set(['skin', 'accessory']);
+/* las 6 "categorias de poder" del personaje - el color (skin) y cada una de las 5 partes del
+   cuerpo le dan su propio poder decorativo, cuyo NIVEL es la rareza de lo que tengas
+   equipado ahi (nada equipado = sin poder en esa categoria) */
+const COLM_POWER_BY_SLOT = {
+  skin_id: { label: 'Instinto', icon: '🧬' },
+  accessory_head_id: { label: 'Astucia', icon: '🧠' },
+  accessory_face_id: { label: 'Visión', icon: '👁️' },
+  accessory_body_id: { label: 'Resistencia', icon: '🛡️' },
+  accessory_hands_id: { label: 'Fuerza', icon: '💪' },
+  accessory_feet_id: { label: 'Velocidad', icon: '⚡' },
+};
+let colmillosItemRarity = new Map(); // itemId -> tier (1-5), solo para items que se poseen
 /* vista previa "para ver como se veria" dentro de la tienda - NO es lo realmente equipado,
    solo cambia lo que se ve en colmillosCharPreviewBig al tocar una cajita. Se limpia (vuelve
    a mostrar lo que el usuario ya tiene puesto de verdad) cada vez que se entra a la tienda o
@@ -26393,6 +26486,7 @@ function renderSharkPreviews(){
   if(loadingSharkEl) loadingSharkEl.innerHTML = startImgHtml;
   renderColmHeroBackground();
   renderColmillosShopPreview();
+  renderColmPowerSheet();
   renderAccountMiniAvatar();
 }
 function renderColmillosShopPreview(){
@@ -26408,6 +26502,24 @@ function renderColmillosShopPreview(){
   const src = BG_IMG_PATHS[background];
   bigEl.style.backgroundImage = src ? ("url('" + src + "')") : '';
   bigEl.classList.toggle('has-bg', !!src);
+}
+/* "ficha del personaje": 6 poderes decorativos (el color + las 5 partes del cuerpo), cada uno
+   al nivel de rareza de lo que de verdad tenes EQUIPADO ahi (no lo que estas previsualizando) -
+   son solo para presumir, no cambian nada del minijuego/ruleta/trivia */
+function renderColmPowerSheet(){
+  const el = document.getElementById('colmillosPowerSheet');
+  if(!el) return;
+  el.innerHTML = Object.keys(COLM_POWER_BY_SLOT).map(field => {
+    const power = COLM_POWER_BY_SLOT[field];
+    const itemId = colmillosEquippedState[field];
+    const tierInfo = itemId ? COLM_RARITY_TIERS[colmillosItemRarity.get(itemId) || 1] : null;
+    const valueHtml = tierInfo
+      ? '<span class="colm-power-dot" style="background:' + tierInfo.color + '"></span>' + tierInfo.name
+      : '<span class="colm-power-dot" style="background:var(--muted2)"></span>Sin equipar';
+    return '<div class="colm-power-row"><span class="colm-power-icon">' + power.icon + '</span>' +
+      '<span class="colm-power-text"><span class="colm-power-label">' + power.label + '</span>' +
+      '<span class="colm-power-value">' + valueHtml + '</span></span></div>';
+  }).join('');
 }
 /* avatarcito del tiburon - se usa tanto en el botoncito de cuenta (arriba a la derecha) como
    en el circulo grande de "Mi perfil", en vez del emoji generico de siempre, para que se
@@ -26597,16 +26709,30 @@ async function loadColmillosShop(){
     if(itemsErr){ console.warn('no se pudo leer la tienda de colmillos', itemsErr); return; }
     colmillosShopItemsCache = items || [];
   }
-  const { data: ledgerRows, error: ledgerErr } = await sbClient.from('user_colmillos_events').select('event_type,amount');
+  const { data: ledgerRows, error: ledgerErr } = await sbClient.from('user_colmillos_events').select('event_type,amount,period_key');
   if(ledgerErr){ console.warn('no se pudo leer el saldo para la tienda', ledgerErr); return; }
   const rows = ledgerRows || [];
   colmillosOwnedItemIds = new Set(
     rows.filter(r => r.event_type.indexOf('purchase_') === 0 && r.event_type !== 'purchase_raffle_ticket')
         .map(r => r.event_type.slice('purchase_'.length))
   );
-  // cuenta del dueno: todo queda desbloqueado/equipable de una vez, sin tener que comprarlo
+  // rareza actual de cada familia poseida: Común (tier 1) en cuanto se compra, y sube un
+  // escalon por cada fila evolve_<id>/tierN que exista en el ledger (ver COLM_EVOLVE_COST)
+  colmillosItemRarity = new Map();
+  colmillosOwnedItemIds.forEach(id => {
+    let tier = 1;
+    for(let t = 5; t >= 2; t--){
+      if(rows.some(r => r.event_type === 'evolve_' + id && r.period_key === 'tier' + t)){ tier = t; break; }
+    }
+    colmillosItemRarity.set(id, tier);
+  });
+  // cuenta del dueno: todo queda desbloqueado/equipable (y al maximo de rareza) de una vez,
+  // sin tener que comprarlo ni evolucionarlo
   if(currentUser.id === OWNER_USER_ID){
     colmillosOwnedItemIds = new Set(colmillosShopItemsCache.filter(it => it.category !== 'raffle').map(it => it.id));
+    colmillosItemRarity = new Map(
+      colmillosShopItemsCache.filter(it => COLM_RARITY_CATEGORIES.has(it.category)).map(it => [it.id, 5])
+    );
   }
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
@@ -26715,6 +26841,16 @@ function renderColmillosShopGrids(balance){
       } else {
         swatch.textContent = COLM_SHOP_ICONS[item.id] || '🦷';
       }
+      if(COLM_RARITY_CATEGORIES.has(cat) && colmillosOwnedItemIds.has(item.id)){
+        // gema de color en la esquina = rareza actual de esta familia (como el "diamantico"
+        // de los juegos de coleccion) - solo se muestra si ya se tiene, nada que presumir antes
+        const tierInfo = COLM_RARITY_TIERS[colmillosItemRarity.get(item.id) || 1];
+        const gem = document.createElement('div');
+        gem.className = 'colm-rarity-gem';
+        gem.style.background = tierInfo.color;
+        gem.title = tierInfo.name;
+        swatch.appendChild(gem);
+      }
       if(cat !== 'raffle'){
         swatch.addEventListener('click', () => {
           colmillosShopPreview[equipField] = item.id;
@@ -26748,6 +26884,28 @@ function renderColmillosShopGrids(balance){
           btn.disabled = balance < item.price;
           btn.addEventListener('click', () => buyColmillosItem(item));
         }
+        if(COLM_RARITY_CATEGORIES.has(cat) && owned){
+          // evolucionar: la MISMA pieza sube de rareza (nunca se compra una nueva) - hay que
+          // ir en orden, un escalon a la vez, y cada escalon cuesta mas que el anterior
+          const tier = colmillosItemRarity.get(item.id) || 1;
+          if(tier < 5){
+            const nextTier = tier + 1;
+            const cost = COLM_EVOLVE_COST[nextTier];
+            const nextInfo = COLM_RARITY_TIERS[nextTier];
+            const evoBtn = document.createElement('button');
+            evoBtn.type = 'button';
+            evoBtn.className = 'colm-evolve-btn';
+            evoBtn.textContent = '⬆️ Evolucionar a ' + nextInfo.name + ' — ' + cost + ' 🦷';
+            evoBtn.disabled = balance < cost;
+            evoBtn.addEventListener('click', () => evolveColmillosItem(item, tier));
+            card.appendChild(evoBtn);
+          } else {
+            const maxedEl = document.createElement('div');
+            maxedEl.className = 'colm-rarity-maxed';
+            maxedEl.textContent = '✨ Mítico (máx)';
+            card.appendChild(maxedEl);
+          }
+        }
       }
       grid.appendChild(card);
     });
@@ -26764,6 +26922,24 @@ async function buyColmillosItem(item){
   const periodKey = isRaffle ? (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random())) : 'once';
   const { error } = await sbClient.from('user_colmillos_events').insert({
     user_id: currentUser.id, event_type: eventType, period_key: periodKey, amount: -item.price,
+  });
+  if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
+  await loadColmillosShop();
+  loadColmillosBalance(true);
+}
+/* evolucionar una familia que ya se tiene a la siguiente rareza - paga COLM_EVOLVE_COST[nextTier]
+   y queda una fila mas en el mismo ledger de siempre (event_type='evolve_<id>',
+   period_key='tier<N>'), nunca una compra nueva ni un item distinto */
+async function evolveColmillosItem(item, currentTier){
+  if(!currentUser) return;
+  const nextTier = currentTier + 1;
+  const cost = COLM_EVOLVE_COST[nextTier];
+  if(!cost) return;
+  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
+  if(balance < cost){ loadColmillosShop(); return; }
+  const { error } = await sbClient.from('user_colmillos_events').insert({
+    user_id: currentUser.id, event_type: 'evolve_' + item.id, period_key: 'tier' + nextTier, amount: -cost,
   });
   if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
   await loadColmillosShop();
@@ -27255,6 +27431,14 @@ function closeColmRouletteModal(){ closeModalGeneric(colmRouletteModal); }
 closeColmRoulette.addEventListener('click', closeColmRouletteModal);
 colmRouletteModal.addEventListener('click', (e) => { if(e.target === colmRouletteModal) closeColmRouletteModal(); });
 document.getElementById('colmOpenRouletteBtn').addEventListener('click', openColmRouletteModal);
+const colmRarityInfoModal = document.getElementById('colmRarityInfoModal');
+const colmRarityInfoPanel = colmRarityInfoModal.querySelector('.modal-panel');
+const closeColmRarityInfo = document.getElementById('closeColmRarityInfo');
+function openColmRarityInfoModal(){ openModalGeneric(colmRarityInfoModal, colmRarityInfoPanel, closeColmRarityInfo); }
+function closeColmRarityInfoModal(){ closeModalGeneric(colmRarityInfoModal); }
+closeColmRarityInfo.addEventListener('click', closeColmRarityInfoModal);
+colmRarityInfoModal.addEventListener('click', (e) => { if(e.target === colmRarityInfoModal) closeColmRarityInfoModal(); });
+document.getElementById('colmRarityInfoBtn').addEventListener('click', openColmRarityInfoModal);
 /* sub-pestañas DENTRO de la tienda (Colores/Cabeza/Cara/Cuerpo/Manos/Fondos/Sorteos) - antes
    todo estaba en una sola columna larga y tocaba bajar mucho scroll; ahora solo se muestra
    una categoria a la vez. Cabeza/Cara/Cuerpo/Manos comparten la misma categoria real
