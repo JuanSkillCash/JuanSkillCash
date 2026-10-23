@@ -14,11 +14,20 @@ numero de operaciones de TODOS los referidos directos de Juan de una vez, en vez
 por usuario conectado - mucho mas eficiente y dentro del limite de 30 llamadas/10s de Bitunix
 aunque haya muchos usuarios conectados.
 
+Aviso por Telegram de subida de rango: se compara el current_rank que ya estaba guardado (de
+ANTES de esta corrida) contra el recien calculado - si subio de verdad (y es el mismo mes, para
+no confundir el reinicio mensual con una "bajada" de rango) se le manda un mensaje al chat_id
+vinculado (user_telegram_links). Si no tiene Telegram conectado, simplemente no se le avisa por
+ahi (sigue viendo el rango nuevo en la cajita del sitio igual). Un fallo mandando los avisos
+nunca debe tumbar la corrida - el volumen/rango ya quedo guardado en Supabase antes de llegar
+a esa parte.
+
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
     BITUNIX_API_KEY
     BITUNIX_API_SECRET
+    TELEGRAM_BOT_TOKEN   (opcional - sin esto simplemente no se mandan los avisos de subida)
 """
 
 from __future__ import annotations
@@ -39,9 +48,11 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 BITUNIX_API_KEY = os.environ.get("BITUNIX_API_KEY", "")
 BITUNIX_API_SECRET = os.environ.get("BITUNIX_API_SECRET", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
 CONNECTIONS_TABLE = "user_exchange_connections"
 VOLUME_TABLE = "user_exchange_volume"
+TELEGRAM_LINKS_TABLE = "user_telegram_links"
 
 # limites del mes en curso (decidido con Juan: el rango se reinicia cada mes)
 RANK_THRESHOLDS_USD = [
@@ -50,6 +61,18 @@ RANK_THRESHOLDS_USD = [
     ("cazador", 50_000),
     ("explorador", 10_000),
 ]
+
+# de menor a mayor - el indice en esta lista es lo que se compara para saber si de verdad
+# "subio" de rango (nunca baja dentro del mismo mes, el volumen solo se acumula)
+RANK_ORDER = ["sin_rango", "cria", "explorador", "cazador", "depredador", "alfa"]
+
+RANK_PROMO_TEXT = {
+    "cria": ("🐣", "Cría"),
+    "explorador": ("🧭", "Explorador"),
+    "cazador": ("🎯", "Cazador"),
+    "depredador": ("🦈", "Depredador"),
+    "alfa": ("👑", "Alfa"),
+}
 
 
 def _sb_headers() -> dict:
@@ -96,6 +119,76 @@ def _upsert_volume_rows(rows: list[dict]) -> bool:
     return True
 
 
+def _fetch_previous_ranks(user_ids: list[str]) -> dict[str, dict]:
+    """Trae el month/current_rank que YA estaba guardado antes de esta corrida, para poder
+    comparar despues contra el recien calculado y detectar una subida de rango real."""
+    if not user_ids:
+        return {}
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{VOLUME_TABLE}",
+        params={"select": "user_id,month,current_rank", "user_id": f"in.({','.join(user_ids)})"},
+        headers=_sb_headers(), timeout=20,
+    )
+    if resp.status_code != 200:
+        log.warning(f"no se pudo leer el rango anterior ({resp.status_code}): {resp.text[:300]}")
+        return {}
+    return {row["user_id"]: row for row in resp.json()}
+
+
+def _fetch_chat_ids(user_ids: list[str]) -> dict[str, int]:
+    if not user_ids:
+        return {}
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{TELEGRAM_LINKS_TABLE}",
+        params={"select": "user_id,chat_id", "user_id": f"in.({','.join(user_ids)})", "chat_id": "not.is.null"},
+        headers=_sb_headers(), timeout=20,
+    )
+    if resp.status_code != 200:
+        log.warning(f"no se pudo leer los chat_id de telegram ({resp.status_code}): {resp.text[:300]}")
+        return {}
+    return {row["user_id"]: row["chat_id"] for row in resp.json()}
+
+
+def _send_telegram(chat_id: int, text: str) -> None:
+    try:
+        resp = requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+            json={"chat_id": chat_id, "text": text},
+            timeout=15,
+        )
+        if resp.status_code >= 300:
+            log.warning(f"telegram respondio {resp.status_code} mandando aviso de rango a {chat_id}: {resp.text[:200]}")
+    except requests.RequestException as e:
+        log.warning(f"fallo mandando aviso de rango por telegram a {chat_id}: {e}")
+
+
+def _notify_promotions(promotions: list[dict]) -> None:
+    """promotions: [{user_id, new_rank, volume_usd}] - ya filtrado para solo incluir subidas
+    de rango reales dentro del mismo mes (ver main())."""
+    if not promotions:
+        return
+    if not TELEGRAM_BOT_TOKEN:
+        log.info(f"{len(promotions)} subida(s) de rango detectada(s), pero falta TELEGRAM_BOT_TOKEN - no se avisa por ahi")
+        return
+
+    chat_ids = _fetch_chat_ids([p["user_id"] for p in promotions])
+    sent = 0
+    for p in promotions:
+        chat_id = chat_ids.get(p["user_id"])
+        if not chat_id:
+            continue
+        emoji, label = RANK_PROMO_TEXT.get(p["new_rank"], ("🦈", p["new_rank"]))
+        text = (
+            f"{emoji} ¡Subiste de rango en la Manada! Ahora eres {label} en Bitunix.\n\n"
+            f"Volumen de este mes: ${p['volume_usd']:,.0f} USD.\n\n"
+            "Sigue operando para subir todavía más este mes — revisa tu progreso en "
+            "juanskillcash.com → Mi perfil → Rango de Manada."
+        )
+        _send_telegram(chat_id, text)
+        sent += 1
+    log.info(f"{len(promotions)} subida(s) de rango detectada(s), {sent} aviso(s) de telegram mandado(s)")
+
+
 def main() -> None:
     if not SUPABASE_URL or not SUPABASE_KEY:
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
@@ -120,7 +213,11 @@ def main() -> None:
         log.error("no se pudo leer el volumen del mes desde Bitunix - no se toca ninguna fila")
         sys.exit(1)
 
+    user_ids = [c["user_id"] for c in connected if c.get("user_id")]
+    previous = _fetch_previous_ranks(user_ids)
+
     rows = []
+    promotions = []
     for conn in connected:
         uid = str(conn.get("uid") or "").strip()
         user_id = conn.get("user_id")
@@ -129,6 +226,7 @@ def main() -> None:
         item = by_uid.get(uid)
         trade_count = int(item.get("tradeCnt") or 0) if item else 0
         volume_usd = float(item.get("tradeAmount") or 0) if item else 0.0
+        new_rank = _rank_for_volume(trade_count, volume_usd)
         rows.append({
             "user_id": user_id,
             "exchange": "bitunix",
@@ -136,14 +234,30 @@ def main() -> None:
             "month": month_label,
             "trade_count": trade_count,
             "month_volume_usd": volume_usd,
-            "current_rank": _rank_for_volume(trade_count, volume_usd),
+            "current_rank": new_rank,
             "updated_at": now.isoformat(),
         })
+
+        # subida de rango real: tenia fila de ESTE MISMO mes y el rango nuevo quedo mas
+        # arriba en RANK_ORDER que el que tenia - si es el primer mes que se le calcula o
+        # si lo que cambio fue el mes (reinicio mensual), nunca se avisa como "subida"
+        prev = previous.get(user_id)
+        if prev and prev.get("month") == month_label:
+            prev_rank = prev.get("current_rank") or "sin_rango"
+            if prev_rank in RANK_ORDER and new_rank in RANK_ORDER and RANK_ORDER.index(new_rank) > RANK_ORDER.index(prev_rank):
+                promotions.append({"user_id": user_id, "new_rank": new_rank, "volume_usd": volume_usd})
 
     if _upsert_volume_rows(rows):
         log.info(f"volumen de {len(rows)} usuario(s) actualizado para {month_label}")
     else:
         sys.exit(1)
+
+    try:
+        _notify_promotions(promotions)
+    except Exception as e:
+        # el volumen/rango ya quedo guardado arriba - un fallo mandando avisos nunca debe
+        # hacer fallar la corrida completa
+        log.warning(f"fallo procesando los avisos de subida de rango: {e}")
 
 
 if __name__ == "__main__":
