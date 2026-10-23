@@ -25424,37 +25424,47 @@ function playBellChime(ringCount){
   ringCount = ringCount || 5;
   try{
     if(!bellAudioCtx) bellAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if(bellAudioCtx.state === 'suspended') bellAudioCtx.resume();
     const ctx = bellAudioCtx;
-    const now = ctx.currentTime;
-    const spacing = 0.17; // un poco más rápido
-    const baseFreq = 1250; // frecuencia base más aguda, tipo campanita brillante
-    // una campana de verdad no suena en una sola nota pura: son varios armónicos
-    // "desafinados" entre sí (no múltiplos exactos) sonando juntos, cada uno apagándose
-    // a su propio ritmo — eso es lo que le da el timbre metálico característico.
-    const partials = [
-      { ratio: 1,    gain: 0.30, decay: 1.1 },
-      { ratio: 2.01, gain: 0.20, decay: 0.9 },
-      { ratio: 2.42, gain: 0.16, decay: 0.7 },
-      { ratio: 3.06, gain: 0.11, decay: 0.5 },
-      { ratio: 4.18, gain: 0.07, decay: 0.35 }
-    ];
-    for(let i = 0; i < ringCount; i++){
-      const t = now + i * spacing;
-      playBellStrikeNoise(ctx, t);
-      partials.forEach(p => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(baseFreq * p.ratio, t);
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(p.gain, t + 0.003);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + p.decay);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(t);
-        osc.stop(t + p.decay + 0.05);
-      });
+    const schedule = () => {
+      const now = ctx.currentTime;
+      const spacing = 0.17; // un poco más rápido
+      const baseFreq = 1250; // frecuencia base más aguda, tipo campanita brillante
+      // una campana de verdad no suena en una sola nota pura: son varios armónicos
+      // "desafinados" entre sí (no múltiplos exactos) sonando juntos, cada uno apagándose
+      // a su propio ritmo — eso es lo que le da el timbre metálico característico.
+      const partials = [
+        { ratio: 1,    gain: 0.30, decay: 1.1 },
+        { ratio: 2.01, gain: 0.20, decay: 0.9 },
+        { ratio: 2.42, gain: 0.16, decay: 0.7 },
+        { ratio: 3.06, gain: 0.11, decay: 0.5 },
+        { ratio: 4.18, gain: 0.07, decay: 0.35 }
+      ];
+      for(let i = 0; i < ringCount; i++){
+        const t = now + i * spacing;
+        playBellStrikeNoise(ctx, t);
+        partials.forEach(p => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(baseFreq * p.ratio, t);
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(p.gain, t + 0.003);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + p.decay);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + p.decay + 0.05);
+        });
+      }
+    };
+    // en una pestaña que estuvo mucho rato en reposo, el navegador suspende el AudioContext
+    // solo - antes esto se "reanudaba" sin esperar la promesa, asi que a veces se programaban
+    // los osciladores sobre un contexto que TODAVIA no estaba corriendo de verdad y no sonaba
+    // nada. Ahora se espera a que resume() realmente termine antes de programar la campana.
+    if(ctx.state === 'suspended'){
+      ctx.resume().then(schedule).catch(() => {});
+    } else {
+      schedule();
     }
   } catch(err){ /* navegador sin soporte de Web Audio — se ignora en silencio */ }
 }
@@ -25503,6 +25513,13 @@ function updateMarketSessions(){
 
 renderMarketSessions();
 setInterval(updateMarketSessions, 1000);
+// si la pestaña estuvo mucho rato en segundo plano, el navegador frena/congela este setInterval
+// para ahorrar bateria - al volver a la pestaña se revisa de una vez (en vez de esperar a que
+// el intervalo retome su ritmo normal), para que la campana de una transicion que paso mientras
+// no se miraba suene apenas se vuelve a la pestaña, no varios segundos/minutos despues
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden) updateMarketSessions();
+});
 
 /* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
 (function checkOAuthReturnError(){
@@ -26726,14 +26743,10 @@ async function loadColmillosShop(){
     }
     colmillosItemRarity.set(id, tier);
   });
-  // cuenta del dueno: todo queda desbloqueado/equipable (y al maximo de rareza) de una vez,
-  // sin tener que comprarlo ni evolucionarlo
-  if(currentUser.id === OWNER_USER_ID){
-    colmillosOwnedItemIds = new Set(colmillosShopItemsCache.filter(it => it.category !== 'raffle').map(it => it.id));
-    colmillosItemRarity = new Map(
-      colmillosShopItemsCache.filter(it => COLM_RARITY_CATEGORIES.has(it.category)).map(it => [it.id, 5])
-    );
-  }
+  // el dueno (Juan) YA NO tiene todo desbloqueado/al maximo de rareza gratis aca - para poder
+  // probar la tienda y las evoluciones tal cual las ve cualquier usuario, su cuenta pasa por el
+  // mismo calculo de arriba (ownedItemIds/rarity derivados 100% de su propio ledger), solo que
+  // con un saldo bien grande de Sharkoins de prueba (ver scripts/sql/colm_owner_test_reset.sql)
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
   const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
