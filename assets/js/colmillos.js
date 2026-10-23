@@ -336,9 +336,9 @@ window.addEventListener('resize', () => {
 /* particulas decorativas flotando alrededor del heroe (moneditas/destellos SkillCash, no
    colores chillones) - puramente ambientacion, se regeneran cada vez que se entra a la
    pagina para que no se vean siempre en la misma posicion */
-/* particulas decorativas: 1 de cada 3 es una monedita SkillCash real (coin-sheet.png, los 4
-   frames del pack de arte animados en loop vía CSS), el resto son destellos rojo/blanco - ya
-   no hay emojis dorados sueltos */
+/* particulas decorativas: 1 de cada 3 es la moneda SkillCash original (assets/mascot/coin_tooth.png,
+   la del tiburoncito doradita - NO la moneda roja del pack nuevo, esa nunca se pidio), el
+   resto son destellos rojo/blanco */
 function renderColmHeroParticles(){
   const farEl = document.getElementById('colmillosHeroParticlesFar');
   const nearEl = document.getElementById('colmillosHeroParticlesNear');
@@ -349,13 +349,13 @@ function renderColmHeroParticles(){
     const dur = (4 + Math.random() * 5).toFixed(1);
     const delay = (Math.random() * 6).toFixed(1);
     const drift = (Math.random() * 16 - 8).toFixed(1) + 'px';
-    const posStyle = 'left:' + left + '%;top:' + top + '%;--drift:' + drift + ';animation-delay:' + delay + 's,' + (Math.random() * 0.9).toFixed(2) + 's';
+    const posStyle = 'left:' + left + '%;top:' + top + '%;--drift:' + drift + ';animation-duration:' + dur + 's;animation-delay:' + delay + 's';
     if(i % 3 === 0){
-      return '<span class="colm-hero-particle colm-hero-particle-coin' + (near ? ' near' : '') + '" style="' + posStyle + ';animation-duration:' + dur + 's,.9s"></span>';
+      return '<span class="colm-hero-particle colm-hero-particle-coin' + (near ? ' near' : '') + '" style="' + posStyle + '"></span>';
     }
     const size = near ? (8 + Math.random() * 4) : (6 + Math.random() * 8);
     const color = i % 2 ? 'var(--hero-red)' : '#fff';
-    return '<span class="colm-hero-particle' + (near ? ' near' : '') + '" style="' + posStyle + ';animation-duration:' + dur + 's;font-size:' + size.toFixed(1) + 'px;color:' + color + '">' + sparkGlyphs[i % sparkGlyphs.length] + '</span>';
+    return '<span class="colm-hero-particle' + (near ? ' near' : '') + '" style="' + posStyle + ';font-size:' + size.toFixed(1) + 'px;color:' + color + '">' + sparkGlyphs[i % sparkGlyphs.length] + '</span>';
   }).join('');
   if(farEl) farEl.innerHTML = build(10, false);
   if(nearEl) nearEl.innerHTML = build(3, true);
