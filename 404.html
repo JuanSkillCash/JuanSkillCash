@@ -380,6 +380,11 @@ button{font-family:inherit;color:inherit}
 .colmillos-pill{border-color:rgba(240,178,61,.35);color:var(--gold);font-family:'Space Mono',monospace}
 .colmillos-pill:hover{border-color:var(--gold)}
 .colmillos-pill svg{opacity:1}
+/* la regla generica .exchange-pill img{opacity:.4} es para apagar el icono de pildoras de
+   "conectar servicio" (Bitunix/Telegram) hasta que esten conectadas - la pildora de Sharkoins
+   no es de ese tipo (siempre muestra saldo, nunca un estado "desconectado"), asi que su moneda
+   se quedaba opaca/grisacea para siempre sin querer. Se fuerza a verse siempre brillante. */
+.colmillos-pill img{opacity:1 !important}
 .colmillos-pill.bump{animation:colmillosBump .5s var(--ease-out)}
 @keyframes colmillosBump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
 .wip-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#13162a;border:1px solid var(--border2);color:var(--white);font-size:13px;font-weight:600;padding:12px 20px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
@@ -26715,6 +26720,10 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
    user_colmillos_events (period_key='once' para cosmeticos, un uuid por boleto para que los
    boletos de sorteo si se puedan comprar varias veces); equipar = fila en
    user_colmillos_equipped. Ver scripts/sql/create_colmillos_minigame.sql ---- */
+// icono de la moneda real (el lado "tiburon" de las dos caras del Sharkoin, ver linea ~27571)
+// para los precios de la tienda - antes se usaba el emoji generico 🦷, que se confundia con
+// un diente de verdad en vez de la moneda que inventamos
+const COLM_COIN_ICON_HTML = '<img src="assets/mascot/coin_tooth.png" alt="Sharkoins" style="width:14px;height:14px;vertical-align:-2px;image-rendering:pixelated;image-rendering:crisp-edges">';
 const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', skin_camo: '🦈', skin_tiger: '🦈', skin_galaxy: '🦈', skin_arcoiris: '🦈', skin_oroliquido: '🦈', skin_neon: '🦈', skin_dragon: '🦈', skin_martillo: '🦈', skin_rayosx: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', acc_scuba: '🤿', acc_scarf: '🧣', acc_headphones: '🎧', acc_crown: '👑', acc_cape: '🏴‍☠️', acc_sombrero: '🪄', acc_antifaz: '🦸', acc_aletarobot: '🤖', acc_collar: '🌺', acc_paraguas: '☂️', acc_guantes: '🥊', acc_microfono: '🎤', acc_bate: '⚾', acc_escudo: '🛡️', acc_espada: '⚔️', acc_mazo: '🔨', acc_raqueta: '🎾', acc_varita: '🪄', acc_aletasbuceo: '🤿', acc_botasnieve: '🥾', acc_botaspirata: '👢', acc_patines: '⛸️', acc_sandalias: '🩴', acc_tenis: '👟', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', bg_sunken_city: '🏛️', bg_volcano: '🌋', bg_night: '🌙', bg_nave: '🛸', bg_tormenta: '⛈️', bg_playa: '🏖️', bg_laboratorio: '🧪', bg_atardecer: '🌅', bg_selva: '🌴', bg_cueva: '💎', bg_neon: '🌃', bg_pradera: '🌼', bg_nieve: '❄️', bg_desierto: '🏜️', raffle_ticket: '🎟️' };
 const COLM_EQUIP_FIELD = { skin: 'skin_id', background: 'background_id' };
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
@@ -26878,7 +26887,7 @@ function renderColmillosShopGrids(balance){
       btn.className = 'colm-shop-item-btn';
       card.appendChild(swatch); card.appendChild(name); card.appendChild(btn);
       if(cat === 'raffle'){
-        btn.textContent = item.price + ' 🦷 comprar boleto';
+        btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar boleto';
         btn.disabled = balance < item.price;
         btn.addEventListener('click', () => buyColmillosItem(item));
       } else {
@@ -26893,7 +26902,7 @@ function renderColmillosShopGrids(balance){
           btn.classList.add('owned');
           btn.addEventListener('click', () => equipColmillosItem(equipField, item.id));
         } else {
-          btn.textContent = item.price + ' 🦷 comprar';
+          btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar';
           btn.disabled = balance < item.price;
           btn.addEventListener('click', () => buyColmillosItem(item));
         }
@@ -26908,7 +26917,7 @@ function renderColmillosShopGrids(balance){
             const evoBtn = document.createElement('button');
             evoBtn.type = 'button';
             evoBtn.className = 'colm-evolve-btn';
-            evoBtn.textContent = '⬆️ Evolucionar a ' + nextInfo.name + ' — ' + cost + ' 🦷';
+            evoBtn.innerHTML = '⬆️ Evolucionar a ' + nextInfo.name + ' — ' + cost + ' ' + COLM_COIN_ICON_HTML;
             evoBtn.disabled = balance < cost;
             evoBtn.addEventListener('click', () => evolveColmillosItem(item, tier));
             card.appendChild(evoBtn);
