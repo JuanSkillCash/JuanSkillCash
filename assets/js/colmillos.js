@@ -157,49 +157,45 @@ function animateColmBalance(target){
   }
   window._colmBalanceRaf = requestAnimationFrame(tick);
 }
-/* "nivel de heroe" = que tanto del catalogo completo (comprar + evolucionar TODO) llevas
-   avanzado - 1 punto por cada fondo que posees (no evolucionan, valen 1 punto fijo c/u), y
-   para skins/accesorios la rareza actual en puntos (Comun=1 ... Mitico=5, ya que cada escalon
-   de evolucion es un punto mas). El boleto de sorteo no cuenta (es consumible, no coleccion).
-   Nivel 0-100 en escala RAIZ CUADRADA (no lineal): subir los primeros niveles se siente rapido
-   con solo comprar algunas cosas, pero los ultimos (80-100) de verdad requieren tener casi
-   todo el catalogo al maximo - nivel 100 es la meta de "coleccionista completo", no se espera
-   que la mayoria lo alcance pronto (a proposito, ver scripts/sql/colm_shop_repricing.sql) */
-function computeColmLevelInfo(){
-  const maxPoints = colmillosShopItemsCache.reduce((sum, item) => {
-    if(item.category === 'raffle') return sum;
-    return sum + (item.category === 'background' ? 1 : 5);
-  }, 0);
-  const points = Array.from(colmillosOwnedItemIds).reduce((sum, id) => {
-    const item = colmillosShopItemsCache.find(i => i.id === id);
-    if(!item || item.category === 'raffle') return sum;
-    return sum + (item.category === 'background' ? 1 : (colmillosItemRarity.get(id) || 1));
-  }, 0);
-  if(maxPoints <= 0) return { level: 0, progress: 0, points, maxPoints };
-  const frac = Math.min(1, points / maxPoints);
-  const level = Math.min(100, Math.floor(100 * Math.sqrt(frac)));
-  const pointsForLevel = lvl => maxPoints * Math.pow(lvl / 100, 2);
-  let progress = 1;
-  if(level < 100){
-    const curP = pointsForLevel(level), nextP = pointsForLevel(level + 1);
-    const span = nextP - curP;
-    progress = span > 0 ? Math.max(0, Math.min(1, (points - curP) / span)) : 1;
-  }
-  return { level, progress, points, maxPoints };
+/* "nivel de heroe" ahora lo calcula getHeroProgress() (assets/js/hero-progress.js), una
+   funcion PURA y testeada (scripts/tests/hero_progress.test.mjs) que no toca el DOM ni las
+   variables globales de este archivo - aqui solo se le arma el catalogo+lo poseido/equipado
+   y se usa el resultado para pintar tanto el HUD chiquito del escenario como la Ficha de
+   Heroe grande. Ver hero-progress.js para la formula completa (pesos por rareza, umbrales de
+   estrellas, mapeo item->stat). */
+function buildHeroCatalogForProgress(){
+  return colmillosShopItemsCache.map(item => ({
+    id: item.id,
+    category: item.category,
+    slot: item.category === 'skin' ? 'skin' : (item.category === 'accessory' ? (ACC_SLOT_MAP[item.id] || 'body') : null),
+  }));
+}
+function getColmHeroProgress(){
+  const catalog = buildHeroCatalogForProgress();
+  if(colmHeroDebugOverride) return getHeroProgress({ catalog, ...colmHeroDebugOverride });
+  const equippedTiers = Object.keys(COLM_POWER_BY_SLOT).map(field => {
+    const itemId = colmillosEquippedState[field];
+    return itemId ? (colmillosItemRarity.get(itemId) || 1) : 0;
+  }).filter(Boolean);
+  return getHeroProgress({
+    catalog,
+    ownedIds: colmillosOwnedItemIds,
+    rarityById: Object.fromEntries(colmillosItemRarity),
+    equippedTiers,
+  });
 }
 /* pinta el nivel en la barrita del HUD (antes era "SUERTE", una barra decorativa aleatoria
-   sin ningun significado - ahora mide algo real) y las estrellitas (1 cada 20 niveles) */
+   sin ningun significado - ahora mide lo mismo que la Ficha de Heroe) y las estrellitas */
 function renderColmLevelHud(){
-  const info = computeColmLevelInfo();
+  const info = getColmHeroProgress();
   const numEl = document.getElementById('colmillosLevelNum');
   const fillEl = document.getElementById('colmillosLifeFill');
   const starsEl = document.getElementById('colmillosFighterStars');
   if(numEl) numEl.textContent = info.level;
   if(fillEl) fillEl.style.width = Math.round(info.progress * 100) + '%';
   if(starsEl){
-    const filled = Math.ceil(info.level / 20);
     starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
-      '<span class="' + (i < filled ? 'filled' : '') + '">★</span>'
+      '<span class="' + (i < info.stars ? 'filled' : '') + '">★</span>'
     ).join('');
   }
   return info;
@@ -269,17 +265,67 @@ let colmillosShopPreview = {};
 function colmEquippedAccessoryIds(state){
   return ACC_SLOTS.map(slot => state['accessory_' + slot + '_id']).filter(Boolean);
 }
-/* el tiburon de la tarjeta de Heroe se escala SOLO en multiplos enteros de su lienzo nativo
-   (96px) para que el pixel art no se deforme/emborrone - se elige el multiplo mas cercano al
-   62% del alto real de la columna del personaje (recalculado si la ventana cambia de tamaño) */
+/* el tiburon + pedestal de la Ficha de Heroe se escalan SOLO en multiplos enteros de su
+   lienzo nativo (tiburon 96x96, pedestal 96x40 - ver assets/hero/LEEME.txt del pack de arte)
+   para que el pixel art no se deforme/emborrone, usando el MISMO factor entero "m" para los
+   dos sprites. Se apunta a que el tiburon ocupe ~75% del alto del escenario (dentro del
+   rango 72-78% pedido), con un tope de ancho para que el conjunto nunca se acerque al panel
+   de info ni se salga del escenario en celular. La posicion del tiburon sobre el pedestal usa
+   el offset fijo del pack (x:+6,y:-67 en pixeles nativos, multiplicados por "m") medido desde
+   el rectangulo YA renderizado del pedestal, asi no hay que duplicar su logica de centrado. */
+const HERO_PEDESTAL_NATIVE = { w: 96, h: 40 };
+const HERO_SHARK_NATIVE = { w: 96, h: 96, offsetX: 6, offsetY: -67 };
 function sizeAndRenderHeroChar(accessoryIds){
-  const col = document.querySelector('.colm-hero-char-col');
+  const stage = document.querySelector('.colm-hero-main');
   const charEl = document.getElementById('colmillosHeroShark');
-  if(!col || !charEl) return;
-  const colH = col.getBoundingClientRect().height || 320;
-  const mult = Math.max(2, Math.round((colH * 0.62) / 96));
-  charEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, mult * 96);
-  charEl.style.bottom = (colH * 0.065) + 'px';
+  const pedGroup = document.getElementById('colmillosPedestalGroup');
+  const shadowEl = document.getElementById('colmillosContactShadow');
+  const floorEl = document.getElementById('colmillosFloorShadow');
+  if(!stage || !charEl || !pedGroup) return;
+  const stageRect = stage.getBoundingClientRect();
+  const stageH = stageRect.height || 480;
+  // el factor de escala NO se redondea a un entero: a los tamaños reales del escenario, un
+  // paso entero (96px) es mas ancho que toda la banda pedida de 72-78% de alto, asi que redondear
+  // garantiza quedar fuera de rango. image-rendering:pixelated evita el borroneo igual con
+  // escala fraccionaria, asi que se usa el factor exacto que da 75% (o el tope de ancho si
+  // el escenario es muy angosto) - el pedestal usa el MISMO factor para que coincida el pixel art
+  let m = Math.max(2, (stageH * 0.75) / HERO_SHARK_NATIVE.h);
+  // tope de ancho: ni el pedestal ni el tiburon pueden comerse el espacio de los "rayos"
+  // laterales del fondo ni acercarse al panel de info flotante (36% + margen a la derecha) -
+  // ese limite solo aplica en escritorio: en celular (<900px) el panel pasa a flujo normal
+  // DEBAJO del escenario (ver .colm-hero-info en el media query), asi que ahi el personaje
+  // puede usar casi todo el ancho sin chocar con nada
+  const isMobileHero = window.matchMedia('(max-width:900px)').matches;
+  const maxPedW = stageRect.width * (isMobileHero ? 0.99 : 0.46);
+  const maxM = maxPedW / HERO_PEDESTAL_NATIVE.w;
+  if(m > maxM) m = Math.max(2, maxM);
+  const sharkPx = m * HERO_SHARK_NATIVE.h;
+  const pedW = m * HERO_PEDESTAL_NATIVE.w;
+  const pedH = m * HERO_PEDESTAL_NATIVE.h;
+
+  charEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, sharkPx);
+  charEl.style.width = sharkPx + 'px';
+  charEl.style.height = sharkPx + 'px';
+  pedGroup.style.width = pedW + 'px';
+  pedGroup.style.height = pedH + 'px';
+
+  const pedRect = pedGroup.getBoundingClientRect();
+  const charLeft = (pedRect.left - stageRect.left) + HERO_SHARK_NATIVE.offsetX * m;
+  const charTop = (pedRect.top - stageRect.top) + HERO_SHARK_NATIVE.offsetY * m;
+  charEl.style.left = charLeft + 'px';
+  charEl.style.top = charTop + 'px';
+
+  if(shadowEl){
+    const shW = sharkPx * 0.46, shH = shW * 0.3;
+    shadowEl.style.width = shW + 'px';
+    shadowEl.style.height = shH + 'px';
+    shadowEl.style.left = (charLeft + sharkPx / 2 - shW / 2) + 'px';
+    shadowEl.style.top = ((pedRect.top - stageRect.top) + pedH * 0.2 - shH / 2) + 'px';
+  }
+  if(floorEl){
+    floorEl.style.width = (pedW * 1.3) + 'px';
+    floorEl.style.height = (pedH * 0.9) + 'px';
+  }
 }
 window.addEventListener('resize', () => {
   clearTimeout(window._colmHeroResizeTimer);
@@ -290,18 +336,26 @@ window.addEventListener('resize', () => {
 /* particulas decorativas flotando alrededor del heroe (moneditas/destellos SkillCash, no
    colores chillones) - puramente ambientacion, se regeneran cada vez que se entra a la
    pagina para que no se vean siempre en la misma posicion */
+/* particulas decorativas: 1 de cada 3 es una monedita SkillCash real (coin-sheet.png, los 4
+   frames del pack de arte animados en loop vía CSS), el resto son destellos rojo/blanco - ya
+   no hay emojis dorados sueltos */
 function renderColmHeroParticles(){
   const farEl = document.getElementById('colmillosHeroParticlesFar');
   const nearEl = document.getElementById('colmillosHeroParticlesNear');
-  const glyphs = ['🪙', '✦', '·'];
+  const sparkGlyphs = ['✦', '·'];
   const build = (count, near) => Array.from({ length: count }, (_, i) => {
     const left = (5 + Math.random() * 55).toFixed(1);
     const top = (10 + Math.random() * 70).toFixed(1);
     const dur = (4 + Math.random() * 5).toFixed(1);
     const delay = (Math.random() * 6).toFixed(1);
     const drift = (Math.random() * 16 - 8).toFixed(1) + 'px';
+    const posStyle = 'left:' + left + '%;top:' + top + '%;--drift:' + drift + ';animation-delay:' + delay + 's,' + (Math.random() * 0.9).toFixed(2) + 's';
+    if(i % 3 === 0){
+      return '<span class="colm-hero-particle colm-hero-particle-coin' + (near ? ' near' : '') + '" style="' + posStyle + ';animation-duration:' + dur + 's,.9s"></span>';
+    }
     const size = near ? (8 + Math.random() * 4) : (6 + Math.random() * 8);
-    return '<span class="colm-hero-particle' + (near ? ' near' : '') + '" style="left:' + left + '%;top:' + top + '%;font-size:' + size.toFixed(1) + 'px;--drift:' + drift + ';animation-duration:' + dur + 's;animation-delay:' + delay + 's">' + glyphs[i % glyphs.length] + '</span>';
+    const color = i % 2 ? 'var(--hero-red)' : '#fff';
+    return '<span class="colm-hero-particle' + (near ? ' near' : '') + '" style="' + posStyle + ';animation-duration:' + dur + 's;font-size:' + size.toFixed(1) + 'px;color:' + color + '">' + sparkGlyphs[i % sparkGlyphs.length] + '</span>';
   }).join('');
   if(farEl) farEl.innerHTML = build(10, false);
   if(nearEl) nearEl.innerHTML = build(3, true);
@@ -322,11 +376,22 @@ function renderSharkPreviews(){
   renderColmPowerSheet();
   renderAccountMiniAvatar();
   renderColmHeroCard();
+  initColmHeroDebugPanel();
 }
 /* tarjeta de Heroe en Inicio (.colm-hero-card) - muñeco parado sobre un pedestal + nombre,
    nivel, estrellas y las 6 habilidades en barras de progreso (llenas segun la rareza de lo
    que tenes equipado en cada parte) - pedido explicito de Juan, calcada de una carta de
    personaje de RPG, NO es el HUD chiquito del escenario arcade (eso sigue aparte) */
+/* colores fijos por stat (ya NO por rareza - cada barra siempre es del mismo color, lo que
+   cambia es cuanto esta llena) - pedido explicito para que la ficha se lea de un vistazo */
+const COLM_HERO_STAT_COLOR = {
+  instinto: '#8B5CF6', astucia: '#EC4899', vision: '#22D3EE',
+  resistencia: '#3B82F6', fuerza: '#F97316', velocidad: 'var(--hero-red)',
+};
+/* campo de colmillosEquippedState -> slot que usa hero-progress.js (HERO_STAT_BY_SLOT) */
+const COLM_FIELD_SLOT = { skin_id: 'skin', accessory_head_id: 'head', accessory_face_id: 'face', accessory_body_id: 'body', accessory_hands_id: 'hands', accessory_feet_id: 'feet' };
+const HERO_STAT_BLOCKS = 10;
+let colmHCPrevLevel = null, colmHCPrevStars = null;
 function renderColmHeroCard(){
   const nameEl = document.getElementById('colmillosHCName');
   if(!nameEl) return;
@@ -336,42 +401,105 @@ function renderColmHeroCard(){
   } else {
     nameEl.textContent = 'INVITADO';
   }
-  const info = computeColmLevelInfo();
+  const info = getColmHeroProgress();
   const lvlEl = document.getElementById('colmillosHCLevel');
-  if(lvlEl) lvlEl.textContent = info.level;
+  if(lvlEl){
+    lvlEl.textContent = info.level;
+    if(colmHCPrevLevel !== null && info.level > colmHCPrevLevel){
+      lvlEl.classList.remove('pop'); void lvlEl.offsetWidth; lvlEl.classList.add('pop');
+    }
+  }
+  colmHCPrevLevel = info.level;
+  const lvlFillEl = document.getElementById('colmillosHCLevelFill');
+  // barra = progreso total hacia el nivel 100 (no "hacia el siguiente nivel"), para que
+  // coincida 1 a 1 con el numero de NIVEL que se ve justo arriba
+  if(lvlFillEl) lvlFillEl.style.width = Math.round(info.progress * 100) + '%';
   const powerEl = document.getElementById('colmillosHCPower');
-  if(powerEl) powerEl.textContent = info.points;
+  if(powerEl) powerEl.textContent = info.power;
   const starsEl = document.getElementById('colmillosHCStars');
   if(starsEl){
-    const filled = Math.ceil(info.level / 20);
     starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
-      '<span class="' + (i < filled ? 'filled' : '') + '">★</span>'
+      '<span class="' + (i < info.stars ? 'filled' : '') + '">★</span>'
     ).join('');
+    starsEl.title = info.nextStarLabel || '5 de 5 estrellas';
+    if(colmHCPrevStars !== null && info.stars > colmHCPrevStars){
+      starsEl.classList.remove('pop'); void starsEl.offsetWidth; starsEl.classList.add('pop');
+    }
   }
+  colmHCPrevStars = info.stars;
   const statsEl = document.getElementById('colmillosHCStats');
   if(statsEl){
     statsEl.innerHTML = Object.keys(COLM_POWER_BY_SLOT).map(field => {
       const power = COLM_POWER_BY_SLOT[field];
-      const itemId = colmillosEquippedState[field];
-      const tier = itemId ? (colmillosItemRarity.get(itemId) || 1) : 0;
-      const tierInfo = tier ? COLM_RARITY_TIERS[tier] : null;
-      const pct = tier ? (tier / 5 * 100) : 0;
-      const fillColor = tierInfo ? tierInfo.color : 'rgba(255,255,255,.12)';
+      const statKey = HERO_STAT_BY_SLOT[COLM_FIELD_SLOT[field]];
+      const value = info.stats[statKey] || 0;
+      const color = COLM_HERO_STAT_COLOR[statKey];
+      const filled = Math.round(value / 100 * HERO_STAT_BLOCKS);
+      const blocks = Array.from({ length: HERO_STAT_BLOCKS }, (_, i) =>
+        '<span class="colm-hero-info-stat-block' + (i < filled ? ' filled' : '') + '" style="--block-color:' + color + '"></span>'
+      ).join('');
       return '<div class="colm-hero-info-stat-row">' +
         '<span class="colm-hero-info-stat-icon">' + power.icon + '</span>' +
         '<span class="colm-hero-info-stat-label">' + power.label + '</span>' +
-        '<span class="colm-hero-info-stat-track"><span class="colm-hero-info-stat-fill" data-pct="' + pct + '" style="background:' + fillColor + '"></span></span>' +
+        '<span class="colm-hero-info-stat-track">' + blocks + '</span>' +
+        '<span class="colm-hero-info-stat-num">' + value + '</span>' +
         '</div>';
     }).join('');
-    // animacion de entrada: cada barra crece de 0 a su valor real, escalonada - si se pone el
-    // ancho final de una (via el innerHTML de arriba) no hay "desde" que animar, por eso se
-    // arranca en 0 (CSS) y se aplica el % real un frame despues
-    requestAnimationFrame(() => {
-      statsEl.querySelectorAll('.colm-hero-info-stat-fill').forEach((el, i) => {
-        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, i * 80);
-      });
-    });
   }
+  const equipNoteEl = document.getElementById('colmillosHCEquipNote');
+  if(equipNoteEl) equipNoteEl.textContent = info.itemsOwned + ' de ' + info.itemsTotal + ' ítems coleccionados';
+  const btnEl = document.getElementById('colmillosHCSelectBtn');
+  if(btnEl){
+    const complete = info.level >= 100;
+    btnEl.textContent = complete ? 'COLECCIÓN COMPLETA ✓' : 'IR A LA TIENDA';
+    btnEl.disabled = complete;
+  }
+}
+/* modo de depuracion ?heroDebug=1 - botones para simular escenarios de coleccion sin tener
+   que comprar/evolucionar de verdad, pensado para verificar la Ficha de Heroe */
+let colmHeroDebugOverride = null;
+function buildHeroDebugScenario(kind){
+  const catalog = buildHeroCatalogForProgress();
+  const rareables = catalog.filter(i => i.category === 'skin' || i.category === 'accessory');
+  if(kind === 'empty') return { ownedIds: [], rarityById: {}, equippedTiers: [] };
+  if(kind === 'full'){
+    const ownedIds = catalog.filter(i => i.category !== 'raffle').map(i => i.id);
+    const rarityById = {};
+    rareables.forEach(i => { rarityById[i.id] = 5; });
+    return { ownedIds, rarityById, equippedTiers: [5] };
+  }
+  if(kind === 'mythic'){
+    const one = rareables[0];
+    return { ownedIds: one ? [one.id] : [], rarityById: one ? { [one.id]: 5 } : {}, equippedTiers: [5] };
+  }
+  const pct = kind === '25' ? 0.25 : 0.5;
+  const slice = rareables.slice(0, Math.round(rareables.length * pct));
+  const rarityById = {};
+  slice.forEach(i => { rarityById[i.id] = 5; });
+  const ownedIds = catalog.filter(i => i.category === 'background').map(i => i.id).concat(slice.map(i => i.id));
+  return { ownedIds, rarityById, equippedTiers: [] };
+}
+function initColmHeroDebugPanel(){
+  if(!/heroDebug=1/.test(location.search)) return;
+  if(document.getElementById('colmillosHeroDebugPanel')) return;
+  const hero = document.querySelector('.colm-hero');
+  if(!hero) return;
+  const panel = document.createElement('div');
+  panel.id = 'colmillosHeroDebugPanel';
+  panel.style.cssText = 'position:absolute;z-index:30;top:3%;left:3%;display:flex;gap:4px;flex-wrap:wrap;max-width:50%';
+  [['empty', '0 ítems'], ['25', '25%'], ['50', '50%'], ['mythic', '1 mítico'], ['full', '100%']].forEach(([kind, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.style.cssText = 'font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #fff;background:#000;color:#fff;cursor:pointer';
+    b.onclick = () => {
+      colmHeroDebugOverride = buildHeroDebugScenario(kind);
+      renderColmHeroCard();
+      renderColmLevelHud();
+    };
+    panel.appendChild(b);
+  });
+  hero.appendChild(panel);
 }
 function renderColmillosShopPreview(){
   const bigEl = document.getElementById('colmillosCharPreviewBig');
