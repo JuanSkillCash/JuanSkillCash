@@ -984,14 +984,14 @@ button{font-family:inherit;color:inherit}
 @media(max-width:480px){ .cat-overview-grid{grid-template-columns:1fr} }
 .cat-overview-card{
   border-radius:18px;padding:20px;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);
-  border:1px solid var(--bc);cursor:pointer;text-align:left;width:100%;font-family:inherit;
+  border:1px solid var(--bc);cursor:pointer;text-align:left;width:100%;height:100%;font-family:inherit;
   background:radial-gradient(ellipse 130% 100% at 0% 0%, var(--tint), transparent 65%), #080c20;
-  position:relative;
+  position:relative;display:flex;flex-direction:column;
 }
 .bite-mark{position:absolute;right:-2px;bottom:-2px;width:64px;height:64px;pointer-events:none}
 .cat-overview-card:hover{transform:translateY(-3px)}
-.cat-flip-outer{perspective:1600px}
-.cat-flip-inner{position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
+.cat-flip-outer{perspective:1600px;height:100%}
+.cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
 @media (hover:hover){
   .cat-flip-outer:hover .cat-flip-inner,.cat-flip-outer:focus-within .cat-flip-inner{transform:rotateY(180deg)}
 }
@@ -1040,7 +1040,7 @@ button{font-family:inherit;color:inherit}
 @keyframes sparkTwinkle{0%,82%,100%{opacity:0;transform:scale(.3)}91%{opacity:var(--peak,1);transform:scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
-.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c)}
+.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);margin-top:auto;align-self:flex-start}
 
 .cat-overview-featured{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:1100px){ .cat-overview-featured{grid-template-columns:1fr 1fr} }
