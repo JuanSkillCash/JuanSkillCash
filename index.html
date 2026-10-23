@@ -8714,10 +8714,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div class="colm-lb">
         <div class="colm-lb-head">
           <div class="colm-lb-tabs" role="tablist">
-            <button type="button" class="colm-lb-tab active" data-lbperiod="weekly" role="tab" aria-selected="true">🏆 Ranking semanal</button>
-            <button type="button" class="colm-lb-tab" data-lbperiod="monthly" role="tab" aria-selected="false">🏆 Ranking mensual</button>
+            <button type="button" class="colm-lb-tab active" data-lbperiod="weekly" role="tab" aria-selected="true">🏆 Semanal</button>
+            <button type="button" class="colm-lb-tab" data-lbperiod="monthly" role="tab" aria-selected="false">🏆 Mensual</button>
+            <button type="button" class="colm-lb-tab" data-lbperiod="alltime" role="tab" aria-selected="false">🦈 Histórico</button>
           </div>
-          <p class="colm-lb-note">El Top 10 de cada semana y de cada mes se gana Sharkoins extra, de regalo, cuando el período termina.</p>
+          <p class="colm-lb-note">El Top 10 de cada semana y de cada mes se gana Sharkoins extra, de regalo, cuando el período termina. El Top 10 histórico nunca se borra — es puro salón de la fama.</p>
         </div>
         <div class="colm-lb-list" id="colmLeaderboardList">
           <p class="colm-lb-empty">Cargando…</p>
@@ -27205,7 +27206,8 @@ async function loadColmLeaderboard(period){
     return;
   }
   if(!data || !data.length){
-    listEl.innerHTML = '<p class="colm-lb-empty">Todavía nadie jugó ' + (period === 'weekly' ? 'esta semana' : 'este mes') + '. ¡Sé el primero!</p>';
+    const emptyWhen = period === 'weekly' ? 'esta semana' : period === 'monthly' ? 'este mes' : 'todavía';
+    listEl.innerHTML = '<p class="colm-lb-empty">Nadie ha jugado ' + emptyWhen + '. ¡Sé el primero!</p>';
     return;
   }
   const myName = currentUser ? getDisplayName(currentUser) : null;

@@ -31,6 +31,9 @@ create policy "usuario registra su propio puntaje"
 
 -- nombre a mostrar: mismo orden de prioridad que getDisplayName() en index.html (username
 -- elegido al registrarse -> nombre de Google -> lo que venga antes de la @ del correo).
+-- 'alltime' es el Top 10 historico que nunca se borra (no tiene corte de fecha - cuenta todas
+-- las partidas desde que existe la tabla) - a diferencia de weekly/monthly, este no reparte
+-- Sharkoins, es solo el "salon de la fama" permanente del minijuego.
 create or replace function public.get_colm_leaderboard(p_period text)
 returns table(rank integer, username text, score integer)
 language plpgsql
@@ -44,6 +47,8 @@ begin
     v_cutoff := date_trunc('week', now());
   elsif p_period = 'monthly' then
     v_cutoff := date_trunc('month', now());
+  elsif p_period = 'alltime' then
+    v_cutoff := '-infinity'::timestamptz;
   else
     raise exception 'periodo invalido: %', p_period;
   end if;
