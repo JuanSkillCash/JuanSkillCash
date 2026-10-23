@@ -35,13 +35,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python scripts/update_new_listings.py
 
-      # el cron propio de cada 5 min de poll-telegram-links.yml nunca disparo solo (ver ese
-      # workflow) - este paso aqui es el respaldo que de verdad corre solo, aprovechando que
-      # este cron horario si dispara de forma confiable
-      - name: Revisar vinculos de Telegram pendientes
+      # la vinculacion de Telegram ya no depende de este robot - corre al instante via
+      # webhook (supabase/functions/telegram-webhook/index.ts). Este paso solo vigila que
+      # ese webhook siga registrado y sano; nunca debe tumbar esta corrida (continue-on-error)
+      - name: Vigilar webhook de Telegram
         continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python scripts/poll_telegram_links.py
+        run: python scripts/check_telegram_webhook.py

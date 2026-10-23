@@ -8578,10 +8578,18 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div id="telegramNotConnected">
         <p class="auth-note" style="margin-bottom:10px">Conecta tu cuenta para recibir ahí los avisos de "Mi Lista" (Deslistados y Nuevos Listados), además de la campanita del sitio.</p>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <a class="a-btn" id="telegramConnectBtn" href="#" style="display:inline-flex;width:auto;padding:10px 18px;text-decoration:none">🔗 Conectar Telegram</a>
+          <a class="a-btn" id="telegramConnectBtn" href="#" aria-disabled="true" style="display:inline-flex;width:auto;padding:10px 18px;text-decoration:none">Preparando…</a>
           <button type="button" id="telegramCheckBtn" class="auth-link-btn" style="display:none">Ya le di Start, revisar →</button>
         </div>
         <p class="auth-note" id="telegramCheckMsg" style="margin-top:8px"></p>
+        <div id="telegramManualBox" style="display:none;margin-top:12px;padding:10px 12px;border:1px dashed var(--border);border-radius:var(--r-md)">
+          <p class="auth-note" style="margin-bottom:6px">¿No se abrió Telegram? Abre la app, busca <b>@SkillCashAltasBajasBot</b> y envía este comando:</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <code id="telegramManualCode" style="background:rgba(255,255,255,.06);padding:4px 8px;border-radius:6px;font-size:13px"></code>
+            <button type="button" id="telegramCopyBtn" class="auth-link-btn" style="padding:2px 0">Copiar comando</button>
+            <a id="telegramConnectBtnApp" href="#" style="font-size:13px;color:#54c3f5;text-decoration:underline">Abrir en la app de Telegram →</a>
+          </div>
+        </div>
       </div>
       <div id="telegramConnected" style="display:none">
         <p class="auth-note">✅ Telegram conectado — ya vas a recibir los avisos ahí.</p>
@@ -11260,9 +11268,13 @@ const telegramPanel = telegramModal.querySelector('.modal-panel');
 const closeTelegram = document.getElementById('closeTelegram');
 function openTelegramModal(){
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
+  if(typeof startTelegramAutoRefresh === 'function') startTelegramAutoRefresh();
   openModalGeneric(telegramModal, telegramPanel, closeTelegram);
 }
-function closeTelegramModal(){ closeModalGeneric(telegramModal); }
+function closeTelegramModal(){
+  if(typeof stopTelegramAutoRefresh === 'function') stopTelegramAutoRefresh();
+  closeModalGeneric(telegramModal);
+}
 closeTelegram.addEventListener('click', closeTelegramModal);
 telegramModal.addEventListener('click', (e) => { if(e.target === telegramModal) closeTelegramModal(); });
 document.getElementById('openTelegramPillBtn').addEventListener('click', openTelegramModal);
@@ -25666,6 +25678,10 @@ const TELEGRAM_BOT_USERNAME = 'SkillCashAltasBajasBot';
 const telegramNotConnected = document.getElementById('telegramNotConnected');
 const telegramConnected = document.getElementById('telegramConnected');
 const telegramConnectBtn = document.getElementById('telegramConnectBtn');
+const telegramConnectBtnApp = document.getElementById('telegramConnectBtnApp');
+const telegramManualBox = document.getElementById('telegramManualBox');
+const telegramManualCode = document.getElementById('telegramManualCode');
+const telegramCopyBtn = document.getElementById('telegramCopyBtn');
 const telegramCheckBtn = document.getElementById('telegramCheckBtn');
 const telegramCheckMsg = document.getElementById('telegramCheckMsg');
 const telegramDisconnectBtn = document.getElementById('telegramDisconnectBtn');
@@ -25674,6 +25690,59 @@ const openTelegramPillBtnEl = document.getElementById('openTelegramPillBtn');
 function updateTelegramPillStatus(connected){
   openTelegramPillBtnEl.classList.toggle('connected', !!connected);
   openTelegramPillBtnEl.title = connected ? '🔵 Telegram conectado' : '⚪ Telegram desconectado — haz clic para conectar';
+}
+
+// alfabeto exacto que Telegram acepta en el parametro de "start" (A-Za-z0-9_-, 1 a 64
+// caracteres) - antes se filtraba con una regex que dejaba pasar codigos validos pero con
+// mezcla rara, esto genera directo en ese alfabeto via base64url sin padding
+function genTelegramLinkCode(){
+  const bytes = new Uint8Array(9);
+  crypto.getRandomValues(bytes);
+  let bin = '';
+  for(const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// pinta el boton/link ya con el codigo listo - IMPORTANTE: esto deja un <a href> real
+// apuntando a t.me, sin ningun listener de click que haga await antes de navegar. Asi el
+// navegador abre el link con su mecanismo nativo (la activacion de usuario del click sigue
+// viva), en vez de depender de window.open() despues de esperar una respuesta de red, que
+// en Android (sobre todo navegadores tipo MIUI/Mi Browser) se bloquea en silencio.
+function setTelegramLinkCode(code){
+  telegramConnectBtn.href = 'https://t.me/' + TELEGRAM_BOT_USERNAME + '?start=' + code;
+  telegramConnectBtn.removeAttribute('aria-disabled');
+  telegramConnectBtn.textContent = '🔗 Conectar Telegram';
+  telegramConnectBtnApp.href = 'tg://resolve?domain=' + TELEGRAM_BOT_USERNAME + '&start=' + code;
+  telegramManualCode.textContent = '/start ' + code;
+  telegramManualBox.style.display = 'block';
+  telegramCheckBtn.style.display = 'inline-flex';
+}
+
+let telegramCodeGenInFlight = null;
+// genera (o reutiliza) el codigo de vinculacion ANTES de que el usuario toque el boton -
+// se llama desde loadTelegramStatus() cuando se abre el modal, nunca desde el click. El
+// candado telegramCodeGenInFlight evita que un doble click o un re-render mientras aun esta
+// generando dispare una segunda fila/codigo.
+async function ensureTelegramLinkCode(){
+  if(!currentUser) return;
+  if(telegramCodeGenInFlight) return telegramCodeGenInFlight;
+  telegramConnectBtn.setAttribute('aria-disabled', 'true');
+  telegramConnectBtn.textContent = 'Preparando…';
+  telegramCodeGenInFlight = (async () => {
+    const code = genTelegramLinkCode();
+    // por si quedo un intento anterior sin completar - cada usuario solo puede borrar/crear SU
+    // PROPIA fila (RLS), nunca se toca chat_id/linked_at desde aca
+    await sbClient.from('user_telegram_links').delete().eq('user_id', currentUser.id);
+    const { error } = await sbClient.from('user_telegram_links').insert({ user_id: currentUser.id, link_code: code });
+    if(error){
+      telegramConnectBtn.textContent = '🔗 Conectar Telegram';
+      telegramConnectBtn.removeAttribute('aria-disabled');
+      alert(friendlyErrMsg(error));
+      return;
+    }
+    setTelegramLinkCode(code);
+  })();
+  try { await telegramCodeGenInFlight; } finally { telegramCodeGenInFlight = null; }
 }
 
 async function loadTelegramStatus(){
@@ -25692,30 +25761,46 @@ async function loadTelegramStatus(){
   telegramConnected.style.display = 'none';
   telegramCheckMsg.textContent = '';
   if(data && data.link_code){
-    telegramConnectBtn.href = 'https://t.me/' + TELEGRAM_BOT_USERNAME + '?start=' + data.link_code;
-    telegramCheckBtn.style.display = 'inline-flex';
+    setTelegramLinkCode(data.link_code);
   } else {
-    telegramConnectBtn.href = '#';
-    telegramCheckBtn.style.display = 'none';
+    telegramManualBox.style.display = 'none';
+    await ensureTelegramLinkCode();
   }
 }
 
-telegramConnectBtn.addEventListener('click', async (e) => {
-  if(!currentUser) return;
-  if(telegramConnectBtn.getAttribute('href') !== '#') return; // ya tiene codigo, el href normal del link hace el resto
-  e.preventDefault();
-  const code = (crypto.randomUUID ? crypto.randomUUID() : (Math.random() + Math.random()).toString()).replace(/[^a-z0-9]/gi, '').slice(0, 12);
-  // por si quedo un intento anterior sin completar - cada usuario solo puede borrar/crear SU
-  // PROPIA fila (RLS), nunca se toca chat_id/linked_at desde aca
-  await sbClient.from('user_telegram_links').delete().eq('user_id', currentUser.id);
-  const { error } = await sbClient.from('user_telegram_links').insert({ user_id: currentUser.id, link_code: code });
-  if(error){
-    alert(friendlyErrMsg(error));
-    return;
+// sin preventDefault ni await: si el codigo aun no esta listo el link queda deshabilitado
+// (aria-disabled), si ya esta listo es un <a href> normal y el navegador lo abre solo
+telegramConnectBtn.addEventListener('click', (e) => {
+  if(telegramConnectBtn.getAttribute('aria-disabled') === 'true') e.preventDefault();
+});
+
+// mientras el modal esta abierto y no esta conectado, revisa el estado solo cada 4s (maximo
+// 2 min) para pasar a "Conectado" sin que el usuario tenga que tocar "revisar" - con el
+// webhook (en vez del polling de ~1h de antes) esto deberia verse casi al instante
+let telegramAutoRefreshTimer = null;
+function startTelegramAutoRefresh(){
+  stopTelegramAutoRefresh();
+  const startedAt = Date.now();
+  telegramAutoRefreshTimer = setInterval(() => {
+    if(Date.now() - startedAt > 120000 || telegramConnected.style.display !== 'none'){
+      stopTelegramAutoRefresh();
+      return;
+    }
+    loadTelegramStatus();
+  }, 4000);
+}
+function stopTelegramAutoRefresh(){
+  if(telegramAutoRefreshTimer){ clearInterval(telegramAutoRefreshTimer); telegramAutoRefreshTimer = null; }
+}
+
+telegramCopyBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(telegramManualCode.textContent);
+    telegramCopyBtn.textContent = '¡Copiado!';
+    setTimeout(() => { telegramCopyBtn.textContent = 'Copiar comando'; }, 1800);
+  } catch(e){
+    console.warn('no se pudo copiar el comando de Telegram', e);
   }
-  telegramConnectBtn.href = 'https://t.me/' + TELEGRAM_BOT_USERNAME + '?start=' + code;
-  telegramCheckBtn.style.display = 'inline-flex';
-  window.open(telegramConnectBtn.href, '_blank', 'noopener');
 });
 
 telegramCheckBtn.addEventListener('click', async () => {

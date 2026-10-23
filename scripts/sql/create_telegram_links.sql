@@ -1,13 +1,17 @@
 -- Notificaciones por Telegram: el usuario genera un codigo desde "Mi perfil", le da Start
--- al bot de Telegram con ese codigo (link t.me/<bot>?start=<codigo>), y un robot aparte
--- (scripts/poll_telegram_links.py, corre cada ~5 min via GitHub Actions) revisa los mensajes
--- nuevos del bot (Telegram getUpdates) y, si encuentra el codigo, guarda el chat_id de esa
--- persona aqui. Una vez vinculado, watchlist_notify.py le manda el aviso por Telegram ademas
--- de la notificacion dentro del sitio.
+-- al bot de Telegram con ese codigo (link t.me/<bot>?start=<codigo>), y la Edge Function
+-- supabase/functions/telegram-webhook/index.ts (que Telegram llama AL INSTANTE via webhook,
+-- no por polling) guarda el chat_id de esa persona aqui apenas le llega el "/start <codigo>".
+-- Una vez vinculado, watchlist_notify.py le manda el aviso por Telegram ademas de la
+-- notificacion dentro del sitio.
 --
--- No hay politica de UPDATE para el usuario: solo el robot (con la service role key, que se
--- salta RLS) puede escribir chat_id/linked_at - el usuario solo puede pedir un codigo nuevo
--- (insert) o desvincularse (delete).
+-- (Version anterior, archivada: scripts/legacy/poll_telegram_links.py revisaba los mensajes
+-- del bot por polling cada cierto tiempo via GitHub Actions - se reemplazo por el webhook de
+-- arriba porque el polling tardaba demasiado, hasta casi una hora en la practica.)
+--
+-- No hay politica de UPDATE para el usuario: solo la Edge Function (con la service role key,
+-- que se salta RLS) puede escribir chat_id/linked_at - el usuario solo puede pedir un codigo
+-- nuevo (insert) o desvincularse (delete).
 --
 -- Ejecutar una sola vez en el SQL editor de Supabase.
 
@@ -34,10 +38,10 @@ create policy "usuario se puede desvincular"
     using (auth.uid() = user_id);
 
 
--- fila unica (id=1) que recuerda hasta donde ya se leyeron los mensajes del bot (offset de
--- Telegram getUpdates) - sin esto, cada corrida del poller volveria a leer los mismos
--- mensajes viejos una y otra vez. Nadie necesita leer/escribir esto desde el navegador, solo
--- el robot con la service role key - RLS habilitado sin ninguna policy = nadie mas entra.
+-- SIN USO desde que se paso al webhook (ver arriba) - solo la usaba scripts/legacy/poll_telegram_links.py
+-- para recordar hasta donde ya se habian leido los mensajes del bot (offset de Telegram
+-- getUpdates); el webhook no necesita ningun offset. Se deja la tabla tal cual por si algun
+-- dia hay que volver al polling.
 create table if not exists telegram_poll_state (
     id smallint primary key default 1,
     last_update_id bigint not null default 0,

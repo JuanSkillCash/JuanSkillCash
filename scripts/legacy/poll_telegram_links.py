@@ -1,8 +1,23 @@
 """
+LEGACY - ARCHIVADO, NO SE USA EN NINGUN WORKFLOW ACTUALMENTE.
+
+Reemplazado por supabase/functions/telegram-webhook/index.ts (vinculacion al instante via
+webhook, en vez de ir a preguntarle a Telegram cada rato). Este script usa getUpdates, que
+Telegram responde con 409 Conflict mientras ese webhook este registrado (son mutuamente
+excluyentes) - asi que NO sirve como "respaldo" corriendolo junto al webhook, fallaria
+siempre. Solo se podria volver a usar despues de correr
+`./scripts/set_telegram_webhook.sh delete` (ver ese script) para quitar el webhook y volver
+a habilitar getUpdates.
+
+Se deja aca por si algun dia hace falta volver al polling. Historial de donde vivia antes:
+scripts/poll_telegram_links.py, llamado desde .github/workflows/poll-telegram-links.yml
+(cron cada 5 min, que en la practica nunca se disparaba solo segun el historial real de
+Actions) y como paso final de los robots horarios de deslistados/nuevos listados.
+
+--- docstring original ---
 Vincula cuentas del sitio con chats de Telegram. No hay un servidor propio escuchando en
 vivo los mensajes del bot (todo este proyecto corre por robots en GitHub Actions, sin
-servidor permanente), asi que esto se corre periodicamente (ver
-.github/workflows/poll-telegram-links.yml, cada ~5 min) y revisa que mensajes nuevos le
+servidor permanente), asi que esto se corria periodicamente y revisaba que mensajes nuevos le
 llegaron al bot desde la ultima vez (Telegram "getUpdates" con un offset guardado en
 Supabase, tabla telegram_poll_state - sin eso, cada corrida volveria a leer los mismos
 mensajes viejos).
