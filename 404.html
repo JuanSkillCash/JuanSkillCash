@@ -444,7 +444,7 @@ button{font-family:inherit;color:inherit}
 @media(max-width:900px){.colm-hero{min-height:0}}
 .colm-hero.menu-open .colm-hero-hud,.colm-hero.menu-open .colm-hero-main,.colm-hero.menu-open .colm-hero-info{visibility:hidden}
 /* z0: fondo (el que la persona eligio en la tienda) - atenuado + tinte azul marino encima */
-.colm-hero-stage{position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),var(--hero-bg-0);background-size:cover;background-position:center;filter:blur(2px) brightness(.6)}
+.colm-hero-stage{position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),var(--hero-bg-0);background-size:cover;background-position:center;image-rendering:pixelated;filter:blur(2px) brightness(.6)}
 .colm-hero-stage.has-bg{background-color:var(--hero-bg-0)}
 .colm-hero-stage::after{content:'';position:absolute;inset:0;background:rgba(10,14,39,.35)}
 /* z1: vineta que oscurece bordes, z2: spotlight rojo/azul detras del personaje */
@@ -542,7 +542,7 @@ button{font-family:inherit;color:inherit}
 @keyframes colmTabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* personaje (tiburon personalizable) */
-.colm-char-preview{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:14px;background:radial-gradient(circle at 50% 30%,rgba(240,178,61,.1),transparent 65%),#0b0d18;background-size:cover;background-position:center bottom;border:1px solid var(--border2);margin-bottom:12px;position:relative;overflow:hidden}
+.colm-char-preview{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:14px;background:radial-gradient(circle at 50% 30%,rgba(240,178,61,.1),transparent 65%),#0b0d18;background-size:cover;background-position:center bottom;image-rendering:pixelated;border:1px solid var(--border2);margin-bottom:12px;position:relative;overflow:hidden}
 .colm-char-preview svg{filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
 .colm-char-mini-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.02);margin-bottom:6px}
 .colm-char-mini-row .colm-char-preview{flex-shrink:0;width:92px;height:72px;min-height:0;margin-bottom:0}
@@ -709,7 +709,7 @@ button{font-family:inherit;color:inherit}
    circulito chiquito - asi si se alcanza a ver la escena completa antes de comprarla */
 .colm-shop-bg-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
 .colm-shop-bg-item{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:14px;border:1px solid var(--border2);background:rgba(255,255,255,.02)}
-.colm-shop-bg-swatch{width:100%;aspect-ratio:8/5;border-radius:10px;background:rgba(255,255,255,.04);background-size:cover;background-position:center bottom;display:flex;align-items:center;justify-content:center;font-size:34px}
+.colm-shop-bg-swatch{width:100%;aspect-ratio:8/5;border-radius:10px;background:rgba(255,255,255,.04);background-size:cover;background-position:center bottom;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font-size:34px}
 .colm-shop-bg-name{font-size:12px;font-weight:700;color:var(--white);text-align:center}
 .colm-shop-item-name{font-size:11px;font-weight:700;color:var(--white)}
 .colm-shop-item-btn{width:100%;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;border-radius:20px;padding:7px 10px;cursor:pointer;border:none;background:var(--gold);color:#1a1306}
