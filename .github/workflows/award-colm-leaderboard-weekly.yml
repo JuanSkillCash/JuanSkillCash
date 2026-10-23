@@ -1,0 +1,28 @@
+name: Premiar ranking semanal del minijuego (Sharkoins)
+
+# Lunes 00:10 UTC - un poco despues de medianoche para que la semana ISO que acaba de cerrar
+# (lunes a lunes) ya este completa cuando el robot calcula el Top 10.
+on:
+  schedule:
+    - cron: "10 0 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  award:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Premiar Top 10 semanal
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/award_colm_leaderboard.py weekly

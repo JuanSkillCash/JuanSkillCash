@@ -527,6 +527,21 @@ button{font-family:inherit;color:inherit}
 .colm-game-mute-btn:hover{background:rgba(255,255,255,.12)}
 .colm-game-mute-btn.muted{color:var(--muted2);opacity:.75}
 .colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
+.colm-lb{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;width:100%}
+.colm-lb-head{display:flex;flex-direction:column;gap:8px}
+.colm-lb-tabs{display:flex;gap:8px}
+.colm-lb-tab{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted2);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.colm-lb-tab:hover{color:var(--white)}
+.colm-lb-tab.active{background:rgba(240,178,61,.14);border-color:var(--gold);color:var(--white)}
+.colm-lb-note{margin:0;font-size:11px;color:var(--muted2);text-align:center}
+.colm-lb-list{display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto}
+.colm-lb-empty{margin:10px 0;font-size:12px;color:var(--muted2);text-align:center}
+.colm-lb-row{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,.03);font-size:12.5px;color:var(--white)}
+.colm-lb-row.top3{background:rgba(240,178,61,.08)}
+.colm-lb-row.me{border:1px solid var(--red);background:rgba(255,47,79,.08)}
+.colm-lb-rank{font-family:'Space Mono',monospace;font-weight:800;color:var(--gold);text-align:center}
+.colm-lb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.colm-lb-score{font-family:'Space Mono',monospace;font-weight:700;color:var(--white);text-align:right}
 /* cajitas de seleccion - cada minijuego vive en su propia ventana emergente (modal), esto
    solo es la vitrina para elegir cual abrir. Por ahora cada pestaña (Minijuegos/Casino)
    tiene una sola cajita, pero el grid ya queda listo para cuando se sumen mas */
@@ -8694,6 +8709,19 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <button type="button" class="colm-game-mute-btn" id="colmGameMuteBtn" title="Silenciar sonido del juego">🔊</button>
         </div>
         <p class="colm-game-hint" id="colmillosGameHint">Tocá el juego o presioná ESPACIO para empezar y saltar</p>
+      </div>
+
+      <div class="colm-lb">
+        <div class="colm-lb-head">
+          <div class="colm-lb-tabs" role="tablist">
+            <button type="button" class="colm-lb-tab active" data-lbperiod="weekly" role="tab" aria-selected="true">🏆 Ranking semanal</button>
+            <button type="button" class="colm-lb-tab" data-lbperiod="monthly" role="tab" aria-selected="false">🏆 Ranking mensual</button>
+          </div>
+          <p class="colm-lb-note">El Top 10 de cada semana y de cada mes se gana Sharkoins extra, de regalo, cuando el período termina.</p>
+        </div>
+        <div class="colm-lb-list" id="colmLeaderboardList">
+          <p class="colm-lb-empty">Cargando…</p>
+        </div>
       </div>
     </div>
   </div>
@@ -26972,6 +27000,15 @@ function endColmGame(){
   if(colmGame.score >= 150 && typeof awardColmillos === 'function'){
     awardColmillos('minigame_played', todayKeyUTC(), 3).then(() => refreshColmillosPageContent());
   }
+  // cada partida jugada (con puntaje > 0) queda en el historial para el ranking semanal/mensual
+  // (ver scripts/sql/create_colm_leaderboard.sql) - el "mejor de la semana/mes" se calcula alla
+  // mismo con MAX(score), asi que mandar cada partida (no solo el record) es lo correcto
+  if(currentUser && colmGame.score > 0){
+    sbClient.from('colm_game_scores').insert({ user_id: currentUser.id, score: colmGame.score }).then(({ error }) => {
+      if(error) console.warn('no se pudo guardar el puntaje para el ranking', error);
+      else if(typeof loadColmLeaderboard === 'function') loadColmLeaderboard(colmLbPeriod);
+    });
+  }
 }
 
 /* ---- pestañas internas de la pagina (Inicio/Trivia/Minijuego/Tienda) ---- */
@@ -27142,6 +27179,7 @@ function openColmGameModal(){
   try { best = parseInt(localStorage.getItem('colm_best_' + todayKeyUTC()) || '0', 10) || 0; } catch(e){}
   document.getElementById('colmillosGameBest').textContent = best;
   if(colmGame.state !== 'playing') drawColmGame();
+  loadColmLeaderboard(colmLbPeriod);
   openModalGeneric(colmGameModal, colmGamePanel, closeColmGame);
 }
 function closeColmGameModal(){
@@ -27151,6 +27189,46 @@ function closeColmGameModal(){
 closeColmGame.addEventListener('click', closeColmGameModal);
 colmGameModal.addEventListener('click', (e) => { if(e.target === colmGameModal) closeColmGameModal(); });
 document.getElementById('colmOpenSharkGameBtn').addEventListener('click', openColmGameModal);
+
+/* ---- ranking semanal/mensual del minijuego (ver scripts/sql/create_colm_leaderboard.sql) -
+   top 10 del periodo EN CURSO, leido con el RPC get_colm_leaderboard (nunca directo de la
+   tabla, asi nadie ve las partidas de otra persona una por una, solo el resumen ya armado) ---- */
+let colmLbPeriod = 'weekly';
+async function loadColmLeaderboard(period){
+  const listEl = document.getElementById('colmLeaderboardList');
+  if(!listEl) return;
+  listEl.innerHTML = '<p class="colm-lb-empty">Cargando…</p>';
+  const { data, error } = await sbClient.rpc('get_colm_leaderboard', { p_period: period });
+  if(error){
+    listEl.innerHTML = '<p class="colm-lb-empty">No se pudo cargar el ranking.</p>';
+    console.warn('no se pudo leer el ranking del minijuego', error);
+    return;
+  }
+  if(!data || !data.length){
+    listEl.innerHTML = '<p class="colm-lb-empty">Todavía nadie jugó ' + (period === 'weekly' ? 'esta semana' : 'este mes') + '. ¡Sé el primero!</p>';
+    return;
+  }
+  const myName = currentUser ? getDisplayName(currentUser) : null;
+  listEl.innerHTML = data.map(row => {
+    const classes = ['colm-lb-row'];
+    if(row.rank <= 3) classes.push('top3');
+    if(myName && row.username === myName) classes.push('me');
+    return '<div class="' + classes.join(' ') + '"><span class="colm-lb-rank">#' + row.rank + '</span>' +
+      '<span class="colm-lb-name">' + escapeHtml(row.username) + '</span>' +
+      '<span class="colm-lb-score">' + row.score + '</span></div>';
+  }).join('');
+}
+document.querySelectorAll('.colm-lb-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    colmLbPeriod = btn.dataset.lbperiod;
+    document.querySelectorAll('.colm-lb-tab').forEach(b => {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+    });
+    loadColmLeaderboard(colmLbPeriod);
+  });
+});
 
 const colmRouletteModal = document.getElementById('colmRouletteModal');
 const colmRoulettePanel = colmRouletteModal.querySelector('.modal-panel');
