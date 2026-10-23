@@ -6274,9 +6274,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
           <button type="button" class="colm-tab active" data-tab="inicio">🏠 Inicio</button>
           <button type="button" class="colm-tab" data-tab="tienda">🛒 Tienda</button>
           <button type="button" class="colm-tab" data-tab="megadientes">💰 Saldo</button>
-          <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuego</button>
+          <button type="button" class="colm-tab" data-tab="juego">🕹️ Minijuegos</button>
           <button type="button" class="colm-tab" data-tab="trivia">🎯 Trivia</button>
-          <button type="button" class="colm-tab" data-tab="ruleta">🎰 Ruleta</button>
+          <button type="button" class="colm-tab" data-tab="ruleta">🎰 Casino</button>
         </div>
 
         <div class="colm-loading" id="colmillosLoading" style="display:none">
@@ -26914,9 +26914,15 @@ async function spinColmRoulette(){
   if(colmRouletteSpinning || !currentUser) return;
   const betInput = document.getElementById('colmRouletteBet');
   const resultEl = document.getElementById('colmRouletteResult');
-  let bet = Math.max(5, Math.min(50, parseInt(betInput.value, 10) || 0));
-  bet = Math.round(bet / 5) * 5;
-  betInput.value = bet;
+  // antes esto corregia en silencio cualquier numero invalido (ej. escribir 2 se convertia
+  // en 5 sin avisar) - ahora un numero fuera de rango o que no sea multiplo de 5 se rechaza
+  // con un error, no se le cambia el numero a la persona por su cuenta
+  const rawBet = parseInt(betInput.value, 10);
+  if(!Number.isFinite(rawBet) || rawBet < 5 || rawBet > 50 || rawBet % 5 !== 0){
+    resultEl.textContent = '⚠️ La apuesta debe ser un número entre 5 y 50, de 5 en 5 (5, 10, 15… 50).';
+    return;
+  }
+  const bet = rawBet;
   const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
   if(balance < bet){ resultEl.textContent = 'No tenés suficientes Sharkoins para esa apuesta.'; return; }
@@ -26929,8 +26935,16 @@ async function spinColmRoulette(){
   const segment = ROULETTE_SEGMENTS[segIndex];
   const wheelEl = document.getElementById('colmRouletteWheel');
   const extraSpins = 4 + Math.floor(Math.random() * 3);
-  const targetAngle = 360 * extraSpins + (360 - (segIndex * segDeg + segDeg / 2));
-  colmRouletteTotalRotation += targetAngle;
+  // BUG real que encontro Juan: esto calculaba el angulo final como si la rueda siempre
+  // arrancara en 0 grados, pero colmRouletteTotalRotation se va ACUMULANDO giro tras giro -
+  // a partir del segundo giro la posicion visual (donde de verdad queda la rueda) y el
+  // segmento ya sorteado (el texto del resultado) dejaban de coincidir. Ahora se calcula
+  // cuanto le falta a la rueda, desde su posicion ACTUAL (modulo 360), para llegar al
+  // segmento sorteado - "delta" siempre es la vuelta que falta, nunca negativa
+  const targetMod = (360 - (segIndex * segDeg + segDeg / 2) + 360) % 360;
+  const currentMod = ((colmRouletteTotalRotation % 360) + 360) % 360;
+  const delta = (targetMod - currentMod + 360) % 360;
+  colmRouletteTotalRotation += 360 * extraSpins + delta;
   wheelEl.style.transform = 'rotate(' + colmRouletteTotalRotation + 'deg)';
   resultEl.textContent = 'Girando...';
   setTimeout(async () => {
