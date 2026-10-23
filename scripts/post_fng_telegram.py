@@ -25,6 +25,7 @@ import math
 import os
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -57,9 +58,16 @@ MESES = [
     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ]
 
+INDICATOR_URL = "https://juanskillcash.com/indicadores/indice-de-miedo-y-codicia"
+LOGO_PATH = Path(__file__).resolve().parent.parent / "logo-skillcash-600.png"
+
+
+def format_fecha_hora(dt: datetime) -> str:
+    return f"{dt.day} de {MESES[dt.month - 1]} de {dt.year}, {dt.strftime('%H:%M')} UTC"
+
 # ---- estilo del gauge (mismos tonos de index.html: --bg, --gold, --white, --muted) ----
 SCALE = 3
-W, H = 1000 * SCALE, 720 * SCALE
+W, H = 1000 * SCALE, 840 * SCALE
 BG = (8, 12, 32, 255)
 GOLD = (240, 178, 61, 255)
 WHITE = (247, 246, 251, 255)
@@ -139,8 +147,21 @@ def make_gauge_image(value: int, classification_es: str, date_label: str) -> byt
 
     f_date = ImageFont.truetype(FONT_REG, 19 * SCALE)
     _ctext(d, W / 2, 650 * SCALE, date_label, f_date, MUTED)
-    f_foot = ImageFont.truetype(FONT_REG, 15 * SCALE)
-    _ctext(d, W / 2, 688 * SCALE, "juanskillcash.com", f_foot, GOLD)
+
+    # logo real de SkillCash (el mismo que ya usa el sitio) en vez de solo el texto de la url
+    try:
+        logo = Image.open(LOGO_PATH).convert("RGBA")
+        logo_h = 80 * SCALE
+        logo_w = int(logo.width * (logo_h / logo.height))
+        logo = logo.resize((logo_w, logo_h), Image.LANCZOS)
+        logo_top = 690 * SCALE
+        img.alpha_composite(logo, (int(W / 2 - logo_w / 2), int(logo_top)))
+        f_foot = ImageFont.truetype(FONT_BOLD, 16 * SCALE)
+        _ctext(d, W / 2, logo_top + logo_h + 24 * SCALE, "juanskillcash.com", f_foot, GOLD)
+    except (FileNotFoundError, OSError) as e:
+        log.warning(f"no se pudo cargar el logo ({LOGO_PATH}): {e} - se deja solo el texto")
+        f_foot = ImageFont.truetype(FONT_REG, 15 * SCALE)
+        _ctext(d, W / 2, 688 * SCALE, "juanskillcash.com", f_foot, GOLD)
 
     img = img.resize((W // SCALE, H // SCALE), Image.LANCZOS)
     buf = io.BytesIO()
@@ -179,10 +200,27 @@ def main() -> None:
     now = datetime.now(timezone.utc)
     date_label = f"Hoy, {now.day} de {MESES[now.month - 1]} de {now.year}"
 
+    # update_time es la hora en que CoinMarketCap calculo ESTE valor (no la hora en que
+    # nuestro robot lo leyo) - si por lo que sea no viene o no se puede leer, se usa la hora
+    # de ahora mismo como respaldo, dejando claro en el texto que es la hora de la consulta
+    update_time_raw = entry.get("update_time")
+    try:
+        if not update_time_raw:
+            raise ValueError("vacio")
+        cmc_dt = datetime.fromisoformat(str(update_time_raw).replace("Z", "+00:00")).astimezone(timezone.utc)
+        hora_texto = f"Actualizado por CoinMarketCap: {format_fecha_hora(cmc_dt)}"
+    except (ValueError, TypeError):
+        hora_texto = f"Consultado: {format_fecha_hora(now)}"
+
     log.info(f"Generando imagen del indice ({value} - {classification_es})...")
     image_bytes = make_gauge_image(value, classification_es, date_label)
 
-    caption = f"📊 Índice de Miedo y Codicia de hoy: {value} ({classification_es})"
+    caption = (
+        f"📊 Índice de Miedo y Codicia — {date_label}\n"
+        f"Valor: {value} ({classification_es})\n"
+        f"{hora_texto}\n\n"
+        f"👉 Consulta el histórico aquí: {INDICATOR_URL}"
+    )
     send_photo(image_bytes, caption)
     log.info("Imagen publicada en el tema de Análisis Crypto.")
 
