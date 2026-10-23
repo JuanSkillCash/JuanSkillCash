@@ -520,7 +520,7 @@ button{font-family:inherit;color:inherit}
 
 /* minijuego */
 .colm-game-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.colm-game-wrap canvas{width:100%;max-width:560px;height:210px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#080c20;cursor:pointer;touch-action:manipulation}
+.colm-game-wrap canvas{width:100%;max-width:600px;aspect-ratio:600/220;height:auto;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#080c20;cursor:pointer;touch-action:manipulation}
 .colm-game-hud{display:flex;align-items:center;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
 .colm-game-hud b{color:var(--gold)}
 .colm-game-mute-btn{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:8px;width:30px;height:30px;font-size:15px;line-height:1;cursor:pointer;color:var(--white);display:flex;align-items:center;justify-content:center}
@@ -8675,7 +8675,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
      propia (no vive pegado a ninguna pestaña) ===== -->
 <div class="modal-overlay" id="colmGameModal">
   <button class="modal-close" id="closeColmGame" aria-label="Cerrar">✕</button>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmGameTitleEl" style="max-width:460px">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="colmGameTitleEl" style="max-width:680px">
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
@@ -8687,7 +8687,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </div>
 
       <div class="colm-game-wrap">
-        <canvas id="colmillosGameCanvas" width="400" height="150"></canvas>
+        <canvas id="colmillosGameCanvas" width="600" height="220"></canvas>
         <div class="colm-game-hud">
           <span>Puntaje: <b id="colmillosGameScore">0</b></span>
           <span>Mejor hoy: <b id="colmillosGameBest">0</b></span>
@@ -26794,15 +26794,32 @@ document.getElementById('colmGameMuteBtn').addEventListener('click', () => {
 });
 updateColmGameMuteBtn();
 
-const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0, lastMilestone: 0 };
+/* antes la caja de colision del tiburon (60x28, fija) era MAS ANCHA que el sprite que
+   realmente se veia (46x46 forzado a cuadrado sin respetar su proporcion real) - por eso a
+   veces "chocaba" sin que se viera el golpe, y de paso el sprite se veia estirado/"espichado".
+   Ahora el tamaño de dibujo y la caja de colision salen de la MISMA cuenta
+   (getColmSharkDrawBox, basada en el ancho/alto real de la imagen), asi nunca se desincronizan */
+const COLM_JUMP_VY = -12.6;
+const COLM_GRAVITY = 0.81;
+const COLM_INITIAL_SPEED = 6.3;
+const COLM_SPEED_INC = 0.00375;
+const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 206, sharkVY: 0, groundY: 206, jumping: false, obstacles: [], clouds: [], groundOffset: 0, speed: COLM_INITIAL_SPEED, score: 0, lastSpawn: 0, frame: 0, lastMilestone: 0 };
 function initColmGameOnce(){
   if(colmGame.canvas) return;
   colmGame.canvas = document.getElementById('colmillosGameCanvas');
   colmGame.ctx = colmGame.canvas.getContext('2d');
   colmGame.ctx.imageSmoothingEnabled = false;
+  colmGame.groundY = colmGame.canvas.height - 14;
+  colmGame.sharkY = colmGame.groundY;
+  // nubes decorativas tipo dino de Chrome, repartidas al ancho real del canvas
+  colmGame.clouds = [0, 1, 2].map((i) => ({
+    x: (colmGame.canvas.width / 3) * i + Math.random() * 60,
+    y: 22 + Math.random() * 40,
+    s: 0.8 + Math.random() * 0.5,
+  }));
   const jump = () => {
     if(colmGame.state === 'idle' || colmGame.state === 'over'){ startColmGame(); return; }
-    if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = -8.6; colmPlayJumpSound(); }
+    if(colmGame.state === 'playing' && !colmGame.jumping){ colmGame.jumping = true; colmGame.sharkVY = COLM_JUMP_VY; colmPlayJumpSound(); }
   };
   colmGame.canvas.addEventListener('click', jump);
   window.addEventListener('keydown', (e) => {
@@ -26815,7 +26832,8 @@ function startColmGame(){
   colmGame.sharkVY = 0;
   colmGame.jumping = false;
   colmGame.obstacles = [];
-  colmGame.speed = 4.2;
+  colmGame.groundOffset = 0;
+  colmGame.speed = COLM_INITIAL_SPEED;
   colmGame.score = 0;
   colmGame.frame = 0;
   colmGame.lastSpawn = 0;
@@ -26826,23 +26844,32 @@ function startColmGame(){
 }
 function colmGameLoop(){
   colmGame.frame++;
-  colmGame.sharkVY += 0.55;
+  colmGame.sharkVY += COLM_GRAVITY;
   colmGame.sharkY += colmGame.sharkVY;
   if(colmGame.sharkY >= colmGame.groundY){ colmGame.sharkY = colmGame.groundY; colmGame.sharkVY = 0; colmGame.jumping = false; }
   if(colmGame.frame - colmGame.lastSpawn > Math.max(45, 90 - colmGame.score / 8)){
     colmGame.lastSpawn = colmGame.frame;
-    colmGame.obstacles.push({ x: colmGame.canvas.width, w: 14 + Math.random() * 10, h: 20 + Math.random() * 18 });
+    colmGame.obstacles.push({ x: colmGame.canvas.width, w: 20 + Math.random() * 16, h: 30 + Math.random() * 26 });
   }
   colmGame.obstacles.forEach(o => { o.x -= colmGame.speed; });
   colmGame.obstacles = colmGame.obstacles.filter(o => o.x + o.w > 0);
-  colmGame.speed += 0.0025;
+  colmGame.groundOffset += colmGame.speed;
+  colmGame.clouds.forEach(c => {
+    c.x -= colmGame.speed * 0.18;
+    if(c.x < -60){ c.x = colmGame.canvas.width + Math.random() * 40; c.y = 20 + Math.random() * 44; c.s = 0.8 + Math.random() * 0.5; }
+  });
+  colmGame.speed += COLM_SPEED_INC;
   colmGame.score++;
   document.getElementById('colmillosGameScore').textContent = colmGame.score;
   const milestone = Math.floor(colmGame.score / 100);
   if(milestone > colmGame.lastMilestone){ colmGame.lastMilestone = milestone; colmPlayMilestoneSound(); }
-  const sharkBox = { x: 36, y: colmGame.sharkY - 24, w: 60, h: 28 };
+  const sb = getColmSharkDrawBox(getSharkImg(colmillosEquippedState.skin_id));
+  // caja de colision un poco mas chica que el dibujo real (igual que el dino de Chrome, que
+  // tambien perdona el contorno exacto del sprite) para que el choque se sienta justo
+  const sharkBox = { x: sb.dx + sb.dw * 0.18, y: sb.dy + sb.dh * 0.12, w: sb.dw * 0.64, h: sb.dh * 0.8 };
   const hit = colmGame.obstacles.some(o => {
-    const oBox = { x: o.x, y: colmGame.canvas.height - 14 - o.h, w: o.w, h: o.h };
+    const baseY = colmGame.canvas.height - 14 - o.h;
+    const oBox = { x: o.x + o.w * 0.12, y: baseY + o.h * 0.08, w: o.w * 0.76, h: o.h * 0.92 };
     return sharkBox.x < oBox.x + oBox.w && sharkBox.x + sharkBox.w > oBox.x && sharkBox.y < oBox.y + oBox.h && sharkBox.y + sharkBox.h > oBox.y;
   });
   if(hit){ endColmGame(); return; }
@@ -26864,25 +26891,57 @@ function drawColmObstacle(ctx, o, canvas){
   ctx.fillRect(o.x, topY + o.h * 0.18, armW, armH);
   ctx.fillRect(o.x + o.w - armW, topY + o.h * 0.38, armW, armH);
 }
+function drawColmCloud(ctx, c){
+  ctx.beginPath();
+  ctx.ellipse(c.x, c.y, 22 * c.s, 11 * c.s, 0, 0, Math.PI * 2);
+  ctx.ellipse(c.x + 16 * c.s, c.y - 6 * c.s, 15 * c.s, 10 * c.s, 0, 0, Math.PI * 2);
+  ctx.ellipse(c.x - 16 * c.s, c.y - 4 * c.s, 13 * c.s, 9 * c.s, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+// el tamaño/posicion de dibujo del tiburon y su caja de colision salen de la MISMA cuenta
+// (ancho/alto reales de la imagen) para que nunca se desincronicen entre si
+function getColmSharkDrawBox(sharkImg){
+  const maxSize = 64;
+  const ratio = (sharkImg && sharkImg.naturalWidth) ? sharkImg.naturalWidth / sharkImg.naturalHeight : 1;
+  const dw = ratio >= 1 ? maxSize : maxSize * ratio;
+  const dh = ratio >= 1 ? maxSize / ratio : maxSize;
+  return { dx: 18, dy: colmGame.sharkY + 8 - dh, dw, dh };
+}
 function drawColmGame(){
   const { ctx, canvas } = colmGame;
   ctx.fillStyle = '#080c20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = 'rgba(255,255,255,.14)';
+  colmGame.clouds.forEach(c => drawColmCloud(ctx, c));
+
+  const groundLineY = canvas.height - 14;
   ctx.strokeStyle = 'rgba(255,255,255,.5)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(0, canvas.height - 14);
-  ctx.lineTo(canvas.width, canvas.height - 14);
+  ctx.moveTo(0, groundLineY);
+  ctx.lineTo(canvas.width, groundLineY);
   ctx.stroke();
-  colmGame.obstacles.forEach(o => drawColmObstacle(ctx, o, canvas));
-  const sharkImg = getSharkImg(colmillosEquippedState.skin_id);
-  const sharkSize = 46;
-  if(sharkImg.complete && sharkImg.naturalWidth){
-    ctx.drawImage(sharkImg, 14, colmGame.sharkY - sharkSize + 8, sharkSize, sharkSize);
+  // guiones del "camino" que se desplazan con groundOffset - el dino original tambien trae
+  // esta textura, antes aca solo habia una linea sola
+  ctx.fillStyle = 'rgba(255,255,255,.35)';
+  const dashW = 18, dashGap = 14, dashSpan = dashW + dashGap;
+  const offset = colmGame.groundOffset % dashSpan;
+  for(let x = -offset; x < canvas.width; x += dashSpan){
+    ctx.fillRect(x, groundLineY + 5, dashW, 3);
   }
+
+  colmGame.obstacles.forEach(o => drawColmObstacle(ctx, o, canvas));
+
+  const sharkImg = getSharkImg(colmillosEquippedState.skin_id);
+  if(sharkImg.complete && sharkImg.naturalWidth){
+    const sb = getColmSharkDrawBox(sharkImg);
+    ctx.drawImage(sharkImg, sb.dx, sb.dy, sb.dw, sb.dh);
+  }
+
   if(colmGame.state === 'idle'){
     ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.font = 'bold 13px monospace';
+    ctx.font = 'bold 16px monospace';
     ctx.textAlign = 'center';
     ctx.fillText('TOCÁ PARA EMPEZAR', canvas.width / 2, canvas.height / 2);
   }
@@ -26905,11 +26964,11 @@ function endColmGame(){
   ctx.fillStyle = 'rgba(0,0,0,.45)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 15px monospace';
+  ctx.font = 'bold 22px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 6);
-  ctx.font = '11px monospace';
-  ctx.fillText('toca para reintentar', canvas.width / 2, canvas.height / 2 + 14);
+  ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
+  ctx.font = '14px monospace';
+  ctx.fillText('toca para reintentar', canvas.width / 2, canvas.height / 2 + 20);
   if(colmGame.score >= 150 && typeof awardColmillos === 'function'){
     awardColmillos('minigame_played', todayKeyUTC(), 3).then(() => refreshColmillosPageContent());
   }
