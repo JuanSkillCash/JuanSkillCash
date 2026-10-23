@@ -521,8 +521,11 @@ button{font-family:inherit;color:inherit}
 /* minijuego */
 .colm-game-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
 .colm-game-wrap canvas{width:100%;max-width:560px;height:210px;border-radius:12px;border:2px solid rgba(240,178,61,.4);background:#080c20;cursor:pointer;touch-action:manipulation}
-.colm-game-hud{display:flex;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
+.colm-game-hud{display:flex;align-items:center;gap:18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--white)}
 .colm-game-hud b{color:var(--gold)}
+.colm-game-mute-btn{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:8px;width:30px;height:30px;font-size:15px;line-height:1;cursor:pointer;color:var(--white);display:flex;align-items:center;justify-content:center}
+.colm-game-mute-btn:hover{background:rgba(255,255,255,.12)}
+.colm-game-mute-btn.muted{color:var(--muted2);opacity:.75}
 .colm-game-hint{margin:0;font-size:11px;color:var(--muted2);text-align:center}
 
 /* tienda / marketplace */
@@ -6378,6 +6381,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-game-hud">
                 <span>Puntaje: <b id="colmillosGameScore">0</b></span>
                 <span>Mejor hoy: <b id="colmillosGameBest">0</b></span>
+                <button type="button" class="colm-game-mute-btn" id="colmGameMuteBtn" title="Silenciar sonido del juego">🔊</button>
               </div>
               <p class="colm-game-hint" id="colmillosGameHint">Tocá el juego o presioná ESPACIO para empezar y saltar</p>
             </div>
@@ -26688,7 +26692,12 @@ async function equipColmillosItem(field, itemId){
    de Chrome. El AudioContext solo se crea/retoma dentro de un gesto real del usuario (el
    primer salto), que es justo cuando los navegadores lo permiten */
 let colmAudioCtx = null;
+// preferencia de silencio del minijuego - se guarda en localStorage para que quede recordada
+// la proxima vez que alguien entre, igual que el mejor puntaje del dia
+let colmGameMuted = false;
+try { colmGameMuted = localStorage.getItem('colm_game_muted') === '1'; } catch(e){}
 function colmPlayTone(freq, duration, type, gainStart){
+  if(colmGameMuted) return;
   try {
     if(!colmAudioCtx) colmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if(colmAudioCtx.state === 'suspended') colmAudioCtx.resume();
@@ -26707,6 +26716,20 @@ function colmPlayTone(freq, duration, type, gainStart){
 function colmPlayJumpSound(){ colmPlayTone(620, 0.09, 'square', 0.1); }
 function colmPlayMilestoneSound(){ colmPlayTone(880, 0.07, 'sine', 0.08); }
 function colmPlayGameOverSound(){ colmPlayTone(160, 0.35, 'sawtooth', 0.12); }
+
+function updateColmGameMuteBtn(){
+  const btn = document.getElementById('colmGameMuteBtn');
+  if(!btn) return;
+  btn.textContent = colmGameMuted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', colmGameMuted);
+  btn.title = colmGameMuted ? 'Activar sonido del juego' : 'Silenciar sonido del juego';
+}
+document.getElementById('colmGameMuteBtn').addEventListener('click', () => {
+  colmGameMuted = !colmGameMuted;
+  try { localStorage.setItem('colm_game_muted', colmGameMuted ? '1' : '0'); } catch(e){}
+  updateColmGameMuteBtn();
+});
+updateColmGameMuteBtn();
 
 const colmGame = { canvas: null, ctx: null, raf: null, state: 'idle', sharkY: 130, sharkVY: 0, groundY: 130, jumping: false, obstacles: [], speed: 4.2, score: 0, lastSpawn: 0, frame: 0, lastMilestone: 0 };
 function initColmGameOnce(){
