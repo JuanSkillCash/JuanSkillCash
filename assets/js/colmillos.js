@@ -139,6 +139,7 @@ function animateColmBalance(target){
   if(!el) return;
   const fighterEl = document.getElementById('colmillosFighterBalance');
   const fighterFill = document.getElementById('colmillosCurrencyFill');
+  const coinChipEl = document.getElementById('colmillosHeroCoinChip');
   cancelAnimationFrame(window._colmBalanceRaf);
   const duration = 900;
   const startTime = performance.now();
@@ -148,6 +149,7 @@ function animateColmBalance(target){
     const value = Math.round(target * eased);
     el.textContent = value.toLocaleString('es-CO');
     if(fighterEl) fighterEl.textContent = value.toLocaleString('es-CO');
+    if(coinChipEl) coinChipEl.textContent = value.toLocaleString('es-CO');
     // barrita decorativa tipo "XP" - se llena cada 100 y vuelve a empezar, solo para que
     // se vea viva, no representa ningun limite real de saldo
     if(fighterFill) fighterFill.style.width = (value > 0 ? ((value % 100) || 100) : 0) + '%';
@@ -267,15 +269,49 @@ let colmillosShopPreview = {};
 function colmEquippedAccessoryIds(state){
   return ACC_SLOTS.map(slot => state['accessory_' + slot + '_id']).filter(Boolean);
 }
+/* el tiburon de la tarjeta de Heroe se escala SOLO en multiplos enteros de su lienzo nativo
+   (96px) para que el pixel art no se deforme/emborrone - se elige el multiplo mas cercano al
+   62% del alto real de la columna del personaje (recalculado si la ventana cambia de tamaño) */
+function sizeAndRenderHeroChar(accessoryIds){
+  const col = document.querySelector('.colm-hero-char-col');
+  const charEl = document.getElementById('colmillosHeroShark');
+  if(!col || !charEl) return;
+  const colH = col.getBoundingClientRect().height || 320;
+  const mult = Math.max(2, Math.round((colH * 0.62) / 96));
+  charEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, mult * 96);
+  charEl.style.bottom = (colH * 0.065) + 'px';
+}
+window.addEventListener('resize', () => {
+  clearTimeout(window._colmHeroResizeTimer);
+  window._colmHeroResizeTimer = setTimeout(() => {
+    sizeAndRenderHeroChar(colmEquippedAccessoryIds(colmillosEquippedState));
+  }, 150);
+});
+/* particulas decorativas flotando alrededor del heroe (moneditas/destellos SkillCash, no
+   colores chillones) - puramente ambientacion, se regeneran cada vez que se entra a la
+   pagina para que no se vean siempre en la misma posicion */
+function renderColmHeroParticles(){
+  const farEl = document.getElementById('colmillosHeroParticlesFar');
+  const nearEl = document.getElementById('colmillosHeroParticlesNear');
+  const glyphs = ['🪙', '✦', '·'];
+  const build = (count, near) => Array.from({ length: count }, (_, i) => {
+    const left = (5 + Math.random() * 55).toFixed(1);
+    const top = (10 + Math.random() * 70).toFixed(1);
+    const dur = (4 + Math.random() * 5).toFixed(1);
+    const delay = (Math.random() * 6).toFixed(1);
+    const drift = (Math.random() * 16 - 8).toFixed(1) + 'px';
+    const size = near ? (8 + Math.random() * 4) : (6 + Math.random() * 8);
+    return '<span class="colm-hero-particle' + (near ? ' near' : '') + '" style="left:' + left + '%;top:' + top + '%;font-size:' + size.toFixed(1) + 'px;--drift:' + drift + ';animation-duration:' + dur + 's;animation-delay:' + delay + 's">' + glyphs[i % glyphs.length] + '</span>';
+  }).join('');
+  if(farEl) farEl.innerHTML = build(10, false);
+  if(nearEl) nearEl.innerHTML = build(3, true);
+}
 function renderSharkPreviews(){
   const miniEl = document.getElementById('colmillosCharPreviewMini');
-  const heroEl = document.getElementById('colmillosHeroShark');
-  const portraitEl = document.getElementById('colmillosFighterPortrait');
   const loadingSharkEl = document.getElementById('colmillosLoadingShark');
   const accessoryIds = colmEquippedAccessoryIds(colmillosEquippedState);
   if(miniEl) miniEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 62);
-  if(heroEl) heroEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 220);
-  if(portraitEl) portraitEl.innerHTML = sharkImgMarkup(colmillosEquippedState.skin_id, accessoryIds, 60);
+  sizeAndRenderHeroChar(accessoryIds);
   // en la pantalla de carga tambien se muestra el tiburon que cada quien configuro (en vez
   // del emoji generico de antes), una vez se sepa su skin
   const startSrc = (colmillosEquippedState.skin_id && SHARK_IMG_PATHS[colmillosEquippedState.skin_id]) || SHARK_IMG_PATHS.default;
@@ -324,9 +360,17 @@ function renderColmHeroCard(){
       return '<div class="colm-hero-info-stat-row">' +
         '<span class="colm-hero-info-stat-icon">' + power.icon + '</span>' +
         '<span class="colm-hero-info-stat-label">' + power.label + '</span>' +
-        '<span class="colm-hero-info-stat-track"><span class="colm-hero-info-stat-fill" style="width:' + pct + '%;background:' + fillColor + '"></span></span>' +
+        '<span class="colm-hero-info-stat-track"><span class="colm-hero-info-stat-fill" data-pct="' + pct + '" style="background:' + fillColor + '"></span></span>' +
         '</div>';
     }).join('');
+    // animacion de entrada: cada barra crece de 0 a su valor real, escalonada - si se pone el
+    // ancho final de una (via el innerHTML de arriba) no hay "desde" que animar, por eso se
+    // arranca en 0 (CSS) y se aplica el % real un frame despues
+    requestAnimationFrame(() => {
+      statsEl.querySelectorAll('.colm-hero-info-stat-fill').forEach((el, i) => {
+        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, i * 80);
+      });
+    });
   }
 }
 function renderColmillosShopPreview(){
@@ -412,7 +456,7 @@ async function refreshColmillosPageContent(){
   const questCards = document.querySelectorAll('#colmillosQuestList .colmillos-quest[data-event]');
   if(!currentUser){
     balEl.textContent = '0';
-    nameEl.textContent = 'INVITADO';
+    if(nameEl) nameEl.textContent = 'INVITADO';
     questCards.forEach(card => {
       const statusEl = card.querySelector('.colmillos-quest-status');
       statusEl.textContent = 'Inicia sesión';
@@ -422,7 +466,7 @@ async function refreshColmillosPageContent(){
     return;
   }
   const meta = currentUser.user_metadata || {};
-  nameEl.textContent = (meta.username || currentUser.email || 'JUGADOR').toUpperCase();
+  if(nameEl) nameEl.textContent = (meta.username || currentUser.email || 'JUGADOR').toUpperCase();
   const ageEl = document.getElementById('colmillosSharkAge');
   if(ageEl) ageEl.textContent = formatSharkAge(currentUser.created_at);
   const { data, error } = await sbClient.from('user_colmillos_events').select('event_type,amount,period_key');
@@ -1411,6 +1455,7 @@ function startColmillosLoadSequence(){
     document.getElementById('colmillosTabs').style.display = 'flex';
     refreshColmillosPageContent();
     loadColmillosShop();
+    renderColmHeroParticles();
     colmSessionStartTs = Date.now();
     clearInterval(window._colmSessionTimerInterval);
     window._colmSessionTimerInterval = setInterval(updateColmSessionTimer, 1000);

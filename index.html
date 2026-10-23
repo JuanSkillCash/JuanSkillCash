@@ -419,55 +419,53 @@ button{font-family:inherit;color:inherit}
 @keyframes colmLoadFill{to{width:100%}}
 .colm-loading-text{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--gold);animation:colmBlink 1s steps(2) infinite}
 @keyframes colmBlink{50%{opacity:.3}}
-.colm-hero{display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding:10px 10px 10px;position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;background:radial-gradient(circle at 50% 0%,rgba(240,178,61,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset}
+/* ==== Tarjeta de Heroe (Inicio) - calcada al pie de la letra de una tarjeta de seleccion de
+   heroe de videojuego: muñeco de cuerpo completo parado sobre un pedestal circular 3D, al
+   lado un panel de info (nombre/nivel/poder/stats), con nuestro pixel art y colores (pedido
+   explicito de Juan, con spec detallada capa por capa). Verificado con Playwright a 1440x810
+   y 390x844 antes de integrar - ver _scratch_hero_test.html si hace falta volver a ajustar. */
+.colm-hero{position:relative;border-radius:18px;margin-bottom:22px;min-height:420px;overflow:hidden;background:#0b0d18;border:2px solid rgba(240,178,61,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 30px rgba(240,178,61,.12) inset}
 .colm-hero.menu-open .colm-hero-hud,.colm-hero.menu-open .colm-hero-main{visibility:hidden}
-/* el muñeco a un lado (con el fondo que la persona eligio) y, AL LADO, una tarjeta propia y
-   solida con su info - no una etiqueta transparente flotando encima de la escena (pedido
-   explicito de Juan, calcado de una carta de heroe de RPG) */
-.colm-hero-main{display:flex;gap:12px;align-items:stretch;flex:1;min-height:0}
-@media(max-width:760px){.colm-hero-main{flex-direction:column}}
-.colm-hero-hud{position:relative;z-index:2;display:flex;flex-direction:column;gap:6px}
-.colm-hero-hud-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-/* HUD estilo arcade noventero (foto + nombre + barra, calcado del HUD de los juegos de pelea
-   viejos tipo Streets of Rage: cuadrito de foto con el nombre debajo, una barra de "vida" al
-   lado, y el segundo "jugador" de la referencia se reemplaza por una fila igual pero para la
-   moneda). La barra de vida es puramente decorativa/aleatoria, no es una mecanica real */
-.colm-fighter-hud{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.colm-fighter-row{display:flex;align-items:center;gap:12px}
-.colm-fighter-idblock{flex-shrink:0;width:60px;display:flex;flex-direction:column;align-items:center}
-.colm-fighter-eyebrow{font-family:'Press Start 2P',cursive;font-size:6.5px;color:var(--gold);letter-spacing:.1em;margin-bottom:3px;text-align:center}
-.colm-fighter-portrait{width:56px;height:56px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.06);border:3px solid #caa23a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
-.colm-fighter-portrait img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;image-rendering:crisp-edges}
-.colm-fighter-portrait.coin{background:#1a1306}
-.colm-fighter-name{margin-top:4px;width:100%;font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;text-shadow:0 1px 0 #000;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.colm-fighter-name.gold{color:var(--gold)}
-.colm-fighter-stars{margin-top:3px;width:100%;text-align:center;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.18)}
-.colm-fighter-stars .filled{color:var(--gold);text-shadow:0 0 4px rgba(240,178,61,.7)}
-.colm-fighter-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.colm-fighter-bar-label{font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;letter-spacing:.04em;text-shadow:0 1px 0 #000}
-.colm-fighter-bar{position:relative;width:100%;height:24px;border-radius:4px;background:#1a0d05;border:3px solid #7a5420;box-shadow:inset 0 0 0 1px #000}
-.colm-fighter-bar-fill{height:100%;width:0%;transition:width .5s ease-out}
-.colm-fighter-bar.life .colm-fighter-bar-fill{background:linear-gradient(180deg,#fff27a,#f0b23d 55%,#c98a1f)}
-.colm-fighter-bar.currency .colm-fighter-bar-fill{background:linear-gradient(180deg,#ff8f6b,#e0472f 55%,#9c2a1b)}
-.colm-fighter-bar-num{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-family:'Press Start 2P',cursive;font-size:11px;color:#fff;text-shadow:0 1px 1px #000}
+/* z0: fondo (el que la persona eligio en la tienda) */
+.colm-hero-stage{position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center;filter:blur(2px) brightness(.68) saturate(.85)}
+.colm-hero-stage.has-bg{background-color:#0b0d18}
+/* z1: vineta que oscurece bordes, z2: spotlight detras del personaje */
+.colm-hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 32% 62%,transparent 0%,rgba(10,15,20,.55) 75%)}
+.colm-hero-spotlight{position:absolute;inset:0;z-index:2;background:radial-gradient(circle at 32% 58%,rgba(255,215,120,.28) 0%,transparent 45%)}
+/* z3/z9: particulas (moneditas/destellos SkillCash flotando) */
+.colm-hero-particles{position:absolute;inset:0;pointer-events:none}
+.colm-hero-particles-far{z-index:3}
+.colm-hero-particles-near{z-index:9}
+.colm-hero-particle{position:absolute;opacity:0;animation:colmHeroParticleFloat linear infinite}
+.colm-hero-particle.near{filter:blur(1px)}
+@keyframes colmHeroParticleFloat{0%{opacity:0;transform:translateY(0) translateX(0)}10%{opacity:.8}85%{opacity:.6}100%{opacity:0;transform:translateY(-30px) translateX(var(--drift,6px))}}
+@media(prefers-reduced-motion:reduce){.colm-hero-particle{animation:none;opacity:.4}}
+/* z11: HUD superior (chip de monedas + TIME), superpuesto, no afecta el alto de la caja */
+.colm-hero-hud{position:absolute;top:0;left:0;right:0;z-index:11;display:flex;align-items:flex-start;justify-content:space-between;padding:3%;pointer-events:none}
+.colm-hero-hud>*{pointer-events:auto}
+.colm-hero-coinchip{display:flex;align-items:center;gap:8px;background:rgba(20,14,8,.75);border:2px solid var(--gold);border-radius:20px;padding:6px 14px;font-family:'Press Start 2P',cursive;font-size:12px;color:#ffe17a}
+.colm-hero-coinchip-dot{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle,#ffe17a,#c98a1f);flex-shrink:0}
 .colm-hero-timer-box{flex-shrink:0;display:flex;flex-direction:column;align-items:center;background:#1a0d05;border:3px solid #7a5420;border-radius:6px;padding:6px 16px;box-shadow:inset 0 0 0 1px #000}
 .colm-hero-timer-label{font-family:'Press Start 2P',cursive;font-size:10px;color:#ffe17a;letter-spacing:.05em}
 .colm-hero-timer-digits{font-family:'Press Start 2P',cursive;font-size:26px;color:#ff5a3c;text-shadow:0 0 6px rgba(255,90,60,.6);line-height:1.25;font-variant-numeric:tabular-nums}
-.colm-hero-stage{position:relative;flex:1 1 56%;min-width:0;min-height:160px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;border-radius:12px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 3px),#0b0d18;background-size:cover;background-position:center bottom}
-.colm-hero-stage.has-bg{background-color:#0b0d18}
-.colm-hero-stage.has-bg::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0px,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.3))}
-/* "portal" debajo del tiburon - un resplandor ovalado que pulsa suavemente, como si estuviera
-   parado sobre un pedestal luminoso (pedido explicito de Juan, inspirado en cartas de heroes
-   de otros juegos) - puro CSS, sin imagen nueva */
-.colm-hero-pedestal{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:min(62%,380px);aspect-ratio:3/1;border-radius:50%;background:radial-gradient(ellipse at 50% 38%,#fff3d6 0%,#ffdf94 28%,#f0b23d 55%,#c4821f 76%,#7a5213 92%,transparent 100%);box-shadow:0 8px 22px rgba(0,0,0,.45);z-index:1;pointer-events:none;animation:colmPedestalPulse 3.2s ease-in-out infinite}
-@keyframes colmPedestalPulse{0%,100%{opacity:.92;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.02)}}
-@media(prefers-reduced-motion:reduce){.colm-hero-pedestal{animation:none}}
-/* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
-   transparente abajo de las patas) - sin este empujoncito se veria flotando aunque el propio
-   div ya este pegado al fondo del escenario */
-.colm-hero-char{flex-shrink:0;width:min(84%,540px);transform:translateY(16.6%);position:relative;z-index:1}
-.colm-hero-char > div{width:100% !important;height:auto !important}
-.colm-hero-char img{filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
+/* z4: fila principal (personaje + panel), en flujo normal - define el alto real de la caja */
+.colm-hero-main{position:relative;z-index:4;display:flex;gap:0;padding:3%;min-height:380px}
+@media(max-width:760px){.colm-hero-main{flex-direction:column;min-height:0;gap:12px}}
+.colm-hero-char-col{flex:0 0 55%;position:relative;min-width:0}
+@media(max-width:760px){.colm-hero-char-col{flex:0 0 auto;height:46vh;min-height:280px}}
+/* z4: sombra difusa en el piso, debajo de todo el pedestal */
+.colm-hero-floor-shadow{position:absolute;left:40%;bottom:4%;transform:translateX(-50%);width:44%;aspect-ratio:5/1;background:radial-gradient(ellipse,rgba(0,0,0,.55) 0%,transparent 70%);filter:blur(6px);z-index:4}
+/* z5/z6: el pedestal (disco grueso en perspectiva) - SVG pixelado (shape-rendering:crispEdges)
+   con contorno oscuro de 3px, como el resto de sprites del juego, para que combine */
+.colm-hero-pedestal{position:absolute;left:40%;bottom:6%;transform:translateX(-50%);width:38%;z-index:6;filter:drop-shadow(0 0 14px rgba(240,178,61,.25))}
+.colm-hero-pedestal-svg{width:100%;height:auto;display:block;overflow:visible}
+/* z7: sombra de contacto bajo los pies, encima de la cara del pedestal */
+.colm-hero-contact-shadow{position:absolute;left:40%;bottom:12.5%;transform:translateX(-50%);width:17%;aspect-ratio:4/1;background:rgba(0,0,0,.4);border-radius:50%;filter:blur(3px);z-index:7;transition:transform .2s ease-in-out}
+/* z8: el tiburon, de pie sobre la cara superior del pedestal, flotacion suave tipo idle */
+.colm-hero-char{position:absolute;left:40%;z-index:8;transform:translateX(-50%);animation:colmHeroCharIdle 2.4s ease-in-out infinite}
+.colm-hero-char img{image-rendering:pixelated;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+@keyframes colmHeroCharIdle{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.colm-hero-char{animation:none}}
 .colm-coin{cursor:pointer;filter:drop-shadow(0 6px 14px rgba(240,178,61,.35));transition:transform .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
 .colm-coin svg,.colm-coin img{width:clamp(38px,9vw,60px);height:auto;display:block}
 .colm-coin:active{transform:scale(.92)}
@@ -602,30 +600,35 @@ button{font-family:inherit;color:inherit}
 .colm-power-value{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
 .colm-power-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-/* ---- tarjeta de Heroe - AL LADO del tiburon (no debajo, no transparente encima de la
-   escena): una tarjeta solida y opaca propia, calcada de una carta de personaje de RPG
-   (titulo, nivel, PW+estrellas, nombre grande, subtitulo, descripcion y las 6 habilidades
-   en barras de progreso) - pedido explicito de Juan, con nuestros colores/arte ---- */
-.colm-hero-info{flex:0 1 230px;min-width:190px;max-width:260px;display:flex;flex-direction:column;padding:14px 15px 16px;border-radius:14px;background:linear-gradient(165deg,#2b1708,#160c04);border:2px solid var(--gold);box-shadow:0 4px 0 rgba(0,0,0,.35),0 0 18px rgba(240,178,61,.15)}
-.colm-hero-info-topline{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid rgba(240,178,61,.3)}
-.colm-hero-info-brand{font-family:'Press Start 2P',cursive;font-size:10px;color:var(--gold);letter-spacing:.04em}
-.colm-hero-info-btn{flex-shrink:0;width:19px;height:19px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#ffe17a;font-size:9.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-.colm-hero-info-lvl{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ffe17a;letter-spacing:.03em;margin-bottom:6px}
-.colm-hero-info-power-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-.colm-hero-info-power{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:var(--muted2);white-space:nowrap}
-.colm-hero-info-power b{color:var(--white)}
-.colm-hero-info-stars{font-size:13px;letter-spacing:1.5px;color:rgba(255,255,255,.2)}
-.colm-hero-info-stars .filled{color:var(--gold);text-shadow:0 0 5px rgba(240,178,61,.7)}
-.colm-hero-info-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white);letter-spacing:.01em;line-height:1.15}
-.colm-hero-info-subtitle{margin-top:2px;font-family:'Space Mono',monospace;font-size:10px;font-style:italic;color:var(--gold)}
-.colm-hero-info-desc{margin:8px 0 12px;font-size:11px;color:var(--muted);line-height:1.5}
-.colm-hero-info-stats{display:flex;flex-direction:column;gap:6px;margin-top:auto}
-.colm-hero-info-stat-row{display:flex;align-items:center;gap:7px}
-.colm-hero-info-stat-icon{flex-shrink:0;font-size:11px;width:14px;text-align:center}
-.colm-hero-info-stat-label{flex:0 0 66px;font-size:8.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.02em}
-.colm-hero-info-stat-track{flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
-.colm-hero-info-stat-fill{height:100%;border-radius:4px;transition:width .4s ease-out}
-@media(max-width:760px){.colm-hero-info{flex:none;max-width:none;min-width:0}}
+/* z10: panel de informacion - tarjeta opaca de verdad (fondo cafe/dorado solido), con una
+   "pestaña" tipo banner que sobresale arriba, calcada de una carta de heroe de RPG */
+.colm-hero-info{flex:1 1 45%;min-width:0;z-index:10;position:relative;display:flex;flex-direction:column;gap:9px;padding:26px 18px 18px;border-radius:18px;background:linear-gradient(180deg,#2A1B0F 0%,#1A110A 100%);border:3px solid #E8A317;box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,220,140,.15)}
+.colm-hero-info-tab{position:absolute;top:0;left:50%;transform:translate(-50%,-55%);display:flex;align-items:center;gap:8px;background:#3A2612;border:3px solid #E8A317;border-radius:10px;padding:5px 14px;z-index:1}
+.colm-hero-info-tab-label{font-family:'Press Start 2P',cursive;font-size:14px;color:#F7C948}
+.colm-hero-info-btn{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:2px solid var(--gold);background:rgba(255,255,255,.06);color:#ffe17a;font-size:10.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.colm-hero-info-lvl{text-align:center;font-family:'Press Start 2P',cursive;font-size:12px;color:#E8A317;letter-spacing:2px;margin-top:8px}
+.colm-hero-info-power-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.colm-hero-info-power{font-family:'Press Start 2P',cursive;font-size:10px;color:#F7C948;white-space:nowrap}
+.colm-hero-info-power b{color:#fff}
+.colm-hero-info-stars{font-size:14px;letter-spacing:1.5px;color:#4A3720}
+.colm-hero-info-stars .filled{color:#F7C948;text-shadow:0 0 5px rgba(240,178,61,.7)}
+.colm-hero-info-name{text-align:center;font-family:'Press Start 2P',cursive;font-size:13px;color:#F7C948;text-shadow:0 2px 0 #7A4A08;line-height:1.4}
+.colm-hero-info-subtitle{margin-top:2px;text-align:center;font-family:'Space Mono',monospace;font-weight:700;font-size:10.5px;color:#E8A317;letter-spacing:1px}
+.colm-hero-info-desc{font-size:11px;color:#CBB89A;line-height:1.5;text-align:center}
+.colm-hero-info-stats-box{margin-top:auto;background:#F4E9D4;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px}
+.colm-hero-info-stat-row{display:grid;grid-template-columns:14px 64px 1fr;align-items:center;gap:7px}
+.colm-hero-info-stat-icon{font-size:11px;text-align:center}
+.colm-hero-info-stat-label{font-family:'Press Start 2P',cursive;font-size:7px;color:#2A1B0F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.colm-hero-info-stat-track{display:block;height:8px;border-radius:3px;background:#2A1B0F;overflow:hidden;position:relative}
+.colm-hero-info-stat-fill{display:block;height:100%;border-radius:3px;width:0;transition:width .7s ease-out;position:relative}
+.colm-hero-info-stat-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.35) 0 35%,transparent 35%)}
+.colm-hero-info-equip-note{text-align:center;font-size:9.5px;color:#A8916E;margin:0}
+.colm-hero-info-select-btn{align-self:center;width:80%;height:40px;font-family:'Press Start 2P',cursive;font-size:10px;color:#2A1B0F;background:linear-gradient(180deg,#F7C948,#D9921A);border:3px solid #7A4A08;border-radius:12px;box-shadow:0 5px 0 #7A4A08;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.colm-hero-info-select-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #7A4A08}
+@media(max-width:760px){
+  .colm-hero-info{flex:1 1 auto}
+  .colm-hero-info-stat-label{font-size:6.5px}
+}
 .colm-rarity-info-btn{display:block;margin:0 auto 12px;background:none;border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted2);cursor:pointer}
 .colm-rarity-info-btn:hover{color:var(--white);border-color:var(--gold)}
 /* "story card": tarjeta ancha tipo pagina de cuento ilustrado (imagen + texto), para las
@@ -700,22 +703,12 @@ button{font-family:inherit;color:inherit}
 .colm-roulette-spin-btn:disabled{opacity:.6;cursor:not-allowed;animation:none}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(max-width:600px){
-  .colm-fighter-idblock{width:48px}
-  .colm-fighter-eyebrow{font-size:5.5px}
-  .colm-fighter-portrait{width:44px;height:44px}
-  .colm-fighter-name{font-size:7.5px}
-  .colm-fighter-stars{font-size:8px}
-  .colm-fighter-bar-label{font-size:7.5px}
-  .colm-fighter-bar{height:20px}
   .colm-hero-timer-label{font-size:8px}
   .colm-hero-timer-digits{font-size:20px}
   .colm-hero-timer-box{padding:4px 10px}
-  /* en celular el recuadro (y por lo tanto tambien la tienda, que reusa esta misma caja
-     como overlay) se sentia chiquito con mucho espacio desperdiciado alrededor - se deja
-     crecer bastante mas alto para aprovechar casi toda la pantalla */
+  .colm-hero-coinchip{font-size:10px;padding:5px 11px}
   .colm-arcade{padding-left:0;padding-right:0}
-  .colm-hero{min-height:min(720px,78vh);border-radius:12px}
-  .colm-hero-char{width:min(92%,560px)}
+  .colm-hero{border-radius:12px}
 }
 @media(min-width:860px){
   /* en pantallas anchas la pantalla grande del tiburon (estilo "game screen") sigue arriba
@@ -726,9 +719,6 @@ button{font-family:inherit;color:inherit}
   .colmillos-quest-list{display:grid;grid-template-columns:1fr 1fr}
   .colm-shop-grid{grid-template-columns:repeat(4,1fr)}
   .colm-shop-bg-grid{display:grid;grid-template-columns:repeat(2,1fr)}
-  /* la ficha de heroe (.colm-hero-info) ahora va AL LADO del tiburon (no debajo), asi que
-     no hace falta alto extra - se queda del mismo tamaño compacto de siempre */
-  .colm-hero{min-height:min(480px,68vh)}
 }
 
 /* CAJITA DE RANGOS (Fase 3, shell vacio) - escala de progreso por volumen de trading y
@@ -6426,47 +6416,69 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <div class="colm-grid">
          <div class="colm-left">
           <div class="colm-hero" id="colmillosHero">
+            <div class="colm-hero-stage" id="colmillosHeroStage"></div>
+            <div class="colm-hero-vignette"></div>
+            <div class="colm-hero-spotlight"></div>
+            <div class="colm-hero-particles colm-hero-particles-far" id="colmillosHeroParticlesFar"></div>
             <div class="colm-hero-hud">
-              <div class="colm-hero-hud-row">
-                <div class="colm-fighter-hud">
-                  <div class="colm-fighter-row">
-                    <div class="colm-fighter-idblock">
-                      <div class="colm-fighter-eyebrow">HÉROE</div>
-                      <div class="colm-fighter-portrait" id="colmillosFighterPortrait"></div>
-                      <div class="colm-fighter-name" id="colmillosPlayerName">JUGADOR</div>
-                      <div class="colm-fighter-stars" id="colmillosFighterStars"></div>
-                    </div>
-                    <div class="colm-fighter-bar-col">
-                      <div class="colm-fighter-bar-label">⭐ NIVEL <span id="colmillosLevelNum">0</span></div>
-                      <div class="colm-fighter-bar life"><div class="colm-fighter-bar-fill" id="colmillosLifeFill"></div></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="colm-hero-timer-box" title="Tiempo en línea">
-                  <div class="colm-hero-timer-label">TIME</div>
-                  <div class="colm-hero-timer-digits" id="colmillosSessionTimer">00</div>
-                </div>
+              <div class="colm-hero-coinchip">
+                <span class="colm-hero-coinchip-dot"></span>
+                <span id="colmillosHeroCoinChip">0</span>
+              </div>
+              <div class="colm-hero-timer-box" title="Tiempo en línea">
+                <div class="colm-hero-timer-label">TIME</div>
+                <div class="colm-hero-timer-digits" id="colmillosSessionTimer">00</div>
               </div>
             </div>
             <div class="colm-hero-main">
-              <div class="colm-hero-stage" id="colmillosHeroStage">
-                <div class="colm-hero-pedestal" aria-hidden="true"></div>
+              <div class="colm-hero-char-col">
+                <div class="colm-hero-floor-shadow"></div>
+                <div class="colm-hero-pedestal" aria-hidden="true">
+                  <svg class="colm-hero-pedestal-svg" viewBox="0 0 100 60" shape-rendering="crispEdges">
+                    <defs>
+                      <radialGradient id="colmPedTopGrad" cx="50%" cy="38%" r="65%">
+                        <stop offset="0%" stop-color="#fff3d6"/>
+                        <stop offset="45%" stop-color="#F7C948"/>
+                        <stop offset="75%" stop-color="#E8A317"/>
+                        <stop offset="100%" stop-color="#B9770E"/>
+                      </radialGradient>
+                      <linearGradient id="colmPedSideGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#5a3a06"/>
+                        <stop offset="18%" stop-color="#7A4A08"/>
+                        <stop offset="35%" stop-color="#C68A1A"/>
+                        <stop offset="50%" stop-color="#E0A52A"/>
+                        <stop offset="65%" stop-color="#C68A1A"/>
+                        <stop offset="82%" stop-color="#7A4A08"/>
+                        <stop offset="100%" stop-color="#5a3a06"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M 4,20 L 4,38 A 46,9 0 0 0 96,38 L 96,20 Z" fill="url(#colmPedSideGrad)" stroke="#3B2304" stroke-width="2.5"/>
+                    <ellipse cx="50" cy="20" rx="46" ry="9" fill="url(#colmPedTopGrad)" stroke="#3B2304" stroke-width="2.5"/>
+                    <ellipse cx="50" cy="20" rx="35" ry="6.8" fill="none" stroke="rgba(255,240,180,.55)" stroke-width="1.6"/>
+                  </svg>
+                </div>
+                <div class="colm-hero-contact-shadow" id="colmillosContactShadow"></div>
                 <div class="colm-hero-char" id="colmillosHeroShark"></div>
+                <div class="colm-hero-particles colm-hero-particles-near" id="colmillosHeroParticlesNear"></div>
               </div>
               <div class="colm-hero-info">
-                <div class="colm-hero-info-topline">
-                  <span class="colm-hero-info-brand">SkillCash</span>
+                <div class="colm-hero-info-tab">
+                  <span class="colm-hero-info-tab-label">HÉROES</span>
                   <button type="button" class="colm-hero-info-btn" id="colmHeroCardInfoBtn" title="¿Cómo funciona el nivel?">❓</button>
                 </div>
-                <div class="colm-hero-info-lvl">Nivel <span id="colmillosHCLevel">0</span></div>
+                <div class="colm-hero-info-lvl">NIVEL <span id="colmillosHCLevel">0</span></div>
                 <div class="colm-hero-info-power-row">
                   <span class="colm-hero-info-power">PODER <b id="colmillosHCPower">0</b></span>
                   <span class="colm-hero-info-stars" id="colmillosHCStars"></span>
                 </div>
                 <div class="colm-hero-info-name" id="colmillosHCName">JUGADOR</div>
                 <div class="colm-hero-info-subtitle">El tiburón de SkillCash</div>
-                <p class="colm-hero-info-desc">Equipado con lo que ya desbloqueaste en la tienda.</p>
-                <div class="colm-hero-info-stats" id="colmillosHCStats"></div>
+                <p class="colm-hero-info-desc">El depredador del mercado. Huele la liquidez a kilómetros, muerde los quiebres y nunca suelta una buena entrada.</p>
+                <div class="colm-hero-info-stats-box">
+                  <div class="colm-hero-info-stats" id="colmillosHCStats"></div>
+                </div>
+                <p class="colm-hero-info-equip-note">Equipado con lo que ya desbloqueaste en la tienda.</p>
+                <button type="button" class="colm-hero-info-select-btn" data-goto-tab="tienda">IR A LA TIENDA</button>
               </div>
             </div>
             <div class="colm-hero-overlay" id="colmillosHeroOverlay" style="display:none">
@@ -26812,7 +26824,7 @@ async function awardColmillos(eventType, periodKey, amount){
      algunos navegadores/CDN siguen sirviendo la version vieja del archivo (mismo nombre de
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
-<script src="assets/js/colmillos.js?v=4" defer></script>
+<script src="assets/js/colmillos.js?v=5" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
