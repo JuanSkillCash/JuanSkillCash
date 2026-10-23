@@ -155,13 +155,52 @@ function animateColmBalance(target){
   }
   window._colmBalanceRaf = requestAnimationFrame(tick);
 }
-/* vida decorativa del HUD estilo "juego de pelea" - aleatoria, cambia cada vez que se entra
-   de nuevo a la pagina (no es una mecanica real, solo ambientacion) */
-function randomizeColmLifeBar(){
-  const fill = document.getElementById('colmillosLifeFill');
-  if(!fill) return;
-  const pct = 30 + Math.floor(Math.random() * 71);
-  fill.style.width = pct + '%';
+/* "nivel de heroe" = que tanto del catalogo completo (comprar + evolucionar TODO) llevas
+   avanzado - 1 punto por cada fondo que posees (no evolucionan, valen 1 punto fijo c/u), y
+   para skins/accesorios la rareza actual en puntos (Comun=1 ... Mitico=5, ya que cada escalon
+   de evolucion es un punto mas). El boleto de sorteo no cuenta (es consumible, no coleccion).
+   Nivel 0-100 en escala RAIZ CUADRADA (no lineal): subir los primeros niveles se siente rapido
+   con solo comprar algunas cosas, pero los ultimos (80-100) de verdad requieren tener casi
+   todo el catalogo al maximo - nivel 100 es la meta de "coleccionista completo", no se espera
+   que la mayoria lo alcance pronto (a proposito, ver scripts/sql/colm_shop_repricing.sql) */
+function computeColmLevelInfo(){
+  const maxPoints = colmillosShopItemsCache.reduce((sum, item) => {
+    if(item.category === 'raffle') return sum;
+    return sum + (item.category === 'background' ? 1 : 5);
+  }, 0);
+  const points = Array.from(colmillosOwnedItemIds).reduce((sum, id) => {
+    const item = colmillosShopItemsCache.find(i => i.id === id);
+    if(!item || item.category === 'raffle') return sum;
+    return sum + (item.category === 'background' ? 1 : (colmillosItemRarity.get(id) || 1));
+  }, 0);
+  if(maxPoints <= 0) return { level: 0, progress: 0, points, maxPoints };
+  const frac = Math.min(1, points / maxPoints);
+  const level = Math.min(100, Math.floor(100 * Math.sqrt(frac)));
+  const pointsForLevel = lvl => maxPoints * Math.pow(lvl / 100, 2);
+  let progress = 1;
+  if(level < 100){
+    const curP = pointsForLevel(level), nextP = pointsForLevel(level + 1);
+    const span = nextP - curP;
+    progress = span > 0 ? Math.max(0, Math.min(1, (points - curP) / span)) : 1;
+  }
+  return { level, progress, points, maxPoints };
+}
+/* pinta el nivel en la barrita del HUD (antes era "SUERTE", una barra decorativa aleatoria
+   sin ningun significado - ahora mide algo real) y las estrellitas (1 cada 20 niveles) */
+function renderColmLevelHud(){
+  const info = computeColmLevelInfo();
+  const numEl = document.getElementById('colmillosLevelNum');
+  const fillEl = document.getElementById('colmillosLifeFill');
+  const starsEl = document.getElementById('colmillosFighterStars');
+  if(numEl) numEl.textContent = info.level;
+  if(fillEl) fillEl.style.width = Math.round(info.progress * 100) + '%';
+  if(starsEl){
+    const filled = Math.ceil(info.level / 20);
+    starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
+      '<span class="' + (i < filled ? 'filled' : '') + '">★</span>'
+    ).join('');
+  }
+  return info;
 }
 /* "edad del tiburon" = tiempo desde que el usuario se registro en la plataforma */
 function formatSharkAge(createdAtIso){
@@ -265,9 +304,9 @@ function renderColmillosShopPreview(){
    al nivel de rareza de lo que de verdad tenes EQUIPADO ahi (no lo que estas previsualizando) -
    son solo para presumir, no cambian nada del minijuego/ruleta/trivia */
 function renderColmPowerSheet(){
-  const el = document.getElementById('colmillosPowerSheet');
-  if(!el) return;
-  el.innerHTML = Object.keys(COLM_POWER_BY_SLOT).map(field => {
+  const targets = document.querySelectorAll('.colm-power-sheet');
+  if(!targets.length) return;
+  const html = Object.keys(COLM_POWER_BY_SLOT).map(field => {
     const power = COLM_POWER_BY_SLOT[field];
     const itemId = colmillosEquippedState[field];
     const tierInfo = itemId ? COLM_RARITY_TIERS[colmillosItemRarity.get(itemId) || 1] : null;
@@ -278,6 +317,7 @@ function renderColmPowerSheet(){
       '<span class="colm-power-text"><span class="colm-power-label">' + power.label + '</span>' +
       '<span class="colm-power-value">' + valueHtml + '</span></span></div>';
   }).join('');
+  targets.forEach(el => { el.innerHTML = html; });
 }
 /* avatarcito del tiburon - se usa tanto en el botoncito de cuenta (arriba a la derecha) como
    en el circulo grande de "Mi perfil", en vez del emoji generico de siempre, para que se
@@ -524,6 +564,7 @@ async function loadColmillosShop(){
   // probar la tienda y las evoluciones tal cual las ve cualquier usuario, su cuenta pasa por el
   // mismo calculo de arriba (ownedItemIds/rarity derivados 100% de su propio ledger), solo que
   // con un saldo bien grande de Sharkoins de prueba (ver scripts/sql/colm_owner_test_reset.sql)
+  renderColmLevelHud();
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
   const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
@@ -1322,7 +1363,6 @@ function startColmillosLoadSequence(){
     document.getElementById('colmillosTabs').style.display = 'flex';
     refreshColmillosPageContent();
     loadColmillosShop();
-    randomizeColmLifeBar();
     colmSessionStartTs = Date.now();
     clearInterval(window._colmSessionTimerInterval);
     window._colmSessionTimerInterval = setInterval(updateColmSessionTimer, 1000);

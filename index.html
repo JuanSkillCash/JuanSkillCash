@@ -432,11 +432,14 @@ button{font-family:inherit;color:inherit}
 .colm-fighter-hud{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .colm-fighter-row{display:flex;align-items:center;gap:12px}
 .colm-fighter-idblock{flex-shrink:0;width:60px;display:flex;flex-direction:column;align-items:center}
+.colm-fighter-eyebrow{font-family:'Press Start 2P',cursive;font-size:6.5px;color:var(--gold);letter-spacing:.1em;margin-bottom:3px;text-align:center}
 .colm-fighter-portrait{width:56px;height:56px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.06);border:3px solid #caa23a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .colm-fighter-portrait img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;image-rendering:crisp-edges}
 .colm-fighter-portrait.coin{background:#1a1306}
 .colm-fighter-name{margin-top:4px;width:100%;font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;text-shadow:0 1px 0 #000;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .colm-fighter-name.gold{color:var(--gold)}
+.colm-fighter-stars{margin-top:3px;width:100%;text-align:center;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.18)}
+.colm-fighter-stars .filled{color:var(--gold);text-shadow:0 0 4px rgba(240,178,61,.7)}
 .colm-fighter-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .colm-fighter-bar-label{font-family:'Press Start 2P',cursive;font-size:9px;color:#ffe17a;letter-spacing:.04em;text-shadow:0 1px 0 #000}
 .colm-fighter-bar{position:relative;width:100%;height:24px;border-radius:4px;background:#1a0d05;border:3px solid #7a5420;box-shadow:inset 0 0 0 1px #000}
@@ -448,6 +451,12 @@ button{font-family:inherit;color:inherit}
 .colm-hero-timer-label{font-family:'Press Start 2P',cursive;font-size:10px;color:#ffe17a;letter-spacing:.05em}
 .colm-hero-timer-digits{font-family:'Press Start 2P',cursive;font-size:26px;color:#ff5a3c;text-shadow:0 0 6px rgba(255,90,60,.6);line-height:1.25;font-variant-numeric:tabular-nums}
 .colm-hero-stage{position:relative;flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+/* "portal" debajo del tiburon - un resplandor ovalado que pulsa suavemente, como si estuviera
+   parado sobre un pedestal luminoso (pedido explicito de Juan, inspirado en cartas de heroes
+   de otros juegos) - puro CSS, sin imagen nueva */
+.colm-hero-pedestal{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:min(72%,460px);aspect-ratio:3/1;border-radius:50%;background:radial-gradient(ellipse at center,rgba(240,178,61,.5),rgba(240,178,61,.16) 45%,transparent 72%);z-index:0;pointer-events:none;animation:colmPedestalPulse 3.2s ease-in-out infinite}
+@keyframes colmPedestalPulse{0%,100%{opacity:.7;transform:translateX(-50%) scale(.96)}50%{opacity:1;transform:translateX(-50%) scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.colm-hero-pedestal{animation:none}}
 /* el dibujo del tiburon no llega hasta el borde de su lienzo cuadrado (le sobra ~17% de aire
    transparente abajo de las patas) - sin este empujoncito se veria flotando aunque el propio
    div ya este pegado al fondo del escenario */
@@ -662,8 +671,10 @@ button{font-family:inherit;color:inherit}
 @media(max-width:380px){.colm-shop-grid{grid-template-columns:1fr}}
 @media(max-width:600px){
   .colm-fighter-idblock{width:48px}
+  .colm-fighter-eyebrow{font-size:5.5px}
   .colm-fighter-portrait{width:44px;height:44px}
   .colm-fighter-name{font-size:7.5px}
+  .colm-fighter-stars{font-size:8px}
   .colm-fighter-bar-label{font-size:7.5px}
   .colm-fighter-bar{height:20px}
   .colm-hero-timer-label{font-size:8px}
@@ -6393,11 +6404,13 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="colm-fighter-hud">
                   <div class="colm-fighter-row">
                     <div class="colm-fighter-idblock">
+                      <div class="colm-fighter-eyebrow">HÉROE</div>
                       <div class="colm-fighter-portrait" id="colmillosFighterPortrait"></div>
                       <div class="colm-fighter-name" id="colmillosPlayerName">JUGADOR</div>
+                      <div class="colm-fighter-stars" id="colmillosFighterStars"></div>
                     </div>
                     <div class="colm-fighter-bar-col">
-                      <div class="colm-fighter-bar-label">🍀 SUERTE</div>
+                      <div class="colm-fighter-bar-label">⭐ NIVEL <span id="colmillosLevelNum">0</span></div>
                       <div class="colm-fighter-bar life"><div class="colm-fighter-bar-fill" id="colmillosLifeFill"></div></div>
                     </div>
                   </div>
@@ -6409,6 +6422,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
             </div>
             <div class="colm-hero-stage">
+              <div class="colm-hero-pedestal" aria-hidden="true"></div>
               <div class="colm-hero-char" id="colmillosHeroShark"></div>
             </div>
             <div class="colm-hero-overlay" id="colmillosHeroOverlay" style="display:none">
@@ -6427,6 +6441,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <button type="button" class="colm-goto-shop-btn" data-goto-tab="tienda">Ir a la tienda 🛒</button>
               </div>
             </div>
+
+            <div class="colm-section-label">🧬 FICHA DEL HÉROE</div>
+            <div class="colm-power-sheet" id="colmillosPowerSheetHero"></div>
 
             <div class="colm-section-label">⚔️ CÓMO SE GANAN</div>
             <div class="colmillos-quest-list" id="colmillosQuestList">
@@ -6567,6 +6584,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
                 <div class="colm-rarity-arrow">→</div>
                 <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>450 <img loading="lazy" src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
               </div>
+
+              <p class="auth-note" style="margin:0 auto 16px">🧬 <b>Nivel de Héroe:</b> tu ficha en Inicio muestra un Nivel (0 a 100) y hasta 5 estrellas — mide qué tanto del catálogo completo llevas comprado y evolucionado. Cada fondo que tenés vale 1 punto; cada skin o accesorio vale según su rareza actual (Común = 1 punto, hasta Mítico = 5). Subir los primeros niveles es rápido, pero llegar a 100 significa tener TODO el catálogo al máximo — es la meta de coleccionista completo, no algo para lograr en unas semanas.</p>
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
