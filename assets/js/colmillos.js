@@ -206,7 +206,7 @@ const COLM_RARITY_TIERS = [
   { tier: 4, name: 'Legendario', color: '#f0a020' },
   { tier: 5, name: 'Mítico', color: 'linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)' },
 ];
-const COLM_EVOLVE_COST = { 2: 150, 3: 300, 4: 550, 5: 900 };
+const COLM_EVOLVE_COST = { 2: 75, 3: 150, 4: 275, 5: 450 };
 const COLM_RARITY_CATEGORIES = new Set(['skin', 'accessory']);
 /* las 6 "categorias de poder" del personaje - el color (skin) y cada una de las 5 partes del
    cuerpo le dan su propio poder decorativo, cuyo NIVEL es la rareza de lo que tengas

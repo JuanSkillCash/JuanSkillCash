@@ -6,8 +6,11 @@
 -- Dorado por primera vez). Una vez la tienes, la puedes EVOLUCIONAR pagando Sharkoins extra -
 -- Raro, Epico, Legendario y Mitico - sin comprar nada nuevo, es la MISMA pieza mejorando (como
 -- en Axie Infinity). Esos costos de evolucion son un numero fijo e igual para CUALQUIER skin o
--- accesorio (no estan en esta tabla, estan en index.html, constante COLM_EVOLVE_COST):
---   Raro (tier 2): 150   Epico (tier 3): 300   Legendario (tier 4): 550   Mitico (tier 5): 900
+-- accesorio (no estan en esta tabla, estan en assets/js/colmillos.js, constante COLM_EVOLVE_COST):
+--   Raro (tier 2): 75   Epico (tier 3): 150   Legendario (tier 4): 275   Mitico (tier 5): 450
+-- (recalibrado despues de validar contra lo que gana alguien jugando normal, sin ganarse rifas
+-- ni el top del leaderboard: evolucionar un solo item hasta Mitico debia tardar un par de meses,
+-- no casi 4 - ver el commit que bajo estos numeros para el detalle del calculo)
 -- La rareza alcanzada se guarda como una fila mas en el ledger de siempre
 -- (user_colmillos_events: event_type='evolve_<item_id>', period_key='tier2'/'tier3'/...), asi
 -- que no hace falta ninguna tabla nueva - el mismo unique constraint evita evolucionar dos
