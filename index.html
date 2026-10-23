@@ -26231,6 +26231,12 @@ const BG_IMG_PATHS = {
   bg_pradera: 'assets/mascot/backgrounds/bg_pradera.png',
   bg_nieve: 'assets/mascot/backgrounds/bg_nieve.png',
   bg_desierto: 'assets/mascot/backgrounds/bg_desierto.png',
+  bg_cripto_bitcoin: 'assets/mascot/backgrounds/fondo_cripto_bitcoin.png',
+  bg_cripto_ethereum: 'assets/mascot/backgrounds/fondo_cripto_ethereum.png',
+  bg_cripto_solana: 'assets/mascot/backgrounds/fondo_cripto_solana.png',
+  bg_cripto_monero: 'assets/mascot/backgrounds/fondo_cripto_monero.png',
+  bg_cripto_pepe: 'assets/mascot/backgrounds/fondo_cripto_pepe.png',
+  bg_cripto_dogecoin: 'assets/mascot/backgrounds/fondo_cripto_dogecoin.png',
 };
 const sharkImgCache = {};
 function getSharkImg(skinId){
@@ -26280,6 +26286,12 @@ const ACC_IMG_PATHS = {
   acc_patines: 'assets/mascot/accessories/acc_patines.png',
   acc_sandalias: 'assets/mascot/accessories/acc_sandalias.png',
   acc_tenis: 'assets/mascot/accessories/acc_tenis.png',
+  acc_laser: 'assets/mascot/accessories/acc_ojos_ojos_laser.png',
+  acc_corazon: 'assets/mascot/accessories/acc_ojos_gafas_corazon.png',
+  acc_monoculo: 'assets/mascot/accessories/acc_ojos_monoculo.png',
+  acc_gafas3d: 'assets/mascot/accessories/acc_ojos_gafas_3d.png',
+  acc_cyberpunk: 'assets/mascot/accessories/acc_ojos_visor_cyberpunk.png',
+  acc_buceo: 'assets/mascot/accessories/acc_ojos_careta_buceo.png',
 };
 /* accessoryIds: un arreglo (0 a 4 ids, uno por cada "parte del cuerpo" - cabeza/cara/cuerpo/
    manos) para poder llevar puesto un gorro Y gafas Y cadena Y algo en la mano, todo a la vez -
@@ -26611,7 +26623,7 @@ async function loadColmillosShop(){
    puestas varias a la vez sin que una se quite a la otra */
 const ACC_SLOT_MAP = {
   acc_cap: 'head', acc_crown: 'head', acc_sombrero: 'head', acc_headphones: 'head', acc_scuba: 'head',
-  acc_shades: 'face', acc_antifaz: 'face',
+  acc_shades: 'face', acc_antifaz: 'face', acc_laser: 'face', acc_corazon: 'face', acc_monoculo: 'face', acc_gafas3d: 'face', acc_cyberpunk: 'face', acc_buceo: 'face',
   acc_chain: 'body', acc_scarf: 'body', acc_cape: 'body', acc_collar: 'body', acc_aletarobot: 'body',
   acc_microfono: 'hands', acc_guantes: 'hands', acc_paraguas: 'hands', acc_bate: 'hands', acc_escudo: 'hands', acc_espada: 'hands', acc_mazo: 'hands', acc_raqueta: 'hands', acc_varita: 'hands',
   acc_aletasbuceo: 'feet', acc_botasnieve: 'feet', acc_botaspirata: 'feet', acc_patines: 'feet', acc_sandalias: 'feet', acc_tenis: 'feet',
