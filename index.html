@@ -6528,7 +6528,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colmillos-quest-list" id="colmillosQuestList">
               <div class="colmillos-quest" data-event="daily_visit">
                 <div class="colmillos-quest-icon">📅</div>
-                <div class="colmillos-quest-body"><h4>Visitar la plataforma</h4><p>+5 cada día que entras</p></div>
+                <div class="colmillos-quest-body"><h4>Visitar la plataforma</h4><p>+20 cada día que entras</p></div>
                 <div class="colmillos-quest-status"></div>
               </div>
               <div class="colmillos-quest" data-event="telegram_connected">
@@ -6548,12 +6548,12 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
               <div class="colmillos-quest" data-event="trivia_correct">
                 <div class="colmillos-quest-icon">🎯</div>
-                <div class="colmillos-quest-body"><h4>Acertar la trivia diaria</h4><p>+8 cada día que aciertas</p></div>
+                <div class="colmillos-quest-body"><h4>Acertar la trivia diaria</h4><p>+30 cada día que aciertas</p></div>
                 <div class="colmillos-quest-status"></div>
               </div>
               <div class="colmillos-quest" data-event="minigame_played">
                 <div class="colmillos-quest-icon">🕹️</div>
-                <div class="colmillos-quest-body"><h4>Jugar el minijuego</h4><p>+10 cada día que llegas a 1500 puntos</p></div>
+                <div class="colmillos-quest-body"><h4>Jugar el minijuego</h4><p>+50 cada día que llegas a 1500 puntos</p></div>
                 <div class="colmillos-quest-status"></div>
               </div>
             </div>
@@ -6614,9 +6614,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-help-panel" data-helppanel="sharkoins">
               <p class="colm-section-label" style="text-align:center">💰 Cómo ganar Sharkoins</p>
               <div class="colm-help-table">
-                <div class="colm-help-row"><span>Entrar cada día</span><b>+5</b></div>
-                <div class="colm-help-row"><span>Acertar la trivia diaria</span><b>+8</b></div>
-                <div class="colm-help-row"><span>Sacar 1500+ puntos en el minijuego</span><b>+10</b></div>
+                <div class="colm-help-row"><span>Entrar cada día</span><b>+20</b></div>
+                <div class="colm-help-row"><span>Acertar la trivia diaria</span><b>+30</b></div>
+                <div class="colm-help-row"><span>Sacar 1500+ puntos en el minijuego</span><b>+50</b></div>
                 <div class="colm-help-row"><span>Completar tu perfil (una vez)</span><b>+30</b></div>
                 <div class="colm-help-row"><span>Conectar Telegram (una vez)</span><b>+70</b></div>
                 <div class="colm-help-row"><span>Conectar Bitunix (una vez)</span><b>+70</b></div>
@@ -11965,7 +11965,7 @@ sbClient.auth.onAuthStateChange((event, session) => {
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   if(typeof loadBitunixStatus === 'function') loadBitunixStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
-  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
+  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 20);
   if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
   if(event === 'PASSWORD_RECOVERY'){
     setAuthMode('reset');
@@ -11981,7 +11981,7 @@ sbClient.auth.getSession().then(({ data }) => {
   if(typeof loadTelegramStatus === 'function') loadTelegramStatus();
   if(typeof loadBitunixStatus === 'function') loadBitunixStatus();
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
-  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 5);
+  if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 20);
   if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
 });
 
@@ -26869,7 +26869,7 @@ async function awardColmillos(eventType, periodKey, amount){
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
 <script src="assets/js/hero-progress.js?v=1" defer></script>
-<script src="assets/js/colmillos.js?v=13" defer></script>
+<script src="assets/js/colmillos.js?v=14" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>

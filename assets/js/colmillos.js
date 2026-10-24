@@ -726,7 +726,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
     buttons.forEach((b, i) => { b.classList.add('disabled'); if(i === correctIndex) b.classList.add('correct'); });
     resultEl.textContent = '✓ ¡Correcto! +8 Sharkoins';
     resultEl.classList.add('done');
-    await awardColmillos('trivia_correct', todayKeyUTC(), 8);
+    await awardColmillos('trivia_correct', todayKeyUTC(), 30);
     refreshColmillosPageContent();
   } else {
     buttons[chosenIndex].classList.add('wrong');
@@ -1291,7 +1291,7 @@ function endColmGame(){
   ctx.font = '14px monospace';
   ctx.fillText('toca para reintentar', canvas.width / 2, canvas.height / 2 + 20);
   if(colmGame.score >= 1500 && typeof awardColmillos === 'function'){
-    awardColmillos('minigame_played', todayKeyUTC(), 10).then(() => refreshColmillosPageContent());
+    awardColmillos('minigame_played', todayKeyUTC(), 50).then(() => refreshColmillosPageContent());
   }
   // cada partida jugada (con puntaje > 0) queda en el historial para el ranking semanal/mensual
   // (ver scripts/sql/create_colm_leaderboard.sql) - el "mejor de la semana/mes" se calcula alla
