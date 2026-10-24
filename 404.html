@@ -3,6 +3,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<!-- arreglo de entrar directo (o refrescar) en una ruta anidada como /sharkoins/ayuda o
+     /indicadores/dominancia-btc: TODO el sitio referencia sus propios archivos con rutas
+     relativas (ej. "assets/js/colmillos.js", sin "/" adelante), y esas se resuelven contra la
+     URL actual del documento - en "/sharkoins/ayuda" eso da "/sharkoins/assets/js/colmillos.js"
+     (no existe) en vez de "/assets/js/colmillos.js". Mas abajo (ver applyInitialRoute) ya se
+     devolvia la URL a "/" con history.replaceState antes de decidir que mostrar, pero eso
+     corria tarde (cerca del final del body) - el "preload scanner" del navegador y, sobre
+     todo, una recarga real con el Service Worker ya activo, llegan a pedir esos archivos ANTES
+     de que ese codigo alcance a correr, y fallan. Por eso esto va aca, literal lo primero en
+     head, antes de cualquier otra etiqueta que cargue un recurso - guarda la ruta real para que
+     applyInitialRoute la siga usando, y corrige la URL del documento de una vez para que TODO
+     lo que se cargue despues (sin excepcion) resuelva bien sus rutas relativas */
+<script>(function(){ window.__initialRoutePath = location.pathname; if(location.pathname !== '/'){ try{ history.replaceState(history.state, '', '/' + location.search + location.hash); }catch(e){} } })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP de defensa en profundidad: aunque el HTML se vea entero (es un sitio estatico), esto
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
@@ -10240,9 +10253,14 @@ function applyRoute(path){
       // recién cerró arriba), nadie más lo refresca
       setPageTitle(CATEGORY_LABELS[cat]);
     }
-  } else if(path === '/sharkoins'){
-    if(typeof showColmillosPage === 'function') showColmillosPage();
-    else window.addEventListener('load', () => { if(typeof showColmillosPage === 'function') showColmillosPage(); });
+  } else if(segs[0] === 'sharkoins'){
+    // segs[1] (ej. "ayuda", "minijuegos") deja a la persona en la MISMA pestaña de Sharkoins
+    // en la que estaba si recarga la pagina, en vez de siempre caer al menu principal -
+    // showColmillosPage (en colmillos.js) es quien traduce ese pedazo de URL a la pestaña
+    // real, no se duplica ese mapeo aca
+    const sharkoinsSlug = segs[1] || '';
+    if(typeof showColmillosPage === 'function') showColmillosPage(sharkoinsSlug);
+    else window.addEventListener('load', () => { if(typeof showColmillosPage === 'function') showColmillosPage(sharkoinsSlug); });
   } else {
     showCategoryOverview();
   }
@@ -25916,7 +25934,10 @@ document.addEventListener('visibilitychange', () => {
    demás ya pasa por showCategoryDetail/jumpToIndicator/click en la tarjeta de herramienta, que
    son los mismos que ya actualizan la URL en cada navegación normal */
 (function applyInitialRoute(){
-  const path = location.pathname.replace(/\/+$/, '') || '/';
+  // la ruta real de entrada ya quedo guardada en window.__initialRoutePath por el script al
+  // ppio de <head> (ver su comentario) - la URL del documento ya la reseteo a "/" desde
+  // entonces, asi que no se puede releer de location.pathname aca
+  const path = (window.__initialRoutePath || location.pathname).replace(/\/+$/, '') || '/';
   replaceRoute(null, '/');
   if(path === '/') return;
   applyRoute(path);

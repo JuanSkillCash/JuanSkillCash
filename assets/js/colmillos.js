@@ -1420,7 +1420,23 @@ async function spinColmRoulette(){
 }
 document.getElementById('colmRouletteSpinBtn').addEventListener('click', spinColmRoulette);
 
+/* mapea cada pestaña de Sharkoins a su pedacito de URL (y al reves) para que la ruta quede
+   marcando donde esta la persona de verdad - asi un refresh (o un link compartido) la deja en
+   la MISMA pestaña en vez de siempre mandarla al menu principal de Sharkoins. 'inicio' no
+   agrega nada a la URL (queda en /sharkoins a secas), es el default natural */
+const COLM_TAB_SLUGS = { inicio: '', ayuda: 'ayuda', tienda: 'tienda', megadientes: 'saldo', juego: 'minijuegos', trivia: 'trivia', ruleta: 'casino' };
+const COLM_SLUG_TO_TAB = Object.fromEntries(Object.entries(COLM_TAB_SLUGS).filter(([, slug]) => slug).map(([t, slug]) => [slug, t]));
+function colmRoutePathForTab(tab){
+  const slug = COLM_TAB_SLUGS[tab] || '';
+  return '/sharkoins' + (slug ? '/' + slug : '');
+}
 function switchColmillosTab(tab){
+  // reemplaza (no apila) la entrada del historial - cambiar de pestaña no debe llenar el
+  // boton "atras" de pasos intermedios, igual que ya pasa al cambiar de herramienta en
+  // Indicadores/Herramientas (ver openModalGeneric)
+  if(typeof replaceRoute === 'function' && colmillosPageView && colmillosPageView.style.display === 'block'){
+    replaceRoute({ skillcashDepth: 'sharkoins' }, colmRoutePathForTab(tab));
+  }
   document.querySelectorAll('#colmillosTabs .colm-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.colm-tabpanel').forEach(p => { p.style.display = (p.dataset.tabpanel === tab) ? 'block' : 'none'; });
   /* la pestaña de Tienda se "presta" al recuadro grande del tiburon cuando se abre con MENU -
@@ -1587,7 +1603,14 @@ document.getElementById('colmillosShopSubtabs').addEventListener('click', (e) =>
    showCategoryOverview()/showCategoryDetail() pero aislado del sistema de categorias para no
    interferir con su propio manejo de historial. Siempre arranca en la pantalla de "JUGAR" -
    como un cabinet de arcade de verdad, no se salta directo al contenido ---- */
-function showColmillosPage(){
+function showColmillosPage(initialSlug){
+  // recibe el PEDAZO DE URL (ej. "ayuda"), no el nombre interno de la pestaña - asi
+  // applyRoute (en index.html, que puede ejecutarse antes de que este script cargue, al ser
+  // defer) no necesita conocer COLM_SLUG_TO_TAB, solo reenviar el segmento de la ruta tal
+  // cual. Los botones que llaman esta funcion directo desde un addEventListener('click', ...)
+  // pasan el MouseEvent como primer argumento - como no hace match con ningun slug, cae en
+  // 'inicio' igual, sin falta un chequeo de tipo aparte
+  const tab = COLM_SLUG_TO_TAB[initialSlug] || 'inicio';
   closeAnyOpenToolInline();
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'none';
@@ -1599,10 +1622,10 @@ function showColmillosPage(){
   if(ticker) ticker.style.display = 'none';
   colmillosPageView.style.display = 'block';
   setPageTitle('Sharkoins');
-  pushRoute({ skillcashDepth: 'sharkoins' }, '/sharkoins');
+  pushRoute({ skillcashDepth: 'sharkoins' }, colmRoutePathForTab(tab));
   colmillosContent.style.display = 'none';
   document.getElementById('colmillosTabs').style.display = 'none';
-  switchColmillosTab('inicio');
+  switchColmillosTab(tab);
   loadGlobalTaps();
   renderSharkPreviews();
   colmillosPageView.scrollIntoView({ behavior: 'smooth', block: 'start' });
