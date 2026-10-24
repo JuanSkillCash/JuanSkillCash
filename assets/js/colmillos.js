@@ -1710,3 +1710,17 @@ colmillosBigCoin.addEventListener('click', (e) => {
   }
   bumpGlobalTaps();
 });
+
+/* ---- avatar circular del topbar (accountMiniBtn) al cargar la pagina: loadAccountMiniAvatar
+   (la version que SI trae el estado equipado real desde Supabase, no solo lo pinta) vive aca,
+   pero quien la llama al entrar/recargar es renderAuthState() en index.html, con un guard
+   typeof loadAccountMiniAvatar==='function' - si la sesion de Supabase se resuelve ANTES de
+   que este script (defer) termine de cargar, esa llamada se salta en silencio (la funcion
+   todavia no existia) y nadie la repite despues, asi que el avatar se queda con el molde por
+   defecto hasta entrar a Sharkoins (ahi si se recarga el equipo) - "ir a mi perfil" tampoco lo
+   arregla porque solo vuelve a PINTAR el estado ya cargado (o default), no lo recarga. En vez
+   de depender de cual de los dos (la sesion o este script) termine primero, si para cuando
+   ESTE script carga la sesion YA estaba resuelta, se dispara aca una vez mas */
+if(typeof currentUser !== 'undefined' && currentUser && typeof loadAccountMiniAvatar === 'function'){
+  loadAccountMiniAvatar();
+}
