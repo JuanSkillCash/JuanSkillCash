@@ -267,16 +267,16 @@ function colmEquippedAccessoryIds(state){
 }
 /* el tiburon + pedestal de la Ficha de Heroe se escalan a partir de su lienzo nativo (tiburon
    384x384, pedestal 384x160 - pack de arte v2; ver assets/hero/LEEME.txt), usando el MISMO
-   factor "m" para los dos sprites. El tiburon se dibuja al 45% del alto del escenario (antes
-   75% - Juan pidio reducirlo ~40% en vertical para que el pixel art se vea mas nitido: entre
-   mas chico en pantalla, mas chico se ve cada "pixel" del arte, menos se nota el bloque).
-   Ancho igual de como estaba (no se toco el eje horizontal). La posicion del tiburon sobre el
-   pedestal usa el offset fijo del pack (x:+24,y:-268 en pixeles nativos, multiplicados por
-   "m") medido desde el rectangulo YA renderizado del pedestal, asi no hay que duplicar su
-   logica de centrado. */
+   factor "m" para los dos sprites. El tiburon ocupa 75% del alto del ESCENARIO (sin achicarlo
+   aparte) - lo que se redujo para que se vea menos pixelado es el escenario completo (ver
+   min-height de .colm-hero en el CSS), no el personaje dentro de un escenario igual de alto -
+   eso dejaba al tiburon chiquito y descolgado en una esquina, que es justo lo que NO se
+   queria. La posicion del tiburon sobre el pedestal usa el offset fijo del pack (x:+24,y:-268
+   en pixeles nativos, multiplicados por "m") medido desde el rectangulo YA renderizado del
+   pedestal, asi no hay que duplicar su logica de centrado. */
 const HERO_PEDESTAL_NATIVE = { w: 384, h: 160 };
 const HERO_SHARK_NATIVE = { w: 384, h: 384, offsetX: 24, offsetY: -268 };
-const HERO_SHARK_HEIGHT_FRACTION = 0.45;
+const HERO_SHARK_HEIGHT_FRACTION = 0.75;
 function sizeAndRenderHeroChar(accessoryIds){
   const stage = document.querySelector('.colm-hero-main');
   const charEl = document.getElementById('colmillosHeroShark');
