@@ -1246,8 +1246,8 @@ function endColmGame(){
   ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
   ctx.font = '14px monospace';
   ctx.fillText('toca para reintentar', canvas.width / 2, canvas.height / 2 + 20);
-  if(colmGame.score >= 150 && typeof awardColmillos === 'function'){
-    awardColmillos('minigame_played', todayKeyUTC(), 3).then(() => refreshColmillosPageContent());
+  if(colmGame.score >= 1500 && typeof awardColmillos === 'function'){
+    awardColmillos('minigame_played', todayKeyUTC(), 10).then(() => refreshColmillosPageContent());
   }
   // cada partida jugada (con puntaje > 0) queda en el historial para el ranking semanal/mensual
   // (ver scripts/sql/create_colm_leaderboard.sql) - el "mejor de la semana/mes" se calcula alla
