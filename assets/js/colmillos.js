@@ -265,16 +265,16 @@ let colmillosShopPreview = {};
 function colmEquippedAccessoryIds(state){
   return ACC_SLOTS.map(slot => state['accessory_' + slot + '_id']).filter(Boolean);
 }
-/* el tiburon + pedestal de la Ficha de Heroe se escalan SOLO en multiplos enteros de su
-   lienzo nativo (tiburon 96x96, pedestal 96x40 - ver assets/hero/LEEME.txt del pack de arte)
-   para que el pixel art no se deforme/emborrone, usando el MISMO factor entero "m" para los
-   dos sprites. Se apunta a que el tiburon ocupe ~75% del alto del escenario (dentro del
-   rango 72-78% pedido), con un tope de ancho para que el conjunto nunca se acerque al panel
-   de info ni se salga del escenario en celular. La posicion del tiburon sobre el pedestal usa
-   el offset fijo del pack (x:+6,y:-67 en pixeles nativos, multiplicados por "m") medido desde
-   el rectangulo YA renderizado del pedestal, asi no hay que duplicar su logica de centrado. */
-const HERO_PEDESTAL_NATIVE = { w: 96, h: 40 };
-const HERO_SHARK_NATIVE = { w: 96, h: 96, offsetX: 6, offsetY: -67 };
+/* el tiburon + pedestal de la Ficha de Heroe se escalan a partir de su lienzo nativo (tiburon
+   384x384, pedestal 384x160 - pack de arte v2, 96px originales escalados x4 sin suavizado;
+   ver assets/hero/LEEME.txt), usando el MISMO factor "m" para los dos sprites. Se apunta a
+   que el tiburon ocupe ~75% del alto del escenario (dentro del rango 72-78% pedido), con un
+   tope de ancho para que el conjunto nunca se acerque al panel de info ni se salga del
+   escenario en celular. La posicion del tiburon sobre el pedestal usa el offset fijo del pack
+   (x:+24,y:-268 en pixeles nativos, multiplicados por "m") medido desde el rectangulo YA
+   renderizado del pedestal, asi no hay que duplicar su logica de centrado. */
+const HERO_PEDESTAL_NATIVE = { w: 384, h: 160 };
+const HERO_SHARK_NATIVE = { w: 384, h: 384, offsetX: 24, offsetY: -268 };
 function sizeAndRenderHeroChar(accessoryIds){
   const stage = document.querySelector('.colm-hero-main');
   const charEl = document.getElementById('colmillosHeroShark');
@@ -289,7 +289,7 @@ function sizeAndRenderHeroChar(accessoryIds){
   // garantiza quedar fuera de rango. image-rendering:pixelated evita el borroneo igual con
   // escala fraccionaria, asi que se usa el factor exacto que da 75% (o el tope de ancho si
   // el escenario es muy angosto) - el pedestal usa el MISMO factor para que coincida el pixel art
-  let m = Math.max(2, (stageH * 0.75) / HERO_SHARK_NATIVE.h);
+  let m = Math.max(0.5, (stageH * 0.75) / HERO_SHARK_NATIVE.h);
   // tope de ancho: ni el pedestal ni el tiburon pueden comerse el espacio de los "rayos"
   // laterales del fondo ni acercarse al panel de info flotante (36% + margen a la derecha) -
   // ese limite solo aplica en escritorio: en celular (<900px) el panel pasa a flujo normal
@@ -298,7 +298,7 @@ function sizeAndRenderHeroChar(accessoryIds){
   const isMobileHero = window.matchMedia('(max-width:900px)').matches;
   const maxPedW = stageRect.width * (isMobileHero ? 0.99 : 0.46);
   const maxM = maxPedW / HERO_PEDESTAL_NATIVE.w;
-  if(m > maxM) m = Math.max(2, maxM);
+  if(m > maxM) m = Math.max(0.5, maxM);
   const sharkPx = m * HERO_SHARK_NATIVE.h;
   const pedW = m * HERO_PEDESTAL_NATIVE.w;
   const pedH = m * HERO_PEDESTAL_NATIVE.h;
