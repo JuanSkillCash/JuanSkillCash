@@ -226,6 +226,7 @@ const COLM_EQUIPPED_DEFAULT = { skin_id: null, accessory_head_id: null, accessor
 let colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
 let colmillosOwnedItemIds = new Set();
 let colmillosShopItemsCache = [];
+let colmillosRaffleBoughtThisMonth = false;
 /* ---- rareza/evolucion de skins y accesorios (NO aplica a fondos ni al boleto - esos siguen
    con un solo precio): cada skin/accesorio es una "familia" que se compra una vez al precio
    de catalogo (eso es el tier 1, Común) y despues se puede EVOLUCIONAR pagando Sharkoins
@@ -809,6 +810,8 @@ async function loadColmillosShop(){
   renderColmLevelHud();
   renderColmHeroCard();
   const raffleTickets = rows.filter(r => r.event_type === 'purchase_raffle_ticket').length;
+  // maximo 1 boleto por mes (el periodKey de la compra es el mes 'YYYY-MM', ver buyColmillosItem)
+  colmillosRaffleBoughtThisMonth = rows.some(r => r.event_type === 'purchase_raffle_ticket' && r.period_key === todayKeyUTC().slice(0, 7));
   const balance = rows.reduce((sum, r) => sum + r.amount, 0);
   const { data: equippedRow } = await sbClient.from('user_colmillos_equipped')
     .select('skin_id,accessory_head_id,accessory_face_id,accessory_body_id,accessory_hands_id,accessory_feet_id,background_id').eq('user_id', currentUser.id).maybeSingle();
@@ -939,9 +942,15 @@ function renderColmillosShopGrids(balance){
       btn.className = 'colm-shop-item-btn';
       card.appendChild(swatch); card.appendChild(name); card.appendChild(btn);
       if(cat === 'raffle'){
-        btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar boleto';
-        btn.disabled = balance < item.price;
-        btn.addEventListener('click', () => buyColmillosItem(item));
+        if(colmillosRaffleBoughtThisMonth){
+          btn.textContent = '✓ Ya tenés tu boleto de este mes';
+          btn.classList.add('owned');
+          btn.disabled = true;
+        } else {
+          btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar boleto';
+          btn.disabled = balance < item.price;
+          btn.addEventListener('click', () => buyColmillosItem(item));
+        }
       } else {
         const owned = colmillosOwnedItemIds.has(item.id);
         const isEquipped = owned && colmillosEquippedState[equipField] === item.id;
@@ -1005,10 +1014,19 @@ async function buyColmillosItem(item){
   if(balance < item.price){ loadColmillosShop(); return; }
   const isRaffle = item.category === 'raffle';
   const eventType = isRaffle ? 'purchase_raffle_ticket' : ('purchase_' + item.id);
-  const periodKey = isRaffle ? (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random())) : 'once';
+  // el boleto de sorteo usa el MES actual como period_key (en vez de un uuid por compra) para
+  // que el unique(user_id,event_type,period_key) de la tabla bloquee solo, sin logica aparte,
+  // una segunda compra el mismo mes - maximo 1 boleto por cuenta por mes (pedido explicito,
+  // el premio es real asi que no puede ser ilimitado)
+  const periodKey = isRaffle ? todayKeyUTC().slice(0, 7) : 'once';
   const { error } = await sbClient.from('user_colmillos_events').insert({
     user_id: currentUser.id, event_type: eventType, period_key: periodKey, amount: -item.price,
   });
+  if(error && error.code === '23505' && isRaffle){
+    alert('Ya compraste tu boleto de este mes — el próximo se habilita el 1.');
+    await loadColmillosShop();
+    return;
+  }
   if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
   await loadColmillosShop();
   loadColmillosBalance(true);
