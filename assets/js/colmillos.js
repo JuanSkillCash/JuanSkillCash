@@ -1544,13 +1544,6 @@ document.getElementById('colmillosShopSubtabs').addEventListener('click', (e) =>
    interferir con su propio manejo de historial. Siempre arranca en la pantalla de "JUGAR" -
    como un cabinet de arcade de verdad, no se salta directo al contenido ---- */
 function showColmillosPage(){
-  // candado temporal mientras se termina de construir Sharkoins (pedido explicito de Juan) -
-  // nadie mas que su cuenta puede entrar, ni por el boton ni entrando directo a /sharkoins
-  // (applyRoute tambien llama esta misma funcion, asi que un solo candado cubre los dos casos)
-  if(!currentUser || currentUser.id !== OWNER_USER_ID){
-    if(typeof showWipToast === 'function') showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
-    return;
-  }
   closeAnyOpenToolInline();
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'none';
@@ -1577,19 +1570,24 @@ function startColmillosLoadSequence(){
   colmillosLoading.classList.remove('run');
   void colmillosLoading.offsetWidth;
   colmillosLoading.classList.add('run');
+  // la carga REAL (balance, tienda, ficha de heroe) arranca YA, al mismo tiempo que la
+  // animacion de 3s - no despues de que la animacion termine. Los 3s son solo un minimo para
+  // que la animacion se vea completa (le dan tiempo al internet de la persona sin que se
+  // sienta instantaneo/brusco), pero si la carga real tarda MAS de 3s (conexion lenta), se
+  // espera a que de verdad termine en vez de mostrar contenido a medio cargar.
   clearTimeout(window._colmillosLoadTimer);
-  window._colmillosLoadTimer = setTimeout(() => {
+  const minDelay = new Promise(resolve => { window._colmillosLoadTimer = setTimeout(resolve, 3000); });
+  const realLoad = Promise.all([refreshColmillosPageContent(), loadColmillosShop()]);
+  Promise.all([minDelay, realLoad]).then(() => {
     colmillosLoading.style.display = 'none';
     colmillosContent.style.display = 'block';
     document.getElementById('colmillosTabs').style.display = 'flex';
-    refreshColmillosPageContent();
-    loadColmillosShop();
     renderColmHeroParticles();
     colmSessionStartTs = Date.now();
     clearInterval(window._colmSessionTimerInterval);
     window._colmSessionTimerInterval = setInterval(updateColmSessionTimer, 1000);
     updateColmSessionTimer();
-  }, 3000);
+  });
 }
 function hideColmillosPage(){
   const wasInColmillos = colmillosPageView.style.display === 'block';
