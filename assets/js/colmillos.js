@@ -643,27 +643,53 @@ async function bumpGlobalTaps(){
   if(el && typeof data === 'number') el.textContent = data.toLocaleString('es-CO');
 }
 
-/* ---- trivia diaria: todo el mundo ve la MISMA pregunta el mismo dia (se elige con un hash de
-   la fecha UTC sobre el banco de preguntas, sin necesitar una tabla de "pregunta de hoy").
+/* ---- trivia diaria: todo el mundo ve la MISMA pregunta el mismo dia, sin necesitar una tabla
+   de "pregunta de hoy". Es una COLA real (no un hash puro): se baraja todo el banco una vez
+   por "ciclo" (un ciclo = tantos dias como preguntas activas haya) con una semilla fija por
+   ciclo, y cada dia del ciclo consume la siguiente pregunta de esa baraja - asi ninguna
+   pregunta se repite hasta que TODAS salieron, y el orden barajado cambia de un ciclo al
+   siguiente (no es siempre la misma secuencia). .order('id') es necesario para que el orden
+   que devuelve Supabase sea el MISMO para todo el mundo (si no, cada quien barajaria un orden
+   base distinto y verian preguntas distintas el mismo dia).
    NOTA: igual que el resto de Colmillos, la respuesta correcta viaja al navegador junto con la
    pregunta (no hay Edge Function de por medio) - alguien muy necio podria verla en el inspector,
    pero no tiene sentido real hacerlo por una moneda de coleccion ---- */
 let colmillosTriviaQuestions = [];
-function simpleHashStr(str){
-  let h = 0;
-  for(let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) | 0; }
-  return Math.abs(h);
+/* PRNG determinista (mulberry32) - mismo seed siempre da la misma secuencia, en cualquier
+   navegador, para que el barajado de cada ciclo sea identico para todo el mundo */
+function seededRandom(seed){
+  let s = seed >>> 0;
+  return function(){
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed){
+  const a = arr.slice();
+  const rand = seededRandom(seed);
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 async function loadDailyTrivia(){
   if(!currentUser) return;
   if(!colmillosTriviaQuestions.length){
-    const { data, error } = await sbClient.from('colmillos_trivia_questions').select('id,question,options,correct_index').eq('active', true);
+    const { data, error } = await sbClient.from('colmillos_trivia_questions').select('id,question,options,correct_index').eq('active', true).order('id');
     if(error){ console.warn('no se pudo leer la trivia', error); return; }
     colmillosTriviaQuestions = data || [];
   }
   if(!colmillosTriviaQuestions.length) return;
   const today = todayKeyUTC();
-  const q = colmillosTriviaQuestions[simpleHashStr(today) % colmillosTriviaQuestions.length];
+  const daysSinceEpoch = Math.floor(Date.parse(today + 'T00:00:00Z') / 86400000);
+  const n = colmillosTriviaQuestions.length;
+  const cycle = Math.floor(daysSinceEpoch / n);
+  const order = seededShuffle(colmillosTriviaQuestions.map((_, i) => i), cycle + 1);
+  const todayIndex = order[daysSinceEpoch % n];
+  const q = colmillosTriviaQuestions[todayIndex];
   const qEl = document.getElementById('colmillosTriviaQuestion');
   const optsEl = document.getElementById('colmillosTriviaOptions');
   const resultEl = document.getElementById('colmillosTriviaResult');
