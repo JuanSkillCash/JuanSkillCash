@@ -355,14 +355,6 @@ button{font-family:inherit;color:inherit}
   .topbar-links a{color:var(--muted2);text-decoration:none;transition:color .2s}
   .topbar-links a:hover{color:var(--white)}
 }
-/* link chiquito "ir al grupo" pegado dentro de la pildora de Telegram (ver su comentario en el
-   HTML) - solo en pantallas anchas, igual que el viejo link de texto "Comunidad" que reemplaza
-   (en celular el espacio de la barra superior ya es justo, no se agrega ahi) */
-.pill-community-link{display:none}
-@media(min-width:861px){
-  .pill-community-link{display:flex;align-items:center;margin-left:1px;padding-left:7px;border-left:1px solid var(--border2);color:var(--muted2);opacity:.75;transition:color .2s,opacity .2s}
-  .pill-community-link:hover{color:var(--red);opacity:1}
-}
 .notif-mini{position:relative;margin-left:auto;flex-shrink:0}
 @media(min-width:861px){ .notif-mini{margin-left:24px} }
 .account-mini{position:relative;margin-left:14px;flex-shrink:0}
@@ -2934,22 +2926,11 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <span class="pill-dot" id="bitunixPillDot"></span>
       </button>
 
-      <!-- el pill en si (icono+nombre+punto) sigue abriendo el modal de "conectar tu cuenta" de
-           siempre - el pedacito nuevo es el link chiquito pegado a la derecha (separado por una
-           rayita), que va DIRECTO al grupo publico de Telegram sin pasar por el modal. Antes
-           ese link vivia aparte como el texto "Comunidad" en el menu de arriba (redundante con
-           la pildora de Telegram, un mismo destino en dos lugares) - pedido explicito de Juan
-           de fusionarlos en uno solo. Ya no es un <button> (no se puede meter un <a> adentro de
-           un button) sino un <div role="button"> - el click/teclado para abrir el modal sigue
-           igual, ver el bloque de abajo que le agrega el manejo de Enter/Espacio -->
-      <div class="exchange-pill" id="openTelegramPillBtn" role="button" tabindex="0">
+      <button class="exchange-pill" id="openTelegramPillBtn" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.34 2.7 10.52c-1.25.5-1.24 1.2-.23 1.51l4.7 1.47 1.8 5.48c.22.6.37.84.76.84.38 0 .55-.17.76-.38l1.84-1.78 3.84 2.83c.7.39 1.22.19 1.4-.65l2.53-11.9c.26-1.1-.4-1.6-1.1-1.1Z"/></svg>
         <span class="exchange-pill-label">Telegram</span>
         <span class="pill-dot" id="telegramPillDot"></span>
-        <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="pill-community-link" id="pillCommunityLink" title="Unirte al grupo de Telegram" aria-label="Unirte al grupo de Telegram">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </a>
-      </div>
+      </button>
 
       <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Sharkoins — se ganan usando la plataforma" style="display:none">
         <img src="assets/mascot/coin_tooth.png" alt="" width="22" height="22" style="image-rendering:pixelated;image-rendering:crisp-edges;margin:-2px 0">
@@ -9066,6 +9047,24 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
         <p class="calc-sub">Notificaciones al instante</p>
       </div>
 
+      <!-- opcion de unirse al grupo PUBLICO - siempre visible aca arriba, sin importar si la
+           cuenta ya esta conectada, esta a medio conectar o todavia no - es un destino aparte
+           (el grupo de comunidad) del resto del modal (que es sobre conectar TU cuenta para
+           recibir avisos personales), pedido explicito de Juan: que esta opcion se vea siempre,
+           no escondida detras de un icono chiquito -->
+      <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner" style="max-width:100%;flex-wrap:wrap;margin:0 0 16px">
+        <div class="telegram-banner-left">
+          <div class="telegram-banner-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
+          </div>
+          <div>
+            <div class="telegram-banner-title">Únete a la comunidad de Telegram de Juan SkillCash</div>
+            <div class="telegram-banner-sub">Análisis, trading, noticias y comunidad de skillianos — gratis.</div>
+          </div>
+        </div>
+        <span class="telegram-banner-btn">UNIRME</span>
+      </a>
+
       <div id="telegramNotConnected">
         <p class="auth-note" style="margin-bottom:10px">Conecta tu cuenta para recibir ahí los avisos de "Mi Lista" (Deslistados y Nuevos Listados), además de la campanita del sitio.</p>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -11852,13 +11851,6 @@ function closeTelegramModal(){
 closeTelegram.addEventListener('click', closeTelegramModal);
 telegramModal.addEventListener('click', (e) => { if(e.target === telegramModal) closeTelegramModal(); });
 document.getElementById('openTelegramPillBtn').addEventListener('click', openTelegramModal);
-// ya no es un <button> (ver comentario en el HTML) - el navegador no le da Enter/Espacio gratis
-document.getElementById('openTelegramPillBtn').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openTelegramModal(); }
-});
-// el link "ir al grupo" vive DENTRO de la pildora de arriba - sin esto, tocarlo tambien abriria
-// el modal de "conectar tu cuenta" por debajo (el click le haria bubbling al div padre)
-document.getElementById('pillCommunityLink').addEventListener('click', (e) => e.stopPropagation());
 document.getElementById('openTelegramFromProfileBtn').addEventListener('click', () => {
   closeProfileModal();
   setTimeout(openTelegramModal, 200);
