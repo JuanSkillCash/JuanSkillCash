@@ -732,7 +732,7 @@ button{font-family:inherit;color:inherit}
    numero/multiplicador escrito en cada gajo, un aro dorado tipo casino y un centro fijo
    (el centro NO rota con la rueda, por eso es un elemento aparte encima, no parte del svg) */
 .colm-roulette-wrap{position:relative;display:flex;justify-content:center;padding:10px 0 20px}
-.colm-roulette-wheel{width:clamp(220px,78vw,360px);height:clamp(220px,78vw,360px);border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #0b0d18,0 0 0 6px rgba(240,178,61,.25),0 10px 30px rgba(0,0,0,.5);transition:transform 3.6s cubic-bezier(.12,.67,.08,1);display:block}
+.colm-roulette-wheel{width:220px;height:220px;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #0b0d18,0 0 0 6px rgba(240,178,61,.25),0 10px 30px rgba(0,0,0,.5);transition:transform 3.6s cubic-bezier(.12,.67,.08,1);display:block}
 .colm-roulette-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:22px;color:var(--gold);z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
 .colm-roulette-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff27a,var(--gold) 60%,#8a6610);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 0 3px #0b0d18,0 4px 10px rgba(0,0,0,.5);z-index:2}
 .colm-roulette-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin:0 0 14px}
@@ -6860,7 +6860,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-wallet-page">
               <div class="colm-section-label" style="text-align:center">🦈 Tu Billetera Sharkoin</div>
               <div class="colm-coin colm-coin-big" id="colmillosBigCoin">
-                <img loading="lazy" src="assets/mascot/coin_tooth.png" alt="" style="width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
+                <img loading="lazy" src="assets/mascot/coin_tooth.png" alt="" style="height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
@@ -26848,7 +26848,7 @@ async function awardColmillos(eventType, periodKey, amount){
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
 <script src="assets/js/hero-progress.js?v=1" defer></script>
-<script src="assets/js/colmillos.js?v=12" defer></script>
+<script src="assets/js/colmillos.js?v=13" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>

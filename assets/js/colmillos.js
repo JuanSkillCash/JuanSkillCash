@@ -1626,6 +1626,13 @@ function startColmillosLoadSequence(){
     colmillosLoading.style.display = 'none';
     colmillosContent.style.display = 'block';
     document.getElementById('colmillosTabs').style.display = 'flex';
+    // refreshColmillosPageContent()/loadColmillosShop() (parte de realLoad) ya habian llamado
+    // a sizeAndRenderHeroChar() mientras colmillosContent todavia estaba display:none (para
+    // mostrar la pantalla de carga encima) - en ese momento el escenario mide 0x0, asi que el
+    // tiburon quedaba parado en una posicion en pixeles congelada e invalida (el pedestal se ve
+    // bien porque usa % en CSS, que se recalcula solo; el tiburon no, por eso "desaparecia").
+    // Ahora que el contenido real ya es visible y mide lo que mide de verdad, se vuelve a medir.
+    sizeAndRenderHeroChar(colmEquippedAccessoryIds(colmillosEquippedState));
     renderColmHeroParticles();
     colmSessionStartTs = Date.now();
     clearInterval(window._colmSessionTimerInterval);
