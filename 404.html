@@ -14,7 +14,7 @@
      de que ese codigo alcance a correr, y fallan. Por eso esto va aca, literal lo primero en
      head, antes de cualquier otra etiqueta que cargue un recurso - guarda la ruta real para que
      applyInitialRoute la siga usando, y corrige la URL del documento de una vez para que TODO
-     lo que se cargue despues (sin excepcion) resuelva bien sus rutas relativas */
+     lo que se cargue despues (sin excepcion) resuelva bien sus rutas relativas -->
 <script>(function(){ window.__initialRoutePath = location.pathname; if(location.pathname !== '/'){ try{ history.replaceState(history.state, '', '/' + location.search + location.hash); }catch(e){} } })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP de defensa en profundidad: aunque el HTML se vea entero (es un sitio estatico), esto
