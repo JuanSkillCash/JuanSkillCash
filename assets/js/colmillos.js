@@ -290,13 +290,14 @@ function sizeAndRenderHeroChar(accessoryIds){
   // de alto pedida; image-rendering:pixelated evita el borroneo igual con escala fraccionaria -
   // el pedestal usa el MISMO factor para que coincida el pixel art
   let m = Math.max(0.5, (stageH * HERO_SHARK_HEIGHT_FRACTION) / HERO_SHARK_NATIVE.h);
-  // tope de ancho: el pedestal/tiburon estan centrados en el 34% del ancho del escenario
-  // (ver .colm-hero-pedestal-group), asi que el lado IZQUIERDO es el que limita primero - su
-  // mitad de ancho no puede pasar de 34% del escenario o se recorta contra el borde (bug visto
-  // en celular: "se ve corrido a la izquierda, la plataforma no se ve completa"). En
-  // escritorio ademas no puede acercarse al panel de info flotante (36% + margen a la derecha)
+  // tope de ancho: en escritorio el pedestal/tiburon estan centrados en el 34% del ancho del
+  // escenario (ver .colm-hero-pedestal-group) para dejarle sitio al panel de info flotante -
+  // el lado IZQUIERDO es el que limita primero ahi (36% + margen a la derecha). En celular el
+  // panel va DEBAJO (no al lado), asi que ahi el tiburon se centra en el 50% del escenario
+  // (ver el media query de .colm-hero-pedestal-group) y el tope solo es un margen cosmetico,
+  // no una prevencion de recorte como en escritorio.
   const isMobileHero = window.matchMedia('(max-width:900px)').matches;
-  const maxPedW = stageRect.width * (isMobileHero ? 0.64 : 0.46);
+  const maxPedW = stageRect.width * (isMobileHero ? 0.9 : 0.46);
   const maxM = maxPedW / HERO_PEDESTAL_NATIVE.w;
   if(m > maxM) m = Math.max(0.5, maxM);
   const sharkPx = m * HERO_SHARK_NATIVE.h;
