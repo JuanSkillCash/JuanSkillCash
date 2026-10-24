@@ -266,15 +266,17 @@ function colmEquippedAccessoryIds(state){
   return ACC_SLOTS.map(slot => state['accessory_' + slot + '_id']).filter(Boolean);
 }
 /* el tiburon + pedestal de la Ficha de Heroe se escalan a partir de su lienzo nativo (tiburon
-   384x384, pedestal 384x160 - pack de arte v2, 96px originales escalados x4 sin suavizado;
-   ver assets/hero/LEEME.txt), usando el MISMO factor "m" para los dos sprites. Se apunta a
-   que el tiburon ocupe ~75% del alto del escenario (dentro del rango 72-78% pedido), con un
-   tope de ancho para que el conjunto nunca se acerque al panel de info ni se salga del
-   escenario en celular. La posicion del tiburon sobre el pedestal usa el offset fijo del pack
-   (x:+24,y:-268 en pixeles nativos, multiplicados por "m") medido desde el rectangulo YA
-   renderizado del pedestal, asi no hay que duplicar su logica de centrado. */
+   384x384, pedestal 384x160 - pack de arte v2; ver assets/hero/LEEME.txt), usando el MISMO
+   factor "m" para los dos sprites. El tiburon se dibuja al 45% del alto del escenario (antes
+   75% - Juan pidio reducirlo ~40% en vertical para que el pixel art se vea mas nitido: entre
+   mas chico en pantalla, mas chico se ve cada "pixel" del arte, menos se nota el bloque).
+   Ancho igual de como estaba (no se toco el eje horizontal). La posicion del tiburon sobre el
+   pedestal usa el offset fijo del pack (x:+24,y:-268 en pixeles nativos, multiplicados por
+   "m") medido desde el rectangulo YA renderizado del pedestal, asi no hay que duplicar su
+   logica de centrado. */
 const HERO_PEDESTAL_NATIVE = { w: 384, h: 160 };
 const HERO_SHARK_NATIVE = { w: 384, h: 384, offsetX: 24, offsetY: -268 };
+const HERO_SHARK_HEIGHT_FRACTION = 0.45;
 function sizeAndRenderHeroChar(accessoryIds){
   const stage = document.querySelector('.colm-hero-main');
   const charEl = document.getElementById('colmillosHeroShark');
@@ -284,19 +286,17 @@ function sizeAndRenderHeroChar(accessoryIds){
   if(!stage || !charEl || !pedGroup) return;
   const stageRect = stage.getBoundingClientRect();
   const stageH = stageRect.height || 480;
-  // el factor de escala NO se redondea a un entero: a los tamaños reales del escenario, un
-  // paso entero (96px) es mas ancho que toda la banda pedida de 72-78% de alto, asi que redondear
-  // garantiza quedar fuera de rango. image-rendering:pixelated evita el borroneo igual con
-  // escala fraccionaria, asi que se usa el factor exacto que da 75% (o el tope de ancho si
-  // el escenario es muy angosto) - el pedestal usa el MISMO factor para que coincida el pixel art
-  let m = Math.max(0.5, (stageH * 0.75) / HERO_SHARK_NATIVE.h);
-  // tope de ancho: ni el pedestal ni el tiburon pueden comerse el espacio de los "rayos"
-  // laterales del fondo ni acercarse al panel de info flotante (36% + margen a la derecha) -
-  // ese limite solo aplica en escritorio: en celular (<900px) el panel pasa a flujo normal
-  // DEBAJO del escenario (ver .colm-hero-info en el media query), asi que ahi el personaje
-  // puede usar casi todo el ancho sin chocar con nada
+  // el factor de escala NO se redondea a un entero - se usa el valor exacto que da la fraccion
+  // de alto pedida; image-rendering:pixelated evita el borroneo igual con escala fraccionaria -
+  // el pedestal usa el MISMO factor para que coincida el pixel art
+  let m = Math.max(0.5, (stageH * HERO_SHARK_HEIGHT_FRACTION) / HERO_SHARK_NATIVE.h);
+  // tope de ancho: el pedestal/tiburon estan centrados en el 34% del ancho del escenario
+  // (ver .colm-hero-pedestal-group), asi que el lado IZQUIERDO es el que limita primero - su
+  // mitad de ancho no puede pasar de 34% del escenario o se recorta contra el borde (bug visto
+  // en celular: "se ve corrido a la izquierda, la plataforma no se ve completa"). En
+  // escritorio ademas no puede acercarse al panel de info flotante (36% + margen a la derecha)
   const isMobileHero = window.matchMedia('(max-width:900px)').matches;
-  const maxPedW = stageRect.width * (isMobileHero ? 0.99 : 0.46);
+  const maxPedW = stageRect.width * (isMobileHero ? 0.64 : 0.46);
   const maxM = maxPedW / HERO_PEDESTAL_NATIVE.w;
   if(m > maxM) m = Math.max(0.5, maxM);
   const sharkPx = m * HERO_SHARK_NATIVE.h;
