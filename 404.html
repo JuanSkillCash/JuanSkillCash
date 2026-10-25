@@ -9091,20 +9091,16 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <div id="adminContent" style="display:none">
         <div class="summary-grid" id="adminSummaryGrid"></div>
 
-        <h3 style="font-size:15px;margin:22px 0 10px">Por usuario</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px;flex-wrap:wrap">
+          <h3 style="font-size:15px;margin:0">Por usuario</h3>
+          <select id="adminMonthSelect" class="auth-note" style="width:auto;padding:7px 10px;cursor:pointer">
+            <option value="">Mes actual</option>
+          </select>
+        </div>
+        <p class="auth-note" id="adminHistoryNote" style="display:none;margin-bottom:10px">Viendo un mes cerrado: solo volumen, operaciones y rango de ese mes — Bitunix/Telegram/Sharkoins siempre muestran el estado actual, no el de esa fecha.</p>
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Bitunix</th>
-                <th>Volumen (mes)</th>
-                <th>Rango</th>
-                <th>Telegram</th>
-                <th>Sharkoins</th>
-                <th>Sharkoins 24h</th>
-              </tr>
-            </thead>
+            <thead id="adminTableHead"></thead>
             <tbody id="adminUserTableBody"></tbody>
           </table>
         </div>
@@ -26550,6 +26546,52 @@ const adminPanel = adminModal.querySelector('.modal-panel');
 const closeAdmin = document.getElementById('closeAdmin');
 const RANK_LABELS = { sin_rango: 'Sin rango', cria: 'Cría', explorador: 'Explorador', cazador: 'Cazador', depredador: 'Depredador', alfa: 'Alfa' };
 function fmtAdminUsd(n){ return '$' + Number(n || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
+const ADMIN_MONTH_NAMES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function adminMonthLabel(monthKey){
+  const [y, m] = monthKey.split('-');
+  return (ADMIN_MONTH_NAMES[Number(m) - 1] || monthKey) + ' ' + y;
+}
+function renderAdminCurrentTable(rows){
+  document.getElementById('adminHistoryNote').style.display = 'none';
+  document.getElementById('adminTableHead').innerHTML =
+    '<tr><th>Usuario</th><th>Bitunix</th><th>Volumen (mes)</th><th>Rango</th><th>Telegram</th><th>Sharkoins</th><th>Sharkoins 24h</th></tr>';
+  document.getElementById('adminUserTableBody').innerHTML = (rows || []).map(u =>
+    '<tr>' +
+      '<td>' + escapeHtml(u.username) + '</td>' +
+      '<td class="' + (u.bitunix_connected ? 'admin-ok' : 'admin-no') + '">' + (u.bitunix_connected ? '✓' : '✗') + '</td>' +
+      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
+      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
+      '<td class="' + (u.telegram_connected ? 'admin-ok' : 'admin-no') + '">' + (u.telegram_connected ? '✓' : '✗') + '</td>' +
+      '<td>' + Number(u.sharkoins_balance || 0).toLocaleString('es-CO') + '</td>' +
+      '<td>' + Number(u.sharkoins_24h || 0).toLocaleString('es-CO') + '</td>' +
+    '</tr>'
+  ).join('');
+}
+function renderAdminHistoryTable(rows){
+  document.getElementById('adminHistoryNote').style.display = 'block';
+  document.getElementById('adminTableHead').innerHTML =
+    '<tr><th>Usuario</th><th>Volumen</th><th>Operaciones</th><th>Rango (ese mes)</th></tr>';
+  document.getElementById('adminUserTableBody').innerHTML = (rows || []).map(u =>
+    '<tr>' +
+      '<td>' + escapeHtml(u.username) + '</td>' +
+      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
+      '<td>' + Number(u.trade_count || 0).toLocaleString('es-CO') + '</td>' +
+      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
+    '</tr>'
+  ).join('');
+}
+async function loadAdminMonthTable(){
+  const month = document.getElementById('adminMonthSelect').value;
+  if(!month){
+    const { data, error } = await sbClient.rpc('get_admin_user_table');
+    if(error){ console.warn('no se pudo leer la tabla de admin', error); return; }
+    renderAdminCurrentTable(data);
+    return;
+  }
+  const { data, error } = await sbClient.rpc('get_admin_volume_history', { p_month: month });
+  if(error){ console.warn('no se pudo leer el historial de volumen', error); return; }
+  renderAdminHistoryTable(data);
+}
 async function loadAdminPanel(){
   const loadingEl = document.getElementById('adminLoading');
   const errorEl = document.getElementById('adminError');
@@ -26557,9 +26599,10 @@ async function loadAdminPanel(){
   loadingEl.style.display = 'block';
   errorEl.style.display = 'none';
   contentEl.style.display = 'none';
-  const [summaryRes, usersRes] = await Promise.all([
+  const [summaryRes, usersRes, monthsRes] = await Promise.all([
     sbClient.rpc('get_admin_summary_stats'),
     sbClient.rpc('get_admin_user_table'),
+    sbClient.rpc('get_admin_available_months'),
   ]);
   if(summaryRes.error || usersRes.error){
     loadingEl.style.display = 'none';
@@ -26583,20 +26626,15 @@ async function loadAdminPanel(){
     ['Rangos', rankRows],
     ['Categorías más usadas (7 días)', topCats],
   ].map(([label, val]) => '<div class="sum-row"><span class="s-label">' + escapeHtml(label) + '</span><span class="s-val">' + escapeHtml(String(val)) + '</span></div>').join('');
-  document.getElementById('adminUserTableBody').innerHTML = (usersRes.data || []).map(u =>
-    '<tr>' +
-      '<td>' + escapeHtml(u.username) + '</td>' +
-      '<td class="' + (u.bitunix_connected ? 'admin-ok' : 'admin-no') + '">' + (u.bitunix_connected ? '✓' : '✗') + '</td>' +
-      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
-      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
-      '<td class="' + (u.telegram_connected ? 'admin-ok' : 'admin-no') + '">' + (u.telegram_connected ? '✓' : '✗') + '</td>' +
-      '<td>' + Number(u.sharkoins_balance || 0).toLocaleString('es-CO') + '</td>' +
-      '<td>' + Number(u.sharkoins_24h || 0).toLocaleString('es-CO') + '</td>' +
-    '</tr>'
-  ).join('');
+  renderAdminCurrentTable(usersRes.data);
+  const monthSelect = document.getElementById('adminMonthSelect');
+  const months = (monthsRes.error ? [] : (monthsRes.data || []));
+  monthSelect.innerHTML = '<option value="">Mes actual</option>' +
+    months.map(m => '<option value="' + escapeHtml(m) + '">' + escapeHtml(adminMonthLabel(m)) + '</option>').join('');
   loadingEl.style.display = 'none';
   contentEl.style.display = 'block';
 }
+document.getElementById('adminMonthSelect').addEventListener('change', loadAdminMonthTable);
 function openAdminModal(){
   accountMiniDropdown.classList.remove('open');
   openModalGeneric(adminModal, adminPanel, closeAdmin);

@@ -165,3 +165,71 @@ end;
 $$;
 revoke all on function public.get_admin_summary_stats() from public;
 grant execute on function public.get_admin_summary_stats() to authenticated;
+
+-- Historial de volumen mensual: user_exchange_volume (arriba) PISA la fila de cada usuario
+-- cada vez que corre el robot (solo guarda el mes EN CURSO, por diseño - ver
+-- create_bitunix_volume.sql), asi que nunca hubo forma de ver meses pasados. A partir de
+-- este cambio, scripts/update_bitunix_volume.py ADEMAS guarda una copia aca cada vez que
+-- corre, con upsert por (user_id, month) - cada mes se va refrescando con el numero mas
+-- reciente hasta que termina, y ahi se queda fijo para siempre. Ojo: esto NO recupera meses
+-- anteriores a cuando se activo esto, esos datos ya se perdieron porque nunca se guardaron.
+--
+-- Sin ninguna policy de select: ni siquiera el propio usuario puede leer esta tabla directo -
+-- solo se lee a traves de get_admin_volume_history()/get_admin_available_months() (abajo),
+-- que revisan auth.uid() contra el owner igual que el resto del panel de admin. Solo el
+-- robot (service role, que se salta RLS) escribe aca.
+create table if not exists user_exchange_volume_history (
+    user_id uuid not null references auth.users(id) on delete cascade,
+    month text not null, -- 'YYYY-MM' (UTC)
+    trade_count integer not null default 0,
+    month_volume_usd numeric not null default 0,
+    current_rank text not null default 'sin_rango',
+    updated_at timestamptz not null default now(),
+    primary key (user_id, month)
+);
+
+alter table user_exchange_volume_history enable row level security;
+
+create or replace function public.get_admin_available_months()
+returns text[]
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  if auth.uid() <> 'e4309251-6078-4233-aab3-6ab8d6c624e1'::uuid then
+    raise exception 'solo el owner puede ver esto';
+  end if;
+
+  return coalesce((select array_agg(distinct month order by month desc) from user_exchange_volume_history), '{}'::text[]);
+end;
+$$;
+revoke all on function public.get_admin_available_months() from public;
+grant execute on function public.get_admin_available_months() to authenticated;
+
+create or replace function public.get_admin_volume_history(p_month text)
+returns table(username text, month_volume_usd numeric, trade_count integer, current_rank text)
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  if auth.uid() <> 'e4309251-6078-4233-aab3-6ab8d6c624e1'::uuid then
+    raise exception 'solo el owner puede ver esto';
+  end if;
+
+  return query
+    select
+      coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'full_name',
+                u.raw_user_meta_data->>'name', split_part(u.email, '@', 1), 'Usuario') as username,
+      h.month_volume_usd,
+      h.trade_count,
+      h.current_rank
+    from user_exchange_volume_history h
+    join auth.users u on u.id = h.user_id
+    where h.month = p_month
+    order by h.month_volume_usd desc;
+end;
+$$;
+revoke all on function public.get_admin_volume_history(text) from public;
+grant execute on function public.get_admin_volume_history(text) to authenticated;

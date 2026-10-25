@@ -52,6 +52,7 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
 CONNECTIONS_TABLE = "user_exchange_connections"
 VOLUME_TABLE = "user_exchange_volume"
+VOLUME_HISTORY_TABLE = "user_exchange_volume_history"
 TELEGRAM_LINKS_TABLE = "user_telegram_links"
 
 # limites del mes en curso (decidido con Juan: el rango se reinicia cada mes)
@@ -117,6 +118,32 @@ def _upsert_volume_rows(rows: list[dict]) -> bool:
         log.warning(f"no se pudo guardar el volumen ({resp.status_code}): {resp.text[:300]}")
         return False
     return True
+
+
+def _upsert_history_rows(rows: list[dict]) -> None:
+    """Copia month/trade_count/month_volume_usd/current_rank en user_exchange_volume_history
+    (ver scripts/sql/create_admin_dashboard.sql) para que el panel de admin pueda filtrar por
+    mes - a diferencia de VOLUME_TABLE, esta tabla nunca se pisa entre meses distintos, solo
+    se refresca la fila del mes en curso hasta que termina. Un fallo aca nunca debe tumbar la
+    corrida: el volumen real ya quedo guardado en VOLUME_TABLE antes de llegar a esto."""
+    if not rows:
+        return
+    history_rows = [{
+        "user_id": r["user_id"],
+        "month": r["month"],
+        "trade_count": r["trade_count"],
+        "month_volume_usd": r["month_volume_usd"],
+        "current_rank": r["current_rank"],
+        "updated_at": r["updated_at"],
+    } for r in rows]
+    resp = requests.post(
+        f"{SUPABASE_URL}/rest/v1/{VOLUME_HISTORY_TABLE}?on_conflict=user_id,month",
+        json=history_rows,
+        headers={**_sb_headers(), "Prefer": "resolution=merge-duplicates,return=minimal"},
+        timeout=30,
+    )
+    if resp.status_code >= 300:
+        log.warning(f"no se pudo guardar el historial de volumen ({resp.status_code}): {resp.text[:300]}")
 
 
 def _fetch_previous_ranks(user_ids: list[str]) -> dict[str, dict]:
@@ -251,6 +278,11 @@ def main() -> None:
         log.info(f"volumen de {len(rows)} usuario(s) actualizado para {month_label}")
     else:
         sys.exit(1)
+
+    try:
+        _upsert_history_rows(rows)
+    except Exception as e:
+        log.warning(f"fallo guardando el historial de volumen: {e}")
 
     try:
         _notify_promotions(promotions)
