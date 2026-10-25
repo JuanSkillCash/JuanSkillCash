@@ -1606,6 +1606,13 @@ img[src=""]{display:none}
 .corr-matrix th,.corr-matrix td{padding:9px 10px;text-align:center;font-size:12px;border:1px solid var(--border)}
 .corr-matrix th{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);font-weight:700;background:var(--bg)}
 .corr-matrix td{font-family:'Space Mono',monospace;font-weight:700;color:var(--white)}
+
+.admin-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border2);max-height:420px}
+.admin-table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.admin-table th{position:sticky;top:0;padding:10px 12px;text-align:left;color:var(--muted2);font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;background:var(--bg);border-bottom:1px solid var(--border2)}
+.admin-table td{padding:9px 12px;text-align:left;color:var(--white);border-bottom:1px solid var(--border)}
+.admin-table td.admin-ok{color:#51cc8b;font-weight:700}
+.admin-table td.admin-no{color:var(--muted);opacity:.6}
 .corr-cell-high{background:rgba(255,47,79,.18);color:var(--red)}
 .corr-cell-mid{background:rgba(240,178,61,.14);color:var(--gold)}
 .corr-cell-low{background:rgba(46,204,113,.14);color:var(--green)}
@@ -2959,6 +2966,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <span id="accountBarEmail"></span>
             </div>
             <button class="account-dropdown-item" id="accountBarProfileBtn" type="button">⚙️ Mi perfil</button>
+            <button class="account-dropdown-item" id="accountAdminBtn" type="button" style="display:none">📊 Admin</button>
             <button class="account-dropdown-item" id="accountBarLogout" type="button">🚪 Cerrar sesión</button>
           </div>
         </div>
@@ -9060,6 +9068,51 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
   </div>
 </div>
 
+<!-- ===== MODAL: PANEL DE ADMIN - solo visible/accesible para el dueño (OWNER_USER_ID); la
+     proteccion real esta en las funciones get_admin_summary_stats()/get_admin_user_table()
+     (scripts/sql/create_admin_dashboard.sql), que revisan auth.uid() en el servidor sin
+     importar quien las llame - este botón escondido es solo cosmético. ===== -->
+<div class="modal-overlay" id="adminModal">
+  <button class="modal-close" id="closeAdmin" aria-label="Cerrar">✕</button>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitleEl" style="max-width:920px">
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-eyebrow">
+          <img src="/logo-skillcash-600.png" alt="SkillCash">
+          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
+        </div>
+        <h2 class="calc-title" id="adminTitleEl" style="font-size:22px">📊 Panel de admin</h2>
+        <p class="calc-sub">Solo tú puedes ver esto</p>
+      </div>
+
+      <div id="adminLoading" class="auth-note">Cargando métricas...</div>
+      <div id="adminError" class="auth-note" style="display:none;border-color:var(--red);color:var(--red)"></div>
+
+      <div id="adminContent" style="display:none">
+        <div class="summary-grid" id="adminSummaryGrid"></div>
+
+        <h3 style="font-size:15px;margin:22px 0 10px">Por usuario</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Bitunix</th>
+                <th>Volumen (mes)</th>
+                <th>Rango</th>
+                <th>Telegram</th>
+                <th>Sharkoins</th>
+                <th>Sharkoins 24h</th>
+              </tr>
+            </thead>
+            <tbody id="adminUserTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL: MINIJUEGOS - Salto del Tiburón - juego independiente, ventana emergente
      propia (no vive pegado a ninguna pestaña) ===== -->
 <div class="modal-overlay" id="colmGameModal">
@@ -9558,6 +9611,7 @@ function showCategoryDetail(cat){
   });
   setIndicMobileMode(cat === 'indicadores');
   filterSidebarNav(cat);
+  if(enteringFromOverview) logToolUsage(cat);
   // el pushState va ANTES de jumpToIndicator('guia') a propósito: jumpToIndicator solo hace
   // replaceState (no agrega otra entrada), así que necesita que la entrada de la categoría ya
   // exista para "afinarla" con el indicador real en vez de pisar la entrada anterior (home)
@@ -11656,6 +11710,7 @@ function renderAuthState(){
     accountLoginBtn.style.display = 'none';
     accountBarSession.style.display = 'flex';
     accountBarEmail.textContent = getDisplayName(currentUser);
+    document.getElementById('accountAdminBtn').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
     loadPortfolios();
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof delistWatchlistWidget !== 'undefined') delistWatchlistWidget.onAuthChange();
@@ -11670,6 +11725,7 @@ function renderAuthState(){
     sbSession.style.display = 'none';
     accountLoginBtn.style.display = 'block';
     accountBarSession.style.display = 'none';
+    document.getElementById('accountAdminBtn').style.display = 'none';
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof COLM_EQUIPPED_DEFAULT !== 'undefined') colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
     if(typeof renderAccountMiniAvatar === 'function') renderAccountMiniAvatar();
@@ -26485,6 +26541,72 @@ closeBitunix.addEventListener('click', closeBitunixModal);
 bitunixModal.addEventListener('click', (e) => { if(e.target === bitunixModal) closeBitunixModal(); });
 document.getElementById('openBitunixPillBtn').addEventListener('click', openBitunixModal);
 
+/* ---- panel de admin (solo Juan) - lee todo a traves de get_admin_summary_stats() y
+   get_admin_user_table() (scripts/sql/create_admin_dashboard.sql), nunca directo de las
+   tablas: esas funciones son las que de verdad bloquean a cualquiera que no sea el owner,
+   el boton escondido de abajo es solo para no mostrarselo a nadie mas en la UI ---- */
+const adminModal = document.getElementById('adminModal');
+const adminPanel = adminModal.querySelector('.modal-panel');
+const closeAdmin = document.getElementById('closeAdmin');
+const RANK_LABELS = { sin_rango: 'Sin rango', cria: 'Cría', explorador: 'Explorador', cazador: 'Cazador', depredador: 'Depredador', alfa: 'Alfa' };
+function fmtAdminUsd(n){ return '$' + Number(n || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
+async function loadAdminPanel(){
+  const loadingEl = document.getElementById('adminLoading');
+  const errorEl = document.getElementById('adminError');
+  const contentEl = document.getElementById('adminContent');
+  loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  contentEl.style.display = 'none';
+  const [summaryRes, usersRes] = await Promise.all([
+    sbClient.rpc('get_admin_summary_stats'),
+    sbClient.rpc('get_admin_user_table'),
+  ]);
+  if(summaryRes.error || usersRes.error){
+    loadingEl.style.display = 'none';
+    errorEl.textContent = friendlyErrMsg(summaryRes.error || usersRes.error);
+    errorEl.style.display = 'block';
+    return;
+  }
+  const s = summaryRes.data;
+  const rankRows = Object.entries(s.rank_distribution || {})
+    .map(([rank, count]) => (RANK_LABELS[rank] || rank) + ': ' + count).join(' · ') || '—';
+  const topCats = (s.top_categories || []).map(c => c.category + ' (' + c.count + ')').join(' · ') || '—';
+  document.getElementById('adminSummaryGrid').innerHTML = [
+    ['Usuarios totales', s.total_users],
+    ['Nuevos esta semana', s.new_signups_week],
+    ['Telegram conectado', s.telegram_connected_count + ' / ' + s.total_users],
+    ['Bitunix conectado', s.bitunix_connected_count + ' / ' + s.total_users],
+    ['Activos hoy', s.dau],
+    ['Activos esta semana', s.wau],
+    ['Sharkoins repartidos hoy', s.sharkoins_today],
+    ['Sharkoins repartidos esta semana', s.sharkoins_week],
+    ['Rangos', rankRows],
+    ['Categorías más usadas (7 días)', topCats],
+  ].map(([label, val]) => '<div class="sum-row"><span class="s-label">' + escapeHtml(label) + '</span><span class="s-val">' + escapeHtml(String(val)) + '</span></div>').join('');
+  document.getElementById('adminUserTableBody').innerHTML = (usersRes.data || []).map(u =>
+    '<tr>' +
+      '<td>' + escapeHtml(u.username) + '<br><span style="color:var(--muted);font-size:11px">' + escapeHtml(u.email || '') + '</span></td>' +
+      '<td class="' + (u.bitunix_connected ? 'admin-ok' : 'admin-no') + '">' + (u.bitunix_connected ? '✓' : '✗') + '</td>' +
+      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
+      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
+      '<td class="' + (u.telegram_connected ? 'admin-ok' : 'admin-no') + '">' + (u.telegram_connected ? '✓' : '✗') + '</td>' +
+      '<td>' + Number(u.sharkoins_balance || 0).toLocaleString('es-CO') + '</td>' +
+      '<td>' + Number(u.sharkoins_24h || 0).toLocaleString('es-CO') + '</td>' +
+    '</tr>'
+  ).join('');
+  loadingEl.style.display = 'none';
+  contentEl.style.display = 'block';
+}
+function openAdminModal(){
+  accountMiniDropdown.classList.remove('open');
+  openModalGeneric(adminModal, adminPanel, closeAdmin);
+  loadAdminPanel();
+}
+function closeAdminModal(){ closeModalGeneric(adminModal); }
+closeAdmin.addEventListener('click', closeAdminModal);
+adminModal.addEventListener('click', (e) => { if(e.target === adminModal) closeAdminModal(); });
+document.getElementById('accountAdminBtn').addEventListener('click', openAdminModal);
+
 /* ---- caja de estado dentro de la cajita "Rango de Manada" (Fase 3, shell vacio) - reusa la
    misma conexion de Bitunix de arriba, todavia sin lectura de volumen real (Fase 2 pendiente
    de si Bitunix ofrece una API para su panel de afiliados) ---- */
@@ -26554,6 +26676,19 @@ const colmillosWalletBtn = document.getElementById('colmillosWalletBtn');
 const colmillosWalletBalance = document.getElementById('colmillosWalletBalance');
 
 function todayKeyUTC(){ return new Date().toISOString().slice(0, 10); }
+
+// registro de uso para el panel de admin (ver scripts/sql/create_admin_dashboard.sql) -
+// fire-and-forget, nunca bloquea la navegacion ni molesta al usuario si falla. El
+// unique(user_id,category,period_key) deduplica solo (on conflict do nothing): entrar 10
+// veces a la misma categoria el mismo dia cuenta como un solo "activo hoy" en esa categoria.
+function logToolUsage(category){
+  if(!currentUser || !category) return;
+  sbClient.from('tool_usage_events').insert({
+    user_id: currentUser.id, category, period_key: todayKeyUTC(),
+  }).then(({ error }) => {
+    if(error && error.code !== '23505') console.warn('no se pudo registrar el uso de', category, error);
+  });
+}
 
 async function loadColmillosBalance(bump){
   if(!currentUser){ colmillosWalletBtn.style.display = 'none'; return; }

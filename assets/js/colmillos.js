@@ -1622,6 +1622,7 @@ function showColmillosPage(initialSlug){
   if(ticker) ticker.style.display = 'none';
   colmillosPageView.style.display = 'block';
   setPageTitle('Sharkoins');
+  if(typeof logToolUsage === 'function') logToolUsage('sharkoins');
   pushRoute({ skillcashDepth: 'sharkoins' }, colmRoutePathForTab(tab));
   colmillosContent.style.display = 'none';
   document.getElementById('colmillosTabs').style.display = 'none';
