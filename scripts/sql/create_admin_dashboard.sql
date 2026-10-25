@@ -38,7 +38,6 @@ create policy "usuario registra su propio uso"
 -- el mismo orden de prioridad que el resto del sitio (ver create_colm_leaderboard.sql).
 create or replace function public.get_admin_user_table()
 returns table(
-    email text,
     username text,
     bitunix_connected boolean,
     month_volume_usd numeric,
@@ -58,7 +57,6 @@ begin
 
   return query
     select
-      u.email::text,
       coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'full_name',
                 u.raw_user_meta_data->>'name', split_part(u.email, '@', 1), 'Usuario') as username,
       exists(

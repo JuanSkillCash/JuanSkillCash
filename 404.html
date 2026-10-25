@@ -26585,7 +26585,7 @@ async function loadAdminPanel(){
   ].map(([label, val]) => '<div class="sum-row"><span class="s-label">' + escapeHtml(label) + '</span><span class="s-val">' + escapeHtml(String(val)) + '</span></div>').join('');
   document.getElementById('adminUserTableBody').innerHTML = (usersRes.data || []).map(u =>
     '<tr>' +
-      '<td>' + escapeHtml(u.username) + '<br><span style="color:var(--muted);font-size:11px">' + escapeHtml(u.email || '') + '</span></td>' +
+      '<td>' + escapeHtml(u.username) + '</td>' +
       '<td class="' + (u.bitunix_connected ? 'admin-ok' : 'admin-no') + '">' + (u.bitunix_connected ? '✓' : '✗') + '</td>' +
       '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
       '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
