@@ -22602,10 +22602,16 @@ function renderStateGuiaResult(groupKey){
   `;
 }
 function ensureStateGuiaLoaded(groupKey){
+  const grid = document.getElementById(groupKey + 'Grid');
+  if(grid && !grid.dataset.rendered){
+    grid.dataset.rendered = '1';
+    renderStateGuiaGrid(groupKey);
+  }
   const selA = document.getElementById(groupKey + 'SelA'), selB = document.getElementById(groupKey + 'SelB');
-  if(!selA || selA.dataset.wired) { renderStateGuiaResult(groupKey); return; }
+  // sin combinador (ej. dominanciaguia, por pedido de Juan - solo queda la grilla de tarjetas
+  // de arriba, con sus flechitas ▲/▼) - no hay nada mas que cablear aca
+  if(!selA || selA.dataset.wired) return;
   selA.dataset.wired = '1';
-  renderStateGuiaGrid(groupKey);
   const cfg = STATE_GUIA_DATA[groupKey];
   const optionsHtml = cfg.indicators.map(ind => `<option value="${ind.id}">${ind.icon} ${ind.label}</option>`).join('');
   selA.innerHTML = optionsHtml;
@@ -22683,7 +22689,7 @@ const GUIA_SLOTS = [
   { slot: 'bitcoinGuiaSlot', id: 'bitcoinguia', title: '¿Cómo Leer los Indicadores de BTC?', combinator: false },
   { slot: 'ethereumGuiaSlot', id: 'ethereumguia', title: '¿Cómo Leer los Indicadores de ETH?', combinator: false },
   { slot: 'tradingGuiaSlot', id: 'tradingguia', title: '¿Cómo Leer los Indicadores de Trading?', combinator: false },
-  { slot: 'dominanciaGuiaSlot', id: 'dominanciaguia', title: '¿Cómo Leer los Indicadores de Dominancia?', combinator: true },
+  { slot: 'dominanciaGuiaSlot', id: 'dominanciaguia', title: '¿Cómo Leer los Indicadores de Dominancia?', combinator: false },
   { slot: 'altcoinsGuiaSlot', id: 'altcoinsguia', title: '¿Cómo Leer los Indicadores de Altcoins?', combinator: true },
 ];
 GUIA_SLOTS.forEach(g => {
