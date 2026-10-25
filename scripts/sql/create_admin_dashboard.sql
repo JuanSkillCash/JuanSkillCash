@@ -30,6 +30,7 @@ create index if not exists tool_usage_events_created_at_idx on tool_usage_events
 
 alter table tool_usage_events enable row level security;
 
+drop policy if exists "usuario registra su propio uso" on tool_usage_events;
 create policy "usuario registra su propio uso"
     on tool_usage_events for insert
     with check (auth.uid() = user_id);
