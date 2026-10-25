@@ -1,10 +1,14 @@
 name: Postear Dominancia BTC/USDT diario en Telegram
 
-# 12:00 UTC = 7:00 AM hora Colombia (UTC-5). Usa el valor EN VIVO de CoinGecko /global (no el
-# cierre diario de TradingView), para que el dato de las 7am sea el real de ese momento.
+# 12:50 UTC = 7:50 AM hora Colombia (UTC-5) - unos minutos antes de las 8am pedidas por Juan,
+# a proposito NO en punto (minuto 0): los workflows programados "en punto" compiten con miles
+# de repos que agendan lo mismo a esa hora exacta, y GitHub los puede atrasar varias horas (asi
+# llegaban las 7am configuradas de antes como 10:14am de verdad). Usa el valor EN VIVO de
+# CoinGecko /global (no el cierre diario de TradingView), para que el dato sea el real de ese
+# momento sin importar la hora exacta en que corra.
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "50 12 * * *"
   workflow_dispatch: {}
 
 jobs:

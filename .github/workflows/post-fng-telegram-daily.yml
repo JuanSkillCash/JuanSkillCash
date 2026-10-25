@@ -1,13 +1,16 @@
 name: Postear Miedo y Codicia diario en Telegram
 
-# 1:00 UTC - una hora despues de medianoche UTC, que es cuando CoinMarketCap recalcula su
-# Indice de Miedo y Codicia (confirmado revisando cmc_fng_latest.update_time: 2026-10-23
-# llego a las 00:08 UTC). Esa hora de margen asegura que, para cuando corre esto, el robot
-# que lee el valor en vivo cada hora (update-cmc-fng-latest.yml, "0 * * * *") ya alcanzo a
-# refrescar cmc_fng_latest con el numero nuevo del dia.
+# 12:50 UTC = 7:50 AM hora Colombia (UTC-5) - unos minutos antes de las 8am pedidas por Juan
+# (antes mandaba a la 1:00 UTC = 8pm Colombia del dia anterior, pero por el atraso tipico de
+# GitHub Actions en horarios "en punto" terminaba llegando pasada la medianoche, 12:25am). A
+# proposito NO en punto (minuto 0): los workflows agendados justo en punto compiten con miles
+# de repos que piden lo mismo a esa hora exacta, y GitHub los puede atrasar varias horas. A
+# las 12:50 UTC sobra margen de sobra para que CoinMarketCap ya haya recalculado su indice
+# (~00:08 UTC) y para que el robot que lo lee cada hora (update-cmc-fng-latest.yml,
+# "0 * * * *") ya haya refrescado cmc_fng_latest con el numero del dia.
 on:
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "50 12 * * *"
   workflow_dispatch: {}
 
 jobs:
