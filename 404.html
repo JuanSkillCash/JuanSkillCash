@@ -2556,12 +2556,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       <button class="sb-item sb-item--sub" data-indic-jump="fedfundsrate">
         <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de interés de la Fed</span>
       </button>
-      <button class="sb-item sb-item--sub" data-indic-jump="treasuryyields">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del tesoro</span>
-      </button>
-      <button class="sb-item sb-item--sub" data-indic-jump="yieldcurve">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Curva 10Y-2Y</span>
-      </button>
       <button class="sb-item sb-item--sub" data-indic-jump="m2supply">
         <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (oferta monetaria)</span>
       </button>
@@ -2857,12 +2851,6 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fedfundsrate">
         <span class="sb-item-icon">🏦</span><span class="sb-item-label">Tasa de interés de la Fed</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="treasuryyields">
-        <span class="sb-item-icon">📜</span><span class="sb-item-label">Rendimientos del tesoro</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="yieldcurve">
-        <span class="sb-item-icon">📐</span><span class="sb-item-label">Curva 10Y-2Y</span>
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="m2supply">
         <span class="sb-item-icon">💰</span><span class="sb-item-label">M2 (oferta monetaria)</span>
@@ -9702,8 +9690,6 @@ const INDIC_GROUPS = {
     { id: 'pce', label: 'PCE' },
     { id: 'ppi', label: 'PPI' },
     { id: 'fedfundsrate', label: 'Tasa de interés de la Fed' },
-    { id: 'treasuryyields', label: 'Rendimientos del tesoro de EEUU' },
-    { id: 'yieldcurve', label: 'Curva 10Y-2Y' },
     { id: 'm2supply', label: 'M2 (oferta monetaria)' },
     { id: 'vixindex', label: 'VIX (índice del miedo)' },
     { id: 'netliquidity', label: 'Liquidez neta' },
@@ -9725,7 +9711,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', newlistradar: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', treasuryyields: 'macro', yieldcurve: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', newlistradar: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -21094,19 +21080,6 @@ const DOM_CHART_DEFS = {
     loadFn: () => fedFundsMacro.load(), realSeries: () => fedFundsMacro.series(), exact: true,
     series: [{ key: 'v', color: '#22c55e', label: 'Tasa de Interés de la Fed' }],
   },
-  treasuryyields: {
-    loadFn: () => treasuryYieldsMacro.load(), realSeries: () => treasuryYieldsMacro.series(), exact: true,
-    series: [
-      { key: 'y2', color: '#60a5fa', label: '2 años' }, { key: 'y5', color: '#2dd4bf', label: '5 años' },
-      { key: 'y10', color: '#f0b23d', label: '10 años' }, { key: 'y20', color: '#c084fc', label: '20 años' },
-      { key: 'y30', color: '#ff2f4f', label: '30 años' },
-    ],
-  },
-  yieldcurve: {
-    loadFn: () => yieldCurveMacro.load(), realSeries: () => yieldCurveMacro.series(), exact: true,
-    series: [{ key: 'v', color: '#ff2f4f', label: 'Curva 10Y-2Y' }],
-    refLine: { value: 0, label: '0 = posible señal de recesión' },
-  },
   m2supply: {
     loadFn: () => m2Macro.load(), realSeries: () => m2Macro.series(), exact: true, fmtVal: fmtBillionsUsd,
     series: [{ key: 'v', color: '#2dd4bf', label: 'M2' }],
@@ -21316,14 +21289,12 @@ const fedFundsMacro = makeSingleFredSeries('DFF');
 // la que todo el mundo cita "M2"
 const m2Macro = makeSingleFredSeries('M2SL');
 const vixMacro = makeSingleFredSeries('VIXCLS');
-const yieldCurveMacro = makeSingleFredSeries('T10Y2Y');
 const gdpGrowthMacro = makeSingleFredSeries('A191RL1Q225SBEA');
 // balance de la Fed como su propio gráfico independiente (ademas de usarse como overlay en
 // OTHERS/BTC) - mismo escalado x1e6 (millones -> USD reales) que ya se usa alla
 const fedBalanceMacro = makeSingleFredSeries('WALCL', 1e6);
 
 const cpiMacro = makeMergedFredSeries(['CPIAUCSL', 'CPILFESL'], ['general', 'nucleo']);
-const treasuryYieldsMacro = makeMergedFredSeries(['DGS2', 'DGS5', 'DGS10', 'DGS20', 'DGS30'], ['y2', 'y5', 'y10', 'y20', 'y30']);
 // % de cambio del CPI contra el mismo mes del año anterior (ej. "USIRYY" en TradingView) - distinto
 // del índice CPI en sí (que casi siempre sube y no se lee como "la inflación está en X%"). Se
 // calcula localmente a partir del mismo CPI que ya se trae arriba, sin pedir ningún dato nuevo -
@@ -22202,7 +22173,7 @@ async function loadDomChartDetail(key){
 const domLoadedOnce = { domratio: false, domall: false, dombtc: false, domusdt: false, othersbtc: false, ethbtc: false, altfever: false, ethvsalt: false, ethpmi: false };
 // indicadores "Macroeconómicos": todos comparten el mismo motor (renderDomChart/loadDomChartDetail),
 // así que un solo helper generico basta en vez de una función ensureXLoaded por cada uno
-const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'cpiyoy', 'pce', 'ppi', 'fedfundsrate', 'treasuryyields', 'yieldcurve', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
+const MACRO_CHART_IDS = ['dxy', 'pmius', 'payrolls', 'unrate', 'icsa', 'cpi', 'cpiyoy', 'pce', 'ppi', 'fedfundsrate', 'm2supply', 'vixindex', 'netliquidity', 'gdpgrowth', 'fedbalance'];
 MACRO_CHART_IDS.forEach(id => { domLoadedOnce[id] = false; domActiveRanges[id] = 'todo'; });
 function ensureMacroChartLoaded(id){ if(!domLoadedOnce[id]){ domLoadedOnce[id] = true; loadDomChartDetail(id); } }
 // contenido (icono/titulo/texto de carga/disclaimer) de cada panel "Macroeconómico" - el HTML en
@@ -22229,10 +22200,6 @@ const MACRO_PANEL_META = {
     disclaimer: '🏗️ Inflación mayorista — lo que pagan las empresas, antes de que el costo le llegue al consumidor.<br>🔎 Fuente: FRED (PPIACO).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   fedfundsrate: { icon: '🏦', title: 'Tasa de Interés de la Fed', loading: 'Descargando el histórico de la tasa de la Fed.',
     disclaimer: '🏦 La tasa que fija la Reserva Federal — mueve todos los mercados cuando cambia.<br>🔎 Fuente: FRED (DFF, versión diaria).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
-  treasuryyields: { icon: '📜', title: 'Rendimientos del Tesoro de EEUU', loading: 'Descargando el histórico de los bonos del Tesoro.',
-    disclaimer: '📜 Los bonos del gobierno de EEUU a 2, 5, 10, 20 y 30 años — referencia de hipotecas, bonos corporativos y el "precio del dinero" a largo plazo.<br>🔎 Fuente: FRED (DGS2, DGS5, DGS10, DGS20, DGS30).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
-  yieldcurve: { icon: '📐', title: 'Curva 10Y-2Y', loading: 'Descargando el histórico de la curva 10Y-2Y.',
-    disclaimer: '📐 Rendimiento del bono a 10 años menos el de 2 años. Cuando se vuelve negativa (el bono corto paga más que el largo), es la señal de recesión más citada en finanzas.<br>🔎 Fuente: FRED (T10Y2Y).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   m2supply: { icon: '💰', title: 'M2 (Oferta Monetaria)', loading: 'Descargando el histórico de M2.',
     disclaimer: '💰 Cuánto dinero hay circulando en la economía — más dinero circulando suele significar más apetito por activos de riesgo, cripto incluida.<br>🔎 Fuente: FRED (M2SL).<br><strong>Herramienta educativa. No constituye asesoría financiera.</strong>' },
   vixindex: { icon: '😨', title: 'VIX (Índice del Miedo)', loading: 'Descargando el histórico del VIX.',
@@ -22331,12 +22298,6 @@ const MACRO_GUIA_INDICATORS = [
   { id: 'fedfundsrate', icon: '🏦', label: 'Tasa de la Fed', def: 'La tasa de interés que fija la Reserva Federal.',
     high: { tag: 'Tasas altas', effects: ['risk_off', 'liquidity_down'] },
     low: { tag: 'Tasas bajas', effects: ['risk_on', 'liquidity_up'] } },
-  { id: 'treasuryyields', icon: '📜', label: 'Rendimientos del Tesoro', def: 'Lo que pagan los bonos del gobierno de EEUU.',
-    high: { tag: 'Rendimientos suben', effects: ['risk_off', 'liquidity_down'] },
-    low: { tag: 'Rendimientos bajan', effects: ['risk_on', 'liquidity_up'] } },
-  { id: 'yieldcurve', icon: '📐', label: 'Curva 10Y-2Y', def: 'Rendimiento del bono a 10 años menos el de 2 años.',
-    high: { tag: 'Positiva (normal)', effects: ['growth'] },
-    low: { tag: 'Negativa (invertida)', effects: ['recession'] } },
   { id: 'm2supply', icon: '💰', label: 'M2', def: 'Cuánto dinero hay circulando en la economía.',
     high: { tag: 'M2 crece', effects: ['liquidity_up', 'risk_on'] },
     low: { tag: 'M2 se contrae', effects: ['liquidity_down', 'risk_off'] } },
