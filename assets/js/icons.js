@@ -216,7 +216,7 @@ const ICON_FOR_EMOJI = {
 "⭐": "star",
 "🚫": "ban",
 "🦈": "fish",
-"🐠": "shell",
+"🐠": "fish",
 "🔔": "bell",
 "🧠": "brain",
 "💪": "dumbbell",
