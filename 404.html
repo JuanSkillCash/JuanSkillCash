@@ -2383,6 +2383,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
 /* cajas del inicio: numerito, "N HERRAMIENTAS", palomitas y "Explorar" en gris claro en vez de rojo */
 .cat-overview-card, .cat-flip-back{ --c:var(--muted2) !important; }
+/* si una caja del inicio no trae subtitulo ("N HERRAMIENTAS"), igual se reserva su renglon
+   para que el dibujo y el texto queden a la misma altura que en las demas cajas */
+.cat-overview-head + .cat-overview-preview{ margin-top:calc(3px + 1.5em + 14px); }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
@@ -3225,6 +3229,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M4 13l6-5 6 5"/><path d="M4 8l6-5 6 5"/></svg><span>Rango de Manada</span></div>
           <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
         </div>
+        <div class="cat-overview-sub">RANGOS POR VOLUMEN</div>
         <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <line x1="20" y1="60" x2="280" y2="60" stroke="var(--border2)" stroke-width="2"/>
@@ -3300,7 +3305,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">5</div>
-          <div class="cat-overview-title">🦈 Zona de Caza</div>
+          <div class="cat-overview-title">🎯 Zona de Caza</div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">10 HERRAMIENTAS</div>
@@ -27198,7 +27203,7 @@ async function awardColmillos(eventType, periodKey, amount){
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
-<script src="/assets/js/icons.js?v=2" defer></script>
+<script src="/assets/js/icons.js?v=3" defer></script>
 <script src="/assets/js/colmillos.js?v=18" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
