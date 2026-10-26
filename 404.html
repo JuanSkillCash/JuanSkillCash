@@ -1761,6 +1761,9 @@ img[src=""]{display:none}
 .auth-divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;text-transform:uppercase;margin:14px 0}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
 .auth-note{font-size:12.5px;color:var(--muted);line-height:1.7;border:1px dashed var(--border2);border-radius:10px;padding:12px 14px;max-width:420px}
+.profile-email-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.profile-email-eye{background:none;border:none;color:var(--muted2);font-size:14px;line-height:1;cursor:pointer;padding:2px 4px;opacity:.75;transition:opacity .15s}
+.profile-email-eye:hover{opacity:1}
 .auth-link-btn{background:none;border:none;color:var(--muted2);font-size:12px;font-weight:600;cursor:pointer;padding:8px 0 0;text-align:left;text-decoration:underline;text-underline-offset:2px}
 .legal-footer-link{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 .legal-footer-link:hover{color:var(--red)}
@@ -8965,7 +8968,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
       <button type="button" id="profileChangePasswordLink" class="auth-link-btn" style="margin-top:14px">Cambiar mi contraseña →</button>
 
-      <p class="auth-note" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b></p>
+      <p class="auth-note profile-email-row" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b><button type="button" id="profileEmailToggleBtn" class="profile-email-eye" aria-label="Mostrar correo" title="Mostrar correo">👁️</button></p>
 
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border)">
         <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Conexiones</p>
@@ -11813,16 +11816,37 @@ const profileModal = document.getElementById('profileModal');
 const profilePanel = profileModal.querySelector('.modal-panel');
 const closeProfile = document.getElementById('closeProfile');
 
+// correo escondido por defecto (puntos) con un ojito para revelarlo - pensado para cuando
+// alguien comparte pantalla sin querer mostrar su correo. Siempre arranca oculto cada vez
+// que se abre el modal, nunca se queda "revelado" de una vez anterior.
+const PROFILE_EMAIL_MASK = '••••••••••••';
+let profileEmailRevealed = false;
+function renderProfileEmail(){
+  const el = document.getElementById('profileEmailDisplay');
+  const btn = document.getElementById('profileEmailToggleBtn');
+  const email = currentUser ? currentUser.email : '—';
+  if(!currentUser){ el.textContent = email; btn.style.display = 'none'; return; }
+  btn.style.display = '';
+  el.textContent = profileEmailRevealed ? email : PROFILE_EMAIL_MASK;
+  btn.textContent = profileEmailRevealed ? '🙈' : '👁️';
+  btn.title = profileEmailRevealed ? 'Ocultar correo' : 'Mostrar correo';
+  btn.setAttribute('aria-label', btn.title);
+}
+document.getElementById('profileEmailToggleBtn').addEventListener('click', () => {
+  profileEmailRevealed = !profileEmailRevealed;
+  renderProfileEmail();
+});
 function openProfileModal(){
   const meta = (currentUser && currentUser.user_metadata) || {};
   document.getElementById('profileUsernameInput').value = meta.username || '';
-  document.getElementById('profileEmailDisplay').textContent = currentUser ? currentUser.email : '—';
+  profileEmailRevealed = false;
+  renderProfileEmail();
   document.getElementById('profileError').classList.remove('show');
   document.getElementById('profileSuccess').classList.remove('show');
   if(typeof renderAccountMiniAvatar === 'function') renderAccountMiniAvatar();
   openModalGeneric(profileModal, profilePanel, closeProfile);
 }
-function closeProfileModal(){ closeModalGeneric(profileModal); }
+function closeProfileModal(){ profileEmailRevealed = false; closeModalGeneric(profileModal); }
 closeProfile.addEventListener('click', closeProfileModal);
 document.getElementById('profileChangeAvatarBtn').addEventListener('click', () => {
   closeProfileModal();
