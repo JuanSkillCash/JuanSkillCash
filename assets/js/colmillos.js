@@ -517,7 +517,7 @@ function initColmHeroDebugPanel(){
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = label;
-    b.style.cssText = 'font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #fff;background:#000;color:#fff;cursor:pointer';
+    b.style.cssText = 'font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid #fff;background:#000;color:#fff;cursor:pointer';
     b.onclick = () => {
       colmHeroDebugOverride = buildHeroDebugScenario(kind);
       renderColmHeroCard();
@@ -1281,7 +1281,7 @@ function getColmSharkDrawBox(sharkImg){
 }
 function drawColmGame(){
   const { ctx, canvas } = colmGame;
-  ctx.fillStyle = '#080c20';
+  ctx.fillStyle = '#0a0b0f';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = 'rgba(255,255,255,.14)';
@@ -1392,10 +1392,10 @@ function initColmRouletteWheel(){
     const midRad = (start + segDeg / 2 - 90) * Math.PI / 180;
     const tx = (cx + r * 0.64 * Math.cos(midRad)).toFixed(2);
     const ty = (cy + r * 0.64 * Math.sin(midRad)).toFixed(2);
-    return '<path d="' + path + '" fill="' + seg.color + '" stroke="#0b0d18" stroke-width="2"/>' +
+    return '<path d="' + path + '" fill="' + seg.color + '" stroke="#0c0d11" stroke-width="2"/>' +
       '<text x="' + tx + '" y="' + ty + '" text-anchor="middle" dominant-baseline="central" ' +
       'font-family="Space Mono,monospace" font-weight="800" font-size="15" fill="#fff" ' +
-      'stroke="#0b0d18" stroke-width="3" paint-order="stroke">' + seg.label + '</text>';
+      'stroke="#0c0d11" stroke-width="3" paint-order="stroke">' + seg.label + '</text>';
   }).join('');
   wheelEl.innerHTML = wedges;
   wheelEl.dataset.ready = '1';
