@@ -335,6 +335,30 @@ window.addEventListener('resize', () => {
     sizeAndRenderHeroChar(colmEquippedAccessoryIds(colmillosEquippedState));
   }, 150);
 });
+/* el listener de resize de arriba solo cubre la VENTANA - pero el escenario tambien cambia de
+   tamaño solo (el panel de info termina de cargar imagenes/fuentes y crece, aparece la barra
+   de scroll, etc.). El pedestal se reacomoda solo (usa % en CSS) pero el tiburon queda en los
+   pixeles que se calcularon antes, y se "sale" del pedestal. Con esto se vuelve a medir cada
+   vez que el escenario cambia de tamaño, por la razon que sea. */
+if(typeof ResizeObserver === 'function'){
+  let colmHeroStageObserved = null;
+  const colmHeroStageObserver = new ResizeObserver(() => {
+    cancelAnimationFrame(window._colmHeroStageRaf);
+    window._colmHeroStageRaf = requestAnimationFrame(() => {
+      sizeAndRenderHeroChar(colmEquippedAccessoryIds(colmillosEquippedState));
+    });
+  });
+  const observeColmHeroStage = () => {
+    const stage = document.querySelector('.colm-hero-main');
+    if(stage && stage !== colmHeroStageObserved){
+      if(colmHeroStageObserved) colmHeroStageObserver.unobserve(colmHeroStageObserved);
+      colmHeroStageObserver.observe(stage);
+      colmHeroStageObserved = stage;
+    }
+  };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observeColmHeroStage);
+  else observeColmHeroStage();
+}
 /* particulas decorativas flotando alrededor del heroe (moneditas/destellos SkillCash, no
    colores chillones) - puramente ambientacion, se regeneran cada vez que se entra a la
    pagina para que no se vean siempre en la misma posicion */
