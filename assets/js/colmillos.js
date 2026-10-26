@@ -972,7 +972,7 @@ function renderColmillosShopGrids(balance){
           btn.disabled = true;
         } else {
           btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar boleto';
-          btn.disabled = balance < item.price;
+          btn.classList.toggle('insufficient', balance < item.price);
           btn.addEventListener('click', () => buyColmillosItem(item));
         }
       } else {
@@ -988,7 +988,7 @@ function renderColmillosShopGrids(balance){
           btn.addEventListener('click', () => equipColmillosItem(equipField, item.id));
         } else {
           btn.innerHTML = item.price + ' ' + COLM_COIN_ICON_HTML + ' comprar';
-          btn.disabled = balance < item.price;
+          btn.classList.toggle('insufficient', balance < item.price);
           btn.addEventListener('click', () => buyColmillosItem(item));
           // antes la unica forma de "probarselo" era tocar la imagen, nada le decia a la gente
           // que podian ver como se veria ANTES de comprarlo - ahora hay un boton explicito para
@@ -1015,7 +1015,7 @@ function renderColmillosShopGrids(balance){
             evoBtn.type = 'button';
             evoBtn.className = 'colm-evolve-btn';
             evoBtn.innerHTML = '⬆️ Evolucionar a ' + nextInfo.name + ' — ' + cost + ' ' + COLM_COIN_ICON_HTML;
-            evoBtn.disabled = balance < cost;
+            evoBtn.classList.toggle('insufficient', balance < cost);
             evoBtn.addEventListener('click', () => evolveColmillosItem(item, tier));
             card.appendChild(evoBtn);
           } else {
@@ -1031,11 +1031,36 @@ function renderColmillosShopGrids(balance){
   });
   applyColmShopSubtabFilter();
 }
+/* aviso flotante de "no te alcanza" - antes el boton de comprar simplemente quedaba gris y
+   deshabilitado, y la persona no sabia por que no pasaba nada al tocarlo. Ahora el boton se
+   ve atenuado pero se puede tocar, y al tocarlo dice cuantos Sharkoins faltan */
+function colmShowToast(msg){
+  let el = document.getElementById('colmToast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'colmToast';
+    el.className = 'colm-toast';
+    el.setAttribute('role', 'alert');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._colmToastTimer);
+  window._colmToastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+function colmShowInsufficient(balance, cost){
+  colmShowToast('💸 Sharkoins insuficientes — te faltan ' + Math.max(0, cost - balance).toLocaleString('es-CO') + ' (tenés ' + Math.max(0, balance).toLocaleString('es-CO') + ').');
+}
+// el trigger colm_check_balance_before_spend (scripts/sql/colm_block_negative_balance.sql)
+// rechaza en la base de datos cualquier gasto que deje el saldo negativo
+function colmIsInsufficientError(error){
+  return !!error && (error.hint === 'colm_saldo_insuficiente' || /suficientes Sharkoins/.test(error.message || ''));
+}
 async function buyColmillosItem(item){
   if(!currentUser) return;
   const { data: rows } = await fetchAllColmLedger('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
-  if(balance < item.price){ loadColmillosShop(); return; }
+  if(balance < item.price){ colmShowInsufficient(balance, item.price); loadColmillosShop(); return; }
   const isRaffle = item.category === 'raffle';
   const eventType = isRaffle ? 'purchase_raffle_ticket' : ('purchase_' + item.id);
   // el boleto de sorteo usa el MES actual como period_key (en vez de un uuid por compra) para
@@ -1051,6 +1076,7 @@ async function buyColmillosItem(item){
     await loadColmillosShop();
     return;
   }
+  if(colmIsInsufficientError(error)){ colmShowToast('💸 Sharkoins insuficientes para esto.'); await loadColmillosShop(); loadColmillosBalance(); return; }
   if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
   await loadColmillosShop();
   loadColmillosBalance(true);
@@ -1065,10 +1091,11 @@ async function evolveColmillosItem(item, currentTier){
   if(!cost) return;
   const { data: rows } = await fetchAllColmLedger('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
-  if(balance < cost){ loadColmillosShop(); return; }
+  if(balance < cost){ colmShowInsufficient(balance, cost); loadColmillosShop(); return; }
   const { error } = await sbClient.from('user_colmillos_events').insert({
     user_id: currentUser.id, event_type: 'evolve_' + item.id, period_key: 'tier' + nextTier, amount: -cost,
   });
+  if(colmIsInsufficientError(error)){ colmShowToast('💸 Sharkoins insuficientes para esto.'); await loadColmillosShop(); loadColmillosBalance(); return; }
   if(error && error.code !== '23505'){ alert(friendlyErrMsg(error)); return; }
   await loadColmillosShop();
   loadColmillosBalance(true);

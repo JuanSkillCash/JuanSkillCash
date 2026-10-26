@@ -744,6 +744,9 @@ button{font-family:inherit;color:inherit}
 .colm-shop-item-btn.owned{background:rgba(255,255,255,.06);color:var(--muted2);cursor:default}
 .colm-shop-item-btn.equipped{background:#4ade80;color:#0b2715}
 .colm-shop-item-btn:disabled{opacity:.5;cursor:not-allowed}
+.colm-shop-item-btn.insufficient,.colm-evolve-btn.insufficient{opacity:.5}
+.colm-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);z-index:10000;max-width:min(92vw,420px);padding:12px 18px;border-radius:14px;background:#2a1414;border:1px solid #ef4444;color:#fff;font-size:14px;font-weight:600;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.colm-toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* ruleta - solo diversion, sin relacion con dinero real (ver nota en el panel). Antes era
    solo colores en un conic-gradient (no decia que era cada pedazo) - ahora es un SVG con el
@@ -27132,7 +27135,7 @@ async function awardColmillos(eventType, periodKey, amount){
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
-<script src="/assets/js/colmillos.js?v=16" defer></script>
+<script src="/assets/js/colmillos.js?v=17" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
