@@ -9,54 +9,54 @@ const colmillosBigCoin = document.getElementById('colmillosBigCoin');
 /* ---- personaje: sprite real en pixel art (generado con PixelLab, ver assets/mascot/) -
    el mismo PNG se usa como <img> en las vistas previas (Inicio/Tienda) y se dibuja con
    drawImage dentro del canvas del minijuego. Los accesorios (gorra/gafas/cadena) son PNGs
-   pixel art dibujados a mano (assets/mascot/accessories/, mismo canvas 96x96 que el
+   pixel art dibujados a mano (/assets/mascot/accessories/, mismo canvas 96x96 que el
    tiburon) superpuestos encima del sprite ---- */
 const SHARK_IMG_PATHS = {
-  default: 'assets/mascot/source/base_original.png',
-  skin_gold: 'assets/mascot/variants/shark_skin_gold.png',
-  skin_red: 'assets/mascot/variants/shark_skin_red.png',
-  skin_abyss: 'assets/mascot/variants/shark_skin_abyss.png',
-  skin_emerald: 'assets/mascot/variants/shark_skin_emerald.png',
-  skin_cyan: 'assets/mascot/variants/shark_skin_cyan.png',
-  skin_pink: 'assets/mascot/variants/shark_skin_pink.png',
-  skin_orange: 'assets/mascot/variants/shark_skin_orange.png',
-  skin_ice: 'assets/mascot/variants/shark_skin_ice.png',
-  skin_lime: 'assets/mascot/variants/shark_skin_lime.png',
-  skin_violet: 'assets/mascot/variants/shark_skin_violet.png',
-  skin_camo: 'assets/mascot/variants/shark_skin_camo.png',
-  skin_tiger: 'assets/mascot/variants/shark_skin_tiger.png',
-  skin_galaxy: 'assets/mascot/variants/shark_skin_galaxy.png',
-  skin_arcoiris: 'assets/mascot/variants/shark_skin_arcoiris.png',
-  skin_oroliquido: 'assets/mascot/variants/shark_skin_oroliquido.png',
-  skin_neon: 'assets/mascot/variants/shark_skin_neon.png',
-  skin_dragon: 'assets/mascot/variants/shark_skin_dragon.png',
-  skin_martillo: 'assets/mascot/variants/shark_skin_martillo.png',
-  skin_rayosx: 'assets/mascot/variants/shark_skin_rayosx.png',
+  default: '/assets/mascot/source/base_original.png',
+  skin_gold: '/assets/mascot/variants/shark_skin_gold.png',
+  skin_red: '/assets/mascot/variants/shark_skin_red.png',
+  skin_abyss: '/assets/mascot/variants/shark_skin_abyss.png',
+  skin_emerald: '/assets/mascot/variants/shark_skin_emerald.png',
+  skin_cyan: '/assets/mascot/variants/shark_skin_cyan.png',
+  skin_pink: '/assets/mascot/variants/shark_skin_pink.png',
+  skin_orange: '/assets/mascot/variants/shark_skin_orange.png',
+  skin_ice: '/assets/mascot/variants/shark_skin_ice.png',
+  skin_lime: '/assets/mascot/variants/shark_skin_lime.png',
+  skin_violet: '/assets/mascot/variants/shark_skin_violet.png',
+  skin_camo: '/assets/mascot/variants/shark_skin_camo.png',
+  skin_tiger: '/assets/mascot/variants/shark_skin_tiger.png',
+  skin_galaxy: '/assets/mascot/variants/shark_skin_galaxy.png',
+  skin_arcoiris: '/assets/mascot/variants/shark_skin_arcoiris.png',
+  skin_oroliquido: '/assets/mascot/variants/shark_skin_oroliquido.png',
+  skin_neon: '/assets/mascot/variants/shark_skin_neon.png',
+  skin_dragon: '/assets/mascot/variants/shark_skin_dragon.png',
+  skin_martillo: '/assets/mascot/variants/shark_skin_martillo.png',
+  skin_rayosx: '/assets/mascot/variants/shark_skin_rayosx.png',
 };
 const BG_IMG_PATHS = {
-  bg_reef: 'assets/mascot/backgrounds/bg_reef.png',
-  bg_abyss: 'assets/mascot/backgrounds/bg_abyss.png',
-  bg_surface: 'assets/mascot/backgrounds/bg_surface.png',
-  bg_sunken_city: 'assets/mascot/backgrounds/bg_sunken_city.png',
-  bg_volcano: 'assets/mascot/backgrounds/bg_volcano.png',
-  bg_night: 'assets/mascot/backgrounds/bg_night.png',
-  bg_nave: 'assets/mascot/backgrounds/bg_nave.png',
-  bg_tormenta: 'assets/mascot/backgrounds/bg_tormenta.png',
-  bg_playa: 'assets/mascot/backgrounds/bg_playa.png',
-  bg_laboratorio: 'assets/mascot/backgrounds/bg_laboratorio.png',
-  bg_atardecer: 'assets/mascot/backgrounds/bg_atardecer.png',
-  bg_selva: 'assets/mascot/backgrounds/bg_selva.png',
-  bg_cueva: 'assets/mascot/backgrounds/bg_cueva.png',
-  bg_neon: 'assets/mascot/backgrounds/bg_neon.png',
-  bg_pradera: 'assets/mascot/backgrounds/bg_pradera.png',
-  bg_nieve: 'assets/mascot/backgrounds/bg_nieve.png',
-  bg_desierto: 'assets/mascot/backgrounds/bg_desierto.png',
-  bg_cripto_bitcoin: 'assets/mascot/backgrounds/fondo_cripto_bitcoin.png',
-  bg_cripto_ethereum: 'assets/mascot/backgrounds/fondo_cripto_ethereum.png',
-  bg_cripto_solana: 'assets/mascot/backgrounds/fondo_cripto_solana.png',
-  bg_cripto_monero: 'assets/mascot/backgrounds/fondo_cripto_monero.png',
-  bg_cripto_pepe: 'assets/mascot/backgrounds/fondo_cripto_pepe.png',
-  bg_cripto_dogecoin: 'assets/mascot/backgrounds/fondo_cripto_dogecoin.png',
+  bg_reef: '/assets/mascot/backgrounds/bg_reef.png',
+  bg_abyss: '/assets/mascot/backgrounds/bg_abyss.png',
+  bg_surface: '/assets/mascot/backgrounds/bg_surface.png',
+  bg_sunken_city: '/assets/mascot/backgrounds/bg_sunken_city.png',
+  bg_volcano: '/assets/mascot/backgrounds/bg_volcano.png',
+  bg_night: '/assets/mascot/backgrounds/bg_night.png',
+  bg_nave: '/assets/mascot/backgrounds/bg_nave.png',
+  bg_tormenta: '/assets/mascot/backgrounds/bg_tormenta.png',
+  bg_playa: '/assets/mascot/backgrounds/bg_playa.png',
+  bg_laboratorio: '/assets/mascot/backgrounds/bg_laboratorio.png',
+  bg_atardecer: '/assets/mascot/backgrounds/bg_atardecer.png',
+  bg_selva: '/assets/mascot/backgrounds/bg_selva.png',
+  bg_cueva: '/assets/mascot/backgrounds/bg_cueva.png',
+  bg_neon: '/assets/mascot/backgrounds/bg_neon.png',
+  bg_pradera: '/assets/mascot/backgrounds/bg_pradera.png',
+  bg_nieve: '/assets/mascot/backgrounds/bg_nieve.png',
+  bg_desierto: '/assets/mascot/backgrounds/bg_desierto.png',
+  bg_cripto_bitcoin: '/assets/mascot/backgrounds/fondo_cripto_bitcoin.png',
+  bg_cripto_ethereum: '/assets/mascot/backgrounds/fondo_cripto_ethereum.png',
+  bg_cripto_solana: '/assets/mascot/backgrounds/fondo_cripto_solana.png',
+  bg_cripto_monero: '/assets/mascot/backgrounds/fondo_cripto_monero.png',
+  bg_cripto_pepe: '/assets/mascot/backgrounds/fondo_cripto_pepe.png',
+  bg_cripto_dogecoin: '/assets/mascot/backgrounds/fondo_cripto_dogecoin.png',
 };
 const sharkImgCache = {};
 function getSharkImg(skinId){
@@ -79,39 +79,39 @@ function getBgImg(backgroundId){
   return bgImgCache[backgroundId];
 }
 const ACC_IMG_PATHS = {
-  acc_cap: 'assets/mascot/accessories/acc_cap.png',
-  acc_shades: 'assets/mascot/accessories/acc_shades.png',
-  acc_chain: 'assets/mascot/accessories/acc_chain.png',
-  acc_scuba: 'assets/mascot/accessories/acc_scuba.png',
-  acc_scarf: 'assets/mascot/accessories/acc_scarf.png',
-  acc_headphones: 'assets/mascot/accessories/acc_headphones.png',
-  acc_crown: 'assets/mascot/accessories/acc_crown.png',
-  acc_cape: 'assets/mascot/accessories/acc_cape.png',
-  acc_sombrero: 'assets/mascot/accessories/acc_sombrero.png',
-  acc_antifaz: 'assets/mascot/accessories/acc_antifaz.png',
-  acc_aletarobot: 'assets/mascot/accessories/acc_aletarobot.png',
-  acc_collar: 'assets/mascot/accessories/acc_collar.png',
-  acc_paraguas: 'assets/mascot/accessories/acc_paraguas.png',
-  acc_guantes: 'assets/mascot/accessories/acc_guantes.png',
-  acc_microfono: 'assets/mascot/accessories/acc_microfono.png',
-  acc_bate: 'assets/mascot/accessories/acc_bate.png',
-  acc_escudo: 'assets/mascot/accessories/acc_escudo.png',
-  acc_espada: 'assets/mascot/accessories/acc_espada.png',
-  acc_mazo: 'assets/mascot/accessories/acc_mazo.png',
-  acc_raqueta: 'assets/mascot/accessories/acc_raqueta.png',
-  acc_varita: 'assets/mascot/accessories/acc_varita.png',
-  acc_aletasbuceo: 'assets/mascot/accessories/acc_aletasbuceo.png',
-  acc_botasnieve: 'assets/mascot/accessories/acc_botasnieve.png',
-  acc_botaspirata: 'assets/mascot/accessories/acc_botaspirata.png',
-  acc_patines: 'assets/mascot/accessories/acc_patines.png',
-  acc_sandalias: 'assets/mascot/accessories/acc_sandalias.png',
-  acc_tenis: 'assets/mascot/accessories/acc_tenis.png',
-  acc_laser: 'assets/mascot/accessories/acc_ojos_ojos_laser.png',
-  acc_corazon: 'assets/mascot/accessories/acc_ojos_gafas_corazon.png',
-  acc_monoculo: 'assets/mascot/accessories/acc_ojos_monoculo.png',
-  acc_gafas3d: 'assets/mascot/accessories/acc_ojos_gafas_3d.png',
-  acc_cyberpunk: 'assets/mascot/accessories/acc_ojos_visor_cyberpunk.png',
-  acc_buceo: 'assets/mascot/accessories/acc_ojos_careta_buceo.png',
+  acc_cap: '/assets/mascot/accessories/acc_cap.png',
+  acc_shades: '/assets/mascot/accessories/acc_shades.png',
+  acc_chain: '/assets/mascot/accessories/acc_chain.png',
+  acc_scuba: '/assets/mascot/accessories/acc_scuba.png',
+  acc_scarf: '/assets/mascot/accessories/acc_scarf.png',
+  acc_headphones: '/assets/mascot/accessories/acc_headphones.png',
+  acc_crown: '/assets/mascot/accessories/acc_crown.png',
+  acc_cape: '/assets/mascot/accessories/acc_cape.png',
+  acc_sombrero: '/assets/mascot/accessories/acc_sombrero.png',
+  acc_antifaz: '/assets/mascot/accessories/acc_antifaz.png',
+  acc_aletarobot: '/assets/mascot/accessories/acc_aletarobot.png',
+  acc_collar: '/assets/mascot/accessories/acc_collar.png',
+  acc_paraguas: '/assets/mascot/accessories/acc_paraguas.png',
+  acc_guantes: '/assets/mascot/accessories/acc_guantes.png',
+  acc_microfono: '/assets/mascot/accessories/acc_microfono.png',
+  acc_bate: '/assets/mascot/accessories/acc_bate.png',
+  acc_escudo: '/assets/mascot/accessories/acc_escudo.png',
+  acc_espada: '/assets/mascot/accessories/acc_espada.png',
+  acc_mazo: '/assets/mascot/accessories/acc_mazo.png',
+  acc_raqueta: '/assets/mascot/accessories/acc_raqueta.png',
+  acc_varita: '/assets/mascot/accessories/acc_varita.png',
+  acc_aletasbuceo: '/assets/mascot/accessories/acc_aletasbuceo.png',
+  acc_botasnieve: '/assets/mascot/accessories/acc_botasnieve.png',
+  acc_botaspirata: '/assets/mascot/accessories/acc_botaspirata.png',
+  acc_patines: '/assets/mascot/accessories/acc_patines.png',
+  acc_sandalias: '/assets/mascot/accessories/acc_sandalias.png',
+  acc_tenis: '/assets/mascot/accessories/acc_tenis.png',
+  acc_laser: '/assets/mascot/accessories/acc_ojos_ojos_laser.png',
+  acc_corazon: '/assets/mascot/accessories/acc_ojos_gafas_corazon.png',
+  acc_monoculo: '/assets/mascot/accessories/acc_ojos_monoculo.png',
+  acc_gafas3d: '/assets/mascot/accessories/acc_ojos_gafas_3d.png',
+  acc_cyberpunk: '/assets/mascot/accessories/acc_ojos_visor_cyberpunk.png',
+  acc_buceo: '/assets/mascot/accessories/acc_ojos_careta_buceo.png',
 };
 /* accessoryIds: un arreglo (0 a 4 ids, uno por cada "parte del cuerpo" - cabeza/cara/cuerpo/
    manos) para poder llevar puesto un gorro Y gafas Y cadena Y algo en la mano, todo a la vez -
@@ -157,7 +157,7 @@ function animateColmBalance(target){
   }
   window._colmBalanceRaf = requestAnimationFrame(tick);
 }
-/* "nivel de heroe" ahora lo calcula getHeroProgress() (assets/js/hero-progress.js), una
+/* "nivel de heroe" ahora lo calcula getHeroProgress() (/assets/js/hero-progress.js), una
    funcion PURA y testeada (scripts/tests/hero_progress.test.mjs) que no toca el DOM ni las
    variables globales de este archivo - aqui solo se le arma el catalogo+lo poseido/equipado
    y se usa el resultado para pintar tanto el HUD chiquito del escenario como la Ficha de
@@ -338,7 +338,7 @@ window.addEventListener('resize', () => {
 /* particulas decorativas flotando alrededor del heroe (moneditas/destellos SkillCash, no
    colores chillones) - puramente ambientacion, se regeneran cada vez que se entra a la
    pagina para que no se vean siempre en la misma posicion */
-/* particulas decorativas: 1 de cada 3 es la moneda SkillCash original (assets/mascot/coin_tooth.png,
+/* particulas decorativas: 1 de cada 3 es la moneda SkillCash original (/assets/mascot/coin_tooth.png,
    la del tiburoncito doradita - NO la moneda roja del pack nuevo, esa nunca se pidio), el
    resto son destellos rojo/blanco */
 function renderColmHeroParticles(){
@@ -742,7 +742,7 @@ async function answerDailyTrivia(chosenIndex, correctIndex, optsEl){
 // icono de la moneda real (el lado "tiburon" de las dos caras del Sharkoin, ver linea ~27571)
 // para los precios de la tienda - antes se usaba el emoji generico 🦷, que se confundia con
 // un diente de verdad en vez de la moneda que inventamos
-const COLM_COIN_ICON_HTML = '<img src="assets/mascot/coin_tooth.png" alt="Sharkoins" style="width:14px;height:14px;vertical-align:-2px;image-rendering:pixelated;image-rendering:crisp-edges">';
+const COLM_COIN_ICON_HTML = '<img src="/assets/mascot/coin_tooth.png" alt="Sharkoins" style="width:14px;height:14px;vertical-align:-2px;image-rendering:pixelated;image-rendering:crisp-edges">';
 const COLM_SHOP_ICONS = { skin_gold: '🦈', skin_red: '🦈', skin_abyss: '🦈', skin_emerald: '🦈', skin_cyan: '🦈', skin_pink: '🦈', skin_orange: '🦈', skin_ice: '🦈', skin_lime: '🦈', skin_violet: '🦈', skin_camo: '🦈', skin_tiger: '🦈', skin_galaxy: '🦈', skin_arcoiris: '🦈', skin_oroliquido: '🦈', skin_neon: '🦈', skin_dragon: '🦈', skin_martillo: '🦈', skin_rayosx: '🦈', acc_cap: '🧢', acc_shades: '🕶️', acc_chain: '📿', acc_scuba: '🤿', acc_scarf: '🧣', acc_headphones: '🎧', acc_crown: '👑', acc_cape: '🏴‍☠️', acc_sombrero: '🪄', acc_antifaz: '🦸', acc_aletarobot: '🤖', acc_collar: '🌺', acc_paraguas: '☂️', acc_guantes: '🥊', acc_microfono: '🎤', acc_bate: '⚾', acc_escudo: '🛡️', acc_espada: '⚔️', acc_mazo: '🔨', acc_raqueta: '🎾', acc_varita: '🪄', acc_aletasbuceo: '🤿', acc_botasnieve: '🥾', acc_botaspirata: '👢', acc_patines: '⛸️', acc_sandalias: '🩴', acc_tenis: '👟', bg_reef: '🪸', bg_abyss: '🌑', bg_surface: '☀️', bg_sunken_city: '🏛️', bg_volcano: '🌋', bg_night: '🌙', bg_nave: '🛸', bg_tormenta: '⛈️', bg_playa: '🏖️', bg_laboratorio: '🧪', bg_atardecer: '🌅', bg_selva: '🌴', bg_cueva: '💎', bg_neon: '🌃', bg_pradera: '🌼', bg_nieve: '❄️', bg_desierto: '🏜️', raffle_ticket: '🎟️' };
 const COLM_EQUIP_FIELD = { skin: 'skin_id', background: 'background_id' };
 const COLM_GRID_EL = { skin: 'colmillosShopSkins', accessory: 'colmillosShopAccessories', background: 'colmillosShopBackgrounds', raffle: 'colmillosShopRaffle' };
@@ -1706,7 +1706,7 @@ colmillosBigCoin.addEventListener('click', (e) => {
   const coinImg = coin.querySelector('img');
   if(coinImg){
     setTimeout(() => {
-      coinImg.src = 'assets/mascot/' + (Math.random() < 0.5 ? 'coin_tooth.png' : 'coin_charcoins.png');
+      coinImg.src = '/assets/mascot/' + (Math.random() < 0.5 ? 'coin_tooth.png' : 'coin_charcoins.png');
     }, 350);
   }
   bumpGlobalTaps();

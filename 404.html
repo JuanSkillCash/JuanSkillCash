@@ -14,7 +14,12 @@
      de que ese codigo alcance a correr, y fallan. Por eso esto va aca, literal lo primero en
      head, antes de cualquier otra etiqueta que cargue un recurso - guarda la ruta real para que
      applyInitialRoute la siga usando, y corrige la URL del documento de una vez para que TODO
-     lo que se cargue despues (sin excepcion) resuelva bien sus rutas relativas -->
+     lo que se cargue despues (sin excepcion) resuelva bien sus rutas relativas.
+     OJO: eso solo cubre la carga inicial - despues pushRoute/replaceRoute vuelven a poner rutas
+     anidadas (ej. /herramientas/x/sharkoins) y todo <img> que el JS cree DESPUES de eso (la
+     tienda de Sharkoins, el monito, etc.) resolvia "assets/..." contra esa ruta y salia roto.
+     Por eso ahora todas las referencias a assets van con "/" adelante ("/assets/..."), que
+     no dependen de la URL actual -->
 <script>(function(){ window.__initialRoutePath = location.pathname; if(location.pathname !== '/'){ try{ history.replaceState(history.state, '', '/' + location.search + location.hash); }catch(e){} } })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP de defensa en profundidad: aunque el HTML se vea entero (es un sitio estatico), esto
@@ -469,14 +474,14 @@ button{font-family:inherit;color:inherit}
 .colm-hero-particles-near{z-index:9}
 .colm-hero-particle{position:absolute;opacity:0;animation:colmHeroParticleFloat linear infinite}
 .colm-hero-particle.near{filter:blur(1px)}
-.colm-hero-particle-coin{width:12px;height:12px;background-image:url('assets/mascot/coin_tooth.png');background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated;animation:colmHeroParticleFloat linear infinite}
+.colm-hero-particle-coin{width:12px;height:12px;background-image:url('/assets/mascot/coin_tooth.png');background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated;animation:colmHeroParticleFloat linear infinite}
 @keyframes colmHeroParticleFloat{0%{opacity:0;transform:translateY(0) translateX(0)}10%{opacity:.8}85%{opacity:.6}100%{opacity:0;transform:translateY(-30px) translateX(var(--drift,6px))}}
 @media(prefers-reduced-motion:reduce){.colm-hero-particle{display:none}}
 /* z11: HUD superior (chip de monedas izq + TIME der), superpuesto, no afecta el alto */
 .colm-hero-hud{position:absolute;top:0;left:0;right:0;z-index:11;display:flex;align-items:flex-start;justify-content:space-between;padding:3%;pointer-events:none}
 .colm-hero-hud>*{pointer-events:auto}
 .colm-hero-coinchip,.colm-hero-timer-box{display:flex;align-items:center;gap:8px;background:rgba(10,14,39,.8);border:1px solid var(--hero-line);border-radius:20px;padding:7px 16px;font-family:'Press Start 2P',cursive;font-size:clamp(12px,1.2vw,16px);color:var(--hero-text)}
-.colm-hero-coinchip-dot{width:16px;height:16px;flex-shrink:0;background-image:url('assets/mascot/coin_tooth.png');background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated}
+.colm-hero-coinchip-dot{width:16px;height:16px;flex-shrink:0;background-image:url('/assets/mascot/coin_tooth.png');background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated}
 .colm-hero-timer-box{flex-direction:column;align-items:center;border-radius:10px;gap:2px}
 .colm-hero-timer-label{font-size:.6em;color:var(--hero-text-2);letter-spacing:.05em}
 .colm-hero-timer-digits{font-size:1.5em;color:var(--hero-red);line-height:1.1;font-variant-numeric:tabular-nums}
@@ -2927,7 +2932,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
       </button>
 
       <button class="exchange-pill colmillos-pill" id="colmillosWalletBtn" type="button" title="Sharkoins — se ganan usando la plataforma" style="display:none">
-        <img src="assets/mascot/coin_tooth.png" alt="" width="22" height="22" style="image-rendering:pixelated;image-rendering:crisp-edges;margin:-2px 0">
+        <img src="/assets/mascot/coin_tooth.png" alt="" width="22" height="22" style="image-rendering:pixelated;image-rendering:crisp-edges;margin:-2px 0">
         <span id="colmillosWalletBalance">0</span>
       </button>
 
@@ -6407,8 +6412,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-hero-main">
               <div class="colm-hero-floor-shadow" id="colmillosFloorShadow"></div>
               <div class="colm-hero-pedestal-group" id="colmillosPedestalGroup">
-                <img class="colm-hero-pedestal-img" src="assets/hero/pedestal.png" alt="" aria-hidden="true">
-                <img class="colm-hero-pedestal-img colm-hero-pedestal-glow" src="assets/hero/pedestal-glow.png" alt="" aria-hidden="true">
+                <img class="colm-hero-pedestal-img" src="/assets/hero/pedestal.png" alt="" aria-hidden="true">
+                <img class="colm-hero-pedestal-img colm-hero-pedestal-glow" src="/assets/hero/pedestal-glow.png" alt="" aria-hidden="true">
               </div>
               <div class="colm-hero-contact-shadow" id="colmillosContactShadow"></div>
               <div class="colm-hero-char" id="colmillosHeroShark"></div>
@@ -6512,8 +6517,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-help-panel active" data-helppanel="general">
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/coin_tooth.png" alt="">
-                  <img src="assets/mascot/variants/shark_skin_cyan.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="">
+                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">¿Qué es Sharkoins?</p>
@@ -6574,21 +6579,21 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-rarity-ladder">
                 <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#9d9d9d"></div><b>Común</b><span>el punto de partida</span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#3b82f6"></div><b>Raro</b><span>75 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#3b82f6"></div><b>Raro</b><span>75 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#a335ee"></div><b>Épico</b><span>150 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#a335ee"></div><b>Épico</b><span>150 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#f0a020"></div><b>Legendario</b><span>275 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#f0a020"></div><b>Legendario</b><span>275 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>450 <img src="assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>450 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
               </div>
 
               <p class="auth-note" style="margin:0 auto 16px">🧬 <b>Nivel de Héroe:</b> tu ficha en Inicio muestra un Nivel (0 a 100) y hasta 5 estrellas — mide qué tanto del catálogo completo llevas comprado y evolucionado. Cada fondo que tenés vale 1 punto; cada skin o accesorio vale según su rareza actual (Común = 1 punto, hasta Mítico = 5). Subir los primeros niveles es rápido, pero llegar a 100 significa tener TODO el catálogo al máximo — es la meta de coleccionista completo, no algo para lograr en unas semanas.</p>
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/variants/shark_skin_oroliquido.png" alt="">
-                  <img src="assets/mascot/accessories/acc_crown.png" alt="">
+                  <img src="/assets/mascot/variants/shark_skin_oroliquido.png" alt="">
+                  <img src="/assets/mascot/accessories/acc_crown.png" alt="">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🎨 Cada skin y cada accesorio, su propia familia</p>
@@ -6598,7 +6603,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="" style="width:76px;height:76px">
+                  <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="" style="width:76px;height:76px">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🌊 Los fondos y los boletos de sorteo, aparte</p>
@@ -6608,8 +6613,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card" style="border-color:var(--gold)">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/coin_tooth.png" alt="">
-                  <img src="assets/mascot/coin_charcoins.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="">
+                  <img src="/assets/mascot/coin_charcoins.png" alt="">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">✨ 100% para presumir</p>
@@ -6623,9 +6628,9 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/variants/shark_skin_cyan.png" alt="" class="small">
-                  <img src="assets/mascot/variants/shark_skin_galaxy.png" alt="" class="small">
-                  <img src="assets/mascot/variants/shark_skin_dragon.png" alt="" class="small">
+                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="" class="small">
+                  <img src="/assets/mascot/variants/shark_skin_galaxy.png" alt="" class="small">
+                  <img src="/assets/mascot/variants/shark_skin_dragon.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🧬 Instinto — el color</p>
@@ -6642,8 +6647,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/accessories/acc_sombrero.png" alt="" class="small">
-                  <img src="assets/mascot/accessories/acc_crown.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_sombrero.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_crown.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🧠 Astucia — la cabeza</p>
@@ -6660,8 +6665,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/accessories/acc_shades.png" alt="" class="small">
-                  <img src="assets/mascot/accessories/acc_ojos_ojos_laser.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_shades.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_ojos_ojos_laser.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">👁️ Visión — la cara</p>
@@ -6678,8 +6683,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/accessories/acc_chain.png" alt="" class="small">
-                  <img src="assets/mascot/accessories/acc_cape.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_chain.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_cape.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🛡️ Resistencia — el cuerpo</p>
@@ -6696,8 +6701,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/accessories/acc_guantes.png" alt="" class="small">
-                  <img src="assets/mascot/accessories/acc_espada.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_guantes.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_espada.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">💪 Fuerza — las manos</p>
@@ -6714,8 +6719,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/accessories/acc_patines.png" alt="" class="small">
-                  <img src="assets/mascot/accessories/acc_aletasbuceo.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_patines.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_aletasbuceo.png" alt="" class="small">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">⚡ Velocidad — los pies</p>
@@ -6734,10 +6739,10 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-help-panel" data-helppanel="fondos">
               <p class="auth-note" style="margin:0 auto 14px">Los fondos no tienen rareza ni evolución — son de precio único. Hay normales (temática de mar/fantasía) y 6 especiales de cripto, que son el escalón más caro de toda la tienda.</p>
               <div class="colm-help-bg-grid">
-                <img src="assets/mascot/backgrounds/bg_reef.png" alt="Arrecife" title="Arrecife (normal)">
-                <img src="assets/mascot/backgrounds/bg_night.png" alt="Noche Estrellada" title="Noche Estrellada (normal)">
-                <img src="assets/mascot/backgrounds/bg_neon.png" alt="Ciudad Neón" title="Ciudad Neón (normal, premium)">
-                <img src="assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="Bóveda Minera Bitcoin" title="Bóveda Minera · Bitcoin (especial)">
+                <img src="/assets/mascot/backgrounds/bg_reef.png" alt="Arrecife" title="Arrecife (normal)">
+                <img src="/assets/mascot/backgrounds/bg_night.png" alt="Noche Estrellada" title="Noche Estrellada (normal)">
+                <img src="/assets/mascot/backgrounds/bg_neon.png" alt="Ciudad Neón" title="Ciudad Neón (normal, premium)">
+                <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="Bóveda Minera Bitcoin" title="Bóveda Minera · Bitcoin (especial)">
               </div>
               <p class="auth-note" style="margin:14px auto 0;border-color:var(--gold)">✨ Los fondos cripto (Bitcoin, Ethereum, Solana, Monero, Dogecoin, Pepe) cuestan entre 350 y 500 Sharkoins — el ítem más caro de toda la tienda es el de Bitcoin.</p>
             </div>
@@ -6792,7 +6797,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
             <div class="colm-wallet-page">
               <div class="colm-section-label" style="text-align:center">🦈 Tu Billetera Sharkoin</div>
               <div class="colm-coin colm-coin-big" id="colmillosBigCoin">
-                <img src="assets/mascot/coin_tooth.png" alt="" style="height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
+                <img src="/assets/mascot/coin_tooth.png" alt="" style="height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
@@ -6818,8 +6823,8 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               <div class="colm-section-label">📖 De dónde salieron los Sharkoins</div>
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/coin_tooth.png" alt="">
-                  <img src="assets/mascot/coin_charcoins.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="">
+                  <img src="/assets/mascot/coin_charcoins.png" alt="">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 1 — El arrecife que brillaba distinto</p>
@@ -6828,7 +6833,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/backgrounds/bg_reef.png" alt="" style="width:76px;height:76px">
+                  <img src="/assets/mascot/backgrounds/bg_reef.png" alt="" style="width:76px;height:76px">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 2 — Nace la Manada</p>
@@ -6837,7 +6842,7 @@ body, body *{ font-family:'Space Grotesk', sans-serif !important; }
               </div>
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="assets/mascot/variants/shark_skin_gold.png" alt="">
+                  <img src="/assets/mascot/variants/shark_skin_gold.png" alt="">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 3 — Hoy</p>
@@ -27105,8 +27110,8 @@ async function awardColmillos(eventType, periodKey, amount){
      algunos navegadores/CDN siguen sirviendo la version vieja del archivo (mismo nombre de
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
-<script src="assets/js/hero-progress.js?v=1" defer></script>
-<script src="assets/js/colmillos.js?v=15" defer></script>
+<script src="/assets/js/hero-progress.js?v=1" defer></script>
+<script src="/assets/js/colmillos.js?v=15" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
