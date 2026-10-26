@@ -147,3 +147,33 @@ trade.
   posibilidad de maquillar resultados.
 - Bitácora con calendario P&L (más adelante, es grande).
 - Salas de audio en vivo: muy costoso; Telegram ya cubre eso por ahora.
+
+---
+
+## 7. Bitácora de trading (decidido: va en Rango de Manada, se desbloquea por volumen)
+
+Juan decidió (oct 2026) que la bitácora es una de las herramientas que se desbloquean con
+volumen en Bitunix, no algo abierto para todos. Plan acordado:
+
+- **Fase 1 – Registro manual:** el usuario anota cada operación (par, long/short, entrada,
+  salida, apalancamiento, margen, resultado) y la bitácora arma el dashboard: P&L del mes,
+  winrate, profit factor, max drawdown, curva de capital, calendario verde/rojo/BE por día,
+  resultado por moneda, mejor/peor trade.
+  Arriba, como resumen automático: volumen, P&L y número de operaciones del mes que YA da
+  la Partner API de Bitunix (`scripts/bitunix_api.py`: transAmountList y
+  queryPnlAndTradeCnt) – sin que el usuario haga nada.
+- **Fase 2 – Importar historial:** subir el archivo de historial que se descarga de Bitunix
+  y llenar la bitácora sola (sin guardar claves de nadie).
+- **Fase 3 – API de solo lectura (solo si la piden):** cada usuario pega una API key de
+  lectura; requiere guardarla cifrada del lado del servidor.
+
+Ojo: la Partner API solo da totales por referido (volumen, P&L, cantidad de trades), NO el
+detalle operación por operación – por eso el winrate, la curva y el calendario necesitan la
+fase 1 o 2.
+
+Extras: logros de bitácora que den Sharkoins ("Primer disparo", "Racha dorada",
+"Semana de hierro"), y usar la tarjeta para compartir (ya existe para el tiburón) para
+mostrar un trade ganado o el resultado del mes.
+
+Pendiente de decidir al construirla: registrar en dólares (margen/resultado, con capital
+inicial del mes, como MLP) o en porcentaje, y desde qué volumen se desbloquea.
