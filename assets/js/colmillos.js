@@ -623,7 +623,7 @@ async function refreshColmillosPageContent(){
   if(nameEl) nameEl.textContent = (meta.username || currentUser.email || 'JUGADOR').toUpperCase();
   const ageEl = document.getElementById('colmillosSharkAge');
   if(ageEl) ageEl.textContent = formatSharkAge(currentUser.created_at);
-  const { data, error } = await sbClient.from('user_colmillos_events').select('event_type,amount,period_key');
+  const { data, error } = await fetchAllColmLedger('event_type,amount,period_key');
   if(error){ console.warn('no se pudo leer colmillos para la pagina', error); return; }
   const rows = data || [];
   const total = rows.reduce((sum, r) => sum + r.amount, 0);
@@ -810,7 +810,7 @@ async function loadColmillosShop(){
     if(itemsErr){ console.warn('no se pudo leer la tienda de colmillos', itemsErr); showColmShopLoadError(); return; }
     colmillosShopItemsCache = items || [];
   }
-  const { data: ledgerRows, error: ledgerErr } = await colmFetchWithRetry(() => sbClient.from('user_colmillos_events').select('event_type,amount,period_key'));
+  const { data: ledgerRows, error: ledgerErr } = await colmFetchWithRetry(() => fetchAllColmLedger('event_type,amount,period_key'));
   if(ledgerErr){ console.warn('no se pudo leer el saldo para la tienda', ledgerErr); showColmShopLoadError(); return; }
   const rows = ledgerRows || [];
   colmillosOwnedItemIds = new Set(
@@ -1033,7 +1033,7 @@ function renderColmillosShopGrids(balance){
 }
 async function buyColmillosItem(item){
   if(!currentUser) return;
-  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const { data: rows } = await fetchAllColmLedger('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
   if(balance < item.price){ loadColmillosShop(); return; }
   const isRaffle = item.category === 'raffle';
@@ -1063,7 +1063,7 @@ async function evolveColmillosItem(item, currentTier){
   const nextTier = currentTier + 1;
   const cost = COLM_EVOLVE_COST[nextTier];
   if(!cost) return;
-  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const { data: rows } = await fetchAllColmLedger('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
   if(balance < cost){ loadColmillosShop(); return; }
   const { error } = await sbClient.from('user_colmillos_events').insert({
@@ -1399,7 +1399,7 @@ async function spinColmRoulette(){
     return;
   }
   const bet = rawBet;
-  const { data: rows } = await sbClient.from('user_colmillos_events').select('amount');
+  const { data: rows } = await fetchAllColmLedger('amount');
   const balance = (rows || []).reduce((sum, r) => sum + r.amount, 0);
   if(balance < bet){ resultEl.textContent = 'No tenés suficientes Sharkoins para esa apuesta.'; return; }
   colmRouletteSpinning = true;

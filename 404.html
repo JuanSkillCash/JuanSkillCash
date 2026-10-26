@@ -26871,9 +26871,26 @@ function logToolUsage(category){
   });
 }
 
+/* Supabase (PostgREST) devuelve como MAXIMO 1000 filas por pedido, aunque no se le ponga
+   limite - y el ledger de Sharkoins tiene una fila por cada premio, compra, apuesta, etc. Una
+   cuenta activa pasa las 1000 filas rapido, y desde ahi el saldo salia mal y la tienda
+   "olvidaba" compras (aparecia todo sin comprar y los botones de comprar bloqueados). Por eso
+   todo lo que necesita el ledger COMPLETO lo lee con esto, de a paginas de 1000. */
+async function fetchAllColmLedger(columns){
+  const PAGE = 1000;
+  let all = [];
+  for(let from = 0; ; from += PAGE){
+    const { data, error } = await sbClient.from('user_colmillos_events').select(columns)
+      .eq('user_id', currentUser.id).order('id').range(from, from + PAGE - 1);
+    if(error) return { data: null, error };
+    all = all.concat(data || []);
+    if(!data || data.length < PAGE) return { data: all, error: null };
+  }
+}
+
 async function loadColmillosBalance(bump){
   if(!currentUser){ colmillosWalletBtn.style.display = 'none'; return; }
-  const { data, error } = await sbClient.from('user_colmillos_events').select('amount').eq('user_id', currentUser.id);
+  const { data, error } = await fetchAllColmLedger('amount');
   if(error){ console.warn('no se pudo leer el saldo de colmillos', error); return; }
   const total = (data || []).reduce((sum, row) => sum + row.amount, 0);
   colmillosWalletBalance.textContent = total.toLocaleString('es-CO');
