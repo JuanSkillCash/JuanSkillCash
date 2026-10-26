@@ -1,6 +1,6 @@
-/* Bitacora de trading - herramienta de Rango de Manada (por ahora solo la ve el dueño: la
-   tarjeta "Bitácora" esta en WIP_OWNER_ONLY_CATEGORIES y showCategoryDetail('bitacora') llama
-   a openJournalPage()).
+/* Bitacora de trading - herramienta de Rango de Manada (se abre desde su tarjeta dentro de esa
+   seccion o desde el menu; mientras Rango de Manada este en WIP_OWNER_ONLY_CATEGORIES, solo el
+   dueño la puede abrir).
 
    Datos (scripts/sql/create_trade_journal.sql): trade_journal_trades (cada operacion, manual o
    sincronizada desde Bitunix), trade_journal_settings / trade_journal_capital (capital inicial)
@@ -879,8 +879,24 @@ window.closeJournalPage = function(){
   document.querySelectorAll('.jr-modal').forEach(m => m.remove());
   return true;
 };
+/* la Bitacora es una herramienta de Rango de Manada: se abre desde su tarjeta dentro de esa
+   seccion y desde el menu lateral. Mientras Rango de Manada este en construccion
+   (WIP_OWNER_ONLY_CATEGORIES), solo el dueño la puede abrir */
+document.querySelectorAll('[data-open-journal]').forEach(btn => btn.addEventListener('click', () => {
+  if(typeof isWipLockedForCurrentUser === 'function' && isWipLockedForCurrentUser('rangos')){
+    if(typeof showWipToast === 'function') showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
+    return;
+  }
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
+  window.openJournalPage();
+}));
 const backBtn = $('journalBackBtn');
-if(backBtn) backBtn.addEventListener('click', () => { window.closeJournalPage(); if(typeof showCategoryOverview === 'function') showCategoryOverview(); });
+if(backBtn) backBtn.addEventListener('click', () => {
+  window.closeJournalPage();
+  if(typeof showCategoryDetail === 'function') showCategoryDetail('rangos');
+  else if(typeof showCategoryOverview === 'function') showCategoryOverview();
+});
 // si se cierra sesion con la bitacora abierta, se vuelve al inicio
 sbClient.auth.onAuthStateChange((event, session) => {
   if(!session && view() && view().style.display === 'block'){ window.closeJournalPage(); if(typeof showCategoryOverview === 'function') showCategoryOverview(); }

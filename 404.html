@@ -808,6 +808,10 @@ button{font-family:inherit;color:inherit}
 .locked-tool-icon{font-size:22px}
 .locked-tool-card h3{font-size:13px;color:var(--muted2);font-weight:700;margin:0}
 .locked-tool-card p{font-size:11.5px;color:var(--muted);margin:0}
+.rank-tool-ready{opacity:1;cursor:pointer;color:inherit;font-family:inherit}
+.rank-tool-ready h3{color:var(--white)}
+.rank-tool-ready:hover{border-color:rgba(255,255,255,.3)}
+.rank-tool-open{font-size:12px;font-weight:700;color:var(--accent);margin-top:2px}
 
 /* NOTIFICACIONES (campanita) */
 .notif-mini-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
@@ -2842,10 +2846,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <button class="sb-item" data-sb-open-card="rangos">
         <span class="sb-item-icon">🏆</span><span class="sb-item-label">Ver mi rango</span>
       </button>
-
-      <div class="sb-cat-label" data-category="bitacora">Bitácora</div>
-      <button class="sb-item" data-sb-open-card="bitacora">
-        <span class="sb-item-icon">📒</span><span class="sb-item-label">Mi bitácora</span>
+      <button class="sb-item" data-open-journal>
+        <span class="sb-item-icon">📒</span><span class="sb-item-label">Bitácora de trading</span>
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Mi Arrecife</div>
@@ -3645,29 +3647,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       </div>
 
-      <div class="cat-flip-outer">
-      <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="bitacora" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
-        <div class="cat-overview-head">
-          <div class="cat-overview-num">8</div>
-          <div class="cat-overview-title">📒 Bitácora</div>
-          <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
-        </div>
-        <div class="cat-overview-sub">TU DIARIO DE TRADING</div>
-        <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <polyline points="20,60 55,52 85,56 115,40 145,44 175,30 205,34 235,20 280,14" fill="none" stroke="#5b8def" stroke-width="2.2" stroke-linejoin="round"/>
-            <g fill="#4ade80" opacity=".85"><rect x="34" y="66" width="10" height="6" rx="1"/><rect x="94" y="62" width="10" height="10" rx="1"/><rect x="154" y="60" width="10" height="12" rx="1"/><rect x="214" y="58" width="10" height="14" rx="1"/></g>
-            <g fill="#f87171" opacity=".85"><rect x="64" y="66" width="10" height="6" rx="1"/><rect x="124" y="64" width="10" height="8" rx="1"/><rect x="184" y="66" width="10" height="6" rx="1"/></g>
-          </svg>
-        </div>
-        <div class="cat-overview-desc">Registra tus operaciones a mano o conéctalas solas desde Bitunix, y mira tu P&amp;L, winrate, drawdown, calendario y estadísticas en un solo lugar.</div>
-        <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
-      </button>
-      <div class="cat-flip-back" data-category="bitacora" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Bitácora</div><div class="cat-flip-back-eyebrow">QUÉ TRAE</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Registro manual o automático con Bitunix</li><li><span class="cat-flip-back-check">✓</span>Curva de capital y drawdown</li><li><span class="cat-flip-back-check">✓</span>Calendario de P&amp;L</li><li><span class="cat-flip-back-check">✓</span>Winrate, profit factor y rachas</li><li><span class="cat-flip-back-check">✓</span>Análisis por par, hora y setup</li></ul><div class="cat-flip-back-cta">Explorar →</div></div>
-      </div>
-      </div>
 
     </div>
     </div>
@@ -6566,7 +6545,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="locked-tools-counter">0 / 7 desbloqueadas</div>
       </div>
       <div class="tool-grid">
-        <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #1</h3><p>Se revela al definir los rangos.</p></div>
+        <button type="button" class="locked-tool-card rank-tool-ready" data-open-journal><div class="locked-tool-icon">📒</div><h3>Bitácora de trading</h3><p>Registra tus operaciones o conéctalas solas desde Bitunix, y mira tu P&amp;L, winrate, drawdown y calendario.</p><span class="rank-tool-open">Abrir →</span></button>
         <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #2</h3><p>Se revela al definir los rangos.</p></div>
         <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #3</h3><p>Se revela al definir los rangos.</p></div>
         <div class="locked-tool-card"><div class="locked-tool-icon">🔒</div><h3>Herramienta #4</h3><p>Se revela al definir los rangos.</p></div>
@@ -9952,7 +9931,7 @@ function renderCatPillTabs(cat){
 // (OWNER_USER_ID) puede entrar, sin importar si alguien ya cumple el rango/volumen: el candado
 // es por estado de construccion, no por permiso ganado. Se revisa aca mismo (no solo al hacer
 // clic en la cajita) para que tambien bloquee un link directo a la ruta.
-const WIP_OWNER_ONLY_CATEGORIES = ['rangos', 'bitacora'];
+const WIP_OWNER_ONLY_CATEGORIES = ['rangos'];
 function isWipLockedForCurrentUser(cat){
   return WIP_OWNER_ONLY_CATEGORIES.includes(cat) && (!currentUser || currentUser.id !== 'e4309251-6078-4233-aab3-6ab8d6c624e1');
 }
@@ -9981,11 +9960,6 @@ function updateWipLockVisuals(){
 function showCategoryDetail(cat){
   if(isWipLockedForCurrentUser(cat)){
     showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
-    return;
-  }
-  // la Bitacora no es una categoria con herramientas sino su propia pantalla (assets/js/journal.js)
-  if(cat === 'bitacora'){
-    if(typeof openJournalPage === 'function') openJournalPage();
     return;
   }
   if(typeof closeJournalPage === 'function') closeJournalPage();
@@ -27499,7 +27473,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
 <script src="/assets/js/icons.js?v=5" defer></script>
 <script src="/assets/js/community.js?v=2" defer></script>
-<script src="/assets/js/journal.js?v=1" defer></script>
+<script src="/assets/js/journal.js?v=2" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
