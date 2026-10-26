@@ -6,9 +6,6 @@
 if(typeof sbClient === 'undefined') return;
 
 const OWNER_ID = 'e4309251-6078-4233-aab3-6ab8d6c624e1';
-// numeros que no salen de la base de datos - se editan a mano aca cuando cambien.
-// tiktok: null = no se muestra hasta que Juan pase la cifra real
-const MANUAL_STATS = { tiktok: null };
 
 const $ = id => document.getElementById(id);
 const fmt = n => Number(n).toLocaleString('es-CO');
@@ -61,20 +58,18 @@ if(adminLiveBtn){
 loadLiveStatus();
 setInterval(loadLiveStatus, 120000);
 
-/* ================= Creado por Juan SkillCash ================= */
+/* ================= Creado por Juan SkillCash =================
+   TikTok (10.000+), lineas de codigo (43.000+, sin contar 404.html que es copia del inicio ni
+   librerias de terceros) y Telegram (200+) estan escritos a mano en index.html - actualizarlos
+   ahi cuando cambien. Herramientas e indicadores se cuentan solos */
 async function loadAboutStats(){
   const toolsEl = $('aboutStatTools');
   if(toolsEl && typeof TOOL_LABELS === 'object') toolsEl.textContent = Object.keys(TOOL_LABELS).length;
   const indicEl = $('aboutStatIndic');
   const badge = $('indicCountBadge');
   if(indicEl && badge) indicEl.textContent = (badge.textContent.match(/\d+/) || ['—'])[0];
-  if(MANUAL_STATS.tiktok){
-    $('aboutStatTiktok').textContent = MANUAL_STATS.tiktok;
-    $('aboutStatTiktokBox').style.display = '';
-  }
   const { data, error } = await sbClient.rpc('get_public_stats');
   if(error || !data) return;
-  if($('aboutStatUsers')) $('aboutStatUsers').textContent = fmt(data.users);
   renderReviewsSummary(data);
 }
 
