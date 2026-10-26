@@ -2359,6 +2359,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 /* cajas sin relleno: solo el contorno (pedido de Juan - el relleno grisaceo no le gusta) */
 .cat-overview-card, .cat-flip-back{ background:transparent !important; border-color:var(--border2) !important; }
 .cat-overview-card:hover{ border-color:rgba(255,255,255,.22) !important; }
+/* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
+   gris como el borde en vez de roja */
+.cat-flip-back, .cat-flip-back::before, .cat-flip-back::after,
+.cat-overview-card::before, .cat-overview-card::after, .cat-overview-preview::before, .cat-overview-preview::after
+{ background-image:none !important; }
+.cat-overview-card [fill="url(#tradeDangerGrad)"], .cat-overview-card [fill="url(#shieldGlow)"]{ fill:transparent !important; }
+.cat-overview-card [fill="url(#tradeCandleGrad)"]{ fill:var(--c) !important; }
+.cat-overview-card [stroke="url(#tradeCandleGrad)"]{ stroke:var(--c) !important; }
+.bite-mark path:last-child{ stroke:rgba(255,255,255,.16) !important; stroke-opacity:1 !important; }
 .cat-overview-preview{ background:transparent !important; border:1px solid var(--border); }
 /* iconos de linea (assets/js/icons.js) */
 .lc-ic{ display:inline-flex; width:1.05em; height:1.05em; vertical-align:-0.16em; flex-shrink:0; }
