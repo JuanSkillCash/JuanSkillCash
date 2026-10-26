@@ -19,5 +19,5 @@ insert into colmillos_shop_items (id, category, name, price) values
     ('bg_cripto_solana', 'background', 'Pista Veloz (Solana)', 85),
     ('bg_cripto_monero', 'background', 'Callejón Privado (Monero)', 80),
     ('bg_cripto_pepe', 'background', 'Estanque de Ranas (Pepe)', 75),
-    ('bg_cripto_dogecoin', 'background', 'Shiba a la Luna (Dogecoin)', 75)
+    ('bg_cripto_dogecoin', 'background', 'Doge a la Luna (Dogecoin)', 75)
 on conflict do nothing;
