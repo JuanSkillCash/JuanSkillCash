@@ -26877,14 +26877,18 @@ function logToolUsage(category){
    "olvidaba" compras (aparecia todo sin comprar y los botones de comprar bloqueados). Por eso
    todo lo que necesita el ledger COMPLETO lo lee con esto, de a paginas de 1000. */
 async function fetchAllColmLedger(columns){
+  // se sigue pidiendo hasta que llegue una pagina VACIA (no "una pagina con menos de 1000"):
+  // si el tope del servidor fuera menor a 1000, cortar en la primera pagina corta dejaria
+  // afuera un pedazo del ledger y el saldo saldria mal otra vez
   const PAGE = 1000;
   let all = [];
-  for(let from = 0; ; from += PAGE){
+  for(let from = 0; ; ){
     const { data, error } = await sbClient.from('user_colmillos_events').select(columns)
       .eq('user_id', currentUser.id).order('id').range(from, from + PAGE - 1);
     if(error) return { data: null, error };
-    all = all.concat(data || []);
-    if(!data || data.length < PAGE) return { data: all, error: null };
+    if(!data || !data.length) return { data: all, error: null };
+    all = all.concat(data);
+    from += data.length;
   }
 }
 
