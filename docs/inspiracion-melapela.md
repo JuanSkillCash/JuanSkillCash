@@ -152,6 +152,11 @@ trade.
 
 ## 7. Bitácora de trading (decidido: va en Rango de Manada, se desbloquea por volumen)
 
+> **Construida (oct 2026)** con registro manual + conexión automática por API de solo lectura:
+> `assets/js/journal.js`, `scripts/sql/create_trade_journal.sql`,
+> `supabase/functions/trade-journal-sync/index.ts`. Por ahora solo la ve el dueño
+> (`WIP_OWNER_ONLY_CATEGORIES`). Falta decidir desde qué volumen se desbloquea.
+
 Juan decidió (oct 2026) que la bitácora es una de las herramientas que se desbloquean con
 volumen en Bitunix, no algo abierto para todos. Plan acordado:
 

@@ -1663,6 +1663,7 @@ function showColmillosPage(initialSlug){
   // 'inicio' igual, sin falta un chequeo de tipo aparte
   const tab = COLM_SLUG_TO_TAB[initialSlug] || 'inicio';
   closeAnyOpenToolInline();
+  if(typeof closeJournalPage === 'function') closeJournalPage();
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'none';
   document.getElementById('marketDashboardBlock').style.display = 'none';

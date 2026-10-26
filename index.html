@@ -2457,6 +2457,137 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .share-card-actions .primary{background:var(--white);color:#090b16;border-color:var(--white)}
 .share-card-note{color:var(--muted);font-size:12px;margin-top:10px}
 
+#topbarInicio{display:none !important}
+/* ===================== Bitacora de trading ===================== */
+#journalPageView{padding-bottom:40px}
+.jr-loading,.jr-empty{color:var(--muted);font-size:14px;padding:18px;text-align:center}
+.jr-empty{border:1px dashed var(--border2);border-radius:12px}
+.jr-big{padding:36px 18px;font-size:15px;color:var(--muted2);margin-top:12px}
+.jr-muted{color:var(--muted)}.jr-xs{font-size:12px}
+.jr-pos{color:#4ade80 !important}.jr-neg{color:#f87171 !important}.jr-be{color:var(--muted2)}
+.jr-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:18px 0 14px}
+.jr-title{font-size:28px;font-weight:700;margin:0}
+.jr-sync-line{color:var(--muted);font-size:13px;margin-top:4px;display:flex;align-items:center;gap:6px}
+.jr-sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.jr-sync-dot.on{background:#4ade80}.jr-sync-dot.err{background:#f87171}
+.jr-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.jr-btn{border:1px solid var(--border2);background:transparent;color:var(--white);border-radius:20px;padding:8px 16px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
+.jr-btn:hover:not(:disabled){border-color:rgba(255,255,255,.3)}
+.jr-btn:disabled{opacity:.45;cursor:default}
+.jr-btn-primary{background:var(--white);color:#090b16;border-color:var(--white)}
+.jr-btn-primary:hover:not(:disabled){background:#e3e5ea}
+.jr-danger{color:#f87171;border-color:rgba(248,113,113,.4)}
+.jr-link{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;padding:0;font-size:13px}
+.jr-filters{border:1px solid var(--border2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.jr-presets{display:flex;gap:6px;flex-wrap:wrap}
+.jr-chip{border:1px solid var(--border2);background:transparent;color:var(--muted2);border-radius:20px;padding:5px 12px;font-size:12.5px;cursor:pointer}
+.jr-chip.on{border-color:var(--accent);color:#fff;background:rgba(91,141,239,.16)}
+.jr-custom{gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted2)}
+.jr-custom input,.jr-select,.jr-search{background:transparent;border:1px solid var(--border2);color:var(--white);border-radius:8px;padding:6px 10px;font-size:13px;color-scheme:dark}
+.jr-select option{background:#090b16}
+.jr-filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.jr-search{min-width:200px;flex:1}
+.jr-ms{position:relative}
+.jr-ms-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;background:#0e1220;border:1px solid var(--border2);border-radius:10px;padding:8px;max-height:280px;overflow:auto;min-width:200px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.jr-ms-pop label{display:flex;gap:8px;align-items:center;padding:4px 6px;font-size:13px;cursor:pointer;white-space:nowrap}
+.jr-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border2);margin-bottom:16px;overflow-x:auto}
+.jr-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted2);padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.jr-tab.on{color:#fff;border-bottom-color:var(--accent)}
+.jr-hero{border:1px solid var(--border2);border-radius:14px;padding:20px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.jr-hero-val{font-size:44px;font-weight:700;line-height:1.1;margin:4px 0}
+.jr-hero.jr-pos .jr-hero-val{color:#4ade80}.jr-hero.jr-neg .jr-hero-val{color:#f87171}
+.jr-hero-sub{color:var(--muted2);font-size:14px}
+.jr-hero-mini{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:10px 22px;align-content:center}
+.jr-hero-mini span{display:block;color:var(--muted);font-size:12px}.jr-hero-mini b{font-size:17px}
+.jr-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.jr-kpi{border:1px solid var(--border2);border-radius:12px;padding:12px 14px}
+.jr-kpi-label{color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.jr-kpi-val{font-size:22px;font-weight:700;margin-top:4px}
+.jr-kpi-sub{color:var(--muted);font-size:12px;margin-top:2px}
+.jr-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.jr-span2{grid-column:1/-1}
+.jr-span3{grid-column:1/-1}
+.jr-card{border:1px solid var(--border2);border-radius:12px;padding:14px 16px;min-width:0;margin-bottom:0;overflow-x:auto}
+.jr-card + .jr-card{margin-top:0}
+#jrPane>.jr-card{margin-bottom:14px}
+.jr-card-title{font-weight:600;font-size:15px;margin-bottom:10px}
+.jr-svg{width:100%;display:block}
+.jr-hbars{display:flex;flex-direction:column;gap:6px}
+.jr-hbar{display:grid;grid-template-columns:110px 1fr 100px;align-items:center;gap:10px;font-size:13px}
+.jr-hbar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jr-hbar-track{height:10px;background:rgba(255,255,255,.04);border-radius:6px;overflow:hidden}
+.jr-hbar-fill{display:block;height:100%;border-radius:6px;opacity:.85}
+.jr-hbar-val{text-align:right;font-weight:600}
+.jr-donut{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.jr-donut-legend div{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0}
+.jr-donut-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.jr-donut-legend span{color:var(--muted)}
+.jr-table-wrap{overflow-x:auto}
+.jr-table{width:100%;border-collapse:collapse;font-size:13px}
+.jr-table th{text-align:left;color:var(--muted);font-weight:600;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border2);white-space:nowrap}
+.jr-sortable th{cursor:pointer}.jr-sortable th.on{color:#fff}
+.jr-table td{padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;vertical-align:top}
+.jr-compact td,.jr-compact th{padding:6px 8px}
+.jr-row{cursor:pointer}.jr-row:hover td{background:rgba(255,255,255,.025)}
+.jr-dim td{color:var(--muted)}
+.jr-side{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+.jr-side.long{color:#4ade80;background:rgba(74,222,128,.12)}.jr-side.short{color:#f87171;background:rgba(248,113,113,.12)}
+.jr-src{font-size:11px;color:var(--accent)}.jr-src.man{color:var(--muted2)}
+.jr-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.jr-tags span{font-size:10.5px;color:var(--muted2);border:1px solid var(--border2);border-radius:10px;padding:0 6px}
+.jr-pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:12px;font-size:13px;color:var(--muted2)}
+.jr-cal-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.jr-cal-head h3{margin:0;font-size:20px;min-width:150px;text-align:center}
+.jr-cal-sum{margin-left:auto;color:var(--muted2);font-size:14px}
+.jr-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(0,1.1fr);gap:6px;margin-bottom:8px}
+.jr-cal-wd{color:var(--muted);font-size:12px;text-align:center;padding:4px 0}
+.jr-cal-cell{border:1px solid var(--border2);border-radius:10px;min-height:82px;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:12px}
+.jr-cal-cell.has{cursor:pointer}.jr-cal-cell.has:hover{border-color:rgba(255,255,255,.3)}
+.jr-cal-cell.today{border-color:var(--accent)}
+.jr-cal-blank{border-color:transparent}
+.jr-cal-d{color:var(--muted2);font-weight:600}
+.jr-cal-cell b{font-size:14px}
+.jr-cal-cell small{color:var(--muted2);font-size:11px}
+.jr-cal-week{background:rgba(255,255,255,.02)}
+.jr-cal-week span{color:var(--muted);font-size:11px}
+.jr-steps{color:var(--muted2);font-size:14px;padding-left:20px;margin:8px 0 14px}
+.jr-steps li{margin:4px 0}
+.jr-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.jr-card .jr-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.jr-form-grid label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted2)}
+.jr-form-grid input,.jr-form-grid select,.jr-form-grid textarea{background:transparent;border:1px solid var(--border2);color:var(--white);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color-scheme:dark}
+.jr-form-grid select option{background:#090b16}
+.jr-form-grid input:focus,.jr-form-grid select:focus,.jr-form-grid textarea:focus{outline:none;border-color:var(--accent)}
+.jr-form-grid input:disabled,.jr-form-grid select:disabled{opacity:.6}
+.jr-row-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.jr-msg{font-size:13px;color:var(--muted2)}
+.jr-conn{border:1px solid var(--border2);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.jr-modal{position:fixed;inset:0;z-index:10002;background:rgba(5,6,12,.82);display:flex;align-items:flex-start;justify-content:center;padding:24px 14px;overflow:auto}
+.jr-modal-panel{background:#090b16;border:1px solid var(--border2);border-radius:16px;padding:20px;width:min(860px,100%)}
+.jr-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.jr-modal-head h3{margin:0;font-size:20px}
+.jr-x{background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer}
+.jr-modal-foot{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.jr-modal-foot .jr-msg{flex:1}
+.jr-modal-foot .jr-danger{margin-right:auto}
+.jr-net-preview{margin-top:12px;font-size:14px;color:var(--muted2)}
+.jr-rate{display:flex;gap:2px}
+.jr-rate button{background:none;border:none;font-size:22px;color:rgba(255,255,255,.18);cursor:pointer;padding:0 2px}
+.jr-rate button.on{color:#f0b23d}
+@media(max-width:900px){
+  .jr-grid2{grid-template-columns:1fr}
+  .jr-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jr-hero-val{font-size:34px}
+  .jr-cal{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .jr-cal-week{display:none}
+  .jr-cal-wd:nth-child(8){display:none}
+  .jr-cal-cell{min-height:58px;padding:5px}
+  .jr-cal-cell small{display:none}
+  .jr-cal-cell b{font-size:11px}
+  .jr-hbar{grid-template-columns:80px 1fr 80px}
+}
+@media(max-width:560px){ .jr-form-grid{grid-template-columns:1fr} }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
@@ -2710,6 +2841,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="sb-cat-label" data-category="rangos">Rango de Manada</div>
       <button class="sb-item" data-sb-open-card="rangos">
         <span class="sb-item-icon">🏆</span><span class="sb-item-label">Ver mi rango</span>
+      </button>
+
+      <div class="sb-cat-label" data-category="bitacora">Bitácora</div>
+      <button class="sb-item" data-sb-open-card="bitacora">
+        <span class="sb-item-icon">📒</span><span class="sb-item-label">Mi bitácora</span>
       </button>
 
       <div class="sb-cat-label" data-category="portafolio">Mi Arrecife</div>
@@ -3506,6 +3642,30 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </button>
       <div class="cat-flip-back" data-category="aprender" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Manual del Depredador</div><div class="cat-flip-back-eyebrow">LAS 2 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Glosario Cripto</li><li><span class="cat-flip-back-check">✓</span>Biblioteca de Errores Comunes</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+      </div>
+      </div>
+
+      <div class="cat-flip-outer">
+      <div class="cat-flip-inner">
+      <button type="button" class="cat-overview-card cat-flip-front" data-category="bitacora" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)">
+        <div class="cat-overview-head">
+          <div class="cat-overview-num">8</div>
+          <div class="cat-overview-title">📒 Bitácora</div>
+          <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
+        </div>
+        <div class="cat-overview-sub">TU DIARIO DE TRADING</div>
+        <div class="cat-overview-preview">
+          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
+            <polyline points="20,60 55,52 85,56 115,40 145,44 175,30 205,34 235,20 280,14" fill="none" stroke="#5b8def" stroke-width="2.2" stroke-linejoin="round"/>
+            <g fill="#4ade80" opacity=".85"><rect x="34" y="66" width="10" height="6" rx="1"/><rect x="94" y="62" width="10" height="10" rx="1"/><rect x="154" y="60" width="10" height="12" rx="1"/><rect x="214" y="58" width="10" height="14" rx="1"/></g>
+            <g fill="#f87171" opacity=".85"><rect x="64" y="66" width="10" height="6" rx="1"/><rect x="124" y="64" width="10" height="8" rx="1"/><rect x="184" y="66" width="10" height="6" rx="1"/></g>
+          </svg>
+        </div>
+        <div class="cat-overview-desc">Registra tus operaciones a mano o conéctalas solas desde Bitunix, y mira tu P&amp;L, winrate, drawdown, calendario y estadísticas en un solo lugar.</div>
+        <div class="cat-overview-btn">Explorar →</div>
+            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </button>
+      <div class="cat-flip-back" data-category="bitacora" style="--c:var(--red);--bc:rgba(255,255,255,.16);--tint:rgba(255,47,79,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Bitácora</div><div class="cat-flip-back-eyebrow">QUÉ TRAE</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Registro manual o automático con Bitunix</li><li><span class="cat-flip-back-check">✓</span>Curva de capital y drawdown</li><li><span class="cat-flip-back-check">✓</span>Calendario de P&amp;L</li><li><span class="cat-flip-back-check">✓</span>Winrate, profit factor y rachas</li><li><span class="cat-flip-back-check">✓</span>Análisis por par, hora y setup</li></ul><div class="cat-flip-back-cta">Explorar →</div></div>
       </div>
       </div>
 
@@ -6546,6 +6706,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
 
+    </div>
+
+    <!-- Bitacora de trading (assets/js/journal.js): todo el contenido lo arma el JS -->
+    <div id="journalPageView" style="display:none">
+      <button type="button" class="cat-back-btn" id="journalBackBtn">← Volver</button>
+      <div id="journalRoot"></div>
     </div>
 
     <div id="colmillosPageView" style="display:none">
@@ -9786,7 +9952,7 @@ function renderCatPillTabs(cat){
 // (OWNER_USER_ID) puede entrar, sin importar si alguien ya cumple el rango/volumen: el candado
 // es por estado de construccion, no por permiso ganado. Se revisa aca mismo (no solo al hacer
 // clic en la cajita) para que tambien bloquee un link directo a la ruta.
-const WIP_OWNER_ONLY_CATEGORIES = ['rangos'];
+const WIP_OWNER_ONLY_CATEGORIES = ['rangos', 'bitacora'];
 function isWipLockedForCurrentUser(cat){
   return WIP_OWNER_ONLY_CATEGORIES.includes(cat) && (!currentUser || currentUser.id !== 'e4309251-6078-4233-aab3-6ab8d6c624e1');
 }
@@ -9817,6 +9983,12 @@ function showCategoryDetail(cat){
     showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
     return;
   }
+  // la Bitacora no es una categoria con herramientas sino su propia pantalla (assets/js/journal.js)
+  if(cat === 'bitacora'){
+    if(typeof openJournalPage === 'function') openJournalPage();
+    return;
+  }
+  if(typeof closeJournalPage === 'function') closeJournalPage();
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   closeAnyOpenToolInline();
   setCatLabelToolOpen(false);
@@ -9852,6 +10024,7 @@ function showCategoryDetail(cat){
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
+  if(typeof closeJournalPage === 'function') closeJournalPage();
   if(typeof colmillosPageView !== 'undefined' && colmillosPageView && colmillosPageView.style.display === 'block' && typeof hideColmillosPage === 'function'){
     hideColmillosPage();
   }
@@ -27324,9 +27497,10 @@ async function awardColmillos(eventType, periodKey, amount){
      archivo = mismo URL = cacheable indefinidamente) y los cambios no se ven hasta que el
      usuario fuerce un refresh duro -->
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
-<script src="/assets/js/icons.js?v=4" defer></script>
+<script src="/assets/js/icons.js?v=5" defer></script>
 <script src="/assets/js/community.js?v=2" defer></script>
-<script src="/assets/js/colmillos.js?v=19" defer></script>
+<script src="/assets/js/journal.js?v=1" defer></script>
+<script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
