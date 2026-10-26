@@ -2387,6 +2387,76 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    para que el dibujo y el texto queden a la misma altura que en las demas cajas */
 .cat-overview-head + .cat-overview-preview{ margin-top:calc(3px + 1.5em + 14px); }
 
+/* estado pegado a la derecha en las pildoras de Bitunix y Telegram: "Conectado" en verde,
+   "En espera" / "Fallido" segun el UID, y "Conectar" en gris si todavia no esta vinculado.
+   La pildora de Sharkoins no lleva estado. En celular no se muestra (no cabe, ver media query) */
+#openBitunixPillBtn::after, #openTelegramPillBtn::after{
+  content:'Conectar'; font-size:11px; font-weight:600; color:var(--muted); margin-left:2px; white-space:nowrap;
+}
+#openBitunixPillBtn.connected::after, #openTelegramPillBtn.connected::after{ content:'Conectado'; color:#4ade80; }
+#openBitunixPillBtn.pending::after{ content:'En espera'; color:#f0b23d; }
+#openBitunixPillBtn.rejected::after{ content:'Fallido'; color:#f87171; }
+@media(max-width:860px){ #openBitunixPillBtn::after, #openTelegramPillBtn::after{ display:none; } }
+
+/* ===== etiquetas pequeñas sobre cada seccion ===== */
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:30px 0 12px}
+#marketDashboardBlock>.section-eyebrow{margin-top:6px}
+/* ===== EN VIVO ===== */
+.live-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid rgba(74,222,128,.45);color:#4ade80;font-size:11px;font-weight:700;letter-spacing:.12em;text-decoration:none;white-space:nowrap}
+.live-pill i{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pillDotPulse 1.6s ease-in-out infinite}
+.live-pill:hover{background:rgba(74,222,128,.08)}
+.admin-live-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:14px}
+.admin-live-btn{border:1px solid var(--border2);background:transparent;color:var(--white);border-radius:20px;padding:6px 14px;font-weight:700;cursor:pointer}
+.admin-live-btn.on{border-color:#4ade80;color:#4ade80}
+/* ===== Creado por Juan / Reseñas ===== */
+.community-block{margin-top:44px}
+.community-title{font-size:26px;font-weight:700;margin:0 0 8px}
+.community-lead{color:var(--muted2);font-size:15px;margin:0 0 18px;max-width:640px}
+.about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.about-stat{border:1px solid var(--border2);border-radius:12px;padding:18px 14px;text-align:center}
+.about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
+.about-stat-label{color:var(--muted);font-size:13px;margin-top:6px}
+.reviews-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.reviews-summary{color:var(--muted2);font-size:14px}
+.reviews-summary b{color:var(--white);font-size:20px;margin-right:4px}
+.reviews-summary .rs-stars{color:#f0b23d;letter-spacing:2px;margin-right:6px}
+.review-form-box{border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:16px}
+.review-login-note{color:var(--muted2);font-size:14px}
+.review-link-btn{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;padding:0;font-size:14px}
+.review-form-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.review-form-label{color:var(--muted2);font-size:14px}
+.review-stars-input{display:flex;gap:2px}
+.review-stars-input button{background:none;border:none;font-size:26px;line-height:1;color:rgba(255,255,255,.18);cursor:pointer;padding:0 2px}
+.review-stars-input button.on{color:#f0b23d}
+.review-form textarea{width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--white);padding:10px 12px;font-size:14px;resize:vertical;font-family:inherit}
+.review-form textarea:focus{outline:none;border-color:var(--accent)}
+.review-form-foot{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.review-counter{color:var(--muted);font-size:12px}
+.review-msg{font-size:13px;color:var(--muted2);flex:1}
+.review-msg.err{color:#f87171}.review-msg.ok{color:#4ade80}
+.review-submit{border:none;background:var(--white);color:#090b16;font-weight:700;border-radius:20px;padding:8px 18px;cursor:pointer}
+.review-submit:disabled{opacity:.5;cursor:default}
+.reviews-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.review-card{border:1px solid var(--border2);border-radius:12px;padding:14px 16px}
+.review-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.review-card-name{font-weight:600;font-size:14px}
+.review-card-stars{color:#f0b23d;font-size:13px;letter-spacing:1px}
+.review-card-text{color:var(--muted2);font-size:14px;line-height:1.5;margin:0;white-space:pre-wrap;word-break:break-word}
+.review-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:12px}
+.review-card.is-hidden{opacity:.5}
+.review-empty{color:var(--muted);font-size:14px;border:1px dashed var(--border2);border-radius:12px;padding:18px;text-align:center}
+.review-more{margin:14px auto 0;display:block;background:none;border:1px solid var(--border2);color:var(--white);border-radius:20px;padding:8px 18px;cursor:pointer}
+/* ===== tarjeta para compartir ===== */
+.colm-hero-share-btn{align-self:center;margin-top:8px;background:none;border:1px solid rgba(255,255,255,.22);color:var(--white);border-radius:12px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;width:84%}
+.colm-hero-share-btn:hover{border-color:rgba(255,255,255,.4)}
+.share-card-overlay{position:fixed;inset:0;z-index:10001;background:rgba(5,6,12,.82);display:flex;align-items:center;justify-content:center;padding:16px}
+.share-card-panel{background:#090b16;border:1px solid var(--border2);border-radius:16px;padding:18px;width:min(420px,100%);max-height:94vh;overflow:auto;text-align:center}
+.share-card-panel img{width:100%;border-radius:12px;border:1px solid var(--border)}
+.share-card-actions{display:flex;gap:10px;margin-top:14px}
+.share-card-actions button{flex:1;border-radius:20px;padding:10px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--white)}
+.share-card-actions .primary{background:var(--white);color:#090b16;border-color:var(--white)}
+.share-card-note{color:var(--muted);font-size:12px;margin-top:10px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas-pro.min.js"></script>
 </head>
@@ -2979,6 +3049,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <a href="#" id="topbarInicio">Inicio</a>
       </nav>
 
+      <a class="live-pill" id="livePill" href="https://www.tiktok.com/@juanskll/live" target="_blank" rel="noopener" style="display:none"><i></i>EN VIVO</a>
       <button class="exchange-pill" id="openBitunixPillBtn" type="button">
         <img src="data:image/png;base64,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" alt="" width="18" height="14" style="object-fit:contain">
         <span class="exchange-pill-label">Bitunix</span>
@@ -3051,6 +3122,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
 
     <div id="marketDashboardBlock">
+    <div class="section-eyebrow">Panorama del mercado</div>
     <div class="market-overview reveal">
       <div class="fng-section" id="fngSectionBox" style="cursor:pointer;position:relative">
         <div class="fng-section-head">
@@ -3148,6 +3220,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
     <div id="favoritesSection"></div>
 
+    <div class="section-eyebrow home-mirror" id="toolsEyebrow">Tus herramientas</div>
     <div id="categoryOverviewGrid">
     <div class="cat-overview-featured">
 
@@ -3438,6 +3511,49 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
     </div>
     </div>
+
+    <!-- secciones fijas del inicio (no flotantes): quien hace SkillCash y reseñas de la comunidad.
+         Se muestran/ocultan junto con #categoryOverviewGrid (ver assets/js/community.js) -->
+    <section class="home-mirror community-block" id="aboutJuanBlock">
+      <div class="section-eyebrow">Creado por un trader, para traders</div>
+      <h2 class="community-title">Juan SkillCash</h2>
+      <p class="community-lead">Herramientas que yo mismo uso para operar, abiertas para la manada. Estos son los números reales, sin inflar.</p>
+      <div class="about-stats" id="aboutStats">
+        <div class="about-stat"><div class="about-stat-num" id="aboutStatUsers">—</div><div class="about-stat-label">Usuarios registrados</div></div>
+        <div class="about-stat"><div class="about-stat-num" id="aboutStatTools">—</div><div class="about-stat-label">Herramientas</div></div>
+        <div class="about-stat"><div class="about-stat-num" id="aboutStatIndic">—</div><div class="about-stat-label">Indicadores</div></div>
+        <div class="about-stat" id="aboutStatTiktokBox" style="display:none"><div class="about-stat-num" id="aboutStatTiktok">—</div><div class="about-stat-label">Seguidores en TikTok</div></div>
+        <div class="about-stat"><div class="about-stat-num">200+</div><div class="about-stat-label">Miembros en Telegram</div></div>
+      </div>
+    </section>
+
+    <section class="home-mirror community-block" id="reviewsBlock">
+      <div class="section-eyebrow">Opiniones de la manada</div>
+      <div class="reviews-head">
+        <h2 class="community-title">Reseñas</h2>
+        <div class="reviews-summary" id="reviewsSummary"></div>
+      </div>
+      <div class="review-form-box" id="reviewFormBox">
+        <div class="review-login-note" id="reviewLoginNote">Inicia sesión para dejar tu reseña. <button type="button" class="review-link-btn" id="reviewLoginBtn">Iniciar sesión</button></div>
+        <form class="review-form" id="reviewForm" style="display:none">
+          <div class="review-form-row">
+            <span class="review-form-label" id="reviewFormLabel">Tu calificación</span>
+            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Calificación">
+              <button type="button" data-v="1" aria-label="1 estrella">★</button><button type="button" data-v="2" aria-label="2 estrellas">★</button><button type="button" data-v="3" aria-label="3 estrellas">★</button><button type="button" data-v="4" aria-label="4 estrellas">★</button><button type="button" data-v="5" aria-label="5 estrellas">★</button>
+            </div>
+          </div>
+          <textarea id="reviewComment" maxlength="500" rows="3" placeholder="¿Qué te parece la plataforma? ¿Qué te sirve, qué mejorarías?"></textarea>
+          <div class="review-form-foot">
+            <span class="review-counter" id="reviewCounter">0/500</span>
+            <span class="review-msg" id="reviewMsg"></span>
+            <button type="button" class="review-link-btn" id="reviewDeleteBtn" style="display:none">Borrar mi reseña</button>
+            <button type="submit" class="review-submit" id="reviewSubmitBtn">Publicar reseña</button>
+          </div>
+        </form>
+      </div>
+      <div class="reviews-list" id="reviewsList"></div>
+      <button type="button" class="review-more" id="reviewsMoreBtn" style="display:none">Ver más reseñas</button>
+    </section>
 
     <div id="categoryDetailView" style="display:none">
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
@@ -6500,6 +6616,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               </div>
               <p class="colm-hero-info-equip-note" id="colmillosHCEquipNote">0 de 0 ítems coleccionados</p>
               <button type="button" class="colm-hero-info-select-btn" id="colmillosHCSelectBtn" data-goto-tab="tienda">IR A LA TIENDA</button>
+              <button type="button" class="colm-hero-share-btn" id="colmillosHCShareBtn">Compartir mi tiburón</button>
             </div>
             <div class="colm-hero-overlay" id="colmillosHeroOverlay" style="display:none">
               <button type="button" class="colm-hero-overlay-close" data-goto-tab="inicio">✕ Cerrar</button>
@@ -9194,6 +9311,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div id="adminError" class="auth-note" style="display:none;border-color:var(--red);color:var(--red)"></div>
 
       <div id="adminContent" style="display:none">
+        <div class="admin-live-row">
+          <span>Indicador <b>EN VIVO</b> en la barra de arriba:</span>
+          <button type="button" class="admin-live-btn" id="adminLiveToggle">Cargando…</button>
+        </div>
         <div class="summary-grid" id="adminSummaryGrid"></div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px;flex-wrap:wrap">
@@ -27204,7 +27325,8 @@ async function awardColmillos(eventType, periodKey, amount){
      usuario fuerce un refresh duro -->
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
 <script src="/assets/js/icons.js?v=4" defer></script>
-<script src="/assets/js/colmillos.js?v=18" defer></script>
+<script src="/assets/js/community.js?v=1" defer></script>
+<script src="/assets/js/colmillos.js?v=19" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>

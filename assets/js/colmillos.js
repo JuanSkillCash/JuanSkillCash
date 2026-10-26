@@ -1776,3 +1776,149 @@ colmillosBigCoin.addEventListener('click', (e) => {
 if(typeof currentUser !== 'undefined' && currentUser && typeof loadAccountMiniAvatar === 'function'){
   loadAccountMiniAvatar();
 }
+
+/* ---- tarjeta para compartir (boton "Compartir mi tiburón" en la ficha de Heroe): arma una
+   imagen 1080x1350 (formato historia/post) con el tiburon tal cual lo tiene puesto la persona
+   (skin + accesorios + fondo), su nivel, poder, estrellas e items, y un QR a la plataforma.
+   Se dibuja en un canvas con los mismos PNG de siempre; la libreria del QR
+   (/assets/js/vendor/qrcode.js, MIT) se carga recien al abrir la tarjeta para no pesar en la
+   carga inicial ---- */
+const COLM_SHARE_URL = 'https://juanskillcash.com';
+function colmLoadImage(src){
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+function colmLoadQrLib(){
+  if(typeof qrcode === 'function') return Promise.resolve(true);
+  return new Promise(resolve => {
+    const s = document.createElement('script');
+    s.src = '/assets/js/vendor/qrcode.js';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+async function buildColmShareCanvas(){
+  const W = 1080, H = 1350;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  const st = colmillosEquippedState || {};
+  const info = getColmHeroProgress();
+  const meta = (currentUser && currentUser.user_metadata) || {};
+  const name = (meta.username || 'Jugador').toString();
+  try{ await document.fonts.load('700 40px "Space Grotesk"'); }catch(e){}
+  const FONT = '"Space Grotesk", Inter, sans-serif';
+
+  ctx.fillStyle = '#090b16';
+  ctx.fillRect(0, 0, W, H);
+  // marco fino como las cajas de la plataforma
+  ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(24, 24, W - 48, H - 48, 36); ctx.stroke();
+
+  ctx.fillStyle = '#8b8f9a'; ctx.font = '600 30px ' + FONT;
+  ctx.fillText('SKILLCASH  ·  LA MANADA', 80, 110);
+
+  // escenario: fondo equipado (si tiene) + tiburon con sus accesorios, en pixel art nitido
+  const sx = 140, sy = 150, sw = W - 280, sh = 640;
+  ctx.save();
+  ctx.beginPath(); ctx.roundRect(sx, sy, sw, sh, 28); ctx.clip();
+  ctx.imageSmoothingEnabled = false;
+  const bgSrc = st.background_id && BG_IMG_PATHS[st.background_id];
+  const bg = bgSrc ? await colmLoadImage(bgSrc) : null;
+  if(bg){
+    const k = Math.max(sw / bg.width, sh / bg.height);
+    ctx.drawImage(bg, sx + (sw - bg.width * k) / 2, sy + (sh - bg.height * k) / 2, bg.width * k, bg.height * k);
+  } else {
+    ctx.fillStyle = '#0e1220'; ctx.fillRect(sx, sy, sw, sh);
+  }
+  const size = 560;
+  const px = (W - size) / 2, py = sy + (sh - size) / 2 + 20;
+  const skin = await colmLoadImage((st.skin_id && SHARK_IMG_PATHS[st.skin_id]) || SHARK_IMG_PATHS.default);
+  if(skin) ctx.drawImage(skin, px, py, size, size);
+  for(const id of colmEquippedAccessoryIds(st)){
+    const acc = ACC_IMG_PATHS[id] ? await colmLoadImage(ACC_IMG_PATHS[id]) : null;
+    if(acc) ctx.drawImage(acc, px, py, size, size);
+  }
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(sx, sy, sw, sh, 28); ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 72px ' + FONT;
+  ctx.fillText(name.toUpperCase().slice(0, 18), W / 2, 900);
+  ctx.fillStyle = '#f0b23d'; ctx.font = '700 46px ' + FONT;
+  ctx.fillText('★★★★★'.slice(0, info.stars) + '☆☆☆☆☆'.slice(0, 5 - info.stars), W / 2, 965);
+
+  // tres numeros grandes con su etiqueta gris debajo
+  const cols = [['NIVEL', info.level], ['PODER', info.power], ['ÍTEMS', info.itemsOwned + '/' + info.itemsTotal]];
+  cols.forEach(([label, val], i) => {
+    const cx = W / 2 + (i - 1) * 300;
+    ctx.fillStyle = '#ffffff'; ctx.font = '700 64px ' + FONT;
+    ctx.fillText(String(val), cx, 1060);
+    ctx.fillStyle = '#8b8f9a'; ctx.font = '600 24px ' + FONT;
+    ctx.fillText(label, cx, 1100);
+  });
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 34px ' + FONT;
+  ctx.fillText('Arma tu tiburón gratis', 80, 1220);
+  ctx.fillStyle = '#8b8f9a'; ctx.font = '500 30px ' + FONT;
+  ctx.fillText('juanskillcash.com', 80, 1262);
+
+  if(await colmLoadQrLib()){
+    const qr = qrcode(0, 'M');
+    qr.addData(COLM_SHARE_URL);
+    qr.make();
+    const n = qr.getModuleCount(), box = 170, cell = box / (n + 2);
+    const qx = W - 80 - box, qy = 1140;
+    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.roundRect(qx, qy, box, box, 12); ctx.fill();
+    ctx.fillStyle = '#090b16';
+    for(let r = 0; r < n; r++) for(let col = 0; col < n; col++){
+      if(qr.isDark(r, col)) ctx.fillRect(qx + (col + 1) * cell, qy + (r + 1) * cell, Math.ceil(cell), Math.ceil(cell));
+    }
+  }
+  return c;
+}
+async function openColmShareCard(){
+  const btn = document.getElementById('colmillosHCShareBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Preparando…'; }
+  let canvas;
+  try{ canvas = await buildColmShareCanvas(); }
+  finally{ if(btn){ btn.disabled = false; btn.textContent = 'Compartir mi tiburón'; } }
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  // data: y no blob: - la CSP del sitio (img-src) solo permite 'self' y data:
+  const url = canvas.toDataURL('image/png');
+  const file = new File([blob], 'mi-tiburon-skillcash.png', { type: 'image/png' });
+
+  const overlay = document.createElement('div');
+  overlay.className = 'share-card-overlay';
+  overlay.innerHTML = '<div class="share-card-panel" role="dialog" aria-label="Compartir mi tiburón">' +
+    '<img alt="Tarjeta para compartir">' +
+    '<div class="share-card-actions"><button type="button" data-act="close">Cerrar</button>' +
+    '<button type="button" data-act="download">Descargar</button>' +
+    '<button type="button" class="primary" data-act="share">Compartir</button></div>' +
+    '<p class="share-card-note">Súbela a tus historias o estados: el QR lleva a juanskillcash.com.</p></div>';
+  overlay.querySelector('img').src = url;
+  const close = () => overlay.remove();
+  const shareBtn = overlay.querySelector('[data-act="share"]');
+  const canShareFile = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+  if(!canShareFile) shareBtn.style.display = 'none';
+  overlay.addEventListener('click', async e => {
+    const act = e.target.dataset && e.target.dataset.act;
+    if(e.target === overlay || act === 'close') close();
+    else if(act === 'download'){
+      const a = document.createElement('a');
+      a.href = url; a.download = file.name; a.click();
+    } else if(act === 'share'){
+      try{ await navigator.share({ files: [file], text: 'Mi tiburón en SkillCash 🦈 ' + COLM_SHARE_URL }); }catch(err){ /* la persona cancelo */ }
+    }
+  });
+  document.body.appendChild(overlay);
+}
+const colmShareBtnEl = document.getElementById('colmillosHCShareBtn');
+if(colmShareBtnEl) colmShareBtnEl.addEventListener('click', openColmShareCard);
