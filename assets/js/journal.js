@@ -45,7 +45,7 @@ const toDateInput = d => d ? dayKey(d) : '';
 /* ======================= estado ======================= */
 const S = {
   loaded: false, error: null,
-  trades: [], settings: { default_capital: 1000 }, capitalByMonth: {}, cashbackByMonth: {}, sync: null,
+  trades: [], settings: { default_capital: 1000 }, capitalByMonth: {}, cashbackByMonth: {}, sync: null, exchangeConnected: false,
   tab: 'resumen',
   f: { preset: 'month', from: null, to: null, symbols: [], side: 'all', result: 'all', source: 'all', tag: 'all', setup: 'all', q: '' },
   sort: { key: 'closed', dir: -1 }, page: 0,
@@ -88,18 +88,22 @@ async function fetchAllTrades(){
 async function loadAll(){
   if(!currentUser) return;
   try{
-    const [trades, settings, capital, sync, cashback] = await Promise.all([
+    const [trades, settings, capital, sync, cashback, connection] = await Promise.all([
       fetchAllTrades(),
       sbClient.from('trade_journal_settings').select('default_capital').eq('user_id', currentUser.id).maybeSingle(),
       sbClient.from('trade_journal_capital').select('month,starting_capital').eq('user_id', currentUser.id),
       sbClient.from('trade_journal_sync').select('*').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle(),
       sbClient.from('user_bitunix_cashback').select('month,cashback_usdt').eq('user_id', currentUser.id),
+      sbClient.from('user_exchange_connections').select('status').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle(),
     ]);
     S.trades = trades.map(normalize);
     S.settings = (settings && settings.data) || { default_capital: 1000 };
     S.capitalByMonth = {};
     ((capital && capital.data) || []).forEach(c => { S.capitalByMonth[c.month] = Number(c.starting_capital); });
     S.sync = (sync && sync.data) || null;
+    // conectado a Bitunix (con clave personal o solo por UID via Partner API) = el saldo mensual
+    // ya lo llena solo un robot (scripts/sync_journal_partner.py) - no se le debe pedir a mano.
+    S.exchangeConnected = !!(connection && connection.data && connection.data.status === 'connected');
     // cashback del 20% de descuento de Juan, devuelto a la cuenta spot - lo llena
     // scripts/sync_journal_partner.py (Partner API), no es algo que el usuario registre
     S.cashbackByMonth = {};
@@ -641,7 +645,10 @@ function paneAjustes(){
         </form>
         <p class="jr-muted jr-xs">La clave se guarda cifrada en el servidor: ni esta página ni nadie más la puede volver a leer. Puedes desconectarla cuando quieras.</p>`}
       <div class="jr-msg" id="jrSyncMsg"></div>`)}
-    ${card('Capital', `
+    ${card('Capital', S.exchangeConnected ? `
+      <p class="jr-muted">Tu saldo inicial de cada mes se detecta solo desde tu cuenta de Bitunix conectada - no hay que escribirlo a mano.</p>
+      ${months.length ? `<table class="jr-table jr-compact" style="margin-top:12px"><tbody>${months.map(mk => `<tr><td>${MONTHS[Number(mk.slice(5)) - 1]} ${mk.slice(0, 4)}</td><td>${usd(S.capitalByMonth[mk])}</td></tr>`).join('')}</tbody></table>` : `<p class="jr-muted jr-xs">Todavía no se ha registrado - se guarda solo en la próxima sincronización.</p>`}`
+    : `
       <p class="jr-muted">Se usa para calcular la rentabilidad % y el drawdown %. Puedes poner un capital distinto para cada mes (por ejemplo si depositas o retiras).</p>
       <form id="jrCapForm" class="jr-form-grid">
         <label class="jr-span2">Capital inicial por defecto (USD)<input type="number" id="jrDefCap" min="1" step="0.01" value="${S.settings.default_capital}"></label>
