@@ -90,7 +90,7 @@ async function loadAll(){
   try{
     const [trades, settings, capital, sync, cashback, connection] = await Promise.all([
       fetchAllTrades(),
-      sbClient.from('trade_journal_settings').select('default_capital').eq('user_id', currentUser.id).maybeSingle(),
+      sbClient.from('trade_journal_settings').select('default_capital,journal_start_date').eq('user_id', currentUser.id).maybeSingle(),
       sbClient.from('trade_journal_capital').select('month,starting_capital').eq('user_id', currentUser.id),
       sbClient.from('trade_journal_sync').select('*').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle(),
       sbClient.from('user_bitunix_cashback').select('month,cashback_usdt').eq('user_id', currentUser.id),
@@ -98,6 +98,12 @@ async function loadAll(){
     ]);
     S.trades = trades.map(normalize);
     S.settings = (settings && settings.data) || { default_capital: 1000 };
+    // "empezar de cero" desde una fecha - oculta (no borra) todo lo anterior, pedido puntual de
+    // Juan para su propia cuenta pero disponible para cualquiera via trade_journal_settings.
+    if(S.settings.journal_start_date){
+      const startD = new Date(S.settings.journal_start_date + 'T00:00:00');
+      S.trades = S.trades.filter(t => t.opened && t.opened >= startD);
+    }
     S.capitalByMonth = {};
     ((capital && capital.data) || []).forEach(c => { S.capitalByMonth[c.month] = Number(c.starting_capital); });
     S.sync = (sync && sync.data) || null;
