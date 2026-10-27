@@ -26956,41 +26956,61 @@ bitunixSubmitBtn.addEventListener('click', async () => {
     bitunixErrorEl.style.display = 'block';
     return;
   }
-  let screenshotPath = null;
+  let screenshotFile = null;
   if(bitunixPath === 'transfer_existing'){
-    const file = bitunixScreenshotInput.files[0];
-    if(!file){
+    screenshotFile = bitunixScreenshotInput.files[0];
+    if(!screenshotFile){
       bitunixErrorEl.textContent = 'Sube una captura de tu panel con el UID visible.';
       bitunixErrorEl.style.display = 'block';
       return;
     }
-    screenshotPath = currentUser.id + '/' + Date.now() + '-' + file.name.replace(/[^a-z0-9.\-_]/gi, '_');
-    const { error: upErr } = await sbClient.storage.from('exchange-screenshots').upload(screenshotPath, file);
-    if(upErr){
-      bitunixErrorEl.textContent = friendlyErrMsg(upErr);
+    // las fotos de celular a veces pesan 8-10 MB - mejor avisar de una que es muy pesada en
+    // vez de dejar que la subida se quede colgada en una conexion movil lenta
+    if(screenshotFile.size > 8 * 1024 * 1024){
+      bitunixErrorEl.textContent = 'Esa captura pesa mucho (más de 8 MB) — toma una captura de pantalla normal en vez de una foto, o comprime la imagen antes de subirla.';
       bitunixErrorEl.style.display = 'block';
       return;
     }
   }
+  // antes, si algo de aca abajo fallaba de una forma que no fuera un {error} normal de
+  // Supabase (ej. se corta la conexion a mitad de la subida en datos moviles), el boton se
+  // quedaba trabado en "Enviando..." para siempre, sin ningun aviso - el try/catch + finally
+  // garantiza que el boton SIEMPRE vuelve a quedar disponible y SIEMPRE se muestra algun error
   const original = bitunixSubmitBtn.textContent;
   bitunixSubmitBtn.disabled = true;
   bitunixSubmitBtn.textContent = 'Enviando...';
-  await bitunixDeleteOwnRow(); // por si quedo un intento anterior rechazado/pendiente sin terminar
-  const { error } = await sbClient.from('user_exchange_connections').insert({
-    user_id: currentUser.id,
-    exchange: 'bitunix',
-    connect_path: bitunixPath,
-    uid: uid,
-    screenshot_path: screenshotPath,
-  });
-  bitunixSubmitBtn.disabled = false;
-  bitunixSubmitBtn.textContent = original;
-  if(error){
-    bitunixErrorEl.textContent = friendlyErrMsg(error);
+  try{
+    let screenshotPath = null;
+    if(screenshotFile){
+      screenshotPath = currentUser.id + '/' + Date.now() + '-' + screenshotFile.name.replace(/[^a-z0-9.\-_]/gi, '_');
+      const { error: upErr } = await sbClient.storage.from('exchange-screenshots').upload(screenshotPath, screenshotFile);
+      if(upErr){
+        bitunixErrorEl.textContent = friendlyErrMsg(upErr);
+        bitunixErrorEl.style.display = 'block';
+        return;
+      }
+    }
+    await bitunixDeleteOwnRow(); // por si quedo un intento anterior rechazado/pendiente sin terminar
+    const { error } = await sbClient.from('user_exchange_connections').insert({
+      user_id: currentUser.id,
+      exchange: 'bitunix',
+      connect_path: bitunixPath,
+      uid: uid,
+      screenshot_path: screenshotPath,
+    });
+    if(error){
+      bitunixErrorEl.textContent = friendlyErrMsg(error);
+      bitunixErrorEl.style.display = 'block';
+      return;
+    }
+    loadBitunixStatus();
+  } catch(e){
+    bitunixErrorEl.textContent = 'Algo falló enviando tu solicitud (revisa tu conexión e intenta de nuevo). Si sigue sin funcionar, escríbenos por Telegram.';
     bitunixErrorEl.style.display = 'block';
-    return;
+  } finally {
+    bitunixSubmitBtn.disabled = false;
+    bitunixSubmitBtn.textContent = original;
   }
-  loadBitunixStatus();
 });
 
 document.getElementById('bitunixCancelBtn').addEventListener('click', async () => {
@@ -27473,7 +27493,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
 <script src="/assets/js/icons.js?v=5" defer></script>
 <script src="/assets/js/community.js?v=2" defer></script>
-<script src="/assets/js/journal.js?v=2" defer></script>
+<script src="/assets/js/journal.js?v=3" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>

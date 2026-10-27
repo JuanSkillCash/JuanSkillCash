@@ -45,7 +45,7 @@ const toDateInput = d => d ? dayKey(d) : '';
 /* ======================= estado ======================= */
 const S = {
   loaded: false, error: null,
-  trades: [], settings: { default_capital: 1000 }, capitalByMonth: {}, sync: null,
+  trades: [], settings: { default_capital: 1000 }, capitalByMonth: {}, cashbackByMonth: {}, sync: null,
   tab: 'resumen',
   f: { preset: 'month', from: null, to: null, symbols: [], side: 'all', result: 'all', source: 'all', tag: 'all', setup: 'all', q: '' },
   sort: { key: 'closed', dir: -1 }, page: 0,
@@ -88,17 +88,22 @@ async function fetchAllTrades(){
 async function loadAll(){
   if(!currentUser) return;
   try{
-    const [trades, settings, capital, sync] = await Promise.all([
+    const [trades, settings, capital, sync, cashback] = await Promise.all([
       fetchAllTrades(),
       sbClient.from('trade_journal_settings').select('default_capital').eq('user_id', currentUser.id).maybeSingle(),
       sbClient.from('trade_journal_capital').select('month,starting_capital').eq('user_id', currentUser.id),
       sbClient.from('trade_journal_sync').select('*').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle(),
+      sbClient.from('user_bitunix_cashback').select('month,cashback_usdt').eq('user_id', currentUser.id),
     ]);
     S.trades = trades.map(normalize);
     S.settings = (settings && settings.data) || { default_capital: 1000 };
     S.capitalByMonth = {};
     ((capital && capital.data) || []).forEach(c => { S.capitalByMonth[c.month] = Number(c.starting_capital); });
     S.sync = (sync && sync.data) || null;
+    // cashback del 20% de descuento de Juan, devuelto a la cuenta spot - lo llena
+    // scripts/sync_journal_partner.py (Partner API), no es algo que el usuario registre
+    S.cashbackByMonth = {};
+    ((cashback && cashback.data) || []).forEach(c => { S.cashbackByMonth[c.month] = Number(c.cashback_usdt); });
     S.error = null;
   }catch(err){
     S.error = err;
@@ -392,6 +397,10 @@ function paneResumen(){
   const cap = rangeStartCapital(list);
   const st = stats(list, cap);
   if(!S.trades.length) return emptyState();
+  // cashback del 20% de descuento de Juan (se devuelve a tu cuenta SPOT, no es un descuento en
+  // la comision misma) - siempre del MES EN CURSO, independiente del filtro de fechas de arriba,
+  // porque es plata real que ya te devolvieron, no algo que dependa de que rango estes mirando
+  const cashbackMonth = S.cashbackByMonth[monthKey(new Date())] || 0;
   const curve = [{ y: cap, label: 'Inicio' }].concat(st.curve.map(p => ({ y: p.eq, label: fmtDate(p.d) })));
   const ddCurve = [{ y: 0, label: 'Inicio' }].concat(st.curve.map(p => ({ y: p.dd, label: fmtDate(p.d) })));
   const dayItems = Object.keys(st.days).sort().map(k => { const [y, m, d] = k.split('-'); return { label: Number(d) + ' ' + MONTHS_S[Number(m) - 1], value: st.days[k] }; });
@@ -409,7 +418,9 @@ function paneResumen(){
         <div><span>Perdido</span><b class="jr-neg">${usd(st.gl)}</b></div>
         <div><span>Comisiones</span><b>${usd(st.fees)}</b></div>
         <div><span>Funding</span><b class="${signCls(st.funding)}">${sUsd(st.funding)}</b></div>
+        <div><span>💰 Cashback Bitunix (mes)</span><b class="jr-pos">${usd(cashbackMonth)}</b></div>
       </div>
+      <div class="jr-hero-sub" style="margin-top:6px">El 20% de descuento que te doy en comisiones no es un descuento en el momento — Bitunix te lo devuelve como cashback real a tu cuenta spot. Esto es lo que llevas recibido este mes.</div>
     </div>
     <div class="jr-kpis">
       ${kpi('Winrate', pct(st.winrate), st.wins + ' G · ' + st.losses + ' P · ' + st.be + ' BE')}

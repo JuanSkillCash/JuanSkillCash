@@ -243,6 +243,29 @@ def snapshot_capital(user_id: str, uid: str) -> None:
         log.warning(f"no se pudo guardar el capital inicial de {user_id} ({resp.status_code}): {resp.text[:300]}")
 
 
+def snapshot_cashback(user_id: str, uid: str) -> None:
+    """Cashback (20% de reembolso a la cuenta spot) acumulado en lo que va del mes - se
+    actualiza cada corrida (merge-duplicates), a diferencia del capital inicial que solo se
+    fija una vez por mes."""
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    start_str = month_start.strftime("%Y-%m-%dT%H:%M:%SZ")
+    end_str = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    cashback = bitunix_api.total_commission_earned_usdt(uid, start_str, end_str, BITUNIX_API_KEY, BITUNIX_API_SECRET)
+    if cashback is None:
+        log.warning(f"no se pudo leer el cashback de uid={uid}")
+        return
+    month = now.strftime("%Y-%m")
+    resp = requests.post(
+        f"{SUPABASE_URL}/rest/v1/user_bitunix_cashback?on_conflict=user_id,month",
+        json={"user_id": user_id, "month": month, "cashback_usdt": cashback, "updated_at": now.isoformat()},
+        headers={**_sb_headers(), "Prefer": "resolution=merge-duplicates,return=minimal"},
+        timeout=20,
+    )
+    if resp.status_code >= 300:
+        log.warning(f"no se pudo guardar el cashback de {user_id} ({resp.status_code}): {resp.text[:300]}")
+
+
 def main() -> None:
     if not SUPABASE_URL or not SUPABASE_KEY:
         log.error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el entorno.")
@@ -265,6 +288,7 @@ def main() -> None:
             continue
 
         snapshot_capital(user_id, uid)
+        snapshot_cashback(user_id, uid)
 
         if user_id in personal_key_users:
             continue  # ya tiene su propia clave conectada - su Bitacora la llena trade-journal-sync

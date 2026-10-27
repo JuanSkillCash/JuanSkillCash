@@ -190,6 +190,27 @@ def futures_open_positions_page(
     )
 
 
+def total_commission_earned_usdt(uid: str, start_time: str, end_time: str, api_key: str, api_secret: str) -> float | None:
+    """Cuanto cashback (reembolso del 20% de comisiones, devuelto a la cuenta SPOT del propio
+    usuario) gano un UID en un rango de fechas - suma totalCommission de todas las monedas/tipos
+    de trading que devuelve totalTransaction en perspectiva userType='user' (ver
+    docs/bitunix-partner-api.md). None si la llamada fallo."""
+    result = call(
+        "GET", "/partner/api/v1/openapi/totalTransaction",
+        {"userType": "user", "uid": uid, "startTime": start_time, "endTime": end_time},
+        api_key, api_secret,
+    )
+    if result is None:
+        return None
+    total = 0.0
+    for row in (result.get("detail") or []):
+        try:
+            total += float(row.get("totalCommission") or 0)
+        except (TypeError, ValueError):
+            continue
+    return total
+
+
 def sum_volume_usd(uid: str, start_time: str, end_time: str, api_key: str, api_secret: str) -> float | None:
     """Suma transVolumeUsd de todas las paginas/pares de un UID en el rango dado. None si
     alguna pagina fallo (mejor no guardar un numero parcial que subestime el volumen real)."""
