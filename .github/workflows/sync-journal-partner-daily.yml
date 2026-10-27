@@ -1,0 +1,33 @@
+name: Bitácora (Partner API) para referidos sin clave personal de Bitunix
+
+# Diario, no en punto (minuto 35) para evitar la congestion de GitHub Actions en horarios
+# redondos (ver nota igual en post-fng-telegram-daily.yml). Usa las credenciales de Partner API
+# de Juan (las mismas de update-bitunix-rank.yml) para llenar la Bitacora de quien es su
+# referido pero no conecto su propia API key personal de Bitunix - ver
+# docs/bitunix-partner-api.md y scripts/sync_journal_partner.py.
+on:
+  schedule:
+    - cron: "35 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Saldo mensual + Bitácora via Partner API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BITUNIX_API_KEY: ${{ secrets.BITUNIX_API_KEY }}
+          BITUNIX_API_SECRET: ${{ secrets.BITUNIX_API_SECRET }}
+        run: python scripts/sync_journal_partner.py

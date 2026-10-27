@@ -155,6 +155,41 @@ def query_pnl_and_trade_cnt_all(start_time: str, end_time: str, api_key: str, ap
     return by_uid
 
 
+def total_asset_value(uid: str, api_key: str, api_secret: str) -> dict | None:
+    """Saldo total de un UID ahora mismo (spot+futuros+copy-trading+lead-trader, en USDT) - ver
+    docs/bitunix-partner-api.md. dict con totalAssetValue/spotAccounts/futuresAccounts/
+    copyAccount/leadAccount (strings numericos), o None si la llamada fallo."""
+    return call("GET", "/partner/api/v1/openapi/totalAssetValue", {"uid": uid}, api_key, api_secret)
+
+
+def futures_positions_history_page(
+    uid: str, start_time: str, end_time: str, page: int, api_key: str, api_secret: str, page_size: int = 100,
+) -> dict | None:
+    """Una pagina de posiciones de futuros YA CERRADAS de un UID en un rango de fechas (max 180
+    dias por llamada - paginar en ventanas mas chicas si hace falta cubrir mas). Formato de
+    fechas: "yyyy-MM-ddTHH:mm:ssZ". Campos de cada item (ver docs/bitunix-partner-api.md):
+    positionId, pair, category, side, leverage, marginMode, entryPrice, closePrice, positionPnl,
+    ROI, maxHeld, closeQty, timeOpened, timeClosed, status."""
+    return call(
+        "POST", "/partner/api/v1/openapi/futuresPositionsHistory",
+        {"uid": uid, "startTime": start_time, "endTime": end_time, "page": page, "pageSize": page_size},
+        api_key, api_secret,
+    )
+
+
+def futures_open_positions_page(
+    uid: str, page: int, api_key: str, api_secret: str, page_size: int = 100,
+) -> dict | None:
+    """Una pagina de posiciones de futuros ABIERTAS de un UID ahora mismo. Campos de cada item:
+    positionId, pair, category, side, leverage, marginMode, entryPrice, amount, margin,
+    timeOpened (sin PnL todavia, porque sigue abierta)."""
+    return call(
+        "POST", "/partner/api/v1/openapi/futuresOpenPositions",
+        {"uid": uid, "page": page, "pageSize": page_size},
+        api_key, api_secret,
+    )
+
+
 def sum_volume_usd(uid: str, start_time: str, end_time: str, api_key: str, api_secret: str) -> float | None:
     """Suma transVolumeUsd de todas las paginas/pares de un UID en el rango dado. None si
     alguna pagina fallo (mejor no guardar un numero parcial que subestime el volumen real)."""
