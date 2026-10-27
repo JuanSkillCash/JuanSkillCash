@@ -105,12 +105,22 @@ const iso = (ms: unknown): string | null => {
   return Number.isFinite(n) && n > 0 ? new Date(n).toISOString() : null;
 };
 // una posicion de Bitunix -> una fila de trade_journal_trades
+//
+// OJO: Bitunix manda "realizedPNL" ya NETO de comision - confirmado contra el detalle real de
+// una posicion en la app de Bitunix (Juan, 27 oct 2026): "Beneficio/Perdida Realizada" ahi =
+// "Perdidas y ganancias de posiciones cerradas" (bruto) MENOS "Comisiones de negociacion". Si
+// aca se guarda ese valor tal cual en `pnl` (que en TODO el esquema es BRUTO - ver manual/
+// bitunix_partner), journal.js (net = pnl - fees + funding) resta la comision una SEGUNDA vez,
+// lo que puede hasta voltear un dia ganador en perdedor. Por eso se "des-netea" sumando la
+// comision de vuelta - asi `pnl` queda bruto en todas las fuentes y no hay que tocar journal.js.
 function mapPosition(p: Record<string, unknown>, userId: string, open: boolean) {
   const entry = num(p.entryPrice ?? p.avgOpenPrice);
   const qty = num(p.maxQty ?? p.qty);
   const lev = num(p.leverage);
   const side = String(p.side || '').toUpperCase().includes('SHORT') || String(p.side || '').toUpperCase() === 'SELL' ? 'short' : 'long';
   const margin = num(p.margin) ?? (entry && qty && lev ? (entry * qty) / lev : null);
+  const fee = Math.abs(num(p.fee ?? p.fees) ?? 0);
+  const realizedNet = num(p.realizedPNL) ?? 0;
   return {
     user_id: userId,
     source: 'bitunix',
@@ -123,8 +133,8 @@ function mapPosition(p: Record<string, unknown>, userId: string, open: boolean) 
     qty,
     entry_price: entry,
     exit_price: open ? null : num(p.closePrice),
-    pnl: num(p.realizedPNL) ?? 0,
-    fees: Math.abs(num(p.fee ?? p.fees) ?? 0),
+    pnl: open ? realizedNet : realizedNet + fee,
+    fees: fee,
     funding: num(p.funding) ?? 0,
     opened_at: iso(p.ctime) ?? new Date().toISOString(),
     closed_at: open ? null : (iso(p.mtime) ?? new Date().toISOString()),
