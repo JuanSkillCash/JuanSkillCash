@@ -9419,6 +9419,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <input type="file" id="bitunixScreenshotInput" accept="image/*">
         </div>
 
+        <div class="field" id="f-bitunix-notify-telegram" style="display:none;margin-top:10px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
+            <input type="checkbox" id="bitunixNotifyTelegramInput" style="width:auto">
+            🔔 Avísame por Telegram apenas quede aprobado
+          </label>
+        </div>
+
         <button type="button" class="a-btn" id="bitunixSubmitBtn" style="width:auto;padding:10px 18px;margin-top:14px">Enviar solicitud</button>
         <p class="auth-note" id="bitunixError" style="display:none;margin-top:10px;border-color:var(--red);color:var(--red)"></p>
       </div>
@@ -26467,6 +26474,21 @@ async function loadNotifications(){
   rows.forEach(r => {
     const a = document.createElement('a');
     a.className = 'notif-item' + (r.read_at ? '' : ' unread');
+    if(r.kind === 'bitunix_approved'){
+      a.href = '#';
+      a.innerHTML =
+        '<div class="notif-item-top"><span>🎉 ¡Felicidades!</span></div>' +
+        '<div class="notif-item-title">' + escapeHtml(r.title) + '</div>' +
+        '<div class="notif-item-date">' + notifTimeAgoShort(r.created_at) + '</div>';
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        if(!r.read_at) markNotificationRead(r.id);
+        notifMiniDropdown.classList.remove('open');
+        if(typeof openBitunixModal === 'function') openBitunixModal();
+      });
+      notifList.appendChild(a);
+      return;
+    }
     a.href = r.source_url;
     a.target = '_blank';
     a.rel = 'noopener';
@@ -26874,6 +26896,8 @@ const bitunixPathTransfer = document.getElementById('bitunixPathTransfer');
 const bitunixScreenshotField = document.getElementById('f-bitunix-screenshot');
 const bitunixUidInput = document.getElementById('bitunixUidInput');
 const bitunixScreenshotInput = document.getElementById('bitunixScreenshotInput');
+const bitunixNotifyTelegramField = document.getElementById('f-bitunix-notify-telegram');
+const bitunixNotifyTelegramInput = document.getElementById('bitunixNotifyTelegramInput');
 const bitunixSubmitBtn = document.getElementById('bitunixSubmitBtn');
 const bitunixErrorEl = document.getElementById('bitunixError');
 let bitunixPath = 'referral_new';
@@ -26929,6 +26953,11 @@ async function loadBitunixStatus(){
   if(!data){
     bitunixShowState('form');
     updateBitunixPillStatus(null);
+    // la casilla de "avisame por Telegram" solo tiene sentido si ya vinculo Telegram - si no,
+    // de todas formas le queda la notificacion dentro del sitio (campanita) cuando lo aprueben
+    const { data: tg } = await sbClient.from('user_telegram_links').select('linked_at').eq('user_id', currentUser.id).maybeSingle();
+    bitunixNotifyTelegramField.style.display = (tg && tg.linked_at) ? 'block' : 'none';
+    if(!(tg && tg.linked_at)) bitunixNotifyTelegramInput.checked = false;
     return;
   }
   updateBitunixPillStatus(data.status);
@@ -27002,6 +27031,7 @@ bitunixSubmitBtn.addEventListener('click', async () => {
       connect_path: bitunixPath,
       uid: uid,
       screenshot_path: screenshotPath,
+      notify_telegram: bitunixNotifyTelegramField.style.display !== 'none' && bitunixNotifyTelegramInput.checked,
     });
     if(error){
       bitunixErrorEl.textContent = friendlyErrMsg(error);

@@ -35,6 +35,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           BITUNIX_API_KEY: ${{ secrets.BITUNIX_API_KEY }}
           BITUNIX_API_SECRET: ${{ secrets.BITUNIX_API_SECRET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python scripts/update_bitunix_connections.py
 
       - name: Calcular volumen y rango del mes en curso

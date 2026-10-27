@@ -12,11 +12,21 @@ una: quizas la persona todavia esta esperando a que soporte de Bitunix complete 
 su cuenta existente, o se demoro en darle Start al registro. Nunca se auto-rechaza una
 conexion - eso lo sigue haciendo Juan a mano si hace falta.
 
+Cuando se promueve a "connected" se avisa de dos formas (ver scripts/sql/
+bitunix_approval_notify.sql): SIEMPRE una fila en user_notifications (la campanita del sitio),
+y ADEMAS por Telegram si la persona marco "avisame por Telegram" al pedir la conexion Y ya
+tiene su Telegram vinculado (user_telegram_links.chat_id) - igual que
+scripts/watchlist_notify.py. Ninguno de los dos avisos puede tumbar la corrida: si fallan, se
+deja un warning y se sigue (la conexion ya quedo "connected" de todas formas, eso es lo que
+importa).
+
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
     BITUNIX_API_KEY
     BITUNIX_API_SECRET
+Opcional:
+    TELEGRAM_BOT_TOKEN (si falta, simplemente no se manda el aviso de Telegram)
 """
 
 from __future__ import annotations
@@ -29,6 +39,7 @@ from datetime import datetime, timezone
 import requests
 
 import bitunix_api
+from telegram_notify import send_telegram_message
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("update_bitunix_connections")
@@ -37,8 +48,18 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 BITUNIX_API_KEY = os.environ.get("BITUNIX_API_KEY", "")
 BITUNIX_API_SECRET = os.environ.get("BITUNIX_API_SECRET", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
 CONNECTIONS_TABLE = "user_exchange_connections"
+NOTIFICATIONS_TABLE = "user_notifications"
+TELEGRAM_LINKS_TABLE = "user_telegram_links"
+
+APPROVAL_TITLE = "Tu cuenta de Bitunix ya quedó verificada — ya puedes usar las herramientas de Rango de Manada."
+APPROVAL_TELEGRAM_TEXT = (
+    "🎉 ¡Felicidades!\n\n"
+    "Tu cuenta de Bitunix ya quedó verificada — ya puedes usar las herramientas de Rango de Manada "
+    "en juanskillcash.com."
+)
 
 
 def _sb_headers() -> dict:
@@ -52,7 +73,7 @@ def _sb_headers() -> dict:
 def _fetch_pending() -> list[dict]:
     resp = requests.get(
         f"{SUPABASE_URL}/rest/v1/{CONNECTIONS_TABLE}",
-        params={"select": "user_id,uid", "exchange": "eq.bitunix", "status": "eq.pending"},
+        params={"select": "user_id,uid,notify_telegram", "exchange": "eq.bitunix", "status": "eq.pending"},
         headers=_sb_headers(), timeout=20,
     )
     if resp.status_code != 200:
@@ -70,6 +91,36 @@ def _mark_connected(user_id: str) -> bool:
         timeout=20,
     )
     return resp.status_code < 300
+
+
+def _notify_in_app(user_id: str) -> None:
+    resp = requests.post(
+        f"{SUPABASE_URL}/rest/v1/{NOTIFICATIONS_TABLE}?on_conflict=user_id,source_url",
+        json={
+            "user_id": user_id, "kind": "bitunix_approved", "radar": "bitunix",
+            "exchange": "bitunix", "title": APPROVAL_TITLE, "source_url": "bitunix-approval",
+        },
+        # ignore-duplicates: si este robot vuelve a correr sobre el mismo usuario (no deberia,
+        # ya quedo "connected", pero por si acaso) no duplica el aviso
+        headers={**_sb_headers(), "Prefer": "resolution=ignore-duplicates,return=minimal"},
+        timeout=20,
+    )
+    if resp.status_code >= 300:
+        log.warning(f"no se pudo crear la notificacion en el sitio para {user_id} ({resp.status_code}): {resp.text[:300]}")
+
+
+def _notify_telegram_if_opted_in(user_id: str) -> None:
+    if not TELEGRAM_BOT_TOKEN:
+        return
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{TELEGRAM_LINKS_TABLE}",
+        params={"select": "chat_id", "user_id": f"eq.{user_id}", "chat_id": "not.is.null"},
+        headers=_sb_headers(), timeout=20,
+    )
+    if resp.status_code != 200 or not resp.json():
+        return
+    chat_id = resp.json()[0].get("chat_id")
+    send_telegram_message(TELEGRAM_BOT_TOKEN, chat_id, APPROVAL_TELEGRAM_TEXT)
 
 
 def main() -> None:
@@ -100,6 +151,9 @@ def main() -> None:
         if result.get("result") is True:
             if _mark_connected(user_id):
                 promoted += 1
+                _notify_in_app(user_id)
+                if row.get("notify_telegram"):
+                    _notify_telegram_if_opted_in(user_id)
             else:
                 failed += 1
         else:
