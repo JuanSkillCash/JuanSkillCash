@@ -101,9 +101,13 @@ async function loadAll(){
     S.capitalByMonth = {};
     ((capital && capital.data) || []).forEach(c => { S.capitalByMonth[c.month] = Number(c.starting_capital); });
     S.sync = (sync && sync.data) || null;
-    // conectado a Bitunix (con clave personal o solo por UID via Partner API) = el saldo mensual
-    // ya lo llena solo un robot (scripts/sync_journal_partner.py) - no se le debe pedir a mano.
-    S.exchangeConnected = !!(connection && connection.data && connection.data.status === 'connected');
+    // conectado a Bitunix (con clave personal via trade-journal-sync, o solo por UID via Partner
+    // API) = no se le debe pedir el saldo a mano - aunque hoy solo scripts/sync_journal_partner.py
+    // lo llena solo (a quien conecto por UID); a quien tiene SOLO su clave personal (hoy, en la
+    // practica, solo el dueño) hay que fijarselo una vez a mano por SQL, pero la caja de "poner
+    // saldo" igual se le oculta porque no es algo que tenga sentido que el toque el mismo.
+    S.exchangeConnected = !!(connection && connection.data && connection.data.status === 'connected')
+      || !!(S.sync && S.sync.status === 'connected');
     // cashback del 20% de descuento de Juan, devuelto a la cuenta spot - lo llena
     // scripts/sync_journal_partner.py (Partner API), no es algo que el usuario registre
     S.cashbackByMonth = {};
