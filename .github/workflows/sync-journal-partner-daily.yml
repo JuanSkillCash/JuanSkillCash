@@ -1,13 +1,18 @@
 name: Bitácora (Partner API) para referidos sin clave personal de Bitunix
 
-# Diario, no en punto (minuto 35) para evitar la congestion de GitHub Actions en horarios
-# redondos (ver nota igual en post-fng-telegram-daily.yml). Usa las credenciales de Partner API
-# de Juan (las mismas de update-bitunix-rank.yml) para llenar la Bitacora de quien es su
-# referido pero no conecto su propia API key personal de Bitunix - ver
+# 04:59 UTC = 11:59 PM hora Colombia (UTC-5), pedido explicito de Juan. Usa las credenciales de
+# Partner API de Juan (las mismas de update-bitunix-rank.yml) para llenar la Bitacora de quien es
+# su referido pero no conecto su propia API key personal de Bitunix - ver
 # docs/bitunix-partner-api.md y scripts/sync_journal_partner.py.
+#
+# OJO: el horario "schedule" de GitHub Actions NO es confiable para hora exacta en este repo -
+# confirmado con el historial real de corridas de post-dominance-telegram-daily.yml y
+# post-fng-telegram-daily.yml, que llegan atrasadas 3 a 6 HORAS incluso con el minuto ya corrido
+# ("50" en vez de "00"). Esto le pasa a cualquier workflow con "schedule" aca, este incluido - no
+# es un problema del minuto exacto que se elija.
 on:
   schedule:
-    - cron: "35 3 * * *"
+    - cron: "59 4 * * *"
   workflow_dispatch: {}
 
 jobs:
