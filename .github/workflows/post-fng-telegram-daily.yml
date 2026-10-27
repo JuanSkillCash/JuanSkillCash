@@ -1,16 +1,10 @@
 name: Postear Miedo y Codicia diario en Telegram
 
-# 12:50 UTC = 7:50 AM hora Colombia (UTC-5) - unos minutos antes de las 8am pedidas por Juan
-# (antes mandaba a la 1:00 UTC = 8pm Colombia del dia anterior, pero por el atraso tipico de
-# GitHub Actions en horarios "en punto" terminaba llegando pasada la medianoche, 12:25am). A
-# proposito NO en punto (minuto 0): los workflows agendados justo en punto compiten con miles
-# de repos que piden lo mismo a esa hora exacta, y GitHub los puede atrasar varias horas. A
-# las 12:50 UTC sobra margen de sobra para que CoinMarketCap ya haya recalculado su indice
-# (~00:08 UTC) y para que el robot que lo lee cada hora (update-cmc-fng-latest.yml,
-# "0 * * * *") ya haya refrescado cmc_fng_latest con el numero del dia.
+# REEMPLAZADO por post-crypto-bulletin-telegram-daily.yml (una sola imagen con dominancia +
+# miedo y codicia, un solo link a la pagina principal - pedido de Juan). Se deja sin "schedule"
+# para que no siga posteando por su cuenta (duplicaria el boletin); workflow_dispatch se deja
+# por si hace falta correrlo suelto para pruebas.
 on:
-  schedule:
-    - cron: "50 12 * * *"
   workflow_dispatch: {}
 
 jobs:

@@ -1,14 +1,10 @@
 name: Postear Dominancia BTC/USDT diario en Telegram
 
-# 12:50 UTC = 7:50 AM hora Colombia (UTC-5) - unos minutos antes de las 8am pedidas por Juan,
-# a proposito NO en punto (minuto 0): los workflows programados "en punto" compiten con miles
-# de repos que agendan lo mismo a esa hora exacta, y GitHub los puede atrasar varias horas (asi
-# llegaban las 7am configuradas de antes como 10:14am de verdad). Usa el valor EN VIVO de
-# CoinGecko /global (no el cierre diario de TradingView), para que el dato sea el real de ese
-# momento sin importar la hora exacta en que corra.
+# REEMPLAZADO por post-crypto-bulletin-telegram-daily.yml (una sola imagen con dominancia +
+# miedo y codicia, un solo link a la pagina principal - pedido de Juan). Se deja sin "schedule"
+# para que no siga posteando por su cuenta (duplicaria el boletin); workflow_dispatch se deja
+# por si hace falta correrlo suelto para pruebas.
 on:
-  schedule:
-    - cron: "50 12 * * *"
   workflow_dispatch: {}
 
 jobs:

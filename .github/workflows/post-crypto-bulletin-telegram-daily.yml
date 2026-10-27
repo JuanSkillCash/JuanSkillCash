@@ -1,0 +1,35 @@
+name: Postear boletín cripto diario en Telegram (dominancia + miedo y codicia)
+
+# Una sola imagen con dominancia BTC/USDT + Indice de Miedo y Codicia, un solo link a la pagina
+# principal - reemplaza a post-dominance-telegram-daily.yml + post-fng-telegram-daily.yml
+# (que quedan solo con workflow_dispatch, sin cron, para no duplicar el envio).
+#
+# OJO: el "schedule" de GitHub Actions en este repo llega atrasado 3-6 horas, sin importar el
+# minuto (confirmado con el historial real de corridas) - este cron es solo un respaldo. La hora
+# real y confiable la dispara Claude manualmente via workflow_dispatch a las 8am Colombia en
+# punto, hasta que se resuelva una forma de disparo externo mas confiable.
+on:
+  schedule:
+    - cron: "50 12 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests pillow
+
+      - name: Generar y postear el boletín
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/post_crypto_bulletin_telegram.py
