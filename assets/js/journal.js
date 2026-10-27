@@ -331,10 +331,93 @@ function donut(parts){
 /* ======================= UI base ======================= */
 const root = () => $('journalRoot');
 function kpi(label, value, sub, cls){
-  return `<div class="jr-kpi"><div class="jr-kpi-label">${label}</div><div class="jr-kpi-val ${cls || ''}">${value}</div>${sub ? `<div class="jr-kpi-sub">${sub}</div>` : ''}</div>`;
+  return `<div class="jr-kpi"><div class="jr-kpi-label">${label}${helpBtn(label)}</div><div class="jr-kpi-val ${cls || ''}">${value}</div>${sub ? `<div class="jr-kpi-sub">${sub}</div>` : ''}</div>`;
 }
 function card(title, body, extra){
-  return `<div class="jr-card ${extra || ''}"><div class="jr-card-title">${title}</div>${body}</div>`;
+  return `<div class="jr-card ${extra || ''}"><div class="jr-card-title">${title}${helpBtn(title)}</div>${body}</div>`;
+}
+/* ======================= ayuda (bolitas "?") ======================= */
+// Pedido explicito de Juan: no todo el mundo (ni el mismo) entiende todos los terminos de
+// trading que aparecen aca - una bolita con "?" al lado de cada titulo/filtro/pestana, que al
+// tocarla explica en espanol sencillo que es ese dato. helpBtn() busca el texto por la MISMA
+// etiqueta visible (asi no hay que tocar cada sitio donde se usa kpi()/un <th>/una pestana).
+const HELP = {
+  // pestanas
+  'Resumen': 'La vista general: cuánto ganaste o perdiste en el rango de fechas elegido arriba, el cashback de Bitunix del mes, y las métricas clave de tus operaciones cerradas.',
+  'Operaciones': 'La lista completa de tus operaciones, abiertas y cerradas, para revisarlas o editarlas una por una.',
+  'Calendario': 'Tu resultado día por día en un calendario, para ver de un vistazo en qué días ganaste o perdiste.',
+  'Análisis': 'Comparaciones más a fondo: qué par te va mejor, de día o de noche, long contra short, por setup, etc.',
+  'Mensual / Anual': 'El resumen de cada mes y de cada año: cuánto operaste, cuánto ganaste y tu capital inicial de ese período.',
+  'Conexión y ajustes': 'Aquí conectas o desconectas tu cuenta de Bitunix, y ves el capital con el que se calculan tus porcentajes.',
+  // filtros
+  'filter_pares': 'Muestra solo las operaciones de uno o varios pares que elijas (ej. BTCUSDT), ocultando el resto.',
+  'filter_lado': '"Long" = apostaste a que el precio sube. "Short" = apostaste a que baja. Filtra para ver solo uno de los dos.',
+  'filter_resultado': 'Filtra por cómo cerró la operación: con ganancia, con pérdida, o "break-even" (cerró prácticamente sin ganar ni perder).',
+  'filter_origen': '"Manual" = la registraste tú a mano. "Bitunix" = llegó sola porque conectaste tu cuenta. Filtra para ver solo un tipo.',
+  'filter_setup': 'Filtra por la estrategia o "setup" que le escribiste a la operación al registrarla (ej. "ruptura de rango").',
+  'filter_etiqueta': 'Filtra por las etiquetas que le pusiste a tus operaciones (ej. "scalp", "noticia", "tendencia").',
+  // hero
+  'P&L neto del rango': 'Ganancia o pérdida total, ya con comisiones y funding descontados, de las operaciones CERRADAS dentro del rango de fechas que elegiste arriba (las abiertas no cuentan hasta que cierren).',
+  'Ganado': 'La suma de todo lo que ganaste en las operaciones que cerraste con ganancia, dentro del rango de fechas elegido.',
+  'Perdido': 'La suma de todo lo que perdiste en las operaciones que cerraste con pérdida, dentro del rango de fechas elegido.',
+  'Comisiones': 'Lo que Bitunix te cobró en comisiones por todas tus operaciones del rango elegido (ya descontado del P&L neto).',
+  'Funding': 'El pago que se cobra o se paga cada tanto por mantener una posición de futuros abierta - puede ser a tu favor (+) o en contra (-).',
+  'Cashback Bitunix (mes)': 'El 20% de descuento que te doy en comisiones no se aplica al momento - Bitunix te lo devuelve como dinero real a tu cuenta spot. Esto es lo que llevas recibido ESTE MES (no depende del rango de fechas de arriba).',
+  // kpis resumen
+  'Winrate': 'El porcentaje de tus operaciones cerradas que terminaron en ganancia.',
+  'Profit factor': 'Todo lo ganado dividido entre todo lo perdido. Más de 1 = ganas más de lo que pierdes. Menos de 1 = al revés.',
+  'Expectativa': 'La ganancia o pérdida promedio que puedes esperar por cada operación nueva, según cómo te ha ido hasta ahora.',
+  'Ratio G/P': 'Tu ganancia promedio dividida entre tu pérdida promedio - qué tan grandes son tus ganancias comparadas con tus pérdidas.',
+  'Ganancia promedio': 'El promedio de dinero que ganas en las operaciones que te salen bien.',
+  'Pérdida promedio': 'El promedio de dinero que pierdes en las operaciones que te salen mal.',
+  'Max drawdown': 'La caída más grande que tuvo tu capital desde un punto alto hasta un punto bajo, dentro del rango elegido.',
+  'Factor de recuperación': 'Tu ganancia neta dividida entre tu peor caída (drawdown) - qué tan bien compensas lo que llegaste a perder.',
+  'Mejor operación': 'La operación que más dinero te dejó, dentro del rango de fechas elegido.',
+  'Peor operación': 'La operación que más dinero te costó, dentro del rango de fechas elegido.',
+  'Rachas': 'La racha más larga de operaciones ganadoras seguidas, y la más larga de operaciones perdedoras seguidas.',
+  'Días en verde': 'De los días en que hiciste al menos una operación, cuántos terminaron el día con ganancia neta.',
+  'Apalancamiento prom.': 'El apalancamiento (x) promedio que usaste en tus operaciones - cuánto "multiplicaste" tu margen.',
+  'Duración promedio': 'Cuánto tiempo, en promedio, mantienes abierta una operación antes de cerrarla.',
+  'Volumen operado': 'La suma del tamaño de todas tus posiciones (precio de entrada × cantidad) en el rango elegido.',
+  'Sharpe (diario, anual.)': 'Qué tan buena es tu rentabilidad comparada con qué tan pareja o irregular es. Más alto es mejor; 0 o negativo es mala señal.',
+  // tabla mensual/anual
+  'Mes': 'El mes al que corresponde esa fila.',
+  'Op.': 'Cuántas operaciones cerraste ese mes.',
+  'Capital inicial': 'El capital con el que arrancó ese mes - se usa para calcular tu % de rentabilidad y de drawdown de ese mes.',
+  'P&L neto': 'Ganancia o pérdida total de ese mes, ya con comisiones y funding descontados.',
+  'Rentab.': 'El P&L neto de ese mes como porcentaje de tu capital inicial de ese mes.',
+  'Mejor día': 'El día con más ganancia neta dentro de ese mes.',
+  'Peor día': 'El día con más pérdida neta dentro de ese mes.',
+  'Max DD': 'La caída más grande que tuvo tu capital ese mes, desde un punto alto hasta un punto bajo.',
+  // titulos de graficos y tarjetas
+  'Curva de capital': 'Cómo fue creciendo o bajando tu capital, operación tras operación, dentro del rango de fechas elegido.',
+  'Drawdown': 'En cada punto de tu curva de capital, cuánto habías caído desde el pico más alto que llevabas hasta ese momento.',
+  'P&L por día': 'Cuánto ganaste o perdiste en total cada día, dentro del rango de fechas elegido.',
+  'Long vs Short': 'Compara tus resultados cuando apostaste a que el precio sube (long) contra cuando apostaste a que baja (short).',
+  'Resultados': 'De tus operaciones cerradas, cuántas fueron ganadoras, perdedoras, o break-even (sin ganar ni perder).',
+  'Mejores y peores pares': 'Los pares (ej. BTCUSDT) que más te dejaron en ganancia, y los que más te costaron, dentro del rango elegido.',
+  'Posiciones abiertas': 'Las operaciones que todavía no has cerrado - no cuentan en tus estadísticas hasta que las cierres.',
+  'P&L por par': 'Cuánto ganaste o perdiste en total con cada par que operaste (ej. BTCUSDT, ETHUSDT).',
+  'P&L por día de la semana': 'Si te va mejor operando lunes, martes, etc. - suma el resultado de cada día de la semana en todo tu historial filtrado.',
+  'P&L por hora de apertura': 'Si te va mejor abriendo operaciones a ciertas horas del día - agrupa tus resultados por la hora en que abriste cada operación.',
+  'Distribución de resultados': 'Cuántas de tus operaciones cerraron con cada tamaño de ganancia o pérdida, agrupadas en rangos.',
+  'ROE por operación (sobre margen)': 'El "Return On Equity": la ganancia o pérdida de cada operación como porcentaje del margen que usaste en ella (no del capital total).',
+  'Por apalancamiento': 'Cómo te va según el apalancamiento (x) que usaste en cada operación.',
+  'Por duración': 'Cómo te va según cuánto tiempo mantienes abierta una operación antes de cerrarla.',
+  'Por setup': 'Cómo te va según la estrategia o "setup" que le escribiste a cada operación al registrarla.',
+  'Por emoción': 'Cómo te va según el estado de ánimo que marcaste al registrar cada operación (tranquilo, ansioso, FOMO, etc.).',
+  'Por etiqueta': 'Cómo te va según las etiquetas que le pusiste a tus operaciones.',
+  'Por calidad de ejecución': 'Cómo te va según la calificación con estrellas que le diste a tu propia ejecución de cada operación.',
+  'Detalle por par': 'La tabla completa, par por par, con cuántas operaciones hiciste, tu winrate y tu resultado neto de cada uno.',
+  'P&L por mes': 'Cuánto ganaste o perdiste en total cada mes del año que estás viendo.',
+  'P&L acumulado del año': 'Tu ganancia o pérdida sumada mes tras mes, para ver cómo va el año completo de corrido.',
+  'Detalle mes a mes': 'Un resumen fila por fila de cada mes del año: operaciones, winrate, capital inicial y rentabilidad.',
+  'Conexión automática con Bitunix': 'Aquí conectas tu cuenta de Bitunix (con una API key de solo lectura) para que tus operaciones se carguen solas, sin escribirlas a mano.',
+  'Capital': 'El capital con el que se calculan tus porcentajes de rentabilidad y de drawdown en cada mes.',
+};
+function helpBtn(label){
+  const t = HELP[label];
+  return t ? ` <button type="button" class="jr-help" data-help="${esc(t)}" aria-label="¿Qué es esto?">?</button>` : '';
 }
 const PRESETS = [['today','Hoy'],['7d','7 días'],['30d','30 días'],['month','Este mes'],['lastmonth','Mes pasado'],['90d','90 días'],['year','Este año'],['all','Todo'],['custom','Personalizado']];
 const TABS = [['resumen','Resumen'],['operaciones','Operaciones'],['calendario','Calendario'],['analisis','Análisis'],['anual','Mensual / Anual'],['ajustes','Conexión y ajustes']];
@@ -373,20 +456,22 @@ function renderShell(){
         <label>Hasta <input type="date" id="jrTo" value="${toDateInput(f.to ? new Date(f.to - 1) : null)}"></label>
       </div>
       <div class="jr-filter-row">
-        <div class="jr-ms" id="jrSymbolMs">
-          <button type="button" class="jr-select" data-act="ms">${f.symbols.length ? f.symbols.length + ' par' + (f.symbols.length > 1 ? 'es' : '') : 'Todos los pares'} ▾</button>
-          <div class="jr-ms-pop" style="display:none">${symbols.length ? symbols.map(s => `<label><input type="checkbox" value="${esc(s)}" ${f.symbols.includes(s) ? 'checked' : ''}> ${esc(s)}</label>`).join('') : '<span class="jr-muted">Aún no hay pares</span>'}</div>
-        </div>
-        <select class="jr-select" data-f="side"><option value="all">Long y short</option><option value="long" ${f.side === 'long' ? 'selected' : ''}>Solo long</option><option value="short" ${f.side === 'short' ? 'selected' : ''}>Solo short</option></select>
-        <select class="jr-select" data-f="result"><option value="all">Todos los resultados</option><option value="win" ${f.result === 'win' ? 'selected' : ''}>Ganadoras</option><option value="loss" ${f.result === 'loss' ? 'selected' : ''}>Perdedoras</option><option value="be" ${f.result === 'be' ? 'selected' : ''}>Break-even</option></select>
-        <select class="jr-select" data-f="source"><option value="all">Manual y automático</option><option value="manual" ${f.source === 'manual' ? 'selected' : ''}>Solo manual</option><option value="bitunix" ${f.source === 'bitunix' ? 'selected' : ''}>Solo Bitunix</option></select>
-        <select class="jr-select" data-f="setup"><option value="all">Todos los setups</option>${setups.map(s => `<option ${f.setup === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
-        <select class="jr-select" data-f="tag"><option value="all">Todas las etiquetas</option>${tags.map(s => `<option ${f.tag === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+        <span class="jr-fitem">
+          <div class="jr-ms" id="jrSymbolMs">
+            <button type="button" class="jr-select" data-act="ms">${f.symbols.length ? f.symbols.length + ' par' + (f.symbols.length > 1 ? 'es' : '') : 'Todos los pares'} ▾</button>
+            <div class="jr-ms-pop" style="display:none">${symbols.length ? symbols.map(s => `<label><input type="checkbox" value="${esc(s)}" ${f.symbols.includes(s) ? 'checked' : ''}> ${esc(s)}</label>`).join('') : '<span class="jr-muted">Aún no hay pares</span>'}</div>
+          </div>${helpBtn('filter_pares')}
+        </span>
+        <span class="jr-fitem"><select class="jr-select" data-f="side"><option value="all">Long y short</option><option value="long" ${f.side === 'long' ? 'selected' : ''}>Solo long</option><option value="short" ${f.side === 'short' ? 'selected' : ''}>Solo short</option></select>${helpBtn('filter_lado')}</span>
+        <span class="jr-fitem"><select class="jr-select" data-f="result"><option value="all">Todos los resultados</option><option value="win" ${f.result === 'win' ? 'selected' : ''}>Ganadoras</option><option value="loss" ${f.result === 'loss' ? 'selected' : ''}>Perdedoras</option><option value="be" ${f.result === 'be' ? 'selected' : ''}>Break-even</option></select>${helpBtn('filter_resultado')}</span>
+        <span class="jr-fitem"><select class="jr-select" data-f="source"><option value="all">Manual y automático</option><option value="manual" ${f.source === 'manual' ? 'selected' : ''}>Solo manual</option><option value="bitunix" ${f.source === 'bitunix' ? 'selected' : ''}>Solo Bitunix</option></select>${helpBtn('filter_origen')}</span>
+        <span class="jr-fitem"><select class="jr-select" data-f="setup"><option value="all">Todos los setups</option>${setups.map(s => `<option ${f.setup === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>${helpBtn('filter_setup')}</span>
+        <span class="jr-fitem"><select class="jr-select" data-f="tag"><option value="all">Todas las etiquetas</option>${tags.map(s => `<option ${f.tag === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>${helpBtn('filter_etiqueta')}</span>
         <input type="search" class="jr-search" id="jrSearch" placeholder="Buscar par, nota, setup…" value="${esc(f.q)}">
         <button type="button" class="jr-link" data-act="clear">Limpiar filtros</button>
       </div>
     </div>
-    <div class="jr-tabs">${TABS.map(([k, l]) => `<button type="button" class="jr-tab ${S.tab === k ? 'on' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>
+    <div class="jr-tabs">${TABS.map(([k, l]) => `<span class="jr-tab-wrap"><button type="button" class="jr-tab ${S.tab === k ? 'on' : ''}" data-tab="${k}">${l}</button>${helpBtn(l)}</span>`).join('')}</div>
     <div id="jrPane"></div>`;
   renderPane();
 }
@@ -425,14 +510,14 @@ function paneResumen(){
   const opens = openTrades();
   return `
     <div class="jr-hero ${signCls(st.net)}">
-      <div><div class="jr-kpi-label">P&L neto del rango</div><div class="jr-hero-val">${sUsd(st.net)}</div>
+      <div><div class="jr-kpi-label">P&L neto del rango${helpBtn('P&L neto del rango')}</div><div class="jr-hero-val">${sUsd(st.net)}</div>
       <div class="jr-hero-sub"><span class="${signCls(st.ret)}">${sPct(st.ret)}</span> sobre capital de ${usd(cap, 0)} · ${st.n} operaciones cerradas · capital actual ${usd(cap + st.net)}</div></div>
       <div class="jr-hero-mini">
-        <div><span>Ganado</span><b class="jr-pos">${usd(st.gp)}</b></div>
-        <div><span>Perdido</span><b class="jr-neg">${usd(st.gl)}</b></div>
-        <div><span>Comisiones</span><b>${usd(st.fees)}</b></div>
-        <div><span>Funding</span><b class="${signCls(st.funding)}">${sUsd(st.funding)}</b></div>
-        <div><span>💰 Cashback Bitunix (mes)</span><b class="jr-pos">${usd(cashbackMonth)}</b></div>
+        <div><span>Ganado${helpBtn('Ganado')}</span><b class="jr-pos">${usd(st.gp)}</b></div>
+        <div><span>Perdido${helpBtn('Perdido')}</span><b class="jr-neg">${usd(st.gl)}</b></div>
+        <div><span>Comisiones${helpBtn('Comisiones')}</span><b>${usd(st.fees)}</b></div>
+        <div><span>Funding${helpBtn('Funding')}</span><b class="${signCls(st.funding)}">${sUsd(st.funding)}</b></div>
+        <div><span>💰 Cashback Bitunix (mes)${helpBtn('Cashback Bitunix (mes)')}</span><b class="jr-pos">${usd(cashbackMonth)}</b></div>
       </div>
       <div class="jr-hero-sub" style="margin-top:6px">El 20% de descuento que te doy en comisiones no es un descuento en el momento — Bitunix te lo devuelve como cashback real a tu cuenta spot. Esto es lo que llevas recibido este mes.</div>
     </div>
@@ -499,7 +584,7 @@ function paneOperaciones(){
   const opens = openTrades();
   const tot = stats(list, 0);
   return `
-    ${opens.length ? card('Posiciones abiertas (' + opens.length + ')', `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Apertura</th><th>Par</th><th>Lado</th><th>Apal.</th><th>Margen</th><th>Entrada</th><th>SL</th><th>TP</th><th>Origen</th><th></th></tr></thead><tbody>
+    ${opens.length ? card('Posiciones abiertas (' + opens.length + ')' + helpBtn('Posiciones abiertas'), `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Apertura</th><th>Par</th><th>Lado</th><th>Apal.</th><th>Margen</th><th>Entrada</th><th>SL</th><th>TP</th><th>Origen</th><th></th></tr></thead><tbody>
       ${opens.map(t => `<tr class="jr-row" data-edit="${t.id}"><td>${fmtDateTime(t.opened)}</td><td><b>${esc(t.symbol)}</b></td><td><span class="jr-side ${t.side}">${t.side.toUpperCase()}</span></td><td>${t.leverage ? t.leverage + 'x' : '—'}</td><td>${t.margin != null ? usd(t.margin) : '—'}</td><td>${t.entry ?? '—'}</td><td>${t.sl ?? '—'}</td><td>${t.tp ?? '—'}</td><td>${t.source === 'bitunix' ? 'Bitunix' : 'Manual'}</td><td>${t.source === 'manual' ? '<button type="button" class="jr-link" data-close="' + t.id + '">Cerrar</button>' : ''}</td></tr>`).join('')}
     </tbody></table></div>`) : ''}
     <div class="jr-card">
@@ -618,7 +703,7 @@ function paneAnual(){
     <div class="jr-grid2">
       ${card('P&L por mes', barChart(rows.map(r => ({ label: MONTHS_S[r.m], value: r.st.net, tip: r.st.n + ' op. · ' + sUsd(r.st.net) }))))}
       ${card('P&L acumulado del año', lineChart([{ y: 0, label: '' }].concat(cumItems), { h: 220, area: true, areaBase: 0, zero: true }))}
-      ${card('Detalle mes a mes', `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Mes</th><th>Op.</th><th>Winrate</th><th>Profit factor</th><th>Capital inicial</th><th>P&L neto</th><th>Rentab.</th><th>Mejor día</th><th>Peor día</th><th>Max DD</th></tr></thead><tbody>
+      ${card('Detalle mes a mes', `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Mes${helpBtn('Mes')}</th><th>Op.${helpBtn('Op.')}</th><th>Winrate${helpBtn('Winrate')}</th><th>Profit factor${helpBtn('Profit factor')}</th><th>Capital inicial${helpBtn('Capital inicial')}</th><th>P&L neto${helpBtn('P&L neto')}</th><th>Rentab.${helpBtn('Rentab.')}</th><th>Mejor día${helpBtn('Mejor día')}</th><th>Peor día${helpBtn('Peor día')}</th><th>Max DD${helpBtn('Max DD')}</th></tr></thead><tbody>
         ${rows.map(r => `<tr class="${r.st.n ? 'jr-row' : 'jr-dim'}" ${r.st.n ? `data-month="${r.m}"` : ''}><td>${r.name[0].toUpperCase() + r.name.slice(1)}</td><td>${r.st.n}</td><td>${pct(r.st.winrate)}</td><td>${Number.isFinite(r.st.pf) ? r.st.pf.toFixed(2) : '—'}</td><td>${usd(r.cap, 0)}</td>
           <td class="${signCls(r.st.net)}"><b>${r.st.n ? sUsd(r.st.net) : '—'}</b></td><td class="${signCls(r.st.ret)}">${r.st.n ? sPct(r.st.ret) : '—'}</td>
           <td class="jr-pos">${r.bestDay != null ? sUsd(r.bestDay) : '—'}</td><td class="jr-neg">${r.worstDay != null ? sUsd(r.worstDay) : '—'}</td><td class="jr-neg">${r.st.n ? usd(-r.st.maxDD) : '—'}</td></tr>`).join('')}
@@ -822,6 +907,7 @@ function bindEvents(){
   r.addEventListener('click', async e => {
     const el = e.target.closest('button, [data-edit], [data-day], [data-month], th[data-sort]');
     if(!el) return;
+    if(el.classList.contains('jr-help')){ toggleHelp(el); return; }
     if(el.dataset.preset){ S.f.preset = el.dataset.preset; if(el.dataset.preset === 'custom' && !S.f.from){ S.f.from = new Date(new Date().getFullYear(), new Date().getMonth(), 1); S.f.to = null; } S.page = 0; return renderShell(); }
     if(el.dataset.tab){ S.tab = el.dataset.tab; return renderShell(); }
     if(el.dataset.sort){ S.sort = { key: el.dataset.sort, dir: S.sort.key === el.dataset.sort ? -S.sort.dir : -1 }; return renderPane(); }
@@ -878,7 +964,34 @@ function bindEvents(){
   document.addEventListener('click', e => {
     const ms = $('jrSymbolMs');
     if(ms && !ms.contains(e.target)){ const pop = ms.querySelector('.jr-ms-pop'); if(pop) pop.style.display = 'none'; }
+    const hp = document.getElementById('jrHelpPop');
+    if(hp && !hp.contains(e.target) && !e.target.closest('.jr-help')) hp.remove();
   });
+}
+// bolita "?": popover flotante con el texto de ayuda, se abre/cierra al tocarla, se cierra al
+// tocar afuera (mismo patron que el popover de pares de arriba) - funciona igual en touch y mouse.
+function toggleHelp(btn){
+  const existing = document.getElementById('jrHelpPop');
+  if(existing){
+    const wasFor = existing.dataset.for;
+    existing.remove();
+    if(wasFor === btn.dataset.help) return;
+  }
+  const pop = document.createElement('div');
+  pop.id = 'jrHelpPop';
+  pop.className = 'jr-help-pop';
+  pop.dataset.for = btn.dataset.help;
+  pop.textContent = btn.dataset.help;
+  document.body.appendChild(pop);
+  const r = btn.getBoundingClientRect();
+  const pw = Math.min(240, window.innerWidth - 20);
+  pop.style.width = pw + 'px';
+  let left = r.left + r.width / 2 - pw / 2;
+  left = Math.max(10, Math.min(left, window.innerWidth - pw - 10));
+  pop.style.left = left + 'px';
+  const ph = pop.offsetHeight;
+  const spaceBelow = window.innerHeight - r.bottom;
+  pop.style.top = (spaceBelow > ph + 16 ? r.bottom + 8 : r.top - ph - 8) + 'px';
 }
 
 /* ======================= abrir / cerrar la vista ======================= */

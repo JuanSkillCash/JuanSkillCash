@@ -2495,8 +2495,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .jr-ms-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;background:#0e1220;border:1px solid var(--border2);border-radius:10px;padding:8px;max-height:280px;overflow:auto;min-width:200px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
 .jr-ms-pop label{display:flex;gap:8px;align-items:center;padding:4px 6px;font-size:13px;cursor:pointer;white-space:nowrap}
 .jr-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border2);margin-bottom:16px;overflow-x:auto}
+.jr-tab-wrap{display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
 .jr-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted2);padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
 .jr-tab.on{color:#fff;border-bottom-color:var(--accent)}
+.jr-fitem{display:inline-flex;align-items:center;gap:4px}
+.jr-help{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:var(--white);font-size:10px;font-weight:700;line-height:1;cursor:pointer;flex-shrink:0;padding:0;vertical-align:middle;text-transform:none;letter-spacing:normal}
+.jr-help:hover{background:rgba(255,255,255,.3)}
+.jr-help-pop{position:fixed;z-index:200;background:#0e1220;border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.45;color:var(--white);box-shadow:0 14px 34px rgba(0,0,0,.5)}
 .jr-hero{border:1px solid var(--border2);border-radius:14px;padding:20px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
 .jr-hero-val{font-size:44px;font-weight:700;line-height:1.1;margin:4px 0}
 .jr-hero.jr-pos .jr-hero-val{color:#4ade80}.jr-hero.jr-neg .jr-hero-val{color:#f87171}
@@ -27493,7 +27498,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="/assets/js/hero-progress.js?v=1" defer></script>
 <script src="/assets/js/icons.js?v=5" defer></script>
 <script src="/assets/js/community.js?v=2" defer></script>
-<script src="/assets/js/journal.js?v=6" defer></script>
+<script src="/assets/js/journal.js?v=7" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
