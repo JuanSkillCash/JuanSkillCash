@@ -44,17 +44,27 @@ function renderAdminLiveBtn(){
   btn.classList.toggle('on', liveState.is_live);
   btn.textContent = liveState.is_live ? '● Prendido — apagar' : 'Apagado — prender';
 }
-const adminLiveBtn = $('adminLiveToggle');
-if(adminLiveBtn){
-  adminLiveBtn.addEventListener('click', async () => {
-    if(!liveState || !isOwner()) return;
-    adminLiveBtn.disabled = true;
-    const { error } = await sbClient.from('site_status')
-      .update({ is_live: !liveState.is_live, updated_at: new Date().toISOString() }).eq('id', 1);
-    if(error) alert(error.message);
-    await loadLiveStatus();
-  });
+// el boton vive ahora dentro de assets/js/admin.js (pagina /administrador, el HTML se arma de
+// nuevo cada vez que se abre - no existe todavia cuando este script corre al cargar la pagina)
+// - por eso el bind del click y el pintado se repiten cada vez que admin.js lo pide, en vez de
+// una sola vez al cargar como antes (cuando vivia fijo dentro del modal viejo).
+function bindAdminLiveBtn(){
+  const btn = $('adminLiveToggle');
+  if(!btn) return;
+  if(!btn.dataset.liveBound){
+    btn.dataset.liveBound = '1';
+    btn.addEventListener('click', async () => {
+      if(!liveState || !isOwner()) return;
+      btn.disabled = true;
+      const { error } = await sbClient.from('site_status')
+        .update({ is_live: !liveState.is_live, updated_at: new Date().toISOString() }).eq('id', 1);
+      if(error) alert(error.message);
+      await loadLiveStatus();
+    });
+  }
+  renderAdminLiveBtn();
 }
+window.refreshAdminLiveBtn = bindAdminLiveBtn;
 loadLiveStatus();
 setInterval(loadLiveStatus, 120000);
 

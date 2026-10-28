@@ -1664,6 +1664,7 @@ function showColmillosPage(initialSlug){
   const tab = COLM_SLUG_TO_TAB[initialSlug] || 'inicio';
   closeAnyOpenToolInline();
   if(typeof closeJournalPage === 'function') closeJournalPage();
+  if(typeof closeAdminPage === 'function') closeAdminPage();
   categoryOverviewGrid.style.display = 'none';
   categoryDetailView.style.display = 'none';
   document.getElementById('marketDashboardBlock').style.display = 'none';

@@ -6698,6 +6698,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div id="journalRoot"></div>
     </div>
 
+    <!-- Panel de admin (assets/js/admin.js, solo Juan): pagina propia /administrador, no modal -
+         todo el contenido lo arma el JS. La proteccion real vive en el servidor. -->
+    <div id="adminPageView" style="display:none">
+      <button type="button" class="cat-back-btn" id="adminBackBtn">← Volver</button>
+      <div id="adminRoot"></div>
+    </div>
+
     <div id="colmillosPageView" style="display:none">
       <button type="button" class="cat-back-btn" id="colmillosBackBtn">← Volver</button>
 
@@ -9447,51 +9454,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   </div>
 </div>
 
-<!-- ===== MODAL: PANEL DE ADMIN - solo visible/accesible para el dueño (OWNER_USER_ID); la
-     proteccion real esta en las funciones get_admin_summary_stats()/get_admin_user_table()
-     (scripts/sql/create_admin_dashboard.sql), que revisan auth.uid() en el servidor sin
-     importar quien las llame - este botón escondido es solo cosmético. ===== -->
-<div class="modal-overlay" id="adminModal">
-  <button class="modal-close" id="closeAdmin" aria-label="Cerrar">✕</button>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitleEl" style="max-width:920px">
-    <div class="calc">
-      <div class="calc-head">
-        <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.png" alt="SkillCash">
-          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-        </div>
-        <h2 class="calc-title" id="adminTitleEl" style="font-size:22px">📊 Panel de admin</h2>
-        <p class="calc-sub">Solo tú puedes ver esto</p>
-      </div>
-
-      <div id="adminLoading" class="auth-note">Cargando métricas...</div>
-      <div id="adminError" class="auth-note" style="display:none;border-color:var(--red);color:var(--red)"></div>
-
-      <div id="adminContent" style="display:none">
-        <div class="admin-live-row">
-          <span>Indicador <b>EN VIVO</b> en la barra de arriba:</span>
-          <button type="button" class="admin-live-btn" id="adminLiveToggle">Cargando…</button>
-        </div>
-        <div class="summary-grid" id="adminSummaryGrid"></div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px;flex-wrap:wrap">
-          <h3 style="font-size:15px;margin:0">Por usuario</h3>
-          <select id="adminMonthSelect" class="auth-note" style="width:auto;padding:7px 10px;cursor:pointer">
-            <option value="">Mes actual</option>
-          </select>
-        </div>
-        <p class="auth-note" id="adminHistoryNote" style="display:none;margin-bottom:10px">Viendo un mes cerrado: solo volumen, operaciones y rango de ese mes — Bitunix/Telegram/Sharkoins siempre muestran el estado actual, no el de esa fecha.</p>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead id="adminTableHead"></thead>
-            <tbody id="adminUserTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ===== MODAL: MINIJUEGOS - Salto del Tiburón - juego independiente, ventana emergente
      propia (no vive pegado a ninguna pestaña) ===== -->
 <div class="modal-overlay" id="colmGameModal">
@@ -9975,6 +9937,7 @@ function showCategoryDetail(cat){
     return;
   }
   if(typeof closeJournalPage === 'function') closeJournalPage();
+  if(typeof closeAdminPage === 'function') closeAdminPage();
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   closeAnyOpenToolInline();
   setCatLabelToolOpen(false);
@@ -10011,6 +9974,7 @@ function showCategoryDetail(cat){
 }
 function showCategoryOverview(){
   if(typeof closeJournalPage === 'function') closeJournalPage();
+  if(typeof closeAdminPage === 'function') closeAdminPage();
   if(typeof colmillosPageView !== 'undefined' && colmillosPageView && colmillosPageView.style.display === 'block' && typeof hideColmillosPage === 'function'){
     hideColmillosPage();
   }
@@ -10612,6 +10576,8 @@ function applyRoute(path){
       // recién cerró arriba), nadie más lo refresca
       setPageTitle(CATEGORY_LABELS[cat]);
     }
+  } else if(segs[0] === 'administrador'){
+    if(typeof window.openAdminPage === 'function') window.openAdminPage();
   } else if(segs[0] === 'sharkoins'){
     // segs[1] (ej. "ayuda", "minijuegos") deja a la persona en la MISMA pestaña de Sharkoins
     // en la que estaba si recarga la pagina, en vez de siempre caer al menu principal -
@@ -27074,113 +27040,13 @@ closeBitunix.addEventListener('click', closeBitunixModal);
 bitunixModal.addEventListener('click', (e) => { if(e.target === bitunixModal) closeBitunixModal(); });
 document.getElementById('openBitunixPillBtn').addEventListener('click', openBitunixModal);
 
-/* ---- panel de admin (solo Juan) - lee todo a traves de get_admin_summary_stats() y
-   get_admin_user_table() (scripts/sql/create_admin_dashboard.sql), nunca directo de las
-   tablas: esas funciones son las que de verdad bloquean a cualquiera que no sea el owner,
-   el boton escondido de abajo es solo para no mostrarselo a nadie mas en la UI ---- */
-const adminModal = document.getElementById('adminModal');
-const adminPanel = adminModal.querySelector('.modal-panel');
-const closeAdmin = document.getElementById('closeAdmin');
-const RANK_LABELS = { sin_rango: 'Sin rango', cria: 'Cría', explorador: 'Explorador', cazador: 'Cazador', depredador: 'Depredador', alfa: 'Alfa' };
-function fmtAdminUsd(n){ return '$' + Number(n || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
-const ADMIN_MONTH_NAMES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-function adminMonthLabel(monthKey){
-  const [y, m] = monthKey.split('-');
-  return (ADMIN_MONTH_NAMES[Number(m) - 1] || monthKey) + ' ' + y;
-}
-function renderAdminCurrentTable(rows){
-  document.getElementById('adminHistoryNote').style.display = 'none';
-  document.getElementById('adminTableHead').innerHTML =
-    '<tr><th>Usuario</th><th>Bitunix</th><th>Volumen (mes)</th><th>Rango</th><th>Telegram</th><th>Sharkoins</th><th>Sharkoins 24h</th></tr>';
-  document.getElementById('adminUserTableBody').innerHTML = (rows || []).map(u =>
-    '<tr>' +
-      '<td>' + escapeHtml(u.username) + '</td>' +
-      '<td class="' + (u.bitunix_connected ? 'admin-ok' : 'admin-no') + '">' + (u.bitunix_connected ? '✓' : '✗') + '</td>' +
-      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
-      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
-      '<td class="' + (u.telegram_connected ? 'admin-ok' : 'admin-no') + '">' + (u.telegram_connected ? '✓' : '✗') + '</td>' +
-      '<td>' + Number(u.sharkoins_balance || 0).toLocaleString('es-CO') + '</td>' +
-      '<td>' + Number(u.sharkoins_24h || 0).toLocaleString('es-CO') + '</td>' +
-    '</tr>'
-  ).join('');
-}
-function renderAdminHistoryTable(rows){
-  document.getElementById('adminHistoryNote').style.display = 'block';
-  document.getElementById('adminTableHead').innerHTML =
-    '<tr><th>Usuario</th><th>Volumen</th><th>Operaciones</th><th>Rango (ese mes)</th></tr>';
-  document.getElementById('adminUserTableBody').innerHTML = (rows || []).map(u =>
-    '<tr>' +
-      '<td>' + escapeHtml(u.username) + '</td>' +
-      '<td>' + fmtAdminUsd(u.month_volume_usd) + '</td>' +
-      '<td>' + Number(u.trade_count || 0).toLocaleString('es-CO') + '</td>' +
-      '<td>' + escapeHtml(RANK_LABELS[u.current_rank] || u.current_rank) + '</td>' +
-    '</tr>'
-  ).join('');
-}
-async function loadAdminMonthTable(){
-  const month = document.getElementById('adminMonthSelect').value;
-  if(!month){
-    const { data, error } = await sbClient.rpc('get_admin_user_table');
-    if(error){ console.warn('no se pudo leer la tabla de admin', error); return; }
-    renderAdminCurrentTable(data);
-    return;
-  }
-  const { data, error } = await sbClient.rpc('get_admin_volume_history', { p_month: month });
-  if(error){ console.warn('no se pudo leer el historial de volumen', error); return; }
-  renderAdminHistoryTable(data);
-}
-async function loadAdminPanel(){
-  const loadingEl = document.getElementById('adminLoading');
-  const errorEl = document.getElementById('adminError');
-  const contentEl = document.getElementById('adminContent');
-  loadingEl.style.display = 'block';
-  errorEl.style.display = 'none';
-  contentEl.style.display = 'none';
-  const [summaryRes, usersRes, monthsRes] = await Promise.all([
-    sbClient.rpc('get_admin_summary_stats'),
-    sbClient.rpc('get_admin_user_table'),
-    sbClient.rpc('get_admin_available_months'),
-  ]);
-  if(summaryRes.error || usersRes.error){
-    loadingEl.style.display = 'none';
-    errorEl.textContent = friendlyErrMsg(summaryRes.error || usersRes.error);
-    errorEl.style.display = 'block';
-    return;
-  }
-  const s = summaryRes.data;
-  const rankRows = Object.entries(s.rank_distribution || {})
-    .map(([rank, count]) => (RANK_LABELS[rank] || rank) + ': ' + count).join(' · ') || '—';
-  const topCats = (s.top_categories || []).map(c => c.category + ' (' + c.count + ')').join(' · ') || '—';
-  document.getElementById('adminSummaryGrid').innerHTML = [
-    ['Usuarios totales', s.total_users],
-    ['Nuevos esta semana', s.new_signups_week],
-    ['Telegram conectado', s.telegram_connected_count + ' / ' + s.total_users],
-    ['Bitunix conectado', s.bitunix_connected_count + ' / ' + s.total_users],
-    ['Activos hoy', s.dau],
-    ['Activos esta semana', s.wau],
-    ['Sharkoins repartidos hoy', s.sharkoins_today],
-    ['Sharkoins repartidos esta semana', s.sharkoins_week],
-    ['Rangos', rankRows],
-    ['Categorías más usadas (7 días)', topCats],
-  ].map(([label, val]) => '<div class="sum-row"><span class="s-label">' + escapeHtml(label) + '</span><span class="s-val">' + escapeHtml(String(val)) + '</span></div>').join('');
-  renderAdminCurrentTable(usersRes.data);
-  const monthSelect = document.getElementById('adminMonthSelect');
-  const months = (monthsRes.error ? [] : (monthsRes.data || []));
-  monthSelect.innerHTML = '<option value="">Mes actual</option>' +
-    months.map(m => '<option value="' + escapeHtml(m) + '">' + escapeHtml(adminMonthLabel(m)) + '</option>').join('');
-  loadingEl.style.display = 'none';
-  contentEl.style.display = 'block';
-}
-document.getElementById('adminMonthSelect').addEventListener('change', loadAdminMonthTable);
-function openAdminModal(){
+/* ---- panel de admin (solo Juan): pagina propia /administrador (assets/js/admin.js), ya no
+   modal - este boton solo navega ahi; la proteccion real vive en el servidor (funciones
+   SECURITY DEFINER de scripts/sql/create_admin_dashboard.sql + admin_dashboard_v2.sql) ---- */
+document.getElementById('accountAdminBtn').addEventListener('click', () => {
   accountMiniDropdown.classList.remove('open');
-  openModalGeneric(adminModal, adminPanel, closeAdmin);
-  loadAdminPanel();
-}
-function closeAdminModal(){ closeModalGeneric(adminModal); }
-closeAdmin.addEventListener('click', closeAdminModal);
-adminModal.addEventListener('click', (e) => { if(e.target === adminModal) closeAdminModal(); });
-document.getElementById('accountAdminBtn').addEventListener('click', openAdminModal);
+  if(typeof window.openAdminPage === 'function') window.openAdminPage();
+});
 
 /* ---- caja de estado dentro de la cajita "Rango de Manada" (Fase 3, shell vacio) - reusa la
    misma conexion de Bitunix de arriba, todavia sin lectura de volumen real (Fase 2 pendiente
@@ -27529,6 +27395,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="/assets/js/icons.js?v=5" defer></script>
 <script src="/assets/js/community.js?v=2" defer></script>
 <script src="/assets/js/journal.js?v=7" defer></script>
+<script src="/assets/js/admin.js?v=1" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
