@@ -10015,7 +10015,10 @@ function showCategoryOverview(){
     replaceRoute(null, '/');
   }
   if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
-  categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // al tope real de la página, no a categoryOverviewGrid - esa cuadrícula de herramientas vive
+  // más abajo (después del héroe, el ticker y Panorama del Mercado), así que apuntar ahí se
+  // saltaba todo eso (bug reportado por Juan: la casita del menú "scrolleaba hacia abajo")
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.cat-overview-card').forEach(card => {
   card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
