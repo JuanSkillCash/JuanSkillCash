@@ -12,6 +12,7 @@ const BINANCE_WS = 'wss://stream.binance.com:9443/ws';
 const INTERVALS = [
   { v: '1m', label: '1m' }, { v: '5m', label: '5m' }, { v: '15m', label: '15m' },
   { v: '1h', label: '1H' }, { v: '4h', label: '4H' }, { v: '1d', label: '1D' },
+  { v: '1w', label: '1S' }, { v: '1M', label: '1M' },
 ];
 let currentInterval = '1m';
 
@@ -61,18 +62,36 @@ async function ensureCoinList(){
   return loadingPromise;
 }
 
-/* ---- velas iniciales (REST) + velas en vivo (WebSocket), ambas 100% de Binance ---- */
-async function loadInitialCandles(symbol){
-  // 1000 es el máximo que permite Binance por pedido - con 300 en "1m" solo se veían 5 horas de
-  // historial (pedido de Juan: que se vea más de un vistazo, sin tener que cambiar de pestaña)
-  const url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + currentInterval + '&limit=1000';
+/* ---- velas iniciales (REST) + velas en vivo (WebSocket), ambas 100% de Binance ----
+   1000 es el máximo que deja Binance por pedido - para traer bastante más historial (pedido de
+   Juan: "5 o 10 veces más") se encadenan varios pedidos hacia atrás en el tiempo con endTime,
+   hasta juntar MAX_CANDLES velas o hasta que Binance ya no tenga más historial para devolver */
+const CANDLES_PER_PAGE = 1000;
+const MAX_PAGES = 10; // hasta 10.000 velas en total
+async function fetchKlinesPage(symbol, endTime){
+  let url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + currentInterval + '&limit=' + CANDLES_PER_PAGE;
+  if(endTime) url += '&endTime=' + endTime;
   const res = await fetch(url);
   const rows = await res.json();
+  if(!Array.isArray(rows)) return [];
   return rows.map(r => ({
     time: Math.floor(r[0] / 1000),
     open: Number(r[1]), high: Number(r[2]), low: Number(r[3]), close: Number(r[4]),
     volume: Number(r[5]),
   }));
+}
+async function loadInitialCandles(symbol){
+  let all = await fetchKlinesPage(symbol);
+  let pages = 1;
+  while(pages < MAX_PAGES && all.length >= CANDLES_PER_PAGE){
+    const earliestOpenMs = all[0].time * 1000;
+    const olderPage = await fetchKlinesPage(symbol, earliestOpenMs - 1);
+    pages++;
+    if(!olderPage.length) break;
+    all = olderPage.concat(all);
+    if(olderPage.length < CANDLES_PER_PAGE) break; // ya no hay más historial atrás
+  }
+  return all;
 }
 function closeSocket(){
   clearTimeout(wsReconnectTimer);
