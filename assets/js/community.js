@@ -12,12 +12,19 @@ const fmt = n => Number(n).toLocaleString('es-CO');
 const isOwner = () => !!(currentUser && currentUser.id === OWNER_ID);
 
 /* ---- las secciones del inicio se muestran/ocultan junto con las cajas de herramientas
-   (cuando se entra a una categoria, a Sharkoins, etc. desaparecen igual que ellas) ---- */
+   (cuando se entra a una categoria, a Sharkoins, etc. desaparecen igual que ellas) ----
+   el MutationObserver es solo respaldo (microtarea, corre DESPUES del script que cambio el
+   display) - quien entra/sale de una categoria debe llamar window.syncHomeMirror() el mismo
+   synchronamente, ANTES de hacer scrollIntoView, porque si no estas secciones (arriba de
+   categoryDetailView en el documento) siguen "visibles" para el calculo de scroll en ese
+   instante y el salto de pagina aterriza mas abajo de lo que debia (bug real reportado por
+   Juan: entrar a Partners/Rango de Manada, o abrir el menu, scrolleaba la pagina sola) */
 const grid = $('categoryOverviewGrid');
 function syncHomeMirror(){
   const hidden = grid && grid.style.display === 'none';
   document.querySelectorAll('.home-mirror').forEach(el => { el.style.display = hidden ? 'none' : ''; });
 }
+window.syncHomeMirror = syncHomeMirror;
 if(grid){
   new MutationObserver(syncHomeMirror).observe(grid, { attributes: true, attributeFilter: ['style'] });
   syncHomeMirror();
