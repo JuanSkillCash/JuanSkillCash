@@ -9,7 +9,11 @@ if(typeof showCategoryOverview === 'undefined') return;
 const CG_BASE = 'https://api.coingecko.com/api/v3';
 const BINANCE_REST = 'https://api.binance.com';
 const BINANCE_WS = 'wss://stream.binance.com:9443/ws';
-const INTERVAL = '1m';
+const INTERVALS = [
+  { v: '1m', label: '1m' }, { v: '5m', label: '5m' }, { v: '15m', label: '15m' },
+  { v: '1h', label: '1H' }, { v: '4h', label: '4H' }, { v: '1d', label: '1D' },
+];
+let currentInterval = '1m';
 
 let coinList = null; // [{id,symbol,name,image,current_price,price_change_percentage_24h,high_24h,low_24h,total_volume}, ...] - solo las que sí tienen par en Binance
 let binanceSymbols = null; // Set de pares "BTCUSDT" etc.
@@ -59,7 +63,7 @@ async function ensureCoinList(){
 
 /* ---- velas iniciales (REST) + velas en vivo (WebSocket), ambas 100% de Binance ---- */
 async function loadInitialCandles(symbol){
-  const url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + INTERVAL + '&limit=300';
+  const url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + currentInterval + '&limit=300';
   const res = await fetch(url);
   const rows = await res.json();
   return rows.map(r => ({
@@ -76,7 +80,7 @@ function closeSocket(){
 function openLiveSocket(symbol){
   closeSocket();
   wsSymbol = symbol;
-  const streamUrl = BINANCE_WS + '/' + symbol.toLowerCase() + '@kline_' + INTERVAL;
+  const streamUrl = BINANCE_WS + '/' + symbol.toLowerCase() + '@kline_' + currentInterval;
   ws = new WebSocket(streamUrl);
   ws.onmessage = (ev) => {
     if(wsSymbol !== symbol) return; // mensaje tardío de un socket ya reemplazado
@@ -120,25 +124,36 @@ function renderShell(){
   root.innerHTML = `
     <div class="lc-head">
       <h2 class="lc-title">📈 Gráfico en Vivo</h2>
-      <p class="lc-sub">Velas en tiempo real (1 minuto) de cualquier cripto con par en Binance — mismo dato, al mismo tiempo.</p>
+      <p class="lc-sub">Velas en tiempo real de cualquier cripto con par en Binance — mismo dato, al mismo tiempo.</p>
     </div>
-    <div class="lc-layout">
-      <div class="lc-sidebar">
-        <div class="lc-search-wrap">
-          <input type="text" id="lcSearchInput" placeholder="Buscar moneda (BTC, Solana...)" autocomplete="off">
-        </div>
-        <div class="lc-coin-list" id="lcCoinList"><div class="lc-loading">Cargando monedas…</div></div>
-      </div>
-      <div class="lc-main">
-        <div class="lc-stats-bar" id="lcStatsBar"></div>
-        <div class="lc-chart-box">
-          <div id="lcChartContainer" class="lc-chart-container"></div>
-        </div>
-      </div>
+    <div class="lc-stats-bar" id="lcStatsBar"></div>
+    <div class="lc-chart-box">
+      <div id="lcChartContainer" class="lc-chart-container"></div>
     </div>
+    <div class="lc-bottom-stats" id="lcBottomStats"></div>
   `;
-  $('lcSearchInput').addEventListener('input', (e) => renderCoinList(e.target.value.trim().toLowerCase()));
 }
+
+/* el buscador no vive fijo al lado (le quitaba espacio al gráfico) - se abre como desplegable
+   al picarle al nombre de la moneda, estilo TradingView, y se cierra solo al elegir o al tocar
+   afuera (mismo patrón que accountMiniDropdown/notifMiniDropdown en index.html) */
+function toggleCoinPopover(forceOpen){
+  const pop = $('lcCoinPopover');
+  if(!pop) return;
+  const open = forceOpen != null ? forceOpen : !pop.classList.contains('open');
+  pop.classList.toggle('open', open);
+  if(open){
+    const input = $('lcSearchInput');
+    if(input){ input.value = ''; renderCoinList(''); setTimeout(() => input.focus(), 30); }
+  }
+}
+document.addEventListener('click', (e) => {
+  const pop = $('lcCoinPopover');
+  const trigger = $('lcCoinTrigger');
+  if(!pop || !pop.classList.contains('open')) return;
+  if(pop.contains(e.target) || (trigger && trigger.contains(e.target))) return;
+  pop.classList.remove('open');
+});
 
 function renderCoinList(filter){
   const list = $('lcCoinList');
@@ -164,7 +179,7 @@ function renderCoinList(filter){
     `;
   }).join('');
   list.querySelectorAll('[data-coin]').forEach(btn => {
-    btn.addEventListener('click', () => selectCoin(btn.dataset.coin, true));
+    btn.addEventListener('click', () => { toggleCoinPopover(false); selectCoin(btn.dataset.coin, true); });
   });
 }
 
@@ -173,25 +188,63 @@ function renderStatsBar(coin){
   if(!bar) return;
   const up = (coin.price_change_percentage_24h || 0) >= 0;
   bar.innerHTML = `
-    <div class="lc-stats-coin">
-      <img src="${coin.image}" alt="">
-      <div>
-        <div class="lc-stats-symbol">${coin.symbol.toUpperCase()}<span class="lc-stats-pair">/USDT</span></div>
-        <div class="lc-stats-name">${coin.name}</div>
+    <div class="lc-stats-coin-wrap">
+      <button type="button" class="lc-coin-trigger" id="lcCoinTrigger">
+        <img src="${coin.image}" alt="">
+        <div>
+          <div class="lc-stats-symbol">${coin.symbol.toUpperCase()}<span class="lc-stats-pair">/USDT</span></div>
+          <div class="lc-stats-name">${coin.name}</div>
+        </div>
+        <svg class="lc-coin-trigger-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>
+      </button>
+      <div class="lc-coin-popover" id="lcCoinPopover">
+        <div class="lc-search-wrap"><input type="text" id="lcSearchInput" placeholder="Buscar moneda (BTC, Solana...)" autocomplete="off"></div>
+        <div class="lc-coin-list" id="lcCoinList"><div class="lc-loading">Cargando monedas…</div></div>
       </div>
     </div>
     <div class="lc-stats-price">
       <div class="lc-stats-price-val ${up ? 'lc-pos' : 'lc-neg'}" id="lcLivePrice">${fmtUsd(coin.current_price)}</div>
       <div class="lc-stats-price-chg ${up ? 'lc-pos' : 'lc-neg'}">${up ? '▲' : '▼'} ${Math.abs(coin.price_change_percentage_24h || 0).toFixed(2)}%</div>
     </div>
-    <div class="lc-stats-mini"><span>Máximo 24h</span><b>${fmtUsd(coin.high_24h)}</b></div>
-    <div class="lc-stats-mini"><span>Mínimo 24h</span><b>${fmtUsd(coin.low_24h)}</b></div>
-    <div class="lc-stats-mini"><span>Volumen 24h</span><b>${fmtVol(coin.total_volume)}</b></div>
+    <div class="tf-pill-row lc-tf-row" id="lcTfRow">
+      ${INTERVALS.map(iv => `<button type="button" class="tf-pill${iv.v === currentInterval ? ' active' : ''}" data-tf="${iv.v}">${iv.label}</button>`).join('')}
+    </div>
+  `;
+  $('lcCoinTrigger').addEventListener('click', () => toggleCoinPopover());
+  $('lcSearchInput').addEventListener('input', (e) => renderCoinList(e.target.value.trim().toLowerCase()));
+  $('lcTfRow').querySelectorAll('[data-tf]').forEach(btn => {
+    btn.addEventListener('click', () => switchInterval(btn.dataset.tf));
+  });
+}
+
+function renderBottomStats(coin){
+  const box = $('lcBottomStats');
+  if(!box) return;
+  const up = (coin.price_change_percentage_24h || 0) >= 0;
+  box.innerHTML = `
+    <div class="lc-bottom-box">
+      <span class="lc-bottom-label">Precio Actual</span>
+      <span class="lc-bottom-val ${up ? 'lc-pos' : 'lc-neg'}" id="lcLivePriceBottom">${fmtUsd(coin.current_price)}</span>
+    </div>
+    <div class="lc-bottom-box">
+      <span class="lc-bottom-label">Máximo del Día</span>
+      <span class="lc-bottom-val">${fmtUsd(coin.high_24h)}</span>
+    </div>
+    <div class="lc-bottom-box">
+      <span class="lc-bottom-label">Mínimo del Día</span>
+      <span class="lc-bottom-val">${fmtUsd(coin.low_24h)}</span>
+    </div>
+    <div class="lc-bottom-box">
+      <span class="lc-bottom-label">Volumen</span>
+      <span class="lc-bottom-val">${fmtVol(coin.total_volume)}</span>
+    </div>
   `;
 }
-function updateLivePrice(price, isFinalCandle){
+function updateLivePrice(price){
   const el = $('lcLivePrice');
   if(el) el.textContent = fmtUsd(price);
+  const el2 = $('lcLivePriceBottom');
+  if(el2) el2.textContent = fmtUsd(price);
 }
 
 function ensureChart(){
@@ -216,28 +269,44 @@ function ensureChart(){
   });
 }
 
+async function loadChartData(coin){
+  ensureChart();
+  if(!chart) return; // la librería todavía no cargó (CDN lento)
+  closeSocket();
+  try{
+    const candles = await loadInitialCandles(coin.binanceSymbol);
+    candleSeries.setData(candles.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+    volumeSeries.setData(candles.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(46,204,113,.5)' : 'rgba(255,47,79,.5)' })));
+    // sin esto, si la persona arrastró/tocó el eje de precio en la moneda (o la temporalidad)
+    // anterior, el autoescalado se queda apagado y el nuevo precio (ej. XRP a $1) aparece
+    // aplastado en una esquina del rango viejo (ej. BTC a $70.000+) - hay que forzarlo siempre
+    chart.priceScale('right').applyOptions({ autoScale: true });
+    chart.timeScale().fitContent();
+  }catch(err){
+    console.error('Gráfico en vivo: error cargando velas', err);
+  }
+  openLiveSocket(coin.binanceSymbol);
+}
+
 async function selectCoin(coinId, fromClick){
   if(!coinList) return;
   const coin = coinList.find(c => c.id === coinId);
   if(!coin) return;
   currentCoin = coin;
   renderStatsBar(coin);
-  renderCoinList($('lcSearchInput') ? $('lcSearchInput').value.trim().toLowerCase() : '');
+  renderBottomStats(coin);
   if(fromClick && typeof replaceRoute === 'function' && !closingFromPopstate){
     replaceRoute({ skillcashDepth: 'category' }, '/grafico-en-vivo/' + coinId);
   }
-  ensureChart();
-  if(!chart) return; // la librería todavía no cargó (CDN lento) - selectCoin se reintenta al abrir
-  closeSocket();
-  try{
-    const candles = await loadInitialCandles(coin.binanceSymbol);
-    candleSeries.setData(candles.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
-    volumeSeries.setData(candles.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(46,204,113,.5)' : 'rgba(255,47,79,.5)' })));
-    chart.timeScale().fitContent();
-  }catch(err){
-    console.error('Gráfico en vivo: error cargando velas', err);
-  }
-  openLiveSocket(coin.binanceSymbol);
+  await loadChartData(coin);
+}
+
+async function switchInterval(interval){
+  if(interval === currentInterval) return;
+  currentInterval = interval;
+  if(currentCoin) renderStatsBar(currentCoin);
+  if(!currentCoin) return;
+  await loadChartData(currentCoin);
 }
 
 /* ======================= abrir / cerrar la vista ======================= */
@@ -266,11 +335,10 @@ window.openLiveChartPage = async function(initialCoinId){
     await ensureCoinList();
   }catch(err){
     console.error('Gráfico en vivo: error cargando lista de monedas', err);
-    const list = $('lcCoinList');
-    if(list) list.innerHTML = '<div class="lc-loading">No se pudo cargar la lista de monedas. Intenta de nuevo en un momento.</div>';
+    const bar = $('lcStatsBar');
+    if(bar) bar.innerHTML = '<div class="lc-loading">No se pudo cargar la lista de monedas. Intenta de nuevo en un momento.</div>';
     return;
   }
-  renderCoinList('');
   await selectCoin(initialCoinId && coinList.some(c => c.id === initialCoinId) ? initialCoinId : 'bitcoin');
 };
 window.closeLiveChartPage = function(){
