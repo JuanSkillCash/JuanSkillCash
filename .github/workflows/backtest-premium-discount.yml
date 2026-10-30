@@ -1,0 +1,45 @@
+name: Backtest Premium and Discount Pivot Matrix (BigBeluga)
+
+# Pedido de Juan: ver cuántas veces hubiera acertado/fallado ese indicador de TradingView en
+# historia real de Binance. Es un analisis puntual, no un robot programado - se dispara a mano.
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Par de Binance"
+        required: false
+        default: "BTCUSDT"
+      interval:
+        description: "Temporalidad (1m,3m,5m,15m,30m,1h,4h,1d)"
+        required: false
+        default: "15m"
+      years:
+        description: "Años de historia hacia atras"
+        required: false
+        default: "6"
+      horizons:
+        description: "Velas hacia adelante para medir el resultado, separadas por coma"
+        required: false
+        default: "10,20"
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Correr backtest
+        run: >
+          python scripts/backtest_premium_discount.py
+          --symbol "${{ github.event.inputs.symbol }}"
+          --interval "${{ github.event.inputs.interval }}"
+          --years "${{ github.event.inputs.years }}"
+          --horizons "${{ github.event.inputs.horizons }}"
