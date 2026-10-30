@@ -4,7 +4,10 @@ import time
 
 import requests
 
-BINANCE_REST = "https://api.binance.com"
+# api.binance.com bloquea por región las peticiones que salen de las maquinas de GitHub Actions
+# (451 "no disponible por razones legales"). data-api.binance.vision es el espejo público de
+# SOLO DATOS de Binance (mismo formato, pensado justo para este uso) y no tiene ese bloqueo.
+BINANCE_REST = "https://data-api.binance.vision"
 INTERVAL_MS = {
     "1m": 60_000, "3m": 180_000, "5m": 300_000, "15m": 900_000, "30m": 1_800_000,
     "1h": 3_600_000, "4h": 14_400_000, "1d": 86_400_000,
