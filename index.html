@@ -2362,8 +2362,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .page-sparks, .spark{ display:none !important; }
 .cat-overview-preview svg, .cat-overview-preview>div>div{ filter:none !important; }
 /* cajas sin relleno: solo el contorno (pedido de Juan - el relleno grisaceo no le gusta) */
-.cat-overview-card, .cat-flip-back{ background:transparent !important; border-color:var(--border2) !important; }
-.cat-overview-card:hover{ border-color:rgba(255,255,255,.22) !important; }
+.cat-overview-card, .cat-flip-back{ background:transparent !important; border-color:rgba(91,141,239,.35) !important; }
+.cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
 .cat-flip-back, .cat-flip-back::before, .cat-flip-back::after,
@@ -2385,8 +2385,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .indic-cat-label{ color:var(--white) !important; font-size:13px; font-weight:600; letter-spacing:0; }
 
 
-/* cajas del inicio: numerito, "N HERRAMIENTAS", palomitas y "Explorar" en gris claro en vez de rojo */
-.cat-overview-card, .cat-flip-back{ --c:var(--muted2) !important; }
+/* cajas del inicio: numerito, "N HERRAMIENTAS", palomitas y "Explorar" en azul (--accent) */
+.cat-overview-card, .cat-flip-back{ --c:var(--accent) !important; }
 /* si una caja del inicio no trae subtitulo ("N HERRAMIENTAS"), igual se reserva su renglon
    para que el dibujo y el texto queden a la misma altura que en las demas cajas */
 .cat-overview-head + .cat-overview-preview{ margin-top:calc(3px + 1.5em + 14px); }
