@@ -30,6 +30,26 @@ on:
         description: "Parametros propios del indicador, formato clave=valor separados por coma (ej. mode=reversion,cooldown=5)"
         required: false
         default: ""
+      simulate:
+        description: "Tambien simular operaciones reales (stop/meta/break-even), no solo acierto direccional"
+        required: false
+        default: "false"
+      stop_pct:
+        description: "Distancia del stop-loss inicial, en %"
+        required: false
+        default: "1.0"
+      take_profits:
+        description: "Metas de ganancia a probar, en %, separadas por coma"
+        required: false
+        default: "0.5,1,1.5,2,3"
+      breakeven_pct:
+        description: "A cuanto % de ganancia se protege moviendo el stop a la entrada ('none' para no usarlo)"
+        required: false
+        default: "0.5"
+      max_bars:
+        description: "Velas maximas a esperar por operacion antes de cerrar por tiempo"
+        required: false
+        default: "50"
 
 jobs:
   setup:
@@ -68,10 +88,14 @@ jobs:
             IFS=',' read -ra PAIRS <<< "${{ github.event.inputs.extra_params }}"
             for p in "${PAIRS[@]}"; do PARAMS_ARGS="$PARAMS_ARGS --param $p"; done
           fi
+          SIM_ARGS=""
+          if [ "${{ github.event.inputs.simulate }}" = "true" ]; then
+            SIM_ARGS="--simulate --stop-pct ${{ github.event.inputs.stop_pct }} --take-profits ${{ github.event.inputs.take_profits }} --breakeven-pct ${{ github.event.inputs.breakeven_pct }} --max-bars ${{ github.event.inputs.max_bars }}"
+          fi
           python scripts/backtest.py \
             --indicator "${{ github.event.inputs.indicator }}" \
             --symbol "${{ github.event.inputs.symbol }}" \
             --interval "${{ matrix.interval }}" \
             --years "${{ github.event.inputs.years }}" \
             --horizons "${{ github.event.inputs.horizons }}" \
-            $PARAMS_ARGS
+            $PARAMS_ARGS $SIM_ARGS

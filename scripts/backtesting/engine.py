@@ -29,6 +29,87 @@ def evaluate(candles: list[dict], signals: list[dict], horizons: list[int]) -> d
     return results
 
 
+def simulate_trades(candles: list[dict], signals: list[dict], stop_pct: float,
+                     take_profit_pct: float, breakeven_trigger_pct: float | None,
+                     max_bars: int) -> dict:
+    """Simula cada señal como una operación real, vela a vela, usando máximo/mínimo (no solo
+    el cierre) para decidir si tocó el stop o la meta:
+    - stop_pct: qué tan lejos (en %) va el stop-loss inicial
+    - take_profit_pct: qué tan lejos (en %) va la toma de ganancia
+    - breakeven_trigger_pct: si el precio avanza esto a favor (en %), el stop se mueve a la
+      entrada (empate protegido) - None para no usar protección a break-even
+    - max_bars: si no toca ni el stop ni la meta en este número de velas, se cierra al precio
+      de ese momento ("se acabó el tiempo")
+    Si el stop y la meta caen en la misma vela, se asume que tocó el stop primero (conservador).
+    No incluye comisiones ni slippage."""
+    n = len(candles)
+    outcomes = {"win": 0, "loss": 0, "breakeven": 0, "timeout": 0}
+    returns = []
+
+    for sig in signals:
+        entry = sig["price"]
+        is_long = sig["direction"] == "long"
+        stop = entry * (1 - stop_pct / 100) if is_long else entry * (1 + stop_pct / 100)
+        target = entry * (1 + take_profit_pct / 100) if is_long else entry * (1 - take_profit_pct / 100)
+        breakeven_level = None
+        if breakeven_trigger_pct is not None:
+            breakeven_level = entry * (1 + breakeven_trigger_pct / 100) if is_long else entry * (1 - breakeven_trigger_pct / 100)
+        armed = False
+        outcome, exit_price = None, None
+
+        for k in range(1, max_bars + 1):
+            j = sig["idx"] + k
+            if j >= n:
+                break
+            hi, lo = candles[j]["high"], candles[j]["low"]
+            if is_long:
+                if breakeven_level is not None and not armed and hi >= breakeven_level:
+                    armed, stop = True, entry
+                if lo <= stop:
+                    outcome, exit_price = ("breakeven" if armed else "loss"), stop
+                    break
+                if hi >= target:
+                    outcome, exit_price = "win", target
+                    break
+            else:
+                if breakeven_level is not None and not armed and lo <= breakeven_level:
+                    armed, stop = True, entry
+                if hi >= stop:
+                    outcome, exit_price = ("breakeven" if armed else "loss"), stop
+                    break
+                if lo <= target:
+                    outcome, exit_price = "win", target
+                    break
+
+        if outcome is None:
+            outcome = "timeout"
+            j = min(sig["idx"] + max_bars, n - 1)
+            exit_price = candles[j]["close"]
+
+        ret_pct = (exit_price - entry) / entry * 100 if is_long else (entry - exit_price) / entry * 100
+        outcomes[outcome] += 1
+        returns.append(ret_pct)
+
+    total = len(signals)
+    return {
+        "total": total, "outcomes": outcomes, "returns": returns,
+        "win_rate": outcomes["win"] / total * 100 if total else 0,
+        "avg_return": sum(returns) / len(returns) if returns else 0,
+    }
+
+
+def print_simulation_report(label: str, stop_pct: float, take_profit_pct: float,
+                              breakeven_trigger_pct: float | None, max_bars: int, sim: dict):
+    be_txt = f"protección a break-even tras +{breakeven_trigger_pct}%" if breakeven_trigger_pct is not None else "sin protección a break-even"
+    print(f"\n--- {label}: stop {stop_pct}% | meta {take_profit_pct}% | {be_txt} | máx {max_bars} velas ---")
+    o = sim["outcomes"]
+    print(f"  {sim['total']} operaciones simuladas | acierto (toca la meta) {sim['win_rate']:.1f}% | "
+          f"resultado medio {sim['avg_return']:+.2f}% por operación")
+    print(f"  Meta: {o['win']} | Stop (pérdida completa): {o['loss']} | "
+          f"Break-even (protegido, ni gana ni pierde): {o['breakeven']} | "
+          f"Se acabó el tiempo sin tocar nada: {o['timeout']}")
+
+
 def print_report(indicator_name: str, meta: dict, signals: list[dict], results: dict, horizons: list[int]):
     print(f"\n=== Backtest: {indicator_name} ===")
     for k, v in meta.items():

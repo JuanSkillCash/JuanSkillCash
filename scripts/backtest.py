@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])  # permite correr este archivo directo
 from backtesting.data import fetch_all_klines, INTERVAL_MS  # noqa: E402
-from backtesting.engine import evaluate, print_report  # noqa: E402
+from backtesting.engine import evaluate, print_report, simulate_trades, print_simulation_report  # noqa: E402
 from backtesting.indicators import INDICATORS  # noqa: E402
 
 
@@ -41,6 +41,11 @@ def main():
     ap.add_argument("--years", type=int, default=6)
     ap.add_argument("--horizons", default="10,20", help="velas hacia adelante para medir el resultado, separadas por coma")
     ap.add_argument("--param", action="append", help="parámetro propio del indicador, formato clave=valor (puede repetirse)")
+    ap.add_argument("--simulate", action="store_true", help="además del acierto direccional simple, simula operaciones reales con stop/meta/break-even")
+    ap.add_argument("--stop-pct", type=float, default=1.0, help="distancia del stop-loss inicial, en %%")
+    ap.add_argument("--take-profits", default="0.5,1,1.5,2,3", help="metas de ganancia a probar, en %%, separadas por coma")
+    ap.add_argument("--breakeven-pct", default="0.5", help="a cuánto % de ganancia se protege moviendo el stop a la entrada - 'none' para no usar protección a break-even")
+    ap.add_argument("--max-bars", type=int, default=50, help="velas máximas a esperar por operación antes de cerrar por tiempo")
     args = ap.parse_args()
 
     horizons = [int(h) for h in args.horizons.split(",")]
@@ -70,6 +75,14 @@ def main():
         "Parámetros": ", ".join(f"{k}={v}" for k, v in params.items()),
     }
     print_report(spec["description"], meta, signals, results, horizons)
+
+    if args.simulate:
+        breakeven_pct = None if args.breakeven_pct.lower() == "none" else float(args.breakeven_pct)
+        take_profits = [float(tp) for tp in args.take_profits.split(",")]
+        print(f"\n=== Simulación con stop/meta/break-even — {spec['description']} ===")
+        for tp in take_profits:
+            sim = simulate_trades(candles, signals, args.stop_pct, tp, breakeven_pct, args.max_bars)
+            print_simulation_report(f"Meta {tp}%", args.stop_pct, tp, breakeven_pct, args.max_bars, sim)
 
 
 if __name__ == "__main__":
