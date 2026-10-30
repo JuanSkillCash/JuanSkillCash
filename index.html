@@ -2409,9 +2409,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .live-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid rgba(74,222,128,.45);color:#4ade80;font-size:11px;font-weight:700;letter-spacing:.12em;text-decoration:none;white-space:nowrap}
 .live-pill i{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pillDotPulse 1.6s ease-in-out infinite}
 .live-pill:hover{background:rgba(74,222,128,.08)}
-.admin-live-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:14px}
-.admin-live-btn{border:1px solid var(--border2);background:transparent;color:var(--white);border-radius:20px;padding:6px 14px;font-weight:700;cursor:pointer}
+.admin-live-btn{border:1px solid #f87171;background:transparent;color:#f87171;border-radius:20px;padding:6px 14px;font-weight:700;cursor:pointer}
 .admin-live-btn.on{border-color:#4ade80;color:#4ade80}
+.admin-live-btn:disabled{opacity:.5;cursor:default}
 /* ===== Creado por Juan / Reseñas ===== */
 .community-block{margin-top:44px}
 .community-title{font-size:26px;font-weight:700;margin:0 0 8px}
@@ -3242,6 +3242,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             </div>
             <button class="account-dropdown-item" id="accountBarProfileBtn" type="button">⚙️ Mi perfil</button>
             <button class="account-dropdown-item" id="accountAdminBtn" type="button" style="display:none">📊 Admin</button>
+            <button class="account-dropdown-item admin-live-btn" id="adminLiveToggle" type="button" style="display:none">Cargando…</button>
             <button class="account-dropdown-item" id="accountBarLogout" type="button">🚪 Cerrar sesión</button>
           </div>
         </div>
@@ -12066,6 +12067,7 @@ function renderAuthState(){
     accountBarSession.style.display = 'flex';
     accountBarEmail.textContent = getDisplayName(currentUser);
     document.getElementById('accountAdminBtn').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
+    document.getElementById('adminLiveToggle').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
     loadPortfolios();
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof delistWatchlistWidget !== 'undefined') delistWatchlistWidget.onAuthChange();
@@ -12081,6 +12083,7 @@ function renderAuthState(){
     accountLoginBtn.style.display = 'block';
     accountBarSession.style.display = 'none';
     document.getElementById('accountAdminBtn').style.display = 'none';
+    document.getElementById('adminLiveToggle').style.display = 'none';
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof COLM_EQUIPPED_DEFAULT !== 'undefined') colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
     if(typeof renderAccountMiniAvatar === 'function') renderAccountMiniAvatar();

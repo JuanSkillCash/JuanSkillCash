@@ -206,7 +206,6 @@ function renderPane(){
   ADMIN_CHART_SPECS = [];
   pane.innerHTML = S.tab === 'usuarios' ? paneUsuarios() : paneResumen();
   drawAdminCharts();
-  if(typeof window.refreshAdminLiveBtn === 'function') window.refreshAdminLiveBtn();
 }
 
 /* ======================= Resumen ======================= */
@@ -216,7 +215,6 @@ function paneResumen(){
   const ts = S.timeseries || [];
   const tsItems = (key) => ts.map(d => ({ label: String(d.day).slice(8, 10), value: d[key], tip: d.day + ': ' + d[key] }));
   return `
-    <div class="admin-live-row"><span>Indicador <b>EN VIVO</b> en la barra de arriba:</span><button type="button" class="admin-live-btn" id="adminLiveToggle">Cargando…</button></div>
     <div class="jr-kpis">
       ${kpi('Usuarios totales', s.total_users ?? '—')}
       ${kpi('Nuevos esta semana', s.new_signups_week ?? '—')}

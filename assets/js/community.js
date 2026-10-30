@@ -34,23 +34,17 @@ async function loadLiveStatus(){
     pill.style.display = data.is_live ? 'inline-flex' : 'none';
     if(data.live_url) pill.href = data.live_url;
   }
-  renderAdminLiveBtn();
+  bindAdminLiveBtn();
 }
-function renderAdminLiveBtn(){
+// la pildora vive en el menu de la cuenta (junto a "Admin"), pedido de Juan para tenerla a un
+// clic en vez de tener que entrar al panel de admin - roja apagada, verde prendida.
+function bindAdminLiveBtn(){
   const btn = $('adminLiveToggle');
   if(!btn) return;
   if(!liveState){ btn.textContent = 'Falta correr el SQL'; btn.disabled = true; return; }
   btn.disabled = false;
   btn.classList.toggle('on', liveState.is_live);
-  btn.textContent = liveState.is_live ? '● Prendido — apagar' : 'Apagado — prender';
-}
-// el boton vive ahora dentro de assets/js/admin.js (pagina /administrador, el HTML se arma de
-// nuevo cada vez que se abre - no existe todavia cuando este script corre al cargar la pagina)
-// - por eso el bind del click y el pintado se repiten cada vez que admin.js lo pide, en vez de
-// una sola vez al cargar como antes (cuando vivia fijo dentro del modal viejo).
-function bindAdminLiveBtn(){
-  const btn = $('adminLiveToggle');
-  if(!btn) return;
+  btn.textContent = liveState.is_live ? '● EN VIVO — apagar' : 'Apagado — prender EN VIVO';
   if(!btn.dataset.liveBound){
     btn.dataset.liveBound = '1';
     btn.addEventListener('click', async () => {
@@ -62,7 +56,6 @@ function bindAdminLiveBtn(){
       await loadLiveStatus();
     });
   }
-  renderAdminLiveBtn();
 }
 window.refreshAdminLiveBtn = bindAdminLiveBtn;
 loadLiveStatus();
