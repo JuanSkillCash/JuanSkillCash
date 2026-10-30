@@ -18,7 +18,7 @@ let currentInterval = '1m';
 let coinList = null; // [{id,symbol,name,image,current_price,price_change_percentage_24h,high_24h,low_24h,total_volume}, ...] - solo las que sí tienen par en Binance
 let binanceSymbols = null; // Set de pares "BTCUSDT" etc.
 let loadingPromise = null;
-let chart = null, candleSeries = null, volumeSeries = null;
+let chart = null, candleSeries = null;
 let ws = null, wsReconnectTimer = null, wsSymbol = null;
 let currentCoin = null;
 
@@ -96,7 +96,6 @@ function openLiveSocket(symbol){
       volume: Number(k.v),
     };
     if(candleSeries) candleSeries.update(candle);
-    if(volumeSeries) volumeSeries.update({ time: candle.time, value: candle.volume, color: candle.close >= candle.open ? 'rgba(46,204,113,.5)' : 'rgba(255,47,79,.5)' });
     updateLivePrice(candle.close, k.x);
   };
   ws.onclose = () => {
@@ -265,10 +264,6 @@ function ensureChart(){
     upColor: '#2ecc71', downColor: '#ff2f4f', borderVisible: false,
     wickUpColor: '#2ecc71', wickDownColor: '#ff2f4f',
   });
-  volumeSeries = chart.addHistogramSeries({
-    color: 'rgba(91,141,239,.4)', priceFormat: { type: 'volume' },
-    priceScaleId: '', scaleMargins: { top: 0.82, bottom: 0 },
-  });
 }
 
 async function loadChartData(coin){
@@ -278,7 +273,6 @@ async function loadChartData(coin){
   try{
     const candles = await loadInitialCandles(coin.binanceSymbol);
     candleSeries.setData(candles.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
-    volumeSeries.setData(candles.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(46,204,113,.5)' : 'rgba(255,47,79,.5)' })));
     // sin esto, si la persona arrastró/tocó el eje de precio en la moneda (o la temporalidad)
     // anterior, el autoescalado se queda apagado y el nuevo precio (ej. XRP a $1) aparece
     // aplastado en una esquina del rango viejo (ej. BTC a $70.000+) - hay que forzarlo siempre
@@ -348,7 +342,7 @@ window.closeLiveChartPage = function(){
   closeSocket();
   if(!v || v.style.display === 'none') return false;
   v.style.display = 'none';
-  if(chart){ chart.remove(); chart = null; candleSeries = null; volumeSeries = null; }
+  if(chart){ chart.remove(); chart = null; candleSeries = null; }
   return true;
 };
 document.querySelectorAll('[data-open-livechart]').forEach(btn => btn.addEventListener('click', () => {
