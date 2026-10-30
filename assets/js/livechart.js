@@ -63,7 +63,9 @@ async function ensureCoinList(){
 
 /* ---- velas iniciales (REST) + velas en vivo (WebSocket), ambas 100% de Binance ---- */
 async function loadInitialCandles(symbol){
-  const url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + currentInterval + '&limit=300';
+  // 1000 es el máximo que permite Binance por pedido - con 300 en "1m" solo se veían 5 horas de
+  // historial (pedido de Juan: que se vea más de un vistazo, sin tener que cambiar de pestaña)
+  const url = BINANCE_REST + '/api/v3/klines?symbol=' + symbol + '&interval=' + currentInterval + '&limit=1000';
   const res = await fetch(url);
   const rows = await res.json();
   return rows.map(r => ({
