@@ -2,6 +2,7 @@
 su dirección, 'long' o 'short') y mide qué tan seguido acertaron, en varios horizontes de
 velas hacia adelante. No sabe nada de ningún indicador en particular - por eso agregar uno
 nuevo no toca este archivo."""
+import random
 
 
 def evaluate(candles: list[dict], signals: list[dict], horizons: list[int]) -> dict:
@@ -96,6 +97,40 @@ def simulate_trades(candles: list[dict], signals: list[dict], stop_pct: float,
         "win_rate": outcomes["win"] / total * 100 if total else 0,
         "avg_return": sum(returns) / len(returns) if returns else 0,
     }
+
+
+def generate_random_signals(candles: list[dict], n_long: int, n_short: int, max_bars: int, seed: int = 42) -> list[dict]:
+    """Genera señales 'de mentira' en momentos al azar, con la misma cantidad de largos/cortos
+    que un indicador real - sirve de comparación (baseline) para saber si un resultado positivo
+    es porque el indicador acertó algo, o solo porque estar comprado/vendido en ese activo
+    durante ese tramo salía bien de todas formas (ej. BTC en tendencia alcista de fondo)."""
+    rnd = random.Random(seed)
+    max_idx = max(len(candles) - max_bars - 1, 0)
+    directions = ["long"] * n_long + ["short"] * n_short
+    rnd.shuffle(directions)
+    signals = []
+    for direction in directions:
+        idx = rnd.randint(0, max_idx)
+        signals.append({"idx": idx, "direction": direction, "price": candles[idx]["close"], "t": candles[idx]["t"]})
+    return signals
+
+
+def print_simulation_comparison(label: str, stop_pct: float, take_profit_pct: float,
+                                  breakeven_trigger_pct: float | None, max_bars: int,
+                                  sim_real: dict, sim_baseline: dict):
+    be_txt = f"break-even tras +{breakeven_trigger_pct}%" if breakeven_trigger_pct is not None else "sin break-even"
+    print(f"\n--- {label}: stop {stop_pct}% | meta {take_profit_pct}% | {be_txt} | máx {max_bars} velas ---")
+    print(f"  INDICADOR : {sim_real['total']} ops | acierto {sim_real['win_rate']:.1f}% | resultado medio {sim_real['avg_return']:+.2f}%")
+    print(f"  ALEATORIO : {sim_baseline['total']} ops (mismo mix largo/corto, entradas al azar) | "
+          f"acierto {sim_baseline['win_rate']:.1f}% | resultado medio {sim_baseline['avg_return']:+.2f}%")
+    diff = sim_real["avg_return"] - sim_baseline["avg_return"]
+    if diff > 0.05:
+        tag = "VENTAJA REAL (le gana al azar)"
+    elif diff > -0.05:
+        tag = "SIN VENTAJA (igual que el azar)"
+    else:
+        tag = "PEOR QUE EL AZAR"
+    print(f"  diferencia indicador vs azar: {diff:+.2f}% -> {tag}")
 
 
 def print_simulation_report(label: str, stop_pct: float, take_profit_pct: float,

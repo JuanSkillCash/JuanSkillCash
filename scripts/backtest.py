@@ -13,7 +13,10 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])  # permite correr este archivo directo
 from backtesting.data import fetch_all_klines, fetch_all_klines_cached, INTERVAL_MS  # noqa: E402
-from backtesting.engine import evaluate, print_report, simulate_trades, print_simulation_report  # noqa: E402
+from backtesting.engine import (  # noqa: E402
+    evaluate, print_report, simulate_trades, print_simulation_report,
+    generate_random_signals, print_simulation_comparison,
+)
 from backtesting.indicators import INDICATORS  # noqa: E402
 
 
@@ -49,6 +52,8 @@ def main():
     ap.add_argument("--breakeven-pct", default="0.5", help="a cuánto % de ganancia se protege moviendo el stop a la entrada - 'none' para no usar protección a break-even")
     ap.add_argument("--max-bars", type=int, default=50, help="velas máximas a esperar por operación antes de cerrar por tiempo")
     ap.add_argument("--cache-dir", default=None, help="carpeta donde guardar/reusar las velas ya descargadas, para no volver a pedirlas en la próxima corrida")
+    ap.add_argument("--baseline", action="store_true", help="además de la simulación real, compara contra señales al azar con el mismo mix largo/corto - para saber si el resultado es ventaja real del indicador o solo tendencia de fondo del activo")
+    ap.add_argument("--baseline-multiplier", type=int, default=5, help="cuántas veces más señales al azar generar que señales reales, para que el promedio del azar sea menos ruidoso")
     args = ap.parse_args()
 
     horizons = [int(h) for h in args.horizons.split(",")]
@@ -91,11 +96,26 @@ def main():
         print_report(f"{spec['description']} [{mode}]", meta, signals, results, horizons)
 
         if args.simulate:
-            print(f"\n=== Simulación con stop/meta/break-even — modo={mode} ===")
+            baseline_signals = None
+            if args.baseline:
+                n_long = sum(1 for s in signals if s["direction"] == "long")
+                n_short = len(signals) - n_long
+                baseline_signals = generate_random_signals(
+                    candles, n_long * args.baseline_multiplier, n_short * args.baseline_multiplier,
+                    args.max_bars, seed=42,
+                )
+                print(f"\n=== Simulación con stop/meta/break-even, vs. azar (x{args.baseline_multiplier}, "
+                      f"{len(baseline_signals)} señales al azar) — modo={mode} ===")
+            else:
+                print(f"\n=== Simulación con stop/meta/break-even — modo={mode} ===")
             for stop_pct in stop_pcts:
                 for tp in take_profits:
                     sim = simulate_trades(candles, signals, stop_pct, tp, breakeven_pct, args.max_bars)
-                    print_simulation_report(f"stop {stop_pct}% / meta {tp}%", stop_pct, tp, breakeven_pct, args.max_bars, sim)
+                    if baseline_signals is not None:
+                        sim_base = simulate_trades(candles, baseline_signals, stop_pct, tp, breakeven_pct, args.max_bars)
+                        print_simulation_comparison(f"stop {stop_pct}% / meta {tp}%", stop_pct, tp, breakeven_pct, args.max_bars, sim, sim_base)
+                    else:
+                        print_simulation_report(f"stop {stop_pct}% / meta {tp}%", stop_pct, tp, breakeven_pct, args.max_bars, sim)
 
 
 if __name__ == "__main__":
