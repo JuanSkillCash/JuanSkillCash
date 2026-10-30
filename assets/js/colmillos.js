@@ -1682,6 +1682,7 @@ function showColmillosPage(initialSlug){
   switchColmillosTab(tab);
   loadGlobalTaps();
   renderSharkPreviews();
+  if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   colmillosPageView.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // ya no hay pantalla de "JUGAR" intermedia - entrar a Colmillos pasa derecho por la carga
   startColmillosLoadSequence();
@@ -1736,6 +1737,7 @@ function hideColmillosPage(){
   } else if(wasInColmillos && !closingFromPopstate){
     replaceRoute(null, '/');
   }
+  if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 colmillosBackBtn.addEventListener('click', hideColmillosPage);

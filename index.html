@@ -215,6 +215,9 @@ button{font-family:inherit;color:inherit}
    para que el contenido que pasa por debajo no se transparente sobre el texto */
 .sb-sticky-head{position:sticky;top:0;z-index:6;background:rgba(9,11,22,.92);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%)}
 .sb-cat-toggle-all{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(91,141,239,.3);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s,color .2s}
+.sb-home-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(91,141,239,.3);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s,color .2s}
+.sb-home-btn:hover{background:rgba(91,141,239,.14);color:var(--white)}
+.sidebar.collapsed .sb-home-btn{display:none}
 .sb-cat-toggle-all:hover{background:rgba(255,47,79,.12);color:var(--red)}
 .sb-cat-toggle-all svg{flex-shrink:0;transition:transform var(--dur-base) var(--ease-out)}
 .sb-cat-toggle-all.all-expanded svg{transform:rotate(180deg)}
@@ -2624,6 +2627,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <span class="sb-logo-mark"><img src="/logo-skillcash-600.png" alt="SkillCash"></span>
           <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
         </a>
+        <button type="button" class="sb-home-btn" id="sbHomeBtn" title="Ir al inicio" aria-label="Ir al inicio">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        </button>
         <button type="button" class="sb-cat-toggle-all" id="sbCatToggleAll" title="Expandir categorías" aria-label="Expandir categorías">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>
         </button>
@@ -9971,6 +9977,10 @@ function showCategoryDetail(cat){
       item.classList.toggle('active', item.dataset.catHome === cat);
     });
   }
+  // sin esto el scroll se calcula con las secciones "Creado por Juan SkillCash"/Reseñas todavía
+  // visibles (su ocultamiento real llega después, por el MutationObserver de community.js, que
+  // es una microtarea) y la página aterriza mucho más abajo de lo debido
+  if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
@@ -10001,6 +10011,7 @@ function showCategoryOverview(){
     // deja la URL en home igual, en vez de quedarse pegada en la ruta anterior
     replaceRoute(null, '/');
   }
+  if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 document.querySelectorAll('.cat-overview-card').forEach(card => {
@@ -10009,6 +10020,13 @@ document.querySelectorAll('.cat-overview-card').forEach(card => {
 document.getElementById('catBackBtn').addEventListener('click', showCategoryOverview);
 document.getElementById('sbLogo').addEventListener('click', (e) => {
   e.preventDefault();
+  showCategoryOverview();
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbBackdrop').classList.remove('show');
+});
+// casita en el menú (pedido de Juan, aunque el logo ya hace lo mismo - "como en el explorador"
+// que siempre hay una casita visible para volver al inicio)
+document.getElementById('sbHomeBtn').addEventListener('click', () => {
   showCategoryOverview();
   document.getElementById('sidebar').classList.remove('mobile-open');
   document.getElementById('sbBackdrop').classList.remove('show');
@@ -10422,6 +10440,10 @@ sbToggle.addEventListener('click', () => {
 mobileMenuBtn.addEventListener('click', () => {
   sidebar.classList.add('mobile-open');
   sbBackdrop.classList.add('show');
+  // el sidebar tiene su propio scroll interno (overflow-y:auto) que queda pegado donde se dejó
+  // la última vez (ej. al marcar un indicador como activo, más abajo en la lista) - sin esto el
+  // menú se abre ya desplazado en vez de mostrar el inicio
+  sidebar.scrollTop = 0;
 });
 sbBackdrop.addEventListener('click', () => {
   sidebar.classList.remove('mobile-open');
@@ -10579,6 +10601,9 @@ function applyRoute(path){
     }
   } else if(segs[0] === 'administrador'){
     if(typeof window.openAdminPage === 'function') window.openAdminPage();
+  } else if(segs[0] === 'bitacora'){
+    if(typeof window.openJournalPage === 'function') window.openJournalPage();
+    else window.addEventListener('load', () => { if(typeof window.openJournalPage === 'function') window.openJournalPage(); });
   } else if(segs[0] === 'sharkoins'){
     // segs[1] (ej. "ayuda", "minijuegos") deja a la persona en la MISMA pestaña de Sharkoins
     // en la que estaba si recarga la pagina, en vez de siempre caer al menu principal -

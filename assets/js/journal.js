@@ -1005,6 +1005,9 @@ window.openJournalPage = async function(){
   document.querySelectorAll('.hero-mascot, .crypto-ticker').forEach(el => { el.style.display = 'none'; });
   view().style.display = 'block';
   if(typeof setPageTitle === 'function') setPageTitle('Bitácora de trading');
+  if(typeof pushRoute === 'function' && typeof closingFromPopstate !== 'undefined' && !closingFromPopstate && location.pathname !== '/bitacora'){
+    pushRoute({ skillcashDepth: 'category' }, '/bitacora');
+  }
   window.scrollTo({ top: 0 });
   bindEvents();
   S.loaded = false; renderShell();
@@ -1033,11 +1036,19 @@ document.querySelectorAll('[data-open-journal]').forEach(btn => btn.addEventList
   const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
   window.openJournalPage();
 }));
+// igual que adminBackBtn (assets/js/admin.js): si openJournalPage() de verdad empujo /bitacora
+// al historial (se entro desde adentro del sitio), "Volver" hace history.back() - un solo paso
+// atras, a donde sea que la persona estuviera antes (no siempre "Rango de Manada"). Si no hay
+// esa entrada (ej. se abrio /bitacora por URL directa), se cae al comportamiento de siempre.
 const backBtn = $('journalBackBtn');
 if(backBtn) backBtn.addEventListener('click', () => {
-  window.closeJournalPage();
-  if(typeof showCategoryDetail === 'function') showCategoryDetail('rangos');
-  else if(typeof showCategoryOverview === 'function') showCategoryOverview();
+  if(history.state && history.state.skillcashDepth === 'category' && location.pathname === '/bitacora'){
+    history.back();
+  } else {
+    window.closeJournalPage();
+    if(typeof showCategoryDetail === 'function') showCategoryDetail('rangos');
+    else if(typeof showCategoryOverview === 'function') showCategoryOverview();
+  }
 });
 // si se cierra sesion con la bitacora abierta, se vuelve al inicio
 sbClient.auth.onAuthStateChange((event, session) => {
