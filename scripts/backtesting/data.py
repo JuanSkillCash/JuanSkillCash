@@ -1,5 +1,7 @@
 """Descarga de velas históricas de Binance (publico, sin llave) - compartido por todos los
 indicadores del motor de backtesting."""
+import csv
+import os
 import time
 
 import requests
@@ -42,3 +44,44 @@ def fetch_all_klines(symbol: str, interval: str, start_ms: int, end_ms: int) -> 
             break  # ya llegamos a lo mas reciente disponible
         time.sleep(0.15)  # no abusar del rate limit publico
     return [c for c in out if c["t"] < end_ms]
+
+
+def _load_cache(cache_path: str) -> list[dict]:
+    if not os.path.exists(cache_path):
+        return []
+    with open(cache_path, newline="") as f:
+        reader = csv.reader(f)
+        next(reader, None)  # encabezado
+        return [
+            {"t": int(r[0]), "open": float(r[1]), "high": float(r[2]), "low": float(r[3]), "close": float(r[4]), "volume": float(r[5])}
+            for r in reader
+        ]
+
+
+def _save_cache(cache_path: str, candles: list[dict]):
+    os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
+    with open(cache_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["t", "open", "high", "low", "close", "volume"])
+        for c in candles:
+            writer.writerow([c["t"], c["open"], c["high"], c["low"], c["close"], c["volume"]])
+
+
+def fetch_all_klines_cached(symbol: str, interval: str, start_ms: int, end_ms: int, cache_path: str) -> list[dict]:
+    """Igual que fetch_all_klines, pero guarda lo descargado en cache_path (un CSV) y en
+    llamadas futuras solo le pide a Binance las velas nuevas desde la última que ya tiene
+    guardada - para no volver a descargar años de historia cada vez que se corre un backtest
+    (el workflow de GitHub Actions persiste esta carpeta entre corridas con actions/cache)."""
+    cached = _load_cache(cache_path)
+    step_ms = INTERVAL_MS[interval]
+    fetch_start = max(start_ms, cached[-1]["t"] + step_ms) if cached else start_ms
+    if fetch_start < end_ms:
+        print(f"  cache: {len(cached)} velas ya guardadas, pidiendo nuevas desde ahí...", flush=True)
+        new_candles = fetch_all_klines(symbol, interval, fetch_start, end_ms)
+    else:
+        print(f"  cache: {len(cached)} velas ya guardadas, ya está al día, no se pide nada nuevo.", flush=True)
+        new_candles = []
+    all_candles = cached + new_candles
+    if new_candles:
+        _save_cache(cache_path, all_candles)
+    return [c for c in all_candles if c["t"] >= start_ms]

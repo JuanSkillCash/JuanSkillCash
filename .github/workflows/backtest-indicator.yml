@@ -27,29 +27,33 @@ on:
         required: false
         default: "10,20"
       extra_params:
-        description: "Parametros propios del indicador, formato clave=valor separados por coma (ej. mode=reversion,cooldown=5)"
+        description: "Parametros propios del indicador, formato clave=valor separados por coma (ej. cooldown=5)"
         required: false
         default: ""
+      modes:
+        description: "Modos del indicador a probar en la misma corrida, separados por coma"
+        required: false
+        default: "reversion,continuacion"
       simulate:
         description: "Tambien simular operaciones reales (stop/meta/break-even), no solo acierto direccional"
         required: false
         default: "false"
-      stop_pct:
-        description: "Distancia del stop-loss inicial, en %"
+      stop_pcts:
+        description: "Distancias de stop-loss a probar, en %, separadas por coma"
         required: false
-        default: "1.0"
+        default: "10,15,20"
       take_profits:
         description: "Metas de ganancia a probar, en %, separadas por coma"
         required: false
-        default: "0.5,1,1.5,2,3"
+        default: "5,10,15,20,30"
       breakeven_pct:
         description: "A cuanto % de ganancia se protege moviendo el stop a la entrada ('none' para no usarlo)"
         required: false
-        default: "0.5"
+        default: "5"
       max_bars:
         description: "Velas maximas a esperar por operacion antes de cerrar por tiempo"
         required: false
-        default: "50"
+        default: "3000"
 
 jobs:
   setup:
@@ -66,7 +70,7 @@ jobs:
   backtest:
     needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -81,6 +85,14 @@ jobs:
       - name: Instalar dependencias
         run: pip install --no-cache-dir requests
 
+      - name: Cache de velas ya descargadas (no repetir la descarga cada corrida)
+        uses: actions/cache@v4
+        with:
+          path: .cache/klines
+          key: klines-${{ github.event.inputs.symbol }}-${{ matrix.interval }}-${{ github.run_id }}
+          restore-keys: |
+            klines-${{ github.event.inputs.symbol }}-${{ matrix.interval }}-
+
       - name: "Correr backtest (${{ matrix.interval }})"
         run: |
           PARAMS_ARGS=""
@@ -90,7 +102,7 @@ jobs:
           fi
           SIM_ARGS=""
           if [ "${{ github.event.inputs.simulate }}" = "true" ]; then
-            SIM_ARGS="--simulate --stop-pct ${{ github.event.inputs.stop_pct }} --take-profits ${{ github.event.inputs.take_profits }} --breakeven-pct ${{ github.event.inputs.breakeven_pct }} --max-bars ${{ github.event.inputs.max_bars }}"
+            SIM_ARGS="--simulate --stop-pcts ${{ github.event.inputs.stop_pcts }} --take-profits ${{ github.event.inputs.take_profits }} --breakeven-pct ${{ github.event.inputs.breakeven_pct }} --max-bars ${{ github.event.inputs.max_bars }}"
           fi
           python scripts/backtest.py \
             --indicator "${{ github.event.inputs.indicator }}" \
@@ -98,4 +110,6 @@ jobs:
             --interval "${{ matrix.interval }}" \
             --years "${{ github.event.inputs.years }}" \
             --horizons "${{ github.event.inputs.horizons }}" \
+            --modes "${{ github.event.inputs.modes }}" \
+            --cache-dir ".cache/klines" \
             $PARAMS_ARGS $SIM_ARGS
