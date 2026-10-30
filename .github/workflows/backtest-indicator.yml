@@ -54,6 +54,10 @@ on:
         description: "Velas maximas a esperar por operacion antes de cerrar por tiempo"
         required: false
         default: "3000"
+      baseline:
+        description: "Comparar tambien contra señales al azar (mismo mix largo/corto) para separar ventaja real del indicador de la tendencia de fondo del activo"
+        required: false
+        default: "true"
 
 jobs:
   setup:
@@ -103,6 +107,9 @@ jobs:
           SIM_ARGS=""
           if [ "${{ github.event.inputs.simulate }}" = "true" ]; then
             SIM_ARGS="--simulate --stop-pcts ${{ github.event.inputs.stop_pcts }} --take-profits ${{ github.event.inputs.take_profits }} --breakeven-pct ${{ github.event.inputs.breakeven_pct }} --max-bars ${{ github.event.inputs.max_bars }}"
+            if [ "${{ github.event.inputs.baseline }}" = "true" ]; then
+              SIM_ARGS="$SIM_ARGS --baseline"
+            fi
           fi
           python scripts/backtest.py \
             --indicator "${{ github.event.inputs.indicator }}" \
