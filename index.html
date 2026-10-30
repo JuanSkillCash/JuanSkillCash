@@ -121,9 +121,10 @@ button{font-family:inherit;color:inherit}
 }
 .sidebar::-webkit-scrollbar{width:0;height:0;display:none}
 .sidebar.collapsed{width:var(--sidebar-w-collapsed)}
-.sidebar.collapsed .sb-top{flex-direction:column;gap:10px;padding:16px 8px}
-.sb-top{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 8px;gap:6px}
-.sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0}
+.sidebar.collapsed .sb-top{gap:10px;padding:16px 8px}
+.sb-top{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 14px 8px}
+.sb-top-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}
+.sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0;width:100%}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 0 transparent)}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
 .mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
@@ -2627,15 +2628,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <span class="sb-logo-mark"><img src="/logo-skillcash-600.png" alt="SkillCash"></span>
           <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
         </a>
-        <button type="button" class="sb-home-btn" id="sbHomeBtn" title="Ir al inicio" aria-label="Ir al inicio">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1v-9"/></svg>
-        </button>
-        <button type="button" class="sb-cat-toggle-all" id="sbCatToggleAll" title="Expandir categorías" aria-label="Expandir categorías">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>
-        </button>
-        <button class="sb-toggle" id="sbToggle" title="Colapsar" aria-label="Colapsar menú">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
+        <div class="sb-top-actions">
+          <button type="button" class="sb-home-btn" id="sbHomeBtn" title="Ir al inicio" aria-label="Ir al inicio">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1v-9"/></svg>
+          </button>
+          <button type="button" class="sb-cat-toggle-all" id="sbCatToggleAll" title="Expandir todas las categorías" aria-label="Expandir todas las categorías">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5"/><path d="M7 15l5 5 5-5"/></svg>
+          </button>
+          <button class="sb-toggle" id="sbToggle" title="Colapsar menú lateral" aria-label="Colapsar menú lateral">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><line x1="9.5" y1="4.5" x2="9.5" y2="19.5"/></svg>
+          </button>
+        </div>
       </div>
       <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
       <div class="sb-search-wrap">
