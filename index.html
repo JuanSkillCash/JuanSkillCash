@@ -851,7 +851,12 @@ button{font-family:inherit;color:inherit}
 .lc-stats-price{margin-left:4px}
 .lc-stats-price-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:26px;letter-spacing:-.01em}
 .lc-stats-price-chg{font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700}
-.lc-tf-row{margin-left:auto;margin-top:0;flex-wrap:nowrap}
+/* .tf-pill-row.lc-tf-row (dos clases) le gana en especificidad a .tf-pill-row sola (que viene
+   más abajo en la hoja de estilos con flex-wrap:wrap) - sin esto las pestañas se amontonaban en
+   un segundo renglón en celular en vez de quedarse en una sola fila con scroll lateral */
+.tf-pill-row.lc-tf-row{margin-left:auto;margin-top:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch}
+.tf-pill-row.lc-tf-row::-webkit-scrollbar{display:none}
+.lc-tf-row .tf-pill{flex-shrink:0;padding:6px 12px;font-size:11px}
 @media(max-width:640px){ .lc-tf-row{margin-left:0;width:100%} }
 .lc-chart-box{border:1px solid rgba(91,141,239,.3);border-radius:var(--r-md);padding:4px;background:var(--bg)}
 .lc-chart-container{width:100%;height:480px}
@@ -27486,7 +27491,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="/assets/js/journal.js?v=7" defer></script>
 <script src="/assets/js/admin.js?v=1" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
-<script src="/assets/js/livechart.js?v=5" defer></script>
+<script src="/assets/js/livechart.js?v=6" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
