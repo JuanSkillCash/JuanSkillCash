@@ -1000,6 +1000,7 @@ window.openJournalPage = async function(){
   if(!currentUser){ if(typeof openAuthModal === 'function') openAuthModal(); return; }
   if(typeof closeAnyOpenToolInline === 'function') closeAnyOpenToolInline();
   if(typeof closeAdminPage === 'function') closeAdminPage();
+  if(typeof closeLiveChartPage === 'function') closeLiveChartPage();
   if(typeof hideColmillosPage === 'function' && typeof colmillosPageView !== 'undefined' && colmillosPageView.style.display === 'block') hideColmillosPage();
   ['categoryOverviewGrid', 'categoryDetailView', 'marketDashboardBlock', 'favoritesSection'].forEach(id => { const el = $(id); if(el) el.style.display = 'none'; });
   document.querySelectorAll('.hero-mascot, .crypto-ticker').forEach(el => { el.style.display = 'none'; });
