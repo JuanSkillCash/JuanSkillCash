@@ -1,0 +1,77 @@
+name: Backtest de indicador
+
+# Analisis puntual (no un robot programado) - se dispara a mano desde la pestaña Actions.
+# Corre scripts/backtest.py contra historia real de Binance Spot. Ver scripts/backtesting/README.md
+# para la lista de indicadores disponibles y cómo agregar uno nuevo.
+on:
+  workflow_dispatch:
+    inputs:
+      indicator:
+        description: "Nombre del indicador (ver scripts/backtesting/indicators/__init__.py)"
+        required: false
+        default: "premium_discount"
+      symbol:
+        description: "Par de Binance"
+        required: false
+        default: "BTCUSDT"
+      intervals:
+        description: "Temporalidades a probar, separadas por coma (ej. 3m,5m,15m,30m) - una corrida por cada una"
+        required: false
+        default: "15m"
+      years:
+        description: "Años de historia hacia atras"
+        required: false
+        default: "6"
+      horizons:
+        description: "Velas hacia adelante para medir el resultado, separadas por coma"
+        required: false
+        default: "10,20"
+      extra_params:
+        description: "Parametros propios del indicador, formato clave=valor separados por coma (ej. mode=reversion,cooldown=5)"
+        required: false
+        default: ""
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      intervals: ${{ steps.parse.outputs.intervals }}
+    steps:
+      - id: parse
+        run: |
+          IFS=',' read -ra ARR <<< "${{ github.event.inputs.intervals }}"
+          JSON=$(printf '"%s",' "${ARR[@]}" | sed 's/,$//')
+          echo "intervals=[$JSON]" >> "$GITHUB_OUTPUT"
+
+  backtest:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        interval: ${{ fromJson(needs.setup.outputs.intervals) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: "Correr backtest (${{ matrix.interval }})"
+        run: |
+          PARAMS_ARGS=""
+          if [ -n "${{ github.event.inputs.extra_params }}" ]; then
+            IFS=',' read -ra PAIRS <<< "${{ github.event.inputs.extra_params }}"
+            for p in "${PAIRS[@]}"; do PARAMS_ARGS="$PARAMS_ARGS --param $p"; done
+          fi
+          python scripts/backtest.py \
+            --indicator "${{ github.event.inputs.indicator }}" \
+            --symbol "${{ github.event.inputs.symbol }}" \
+            --interval "${{ matrix.interval }}" \
+            --years "${{ github.event.inputs.years }}" \
+            --horizons "${{ github.event.inputs.horizons }}" \
+            $PARAMS_ARGS
