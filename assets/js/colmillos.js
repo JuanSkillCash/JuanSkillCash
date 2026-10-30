@@ -1738,7 +1738,7 @@ function hideColmillosPage(){
     replaceRoute(null, '/');
   }
   if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
-  categoryOverviewGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 colmillosBackBtn.addEventListener('click', hideColmillosPage);
 colmillosWalletBtn.addEventListener('click', showColmillosPage);
