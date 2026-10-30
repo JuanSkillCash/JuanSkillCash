@@ -5,11 +5,15 @@ name: Postear boletín cripto diario en Telegram (dominancia + miedo y codicia)
 # (que quedan solo con workflow_dispatch, sin cron, para no duplicar el envio).
 #
 # OJO: el "schedule" de GitHub Actions en este repo llega atrasado 3-6 horas, sin importar el
-# minuto (confirmado con el historial real de corridas) - por eso NO tiene "schedule" todavia,
-# solo workflow_dispatch. La hora real y confiable (8am Colombia en punto) la dispara Claude
-# manualmente cada dia, hasta que se resuelva una forma de disparo externo mas confiable (ver
-# conversacion - la idea es Supabase pg_cron llamando la API de GitHub a la hora exacta).
+# minuto (confirmado con el historial real de corridas) - por eso la hora real y confiable (8am
+# Colombia en punto) la dispara Claude manualmente cada dia. Este "schedule" es SOLO un respaldo
+# por si ese disparo manual falla o se salta un dia (paso el 28 y 29 de oct 2026 - la sesion que
+# lo dispara no desperto a tiempo) - scripts/post_crypto_bulletin_telegram.py no manda el
+# boletin dos veces el mismo dia (bulletin_post_state), asi que tener los dos no duplica el
+# post, solo evita quedarse sin ninguno.
 on:
+  schedule:
+    - cron: "55 12 * * *"
   workflow_dispatch: {}
 
 jobs:

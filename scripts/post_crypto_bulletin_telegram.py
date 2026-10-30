@@ -109,6 +109,35 @@ def fetch_coin_icons() -> dict[str, Image.Image]:
     return icons
 
 
+def already_posted_today() -> bool:
+    """Revisa bulletin_post_state (una sola fila) para no mandar el boletin dos veces el mismo
+    dia (fecha UTC) - hace falta porque ahora hay DOS caminos que pueden disparar este script:
+    el disparo manual diario a las 8am Colombia en punto (ver conversacion con Juan) Y el
+    "schedule" nativo de GitHub Actions como respaldo (que llega atrasado 3-6 horas, pero
+    eventualmente corre). Si la tabla no existe todavia (falta correr
+    scripts/sql/bulletin_post_state.sql), se asume que NO se ha posteado - no se bloquea el
+    primer envio por un detalle de infraestructura."""
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/bulletin_post_state",
+        params={"id": "eq.1", "select": "last_posted_date"},
+        headers=_sb_headers(), timeout=20,
+    )
+    if resp.status_code != 200 or not resp.json():
+        return False
+    return resp.json()[0].get("last_posted_date") == datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def mark_posted_today() -> None:
+    resp = requests.post(
+        f"{SUPABASE_URL}/rest/v1/bulletin_post_state?on_conflict=id",
+        json={"id": 1, "last_posted_date": datetime.now(timezone.utc).strftime("%Y-%m-%d")},
+        headers={**_sb_headers(), "Prefer": "resolution=merge-duplicates,return=minimal"},
+        timeout=20,
+    )
+    if resp.status_code >= 300:
+        log.warning(f"no se pudo guardar bulletin_post_state ({resp.status_code}): {resp.text[:300]}")
+
+
 def fetch_latest_fng() -> dict:
     resp = requests.get(
         f"{SUPABASE_URL}/rest/v1/{FNG_TABLE}",
@@ -236,6 +265,10 @@ def main() -> None:
         log.error("Falta TELEGRAM_BOT_TOKEN en el entorno.")
         sys.exit(1)
 
+    if already_posted_today():
+        log.info("ya se posteo el boletin hoy (UTC) - no se manda de nuevo.")
+        return
+
     btc_pct, usdt_pct = fetch_dominance()
     icons = fetch_coin_icons()
 
@@ -257,6 +290,7 @@ def main() -> None:
         f"🦈 Entérate de más en juanskillcash.com"
     )
     send_photo(image_bytes, caption)
+    mark_posted_today()
     log.info("Boletin publicado en el tema de Análisis Crypto.")
 
 
