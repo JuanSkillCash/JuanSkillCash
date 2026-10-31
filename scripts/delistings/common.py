@@ -402,6 +402,25 @@ def extract_tickers(title: str) -> list[str]:
     return tickers
 
 
+_BODY_PAIR_TICKER_RE = re.compile(r"\b([A-Z0-9]{2,15})/(?:USDT|USDC|USD|BTC|ETH|BNB)\b")
+
+
+def extract_tickers_from_body(body_text: str) -> list[str]:
+    """Respaldo para titulos genericos tipo 'Notice of Delisting 6 Spot Trading Pairs on
+    November 6, 2026' (visto en Bitget desde fines de octubre 2026) donde el titulo no trae
+    ningun ticker, solo la cantidad - la lista real vive en el cuerpo del aviso, como
+    'Details are as follows: CHILLGUY/USDT; ZIG/USDT; BRETT/USDT; ...'. Busca pares
+    TICKER/QUOTE en todo el texto en vez de depender de esa frase exacta, por si el
+    exchange cambia la redaccion de nuevo."""
+    out: list[str] = []
+    for m in _BODY_PAIR_TICKER_RE.finditer(body_text or ""):
+        tok = m.group(1).upper()
+        if tok in _STOPWORDS or tok in out:
+            continue
+        out.append(tok)
+    return out
+
+
 def rows_from_title(
     exchange: str, title: str, source_url: str,
     announced_at: Optional[datetime] = None, delist_at: Optional[datetime] = None,

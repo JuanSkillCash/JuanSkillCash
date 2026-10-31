@@ -8,8 +8,8 @@ from datetime import datetime, timezone
 
 from . import zendesk
 from .common import (
-    Row, extract_delist_date_from_body, extract_tickers, detect_market,
-    is_noise, is_completion_notice, is_delay_notice,
+    Row, extract_delist_date_from_body, extract_tickers, extract_tickers_from_body,
+    detect_market, is_noise, is_completion_notice, is_delay_notice,
     classify_asset_class,
 )
 
@@ -47,6 +47,10 @@ def fetch(max_pages: int = 5) -> list[Row]:
 
         market = detect_market(title)
         tickers = extract_tickers(title)
+        if not tickers and body:
+            # titulos genericos tipo "Notice of Delisting N Spot Trading Pairs on ..." no
+            # traen tickers, solo la cantidad - la lista real vive en el cuerpo del aviso
+            tickers = extract_tickers_from_body(body)
         if not tickers:
             log.warning(f"[bitunix] no se pudieron sacar tickers de: {title!r} ({source_url})")
             continue

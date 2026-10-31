@@ -11,7 +11,8 @@ from datetime import datetime, timedelta, timezone
 import requests
 
 from .common import (
-    Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
+    Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers,
+    extract_tickers_from_body, detect_market,
     is_noise, html_to_text, parse_delist_datetime,
     classify_asset_class, fetch_known_delist_dates,
 )
@@ -90,18 +91,22 @@ def fetch(max_pages: int = 5) -> list[Row]:
         ann_types = item.get("annType") or []
         is_futures = "futures-announcements" in ann_types
 
+        tickers = extract_tickers(title)
         delist_at = known_dates.get(source_url)
         fetched_body = False
-        if delist_at is None and url and source_url not in known_dates and body_fetches_left > 0:
+        body_text = None
+        if url and source_url not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
             body_fetches_left -= 1
             fetched_body = True
             body_text = _fetch_article_text(url)
-            delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            if delist_at is None:
+                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+            if not tickers and body_text:
+                tickers = extract_tickers_from_body(body_text)
         if delist_at is None:
             delist_at = parse_delist_datetime(title)
 
         market = "futures" if is_futures else detect_market(title)
-        tickers = extract_tickers(title)
         if not tickers:
             log.warning(f"[kucoin] no se pudieron sacar tickers de: {title!r} ({url})")
             continue

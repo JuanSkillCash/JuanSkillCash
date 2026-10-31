@@ -19,8 +19,8 @@ import requests
 
 from .common import (
     Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body, extract_tickers,
-    detect_market, is_noise, html_to_text, parse_delist_datetime, classify_asset_class,
-    fetch_known_delist_dates,
+    extract_tickers_from_body, detect_market, is_noise, html_to_text, parse_delist_datetime,
+    classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.bybit")
@@ -108,26 +108,29 @@ def fetch(max_pages: int = 10) -> list[Row]:
                 if not rel_url or rel_url in seen_urls:
                     continue
 
-                tickers = extract_tickers(title)
-                if not tickers:
-                    log.warning(f"[bybit] no se pudieron sacar tickers de: {title!r} ({rel_url})")
-                    continue
-                seen_urls.add(rel_url)
-
                 full_url = BASE + rel_url if rel_url.startswith("/") else rel_url
+                tickers = extract_tickers(title)
                 announced_at = _epoch_s_to_dt(item.get("publish_time"))
 
                 delist_at = known_dates.get(full_url)
                 fetched_body = False
-                if delist_at is None and full_url not in known_dates and body_fetches_left > 0:
+                if full_url not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
                     body_fetches_left -= 1
                     fetched_body = True
                     body_text = _fetch_article_text(full_url)
-                    delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                    if delist_at is None:
+                        delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                    if not tickers and body_text:
+                        tickers = extract_tickers_from_body(body_text)
                 if delist_at is None:
                     delist_at = extract_delist_date_from_body(item.get("description", ""), announced_at)
                 if delist_at is None:
                     delist_at = parse_delist_datetime(title)
+
+                if not tickers:
+                    log.warning(f"[bybit] no se pudieron sacar tickers de: {title!r} ({full_url})")
+                    continue
+                seen_urls.add(rel_url)
 
                 market = detect_market(title)
                 for base in tickers:

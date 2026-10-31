@@ -20,8 +20,8 @@ import requests
 
 from .common import (
     Row, DEFAULT_HEADERS, ExchangeBlocked, extract_delist_date_from_body,
-    detect_market, html_to_text, is_noise, parse_delist_datetime, classify_asset_class,
-    fetch_known_delist_dates,
+    extract_tickers_from_body, detect_market, html_to_text, is_noise, parse_delist_datetime,
+    classify_asset_class, fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.blofin")
@@ -115,19 +115,23 @@ def fetch(max_pages: int = 3) -> list[Row]:
             announced_at = _parse_date(art.get("date", ""))
 
             tickers = _extract_tickers(title)
-            if not tickers:
-                log.warning(f"[blofin] no se pudieron sacar tickers de: {title!r} ({url})")
-                continue
 
             delist_at = known_dates.get(url)
             fetched_body = False
-            if delist_at is None and url not in known_dates and body_fetches_left > 0:
+            if url not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
                 body_fetches_left -= 1
                 fetched_body = True
                 body_text = _fetch_article_text(url)
-                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                if delist_at is None:
+                    delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                if not tickers and body_text:
+                    tickers = extract_tickers_from_body(body_text)
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
+
+            if not tickers:
+                log.warning(f"[blofin] no se pudieron sacar tickers de: {title!r} ({url})")
+                continue
 
             market = detect_market(title)
             for base in tickers:
