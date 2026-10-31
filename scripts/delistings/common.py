@@ -95,15 +95,19 @@ _RE_HM_UTC_ON_MONTH = re.compile(
     re.IGNORECASE,
 )
 
-# "[Oct 20, 2026, 07:00 (UTC)]"  -> MEXC (con o sin corchetes)
+# "[Oct 20, 2026, 07:00 (UTC)]"  -> MEXC (con o sin corchetes). El AM/PM opcional cubre
+# "November 6, 2026, 10:00 AM (UTC)" (visto en Bitget) - sin esto la fecha real de
+# deslistado no matcheaba NINGUN regex en modo strict y extract_delist_date_from_body
+# terminaba agarrando por error alguna otra fecha suelta del cuerpo (ej. la de publicacion
+# del aviso), confirmado con el caso real de BRETT/USDT en Bitget.
 _RE_MONTH_DD_YYYY_HM_UTC = re.compile(
-    r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),\s*(\d{4}),\s*(\d{1,2}):(\d{2})\s*\(UTC\)",
+    r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),\s*(\d{4}),\s*(\d{1,2}):(\d{2})\s*(AM|PM)?\s*\(UTC\)",
     re.IGNORECASE,
 )
 
 # "October 23, 2026, 14:00 UTC"  -> Kraken (prosa, sin parentesis)
 _RE_MONTH_DD_YYYY_HM_UTC_PROSE = re.compile(
-    r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4}),?\s+(\d{1,2}):(\d{2})\s*UTC",
+    r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4}),?\s+(\d{1,2}):(\d{2})\s*(AM|PM)?\s*UTC",
     re.IGNORECASE,
 )
 
@@ -113,6 +117,20 @@ _RE_DATE_ONLY = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 
 def _month_num(name: str) -> Optional[int]:
     return _MONTHS.get(name.strip().lower()[:3])
+
+
+def _hour_24(h: str, ampm: Optional[str]) -> int:
+    """Convierte una hora de 12h + AM/PM (si vino) a 24h - 'ampm' es None cuando el texto
+    ya trae la hora en 24h (no tenia AM/PM), en cuyo caso se usa tal cual."""
+    hour = int(h)
+    if not ampm:
+        return hour
+    ampm = ampm.upper()
+    if ampm == "PM" and hour != 12:
+        hour += 12
+    elif ampm == "AM" and hour == 12:
+        hour = 0
+    return hour
 
 
 def parse_delist_datetime(text: str, strict: bool = False) -> Optional[datetime]:
@@ -131,10 +149,10 @@ def parse_delist_datetime(text: str, strict: bool = False) -> Optional[datetime]
 
     m = _RE_MONTH_DD_YYYY_HM_UTC.search(text)
     if m:
-        mon, d, y, h, mi = m.groups()
+        mon, d, y, h, mi, ampm = m.groups()
         mo = _month_num(mon)
         if mo:
-            return datetime(int(y), mo, int(d), int(h), int(mi), tzinfo=timezone.utc)
+            return datetime(int(y), mo, int(d), _hour_24(h, ampm), int(mi), tzinfo=timezone.utc)
 
     m = _RE_HM_UTC_ON_MONTH.search(text)
     if m:
@@ -145,10 +163,10 @@ def parse_delist_datetime(text: str, strict: bool = False) -> Optional[datetime]
 
     m = _RE_MONTH_DD_YYYY_HM_UTC_PROSE.search(text)
     if m:
-        mon, d, y, h, mi = m.groups()
+        mon, d, y, h, mi, ampm = m.groups()
         mo = _month_num(mon)
         if mo:
-            return datetime(int(y), mo, int(d), int(h), int(mi), tzinfo=timezone.utc)
+            return datetime(int(y), mo, int(d), _hour_24(h, ampm), int(mi), tzinfo=timezone.utc)
 
     m = _RE_DATE_ONLY.search(text)
     if m:
