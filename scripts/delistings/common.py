@@ -220,7 +220,7 @@ def extract_delist_date_from_body(body_html: str, created_at: Optional[datetime]
     chunks = re.split(r"(?<=[.!?])\s+|\n+", text)
 
     def _scan(strict: bool):
-        best_dt, best_score = None, None
+        best_dt, best_score, best_has_time = None, None, False
         for chunk in chunks:
             dt = parse_delist_datetime(chunk, strict=strict)
             if not dt:
@@ -232,8 +232,19 @@ def extract_delist_date_from_body(body_html: str, created_at: Optional[datetime]
                 score += 1
             if _EXCLUDE_DATE_CTX.search(chunk):
                 score -= 3
-            if best_score is None or score > best_score:
-                best_score, best_dt = score, dt
+            # metadata de la pagina (ej. "ultima actualizacion"/fecha de publicacion, mostrada
+            # suelta cerca del titulo) a veces queda en su propio chunk sin ninguna palabra
+            # clave alrededor (separado por una etiqueta HTML inline), empatando en score con
+            # la fecha real de deslistado si esta TAMBIEN quedo aislada de su contexto por el
+            # mismo motivo - en ese empate, a igual score, se prefiere el candidato que trajo
+            # una hora explicita (viene de un patron mas especifico, no del fallback de "solo
+            # fecha" que ignora cualquier hora que haya al lado) - confirmado con el caso real
+            # de BRETT/USDT en Bitget, donde la fecha de publicacion ("2026-10-30 10:00", sin
+            # "UTC" al lado asi que cae al patron de solo-fecha) aparecia antes en el texto que
+            # la fecha real del deslistado y le ganaba el empate solo por orden
+            has_time = not (dt.hour == 0 and dt.minute == 0)
+            if best_score is None or score > best_score or (score == best_score and has_time and not best_has_time):
+                best_score, best_dt, best_has_time = score, dt, has_time
         return best_dt, best_score
 
     # dos pasadas: primero solo fechas con formato EXACTO (strict=True) en todos los chunks;
