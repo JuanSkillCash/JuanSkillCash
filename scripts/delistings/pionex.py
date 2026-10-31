@@ -24,8 +24,9 @@ from newlistings.common import fetch_html_with_fallback  # noqa: E402
 from bs4 import BeautifulSoup
 
 from .common import (
-    Row, ExchangeBlocked, extract_delist_date_from_body, detect_market,
-    is_noise, classify_asset_class, parse_delist_datetime, fetch_known_delist_dates,
+    Row, ExchangeBlocked, extract_delist_date_from_body, extract_tickers_from_body,
+    detect_market, is_noise, classify_asset_class, parse_delist_datetime,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.pionex")
@@ -88,23 +89,28 @@ def fetch(max_pages: int = 1) -> list[Row]:
         seen_urls.add(url)
 
         tickers = _extract_tickers(title)
-        if not tickers:
-            log.warning(f"[pionex] no se pudieron sacar tickers de: {title!r} ({url})")
-            continue
 
         delist_at = known_dates.get(url)
         fetched_body = False
-        if delist_at is None and url not in known_dates and body_fetches_left > 0:
+        if url not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
             body_fetches_left -= 1
             fetched_body = True
+            art_text = None
             try:
                 art_html, _ = fetch_html_with_fallback(url, timeout=12)
                 art_text = BeautifulSoup(art_html, "html.parser").get_text(separator="\n")
-                delist_at = extract_delist_date_from_body(art_text)
             except Exception as e:
                 log.warning(f"[pionex] no se pudo leer el articulo {url}: {e}")
+            if delist_at is None and art_text:
+                delist_at = extract_delist_date_from_body(art_text)
+            if not tickers and art_text:
+                tickers = extract_tickers_from_body(art_text)
         if delist_at is None:
             delist_at = parse_delist_datetime(title)
+
+        if not tickers:
+            log.warning(f"[pionex] no se pudieron sacar tickers de: {title!r} ({url})")
+            continue
 
         market = detect_market(title)
         for base in tickers:

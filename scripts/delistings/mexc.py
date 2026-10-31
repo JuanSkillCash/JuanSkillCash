@@ -15,9 +15,11 @@ import time
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
+import requests
+
 from .common import (
-    Row, DEFAULT_HEADERS, extract_tickers, detect_market, is_noise, parse_delist_datetime,
-    classify_asset_class,
+    Row, DEFAULT_HEADERS, extract_tickers, extract_tickers_from_body, detect_market,
+    is_noise, parse_delist_datetime, classify_asset_class, html_to_text,
 )
 
 log = logging.getLogger("delistings.mexc")
@@ -27,6 +29,22 @@ BASE = "https://www.mexc.com"
 LIST_URL_TMPL = "https://www.mexc.com/announcements/delistings?page={page}"
 
 _ARTICLE_HREF_SEL = 'a[href*="/announcements/article/"]'
+MAX_BODY_FETCHES = 15
+
+
+def _fetch_article_text(url: str) -> str:
+    """Intento liviano por HTTP plano (no Playwright, para no pagar el costo de una
+    navegacion completa por articulo) - best-effort: si la pagina necesita JS para
+    renderizar el cuerpo, esto puede venir vacio y el llamador simplemente no gana nada,
+    sin empeorar lo que ya habia (titulo sin tickers se descartaba igual antes de esto)."""
+    try:
+        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=12)
+        if resp.status_code != 200:
+            return ""
+        return html_to_text(resp.text)
+    except requests.RequestException as e:
+        log.warning(f"[mexc] fallo trayendo articulo {url}: {e}")
+        return ""
 
 
 def fetch(max_pages: int = 3) -> list[Row]:
@@ -47,6 +65,7 @@ def fetch(max_pages: int = 3) -> list[Row]:
         browser.close()
 
     rows: list[Row] = []
+    body_fetches_left = MAX_BODY_FETCHES
     for page_num, html in enumerate(htmls, start=1):
         soup = BeautifulSoup(html, "html.parser")
         links = soup.select(_ARTICLE_HREF_SEL)
@@ -73,6 +92,11 @@ def fetch(max_pages: int = 3) -> list[Row]:
             delist_at = parse_delist_datetime(title)
             market = detect_market(title)
             tickers = extract_tickers(title)
+            if not tickers and body_fetches_left > 0:
+                body_fetches_left -= 1
+                body_text = _fetch_article_text(url)
+                if body_text:
+                    tickers = extract_tickers_from_body(body_text)
             if not tickers:
                 log.warning(f"[mexc] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue

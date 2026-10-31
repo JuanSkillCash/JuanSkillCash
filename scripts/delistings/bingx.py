@@ -9,8 +9,8 @@ from datetime import datetime
 
 from . import zendesk
 from .common import (
-    Row, extract_delist_date_from_body, extract_tickers, detect_market, is_noise,
-    classify_asset_class,
+    Row, extract_delist_date_from_body, extract_tickers, extract_tickers_from_body,
+    detect_market, is_noise, classify_asset_class,
 )
 
 log = logging.getLogger("delistings.bingx")
@@ -54,6 +54,8 @@ def fetch(max_pages: int = 8) -> list[Row]:
 
         market = detect_market(title)
         tickers = extract_tickers(title)
+        if not tickers and body:
+            tickers = extract_tickers_from_body(body)
         if not tickers:
             log.warning(f"[bingx] no se pudieron sacar tickers de: {title!r} ({source_url})")
             continue

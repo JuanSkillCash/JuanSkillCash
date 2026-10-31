@@ -25,8 +25,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"
 from newlistings.common import DEFAULT_HEADERS, fetch_html_with_fallback  # noqa: E402
 
 from .common import (
-    Row, ExchangeBlocked, extract_delist_date_from_body, html_to_text,
-    is_noise, parse_delist_datetime, classify_asset_class, fetch_known_delist_dates,
+    Row, ExchangeBlocked, extract_delist_date_from_body, extract_tickers_from_body,
+    html_to_text, is_noise, parse_delist_datetime, classify_asset_class,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.weex")
@@ -133,19 +134,23 @@ def fetch(max_pages: int = 1) -> list[Row]:
                 continue
 
             tickers = _extract_tickers(title)
-            if not tickers:
-                log.warning(f"[weex] no se pudieron sacar tickers de: {title!r} ({full_url})")
-                continue
 
             delist_at = known_dates.get(full_url)
             fetched_body = False
-            if delist_at is None and full_url not in known_dates and body_fetches_left > 0:
+            if full_url not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
                 body_fetches_left -= 1
                 fetched_body = True
                 body_text = _fetch_article_text(full_url)
-                delist_at = extract_delist_date_from_body(body_text) if body_text else None
+                if delist_at is None:
+                    delist_at = extract_delist_date_from_body(body_text) if body_text else None
+                if not tickers and body_text:
+                    tickers = extract_tickers_from_body(body_text)
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
+
+            if not tickers:
+                log.warning(f"[weex] no se pudieron sacar tickers de: {title!r} ({full_url})")
+                continue
 
             for base in tickers:
                 rows.append(Row(

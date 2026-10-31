@@ -24,8 +24,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"
 from newlistings.common import DEFAULT_HEADERS, fetch_html_with_fallback  # noqa: E402
 
 from .common import (
-    Row, ExchangeBlocked, extract_delist_date_from_body, detect_market, html_to_text,
-    is_noise, parse_delist_datetime, classify_asset_class, fetch_known_delist_dates,
+    Row, ExchangeBlocked, extract_delist_date_from_body, extract_tickers_from_body,
+    detect_market, html_to_text, is_noise, parse_delist_datetime, classify_asset_class,
+    fetch_known_delist_dates,
 )
 
 log = logging.getLogger("delistings.coinw")
@@ -90,9 +91,6 @@ def fetch(max_pages: int = 3) -> list[Row]:
                 continue
 
             tickers = _extract_tickers(title)
-            if not tickers:
-                continue  # mezcla mantenimiento/politicas/avisos vagos - no es ruido real, simplemente no es un deslistado reconocible
-
             url_full = href if href.startswith("http") else "https://www.coinw.com" + href
 
             announced_at = None
@@ -103,13 +101,21 @@ def fetch(max_pages: int = 3) -> list[Row]:
 
             delist_at = known_dates.get(url_full)
             fetched_body = False
-            if delist_at is None and url_full not in known_dates and body_fetches_left > 0:
+            if url_full not in known_dates and body_fetches_left > 0 and (delist_at is None or not tickers):
                 body_fetches_left -= 1
                 fetched_body = True
                 body_text = _fetch_article_text(url_full)
-                delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                if delist_at is None:
+                    delist_at = extract_delist_date_from_body(body_text, announced_at) if body_text else None
+                if not tickers and body_text:
+                    # titulos vagos tipo "Announcement on the Delisting of Certain Trading
+                    # Pairs" no traen ticker - probar con el cuerpo antes de descartar
+                    tickers = extract_tickers_from_body(body_text)
             if delist_at is None:
                 delist_at = parse_delist_datetime(title)
+
+            if not tickers:
+                continue  # ni titulo ni cuerpo traen un ticker reconocible
 
             market = detect_market(title)
             for base in tickers:

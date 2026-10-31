@@ -11,7 +11,8 @@ from datetime import datetime, timezone
 import requests
 
 from .common import (
-    Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers, detect_market,
+    Row, DEFAULT_HEADERS, extract_delist_date_from_body, extract_tickers,
+    extract_tickers_from_body, detect_market,
     is_noise, is_delay_notice, html_to_text, parse_delist_datetime,
     classify_asset_class, fetch_known_delist_dates,
 )
@@ -86,6 +87,7 @@ def fetch(max_requests: int = 10) -> list[Row]:
 
             delist_at = known_dates.get(source_url)
             fetched_body = False
+            body_text = None
             if delist_at is None and url and source_url not in known_dates and body_fetches_left > 0:
                 body_fetches_left -= 1
                 fetched_body = True
@@ -96,6 +98,17 @@ def fetch(max_requests: int = 10) -> list[Row]:
 
             market = detect_market(title)
             tickers = extract_tickers(title)
+            if not tickers and body_text:
+                # titulo generico tipo "Notice of Delisting 6 Spot Trading Pairs on ..." (visto
+                # desde fines de octubre 2026) - la lista real de tickers vive en el cuerpo
+                tickers = extract_tickers_from_body(body_text)
+            if not tickers and not body_text and url and body_fetches_left > 0:
+                # el cuerpo no se trajo arriba porque ya teniamos delist_at cacheado, pero sin
+                # tickers en el titulo igual hace falta para saber que par es
+                body_fetches_left -= 1
+                fetched_body = True
+                body_text = _fetch_article_text(url)
+                tickers = extract_tickers_from_body(body_text) if body_text else []
             if not tickers:
                 log.warning(f"[bitget] no se pudieron sacar tickers de: {title!r} ({url})")
                 continue
