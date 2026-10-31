@@ -1186,6 +1186,17 @@ button{font-family:inherit;color:inherit}
 }
 .cat-overview-preview svg{filter:drop-shadow(0 0 5px var(--c))}
 .cat-overview-preview>div>div{filter:drop-shadow(0 0 5px var(--c))}
+/* banner de foto (bleed, degradé) — mismo tratamiento que .tool-card-banner.
+   Mientras una categoría no tenga foto real todavía, el dibujo SVG se queda tal
+   cual (sin relleno, solo contorno), igual que el resto de la página ahora. */
+.cat-overview-banner{
+  height:180px;border-radius:0;margin:0 -20px 14px;position:relative;overflow:hidden;
+  background:transparent;
+}
+.cat-overview-banner:not(:has(img)){border:1px solid rgba(91,141,239,.3);margin:0 0 14px;border-radius:12px}
+.cat-overview-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.cat-overview-banner:has(img)::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
+.cat-overview-card.big .cat-overview-banner{height:210px}
 .spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;pointer-events:none;animation:sparkTwinkle 2.6s ease-in-out infinite}
 .cat-overview-preview .spark{box-shadow:0 0 6px 1.5px var(--c)}
 .page-sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
@@ -3459,7 +3470,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub" id="indicCountBadge">50 INDICADORES</div>
-        <div class="cat-overview-preview">
+        <div class="cat-overview-banner">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <rect x="8" y="12" width="66" height="54" rx="10" fill="rgba(59,130,246,.08)" stroke="#3b82f6" stroke-width="1.4"/>
             <polyline points="18,50 30,42 42,46 54,28 64,32" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -3495,23 +3506,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag soon">ALIANZAS</div>
         </div>
         <div class="cat-overview-sub">BITUNIX Y MENTORÍA</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="100%" height="100%" viewBox="0 0 130 70" preserveAspectRatio="xMidYMid meet">
-            <line x1="27" y1="44" x2="45" y2="32" stroke="#f0b23d" stroke-width="1.5" stroke-dasharray="2.5,3" opacity=".65"/>
-            <line x1="103" y1="44" x2="85" y2="32" stroke="#f0b23d" stroke-width="1.5" stroke-dasharray="2.5,3" opacity=".65"/>
-            <circle cx="19" cy="50" r="12.5" fill="rgba(240,178,61,.1)" stroke="#f7d38a" stroke-width="1.6"/>
-            <path d="M14.5 50l2.6 2.6 5.4-5.6" fill="none" stroke="#f7d38a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="111" cy="50" r="12.5" fill="rgba(240,178,61,.1)" stroke="#f7d38a" stroke-width="1.6"/>
-            <path d="M106.5 50l2.6 2.6 5.4-5.6" fill="none" stroke="#f7d38a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M52 39 L41 61 L52 56 L59 64 Z" fill="#f0b23d" opacity=".85"/>
-            <path d="M78 39 L89 61 L78 56 L71 64 Z" fill="#f0b23d" opacity=".85"/>
-            <circle cx="65" cy="29" r="24" fill="rgba(240,178,61,.16)" stroke="#f0b23d" stroke-width="2.4"/>
-            <circle cx="65" cy="29" r="17" fill="none" stroke="#f7d38a" stroke-width="1.6"/>
-            <path d="M56 29l5.7 5.7L74.5 22" fill="none" stroke="#f7d38a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M23 12l1.7 4.3 4.3 1.7-4.3 1.7L23 24l-1.7-4.3-4.3-1.7 4.3-1.7z" fill="#f7d38a" opacity=".85"/>
-            <path d="M109 16l1.2 3.1 3.1 1.2-3.1 1.2-1.2 3.1-1.2-3.1-3.1-1.2 3.1-1.2z" fill="#f7d38a" opacity=".75"/>
-          </svg>
-        </div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/aliados.webp" alt="" loading="lazy"></div>
         <div class="cat-overview-desc">Partners: Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3529,19 +3524,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
         </div>
         <div class="cat-overview-sub">RANGOS POR VOLUMEN</div>
-        <div class="cat-overview-preview" style="display:flex;align-items:center;justify-content:center">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <line x1="20" y1="60" x2="280" y2="60" stroke="var(--border2)" stroke-width="2"/>
-            <circle cx="40" cy="60" r="9" fill="rgba(255,47,79,.16)" stroke="var(--red)" stroke-width="2"/>
-            <circle cx="110" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <circle cx="180" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <circle cx="250" cy="60" r="9" fill="none" stroke="#5b6478" stroke-width="2"/>
-            <path d="M34 60l4 4 8-8" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M104 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-            <path d="M174 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-            <path d="M244 40l6-8 6 8" fill="none" stroke="#5b6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-          </svg>
-        </div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/rango.webp" alt="" loading="lazy"></div>
         <div class="cat-overview-desc">Indicadores de trading en vivo para ayudarte a operar mejor.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3562,35 +3545,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
-        <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <g>
-              <ellipse cx="70" cy="70" rx="22" ry="6.5" fill="#0e7490"/>
-              <ellipse cx="70" cy="61" rx="22" ry="6.5" fill="#155e75"/>
-              <ellipse cx="70" cy="52" rx="22" ry="6.5" fill="#0e7490"/>
-            </g>
-            <g>
-              <ellipse cx="150" cy="70" rx="22" ry="6.5" fill="#0e7490"/>
-              <ellipse cx="150" cy="61" rx="22" ry="6.5" fill="#155e75"/>
-              <ellipse cx="150" cy="52" rx="22" ry="6.5" fill="#0e7490"/>
-              <ellipse cx="150" cy="43" rx="22" ry="6.5" fill="#155e75"/>
-              <ellipse cx="150" cy="34" rx="22" ry="6.5" fill="#22d3ee"/>
-              <text x="150" y="37.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="10" font-weight="800" fill="#083344">₿</text>
-            </g>
-            <g>
-              <ellipse cx="230" cy="70" rx="22" ry="6.5" fill="#0e7490"/>
-              <ellipse cx="230" cy="61" rx="22" ry="6.5" fill="#155e75"/>
-              <ellipse cx="230" cy="52" rx="22" ry="6.5" fill="#0e7490"/>
-              <ellipse cx="230" cy="43" rx="22" ry="6.5" fill="#67e8f9"/>
-              <text x="230" y="46.5" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" font-weight="800" fill="#083344">Ξ</text>
-            </g>
-            <g transform="translate(224,10)">
-              <rect width="58" height="17" rx="8.5" fill="rgba(34,211,238,.22)" stroke="#22d3ee" stroke-width="1"/>
-              <path d="M9 12l3.5-5.5 3.5 5.5" fill="none" stroke="#4ade80" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-              <text x="22" y="12.3" font-family="'Space Mono',monospace" font-size="9" font-weight="700" fill="#eaf1ff">+12.4%</text>
-            </g>
-          </svg>
-        </div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/portafolio.webp" alt="" loading="lazy"></div>
         <div class="cat-overview-desc">Simulador de Portafolio: Diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real — compara capitalizaciones de mercado y calcula cuándo podrías vivir de tus inversiones.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3608,7 +3563,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">10 HERRAMIENTAS</div>
-        <div class="cat-overview-preview">
+        <div class="cat-overview-banner">
           <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="tradeCandleGrad" x1="0" y1="0" x2="300" y2="0" gradientUnits="userSpaceOnUse">
@@ -3661,41 +3616,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
-        <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <radialGradient id="shieldGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#7c7ff5" stop-opacity=".55"/>
-                <stop offset="55%" stop-color="#7c7ff5" stop-opacity=".15"/>
-                <stop offset="100%" stop-color="#7c7ff5" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="150" cy="42" r="62" fill="url(#shieldGlow)"/>
-            <line x1="16" y1="12" x2="98" y2="26" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
-            <line x1="284" y1="12" x2="202" y2="26" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
-            <line x1="16" y1="70" x2="98" y2="58" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
-            <line x1="284" y1="70" x2="202" y2="58" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="2,3" opacity=".55"/>
-            <g fill="#ff4d4d" opacity=".9">
-              <path d="M16 6l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
-              <path d="M284 6l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
-              <path d="M16 64l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
-              <path d="M284 64l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
-            </g>
-            <g stroke="#c7c9fb" stroke-width="1.4" stroke-linecap="round" opacity=".9">
-              <path d="M98 20v12M92 26h12M94 22l8 8M102 22l-8 8"/>
-              <path d="M202 20v12M196 26h12M198 22l8 8M206 22l-8 8"/>
-              <path d="M98 52v12M92 58h12M94 54l8 8M102 54l-8 8"/>
-              <path d="M202 52v12M196 58h12M198 54l8 8M206 54l-8 8"/>
-            </g>
-            <path d="M150 10 L182 22 V44 C182 60 168 70 150 74 C132 70 118 60 118 44 V22 Z" fill="rgba(124,127,245,.18)" stroke="#7c7ff5" stroke-width="2.4" stroke-linejoin="round"/>
-            <path d="M132 30l3.2 3.2L142 27" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="146" y1="29.5" x2="168" y2="29.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
-            <path d="M132 42l3.2 3.2L142 39" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="146" y1="41.5" x2="168" y2="41.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
-            <path d="M132 54l3.2 3.2L142 51" fill="none" stroke="#c7c9fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
-            <line x1="146" y1="53.5" x2="164" y2="53.5" stroke="#c7c9fb" stroke-width="1.6" opacity=".5" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/seguridad.webp" alt="" loading="lazy"></div>
         <div class="cat-overview-desc">Checklists de Seguridad: Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3713,20 +3634,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">2 HERRAMIENTAS</div>
-        <div class="cat-overview-preview">
-          <svg width="100%" height="100%" viewBox="0 0 300 78" preserveAspectRatio="xMidYMid meet">
-            <path d="M150 15 C118 6 88 9 66 18 L66 61 C88 52 118 49 150 58 Z" fill="rgba(236,72,153,.1)" stroke="#ec4899" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M150 15 C182 6 212 9 234 18 L234 61 C212 52 182 49 150 58 Z" fill="rgba(236,72,153,.1)" stroke="#ec4899" stroke-width="1.8" stroke-linejoin="round"/>
-            <line x1="150" y1="15" x2="150" y2="58" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
-            <circle cx="150" cy="15" r="3.5" fill="#f472b6"/>
-            <line x1="82" y1="27" x2="128" y2="23" stroke="#f472b6" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
-            <line x1="82" y1="35" x2="126" y2="32" stroke="#f472b6" stroke-width="1.6" opacity=".55" stroke-linecap="round"/>
-            <line x1="82" y1="43" x2="123" y2="41" stroke="#f472b6" stroke-width="1.6" opacity=".4" stroke-linecap="round"/>
-            <line x1="172" y1="23" x2="218" y2="27" stroke="#f472b6" stroke-width="1.6" opacity=".65" stroke-linecap="round"/>
-            <line x1="174" y1="32" x2="218" y2="35" stroke="#f472b6" stroke-width="1.6" opacity=".55" stroke-linecap="round"/>
-            <line x1="177" y1="41" x2="218" y2="43" stroke="#f472b6" stroke-width="1.6" opacity=".4" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/aprender.webp" alt="" loading="lazy"></div>
         <div class="cat-overview-desc">Guías y Glosario: Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
