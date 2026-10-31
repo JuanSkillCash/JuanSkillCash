@@ -1,0 +1,16 @@
+name: Bitget - inspeccionar cuerpo crudo de 3 articulos (manual, diagnostico)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --no-cache-dir requests beautifulsoup4
+      - name: Inspeccionar
+        run: python scripts/debug_bitget_body.py
