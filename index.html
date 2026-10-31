@@ -25211,7 +25211,17 @@ async function loadDelistHistoryIfNeeded(){
   delistRadarHistoryLoading = false;
 }
 
+function delistRowIsFuture(r){
+  return new Date(r.delist_at).getTime() > Date.now();
+}
+
 function delistCurrentRows(){
+  if(delistRadarSearch){
+    // con texto en el buscador se unen Proximos + Historial, sin importar la pestaña activa -
+    // si no, una moneda que SI esta guardada (ej. BRETT) puede estar "en la otra pestaña" y
+    // parecer que no existe, que fue justo la confusion que reporto Juan
+    return delistRadarUpcoming.concat(delistRadarHistory || []);
+  }
   return delistRadarTab === 'history' ? (delistRadarHistory || []) : delistRadarUpcoming;
 }
 
@@ -25234,7 +25244,7 @@ function renderDelistExchangeCards(){
   const rows = delistCurrentRows().filter(r => delistAssetMatches(r) && delistSearchMatches(r));
   const countsByEx = {};
   rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
-  const countLabel = delistRadarTab === 'history' ? 'Recientes' : 'Próximos';
+  const countLabel = delistRadarSearch ? 'Resultados' : (delistRadarTab === 'history' ? 'Recientes' : 'Próximos');
   grid.innerHTML = DELIST_EXCHANGES.map(ex => {
     const n = countsByEx[ex.id] || 0;
     const isEmpty = n === 0;
@@ -25266,7 +25276,17 @@ function renderDelistList(){
   const heroEl = document.getElementById('delistRadarHero');
   const emptyEl = document.getElementById('delistRadarEmpty');
   const isHistory = delistRadarTab === 'history';
-  const filtered = delistCurrentRows().filter(r => delistRadarActiveExchanges.has(r.exchange) && delistAssetMatches(r) && delistSearchMatches(r));
+  let filtered = delistCurrentRows().filter(r => delistRadarActiveExchanges.has(r.exchange) && delistAssetMatches(r) && delistSearchMatches(r));
+  if(delistRadarSearch){
+    // con Proximos + Historial mezclados por la busqueda: lo que falta ordenar (ya no viene
+    // de una sola query ordenada) - primero lo que aun no pasa (mas cercano arriba), despues
+    // lo ya deslistado (mas reciente arriba)
+    filtered = filtered.slice().sort((a, b) => {
+      const aFut = delistRowIsFuture(a), bFut = delistRowIsFuture(b);
+      if(aFut !== bFut) return aFut ? -1 : 1;
+      return aFut ? new Date(a.delist_at) - new Date(b.delist_at) : new Date(b.delist_at) - new Date(a.delist_at);
+    });
+  }
 
   if(filtered.length === 0){
     heroEl.style.display = 'none';
@@ -25274,8 +25294,9 @@ function renderDelistList(){
     listEl.style.display = 'none';
     listEl.innerHTML = '';
     emptyEl.style.display = 'flex';
-    emptyEl.querySelector('.indic-placeholder-title').textContent =
-      isHistory ? 'No hay historial para lo que elegiste' : 'No hay deslistados próximos en los exchanges que elegiste';
+    emptyEl.querySelector('.indic-placeholder-title').textContent = delistRadarSearch
+      ? 'No encontramos esa moneda en los exchanges que elegiste'
+      : (isHistory ? 'No hay historial para lo que elegiste' : 'No hay deslistados próximos en los exchanges que elegiste');
     return;
   }
   emptyEl.style.display = 'none';
@@ -25283,15 +25304,16 @@ function renderDelistList(){
   heroEl.style.display = 'flex';
 
   const next = filtered[0];
+  const nextIsHistory = !delistRowIsFuture(next);
   const nextEx = DELIST_EX_BY_ID[next.exchange];
   heroEl.innerHTML =
-    '<div class="delist-hero-icon">' + (isHistory ? '🗂️' : '⏰') + '</div>' +
+    '<div class="delist-hero-icon">' + (nextIsHistory ? '🗂️' : '⏰') + '</div>' +
     '<div class="delist-hero-mid">' +
-      '<div class="delist-hero-label">' + (isHistory ? 'El más reciente' : 'El más próximo') + '</div>' +
+      '<div class="delist-hero-label">' + (nextIsHistory ? 'El más reciente' : 'El más próximo') + '</div>' +
       '<div class="delist-hero-coin">' + next.pair_base + '</div>' +
       '<div class="delist-hero-ex" style="color:' + (nextEx ? nextEx.color : 'inherit') + '">' + (nextEx ? nextEx.label : next.exchange) + '</div>' +
     '</div>' +
-    (isHistory
+    (nextIsHistory
       ? '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" style="color:var(--muted2)">' + formatElapsedSince(new Date(next.delist_at)) + '</div><div class="delist-hero-countdown-label">Ya deslistado</div></div>'
       : '<div class="delist-hero-countdown"><div class="delist-hero-countdown-val" data-countdown="' + next.delist_at + '">' + formatDelistCountdown(new Date(next.delist_at)) + '</div><div class="delist-hero-countdown-label">Cuenta regresiva</div></div>'
     );
@@ -25301,10 +25323,11 @@ function renderDelistList(){
     const exLabel = ex ? ex.label : r.exchange;
     const exColor = ex ? ex.color : '#8890ac';
     const dt = new Date(r.delist_at);
+    const rowIsHistory = !delistRowIsFuture(r);
     const dateStr = dt.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const marketLabel = r.market === 'futures' ? 'Futuros' : 'Spot';
     const assetIcon = ASSET_CLASS_ICON[r.asset_class] || '';
-    const countdownHtml = isHistory
+    const countdownHtml = rowIsHistory
       ? '<div class="delist-row-countdown-val" style="color:var(--muted)">' + formatElapsedSince(dt) + '</div>'
       : '<div class="delist-row-countdown-val" data-countdown="' + r.delist_at + '">' + formatDelistCountdown(dt) + '</div>';
     return (
@@ -25372,8 +25395,11 @@ function ensureDelistRadarLoaded(){
       renderDelistList();
     });
   });
-  document.getElementById('delistRadarSearchInput').addEventListener('input', (e) => {
+  document.getElementById('delistRadarSearchInput').addEventListener('input', async (e) => {
     delistRadarSearch = e.target.value.trim().toLowerCase();
+    // buscando: hay que traer Historial aunque el usuario este parado en Proximos, si no
+    // esa mitad de los datos nunca llega a compararse contra lo que escribio
+    if(delistRadarSearch) await loadDelistHistoryIfNeeded();
     renderDelistExchangeCards();
     renderDelistList();
   });
@@ -25462,6 +25488,11 @@ async function loadNewListRadar(){
 
 function newListCurrentRows(){
   const isFuture = r => !!(r.listed_at && new Date(r.listed_at).getTime() > Date.now());
+  if(newListRadarSearch){
+    // con texto en el buscador se ignora la pestaña - aqui los datos de ambas pestañas ya
+    // estan en la misma lista (newListRadarRows), solo falta no filtrarlos por una sola
+    return newListRadarRows;
+  }
   return newListRadarTab === 'upcoming'
     ? newListRadarRows.filter(isFuture)
     : newListRadarRows.filter(r => !isFuture(r));
@@ -25486,7 +25517,7 @@ function renderNewListExchangeCards(){
   const rows = newListCurrentRows().filter(r => newListAssetMatches(r) && newListSearchMatches(r));
   const countsByEx = {};
   rows.forEach(r => { countsByEx[r.exchange] = (countsByEx[r.exchange] || 0) + 1; });
-  const countLabel = newListRadarTab === 'upcoming' ? 'Próximos' : 'Recientes';
+  const countLabel = newListRadarSearch ? 'Resultados' : (newListRadarTab === 'upcoming' ? 'Próximos' : 'Recientes');
   grid.innerHTML = NEWLIST_EXCHANGES.map(ex => {
     const n = countsByEx[ex.id] || 0;
     const isEmpty = n === 0;
@@ -25518,7 +25549,22 @@ function renderNewListList(){
   const heroEl = document.getElementById('newListRadarHero');
   const emptyEl = document.getElementById('newListRadarEmpty');
   const isUpcoming = newListRadarTab === 'upcoming';
-  const filtered = newListCurrentRows().filter(r => newListRadarActiveExchanges.has(r.exchange) && newListAssetMatches(r) && newListSearchMatches(r));
+  let filtered = newListCurrentRows().filter(r => newListRadarActiveExchanges.has(r.exchange) && newListAssetMatches(r) && newListSearchMatches(r));
+  if(newListRadarSearch){
+    // con Proximos + Historial mezclados por la busqueda: lo que aun no se lista primero (mas
+    // cercano arriba), despues lo ya listado (mas reciente arriba)
+    filtered = filtered.slice().sort((a, b) => {
+      const aFut = !!(a.listed_at && new Date(a.listed_at).getTime() > Date.now());
+      const bFut = !!(b.listed_at && new Date(b.listed_at).getTime() > Date.now());
+      if(aFut !== bFut) return aFut ? -1 : 1;
+      if(aFut) return new Date(a.listed_at) - new Date(b.listed_at);
+      const aRef = a.announced_at || a.listed_at, bRef = b.announced_at || b.listed_at;
+      if(!aRef && !bRef) return 0;
+      if(!aRef) return 1;
+      if(!bRef) return -1;
+      return new Date(bRef) - new Date(aRef);
+    });
+  }
 
   if(filtered.length === 0){
     heroEl.style.display = 'none';
@@ -25526,8 +25572,9 @@ function renderNewListList(){
     listEl.style.display = 'none';
     listEl.innerHTML = '';
     emptyEl.style.display = 'flex';
-    emptyEl.querySelector('.indic-placeholder-title').textContent =
-      isUpcoming ? 'No hay próximos listados para lo que elegiste' : 'No hay nuevos listados para lo que elegiste';
+    emptyEl.querySelector('.indic-placeholder-title').textContent = newListRadarSearch
+      ? 'No encontramos esa moneda en los exchanges que elegiste'
+      : (isUpcoming ? 'No hay próximos listados para lo que elegiste' : 'No hay nuevos listados para lo que elegiste');
     return;
   }
   emptyEl.style.display = 'none';
@@ -25540,7 +25587,7 @@ function renderNewListList(){
   heroEl.innerHTML =
     '<div class="delist-hero-icon">🆕</div>' +
     '<div class="delist-hero-mid">' +
-      '<div class="delist-hero-label">' + (isUpcoming ? 'El más próximo' : 'Lo más reciente') + '</div>' +
+      '<div class="delist-hero-label">' + (nextIsFuture ? 'El más próximo' : 'Lo más reciente') + '</div>' +
       '<div class="delist-hero-coin">' + next.pair_base + '</div>' +
       '<div class="delist-hero-ex" style="color:' + (nextEx ? nextEx.color : 'inherit') + '">' + (nextEx ? nextEx.label : next.exchange) + '</div>' +
     '</div>' +
