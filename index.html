@@ -1217,7 +1217,9 @@ button{font-family:inherit;color:inherit}
 .tool-cat-label::after{content:'';flex:1;height:1px;background:rgba(91,141,239,.3)}
 .section-intro-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
 .section-intro-text{font-size:13.5px;color:var(--muted2);line-height:1.65;max-width:640px;margin-bottom:20px}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){ .tool-grid{grid-template-columns:1fr 1fr} }
+@media(max-width:560px){ .tool-grid{grid-template-columns:1fr} }
 .tool-card{
   --bc:rgba(91,141,239,.3);
   border-radius:12px;padding:18px;border:1px solid var(--bc);
@@ -1231,6 +1233,13 @@ button{font-family:inherit;color:inherit}
 .tool-card-banner{margin:-18px -18px 12px;height:110px;position:relative;overflow:hidden;border-radius:12px 12px 0 0}
 .tool-card-banner img{width:100%;height:100%;object-fit:cover;display:block}
 .tool-card-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
+.tool-card-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.tool-card-num{width:24px;height:24px;border-radius:50%;border:1px solid rgba(91,141,239,.4);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;color:var(--accent);flex-shrink:0}
+.tool-card-head .tool-icon{font-size:16px;height:auto;width:auto;margin:0;display:inline-flex;flex-shrink:0}
+.tool-card-headtitle{flex:1;display:flex;align-items:center;gap:7px;min-width:0}
+.tool-card-head h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:13.5px;line-height:1.25;color:var(--white);margin:0;text-align:left;min-height:0}
+.tool-card-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.03em;color:var(--green);border:1px solid rgba(46,204,113,.35);background:rgba(46,204,113,.08);padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.tool-card-btn{margin-top:auto;padding-top:12px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--accent)}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
@@ -6392,80 +6401,110 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <p class="section-intro-text">Todas las calculadoras para cazar oportunidades: liquidación, break-even, comisiones y ganancia real en futuros, DCA de compra/venta, y las utilidades rápidas (conversor, porcentajes, zona horaria) que antes andaban sueltas.</p>
       <div class="tool-grid">
 <button class="tool-card" id="openCalcCard" data-tool="calculadora">
+          <div class="tool-card-head">
+            <div class="tool-card-num">1</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">🧮</span><h3>Calculadora de Trading</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/trading.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">🧮</div>
-          <h3>Calculadora de Trading</h3>
           <p>Calcula liquidación, SL, TP, riesgo/beneficio y tamaño de posición en futuros.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openBreakevenCard" data-tool="breakeven">
+          <div class="tool-card-head">
+            <div class="tool-card-num">2</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">⚖️</span><h3>Calculadora de Break-even</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/breakeven.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">⚖️</div>
-          <h3>Calculadora de Break-even</h3>
           <p>Cuánto tiene que moverse el precio solo para cubrir las comisiones — y cuánto bajas ese número con el cashback de Bitunix.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openCoinmCard" data-tool="coinm">
+          <div class="tool-card-head">
+            <div class="tool-card-num">3</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">₿</span><h3>Calculadora Coin-M</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/coinm.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">₿</div>
-          <h3>Calculadora Coin-M</h3>
           <p>Para futuros con margen en la propia moneda: calcula la ganancia del trade MÁS la revalorización de tu margen — algo que la calculadora normal (USDT-M) no captura.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openFeesCard" data-tool="fees">
+          <div class="tool-card-head">
+            <div class="tool-card-num">4</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">🧾</span><h3>Calculadora de Comisiones</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/fees.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">🧾</div>
-          <h3>Calculadora de Comisiones</h3>
           <p>Cuánto te come el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
+          <div class="tool-card-head">
+            <div class="tool-card-num">5</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">📈</span><h3>Calculadora de Rentabilidad</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/rentabilidad.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">📈</div>
-          <h3>Calculadora de Rentabilidad</h3>
           <p>Simula cuánto ganarías comprando y vendiendo un activo, con precios de cripto en vivo.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openDcaCard" data-tool="dca">
+          <div class="tool-card-head">
+            <div class="tool-card-num">6</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">🪙</span><h3>Simulador de DCA de Compra</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/dca-buy.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">🪙</div>
-          <h3>Simulador de DCA de Compra</h3>
           <p>Simula cuánto acumularías comprando un monto fijo periódicamente, en vez de intentar acertarle al mejor momento.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openDcaExitCard" data-tool="dcaexit">
+          <div class="tool-card-head">
+            <div class="tool-card-num">7</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">📤</span><h3>Simulador de DCA de Venta</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <div class="tool-card-banner"><img src="/assets/zona-caza/dca-sell.webp" alt="" loading="lazy"></div>
-          <div class="tool-icon">📤</div>
-          <h3>Simulador de DCA de Venta</h3>
           <p>Lo opuesto al DCA de compra: cómo ir retirando ganancias por partes en vez de vender todo de una sola vez.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openUnitConverterCard" data-tool="unitconverter">
-          <div class="tool-icon">🔁</div>
-          <h3>Conversor de Unidades</h3>
+          <div class="tool-card-head">
+            <div class="tool-card-num">8</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">🔁</span><h3>Conversor de Unidades</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <p>Sats↔BTC, gwei↔ETH, wei↔ETH — las conversiones que se buscan en Google todo el tiempo, en un solo lugar.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openPctCalcCard" data-tool="pctcalc">
-          <div class="tool-icon">📐</div>
-          <h3>Calculadora de Porcentajes</h3>
+          <div class="tool-card-head">
+            <div class="tool-card-num">9</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">📐</span><h3>Calculadora de Porcentajes</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <p>Qué % es un número de otro, cuánto es el X%, o cuál es el precio nuevo tras subir o bajar un %.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
 
         <button class="tool-card" id="openTzClockCard" data-tool="tzclock">
-          <div class="tool-icon">🕐</div>
-          <h3>Reloj de Zona Horaria</h3>
+          <div class="tool-card-head">
+            <div class="tool-card-num">10</div>
+            <div class="tool-card-headtitle"><span class="tool-icon">🕐</span><h3>Reloj de Zona Horaria</h3></div>
+            <div class="tool-card-tag">GRATIS</div>
+          </div>
           <p>Compara la hora de dos países que elijas — útil para coordinar un live o llamada con tu comunidad.</p>
-          <span class="tool-status open">Disponible</span>
+          <div class="tool-card-btn">Explorar →</div>
         </button>
       </div>
     </div>
