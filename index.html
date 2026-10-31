@@ -892,15 +892,19 @@ button{font-family:inherit;color:inherit}
 .watchlist-box.open .watchlist-box-arrow{transform:rotate(180deg)}
 .watchlist-box-body{padding:14px;border-top:1px solid rgba(91,141,239,.3)}
 .watchlist-box-hint{font-size:11.5px;color:var(--muted2);margin-bottom:10px;line-height:1.5}
-.watchlist-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:9px 11px;font-size:12.5px}
-.watchlist-item .wli-symbol{font-weight:700;color:var(--white)}
+.watchlist-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:9px 11px;font-size:12.5px;flex-wrap:wrap}
+.watchlist-item .wli-symbol{font-weight:700;color:var(--white);flex-shrink:0}
+.wli-ex-list{display:flex;flex-wrap:wrap;gap:6px}
 .watchlist-item .wli-exchange{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--gold);border:1px solid rgba(240,178,61,.3);padding:2px 8px;border-radius:20px;flex-shrink:0;text-transform:capitalize}
-.watchlist-item .wli-remove{margin-left:auto}
+.watchlist-item .wli-edit{margin-left:auto}
 .wl-pending{background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px}
 .wl-pending select{width:100%;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px;color:var(--white);font-size:12.5px;margin:8px 0}
 .wl-ex-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .wl-ex-chip{padding:7px 12px;border-radius:20px;border:1px solid rgba(91,141,239,.3);background:transparent;color:var(--muted2);font-size:11.5px;font-weight:700;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .wl-ex-chip.active{background:rgba(91,141,239,.14);border-color:var(--accent);color:var(--white)}
+.wl-ex-toolbar{display:flex;gap:10px;margin:6px 0 0;font-family:'Space Mono',monospace;font-size:10.5px}
+.wl-ex-toolbar button{background:none;border:none;color:var(--muted2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:2px}
+.wl-ex-toolbar button:hover{color:var(--white)}
 
 /* TOOL GRID */
 .tool-section{margin-bottom:28px}
@@ -26703,19 +26707,63 @@ function initWatchlistWidget(cfg){
     const rows = data || [];
     emptyMsg.style.display = rows.length === 0 ? 'block' : 'none';
     list.innerHTML = '';
+    // agrupar por simbolo: la misma moneda repartida en varios exchanges se ve como UNA fila
+    // con varias etiquetas, no como una fila duplicada por cada exchange - mas facil de leer
+    // (y de editar) cuando esta seguida en muchos intercambios a la vez
+    const groups = [];
+    const bySymbol = new Map();
     rows.forEach(w => {
+      let g = bySymbol.get(w.symbol);
+      if(!g){ g = { symbol: w.symbol, rows: [] }; bySymbol.set(w.symbol, g); groups.push(g); }
+      g.rows.push(w);
+    });
+    groups.forEach(g => {
       const item = document.createElement('div');
       item.className = 'watchlist-item';
+      const tags = g.rows.map(w => '<span class="wli-exchange">' + escapeHtml(watchlistExchangeLabel(w.exchange)) + '</span>').join('');
       item.innerHTML =
-        '<span class="wli-symbol">' + escapeHtml(w.symbol) + '</span>' +
-        '<span class="wli-exchange">' + escapeHtml(watchlistExchangeLabel(w.exchange)) + '</span>' +
-        '<button class="portfolio-del-btn wli-remove" title="Dejar de seguir" type="button">🗑</button>';
+        '<span class="wli-symbol">' + escapeHtml(g.symbol) + '</span>' +
+        '<div class="wli-ex-list">' + tags + '</div>' +
+        '<button class="portfolio-del-btn wli-edit" title="Editar exchanges" type="button">✏️</button>' +
+        '<button class="portfolio-del-btn wli-remove" title="Dejar de seguir por completo" type="button">🗑</button>';
+      item.querySelector('.wli-edit').addEventListener('click', () => showEdit(g));
       item.querySelector('.wli-remove').addEventListener('click', async () => {
-        await sbClient.from('user_watchlist').delete().eq('id', w.id);
-        notifyTelegramWatchlistChange('remove', w.symbol, [w.exchange], cfg.radar);
+        for(const w of g.rows) await sbClient.from('user_watchlist').delete().eq('id', w.id);
+        notifyTelegramWatchlistChange('remove', g.symbol, g.rows.map(w => w.exchange), cfg.radar);
         load();
       });
       list.appendChild(item);
+    });
+  }
+
+  // pildoras de exchange compartidas entre "agregar" y "editar" - "cualquiera" es excluyente
+  // con los exchanges puntuales, y "Seleccionar todos" marca TODOS los puntuales de una sola
+  // vez (pedido explicito: no tener que marcarlos uno por uno si la tiene repartida en 10)
+  function exChipsHtml(){
+    return ['<button type="button" class="wl-ex-chip" data-ex="any">Cualquier exchange</button>']
+      .concat(cfg.exchanges.map(e => '<button type="button" class="wl-ex-chip" data-ex="' + e.id + '">' + e.label + '</button>'))
+      .join('');
+  }
+  function wireExChips(container){
+    container.querySelectorAll('.wl-ex-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if(chip.dataset.ex === 'any'){
+          container.querySelectorAll('.wl-ex-chip').forEach(c => { if(c !== chip) c.classList.remove('active'); });
+          chip.classList.toggle('active');
+        } else {
+          container.querySelector('.wl-ex-chip[data-ex="any"]').classList.remove('active');
+          chip.classList.toggle('active');
+        }
+      });
+    });
+    const selectAllBtn = container.querySelector('.wl-ex-selectall');
+    if(selectAllBtn) selectAllBtn.addEventListener('click', () => {
+      container.querySelector('.wl-ex-chip[data-ex="any"]').classList.remove('active');
+      container.querySelectorAll('.wl-ex-chip:not([data-ex="any"])').forEach(c => c.classList.add('active'));
+    });
+    const selectNoneBtn = container.querySelector('.wl-ex-selectnone');
+    if(selectNoneBtn) selectNoneBtn.addEventListener('click', () => {
+      container.querySelectorAll('.wl-ex-chip').forEach(c => c.classList.remove('active'));
     });
   }
 
@@ -26725,29 +26773,16 @@ function initWatchlistWidget(cfg){
     const symbol = coin.symbol.toUpperCase();
     const pending = document.createElement('div');
     pending.className = 'wl-pending';
-    const chips = ['<button type="button" class="wl-ex-chip" data-ex="any">Cualquier exchange</button>']
-      .concat(cfg.exchanges.map(e => '<button type="button" class="wl-ex-chip" data-ex="' + e.id + '">' + e.label + '</button>'))
-      .join('');
     pending.innerHTML =
       'Seguir <b>' + escapeHtml(symbol) + '</b> en (puedes elegir varios si la tienes repartida):' +
-      '<div class="wl-ex-chip-row">' + chips + '</div>' +
+      '<div class="wl-ex-chip-row">' + exChipsHtml() + '</div>' +
+      '<div class="wl-ex-toolbar"><button type="button" class="wl-ex-selectall">Seleccionar todos</button>' +
+      '<button type="button" class="wl-ex-selectnone">Ninguno</button></div>' +
       '<div class="calc-actions"><button class="a-btn wl-pending-confirm" type="button">Agregar a Mi Lista</button>' +
       '<button class="a-btn wl-pending-cancel" type="button">Cancelar</button></div>';
     pendingBox.innerHTML = '';
     pendingBox.appendChild(pending);
-
-    pending.querySelectorAll('.wl-ex-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        if(chip.dataset.ex === 'any'){
-          // "cualquiera" es excluyente con exchanges puntuales - no tiene sentido combinarlos
-          pending.querySelectorAll('.wl-ex-chip').forEach(c => { if(c !== chip) c.classList.remove('active'); });
-          chip.classList.toggle('active');
-        } else {
-          pending.querySelector('.wl-ex-chip[data-ex="any"]').classList.remove('active');
-          chip.classList.toggle('active');
-        }
-      });
-    });
+    wireExChips(pending);
 
     pending.querySelector('.wl-pending-cancel').addEventListener('click', () => { pendingBox.innerHTML = ''; });
     pending.querySelector('.wl-pending-confirm').addEventListener('click', async () => {
@@ -26767,6 +26802,49 @@ function initWatchlistWidget(cfg){
         }
       }
       if(addedExchanges.length > 0) notifyTelegramWatchlistChange('add', symbol, addedExchanges, cfg.radar);
+      pendingBox.innerHTML = '';
+      load();
+    });
+  }
+
+  // editar un grupo ya existente: mismas pildoras que "agregar", pero precargadas con los
+  // exchanges que ya sigue - al guardar se calcula la diferencia (que agregar, que quitar)
+  // en vez de borrar todo y reinsertar, asi lo que no cambio no genera aviso de Telegram
+  function showEdit(group){
+    const current = new Set(group.rows.map(r => r.exchange));
+    const edit = document.createElement('div');
+    edit.className = 'wl-pending';
+    edit.innerHTML =
+      'Editar <b>' + escapeHtml(group.symbol) + '</b> — exchanges donde la sigues:' +
+      '<div class="wl-ex-chip-row">' + exChipsHtml() + '</div>' +
+      '<div class="wl-ex-toolbar"><button type="button" class="wl-ex-selectall">Seleccionar todos</button>' +
+      '<button type="button" class="wl-ex-selectnone">Ninguno</button></div>' +
+      '<div class="calc-actions"><button class="a-btn wl-pending-confirm" type="button">Guardar cambios</button>' +
+      '<button class="a-btn wl-pending-cancel" type="button">Cancelar</button></div>';
+    pendingBox.innerHTML = '';
+    pendingBox.appendChild(edit);
+    edit.querySelectorAll('.wl-ex-chip').forEach(chip => {
+      if(current.has(chip.dataset.ex)) chip.classList.add('active');
+    });
+    wireExChips(edit);
+
+    edit.querySelector('.wl-pending-cancel').addEventListener('click', () => { pendingBox.innerHTML = ''; });
+    edit.querySelector('.wl-pending-confirm').addEventListener('click', async () => {
+      const selected = new Set(Array.from(edit.querySelectorAll('.wl-ex-chip.active')).map(c => c.dataset.ex));
+      if(selected.size === 0){
+        alert('Elige al menos un exchange (o "Cualquier exchange"), o usa la papelera para dejar de seguir la moneda por completo.');
+        return;
+      }
+      const toAdd = [...selected].filter(ex => !current.has(ex));
+      const toRemove = group.rows.filter(r => !selected.has(r.exchange));
+      for(const r of toRemove) await sbClient.from('user_watchlist').delete().eq('id', r.id);
+      for(const exchange of toAdd){
+        const { error } = await sbClient.from('user_watchlist')
+          .insert({ user_id: currentUser.id, symbol: group.symbol, exchange, radar: cfg.radar });
+        if(error && error.code !== '23505') alert(friendlyErrMsg(error));
+      }
+      if(toAdd.length > 0) notifyTelegramWatchlistChange('add', group.symbol, toAdd, cfg.radar);
+      if(toRemove.length > 0) notifyTelegramWatchlistChange('remove', group.symbol, toRemove.map(r => r.exchange), cfg.radar);
       pendingBox.innerHTML = '';
       load();
     });
