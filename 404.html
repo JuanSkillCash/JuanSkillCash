@@ -26553,10 +26553,14 @@ async function loadNotifications(){
     a.target = '_blank';
     a.rel = 'noopener';
     const kindLabel = r.radar === 'delistings' ? '🔴 Deslistado' : '🟢 Nuevo listado';
+    const exLabel = watchlistExchangeLabel(r.exchange);
+    const sentence = r.radar === 'delistings'
+      ? escapeHtml(r.symbol) + ', que tenías en seguimiento, será deslistado de ' + escapeHtml(exLabel) + '.'
+      : escapeHtml(r.symbol) + ', que tenías en seguimiento, fue listada en ' + escapeHtml(exLabel) + '.';
     a.innerHTML =
-      '<div class="notif-item-top"><span>' + kindLabel + '</span><span>·</span><span>' + escapeHtml(watchlistExchangeLabel(r.exchange)) + '</span></div>' +
-      '<div class="notif-item-title">' + escapeHtml(r.symbol) + ' — ' + escapeHtml(r.title) + '</div>' +
-      '<div class="notif-item-date">' + notifTimeAgoShort(r.created_at) + '</div>';
+      '<div class="notif-item-top"><span>' + kindLabel + '</span><span>·</span><span>' + escapeHtml(exLabel) + '</span></div>' +
+      '<div class="notif-item-title">' + sentence + '</div>' +
+      '<div class="notif-item-date">' + notifTimeAgoShort(r.created_at) + ' · ver aviso del exchange →</div>';
     a.addEventListener('click', () => { if(!r.read_at) markNotificationRead(r.id); });
     notifList.appendChild(a);
   });

@@ -36,6 +36,19 @@ WATCHLIST_TABLE = "user_watchlist"
 NOTIFICATIONS_TABLE = "user_notifications"
 TELEGRAM_LINKS_TABLE = "user_telegram_links"
 
+# mismos nombres que DELIST_EXCHANGES/NEWLIST_EX_BY_ID en index.html (watchlistExchangeLabel) -
+# para que el mensaje de Telegram diga "Bitget"/"BingX" y no el id crudo en minuscula
+EXCHANGE_LABELS = {
+    "bitunix": "Bitunix", "bingx": "BingX", "okx": "OKX", "bitget": "Bitget",
+    "kucoin": "KuCoin", "bybit": "Bybit", "binance": "Binance", "gate": "Gate",
+    "mexc": "MEXC", "kraken": "Kraken", "lbank": "LBank", "pionex": "Pionex",
+    "coinw": "CoinW", "weex": "Weex", "blofin": "Blofin",
+}
+
+
+def _exchange_label(exchange: str) -> str:
+    return EXCHANGE_LABELS.get(exchange, exchange.capitalize())
+
 
 def notify_watchlist_matches(
     supabase_url: str, supabase_key: str, radar: str, rows: list, telegram_bot_token: str = "",
@@ -155,12 +168,19 @@ def _send_telegram_for_new_matches(supabase_url: str, supabase_key: str, bot_tok
         chat_id = chat_by_user.get(n["user_id"])
         if not chat_id:
             continue
-        kind_label = "🔴 Deslistado" if n["radar"] == "delistings" else "🟢 Nuevo listado"
+        ex_label = _exchange_label(n["exchange"])
+        if n["radar"] == "delistings":
+            kind_label = "🔴 Deslistado"
+            sentence = f"{n['symbol']}, que tenías en seguimiento, será deslistado de {ex_label}."
+        else:
+            kind_label = "🟢 Nuevo listado"
+            sentence = f"{n['symbol']}, que tenías en seguimiento, fue listada en {ex_label}."
         text = (
-            f"{kind_label}\n"
+            f"{kind_label}\n\n"
             f"Moneda: {n['symbol']}\n"
-            f"Exchange: {n['exchange']}\n\n"
-            f"{n['title']}\n{n['source_url']}"
+            f"Exchange: {ex_label}\n\n"
+            f"{sentence}\n\n"
+            f"Puedes ver la noticia publicada por el intercambio en el siguiente link:\n{n['source_url']}"
         )
         if send_telegram_message(bot_token, chat_id, text):
             sent += 1
