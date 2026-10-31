@@ -1,0 +1,24 @@
+name: Radar de Deslistados - buscar un symbol puntual (manual, diagnostico)
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Termino a buscar en pair_base (ej. BRETT)"
+        required: false
+        default: "BRETT"
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --no-cache-dir requests
+      - name: Buscar symbol
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/debug_delisting_symbol.py "${{ github.event.inputs.symbol }}"
