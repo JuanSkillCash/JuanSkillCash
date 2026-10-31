@@ -2193,7 +2193,10 @@ img[src=""]{display:none}
 .radar-search input::placeholder{color:var(--muted)}
 .radar-search input:focus{outline:none;border-color:var(--gold)}
 
-.delist-row-asset{font-size:11px;flex-shrink:0;line-height:1}
+.delist-row-assetclass{
+  --c:#8890ac;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;
+  background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);white-space:nowrap
+}
 
 .delist-list{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:4px;margin:-4px -4px 0 0}
 .delist-row{
@@ -25102,7 +25105,10 @@ const DELIST_EXCHANGES = [
 ];
 const DELIST_EX_BY_ID = Object.fromEntries(DELIST_EXCHANGES.map(e => [e.id, e]));
 
-const ASSET_CLASS_ICON = { stock: '📈', index: '📊', commodity: '🥇' };
+// etiqueta de texto (no emoji) para que no haya que "aprenderse" un icono - mismo estilo de
+// pildora que ya se usa para el exchange, pero con su propio color por clase de activo
+const ASSET_CLASS_LABELS = { crypto: 'Cripto', stock: 'Acción', index: 'Índice', commodity: 'Commodity' };
+const ASSET_CLASS_COLORS = { crypto: '#f0b90b', stock: '#2ecc71', index: '#5b8def', commodity: '#e8a33d' };
 
 let delistRadarLoadedOnce = false;
 let delistRadarUpcoming = [];          // filas con delist_at futuro, ascendente
@@ -25326,13 +25332,14 @@ function renderDelistList(){
     const rowIsHistory = !delistRowIsFuture(r);
     const dateStr = dt.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const marketLabel = r.market === 'futures' ? 'Futuros' : 'Spot';
-    const assetIcon = ASSET_CLASS_ICON[r.asset_class] || '';
+    const assetLabel = ASSET_CLASS_LABELS[r.asset_class] || '';
+    const assetColor = ASSET_CLASS_COLORS[r.asset_class] || '#8890ac';
     const countdownHtml = rowIsHistory
       ? '<div class="delist-row-countdown-val" style="color:var(--muted)">' + formatElapsedSince(dt) + '</div>'
       : '<div class="delist-row-countdown-val" data-countdown="' + r.delist_at + '">' + formatDelistCountdown(dt) + '</div>';
     return (
       '<a class="delist-row" href="' + (r.source_url || '#') + '" target="_blank" rel="noopener noreferrer">' +
-        (assetIcon ? '<div class="delist-row-asset" title="' + r.asset_class + '">' + assetIcon + '</div>' : '') +
+        (assetLabel ? '<div class="delist-row-assetclass" style="--c:' + assetColor + '">' + assetLabel + '</div>' : '') +
         '<div class="delist-row-coin">' + r.pair_base + '</div>' +
         '<div class="delist-row-ex" style="--c:' + exColor + '">' + exLabel + '</div>' +
         '<div class="delist-row-market">' + marketLabel + '</div>' +
@@ -25604,13 +25611,14 @@ function renderNewListList(){
     const dt = r.announced_at ? new Date(r.announced_at) : null;
     const dateStr = dt ? dt.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
     const marketLabel = r.market === 'futures' ? 'Futuros' : 'Spot';
-    const assetIcon = ASSET_CLASS_ICON[r.asset_class] || '';
+    const assetLabel = ASSET_CLASS_LABELS[r.asset_class] || '';
+    const assetColor = ASSET_CLASS_COLORS[r.asset_class] || '#8890ac';
     const countdownHtml = isFuture
       ? '<div class="delist-row-countdown-val" data-countdown="' + r.listed_at + '">' + formatDelistCountdown(new Date(r.listed_at)) + '</div>'
       : '<div class="delist-row-countdown-val" style="color:var(--green)">' + (dt ? formatElapsedSince(dt) : 'Disponible') + '</div>';
     return (
       '<a class="delist-row" href="' + (r.source_url || '#') + '" target="_blank" rel="noopener noreferrer">' +
-        (assetIcon ? '<div class="delist-row-asset" title="' + r.asset_class + '">' + assetIcon + '</div>' : '') +
+        (assetLabel ? '<div class="delist-row-assetclass" style="--c:' + assetColor + '">' + assetLabel + '</div>' : '') +
         '<div class="delist-row-coin">' + r.pair_base + '</div>' +
         '<div class="delist-row-ex" style="--c:' + exColor + '">' + exLabel + '</div>' +
         '<div class="delist-row-market">' + marketLabel + '</div>' +
