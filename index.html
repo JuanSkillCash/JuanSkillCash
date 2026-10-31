@@ -1228,6 +1228,9 @@ button{font-family:inherit;color:inherit}
 }
 .tool-card:hover{transform:translateY(-3px)}
 .tool-card:focus-visible{transform:translateY(-3px)}
+.tool-card-banner{margin:-18px -18px 12px;height:110px;position:relative;overflow:hidden;border-radius:12px 12px 0 0}
+.tool-card-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.tool-card-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px}
@@ -6389,6 +6392,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <p class="section-intro-text">Todas las calculadoras para cazar oportunidades: liquidación, break-even, comisiones y ganancia real en futuros, DCA de compra/venta, y las utilidades rápidas (conversor, porcentajes, zona horaria) que antes andaban sueltas.</p>
       <div class="tool-grid">
 <button class="tool-card" id="openCalcCard" data-tool="calculadora">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/trading.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">🧮</div>
           <h3>Calculadora de Trading</h3>
           <p>Calcula liquidación, SL, TP, riesgo/beneficio y tamaño de posición en futuros.</p>
@@ -6396,6 +6400,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openBreakevenCard" data-tool="breakeven">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/breakeven.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">⚖️</div>
           <h3>Calculadora de Break-even</h3>
           <p>Cuánto tiene que moverse el precio solo para cubrir las comisiones — y cuánto bajas ese número con el cashback de Bitunix.</p>
@@ -6403,6 +6408,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openCoinmCard" data-tool="coinm">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/coinm.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">₿</div>
           <h3>Calculadora Coin-M</h3>
           <p>Para futuros con margen en la propia moneda: calcula la ganancia del trade MÁS la revalorización de tu margen — algo que la calculadora normal (USDT-M) no captura.</p>
@@ -6410,6 +6416,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openFeesCard" data-tool="fees">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/fees.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">🧾</div>
           <h3>Calculadora de Comisiones</h3>
           <p>Cuánto te come el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
@@ -6417,6 +6424,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/rentabilidad.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">📈</div>
           <h3>Calculadora de Rentabilidad</h3>
           <p>Simula cuánto ganarías comprando y vendiendo un activo, con precios de cripto en vivo.</p>
@@ -6424,6 +6432,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openDcaCard" data-tool="dca">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/dca-buy.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">🪙</div>
           <h3>Simulador de DCA de Compra</h3>
           <p>Simula cuánto acumularías comprando un monto fijo periódicamente, en vez de intentar acertarle al mejor momento.</p>
@@ -6431,6 +6440,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
 
         <button class="tool-card" id="openDcaExitCard" data-tool="dcaexit">
+          <div class="tool-card-banner"><img src="/assets/zona-caza/dca-sell.webp" alt="" loading="lazy"></div>
           <div class="tool-icon">📤</div>
           <h3>Simulador de DCA de Venta</h3>
           <p>Lo opuesto al DCA de compra: cómo ir retirando ganancias por partes en vez de vender todo de una sola vez.</p>
