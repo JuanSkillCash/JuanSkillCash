@@ -11409,22 +11409,18 @@ document.querySelectorAll('.indic-cat-label').forEach(label => {
   wireCollapsibleLabel(label); // empiezan desplegadas - el usuario las puede plegar a mano
 });
 
-/* ---- recuadro fijo arriba del sidebar para expandir/contraer TODOS los sub-grupos de
-   indicadores (.indic-cat-label) de una — tanto en el nav de escritorio como en el nav móvil de
-   indicadores, sin importar cuál esté visible en ese momento ---- */
+/* ---- recuadro fijo arriba del sidebar para expandir/contraer TODO el sidebar de una: las 7
+   categorías principales (.sb-cat-label, ej. "Zona de Caza") y, dentro de Indicadores, sus
+   sub-grupos (.indic-cat-label, ej. "₿ BTC") — tanto en el nav de escritorio como en el nav
+   móvil de indicadores, sin importar cuál esté visible en ese momento ---- */
 function setAllIndicCatLabelsCollapsed(collapsed){
-  if(!collapsed){
-    // si "Indicadores de Mercado" en sí está plegado, desplegarlo primero — si no, los
-    // sub-grupos quedarían visibles "huérfanos" sin su categoría de arriba abierta
-    const topLabel = document.querySelector('.sb-cat-label[data-category="indicadores"]');
-    if(topLabel && topLabel.classList.contains('collapsed')){
-      topLabel.classList.remove('collapsed');
-      const items = [];
-      let sib = topLabel.nextElementSibling;
-      while(sib && !sib.classList.contains('sb-cat-label')){ items.push(sib); sib = sib.nextElementSibling; }
-      setGroupItemsVisibility(items, true);
-    }
-  }
+  document.querySelectorAll('.sb-cat-label').forEach(label => {
+    label.classList.toggle('collapsed', collapsed);
+    const items = [];
+    let sib = label.nextElementSibling;
+    while(sib && !sib.classList.contains('sb-cat-label')){ items.push(sib); sib = sib.nextElementSibling; }
+    setGroupItemsVisibility(items, !collapsed);
+  });
   document.querySelectorAll('.indic-cat-label').forEach(label => {
     if(label.id === 'indicNavTitle') return;
     label.classList.toggle('collapsed', collapsed);
