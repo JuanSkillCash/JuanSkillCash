@@ -63,11 +63,19 @@ def call(
     api_key: str,
     api_secret: str,
     timeout: int = 20,
+    post_content_type: str = "json",
 ) -> dict | None:
     """Llama un endpoint del Partner API de Bitunix. `params` no debe incluir "timestamp" -
     se agrega aca mismo. Devuelve el dict de `result` si la respuesta vino con code "0", o
     None si algo fallo (se deja un warning en el log, nunca se lanza una excepcion para no
-    tumbar al robot que llama a esto)."""
+    tumbar al robot que llama a esto).
+
+    `post_content_type` ("json" o "form") solo aplica a POST: el PDF oficial de Bitunix solo
+    documenta el Content-Type explicitamente para validateUser (form-urlencoded) - el resto de
+    los POST (futuresPositionsHistory, futuresOpenPositions, etc.) no lo dice, pero los 4
+    ejemplos de codigo del PDF (Python/JS/Java/PHP) usan "application/json" como default. Eso
+    se confirmo en la practica: futuresPositionsHistory con form-urlencoded devuelve error (8)
+    "Request content type not supported" - con JSON funciona."""
     full_params = {**params, "timestamp": int(time.time())}
     sorted_params = _sort_params(full_params)
     signature = _sign(sorted_params, api_secret)
@@ -77,9 +85,12 @@ def call(
         if method.upper() == "GET":
             query = urlencode(sorted_params)
             resp = requests.get(f"{BASE_URL}{path}?{query}", headers=headers, timeout=timeout)
-        else:
+        elif post_content_type == "form":
             headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
             resp = requests.post(f"{BASE_URL}{path}", headers=headers, data=sorted_params, timeout=timeout)
+        else:
+            headers["Content-Type"] = "application/json"
+            resp = requests.post(f"{BASE_URL}{path}", headers=headers, json=sorted_params, timeout=timeout)
     except requests.RequestException as e:
         log.warning(f"fallo llamando a Bitunix {path}: {e}")
         return None
@@ -104,7 +115,10 @@ def call(
 def validate_user(uid: str, api_key: str, api_secret: str) -> dict | None:
     """True/False si el UID es un referido real de Juan (y cuanto tiene depositado). None si
     la llamada fallo (no confundir con "no es referido" - eso es result=False)."""
-    return call("POST", "/partner/api/v2/openapi/validateUser", {"account": uid}, api_key, api_secret)
+    return call(
+        "POST", "/partner/api/v2/openapi/validateUser", {"account": uid}, api_key, api_secret,
+        post_content_type="form",
+    )
 
 
 def trans_amount_list_page(
