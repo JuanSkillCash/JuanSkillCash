@@ -72,25 +72,34 @@ def call(
 
     `post_content_type` ("json" o "form") solo aplica a POST: el PDF oficial de Bitunix solo
     documenta el Content-Type explicitamente para validateUser (form-urlencoded) - el resto de
-    los POST (futuresPositionsHistory, futuresOpenPositions, etc.) no lo dice, pero los 4
-    ejemplos de codigo del PDF (Python/JS/Java/PHP) usan "application/json" como default. Eso
-    se confirmo en la practica: futuresPositionsHistory con form-urlencoded devuelve error (8)
-    "Request content type not supported" - con JSON funciona."""
+    los POST (futuresPositionsHistory, futuresOpenPositions, etc.) no lo dice. Dos intentos
+    reales contra la API:
+      1. form-urlencoded (igual que validateUser) -> error (8) "Request content type not
+         supported" - esos endpoints no aceptan form-urlencoded.
+      2. JSON en el body, sin query string -> error (-1) "Missing required parameter:
+         timestamp" - el body JSON nunca se lee para los parametros firmados (probablemente el
+         backend solo bindea query/form params, al estilo @RequestParam de Spring, y el body
+         JSON no cuenta para eso).
+    Por eso ahora se manda SIEMPRE el query string con todos los parametros firmados (como en
+    GET) y ademas, si post_content_type es "json", el mismo dict tambien como body JSON - cubre
+    el caso de que el endpoint sí necesite el body para los datos pero lea timestamp/firma de la
+    query, sin arriesgar romper lo que ya funciona (form-urlencoded no lleva query de por si,
+    así que sigue igual para validateUser)."""
     full_params = {**params, "timestamp": int(time.time())}
     sorted_params = _sort_params(full_params)
     signature = _sign(sorted_params, api_secret)
     headers = {"apiKey": api_key, "signature": signature}
+    query = urlencode(sorted_params)
 
     try:
         if method.upper() == "GET":
-            query = urlencode(sorted_params)
             resp = requests.get(f"{BASE_URL}{path}?{query}", headers=headers, timeout=timeout)
         elif post_content_type == "form":
             headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
             resp = requests.post(f"{BASE_URL}{path}", headers=headers, data=sorted_params, timeout=timeout)
         else:
             headers["Content-Type"] = "application/json"
-            resp = requests.post(f"{BASE_URL}{path}", headers=headers, json=sorted_params, timeout=timeout)
+            resp = requests.post(f"{BASE_URL}{path}?{query}", headers=headers, json=sorted_params, timeout=timeout)
     except requests.RequestException as e:
         log.warning(f"fallo llamando a Bitunix {path}: {e}")
         return None
