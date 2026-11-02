@@ -992,19 +992,20 @@ button{font-family:inherit;color:inherit}
 .indic-index-banner-sub{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--accent);letter-spacing:.04em}
 .indic-index-standalone{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(124,127,245,.08);border:1px solid rgba(124,127,245,.25);color:#fff;font-family:inherit;font-weight:700;font-size:14px;margin-bottom:22px;width:100%;text-align:left;cursor:pointer;transition:background var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
 .indic-index-standalone:hover{background:rgba(124,127,245,.14);border-color:rgba(124,127,245,.4)}
-.indic-index-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin:22px 0 10px;padding-bottom:8px;border-bottom:1px solid rgba(91,141,239,.3)}
-.indic-index-header:first-of-type{margin-top:0}
-.indic-index-header-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.indic-index-depth-wrap{display:flex;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:4px}
+.indic-index-depth-rail{width:14px;flex-shrink:0;background:var(--bg2);display:flex;justify-content:center}
+.indic-index-depth-rail::after{content:'';width:2px;margin:20px 0;border-radius:2px;background:linear-gradient(180deg,#22d3ee 0%,#7c7ff5 50%,#a855f7 100%)}
+.indic-index-depth-body{flex:1;display:flex;flex-direction:column;min-width:0}
+.indic-index-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:20px 16px 8px}
+.indic-index-header:first-child{padding-top:16px}
+.indic-index-header-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .indic-index-header-zone{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.03em}
-.indic-index-list{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:4px}
-@media(max-width:640px){ .indic-index-list{grid-template-columns:1fr} }
-.indic-index-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;background:transparent;border:1px solid rgba(91,141,239,.3);color:var(--white);cursor:pointer;text-align:left;font-family:inherit;font-size:13.5px;font-weight:600;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
-.indic-index-row:hover{border-color:rgba(91,141,239,.3);background:rgba(255,255,255,.035)}
+.indic-index-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:transparent;border:0;border-top:1px solid var(--border);color:var(--white);cursor:pointer;text-align:left;font-family:inherit;width:100%;transition:background var(--dur-base) var(--ease-out)}
+.indic-index-row:hover{background:rgba(255,255,255,.03)}
 .indic-index-row-icon{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center}
-.indic-index-row-title{flex:1;line-height:1.3}
-.indic-index-row.curated{border-color:rgba(240,178,61,.4);background:rgba(240,178,61,.05)}
-.indic-index-row.curated:hover{border-color:rgba(240,178,61,.65);background:rgba(240,178,61,.09)}
-.indic-index-juan-badge{font-family:'Space Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--bg);background:var(--gold);padding:2px 6px;border-radius:5px;flex-shrink:0}
+.indic-index-row-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.indic-index-row-title{font-size:13.5px;font-weight:600;line-height:1.3}
+.indic-index-row-desc{font-size:11.5px;color:var(--muted2);line-height:1.4}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
 .pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
@@ -11368,6 +11369,72 @@ document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
 // giratorio + cinta "JUAN" + punto en vivo (sin estrella, para no confundirse con favoritos).
 // Va en las cajitas de la guía de Panorama, NO en el menú lateral (ese queda normal)
 const CURATED_INDICATORS = ['pisomercado', 'ciclosoporte', 'rsimensual', 'picycle', 'btcxau', 'domratio', 'domall', 'ethlogreg', 'ethvwap', 'total2', 'others', 'altfever', 'ma4y', 'ethvsalt'];
+// descripcion corta (1 linea) de cada indicador para el Indice de Indicadores - ver renderIndicIndexList()
+const INDIC_DESC = {
+  bitcoinguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  whitepaper: 'El documento original de Satoshi Nakamoto, para quien quiera ir a la fuente.',
+  halving: 'Dónde estamos en el ciclo de 4 años, y qué suele venir después.',
+  btcmacro: 'Cómo se mueve BTC frente a las decisiones de la Fed y los datos económicos.',
+  pisomercado: 'El ritmo de fondo del mercado, para no confundir ruido con tendencia.',
+  rsimensual: 'Qué tan sobrecomprado o sobrevendido está BTC, mes a mes.',
+  ciclosoporte: 'El techo del ciclo anterior, que hoy suele actuar como soporte.',
+  rainbow: 'Bandas de colores que ubican el precio dentro de su tendencia histórica de largo plazo.',
+  picycle: 'Un cruce de medias móviles que ha marcado techos de ciclo con buena puntería.',
+  ma4y: 'La media móvil de 4 años, para ver la tendencia de fondo sin el ruido diario.',
+  ema200: 'La media móvil de 200 semanas, el soporte de largo plazo más vigilado de BTC.',
+  treasuries: 'Cuánto BTC acumulan las empresas que lo tienen en su balance.',
+  govtreasuries: 'Cuánto BTC tienen acumulado los gobiernos del mundo.',
+  btcxau: 'El precio de BTC medido en onzas de oro, no en dólares.',
+  btcaapl: 'Cómo le ha ido a BTC frente a una acción tradicional como Apple.',
+  btcreturns: 'Los retornos históricos de BTC, mes a mes y año a año.',
+  sthmvrv: 'Si los compradores recientes están en ganancia o en pérdida, en promedio.',
+  treascb: 'El precio promedio al que compraron las instituciones que tienen BTC.',
+  epochpl: 'Qué porcentaje del supply está en pérdida, comparado con ciclos pasados.',
+  ethereumguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  ethlogreg: 'Canal de precio en escala logarítmica para ubicar extremos históricos.',
+  ethvwap: 'El precio promedio ponderado desde un punto de referencia clave.',
+  ethpmi: 'Cómo se mueve ETH frente a la actividad manufacturera global.',
+  ethreturns: 'Los retornos históricos de ETH, mes a mes y año a año.',
+  tradingguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  cbpremium: 'Si Coinbase paga más o menos que el resto — una pista de demanda institucional.',
+  longshort: 'Cuántos traders apuestan al alza contra cuántos apuestan a la baja.',
+  optionsoi: 'Cuánto dinero hay abierto en opciones, y en qué precios se concentra.',
+  delistradar: 'Qué monedas están siendo retiradas de los exchanges, antes de que te tome por sorpresa.',
+  newlistradar: 'Las monedas más recientes en listarse en los exchanges grandes.',
+  tvchart: 'Un gráfico completo de TradingView para analizar a tu manera.',
+  fng: 'Qué tan extremo está el sentimiento del mercado hoy.',
+  btctrends: 'Cuánta gente está buscando Bitcoin en Google ahora mismo.',
+  cryptobubbles: 'Todo el mercado cripto de un vistazo — el tamaño de cada burbuja es su capitalización.',
+  macroguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  dxy: 'La fuerza del dólar frente a otras monedas — cuando sube, suele presionar a cripto.',
+  pmius: 'Si la industria de EEUU está creciendo o contrayéndose.',
+  payrolls: 'Cuántos empleos nuevos creó EEUU el mes pasado.',
+  unrate: 'El porcentaje de la fuerza laboral de EEUU que está sin empleo.',
+  icsa: 'Las solicitudes nuevas de desempleo, semana a semana.',
+  cpi: 'La inflación oficial de EEUU, con y sin alimentos y energía.',
+  cpiyoy: 'Cuánto ha subido el costo de vida comparado con hace un año.',
+  pce: 'La medida de inflación que más vigila la Reserva Federal.',
+  ppi: 'La inflación que pagan las empresas antes de que llegue al consumidor.',
+  fedfundsrate: 'La tasa de interés que fija la Fed, el dato que mueve todos los mercados.',
+  m2supply: 'Cuánto dinero hay circulando en la economía — más M2 suele ser bueno para los activos de riesgo.',
+  vixindex: 'El índice del miedo en los mercados tradicionales.',
+  netliquidity: 'Cuánto efectivo real tiene disponible el sistema financiero.',
+  gdpgrowth: 'Si la economía de EEUU está creciendo o encogiéndose.',
+  fedbalance: 'Cuántos activos tiene acumulados la Reserva Federal en su balance.',
+  econcalendar: 'Las próximas publicaciones económicas importantes, para saber qué viene.',
+  dominanciaguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  domratio: 'Si el dinero está rotando hacia ETH o hacia BTC en este momento.',
+  domall: 'Qué tan repartido está el mercado entre BTC, ETH y el resto de monedas.',
+  dombtc: 'Qué porcentaje de todo el mercado cripto representa Bitcoin.',
+  domusdt: 'Qué tanto dinero está parqueado en stablecoins, esperando entrar al mercado.',
+  ethbtc: 'Si ETH le está ganando o perdiendo terreno a Bitcoin.',
+  altcoinsguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
+  othersbtc: 'Cómo le va al resto de altcoins (sin BTC ni ETH) frente a Bitcoin.',
+  altfever: 'Qué tan caliente está la temporada de altcoins en este momento.',
+  ethvsalt: 'Si ETH está caro o barato comparado con el resto de altcoins.',
+  total2: 'La capitalización de todo el mercado cripto, sin contar a Bitcoin.',
+  others: 'La capitalización del resto de altcoins, sin contar BTC ni ETH.',
+};
 // ---- Índice de Indicadores: lista generada a partir de INDIC_GROUPS (la misma fuente que ya
 // maneja las pestañas) en vez de ~70 tarjetas escritas a mano - con tantas categorías ya no cabía
 // como grilla de cajas grandes, y escribirlas a mano garantizaba que alguna quedara desactualizada
@@ -11409,22 +11476,29 @@ function renderIndicIndexList(){
       ${indicRowIconHtml('target', nextColor())}
       <span class="indic-index-row-title">Predicciones de Precio</span>
     </button>
+    <div class="indic-index-depth-wrap">
+      <div class="indic-index-depth-rail"></div>
+      <div class="indic-index-depth-body">
   `;
-  visibleGroups.forEach(cat => {
+  visibleGroups.forEach((cat, catIdx) => {
     const items = INDIC_GROUPS[cat.group];
-    html += `<div class="indic-index-header"><span class="indic-index-header-label">${cat.label}</span><span class="indic-index-header-zone">${INDIC_DEPTH_ZONES[cat.group] || ''}</span></div><div class="indic-index-list">`;
+    const headerColor = indicDepthColor(totalRows > 1 ? rowIndex / (totalRows - 1) : 0);
+    html += `<div class="indic-index-header"${catIdx === 0 ? '' : ' style="border-top:1px solid var(--border)"'}><span class="indic-index-header-label" style="color:${headerColor}">${cat.label}</span><span class="indic-index-header-zone">${INDIC_DEPTH_ZONES[cat.group] || ''}</span></div>`;
     items.forEach(it => {
-      const curated = CURATED_INDICATORS.includes(it.id);
       const key = INDIC_ICON_KEY[it.id] || 'target';
+      const desc = INDIC_DESC[it.id] || '';
       html += `
-        <button type="button" class="indic-index-row${curated ? ' curated' : ''}" data-jump="${it.id}">
+        <button type="button" class="indic-index-row" data-jump="${it.id}">
           ${indicRowIconHtml(key, nextColor())}
-          <span class="indic-index-row-title">${it.label}</span>
+          <span class="indic-index-row-text">
+            <span class="indic-index-row-title">${it.label}</span>
+            ${desc ? `<span class="indic-index-row-desc">${desc}</span>` : ''}
+          </span>
         </button>
       `;
     });
-    html += `</div>`;
   });
+  html += `</div></div>`;
   grid.innerHTML = html;
   grid.querySelectorAll('[data-jump]').forEach(el => {
     el.addEventListener('click', () => jumpToIndicator(el.dataset.jump));
