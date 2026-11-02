@@ -27326,6 +27326,14 @@ function updateBitunixPillStatus(status){
 // pasar por user_exchange_connections/user_exchange_volume, para que el robot nunca la toque.
 const OWNER_USER_ID = 'e4309251-6078-4233-aab3-6ab8d6c624e1';
 
+// "conejillos de indias": UIDs de Bitunix de probadores a los que Juan les da Alfa/conectado
+// sin pasar por user_exchange_connections.status ni por user_exchange_volume (el robot horario
+// de update-bitunix-rank.yml pisa esa tabla con el volumen real cada hora, asi que un grant
+// hecho solo por SQL se perderia en la siguiente corrida - por eso el bypass va aqui, igual que
+// el de OWNER_USER_ID arriba, pero comparando el UID en vez del user_id porque no necesitamos
+// saber su UUID de Supabase para activarlo). Agregar/quitar UIDs aqui a mano cuando haga falta.
+const TESTER_BITUNIX_UIDS = ['925977920']; // Jeison Velandia - probador de Rango de Manada
+
 async function loadBitunixStatus(){
   if(!currentUser){ updateBitunixPillStatus(null); return; }
   if(currentUser.id === OWNER_USER_ID){
@@ -27347,6 +27355,13 @@ async function loadBitunixStatus(){
     const { data: tg } = await sbClient.from('user_telegram_links').select('linked_at').eq('user_id', currentUser.id).maybeSingle();
     bitunixNotifyTelegramField.style.display = (tg && tg.linked_at) ? 'block' : 'none';
     if(!(tg && tg.linked_at)) bitunixNotifyTelegramInput.checked = false;
+    return;
+  }
+  if(TESTER_BITUNIX_UIDS.includes(data.uid)){
+    updateBitunixPillStatus('connected');
+    document.getElementById('bitunixConnectedUid').textContent = data.uid;
+    bitunixShowState('connected');
+    if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
     return;
   }
   updateBitunixPillStatus(data.status);
@@ -27495,6 +27510,15 @@ async function loadRankStatus(){
   const { data, error } = await sbClient.from('user_exchange_connections')
     .select('status,uid').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
   if(error){ console.warn('no se pudo revisar el estado de Bitunix para el rango', error); return; }
+  if(data && TESTER_BITUNIX_UIDS.includes(data.uid)){
+    updateBitunixPillStatus('connected');
+    rankConnectBitunixBtn.style.display = 'none';
+    rankStatusText.textContent = `✅ Bitunix conectado (UID ${data.uid}) — Alfa (cuenta de prueba).`;
+    document.querySelectorAll('#rankRuler .rank-step').forEach(step => {
+      step.classList.toggle('active', step.dataset.rank === 'alfa');
+    });
+    return;
+  }
   updateBitunixPillStatus(data ? data.status : null);
   if(!data){
     rankStatusText.textContent = 'Conecta tu cuenta de Bitunix para empezar a sumar rango.';
