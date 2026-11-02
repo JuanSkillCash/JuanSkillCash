@@ -21376,6 +21376,30 @@ function renderEpochPlChart(){
   const btcLine = pathFor(p => p.btc, yForPrice);
   const epochLines = EPOCH_DEFS.map(e => ({ ...e, d: pathFor(p => p[`epoch${e.n}`], yForPct) }));
 
+  // marca vertical (arriba a abajo, cruzando el panel de precio Y el de porcentaje) cada vez que
+  // alguna de las lineas de color sube a 95% o mas - juntamos los cruces de todas las epocas y
+  // descartamos los que caen a menos de 4px de distancia (misma fecha, varias epocas a la vez)
+  // para no amontonar lineas pegadas
+  const crossing95Xs = [];
+  EPOCH_DEFS.forEach(e => {
+    let wasAbove = false;
+    points.forEach(p => {
+      const v = p[`epoch${e.n}`];
+      if(v == null){ wasAbove = false; return; }
+      const isAbove = v >= 95;
+      if(isAbove && !wasAbove) crossing95Xs.push(xFor(p.t));
+      wasAbove = isAbove;
+    });
+  });
+  crossing95Xs.sort((a, b) => a - b);
+  const dedupedCrossing95Xs = [];
+  crossing95Xs.forEach(x => {
+    if(!dedupedCrossing95Xs.length || x - dedupedCrossing95Xs[dedupedCrossing95Xs.length - 1] > 4) dedupedCrossing95Xs.push(x);
+  });
+  const crossing95Html = dedupedCrossing95Xs.map(x => `
+    <line x1="${x.toFixed(1)}" y1="${priceTop}" x2="${x.toFixed(1)}" y2="${pctBottom}" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="2,3"/>
+  `).join('');
+
   const lastPx = xFor(endMs), lastPy = yForPrice(points[points.length - 1].btc);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
@@ -21396,6 +21420,7 @@ function renderEpochPlChart(){
         ${priceGridHtml}
         ${pctGridHtml}
         <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+        ${crossing95Html}
         <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${epochLines.map(e => `<path d="${e.d}" fill="none" stroke="${e.color}" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
         ${xLabelsHtml}
