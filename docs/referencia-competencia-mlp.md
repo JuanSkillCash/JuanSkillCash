@@ -458,3 +458,111 @@ Modal de señal (UI): par, TF, lado, `x/3`, antigüedad, selector SL ×1,5/×2/�
   - `GET /telegram/users/monthly` → `{"items":[{"id","bitunixUid","exchange":"bitunix","year":2026,"month":10,"totalVolume":"0.xxx" (string),"boostVolume":0,"registerTime","lastTradeTime":null,"tradingviewUsername":null,"roleId":1,"telegramLinked":false,"effectiveVolume":0,"youtubeHandle":null,"exchanges":[]}, …]}` (una fila por mes y exchange).
   - `GET /users/me/exchanges` → `[{"exchange":"bitunix","exchangeUid","verified":"true","thisMonthVolume":0,"rawVolume":0,"allVolume":0}]`.
   - FAQ: si el UID queda "Fallido" casi siempre es porque la cuenta del exchange no se creó con el link de referido de la comunidad (el modelo depende de ser afiliado); verificación de UID hasta 2 h.
+
+---
+---
+
+# COMPLEMENTO v3: MLP Games a fondo (BTC 5 Minutos, Carrera, Predicción BTC, Ruleta)
+
+> Tercera pasada (3 nov 2026, ~20:40-21:00 UTC, con un directo de YouTube al aire). Esta vez
+> incluye UNA acción real (no solo lectura): se jugó una ronda real de BTC 5 Minutos con 5 $MLP
+> de saldo interno (moneda de juego, sin valor real) para capturar el flujo completo y verificar
+> la fórmula del payout contra un resultado real.
+
+Complementa los prompts v1 y v2. Fuente: mi propia cuenta (solo lectura, salvo UNA ronda real de BTC 5 Minutos jugada con 5 $MLP de saldo interno), bundles JS ya descargados y respuestas JSON de mi sesión. Lo marcado **NO CONFIRMADO** no se pudo verificar. Úsalo como referencia para diseñar MIS juegos para SkillCash (mis nombres y reglas), sin copiar textos ni imágenes.
+
+Contexto de la sesión: 3-nov-2026 ~20:40–21:00 UTC, con un directo de YouTube al aire (`hasLiveSession: true`). Saldo inicial 10 $MLP (solo el login diario).
+
+---
+
+## A) BTC 5 Minutos
+
+### A1. Ronda real jugada (resultado tal cual)
+- Apuesta: **Sube**, **5 $MLP** (el saldo era 10, no alcanzaba para 50), `payoutUp 1,7717` (53 % prob.).
+- Al abrir: "Precio a superar" fijado en **$77.834,00**, saldo pasó de 10 → 5 al instante, cuenta regresiva 5:00, etiqueta de estado en vivo "Cumpliéndose" (verde) / "Fuera del objetivo" (rojo) según el precio actual, gráfico de línea que cambia de color (verde/rojo).
+- Al llegar a 0:00: tarjeta "Resolviendo posición… Estamos esperando el precio final." (~5 s).
+- **Resultado: GANÉ.** Precio final **$77.854,01** (`outcome: "won"`). Me acreditaron **8 $MLP** (= floor(5 × 1,7717)) → **ganancia neta +3 $MLP**; saldo final **13 $MLP**.
+- Banner tras ganar: "↑ Ganaste 3 $MLP · se te acreditaron 8 $MLP · BTC cerró en $77,854.01". El saldo del header se actualizó al instante. No hubo animación especial más allá del banner y el cambio de color.
+- Ojo: el "Precio actual" en pantalla a 0:00 mostraba $77.828 (debajo del objetivo) y aun así el precio final oficial fue $77.854,01 → el precio de liquidación sale del servidor y no coincide necesariamente con el último tick que ve el usuario. NO CONFIRMADO de qué fuente/vela toma `finalPrice`.
+
+### A2. UI de selección
+- **Solo Sube / Baja. No se elige umbral** en la UI actual: el código toma `config.thresholds.find(t => t.pct === 0)`; el JSON solo trae un threshold (`index 0, pct 0`). La tarjeta de la portada sí dice "Elige dirección y umbral de movimiento… Si el precio llega a tu objetivo antes de que se acabe el reloj" — **eso no coincide con la mecánica real** (no hay umbrales elegibles y se liquida al cierre, no "al tocar").
+- Junto a "Monto" muestra probabilidad y pago juntos: "53% prob. · 1.77×". Botones rápidos 50/100/250 $MLP con "recibes X $MLP", campo "Otro monto" + "Máx.", resumen "Ganancia +3 $MLP / Total 8 $MLP" y botón "Abrir Sube · recibes 8 $MLP". Pie: "El precio se fija al abrir. Una posición a la vez."
+- Validación legible del cliente:
+```js
+valid = Number.isInteger(stake) && stake > 0 && stake <= balance && stake <= threshold.maxStake /*500*/ && !openRound;
+total = Math.floor(stake * payout);  gain = Math.max(0, total - stake);
+// errores: errors.invalidAmount | errors.balance | errors.maxStake
+```
+- Apertura: `POST /sorteo/btc5/open` con body `{ direction: "up"|"down", thresholdIndex: 0, stake }`.
+- `openRound` (en `/sorteo/btc5/status` mientras corre): `{id, direction:"up", thresholdPct:0, stake:5, payout:1.7717, entryPrice:77834, targetPrice:77834, endsAt}` → duración exacta 5 min desde la apertura; el payout queda congelado al abrir.
+
+### A3. Fórmula del payout — AJUSTADA
+5 lecturas reales de `config` (p = probabilidad del lado, y = payout servido):
+(0,5 → 1,89) · (0,5107 → 1,851) · (0,4893 → 1,9307) · (0,53395 → 1,7717) · (0,46605 → 2,0255).
+
+| Fórmula | Error máx. |
+|---|---|
+| `(1 − edge) / p` | 0,0344 ✗ |
+| `1 / (p · (1 + edge))` | 0,0377 ✗ |
+| **`(1 − edge) / (p + 0,00793)`** | **0,0001 ✔** (= redondeo a 4 decimales) |
+| `1 / (1,0416·p + 0,0083)` (equivalente) | 0,00012 ✔ |
+
+→ **`payout = 0,96 / (p + 0,00793)`**. Es decir: aplican el `edge` 4 % declarado Y además suman ~0,8 puntos de probabilidad al lado apostado (margen extra; el margen efectivo de la casa ronda 5,5 %). La constante 0,00793 es un AJUSTE mío a los datos: su origen (¿spread fijo?, ¿p de un precio con colchón?) **NO está confirmado**. Recordatorio v1: `probUp = Φ(mu/sigma)`, `probDn = 1 − probUp`, con mu/sigma recalculados desde el histórico de 1 min (`/sorteo/btc5/history` = 15 cierres de 1 min: `[{at, price}]`); `edge 0.04`, `durationMinutes 5`. El `config` no cambia segundo a segundo (mismos valores varios minutos).
+
+### A4. Historial de mis rondas
+- **No hay endpoint separado** (`/sorteo/btc5/my-rounds` no aparece; en el bundle solo existen `/sorteo/btc5/status`, `/history`, `/open`). Tus rondas vienen en `status.recent[]`:
+  `{"direction":"up","thresholdPct":0,"stake":5,"payout":1.7717,"entryPrice":77834,"finalPrice":77854.01,"outcome":"won","settledAt":"…"}`
+- UI "Últimas rondas": fila "G · Cierra arriba · +3 $MLP · monto 5 · total 8".
+- Lo ganado aquí NO cuenta para el ranking mensual de $MLP (texto "¿Cómo funciona?").
+- Durante la resolución apareció "Sin conexión · reintentando…" (conexión de streaming que reintenta). Existen `/sorteo/race/status/stream` y `/sorteo/race/balance-stream` (SSE) para tiempo real.
+
+---
+
+## B) Carrera ("CARRERA CRIPTOS · COMPETENCIA EN TIEMPO REAL", patrocinio Bitunix)
+
+1. **Cuándo es la próxima:** no hay horario anunciado. Con el directo al aire la pantalla decía: "🏁 SIN TICKET — El directo está al aire. Deja un comentario en YouTube para obtener un ticket antes de que se abra la línea de salida." → **la Carrera se juega solo durante los directos y la abre el host** (`status.host`, `status.session` = null hasta que la abre). El ticket también tiene `price: 200` ($MLP), NO CONFIRMADO si se puede comprar sin comentar.
+2. **Historial:** `/sorteo/race/history` y `/sorteo/race/results` → **404** (no existen). No hay endpoint de carreras pasadas con podios por carrera. Solo agregados:
+   - `GET /sorteo/race/podium-leaderboard` → 69 corredores `[{userId, golds, silvers, bronzes, total, bonusUsd, name, youtubeHandle}]` ("TOP CORREDORES · más podios — histórico"). Totales: 83 oros, 81 platas, 81 bronces → ~83 carreras jugadas. **`bonusUsd` = premios en USDT reales** (ej. 21 podios → $600 USDT; 13 podios → $1.000 USDT; suma $13.500); no es proporcional a las medallas, NO CONFIRMADO cómo se calcula.
+   - `GET /sorteo/race/callers-leaderboard` → 20 `[{userId, name, avatarUrl, calls, hits, hitRate}]` (aciertos al predecir podio).
+   - `GET /sorteo/race/mlp-leaderboard/previous` (ranking $MLP del mes anterior).
+3. **Registro de combate:** no se pudo capturar (no había carrera en curso y no hay historial). En el código, el log se arma desde `powerUses[]` del status; los textos son i18n que no estaban cargados. **NO CONFIRMADO** el formato del mensaje.
+4. **Cómo se compra/usa un poder (código legible):**
+   - Comprar en la "Tienda" (botón "ABRIR TIENDA" en "POWER UPS"): `POST /sorteo/race/buy` `{type}` → va a la "mochila" (`inventory`).
+   - Usar durante la carrera: `POST /sorteo/race/power` `{type, targetUserId}` si `requiresTarget` (Bombardeo, Drenaje, Misil) o `{type}` si no. **Sí: `requiresTarget` = eliges a qué jugador apuntar** (`onTargetRequest` abre el selector de objetivo). `canDeploy` solo es true con la carrera en marcha.
+   - Niebla bloqueada en el último minuto: `nieblaLocked = endsAt != null && endsAt − now <= 60000`. Máx. 5 poderes por carrera (`maxPowersPerRace`). Estados del status: `powerUses[]`, `hiddenUserIds[]` (Niebla), `drainedUserIds[]` (Drenaje), `sonarReveal` (Sonar).
+   - Flujo completo de endpoints: `POST /sorteo/race/ticket` / `POST /sorteo/race/join` `{corredor, boat}` → `PATCH /sorteo/race/corredor` (cambiar) → `GET /sorteo/race/live-prices` → `POST /sorteo/race/bet` `{predictedUserId, stake}` (predecir podio con fondo común) → `GET /sorteo/race/status/stream`.
+   - Corredores: `status.corredores` trae 17 sugeridos (BTC, ETH, SOL, BNB, XRP, ADA, AVAX, LINK, DOT, UNI, ATOM, NEAR, APT, ARB, OP, INJ, CRO); `GET /sorteo/race/binance-symbols` → **4.058 criptos** elegibles ("4058 criptos listas para la próxima regata"), precios de Binance. `takenCorredores[]` = ya elegidos (no se repiten). Fases vistas en código: `"running"`, `"finished"`.
+
+---
+
+## C) Predicción BTC ("PRECISIÓN CONTRA EL RELOJ", patrocinio Bitget)
+
+1. **Horario:** ninguno. Con el directo al aire: "DIRECTO AL AIRE — El directo está al aire. Espera a que el capitán abra la ronda de predicción." → la abre el host en vivo: `POST /sorteo/prediction/{id}/start` `{durationMinutes}` (el host elige la duración del temporizador), `POST /sorteo/prediction/{id}/cancel`, `POST /sorteo/prediction/admin`.
+2. **`eligible: false`:** el servidor lo calcula; el cliente solo muestra un ícono/título distinto según `eligible` y `myPrediction` (textos i18n `open.aboardTitle`, etc., no visibles sin ronda abierta). La única pista explícita es la del panel $MLP: "necesitas cuenta de Bitget verificada" (mi cuenta: Bitget sin vincular). **No se pudo ver el mensaje exacto de no elegible** (solo aparece con una ronda abierta).
+   - Status: `{"game":null,"myPrediction":null,"eligible":false,"btcPrice":77876,"hasLiveSession":true}`. Predecir: `POST /sorteo/prediction/{id}/predict` `{predictedPrice}`.
+3. **Rondas pasadas:** `/sorteo/prediction/history` → **404**. No se encontró forma de ver ganadores ni precio predicho vs. real.
+
+---
+
+## D) Ruleta del Capitán (widget flotante)
+
+1. Al hacer clic se despliega una tarjeta (no modal) abajo a la derecha:
+   - "RULETA DEL CAPITÁN · Tickets extra: 0 de 5 · Ronda 1 en juego"
+   - Botón "+1 ticket · 200 $MLP" (**deshabilitado**)
+   - Mensaje por el bloqueo `sin_canal`: **"Vincula tu canal de YouTube en Editar perfil para participar"**
+   - Regla: "Tus tickets se usan solos en cada ronda y solo se gastan si sales elegido. Vencen al terminar el directo."
+   - `GET /sorteo/ruleta/active` en vivo: `{"live":true,"round":{"id","number":1,"closesAt","phase":"juego"},"me":{"saldo":0,"max":5,"price":200,"hasTicket":false,"ticketSpentIn":null,"reason":"sin_canal","weight":0},"openingBonus":null,"serverNow"}`. Compra: `POST /sorteo/ruleta/boletos`.
+2. **Vincular canal (pasos, sin guardar nada):** Editar perfil → sección "CUENTAS VINCULADAS" (Bitunix · Conectado / Bitget · Sin vincular / Telegram · No vinculado / YouTube · Sin vincular) → ícono de enlace de YouTube → buscador "Nombre, @handle o enlace del canal" ("Escribe el nombre de tu canal, tu @handle o pega el enlace") → elegir y "Guardar". **No usa OAuth de Google** (endpoints `/auth/youtube/channels/search`, `/auth/youtube/channel/info`, `/auth/youtube/channel`) → NO CONFIRMADO si luego verifica que el canal sea tuyo. Lo cancelé sin guardar.
+3. **Historial público de ganadores:** no encontrado (`/sorteo/ruleta/history` 404; `/panel/ganadores` y `/panel/sorteo/ruleta` redirigen a `/panel/games` para mi cuenta, parecen de admin). Solo existe mi propio `/sorteo/my-prizes` → `[]`.
+
+---
+
+## E) Pantalla general `/panel/games` (texto exacto)
+
+Encabezado: "MLP GAMES / CARRERA / PREDICCIÓN BTC · CON EL APOYO DE [Bitunix][Bitget]" · banner "MLP GAMES — ELIGE TU DESAFÍO · MODOS DISPONIBLES 03".
+- **01 — "SIN CARRERA ACTIVA" · COMPETENCIA EN TIEMPO REAL · Carrera** — "Elige tu corredor cripto y compite por el mayor cambio de precio. Poderes, apuestas y podio." · etiquetas TIEMPO REAL · PODERES · PODIO · PATROCINADO POR **Bitunix** · ENTRAR AL JUEGO.
+- **02 — "SIN JUEGO ACTIVO" · PRECISIÓN CONTRA EL RELOJ · Predicción BTC** — "Predice el precio de Bitcoin al cierre del temporizador. La predicción más cercana gana." · BITCOIN · PRECISIÓN · CONTRARRELOJ · PATROCINADO POR **Bitget** · ENTRAR AL JUEGO.
+- **03 — badge "NUEVO" · MERCADO EXPRESS · BTC 5 Minutos** — "Elige dirección y umbral de movimiento de Bitcoin. Si el precio llega a tu objetivo antes de que se acabe el reloj, te llevas el pago." · 5 MIN · $MLP · PATROCINADO POR **$MLP** · ENTRAR AL JUEGO.
+- **Fecha de lanzamiento de BTC 5 Minutos: no se pudo confirmar.** No hay fecha en la UI ni en mis 17 notificaciones (solo "+10 $MLP por entrar hoy" y tickets de soporte). Lo único seguro: en la pasada del 3-nov ya estaba con badge "NUEVO".
+- Rutas: `/panel/carrera`, `/panel/prediccion`, `/panel/games/btc-5-minutos`.
