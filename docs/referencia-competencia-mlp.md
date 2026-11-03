@@ -566,3 +566,57 @@ Encabezado: "MLP GAMES / CARRERA / PREDICCIÓN BTC · CON EL APOYO DE [Bitunix][
 - **03 — badge "NUEVO" · MERCADO EXPRESS · BTC 5 Minutos** — "Elige dirección y umbral de movimiento de Bitcoin. Si el precio llega a tu objetivo antes de que se acabe el reloj, te llevas el pago." · 5 MIN · $MLP · PATROCINADO POR **$MLP** · ENTRAR AL JUEGO.
 - **Fecha de lanzamiento de BTC 5 Minutos: no se pudo confirmar.** No hay fecha en la UI ni en mis 17 notificaciones (solo "+10 $MLP por entrar hoy" y tickets de soporte). Lo único seguro: en la pasada del 3-nov ya estaba con badge "NUEVO".
 - Rutas: `/panel/carrera`, `/panel/prediccion`, `/panel/games/btc-5-minutos`.
+
+---
+---
+
+# SÍNTESIS: lecturas clave de toda la investigación (análisis de Claude, no datos crudos)
+
+> A diferencia de las secciones de arriba (que son hallazgos tal cual, de la investigación en
+> vivo), esto es interpretación/opinión sobre lo encontrado - para no perder el razonamiento
+> cuando llegue el momento de diseñar la versión propia. Fecha: 3-nov-2026.
+
+**Lo más sólido y directamente reusable (matemática pública, no propiedad de nadie):**
+- La fórmula del SL del Radar (`tendencial ∓ 1,5·(tendencial − vulneración)`) quedó verificada
+  con un dato real, no solo inferida - y el SL escala de verdad con la volatilidad (2,5-4,4× ATR14).
+- El Mapa Tendencial es, con alta confianza, un trailing-stop de volatilidad tipo SuperTrend/ATR
+  (no una media móvil) - probado contra 800 velas reales, acierta dirección 8/8.
+- La fórmula del payout de BTC 5 Minutos quedó prácticamente exacta tras jugar una ronda real:
+  `payout = 0,96 / (p + 0,00793)`.
+
+**Hallazgo honesto que vale la pena recordar al diseñar lo nuestro:** el margen real de la casa en
+BTC 5 Minutos (~5,5%) es más alto que el "edge" que declaran (4%) - el +0,00793 extra no está
+anunciado en ningún lado. Si hacemos algo parecido, ser transparentes con el margen REAL (no solo
+con un "edge" que suena más bonito) es una forma concreta de diferenciarnos.
+
+**Otro descuido de ellos que no deberíamos repetir:** el texto de marketing de BTC 5 Minutos
+("elige umbral... si el precio llega a tu objetivo antes de que se acabe el reloj") no coincide
+con la mecánica real (no hay umbrales que elegir, se liquida al cierre del reloj, no al tocar el
+precio). Cuidar que nuestra propia copy describa exactamente lo que el código hace.
+
+**Decisión de diseño importante a tener en cuenta:** "Carrera" y "Predicción BTC" NO son juegos
+siempre disponibles - solo corren durante un directo de YouTube en vivo, y el anfitrión los abre
+a mano. Si queremos algo parecido, eso implica necesitar a alguien transmitiendo en vivo para
+activarlo - no es un juego "cuando el usuario quiera", como sí lo es BTC 5 Minutos o nuestro
+propio minijuego del tiburón.
+
+**Dato de contexto que cambia la escala del negocio:** detrás de la "Carrera" con moneda de
+mentira ($MLP) hay premios reales en USDT para los mejores del histórico (~$13.500 USDT
+repartidos entre 69 corredores con podios) - no es un juego puramente cosmético.
+
+**Comparado con lo que ya tenemos en SkillCash:**
+- La Bitácora nuestra ya es más sofisticada en analítica (winrate, profit factor, Sharpe,
+  drawdown%, recovery factor) que la de ellos, que apenas muestra capital inicial/actual y P&L
+  del mes. Lo único que ellos tienen y nosotros no: el campo `risk` (% de capital arriesgado) por
+  operación, y una bitácora pública de un "Capitán" que otros pueden ver/seguir.
+- Nuestro sistema de Sharkoins ya tiene más formas de ganar (9) que lo documentado de su economía
+  base, pero no tenemos nada parecido a "La Cubierta" (red social de trading con calls
+  verificables e inmutables) ni a logros/insignias reales (lo que mostramos como "logros" hoy es
+  solo la lista de formas de ganar, no un sistema de hitos de verdad).
+- "Rango de Manada" es hoy un cascarón: calcula el volumen y el rango real correctamente, pero
+  nada en el código usa ese rango para desbloquear ninguna herramienta todavía (ver v1, sección
+  de "lo que ya existe en SkillCash").
+
+**Nada de esto es copia:** las técnicas (SuperTrend/ATR, DCA ponderado, SL por R:R, confluencia
+multi-temporalidad) son de dominio público en trading; lo investigado fue con cuenta propia,
+código que el navegador ya descarga igual, y páginas públicas de marketing/guías de ellos mismos.
