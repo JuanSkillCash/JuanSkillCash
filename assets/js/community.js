@@ -245,6 +245,6 @@ if(deleteBtn){
 const moreBtn = $('reviewsMoreBtn');
 if(moreBtn) moreBtn.addEventListener('click', () => { reviewsShown += PAGE; renderReviewsList(); });
 
-sbClient.auth.onAuthStateChange(() => { setTimeout(() => { loadReviews(); renderAdminLiveBtn(); }, 0); });
+sbClient.auth.onAuthStateChange(() => { setTimeout(() => { loadReviews(); bindAdminLiveBtn(); }, 0); });
 loadReviews();
 })();
