@@ -620,3 +620,192 @@ repartidos entre 69 corredores con podios) - no es un juego puramente cosmético
 **Nada de esto es copia:** las técnicas (SuperTrend/ATR, DCA ponderado, SL por R:R, confluencia
 multi-temporalidad) son de dominio público en trading; lo investigado fue con cuenta propia,
 código que el navegador ya descarga igual, y páginas públicas de marketing/guías de ellos mismos.
+
+---
+---
+
+# COMPLEMENTO v4: "Noticias y Eventos" (/panel/noticias) a fondo + extras de la landing
+
+> Cuarta pasada (3 nov 2026, 21:08-21:23 UTC). La página resultó ser un "lienzo personal" de
+> widgets arrastrables (no pestañas), con 13 módulos: 7 alimentados por la API propia de
+> melapela.ai, 4 por iframes de terceros (TradingView, Investing.com, YouTube), y 2 calculados
+> en el cliente. Fuentes de datos CONFIRMADAS por comparación directa (no solo nombradas).
+
+Complementa los prompts v1, v2 y v3. Fuente: mi propia cuenta, solo lectura (respuestas JSON reales de mi sesión, bundles JS ya descargados, iframes de terceros embebidos, landing pública). Lo marcado **NO CONFIRMADO** no se pudo verificar. Úsalo como referencia para diseñar MI propio módulo de noticias/mercado en SkillCash, con mis nombres y diseño, sin copiar textos ni imágenes, y respetando las condiciones de uso de cada fuente de datos (ojo con la atribución obligatoria de alternative.me, TradingView, Investing.com, CoinGecko, OKX).
+
+Lecturas hechas el 3-nov-2026 entre 21:08 y 21:23 UTC.
+
+---
+
+## A) Estructura de la página
+
+La página NO es una lista de pestañas: es un **"LIENZO PERSONAL"** de widgets arrastrables.
+- Cabecera: "LIENZO PERSONAL · Tu información, a tu manera. · Reúne las señales que importan, ordénalas y dales el espacio que necesites." Botones **"Añadir widget"** y **"Personalizar"**, selector **PLANTILLAS** ("Predeterminada" / "Nueva"), contador "13 WIDGETS ACTIVOS", "Guardado automáticamente".
+- **Persistencia: solo en el navegador** (`localStorage`), NO en la API:
+  - `mlp.newsCanvas.v14` = `{"templates":[{"id":"default","name":"Predeterminada","layouts":{"desktop":[…],"tablet":[…],"mobile":[…]},"visible":[…]}],"activeId":"default"}`. Cada item: `{i, x, y, w, h, minW, minH}` → formato de **react-grid-layout**, grilla de 12 columnas, 3 breakpoints.
+  - `mlp.tvWidgetsConsent = 1` (consentimiento para cargar widgets de TradingView/terceros; cada widget de terceros tiene un botón "Desactivar widgets" / "Desactivar fuente").
+- Layout por defecto (desktop, x,y,w×h): calendar(0,0,6×10) · events(6,0,6×10) · markets(0,10,6×9) · trump(6,10,6×9) · crypto(0,19,4×12) · macro(4,19,4×12) · trending(8,19,4×12) · fearGreed(0,31,4×10) · dominance(4,31,4×10) · longShort(8,31,4×10) · macroPulse(0,41,6×11) · heatmap(6,41,6×11) · btcMonthly(0,52,12×10).
+- **Biblioteca de widgets** ("Toca un módulo para añadirlo o quitarlo · 13/13 en el lienzo"). Los 13, con su descripción exacta:
+
+| id | Nombre en UI | Descripción en la biblioteca | Fuente del dato |
+|---|---|---|---|
+| calendar | Calendario económico | Eventos de EE.UU. de todas las importancias. | iframe Investing.com |
+| markets | Horarios de mercados | Aperturas y cierres bursátiles en el horario de tu dispositivo. | Cálculo en cliente |
+| crypto | Noticias cripto | Titulares y movimientos del ecosistema cripto. | `/noticias/feed?cat=crypto` |
+| macro | Macro y economía | Fed, política, tasas y mercados globales. | `/noticias/feed?cat=economia` |
+| trending | Tendencias cripto | Las monedas más buscadas en CoinGecko en este momento. | `/noticias/market/trending` |
+| fearGreed | Miedo y codicia | El sentimiento del mercado cripto medido día a día. | `/noticias/market/fear-greed` |
+| dominance | Dominancia de Bitcoin | Reparto del mercado entre BTC, ETH, estables y el resto. | `/noticias/market/dominance` |
+| longShort | Largos y cortos | Cómo se posicionan las cuentas de futuros en los exchanges. | `/noticias/market/long-short` |
+| macroPulse | Pulso macro | Índices, tasas, materias primas y cripto en una sola tabla. | iframe TradingView |
+| trump | Agenda de Trump | La agenda pública del presidente de EE.UU., día por día. | `/noticias/trump-agenda` |
+| heatmap | Mapa de calor cripto | El mercado cripto por capitalización y variación del día. | iframe TradingView |
+| btcMonthly | Rentabilidad mensual de BTC | Cuánto rindió Bitcoin cada mes, año por año, desde 2017. | `/noticias/market/btc-monthly` |
+| events | Conferencias | Discursos y ruedas de prensa del presidente de EE.UU.: Casa Blanca oficial o cobertura en español. | iframe YouTube + `/noticias/conferencias-live` |
+
+### Contenido real visto en cada widget (tal cual)
+- **Calendario económico** — "AGENDA · EE.UU. · Impacto alto · Semana actual · Desplaza para recorrer ↕ ↔ · Desactivar fuente · Investing.com". (Las filas están dentro del iframe de Investing, no legibles desde la página.)
+- **Horarios de mercados** — "SESIONES · 4 MERCADOS": Tokio (Tokyo Stock Exchange) "mar 19:00–21:30 · mar 22:30–mié 01:30 · Cerrado · Abre en 2h 42m"; Hong Kong "mar 20:30–23:00 · mié 00:00–03:00 · Cerrado · Abre en 4h 12m"; Londres "mié 03:00–11:30 · Abre en 10h 42m"; Nueva York (NYSE · Nasdaq) "mié 09:30–16:00 · Abre en 17h 12m". Pie: "Calendarios oficiales · 2026–2027 · Sincronizado al minuto" (horas en la zona del dispositivo; incluye pausa de almuerzo de Tokio/HK).
+- **Noticias cripto** — "24H · Últimos titulares · 60 notas": "La CFTC autoriza los futuros perpetuos de acciones para negociar en las bolsas de EE. UU. · 03:24 p.m. · hace 49 min · Cointelegraph"; "Las elecciones intermedias de EE. UU.: los mercados de predicción favorecen a los demócratas en las carreras criptográficas clave · Cointelegraph"; "Bitcoin atrapado bajo resistencias clave: niveles en vivo · Investing.com".
+- **Macro y economía** — "GLOBAL · Últimos titulares · 42 notas": "El beneficio por acción GAAP de Ouster de -0,20 dólares supera a 0,04 dólares… · hace 4 min · Seeking Alpha"; "Odfjell Drilling Ltd. informa los resultados del tercer trimestre · Seeking Alpha"; "Vista previa de las ganancias de AdvanSix Q3 2026".
+- **Tendencias cripto** — "TOP 15 · MÁS BUSCADAS · 04:08 p.m.": 1 AudaCity (DACITYCOIN) CAP. #868 · Vol $4,459,515 · $0.0191923 · 16.14 %; 2 SNOWMOON CAP. #912 · $0.0176394 · 607.72 %; 3 Super Pepe (SP) #870 · 3080.86 %; 4 Pudgy Penguins (PENGU) #113; 5 Lighter (LIT) #80; 6 Chainlink (LINK) #17.
+- **Miedo y codicia** — "DIARIO · Índice diario · Próxima lectura en 2 h · 26 SOBRE 100 · Miedo · AYER 37 (HOY −11) · SEMANA 48 (HOY −22) · MES 65 (HOY −39) · TENDENCIA · 30 DÍAS 26 — 73 · Actualiza una vez al día · Alternative.me".
+- **Dominancia de Bitcoin** — "GLOBAL · CUOTA DE BITCOIN 59.3 % · Del valor total del mercado cripto · MERCADO · 24 H −1.21 % · Cap. total $2.63 T · BTC 59.3 % / ETH 10.6 % / Estables 9.5 % / Resto 20.6 % · Volumen negociado en 24 h $62.4 MM · ROTACIÓN DEL MERCADO · Altseason estimada · 30 D · Mercado mixto · 36 · BTC / MIXTO / ALTCOIN · 18 de 50 monedas superaron a BTC en 30 días · BTC −8.86 %. No es el índice oficial de 90 días. · Actualización automática · 10 min · CoinGecko".
+- **Largos y cortos** — "5 PARES · CUENTAS ABIERTAS · OKX · BTC/ETH/SOL/XRP/DOGE · LONG 71.1 % · SHORT 28.9 % · LECTURA: Sesgo comprador · RATIO L/S 2.46 · EVOLUCIÓN LONG · 24 H 71.1 – 73.6 · línea de referencia 50 % · Cuentas con posición abierta, últimas 24 h · Datos de OKX".
+- **Pulso macro** — "MERCADOS · 11 ACTIVOS · TABLERO MULTIMERCADO · Desactivar widgets · Datos por TradingView". Símbolos (grupos): Índices `FOREXCOM:SPXUSD`, `FOREXCOM:NSXUSD`, `TVC:DXY`, `TVC:VIX` · Tasas `TVC:US10Y`, `TVC:US02Y` · Materias primas `TVC:GOLD`, `TVC:USOIL`, `TVC:SILVER` · Cripto `BINANCE:BTCUSDT`, `BINANCE:ETHUSDT`.
+- **Agenda de Trump** — "WASHINGTON · OFICIAL · Agenda pública · GMT-5 · Martes, 03 De Noviembre · 11:00 El Presidente participa en una Reunión de Política · La Casa Blanca · Sin prensa · 11:05 El Presidente llama a Dan Bongino para una entrevista en vivo · 13:30 El Presidente se reúne con el Embajador de Estados Unidos en la República Portuguesa · Despacho Oval · Sin prensa · 16:00 El Presidente participa en Signing Time…".
+- **Mapa de calor cripto** — "PANORAMA · 24H · CAPITALIZACIÓN DEL MERCADO · CAMBIO 24 H · Datos por TradingView".
+- **Rentabilidad mensual de BTC** — "ESTACIONALIDAD · DESDE 2017 · BITCOIN MES A MES · % CIERRE". Tabla AÑO × ENE…DIC + columna AÑO. Ej.: 2026: −10, −15, +2, +12, −3, −20, +7, +25, +6, −7, +0 (nov en curso), · , año −11 · 2024 … año +121 · 2023 … año +156 · 2022 … año −64.
+- **Conferencias** — selector de canal: "Casa Blanca (oficial · inglés) / USA en Vivo (español) / EVTV Miami (español) / NTN24 (español) / Voz de América (español) / CNN en Español / CoinDesk (cripto · inglés)" + "Buscar directo". Reproductor YouTube (lista de subidas del canal) cuando no hay directo.
+
+---
+
+## B) Cada endpoint, a fondo
+
+Todos en `https://api.melapela.ai`, GET con Bearer. En el bundle solo existen estos 8 endpoints de noticias (no hay más):
+
+### B1. `GET /noticias/feed?cat=crypto|economia`
+- **Solo hay 2 categorías.** `cat=macro` → 400 `"cat debe ser crypto o economia"`. (En el bundle aparecen las strings "crypto", "macro", "economia", pero la API solo acepta dos.)
+- Cuerpo: `{"items":[{"title","link","pubDate","source"}]}` (sin imagen, sin resumen, sin categoría).
+- **Fuentes reales** (contadas por `source` y host del `link`):
+  - crypto (60 ítems): `cointelegraph` 15 (cointelegraph.com), `coindesk` 15 (www.coindesk.com), `watcherguru` 15 (**t.me** = canal de Telegram de Watcher Guru), `cryptoslate` 10, `investing` 5 (es.investing.com).
+  - economia (42 ítems): `cnbc` 15, `marketwatch` 10, `investing` 10 (es.investing.com), `seekingalpha` 7.
+  - Tope aparente de **15 ítems por fuente** (NO CONFIRMADO como regla; todas las fuentes grandes llegan a 15 exactos).
+- **Los títulos vienen traducidos al español automáticamente** aunque los links son a artículos en inglés (ej. `cointelegraph.com/news/cftc-equity-perpetual-futures-…` → "La CFTC autoriza los futuros perpetuos…"). Se nota traducción automática ("tokens" → "tokens poco comercializados", cifras de EPS mal traducidas).
+- Ventana: crypto del 1-nov 05:19 al 3-nov 20:24 UTC (≈ 2,5 días); widget dice "24H".
+- **Actualización:** entre 21:08 y 21:23 UTC el feed economía cambió (más nuevo 21:10 → 21:15); el de cripto no tuvo nuevas notas (más nuevo seguía en 20:24). → el servidor re-ingesta cada pocos minutos; frecuencia exacta NO CONFIRMADA. Cliente: refresco cada **5 min** (`setInterval 3e5`).
+- **Filtro por fuente: en el cliente.** Botón "Elegir fuentes de noticias" → "FUENTES: Watcher Guru / Cointelegraph / CoinDesk / CryptoSlate / Investing.com" (checkbox). Al quitar Watcher Guru pasó de 60 a 45 notas **sin nueva llamada a la API**. No hay buscador de texto ni paginación ni scroll infinito: lista completa con scroll interno del widget. Formato de cada nota: título · hora local · "hace X" · fuente (sin imagen).
+
+### B2. `GET /noticias/market/fear-greed`
+```json
+{"value":26,"classification":"Miedo","updatedAt":"2026-11-03T00:00:00.000Z","nextUpdateAt":"2026-11-04T00:00:00.000Z",
+ "history":[{"value":65,"date":"2026-10-04T00:00:00.000Z"}, … 31 puntos diarios … ,{"value":26,"date":"2026-11-03T00:00:00.000Z"}],
+ "previous":{"yesterday":37,"week":48,"month":65}}
+```
+- **CONFIRMADO: es el índice de alternative.me.** Su web el mismo día: Now 26 (Fear), Yesterday 37 (Fear), Last week 48 (Neutral), Last month 65 (Greed) — idéntico. La UI lo atribuye ("Alternative.me" con enlace). API pública: `https://api.alternative.me/fng/?limit=31`. Sus reglas: uso comercial permitido **con atribución justo al lado del dato**.
+- `classification` traducida (Miedo extremo / Miedo / Neutral / Codicia / Codicia extrema). Actualiza 1 vez al día (00:00 UTC). Cliente: refresco cada **30 min** (`18e5`).
+
+### B3. `GET /noticias/market/long-short?symbol=BTC|ETH|SOL|XRP|DOGE`
+```json
+{"symbol":"BTC","source":"okx","longPct":71.1,"shortPct":28.9,"ratio":2.46,
+ "history":[{"t":1793656800000,"longPct":72.6}, … 24 puntos horarios …],"updatedAt":"2026-11-03T21:14:24.064Z"}
+```
+- **Solo 5 símbolos**: cualquier otro (PEPE, BTCUSDT) → 400 `"symbol debe ser uno de: BTC, ETH, SOL, XRP, DOGE"`.
+- Lecturas reales (21:16 UTC): ETH 65,64/34,36 (1,91) · SOL 76,74/23,26 (3,30) · XRP 75,79/24,21 (3,13) · DOGE 82,49/17,51 (4,71).
+- `ratio = longPct / shortPct` (verificado: 65,64/34,36 = 1,91). `history` = 24 puntos cada 1 h (últimas 24 h). Es el **ratio de cuentas** long/short de OKX ("Cuentas con posición abierta"), no de volumen. Endpoint exacto de OKX NO CONFIRMADO (probablemente su API pública "long-short account ratio").
+- Caché del servidor ≈ 5 min (`updatedAt` 21:14 → 21:19). Cliente: refresco cada **5 min**.
+
+### B4. `GET /noticias/market/dominance`
+```json
+{"btc":59.34,"eth":10.61,"stables":9.47,"others":20.58,"totalMarketCapUsd":2633497930088.651,"totalVolumeUsd":62385532495.48067,
+ "marketCapChange24h":-1.21,"altseason":{"index":36,"window":"30d","outperformers":18,"sample":50,"btcChange":-8.86},"updatedAt":"2026-11-03T21:00:26.000Z"}
+```
+- Fuente: **CoinGecko** (atribuida en la UI; datos globales de capitalización).
+- **Altseason reconfirmado** en 4 lecturas del día: 18:59 UTC → 36 / 18 de 50 / BTC −9,1 % · ~20:00 → 36 / 18 / 50 / −9,1 % · 21:08 → 36 / 18 / 50 / −8,86 % · 21:23 → 36 / 18 / 50 / −8,86 %. `index = outperformers / sample × 100` en todas; **`sample` fue siempre 50** (probablemente top-50 por capitalización sin estables; NO CONFIRMADO cuáles). La UI aclara: "No es el índice oficial de 90 días" (versión propia a 30 d). Escala BTC / MIXTO / ALTCOIN con etiqueta "Mercado mixto" a 36 (cortes NO CONFIRMADOS; claves i18n `scaleMixed`, `scaleAltcoin`, `altseasonUnavailable`).
+- `updatedAt` se mantuvo en 21:00:26 de 21:08 a 21:23 → caché del servidor ≥ 20–30 min (NO CONFIRMADO exacto). Cliente: refresco cada **10 min** ("Actualización automática · 10 min").
+
+### B5. `GET /noticias/market/trending` (cuerpo nuevo)
+```json
+{"coins":[{"id":"audacity-2","symbol":"DACITYCOIN","name":"AudaCity","rank":868,"thumb":"https://coin-images.coingecko.com/coins/images/…",
+           "priceUsd":0.019192344438087323,"change24h":-16.14,"marketCap":"$19,191,741","volume24h":"$4,459,515","slug":"audacity-2"}, … 15 …],
+ "fetchedAt":"2026-11-03T21:08:49.071Z"}
+```
+- Fuente: **CoinGecko "Trending Search"** (top 15 más buscadas; ids/slugs/thumbs de CoinGecko). `marketCap` y `volume24h` vienen ya como string formateado; `rank` = puesto por capitalización. Ojo: la UI muestra "16.14 %" sin signo para un −16,14 % (bug de presentación visto).
+- Caché del servidor **10 min** (`fetchedAt` 21:08:49 → 21:18:49). Cliente: refresco cada **10 min**.
+
+### B6. `GET /noticias/market/btc-monthly` (cuerpo nuevo) — **sí, retornos mensuales históricos de BTC**
+```json
+{"months":[{"year":2017,"month":9,"pct":-7.33},{"year":2017,"month":10,"pct":47.61}, … ,{"year":2026,"month":10,"pct":-7.22},{"year":2026,"month":11,"pct":0.25}],
+ "updatedAt":"2026-11-03T21:22:51.121Z"}
+```
+- 111 meses, de **sep-2017** (primer mes completo de BTCUSDT en Binance; fuente NO CONFIRMADA) hasta el mes en curso (nov-2026 = +0,25 % acumulado del mes). `pct` = variación cierre/cierre del mes (o apertura→cierre; NO CONFIRMADO).
+- La columna AÑO de la tabla es **compuesta**: 2024 → ∏(1+pct) − 1 = +121,3 % (la suma simple daría 97,1 %) ✔.
+- Cliente: refresco cada **60 min** (`36e5`); `updatedAt` cambió de 20:22 a 21:22 → caché ~1 h.
+
+### B7. `GET /noticias/trump-agenda` (cuerpo nuevo)
+```json
+{"days":[{"date":"2026-11-03","events":[{"time":"11:00:00","timeFormatted":"11:00 AM","details":"El Presidente participa en una Reunión de Política",
+          "location":"La Casa Blanca","coverage":"Sin prensa","url":null,"videoUrl":null}, …]}, …],
+ "fetchedAt":"2026-11-03T21:08:49.563Z"}
+```
+- 5 días (3-nov 6 eventos, 2-nov 9, 1-nov 3, 31-oct 7, 30-oct 6), del más reciente al más antiguo.
+- Tipo de eventos: **la agenda pública diaria del presidente de EE.UU.** — reuniones de política, llamadas/entrevistas (ej. con un podcast), tele-rallies de campaña con notas ("[Nota: Convocatoria en apoyo a los candidatos republicanos…]"), declaraciones, firmas ("Signing Time"), reuniones con embajadores; lugar (La Casa Blanca, Despacho Oval…), cobertura de prensa (`coverage`: "Sin prensa", "In-Town Travel Pool", "Medios acreditados", "In-House Pool Spray" o vacío).
+- **Fuente: Roll Call Factbase** (`url` → `rollcall.com/factbase/trump/transcript/…`, `videoUrl` → `vimeo.com`). Textos traducidos al español (algunos términos quedan en inglés).
+- Hora: la UI la muestra como "GMT-5"; el horario original es de Washington (ET, que desde el 1-nov es UTC−5). NO CONFIRMADO si convierten a la zona del usuario.
+- Caché del servidor ≥ 15 min (mismo `fetchedAt` a los 15 min). Cliente: refresco cada **15 min** (`9e5`).
+
+### B8. `GET /noticias/conferencias-live?channel=<YouTubeChannelId>` (cuerpo nuevo)
+```json
+{"live":false,"videoId":null}
+```
+- Solo indica si el canal está en directo y el `videoId`. Si no, el widget embebe la **lista de subidas** del canal: `youtube-nocookie.com/embed/videoseries?list=UULF<id>` (UULF = videos largos del canal), `mute=1`, `playsinline=1`, `rel=0`.
+- Mapa de canales en el bundle: `oficial: UCYxRlFDqcWM4y7FfpiAN3KQ` (Casa Blanca, default), `espanol: NEXT_PUBLIC_CONFERENCIAS_CHANNEL_ID || UCi6-pNJPwSbUzZOO6P3UmNQ` (USA en Vivo), `evtv: UCshe7-1A5MN_ArHsG_3V41g`, `ntn24: UCEJs1fTF3KszRJGxJY14VrA`, `voa: UCJ46VgZgCMLFUvOT671AOJw`, `cnnee`, `coindesk` (ids no leídos). "Buscar directo" usa el buscador de canales (`/auth/youtube/channels/search`, NO CONFIRMADO para este widget).
+- Frecuencia de chequeo de "live": NO CONFIRMADA (no estaba entre los `setInterval` identificados).
+
+### Endpoints nuevos
+No apareció ningún endpoint de noticias adicional ni en Network ni en el bundle (`27c3jr…`). Lo demás de la página es de terceros (iframes) o se calcula en el cliente.
+
+---
+
+## C) Cómo se ve cada cosa
+
+1. **Miedo y codicia:** **velocímetro semicircular** (arco degradado rojo→naranja→verde, 0 a la izquierda "MIEDO EXTREMO", 100 a la derecha "CODICIA EXTREMA", aguja naranja con pivote), número grande "26" en color del nivel + "SOBRE 100 · Miedo". Debajo, 3 tarjetas (AYER/SEMANA/MES) con flecha y diferencia "HOY −11"; luego **mini-gráfico de línea/área** "TENDENCIA · 30 DÍAS" con rango "26 — 73". Pie: "Actualiza una vez al día · Alternative.me ↗".
+2. **Largos y cortos:** pestañas de símbolo (BTC/ETH/SOL/XRP/DOGE), dos tarjetas grandes LONG (verde) y SHORT (rojo) con %, **barra horizontal apilada verde/roja** con marca del 50 %, recuadro "LECTURA: Sesgo comprador" + "RATIO L/S 2.46", y **línea de 24 h** del % long con línea guía en 50 %.
+3. **Dominancia:** tarjeta grande "CUOTA DE BITCOIN 59.3 %" (naranja) + tarjeta "MERCADO · 24 H −1.21 % · Cap. total $2.63 T"; **barra horizontal apilada** de 4 colores (BTC naranja, ETH azul/violeta, Estables verde, Resto gris) con leyenda y %; "Volumen negociado en 24 h $62.4 MM". **Altseason**: cuadro con el número "36" + chip "30 D" + etiqueta "Mercado mixto" + **barra-escala BTC → MIXTO → ALTCOIN con un marcador vertical** (tipo termómetro), y texto explicativo "18 de 50 monedas superaron a BTC…".
+4. **Feeds de noticias:** solo texto (sin imágenes), lista vertical con scroll interno, chips "24H"/"GLOBAL", contador de notas, filtro por fuentes (cliente). Sin búsqueda ni paginación.
+5. **Agenda de Trump:** lista por día ("Martes, 03 De Noviembre") con hora a la izquierda (11:00, 13:30…), título del evento y debajo "lugar · cobertura"; chips "WASHINGTON · OFICIAL · Agenda pública · GMT-5". El **Calendario económico** es el widget embebido de Investing.com (`sslecal2.investing.com`, parámetros: `importance=3` (alto), `countries=5` (EE.UU.), `calType=week`, `timeZone=42`, `lang=4` (español), columnas divisa/importancia/actual/previsión/anterior).
+6. **Rentabilidad mensual BTC:** tabla tipo heatmap (celdas verdes/rojas por mes, columna AÑO compuesta). **Mapa de calor cripto:** widget TradingView `crypto-coins-heatmap` (`blockSize: market_cap_calc`, `blockColor: 24h_close_change|5`, zoom y tooltip activados). **Pulso macro:** widget TradingView `market-quotes` con 4 grupos.
+7. **Horarios de mercados:** tarjetas por bolsa con estado (Abierto/Cerrado), cuenta regresiva "Abre en 2h 42m" y horarios en la zona local, incluidos descansos de mediodía.
+
+---
+
+## D) Actualización en vivo
+
+Todo es **polling en el cliente** (no WebSocket) con `setInterval` en el bundle `27c3jr…`:
+
+| Widget | Intervalo cliente | Caché observada en servidor |
+|---|---|---|
+| Noticias (cripto y economía) | 5 min (`3e5`) | re-ingesta en minutos (economía cambió en 5 min) |
+| Largos y cortos | 5 min (`3e5`) | ~5 min |
+| Tendencias | 10 min (`6e5`) | 10 min |
+| Dominancia | 10 min (`6e5`) | ≥ 20–30 min |
+| Agenda de Trump | 15 min (`9e5`) | ≥ 15 min |
+| Miedo y codicia | 30 min (`18e5`) | 1 vez al día (00:00 UTC) |
+| Rentabilidad mensual | 60 min (`36e5`) | ~1 h |
+
+"Horarios de mercados" se recalcula al minuto en el cliente (calendarios oficiales 2026–2027 embebidos). Los widgets de TradingView e Investing se actualizan solos dentro de su iframe.
+
+---
+
+## E) Extras aprovechables (no documentados en pasadas anteriores)
+
+1. **Lienzo de widgets personalizable** (lo más valioso de esta página): react-grid-layout, 13 módulos activables, plantillas guardables, layouts separados desktop/tablet/mobile, autoguardado en `localStorage` con versión de esquema (`v14`, para migrar). Mejora para mi versión: guardar el layout en mi backend para que siga al usuario entre dispositivos.
+2. **Consentimiento para widgets de terceros** (`tvWidgetsConsent`) y botón "Desactivar fuente/widgets" en cada embed → buena práctica de privacidad/rendimiento.
+3. **Atribución visible de cada fuente** en el pie del widget (Alternative.me, CoinGecko, OKX, TradingView, Investing) + frecuencia ("Actualiza una vez al día", "Actualización automática · 10 min").
+4. **Traducción automática al español** de titulares y agenda en el servidor (mejorable: guardar original + traducción y mostrar enlace al original).
+5. **Landing pública** (`/`), secciones nuevas para nosotros:
+   - **Aclara qué es "Indicador Tendencial" (150k)** — hueco de la v2 cerrado: "Soportes y resistencias dinámicas directamente en TradingView. Tu primer indicador propietario MLP." Y del Tactical (300k, "MLP Tactical Bridge — El Arma Definitiva"): "Más de 4,500 líneas de código Pine Script. Sistema de triple confirmación (1/3, 2/3, 3/3), winrate en tiempo real, multi-temporalidad (1m a 1M), TP/SL dinámico, DCA integrado, y alertas JSON. Creado por Capitán Aurolo". El Radar dice cubrir también Oro, Petróleo, Plata e Índices.
+   - **Tarjeta compartible de operación ganada**: "Cierras una operación y la compartes como imagen: resultado, precios, duración y tu enlace de referido con QR."
+   - **Bitácora**: curva de equity, winrate, profit factor, drawdown, rachas y **Calendario P&L** ("Verde, rojo, break-even — día a día").
+   - **12 "escudos" de logro de trading** (distintos de los 7 logros de $MLP): Primer Disparo (1ª operación), Semana de Hierro (7 días seguidos), Mes Completo (20+ días hábiles), Artillero (30 ops/mes), Bombardero (100 ops/mes), Ametralladora (5 ops en un día), Racha Dorada (5 wins seguidos), Francotirador (WR 70 %+ con 20+ ops), El Tesoro (+50 % mensual), Inquebrantable (recuperarse de drawdown 10 %+), Maestro del Mar (Profit Factor > 3 con 30+ ops), Leyenda (WR 60 %+ 3 meses).
+   - Onboarding en 4 pasos ("Embarcar → Operar y subir de rango → Desbloquear el Arsenal → Dominar el mar") y directos L–V del líder en YouTube como motor de comunidad.
