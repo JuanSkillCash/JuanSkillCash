@@ -1287,7 +1287,7 @@ button{font-family:inherit;color:inherit}
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(5,4,7,.72);backdrop-filter:blur(10px) saturate(150%);-webkit-backdrop-filter:blur(10px) saturate(150%);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal-panel{background:var(--bg);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 transparent;opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
+.modal-panel{background:rgba(9,11,22,.97);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 transparent;opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
 .modal-overlay.open .modal-panel{opacity:1;transform:translateY(0) scale(1)}
 .modal-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(6px);border:1px solid rgba(91,141,239,.3);color:var(--white);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:background .2s,transform .2s}
 .modal-close:hover{background:rgba(255,47,79,.2);transform:rotate(90deg)}
