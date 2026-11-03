@@ -1158,11 +1158,12 @@ button{font-family:inherit;color:inherit}
 }
 .bite-mark{position:absolute;right:-2px;bottom:-2px;width:64px;height:64px;pointer-events:none}
 .cat-overview-card:hover{transform:translateY(-3px)}
-.cat-flip-outer{perspective:1600px;height:100%}
+.cat-flip-outer{perspective:1600px;height:100%;position:relative}
 .cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
-@media (hover:hover){
-  .cat-flip-outer:hover .cat-flip-inner,.cat-flip-outer:focus-within .cat-flip-inner{transform:rotateY(180deg)}
-}
+.cat-flip-outer.flipped .cat-flip-inner{transform:rotateY(180deg)}
+.cat-flip-toggle{position:absolute;top:10px;right:10px;z-index:5;width:28px;height:28px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
+.cat-flip-toggle:hover{background:rgba(91,141,239,.14)}
+.cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
 .cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .cat-flip-front:hover{transform:none}
 .cat-flip-back{
@@ -3471,6 +3472,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="cat-overview-featured">
 
       <div class="cat-flip-outer big">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card big cat-flip-front" data-category="indicadores" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3489,6 +3491,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="cat-flip-outer big">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card big cat-flip-front" data-category="partners" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3507,6 +3510,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="cat-flip-outer big">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card big cat-flip-front" data-category="rangos" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3528,6 +3532,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="cat-overview-grid">
 
       <div class="cat-flip-outer">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="portafolio" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3546,6 +3551,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="cat-flip-outer">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="trading" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3564,6 +3570,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="cat-flip-outer">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="seguridad" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -3582,6 +3589,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="cat-flip-outer">
+      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
       <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
         <div class="cat-overview-head">
@@ -10043,6 +10051,15 @@ function showCategoryOverview(){
 }
 document.querySelectorAll('.cat-overview-card').forEach(card => {
   card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
+});
+/* las tarjetas del menú principal ya no giran solas al pasar el mouse (molestaba) - ahora
+   solo giran al picarle a este botoncito; el resto de la tarjeta sigue abriendo la categoría
+   igual que siempre, tanto del lado de enfrente como del reverso */
+document.querySelectorAll('.cat-flip-toggle').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    btn.closest('.cat-flip-outer').classList.toggle('flipped');
+  });
 });
 /* "N HERRAMIENTAS" (caja de categoría y su reverso al voltear) se cuenta SIEMPRE de las
    tool-card reales de esa categoría, nunca a mano - así no vuelve a pasar que el numero quede
