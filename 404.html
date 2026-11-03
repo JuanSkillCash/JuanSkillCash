@@ -1371,19 +1371,20 @@ button{font-family:inherit;color:inherit}
 .field.invalid .field-err{display:block}
 
 .input-stepper{display:flex;align-items:center;gap:9px}
-.step-btn{width:22px;height:22px;border-radius:8px;background:transparent;border:1.5px solid var(--accent);color:var(--white);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
-.step-btn:hover{background:rgba(91,141,239,.14);color:var(--white);border-color:var(--accent);transform:translateY(-1px)}
+.step-btn{width:22px;height:22px;border-radius:8px;background:none;border:none;color:var(--white);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
+.step-btn:hover{color:var(--accent);transform:translateY(-1px)}
 .step-btn:active{transform:translateY(0) scale(.94)}
 .step-btn:active{transform:scale(.92)}
 
 /* campos con input-stepper (+/-): la etiqueta queda afuera del recuadro (sin fondo/borde propio) y
    el borde se mueve al input-stepper, que se hace más angosto — aplica a todas las calculadoras
-   y simuladores del sitio por igual, ya que todos comparten estas mismas clases base */
+   y simuladores del sitio por igual, ya que todos comparten estas mismas clases base. Sin fondo
+   relleno en ningún punto: solo el contorno azul, tal como el resto de los campos. */
 .field:has(.input-stepper){background:none;border:none;padding:0;margin-bottom:0}
 .field:has(.input-stepper) label{margin-bottom:5px;font-size:10px}
-.field:has(.input-stepper) .input-stepper{background:rgba(91,141,239,.07);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:background var(--dur-base) var(--ease-out)}
-.field:has(.input-stepper):focus-within .input-stepper{border-color:rgba(91,141,239,.4);border-left-color:var(--accent);box-shadow:0 0 0 0 transparent;background:linear-gradient(155deg,rgba(91,141,239,.08),rgba(255,255,255,.015))}
-.field:has(.input-stepper).invalid .input-stepper{border-color:var(--red);border-left-color:var(--red)}
+.field:has(.input-stepper) .input-stepper{background:transparent;border:1.5px solid var(--accent);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:background var(--dur-base) var(--ease-out)}
+.field:has(.input-stepper):focus-within .input-stepper{background:rgba(91,141,239,.08)}
+.field:has(.input-stepper).invalid .input-stepper{border-color:var(--red)}
 .field:has(.input-stepper) .field-err{margin-top:4px}
 .field:has(.input-stepper) input[type="number"]{font-size:14.5px}
 
@@ -7313,7 +7314,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <p class="calc-sub" id="calcSubEl">USDT-M: Entrada · Liquidación · SL · TP · Riesgo y beneficio</p>
       </div>
 
-      <div class="mode-tabs" style="margin:0 20px 0">
+      <div class="mode-tabs" style="margin:14px 20px">
         <button type="button" class="mode-tab active" id="futModeUsdtmBtn" data-futmode="usdtm">USDT-M</button>
         <button type="button" class="mode-tab" id="futModeCoinmBtn" data-futmode="coinm">Coin-M</button>
       </div>
@@ -7878,7 +7879,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <p class="calc-sub" id="dcaSubEl">Compra: simula cuánto acumularías comprando un monto fijo cada cierto tiempo, en vez de intentar acertarle al mejor momento para comprar todo de una vez.</p>
       </div>
 
-      <div class="mode-tabs" style="margin:0 20px 0">
+      <div class="mode-tabs" style="margin:14px 20px">
         <button type="button" class="mode-tab active" id="dcaModeBuyBtn" data-dcamode="buy">Compra</button>
         <button type="button" class="mode-tab" id="dcaModeSellBtn" data-dcamode="sell">Venta</button>
       </div>
