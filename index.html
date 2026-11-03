@@ -1287,7 +1287,7 @@ button{font-family:inherit;color:inherit}
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(5,4,7,.72);backdrop-filter:blur(10px) saturate(150%);-webkit-backdrop-filter:blur(10px) saturate(150%);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal-panel{background:rgba(9,11,22,.82);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 transparent;opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
+.modal-panel{background:var(--bg);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:900px;width:100%;position:relative;box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 transparent;opacity:0;transform:translateY(16px) scale(.98);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease);margin:auto}
 .modal-overlay.open .modal-panel{opacity:1;transform:translateY(0) scale(1)}
 .modal-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(6px);border:1px solid rgba(91,141,239,.3);color:var(--white);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:background .2s,transform .2s}
 .modal-close:hover{background:rgba(255,47,79,.2);transform:rotate(90deg)}
@@ -1517,10 +1517,6 @@ button{font-family:inherit;color:inherit}
 .returns-table .ret-summary-row td{background:rgba(255,255,255,.06);color:var(--muted2);font-weight:700}
 
 /* SCROLL HINT (mejora 3) */
-.scroll-fade{position:sticky;bottom:0;left:0;right:0;height:44px;margin:0 -32px -1px;background:linear-gradient(to bottom,transparent,var(--bg2) 78%);pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;opacity:1;transition:opacity .25s ease;z-index:4}
-.scroll-fade.hide{opacity:0}
-.scroll-fade-arrow{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted2);animation:bounceDown 1.6s ease-in-out infinite;background:var(--bg);border:1px solid rgba(91,141,239,.3);padding:5px 12px;border-radius:20px}
-@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 
 /* ===== CALCULADORA DE RENTABILIDAD ===== */
 .cat-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
@@ -1531,7 +1527,7 @@ button{font-family:inherit;color:inherit}
 .curated-asset-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
 .curated-asset-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--bg);border:1px solid rgba(91,141,239,.3);color:var(--white);cursor:pointer;text-align:left;transition:border-color .2s,background .2s}
 .curated-asset-btn:hover{border-color:var(--red);background:rgba(255,47,79,.08)}
-.curated-asset-btn.active{border-color:var(--accent);background:rgba(91,141,239,.14)}
+.curated-asset-btn.active{border-color:var(--accent);background:transparent}
 .curated-asset-btn .curated-asset-emoji{font-size:20px;flex-shrink:0}
 .curated-asset-btn .curated-asset-name{font-size:14px;font-weight:700}
 .cat-locked-note{font-size:12px;color:var(--gold);line-height:1.5;margin:-6px 0 14px;max-height:0;overflow:hidden;opacity:0;transition:opacity .25s ease,max-height .25s ease}
@@ -1901,7 +1897,7 @@ img[src=""]{display:none}
 
 .mode-tabs{display:flex;gap:8px;margin:12px 0}
 .mode-tab{flex:1;padding:11px;border-radius:8px;border:1px solid rgba(91,141,239,.3);background:transparent;color:var(--muted2);font-weight:700;font-size:12.5px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
-.mode-tab.active{background:rgba(91,141,239,.14);border-color:var(--accent);color:var(--white)}
+.mode-tab.active{background:transparent;border-color:var(--accent);color:var(--white)}
 
 .portfolio-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .portfolio-detail-head span{font-size:15px;font-weight:700;color:var(--white)}
@@ -2279,13 +2275,8 @@ img[src=""]{display:none}
   .site-footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
 }
 
-/* BUSCADORES — resaltado visual para indicar dónde escribir */
-@keyframes searchGlow{
-  0%,100%{box-shadow:0 0 0 0 rgba(255,47,79,.5);border-color:rgba(255,47,79,.5)}
-  50%{box-shadow:0 0 0 transparent;border-color:rgba(255,47,79,.95)}
-}
-.search-highlight{animation:searchGlow 1.8s ease-in-out infinite}
-.search-highlight:focus{animation:none;border-color:var(--accent) !important;box-shadow:none}
+/* BUSCADORES — sin brillo parpadeante, mismo estilo de borde azul que el resto del sitio */
+.search-highlight:focus{border-color:var(--accent) !important;box-shadow:none}
 
 .promo-note-hero{
   display:flex;align-items:center;gap:16px;
@@ -2330,7 +2321,6 @@ img[src=""]{display:none}
   .summary-grid{grid-template-columns:1fr}
   .modal-overlay{padding:0}
   .modal-panel{border-radius:0;min-height:100vh}
-  .scroll-fade{margin:0 -18px -1px}
   .promo-note-foot{flex-wrap:wrap}
   /* las píldoras (Bitunix/Telegram/Colmillos) + campana + cuenta no caben con el texto
      completo junto a la hamburguesa en celular - se quita la etiqueta de texto y se
@@ -7328,8 +7318,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button type="button" class="mode-tab" id="futModeCoinmBtn" data-futmode="coinm">Coin-M</button>
       </div>
 
-      <div class="calc-body">
-      <div id="usdtmFutSection">
+      <div>
+      <div id="usdtmFutSection" class="calc-body">
       <div class="calc-inputs">
       <div class="dir-toggle">
         <button class="dir-btn active" data-dir="long">🟢 LONG</button>
@@ -7401,7 +7391,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </div>
         <div class="be-note" id="addMarginNote" style="display:none;grid-column:1/-1"></div>
 
-        <div class="margin-mode-field field" style="grid-column:1/-1">
+        <div class="margin-mode-field" style="grid-column:1/-1">
           <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Margen de mantenimiento (%) — opcional, para mayor precisión</label>
           <div class="input-stepper">
             <button type="button" class="step-btn" data-target="maintMarginPct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -7468,7 +7458,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       </div>
 
-      <div id="coinmModal" style="display:none">
+      <div id="coinmModal" class="calc-body" style="display:none">
       <div class="calc-inputs">
 
         <div class="asset-search">
@@ -7540,7 +7530,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             </div>
           </div>
 
-          <div class="margin-mode-field field" style="grid-column:1/-1">
+          <div class="margin-mode-field" style="grid-column:1/-1">
             <label style="display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Margen de mantenimiento (%) — opcional, para mayor precisión</label>
             <div class="input-stepper">
               <button type="button" class="step-btn" data-target="coinmMaintMarginPct" data-dir="-1" aria-label="Disminuir">−</button>
@@ -7616,9 +7606,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       </div>
 
-      <div class="scroll-fade" id="scrollFade"><span class="scroll-fade-arrow">▼ más abajo</span></div>
     </div>
-  
+
       <div class="tool-footer-links">
         <a href="https://t.me/juanskll" target="_blank" rel="noopener">Telegram</a>
         <span>·</span>
@@ -7894,8 +7883,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button type="button" class="mode-tab" id="dcaModeSellBtn" data-dcamode="sell">Venta</button>
       </div>
 
-      <div class="calc-body">
-      <div id="dcaBuySection">
+      <div>
+      <div id="dcaBuySection" class="calc-body">
       <div class="calc-inputs">
 
         <div class="asset-search" id="dcaAssetSearchWrap">
@@ -7980,7 +7969,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       </div>
 
-      <div id="dcaExitModal" style="display:none">
+      <div id="dcaExitModal" class="calc-body" style="display:none">
       <div class="calc-inputs">
 
         <div class="asset-search" id="dcaExitAssetSearchWrap">
@@ -10010,7 +9999,7 @@ document.querySelectorAll('[data-category]').forEach(el => {
   const word = count === 1 ? 'HERRAMIENTA' : 'HERRAMIENTAS';
   sub.textContent = sub.classList.contains('cat-flip-back-eyebrow') ? `LAS ${count} ${word}` : `${count} ${word}`;
 });
-document.getElementById('catBackBtn').addEventListener('click', showCategoryOverview);
+document.getElementById('catBackBtn').addEventListener('click', () => goBackOneStep());
 document.getElementById('sbLogo').addEventListener('click', (e) => {
   e.preventDefault();
   showCategoryOverview();
@@ -10041,7 +10030,12 @@ function goToMainMenu(e){
   document.getElementById('sidebar').classList.remove('mobile-open');
   document.getElementById('sbBackdrop').classList.remove('show');
 }
-document.getElementById('sbBackToMenu').addEventListener('click', goToMainMenu);
+document.getElementById('sbBackToMenu').addEventListener('click', (e) => {
+  e.preventDefault();
+  goBackOneStep();
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbBackdrop').classList.remove('show');
+});
 document.getElementById('topbarInicio').addEventListener('click', goToMainMenu);
 
 /* ---- indicadores de mercado: pestañas ---- */
@@ -10442,7 +10436,7 @@ if(indicMobileNav){
     });
   });
   document.getElementById('indicMobileBackBtn').addEventListener('click', () => {
-    showCategoryOverview();
+    goBackOneStep();
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sbBackdrop').classList.remove('show');
   });
@@ -10630,6 +10624,20 @@ function closeModalGeneric(overlay){
     // no había una entrada "real" de la herramienta arriba (p.ej. se entró por un link directo a
     // la herramienta) — se deja la URL en la categoría igual, en vez de quedarse pegada
     replaceRoute({ skillcashDepth: 'category' }, routePathForCategory(category));
+  }
+}
+/* ---- botones "← Volver"/"Volver al menú" (catBackBtn, sbBackToMenu, indicMobileBackBtn): un
+   solo paso atrás, nunca directo al menú principal saltándose la herramienta abierta — si hay
+   una herramienta abierta en línea dentro de la categoría actual, el primer "atrás" solo la
+   cierra (vuelve a la cuadrícula de esa categoría); recién el siguiente "atrás" sale a categorías.
+   Bug reportado por Juan: estos botones mandaban siempre al menú principal sin respetar eso. ---- */
+function goBackOneStep(){
+  const openToolWrap = toolDetailSlot.querySelector('.tool-detail-card');
+  const openToolOverlay = openToolWrap ? openToolWrap.querySelector('.modal-overlay') : null;
+  if(openToolOverlay){
+    closeModalGeneric(openToolOverlay);
+  } else {
+    showCategoryOverview();
   }
 }
 // mientras esto es true, showCategoryDetail/jumpToIndicator/openModalGeneric no tocan el
@@ -11108,14 +11116,6 @@ Herramienta educativa. No constituye asesoría financiera.`;
     setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1800);
   });
 });
-
-/* ---- scroll hint (mejora 3) ---- */
-const scrollFade = $('scrollFade');
-const disclaimerEl = document.querySelector('.calc-disclaimer');
-const scrollIO = new IntersectionObserver((entries) => {
-  entries.forEach(entry => scrollFade.classList.toggle('hide', entry.isIntersecting));
-}, { root: calcModal, threshold: 0.6 });
-scrollIO.observe(disclaimerEl);
 
 /* ---- shareable link (mejora 6) ---- */
 $('btnLink').addEventListener('click', () => {
