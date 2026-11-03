@@ -1545,6 +1545,15 @@ button{font-family:inherit;color:inherit}
 .asset-option-name{font-size:13.5px;font-weight:600;color:var(--white)}
 .asset-option-sym{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-left:auto;text-transform:uppercase}
 .asset-empty,.asset-loading{padding:15px;font-size:12.5px;color:var(--muted);text-align:center}
+.trade-pick-row{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.05)}
+.trade-pick-row:last-child{border-bottom:none}
+.trade-pick-row:hover{background:rgba(91,141,239,.1)}
+.trade-pick-dir{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid var(--accent);flex-shrink:0}
+.trade-pick-dir.long{color:var(--green);border-color:var(--green)}
+.trade-pick-dir.short{color:var(--red);border-color:var(--red)}
+.trade-pick-main{flex:1;min-width:0}
+.trade-pick-symbol{font-size:13.5px;font-weight:700;color:var(--white)}
+.trade-pick-sub{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;margin-top:2px}
 
 .asset-placeholder{text-align:center;padding:24px 16px;color:var(--muted);font-size:13px;line-height:1.6;border:1px dashed var(--border2);border-radius:12px;margin-bottom:14px}
 .asset-chip{display:none;align-items:center;gap:12px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:13px 15px;margin-bottom:14px}
@@ -7322,6 +7331,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div>
       <div id="usdtmFutSection" class="calc-body">
       <div class="calc-inputs">
+      <div style="position:relative;margin-bottom:14px">
+        <button type="button" class="a-btn" id="futTradePickBtn">📥 Traer operación real</button>
+        <div class="asset-dropdown" id="futTradePickDropdown"></div>
+      </div>
       <div class="dir-toggle">
         <button class="dir-btn active" data-dir="long">🟢 LONG</button>
         <button class="dir-btn" data-dir="short">🔴 SHORT</button>
@@ -7638,6 +7651,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="calc-body">
       <div class="calc-inputs">
 
+      <div style="position:relative;margin-bottom:14px">
+        <button type="button" class="a-btn" id="profitTradePickBtn">📥 Traer operación real (cerrada)</button>
+        <div class="asset-dropdown" id="profitTradePickDropdown"></div>
+      </div>
+
       <div class="cat-tabs" id="catTabs">
         <button class="cat-tab active" data-cat="cripto">Cripto</button>
         <button class="cat-tab" data-cat="acciones">Acciones</button>
@@ -7755,6 +7773,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <div class="calc-body">
       <div class="calc-inputs">
+
+      <div style="position:relative;margin-bottom:14px">
+        <button type="button" class="a-btn" id="beTradePickBtn">📥 Traer operación real</button>
+        <div class="asset-dropdown" id="beTradePickDropdown"></div>
+      </div>
 
       <div class="dir-toggle">
         <button class="mode-btn active" data-bemode="spot">Spot</button>
@@ -9363,11 +9386,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="bitunixTitleEl" style="font-size:22px">🦈 Bitunix</h2>
-        <p class="calc-sub">Conecta tu cuenta por UID — nunca una API key</p>
+        <p class="calc-sub">Conecta tu cuenta por UID — y, si quieres, la lectura de tus operaciones</p>
       </div>
 
       <div id="bitunixNotConnected">
-        <p class="auth-note" style="margin-bottom:14px">Vinculamos tu cuenta de Bitunix a mi red por tu <b>UID público</b> — el mismo número que Bitunix ya usa para su propio sistema de afiliados. Nunca pedimos una API key ni tu contraseña.</p>
+        <p class="auth-note" style="margin-bottom:14px">Vinculamos tu cuenta de Bitunix a mi red por tu <b>UID público</b> — el mismo número que Bitunix ya usa para su propio sistema de afiliados. Para esto, nunca pedimos una API key ni tu contraseña.</p>
 
         <div class="auth-tabs" id="bitunixPathTabs">
           <button type="button" class="auth-tab active" data-bitunix-path="referral_new">Soy nuevo en Bitunix</button>
@@ -9411,6 +9434,30 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <div id="bitunixConnected" style="display:none">
         <p class="auth-note">✅ Bitunix conectado — UID <b id="bitunixConnectedUid"></b>.</p>
+
+        <div class="auth-divider">Opcional</div>
+
+        <div id="bitunixApiNotConnected">
+          <p class="auth-note" style="margin-bottom:12px">¿Quieres traer tus operaciones reales a las calculadoras (precio de entrada, apalancamiento, SL/TP) con un clic? Conecta una <b>API key de SOLO LECTURA</b> de tu cuenta de futuros. En Bitunix: Perfil → API Management → Create API → marca únicamente "Read". <b>Nunca</b> actives trading ni retiros.</p>
+          <form id="bitunixApiConnectForm">
+            <div class="field" id="f-bitunix-apikey">
+              <label for="bitunixApiKeyInput">API key</label>
+              <input type="text" id="bitunixApiKeyInput" autocomplete="off" spellcheck="false" required>
+            </div>
+            <div class="field" id="f-bitunix-apisecret" style="margin-top:10px">
+              <label for="bitunixApiSecretInput">Secret</label>
+              <input type="password" id="bitunixApiSecretInput" autocomplete="off" required>
+            </div>
+            <button type="submit" class="a-btn" id="bitunixApiConnectBtn" style="width:auto;padding:10px 18px;margin-top:14px">Conectar lectura de operaciones</button>
+            <p class="auth-note" id="bitunixApiConnectMsg" style="display:none;margin-top:10px"></p>
+          </form>
+          <p class="auth-note" style="margin-top:10px">La clave se guarda cifrada en el servidor — ni esta página ni nadie más la puede volver a leer. Puedes desconectarla cuando quieras.</p>
+        </div>
+
+        <div id="bitunixApiConnected" style="display:none">
+          <p class="auth-note">✅ Lectura de operaciones conectada<span id="bitunixApiConnectedHint"></span> — ya puedes usar "Traer operaciones actuales" en las calculadoras.</p>
+          <button type="button" id="bitunixApiDisconnectBtn" class="auth-link-btn" style="color:var(--red)">Desconectar lectura de operaciones</button>
+        </div>
       </div>
 
       <div id="bitunixRejected" style="display:none">
@@ -27305,6 +27352,7 @@ async function loadBitunixStatus(){
     document.getElementById('bitunixConnectedUid').textContent = 'tu cuenta';
     bitunixShowState('connected');
     if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
+    loadBitunixApiSyncStatus();
     return;
   }
   bitunixErrorEl.style.display = 'none';
@@ -27326,6 +27374,7 @@ async function loadBitunixStatus(){
     document.getElementById('bitunixConnectedUid').textContent = data.uid;
     bitunixShowState('connected');
     if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
+    loadBitunixApiSyncStatus();
     return;
   }
   updateBitunixPillStatus(data.status);
@@ -27333,6 +27382,7 @@ async function loadBitunixStatus(){
     document.getElementById('bitunixConnectedUid').textContent = data.uid;
     bitunixShowState('connected');
     if(typeof awardColmillos === 'function') awardColmillos('bitunix_connected', 'once', 70);
+    loadBitunixApiSyncStatus();
   } else if(data.status === 'rejected'){
     document.getElementById('bitunixRejectedNote').textContent = data.review_note ? (': ' + data.review_note) : '';
     bitunixShowState('rejected');
@@ -27348,6 +27398,202 @@ async function loadBitunixStatus(){
 async function bitunixDeleteOwnRow(){
   await sbClient.from('user_exchange_connections').delete().eq('user_id', currentUser.id).eq('exchange', 'bitunix');
 }
+
+/* ===================================================================================
+   BITUNIX: lectura de operaciones (opcional, API key de SOLO LECTURA) - separado a propósito
+   del paso de arriba (UID). Vive aquí, no detrás del candado de la Bitácora (journal.js),
+   para que cualquiera que conecte su cuenta pueda usar "Traer operaciones actuales" en las
+   calculadoras aunque todavía no tenga la Bitácora desbloqueada. Usa la misma Edge Function
+   y las mismas tablas (trade_journal_sync/trade_journal_trades/trade_journal_secrets) que la
+   Bitácora - una sola conexión sirve para ambas cosas.
+   =================================================================================== */
+const bitunixApiNotConnected = document.getElementById('bitunixApiNotConnected');
+const bitunixApiConnectedEl = document.getElementById('bitunixApiConnected');
+const bitunixApiConnectForm = document.getElementById('bitunixApiConnectForm');
+const bitunixApiKeyInput = document.getElementById('bitunixApiKeyInput');
+const bitunixApiSecretInput = document.getElementById('bitunixApiSecretInput');
+const bitunixApiConnectBtn = document.getElementById('bitunixApiConnectBtn');
+const bitunixApiConnectMsg = document.getElementById('bitunixApiConnectMsg');
+const bitunixApiDisconnectBtn = document.getElementById('bitunixApiDisconnectBtn');
+let bitunixApiSyncStatus = null; // 'connected' | 'error' | 'disconnected' | null (aun no se sabe)
+
+function bitunixApiShowMsg(el, text, isError){
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.borderColor = isError ? 'var(--red)' : 'var(--green)';
+  el.style.color = isError ? 'var(--red)' : 'var(--green)';
+}
+
+async function loadBitunixApiSyncStatus(){
+  if(!currentUser) return;
+  const { data, error } = await sbClient.from('trade_journal_sync')
+    .select('status,api_key_hint').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
+  if(error){ console.warn('no se pudo revisar el estado de la lectura de operaciones', error); return; }
+  bitunixApiSyncStatus = data ? data.status : 'disconnected';
+  const isConnected = bitunixApiSyncStatus === 'connected';
+  bitunixApiNotConnected.style.display = isConnected ? 'none' : 'block';
+  bitunixApiConnectedEl.style.display = isConnected ? 'block' : 'none';
+  document.getElementById('bitunixApiConnectedHint').textContent = (isConnected && data.api_key_hint) ? (' · clave ' + data.api_key_hint) : '';
+}
+
+bitunixApiConnectForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if(!currentUser) return;
+  const apiKey = bitunixApiKeyInput.value.trim();
+  const apiSecret = bitunixApiSecretInput.value.trim();
+  bitunixApiConnectMsg.style.display = 'none';
+  if(!apiKey || !apiSecret){
+    bitunixApiShowMsg(bitunixApiConnectMsg, 'Completa la API key y el Secret.', true);
+    return;
+  }
+  const original = bitunixApiConnectBtn.textContent;
+  bitunixApiConnectBtn.disabled = true;
+  bitunixApiConnectBtn.textContent = 'Conectando…';
+  try{
+    const { data, error } = await sbClient.functions.invoke('trade-journal-sync', { body: { action: 'connect', apiKey, apiSecret } });
+    let errMsg = error ? (error.message || 'Error') : (data && data.error);
+    if(error && error.context && typeof error.context.json === 'function'){
+      try{ const b = await error.context.json(); if(b && b.error) errMsg = b.error; }catch(e2){}
+    }
+    if(errMsg){
+      bitunixApiShowMsg(bitunixApiConnectMsg, /Failed to send|not found|FunctionsFetchError|FunctionsRelayError/i.test(errMsg) ? 'La función de sincronización todavía no está desplegada en Supabase (trade-journal-sync).' : errMsg, true);
+    } else {
+      bitunixApiKeyInput.value = '';
+      bitunixApiSecretInput.value = '';
+      await loadBitunixApiSyncStatus();
+    }
+  } finally {
+    bitunixApiConnectBtn.disabled = false;
+    bitunixApiConnectBtn.textContent = original;
+  }
+});
+
+bitunixApiDisconnectBtn.addEventListener('click', async () => {
+  if(!currentUser) return;
+  if(!confirm('¿Desconectar la lectura de tus operaciones? Las que ya se trajeron se quedan donde estén guardadas.')) return;
+  await sbClient.functions.invoke('trade-journal-sync', { body: { action: 'disconnect' } });
+  await loadBitunixApiSyncStatus();
+});
+
+/* ===================================================================================
+   "Traer operación real": botón reusable en Futuros (USDT-M), Rentabilidad (cerradas) y
+   Break-even - lee de trade_journal_trades (la misma tabla de la Bitácora, RLS: cada quien
+   ve solo lo suyo) y rellena los campos de la calculadora con una operación real. Solo
+   funciona si el usuario conectó la lectura de sus operaciones (sección "Opcional" del modal
+   de Bitunix) - si no, abre ese modal y lo lleva directo a esa sección. No depende de que la
+   Bitácora en sí esté desbloqueada - son dos cosas independientes a propósito.
+   =================================================================================== */
+function fmtTradePickDate(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+}
+function renderTradePickRow(t){
+  const row = document.createElement('div');
+  row.className = 'trade-pick-row';
+  const dir = document.createElement('span');
+  dir.className = 'trade-pick-dir ' + t.side;
+  dir.textContent = t.side === 'long' ? 'LONG' : 'SHORT';
+  const main = document.createElement('div');
+  main.className = 'trade-pick-main';
+  const sym = document.createElement('div');
+  sym.className = 'trade-pick-symbol';
+  sym.textContent = t.symbol + (t.leverage ? ' · ' + t.leverage + 'x' : '');
+  const sub = document.createElement('div');
+  sub.className = 'trade-pick-sub';
+  sub.textContent = t.status === 'open' ? ('🟢 Abierta · ' + fmtTradePickDate(t.opened_at)) : ('Cerrada · ' + fmtTradePickDate(t.closed_at || t.opened_at));
+  main.append(sym, sub);
+  row.append(dir, main);
+  return row;
+}
+async function fetchRecentTrades(onlyClosed){
+  const { data, error } = await sbClient.from('trade_journal_trades')
+    .select('id,symbol,side,status,leverage,margin,qty,entry_price,exit_price,stop_loss,take_profit,fees,opened_at,closed_at')
+    .eq('user_id', currentUser.id)
+    .order('status', { ascending: false })
+    .order('opened_at', { ascending: false })
+    .limit(25);
+  if(error){ console.warn('no se pudieron leer las operaciones', error); return []; }
+  return onlyClosed ? data.filter(t => t.status === 'closed') : data;
+}
+function promptConnectBitunixApi(){
+  openBitunixModal();
+  setTimeout(() => {
+    if(bitunixApiSyncStatus !== 'connected' && bitunixApiNotConnected) bitunixApiNotConnected.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 350);
+}
+async function toggleTradePickDropdown(dropdown, onlyClosed, onPick){
+  if(!currentUser){ openAuthModal(); return; }
+  if(bitunixApiSyncStatus !== 'connected'){ promptConnectBitunixApi(); return; }
+  if(dropdown.classList.contains('show')){ dropdown.classList.remove('show'); return; }
+  dropdown.innerHTML = '<div class="asset-loading">Cargando…</div>';
+  dropdown.classList.add('show');
+  const trades = await fetchRecentTrades(onlyClosed);
+  if(!dropdown.classList.contains('show')) return; // se cerró mientras cargaba
+  if(!trades.length){
+    dropdown.innerHTML = '<div class="asset-empty">' + (onlyClosed ? 'Todavía no tienes operaciones cerradas sincronizadas.' : 'Todavía no tienes operaciones sincronizadas.') + '</div>';
+    return;
+  }
+  dropdown.innerHTML = '';
+  trades.forEach(t => {
+    const row = renderTradePickRow(t);
+    row.addEventListener('click', () => { dropdown.classList.remove('show'); onPick(t); });
+    dropdown.appendChild(row);
+  });
+}
+function wireTradePicker(btnId, dropdownId, onlyClosed, onPick){
+  const btn = document.getElementById(btnId);
+  const dropdown = document.getElementById(dropdownId);
+  if(!btn || !dropdown) return;
+  btn.addEventListener('click', (e) => { e.stopPropagation(); toggleTradePickDropdown(dropdown, onlyClosed, onPick); });
+  document.addEventListener('click', (e) => {
+    if(dropdown.classList.contains('show') && !dropdown.contains(e.target) && e.target !== btn) dropdown.classList.remove('show');
+  });
+}
+
+function fillFuturesFromTrade(t){
+  const dirBtn = document.querySelector('#usdtmFutSection .dir-btn[data-dir="' + t.side + '"]');
+  if(dirBtn) dirBtn.click();
+  if(t.entry_price != null){ entryInput.value = t.entry_price; entryInput.dispatchEvent(new Event('input')); }
+  if(t.margin != null){ capitalInput.value = t.margin; capitalInput.dispatchEvent(new Event('input')); }
+  if(t.leverage){ levSlider.value = t.leverage; levSlider.dispatchEvent(new Event('input')); }
+  if(t.entry_price && t.stop_loss){
+    const slPct = Math.abs((t.side === 'long' ? (t.entry_price - t.stop_loss) : (t.stop_loss - t.entry_price)) / t.entry_price) * 100;
+    slInput.value = slPct.toFixed(2); slInput.dispatchEvent(new Event('input'));
+  }
+  if(t.entry_price && t.take_profit){
+    const tpPct = Math.abs((t.side === 'long' ? (t.take_profit - t.entry_price) : (t.entry_price - t.take_profit)) / t.entry_price) * 100;
+    tpInput.value = tpPct.toFixed(2); tpInput.dispatchEvent(new Event('input'));
+  }
+  calc();
+}
+wireTradePicker('futTradePickBtn', 'futTradePickDropdown', false, fillFuturesFromTrade);
+
+function fillProfitFromTrade(t){
+  if(t.entry_price != null){ buyInput.value = t.entry_price; buyInput.dispatchEvent(new Event('input')); }
+  if(t.exit_price != null){ sellInput.value = t.exit_price; sellInput.dispatchEvent(new Event('input')); }
+  if(t.margin != null){ profitCapInput.value = t.margin; profitCapInput.dispatchEvent(new Event('input')); }
+  computeProfit();
+}
+wireTradePicker('profitTradePickBtn', 'profitTradePickDropdown', true, fillProfitFromTrade);
+
+function fillBreakevenFromTrade(t){
+  const futBtn = document.querySelector('#breakevenModal .mode-btn[data-bemode="futuros"]');
+  if(futBtn) futBtn.click();
+  if(t.margin != null){ beCapitalInput.value = t.margin; beCapitalInput.dispatchEvent(new Event('input')); }
+  if(t.leverage){ beLevSlider.value = t.leverage; beLevSlider.dispatchEvent(new Event('input')); }
+  if(t.fees != null && t.qty && t.entry_price){
+    const notional = t.qty * t.entry_price;
+    if(notional > 0){
+      const perLeg = Math.max(0.01, (t.fees / notional) * 100 / 2);
+      beFeeEntryInput.value = perLeg.toFixed(2);
+      beFeeExitInput.value = perLeg.toFixed(2);
+      beFeeEntryInput.dispatchEvent(new Event('input'));
+      beFeeExitInput.dispatchEvent(new Event('input'));
+    }
+  }
+  computeBreakeven();
+}
+wireTradePicker('beTradePickBtn', 'beTradePickDropdown', false, fillBreakevenFromTrade);
 
 bitunixSubmitBtn.addEventListener('click', async () => {
   if(!currentUser) return;
