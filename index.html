@@ -1161,7 +1161,7 @@ button{font-family:inherit;color:inherit}
 .cat-flip-outer{perspective:1600px;height:100%;position:relative}
 .cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
 .cat-flip-outer.flipped .cat-flip-inner{transform:rotateY(180deg)}
-.cat-flip-toggle{position:absolute;top:-14px;right:16px;z-index:5;width:26px;height:26px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
+.cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
 .cat-flip-toggle:hover{background:rgba(91,141,239,.14)}
 .cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
 .cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -10061,6 +10061,23 @@ document.querySelectorAll('.cat-flip-toggle').forEach(btn => {
     btn.closest('.cat-flip-outer').classList.toggle('flipped');
   });
 });
+/* el botoncito de girar va pegado justo debajo de la píldora (GRATIS/ALIANZAS/etc) de cada
+   tarjeta, nunca fuera de la caja - como el título a veces ocupa 1 o 2 líneas, esa píldora no
+   siempre está a la misma altura, así que se calcula en JS en vez de un top fijo en CSS */
+function positionCatFlipToggles(){
+  document.querySelectorAll('.cat-flip-outer').forEach(outer => {
+    const tag = outer.querySelector('.cat-overview-tag');
+    const toggle = outer.querySelector('.cat-flip-toggle');
+    if(!tag || !toggle) return;
+    const outerTop = outer.getBoundingClientRect().top;
+    const tagBottom = tag.getBoundingClientRect().bottom;
+    toggle.style.top = Math.round(tagBottom - outerTop + 8) + 'px';
+  });
+}
+positionCatFlipToggles();
+window.addEventListener('load', positionCatFlipToggles);
+let catFlipToggleResizeT;
+window.addEventListener('resize', () => { clearTimeout(catFlipToggleResizeT); catFlipToggleResizeT = setTimeout(positionCatFlipToggles, 150); });
 /* "N HERRAMIENTAS" (caja de categoría y su reverso al voltear) se cuenta SIEMPRE de las
    tool-card reales de esa categoría, nunca a mano - así no vuelve a pasar que el numero quede
    desactualizado cuando se agrega o quita una herramienta (bug reportado por Juan: Manual del
