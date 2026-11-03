@@ -103,9 +103,77 @@ sensible de la cuenta del usuario — hay que ser explícito en los términos de
 uso sobre qué se hace con ella, y limitar el alcance de los permisos pedidos
 al mínimo indispensable desde el primer día.
 
-## Estado
+## Sesión 2026-11-03: investigación a fondo de un competidor + orden de construcción acordado
 
-Solo documentado. No se ha empezado a construir nada de esto. Próximo paso,
-cuando Juan quiera retomarlo: resolver las preguntas abiertas de arriba y
-definir la Fase 1 concreta (probablemente: conectar Bitunix en modo lectura +
-mostrar el volumen/tier actual, sin desbloquear nada todavía).
+Juan pidió investigar en profundidad (vía otra sesión de Claude con navegador real, cuenta
+propia de Juan) la plataforma "Marines Live Platform" (melapela.ai) - mismo modelo que este
+roadmap (volumen real → desbloqueo de herramientas). Cuatro rondas de investigación quedaron
+guardadas como oro en `docs/referencia-competencia-mlp.md` (dossier técnico: endpoints, campos
+JSON reales, fórmulas de sus indicadores verificadas con datos reales - Radar, Mapa Tendencial,
+Tactical, La Cubierta, sus 3 minijuegos, y su panel de Noticias completo). Léelo antes de
+diseñar cualquier pieza de este roadmap - ya resuelve varias de las "preguntas abiertas" de
+arriba por comparación directa con quien ya lo construyó.
+
+### Corrección importante: Rango de Manada NO se abre al público
+
+Una ronda anterior de esta misma conversación sugirió abrir la Bitácora de trading a todo el
+mundo sin candado. **Juan lo corrigió explícitamente: no.** El modelo se mantiene 100% cerrado
+por volumen, igual que el roadmap original de arriba ya decía:
+- Para siquiera ENTRAR a la categoría "Rango de Manada" hace falta mínimo 1 operación real con
+  el link de afiliado de Juan (equivalente al rango 🐣 Cría ya definido arriba).
+- Las herramientas DE ADENTRO (Bitácora y las que se construyan después) se desbloquean por
+  volumen, no quedan abiertas a quien no cumple el mínimo.
+- Ninguna herramienta de "Rango de Manada" se abre gratis a quien no haya conectado Bitunix con
+  el link de Juan y generado al menos ese volumen mínimo.
+
+### Orden de construcción acordado (de más fácil a más difícil)
+
+Juan pidió explícitamente dejar TODO lo que vive dentro de "Rango de Manada" para el final
+(justo lo de esta sección del roadmap), porque es lo que más detalle necesita. Orden decidido:
+
+1. **12 Logros de trading en la Bitácora** (badges tipo Primer Disparo, Racha Dorada, etc. -
+   ver `referencia-competencia-mlp.md` sección "Extras aprovechables" de la v4) - usa datos que
+   `journal.js` ya calcula, no necesita dato externo nuevo.
+2. **Panel de Noticias y Mercado** - agregación de fuentes públicas gratis (Alternative.me,
+   CoinGecko, OKX) + un par de widgets embebidos (TradingView, Investing.com). Empezar con
+   versión fija (sin drag-and-drop) y agregar personalización después si se quiere. Pendiente
+   de decidir: si incluir contenido de la "Agenda de Trump" (es contenido de política de EE.UU.,
+   Juan no ha confirmado si encaja con la marca).
+3. **Tarjeta compartible de operación con QR de referido** - extiende la tarjeta para compartir
+   que ya existe (la del tiburón) a un trade cerrado de la Bitácora.
+4. **Minijuego tipo "BTC 5 minutos"** con Sharkoins (apuesta binaria sube/baja en ventana corta,
+   fórmula de pago propia y transparente).
+5. **Mapa Tendencial** (indicador de confluencia multi-temporalidad, ver sección C de la v2 del
+   dossier) - más esfuerzo porque calcula un indicador real (tipo SuperTrend) en 8 temporalidades,
+   pero es solo informativo, sin el riesgo de un generador de señales.
+6. **La Cubierta** (red social de trading, feed + calls verificables + contenido exclusivo por
+   rango) - proyecto grande en sí mismo; el contenido exclusivo por rango de todas formas
+   necesita que el sistema de rangos (punto 9) ya exista.
+7. **Radar / Tactical** (generador de señales reales con SL/TP/apalancamiento sugerido) - el
+   más potente pero también el que más cuidado legal/de responsabilidad necesita (estaríamos
+   diciendo "entra aquí con este apalancamiento"); merece conversación aparte antes de construir.
+8. **Rango de Manada completo** (de último) - la tabla de rangos propia, el motor que conecta
+   el volumen real de Bitunix con cada herramienta de arriba, la escalera visual, el anillo de
+   progreso. Se deja de último porque amarra todo lo anterior - tiene más sentido construirlo
+   ya sabiendo qué herramientas exactas está gateando.
+
+### Ideas nuevas de Juan (mismo día) - por desarrollar más adelante
+
+- **"Mi Arrecife" como el nuevo dashboard de widgets personalizables.** Juan propone reutilizar
+  la tarjeta/categoría existente "Mi Arrecife" como el lugar donde vive el panel de Noticias y
+  Mercado tipo "lienzo" (inspirado en el de melapela.ai, ver v4 del dossier) - y redistribuir
+  en otras cajas del sitio lo que hoy vive dentro de Mi Arrecife. Sin decidir todavía qué pasa
+  exactamente con cada cosa que hoy tiene Mi Arrecife; es una idea a madurar antes de tocar código.
+- **Incluir el contenido de "en vivo"** (conferencias/videos en vivo embebidos, al estilo del
+  widget "Conferencias" de melapela) dentro de esos widgets personalizables - a Juan le gustó
+  poder ver un video en vivo directo ahí mismo.
+- **"Profundidad" visual en ciertas cajas** - Juan quiere que, más adelante, algunas cajas del
+  sitio (hoy todas con el mismo contorno azul aguamarina plano) tengan algo de profundidad
+  visual en casos puntuales - todavía sin decidir en cuáles ni cómo se vería. Pendiente de
+  retomar la conversación cuando Juan tenga tiempo de pensarlo con calma.
+
+### Estado
+
+Solo documentado y acordado el orden - **nada se ha construido todavía de este roadmap.** Juan
+se quedó sin límite semanal de uso; retoma después del jueves (reinicio del límite). Próximo
+paso cuando retome: empezar por el ítem 1 del orden de arriba (los 12 logros de trading).
