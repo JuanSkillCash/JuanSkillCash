@@ -809,3 +809,13 @@ Todo es **polling en el cliente** (no WebSocket) con `setInterval` en el bundle 
    - **Bitácora**: curva de equity, winrate, profit factor, drawdown, rachas y **Calendario P&L** ("Verde, rojo, break-even — día a día").
    - **12 "escudos" de logro de trading** (distintos de los 7 logros de $MLP): Primer Disparo (1ª operación), Semana de Hierro (7 días seguidos), Mes Completo (20+ días hábiles), Artillero (30 ops/mes), Bombardero (100 ops/mes), Ametralladora (5 ops en un día), Racha Dorada (5 wins seguidos), Francotirador (WR 70 %+ con 20+ ops), El Tesoro (+50 % mensual), Inquebrantable (recuperarse de drawdown 10 %+), Maestro del Mar (Profit Factor > 3 con 30+ ops), Leyenda (WR 60 %+ 3 meses).
    - Onboarding en 4 pasos ("Embarcar → Operar y subir de rango → Desbloquear el Arsenal → Dominar el mar") y directos L–V del líder en YouTube como motor de comunidad.
+
+---
+
+## Nota de Juan (3 nov 2026): consistencia visual
+
+Todo el panel de Noticias — a pesar de mezclar datos propios, iframes de TradingView, de
+Investing.com y de YouTube — se ve como una sola pieza, no como un collage de widgets ajenos
+pegados. Vale la pena tenerlo presente como estándar de calidad para cuando construyamos lo
+nuestro: si usamos algún embed de terceros (TradingView, etc.), que respete nuestra paleta y
+tipografía tanto como se pueda, no que se note "pegado".
