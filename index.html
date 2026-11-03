@@ -27426,14 +27426,18 @@ function bitunixApiShowMsg(el, text, isError){
 
 async function loadBitunixApiSyncStatus(){
   if(!currentUser) return;
-  const { data, error } = await sbClient.from('trade_journal_sync')
-    .select('status,api_key_hint').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
-  if(error){ console.warn('no se pudo revisar el estado de la lectura de operaciones', error); return; }
-  bitunixApiSyncStatus = data ? data.status : 'disconnected';
-  const isConnected = bitunixApiSyncStatus === 'connected';
-  bitunixApiNotConnected.style.display = isConnected ? 'none' : 'block';
-  bitunixApiConnectedEl.style.display = isConnected ? 'block' : 'none';
-  document.getElementById('bitunixApiConnectedHint').textContent = (isConnected && data.api_key_hint) ? (' · clave ' + data.api_key_hint) : '';
+  try{
+    const { data, error } = await sbClient.from('trade_journal_sync')
+      .select('status,api_key_hint').eq('user_id', currentUser.id).eq('exchange', 'bitunix').maybeSingle();
+    if(error){ console.warn('no se pudo revisar el estado de la lectura de operaciones', error); return; }
+    bitunixApiSyncStatus = data ? data.status : 'disconnected';
+    const isConnected = bitunixApiSyncStatus === 'connected';
+    bitunixApiNotConnected.style.display = isConnected ? 'none' : 'block';
+    bitunixApiConnectedEl.style.display = isConnected ? 'block' : 'none';
+    document.getElementById('bitunixApiConnectedHint').textContent = (isConnected && data.api_key_hint) ? (' · clave ' + data.api_key_hint) : '';
+  } catch(err){
+    console.warn('no se pudo revisar el estado de la lectura de operaciones', err);
+  }
 }
 
 bitunixApiConnectForm.addEventListener('submit', async (e) => {
