@@ -9440,7 +9440,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="auth-divider">Opcional</div>
 
         <div id="bitunixApiNotConnected">
-          <p class="auth-note" style="margin-bottom:12px">¿Quieres traer tus operaciones reales a las calculadoras (precio de entrada, apalancamiento, SL/TP) con un clic? Conecta una <b>API key de SOLO LECTURA</b> de tu cuenta de futuros. En Bitunix: Perfil → API Management → Create API → marca únicamente "Read". <b>Nunca</b> actives trading ni retiros.</p>
+          <p class="auth-note" style="margin-bottom:12px">¿Quieres traer tus operaciones reales a las calculadoras (precio de entrada, apalancamiento, SL/TP) con un clic? Conecta una <b>API key de SOLO LECTURA</b> de tu cuenta de futuros — nunca actives "API comercial" ni ningún permiso de retiro.</p>
+          <ol class="auth-note" style="margin:0 0 14px;padding-left:20px;line-height:1.9">
+            <li>En Bitunix, haz clic en tu ícono de perfil (arriba a la derecha) → <b>API</b>.</li>
+            <li>En "Gestión de API", dale a <b>Crear API</b>.</li>
+            <li>En "Nota", ponle un nombre para reconocerla después, ej. <i>Bitácora SkillCash</i>.</li>
+            <li>En "Objetivo", elige <b>Vincular aplicaciones de terceros</b> (NO "API comercial").</li>
+            <li>En "Permiso", elige <b>Sólo lectura</b>.</li>
+            <li>Completa la verificación de seguridad que te pida (correo, SMS y/o Google Authenticator) y dale a Enviar.</li>
+            <li>Bitunix te muestra la <b>API Key</b> y el <b>Secret</b> una sola vez — cópialos y pégalos aquí abajo.</li>
+          </ol>
           <form id="bitunixApiConnectForm">
             <div class="field" id="f-bitunix-apikey">
               <label for="bitunixApiKeyInput">API key</label>
@@ -26754,10 +26763,18 @@ const notifList = document.getElementById('notifList');
 const notifEmptyMsg = document.getElementById('notifEmptyMsg');
 const notifMarkAllBtn = document.getElementById('notifMarkAllBtn');
 
+async function markAllNotificationsRead(){
+  if(!currentUser) return;
+  await sbClient.from('user_notifications').update({ read_at: new Date().toISOString() }).eq('user_id', currentUser.id).is('read_at', null);
+  loadNotifications();
+}
 notifMiniBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   const isOpen = notifMiniDropdown.classList.toggle('open');
   notifMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  // con solo abrir la campanita ya se marcan como leidas - antes habia que entrar Y darle a
+  // "marcar todas como leidas" aparte, un paso de mas que Juan no queria
+  if(isOpen) markAllNotificationsRead();
 });
 document.addEventListener('click', (e) => {
   if(notifMiniDropdown.classList.contains('open') && !notifMiniDropdown.contains(e.target) && e.target !== notifMiniBtn){
@@ -26835,11 +26852,7 @@ async function markNotificationRead(id){
   loadNotifications();
 }
 
-notifMarkAllBtn.addEventListener('click', async () => {
-  if(!currentUser) return;
-  await sbClient.from('user_notifications').update({ read_at: new Date().toISOString() }).eq('user_id', currentUser.id).is('read_at', null);
-  loadNotifications();
-});
+notifMarkAllBtn.addEventListener('click', markAllNotificationsRead);
 
 function renderNotifAuthState(){
   if(currentUser){
