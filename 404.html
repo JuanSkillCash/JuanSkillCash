@@ -1353,9 +1353,9 @@ button{font-family:inherit;color:inherit}
 .calc-inputs{min-width:0}
 .calc-results{min-width:0}
 .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:start}
-.field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(91,141,239,.4);border-radius:var(--r-md);padding:15px 16px 15px 14px;transition:border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
-.field:hover{border-color:var(--accent);background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
-.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 0 transparent,var(--shadow-sm);background:linear-gradient(155deg,rgba(91,141,239,.08),rgba(255,255,255,.015))}
+.field{background:transparent;border:1.5px solid var(--accent);border-radius:var(--r-md);padding:15px 16px 15px 14px;transition:box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.field:hover{background:rgba(91,141,239,.05)}
+.field:focus-within{box-shadow:0 0 0 0 transparent,var(--shadow-sm);background:rgba(91,141,239,.08)}
 .field.invalid{border-color:var(--red)}
 .field label{display:block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--white);margin-bottom:10px}
 .field input[type="number"],#maintMarginPct,#coinmMaintMarginPct{width:100%;min-width:0;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;outline:none}
@@ -1371,8 +1371,8 @@ button{font-family:inherit;color:inherit}
 .field.invalid .field-err{display:block}
 
 .input-stepper{display:flex;align-items:center;gap:9px}
-.step-btn{width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(91,141,239,.3);color:var(--muted2);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
-.step-btn:hover{background:rgba(255,47,79,.14);color:var(--red);border-color:var(--red);transform:translateY(-1px)}
+.step-btn{width:22px;height:22px;border-radius:8px;background:transparent;border:1.5px solid var(--accent);color:var(--white);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);line-height:1}
+.step-btn:hover{background:rgba(91,141,239,.14);color:var(--white);border-color:var(--accent);transform:translateY(-1px)}
 .step-btn:active{transform:translateY(0) scale(.94)}
 .step-btn:active{transform:scale(.92)}
 
@@ -1381,13 +1381,13 @@ button{font-family:inherit;color:inherit}
    y simuladores del sitio por igual, ya que todos comparten estas mismas clases base */
 .field:has(.input-stepper){background:none;border:none;padding:0;margin-bottom:0}
 .field:has(.input-stepper) label{margin-bottom:5px;font-size:10px}
-.field:has(.input-stepper) .input-stepper{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(91,141,239,.3);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
+.field:has(.input-stepper) .input-stepper{background:rgba(91,141,239,.07);border-radius:var(--r-md);padding:8px 10px;gap:6px;transition:background var(--dur-base) var(--ease-out)}
 .field:has(.input-stepper):focus-within .input-stepper{border-color:rgba(91,141,239,.4);border-left-color:var(--accent);box-shadow:0 0 0 0 transparent;background:linear-gradient(155deg,rgba(91,141,239,.08),rgba(255,255,255,.015))}
 .field:has(.input-stepper).invalid .input-stepper{border-color:var(--red);border-left-color:var(--red)}
 .field:has(.input-stepper) .field-err{margin-top:4px}
 .field:has(.input-stepper) input[type="number"]{font-size:14.5px}
 
-.lev-field{background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(91,141,239,.3);border-left:3px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:15px 16px 15px 14px}
+.lev-field{background:transparent;border:1.5px solid var(--accent);border-radius:var(--r-md);padding:15px 16px 15px 14px}
 .lev-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .lev-head label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--white)}
 .lev-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:19px;color:var(--gold)}
@@ -1427,7 +1427,7 @@ button{font-family:inherit;color:inherit}
 /* SUMMARY */
 .summary-title{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:13px}
 .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:22px}
-.sum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:13px 15px;font-size:13.5px}
+.sum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);border:1.5px solid var(--accent);border-radius:8px;padding:13px 15px;font-size:13.5px}
 .sum-row .s-label{color:var(--muted2)}
 .sum-row .s-val{font-weight:700;font-family:'Space Mono',monospace;font-size:13px}
 .sum-row .s-val.pos{color:var(--green)}
