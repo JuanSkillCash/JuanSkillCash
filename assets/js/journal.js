@@ -383,15 +383,13 @@ const HELP = {
   // tabla mensual/anual
   'Mes': 'El mes al que corresponde esa fila.',
   'Op.': 'Cuántas operaciones cerraste ese mes.',
-  'Capital inicial': 'El capital con el que arrancó ese mes - se usa para calcular tu % de rentabilidad y de drawdown de ese mes.',
   'P&L neto': 'Ganancia o pérdida total de ese mes, ya con comisiones y funding descontados.',
-  'Rentab.': 'El P&L neto de ese mes como porcentaje de tu capital inicial de ese mes.',
   'Mejor día': 'El día con más ganancia neta dentro de ese mes.',
   'Peor día': 'El día con más pérdida neta dentro de ese mes.',
   'Max DD': 'La caída más grande que tuvo tu capital ese mes, desde un punto alto hasta un punto bajo.',
   // titulos de graficos y tarjetas
-  'Curva de capital': 'Cómo fue creciendo o bajando tu capital, operación tras operación, dentro del rango de fechas elegido.',
-  'Drawdown': 'En cada punto de tu curva de capital, cuánto habías caído desde el pico más alto que llevabas hasta ese momento.',
+  'P&L acumulado': 'Cómo se fue sumando tu ganancia o pérdida, operación tras operación, dentro del rango de fechas elegido - parte de $0, no de tu saldo.',
+  'Drawdown': 'En cada punto de tu curva de P&L acumulado, cuánto habías caído desde el pico más alto que llevabas hasta ese momento.',
   'P&L por día': 'Cuánto ganaste o perdiste en total cada día, dentro del rango de fechas elegido.',
   'Long vs Short': 'Compara tus resultados cuando apostaste a que el precio sube (long) contra cuando apostaste a que baja (short).',
   'Resultados': 'De tus operaciones cerradas, cuántas fueron ganadoras, perdedoras, o break-even (sin ganar ni perder).',
@@ -500,7 +498,7 @@ function paneResumen(){
   // la comision misma) - siempre del MES EN CURSO, independiente del filtro de fechas de arriba,
   // porque es plata real que ya te devolvieron, no algo que dependa de que rango estes mirando
   const cashbackMonth = S.cashbackByMonth[monthKey(new Date())] || 0;
-  const curve = [{ y: cap, label: 'Inicio' }].concat(st.curve.map(p => ({ y: p.eq, label: fmtDate(p.d) })));
+  const curve = [{ y: 0, label: 'Inicio' }].concat(st.curve.map(p => ({ y: p.eq - cap, label: fmtDate(p.d) })));
   const ddCurve = [{ y: 0, label: 'Inicio' }].concat(st.curve.map(p => ({ y: p.dd, label: fmtDate(p.d) })));
   const dayItems = Object.keys(st.days).sort().map(k => { const [y, m, d] = k.split('-'); return { label: Number(d) + ' ' + MONTHS_S[Number(m) - 1], value: st.days[k] }; });
   const longs = list.filter(t => t.side === 'long'), shorts = list.filter(t => t.side === 'short');
@@ -511,7 +509,7 @@ function paneResumen(){
   return `
     <div class="jr-hero ${signCls(st.net)}">
       <div><div class="jr-kpi-label">P&L neto del rango${helpBtn('P&L neto del rango')}</div><div class="jr-hero-val">${sUsd(st.net)}</div>
-      <div class="jr-hero-sub"><span class="${signCls(st.ret)}">${sPct(st.ret)}</span> sobre capital de ${usd(cap, 0)} · ${st.n} operaciones cerradas · capital actual ${usd(cap + st.net)}</div></div>
+      <div class="jr-hero-sub">${st.n} operaciones cerradas</div></div>
       <div class="jr-hero-mini">
         <div><span>Ganado${helpBtn('Ganado')}</span><b class="jr-pos">${usd(st.gp)}</b></div>
         <div><span>Perdido${helpBtn('Perdido')}</span><b class="jr-neg">${usd(st.gl)}</b></div>
@@ -528,7 +526,7 @@ function paneResumen(){
       ${kpi('Ratio G/P', Number.isFinite(st.payoff) ? st.payoff.toFixed(2) : '—', 'Ganancia prom. ÷ pérdida prom.')}
       ${kpi('Ganancia promedio', usd(st.avgWin), '', 'jr-pos')}
       ${kpi('Pérdida promedio', usd(st.avgLoss), '', 'jr-neg')}
-      ${kpi('Max drawdown', usd(-st.maxDD), pct(-st.maxDDpct) + ' desde el pico', 'jr-neg')}
+      ${kpi('Max drawdown', usd(-st.maxDD), 'Pico a valle, en dólares', 'jr-neg')}
       ${kpi('Factor de recuperación', Number.isFinite(st.recovery) ? st.recovery.toFixed(2) : '—', 'Neto ÷ max drawdown')}
       ${kpi('Mejor operación', st.best ? sUsd(st.best.net) : '—', st.best ? esc(st.best.symbol) + ' · ' + fmtDate(st.best.closed) : '', 'jr-pos')}
       ${kpi('Peor operación', st.worst ? sUsd(st.worst.net) : '—', st.worst ? esc(st.worst.symbol) + ' · ' + fmtDate(st.worst.closed) : '', 'jr-neg')}
@@ -540,7 +538,7 @@ function paneResumen(){
       ${kpi('Sharpe (diario, anual.)', Number.isFinite(st.sharpe) ? st.sharpe.toFixed(2) : '—', 'Rentabilidad ÷ variabilidad')}
     </div>
     <div class="jr-grid2">
-      ${card('Curva de capital', lineChart(curve, { area: true, color: C.line, h: 260, areaBase: Math.min(...curve.map(p => p.y)) }), 'jr-span2')}
+      ${card('P&L acumulado', lineChart(curve, { area: true, color: C.line, h: 260, areaBase: 0, zero: true }), 'jr-span2')}
       ${card('Drawdown', lineChart(ddCurve, { area: true, color: C.neg, h: 160, areaBase: 0 }), 'jr-span2')}
       ${card('P&L por día', barChart(dayItems, { h: 220 }), 'jr-span2')}
       ${card('Long vs Short', `<table class="jr-table jr-compact"><thead><tr><th></th><th>Long</th><th>Short</th></tr></thead><tbody>
@@ -638,7 +636,7 @@ function paneCalendario(){
       <button type="button" class="jr-btn" data-cal="-1">←</button>
       <h3>${MONTHS[m][0].toUpperCase() + MONTHS[m].slice(1)} ${y}</h3>
       <button type="button" class="jr-btn" data-cal="1">→</button>
-      <div class="jr-cal-sum">Neto <b class="${signCls(st.net)}">${sUsd(st.net)}</b> · ${st.n} op. · winrate ${pct(st.winrate)} · <span class="${signCls(st.ret)}">${sPct(st.ret)}</span> sobre ${usd(capitalFor(monthKey(first)), 0)}</div>
+      <div class="jr-cal-sum">Neto <b class="${signCls(st.net)}">${sUsd(st.net)}</b> · ${st.n} op. · winrate ${pct(st.winrate)}</div>
     </div>
     <div class="jr-cal">${WEEKDAYS.map(w => `<div class="jr-cal-wd">${w}</div>`).join('')}<div class="jr-cal-wd">Total</div>${cells}</div>
     <p class="jr-muted jr-xs">Toca un día para ver sus operaciones. El calendario respeta los filtros de par, lado, origen, setup y etiqueta (no el de fechas).</p>`;
@@ -703,9 +701,9 @@ function paneAnual(){
     <div class="jr-grid2">
       ${card('P&L por mes', barChart(rows.map(r => ({ label: MONTHS_S[r.m], value: r.st.net, tip: r.st.n + ' op. · ' + sUsd(r.st.net) }))))}
       ${card('P&L acumulado del año', lineChart([{ y: 0, label: '' }].concat(cumItems), { h: 220, area: true, areaBase: 0, zero: true }))}
-      ${card('Detalle mes a mes', `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Mes${helpBtn('Mes')}</th><th>Op.${helpBtn('Op.')}</th><th>Winrate${helpBtn('Winrate')}</th><th>Profit factor${helpBtn('Profit factor')}</th><th>Capital inicial${helpBtn('Capital inicial')}</th><th>P&L neto${helpBtn('P&L neto')}</th><th>Rentab.${helpBtn('Rentab.')}</th><th>Mejor día${helpBtn('Mejor día')}</th><th>Peor día${helpBtn('Peor día')}</th><th>Max DD${helpBtn('Max DD')}</th></tr></thead><tbody>
-        ${rows.map(r => `<tr class="${r.st.n ? 'jr-row' : 'jr-dim'}" ${r.st.n ? `data-month="${r.m}"` : ''}><td>${r.name[0].toUpperCase() + r.name.slice(1)}</td><td>${r.st.n}</td><td>${pct(r.st.winrate)}</td><td>${Number.isFinite(r.st.pf) ? r.st.pf.toFixed(2) : '—'}</td><td>${usd(r.cap, 0)}</td>
-          <td class="${signCls(r.st.net)}"><b>${r.st.n ? sUsd(r.st.net) : '—'}</b></td><td class="${signCls(r.st.ret)}">${r.st.n ? sPct(r.st.ret) : '—'}</td>
+      ${card('Detalle mes a mes', `<div class="jr-table-wrap"><table class="jr-table"><thead><tr><th>Mes${helpBtn('Mes')}</th><th>Op.${helpBtn('Op.')}</th><th>Winrate${helpBtn('Winrate')}</th><th>Profit factor${helpBtn('Profit factor')}</th><th>P&L neto${helpBtn('P&L neto')}</th><th>Mejor día${helpBtn('Mejor día')}</th><th>Peor día${helpBtn('Peor día')}</th><th>Max DD${helpBtn('Max DD')}</th></tr></thead><tbody>
+        ${rows.map(r => `<tr class="${r.st.n ? 'jr-row' : 'jr-dim'}" ${r.st.n ? `data-month="${r.m}"` : ''}><td>${r.name[0].toUpperCase() + r.name.slice(1)}</td><td>${r.st.n}</td><td>${pct(r.st.winrate)}</td><td>${Number.isFinite(r.st.pf) ? r.st.pf.toFixed(2) : '—'}</td>
+          <td class="${signCls(r.st.net)}"><b>${r.st.n ? sUsd(r.st.net) : '—'}</b></td>
           <td class="jr-pos">${r.bestDay != null ? sUsd(r.bestDay) : '—'}</td><td class="jr-neg">${r.worstDay != null ? sUsd(r.worstDay) : '—'}</td><td class="jr-neg">${r.st.n ? usd(-r.st.maxDD) : '—'}</td></tr>`).join('')}
       </tbody></table></div><p class="jr-muted jr-xs">Toca un mes para abrirlo en el calendario.</p>`, 'jr-span2')}
     </div>`;
@@ -740,21 +738,10 @@ function paneAjustes(){
         </form>
         <p class="jr-muted jr-xs">La clave se guarda cifrada en el servidor: ni esta página ni nadie más la puede volver a leer. Puedes desconectarla cuando quieras.</p>`}
       <div class="jr-msg" id="jrSyncMsg"></div>`)}
-    ${card('Capital', S.exchangeConnected ? `
-      <p class="jr-muted">Tu saldo inicial de cada mes se detecta solo desde tu cuenta de Bitunix conectada - no hay que escribirlo a mano.</p>
-      ${months.length ? `<table class="jr-table jr-compact" style="margin-top:12px"><tbody>${months.map(mk => `<tr><td>${MONTHS[Number(mk.slice(5)) - 1]} ${mk.slice(0, 4)}</td><td>${usd(S.capitalByMonth[mk])}</td></tr>`).join('')}</tbody></table>` : `<p class="jr-muted jr-xs">Todavía no se ha registrado - se guarda solo en la próxima sincronización.</p>`}`
-    : `
-      <p class="jr-muted">Se usa para calcular la rentabilidad % y el drawdown %. Puedes poner un capital distinto para cada mes (por ejemplo si depositas o retiras).</p>
-      <form id="jrCapForm" class="jr-form-grid">
-        <label class="jr-span2">Capital inicial por defecto (USD)<input type="number" id="jrDefCap" min="1" step="0.01" value="${S.settings.default_capital}"></label>
-        <div class="jr-span2 jr-row-btns"><button type="submit" class="jr-btn jr-btn-primary">Guardar</button><span class="jr-msg" id="jrCapMsg"></span></div>
-      </form>
-      <form id="jrMonthCapForm" class="jr-form-grid" style="margin-top:14px">
-        <label>Mes<input type="month" id="jrCapMonth" value="${monthKey(new Date())}" required></label>
-        <label>Capital inicial (USD)<input type="number" id="jrCapMonthVal" min="1" step="0.01" required></label>
-        <div class="jr-span2 jr-row-btns"><button type="submit" class="jr-btn">Guardar capital del mes</button></div>
-      </form>
-      ${months.length ? `<table class="jr-table jr-compact" style="margin-top:12px"><tbody>${months.map(mk => `<tr><td>${MONTHS[Number(mk.slice(5)) - 1]} ${mk.slice(0, 4)}</td><td>${usd(S.capitalByMonth[mk])}</td><td><button type="button" class="jr-link" data-delcap="${mk}">Quitar</button></td></tr>`).join('')}</tbody></table>` : ''}`)}
+    ${card('Capital', `
+      <p class="jr-muted">La detección automática de tu saldo real desde Bitunix todavía no cuenta bien lo que tienes en posiciones abiertas, así que por ahora la Bitácora <b>no usa ningún saldo</b> para sus números - el P&L, winrate, profit factor, drawdown en dólares y todo lo demás ya son exactos sin necesitarlo.</p>
+      ${months.length ? `<p class="jr-muted jr-xs" style="margin-top:10px">Valores guardados mientras se corrige esto (no se están usando en ningún lado todavía):</p><table class="jr-table jr-compact" style="margin-top:6px"><tbody>${months.map(mk => `<tr><td>${MONTHS[Number(mk.slice(5)) - 1]} ${mk.slice(0, 4)}</td><td>${usd(S.capitalByMonth[mk])}</td></tr>`).join('')}</tbody></table>` : ''}
+    `)}
   </div>`;
 }
 
