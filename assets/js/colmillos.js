@@ -1655,6 +1655,15 @@ document.getElementById('colmillosShopSubtabs').addEventListener('click', (e) =>
    interferir con su propio manejo de historial. Siempre arranca en la pantalla de "JUGAR" -
    como un cabinet de arcade de verdad, no se salta directo al contenido ---- */
 function showColmillosPage(initialSlug){
+  // Sharkoins en actualizacion (tienda y otras partes en rediseño) - mismo candado de
+  // "en construccion" que ya usa Rango de Manada (WIP_OWNER_ONLY_CATEGORIES, index.html). Se
+  // revisa aca mismo porque este es el UNICO punto por el que entran las 3 formas de llegar a
+  // esta pagina: la pildora de saldo del header, el boton "Cambiar imagen" del perfil, y un
+  // link directo a /sharkoins.
+  if(typeof isWipLockedForCurrentUser === 'function' && isWipLockedForCurrentUser('sharkoins')){
+    if(typeof showWipToast === 'function') showWipToast('🔒 Estamos actualizando Sharkoins — vuelve pronto.');
+    return;
+  }
   // recibe el PEDAZO DE URL (ej. "ayuda"), no el nombre interno de la pestaña - asi
   // applyRoute (en index.html, que puede ejecutarse antes de que este script cargue, al ser
   // defer) no necesita conocer COLM_SLUG_TO_TAB, solo reenviar el segmento de la ruta tal

@@ -9933,12 +9933,14 @@ function renderCatPillTabs(cat){
     }, 300);
   }
 }
-// cajitas marcadas "PRÓXIMAMENTE" que Juan quiere seguir probando el antes de abrirlas a toda
-// la comunidad - mientras un data-category este en esta lista, SOLO las cuentas de
+// cajitas/paginas marcadas "en construccion" que Juan quiere seguir probando antes de abrirlas
+// a toda la comunidad - mientras una clave este en esta lista, SOLO las cuentas de
 // WIP_UNLOCKED_USER_IDS pueden entrar, sin importar si alguien ya cumple el rango/volumen: el
 // candado es por estado de construccion, no por permiso ganado. Se revisa aca mismo (no solo al
-// hacer clic en la cajita) para que tambien bloquee un link directo a la ruta.
-const WIP_OWNER_ONLY_CATEGORIES = ['rangos'];
+// hacer clic en la cajita) para que tambien bloquee un link directo a la ruta. 'rangos' es un
+// data-category real; 'sharkoins' es una clave propia (Sharkoins no vive en el sistema de
+// categorias) usada igual por showColmillosPage - Juan va a rehacer la tienda y otras partes.
+const WIP_OWNER_ONLY_CATEGORIES = ['rangos', 'sharkoins'];
 const WIP_UNLOCKED_USER_IDS = [
   'e4309251-6078-4233-aab3-6ab8d6c624e1', // Juan (dueño)
   '7fc2bf39-44e5-4055-aacb-e9f88bff6adc', // Jeison Velandia - probador de Rango de Manada
