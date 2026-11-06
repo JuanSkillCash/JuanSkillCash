@@ -2389,39 +2389,22 @@ img[src=""]{display:none}
   --hero-grafico-color:#ff2f4f;
 }
 .hero-mascot-imgwrap, .hero-mascot-text{position:relative;z-index:1}
-/* fondo del hero: rayos de luz bajo el agua (franjas difusas que se mecen despacio, un poco
-   notorio el movimiento - no imperceptible) + una bolita de resplandor chiquita que da vueltas
-   MUY despacio, con una ruta larga e irregular (no una elipse simple) para que no parezca
-   siempre el mismo recorrido, y SIN bajar de la zona de los hombros del tiburon (su imagen se
-   desvanece a partir de la mitad hacia abajo - mask-image mas abajo - asi que la bolita no pasa
-   por ahi). Reemplaza intentos anteriores (ver docs/referencia-competencia-mlp.md seccion
-   "cryptobruj.com" punto 5). */
-.hero-rayos{
-  position:absolute;z-index:0;inset:0;pointer-events:none;overflow:hidden;
-  -webkit-mask-image:radial-gradient(ellipse 70% 90% at 80% 50%, #000 30%, transparent 78%);
-          mask-image:radial-gradient(ellipse 70% 90% at 80% 50%, #000 30%, transparent 78%);
-}
-.hero-rayos i{
-  position:absolute;top:-40%;height:180%;width:12%;
-  background:linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--hero-grafico-color) 50%, transparent) 50%, transparent 100%);
-  filter:blur(13px);transform:rotate(13deg);
-}
-.hero-rayos i:nth-child(1){ left:48%; opacity:.16; }
-.hero-rayos i:nth-child(2){ left:68%; width:9%; opacity:.11; }
-.hero-rayos i:nth-child(3){ left:32%; width:8%; opacity:.08; }
-.hero-orbe{
-  position:absolute;z-index:0;left:10%;top:15%;width:28px;height:28px;border-radius:50%;
+/* fondo del hero: quitadas las "luces de profundidad" (rayos) - Juan solo quiso quedarse con la
+   bolita de resplandor chiquita (su propia palabra: "la mosca que se mueve") y pidio 2 mas.
+   Las 3 dan vueltas MUY despacio, cada una con su propia ruta irregular y velocidad (para que no
+   se vean sincronizadas ni repitiendo la misma forma), y SIN bajar de la zona de los hombros del
+   tiburon (su imagen se desvanece a partir de la mitad hacia abajo - mask-image en
+   .hero-mascot-imgwrap img - asi que ninguna pasa por ahi). Reemplaza intentos anteriores (ver
+   docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5). */
+.hero-orbe, .hero-orbe2, .hero-orbe3{
+  position:absolute;z-index:0;width:28px;height:28px;border-radius:50%;
   pointer-events:none;filter:blur(7px);
   background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%);
 }
+.hero-orbe{ left:10%; top:15%; }
+.hero-orbe2{ left:60%; top:8%; width:20px; height:20px; }
+.hero-orbe3{ left:35%; top:30%; width:23px; height:23px; }
 @media(prefers-reduced-motion:no-preference){
-  .hero-rayos i{ animation:hero-rayo-mov 10s ease-in-out infinite; }
-  .hero-rayos i:nth-child(2){ animation-duration:13s; animation-delay:-3s; }
-  .hero-rayos i:nth-child(3){ animation-duration:11.5s; animation-delay:-6s; }
-  @keyframes hero-rayo-mov{
-    0%,100%{ transform:rotate(13deg) translateX(0); }
-    50%{ transform:rotate(7deg) translateX(22px); }
-  }
   .hero-orbe{ animation:hero-orbita 38s ease-in-out infinite; }
   @keyframes hero-orbita{
     0%{ left:8%; top:10%; }
@@ -2432,6 +2415,25 @@ img[src=""]{display:none}
     71%{ left:32%; top:33%; }
     85%{ left:14%; top:20%; }
     100%{ left:8%; top:10%; }
+  }
+  .hero-orbe2{ animation:hero-orbita2 29s ease-in-out infinite; }
+  @keyframes hero-orbita2{
+    0%{ left:70%; top:6%; }
+    20%{ left:40%; top:18%; }
+    40%{ left:18%; top:9%; }
+    60%{ left:30%; top:34%; }
+    80%{ left:62%; top:28%; }
+    100%{ left:70%; top:6%; }
+  }
+  .hero-orbe3{ animation:hero-orbita3 45s ease-in-out infinite; }
+  @keyframes hero-orbita3{
+    0%{ left:20%; top:32%; }
+    16%{ left:50%; top:12%; }
+    33%{ left:78%; top:22%; }
+    50%{ left:60%; top:5%; }
+    66%{ left:40%; top:28%; }
+    83%{ left:10%; top:16%; }
+    100%{ left:20%; top:32%; }
   }
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
@@ -3539,8 +3541,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
 
     <div class="hero-mascot">
-      <div class="hero-rayos" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="hero-orbe" aria-hidden="true"></div>
+      <div class="hero-orbe2" aria-hidden="true"></div>
+      <div class="hero-orbe3" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
         <div class="hero-mascot-tint" aria-hidden="true"></div>
         <img class="hero-mascot-glow" src="/logo-skillcash-1050.webp" alt="" aria-hidden="true">
