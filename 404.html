@@ -52,7 +52,9 @@
   --bg:#090b16;
   --bg2:#0e1321;
   --surface:#141824;
-  --card:#1a202d;
+  --card:#0c0f1c; /* relleno de las cajas de la pagina principal (cat-overview-card) - un
+                     poco mas claro que --bg pero mas oscuro que --bg2, para dar profundidad
+                     sin que se vea "grisaceo" */
   --border:rgba(255,255,255,.07);
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
@@ -1211,7 +1213,7 @@ button{font-family:inherit;color:inherit}
 }
 .cat-overview-banner:not(:has(img)){border:1px solid rgba(91,141,239,.3);margin:0 0 14px;border-radius:12px}
 .cat-overview-banner img{width:100%;height:100%;object-fit:cover;display:block}
-.cat-overview-banner:has(img)::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
+.cat-overview-banner:has(img)::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--card) 0%,rgba(12,15,28,0) 60%)}
 .cat-overview-card.big .cat-overview-banner{height:210px}
 .spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;pointer-events:none;animation:sparkTwinkle 2.6s ease-in-out infinite}
 .cat-overview-preview .spark{box-shadow:0 0 6px 1.5px var(--c)}
@@ -2465,8 +2467,9 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !important; }
 .page-sparks, .spark{ display:none !important; }
 .cat-overview-preview svg, .cat-overview-preview>div>div{ filter:none !important; }
-/* cajas sin relleno: solo el contorno (pedido de Juan - el relleno grisaceo no le gusta) */
-.cat-overview-card, .cat-flip-back{ background:transparent !important; border-color:rgba(91,141,239,.35) !important; }
+/* cajas de la pagina principal con relleno propio (--card) para dar profundidad frente al
+   fondo (pedido de Juan) - antes eran sin relleno, solo contorno; ver CLAUDE.md */
+.cat-overview-card, .cat-flip-back{ background:var(--card) !important; border-color:rgba(91,141,239,.35) !important; }
 .cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
