@@ -2091,7 +2091,8 @@ img[src=""]{display:none}
   letter-spacing:-.02em;font-size:clamp(28px,5vw,52px);color:var(--white);margin:8px 0 36px;
   text-wrap:balance;max-width:720px;
 }
-.site-footer-phrase .acc{ color:var(--red); font-family:'Caveat',cursive; font-weight:700; }
+.site-footer-phrase .acc{ color:var(--red); }
+.site-footer-phrase .acc-cursiva{ color:var(--red); font-family:'Caveat',cursive !important; font-weight:700; font-size:1.15em; letter-spacing:0; }
 .site-footer-cols{position:relative;display:flex;flex-wrap:wrap;gap:36px;margin-bottom:28px}
 .site-footer-col-brand{flex:1 1 220px;min-width:200px;display:flex;flex-direction:column;gap:14px}
 .site-footer-col-email{font-size:12.5px;color:var(--muted2)}
@@ -2388,37 +2389,49 @@ img[src=""]{display:none}
   --hero-grafico-color:#ff2f4f;
 }
 .hero-mascot-imgwrap, .hero-mascot-text{position:relative;z-index:1}
-/* fondo del hero: malla/rejilla con lineas difuminadas (bordes suaves tipo neon apagado, no
-   lineas nitidas) + una bolita de resplandor chiquita (tamano de una "O" del titulo) que orbita
-   lento por toda la zona, como un animalito que se mueve. Reemplaza intentos anteriores (ver
-   docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5). Todo muy tenue/blureado
-   a proposito para que se sienta "al fondo" y no choque con el tiburon ni el titulo. */
-.hero-malla{
-  position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.22;filter:blur(2.5px);
-  background-image:
-    repeating-linear-gradient(0deg, var(--hero-grafico-color) 0 1px, transparent 1px 34px),
-    repeating-linear-gradient(90deg, var(--hero-grafico-color) 0 1px, transparent 1px 34px);
-  -webkit-mask-image:radial-gradient(ellipse 55% 70% at 85% 50%, #000 25%, transparent 70%);
-          mask-image:radial-gradient(ellipse 55% 70% at 85% 50%, #000 25%, transparent 70%);
+/* fondo del hero: rayos de luz bajo el agua (franjas difusas que se mecen despacio, un poco
+   notorio el movimiento - no imperceptible) + una bolita de resplandor chiquita que da vueltas
+   MUY despacio, con una ruta larga e irregular (no una elipse simple) para que no parezca
+   siempre el mismo recorrido, y SIN bajar de la zona de los hombros del tiburon (su imagen se
+   desvanece a partir de la mitad hacia abajo - mask-image mas abajo - asi que la bolita no pasa
+   por ahi). Reemplaza intentos anteriores (ver docs/referencia-competencia-mlp.md seccion
+   "cryptobruj.com" punto 5). */
+.hero-rayos{
+  position:absolute;z-index:0;inset:0;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:radial-gradient(ellipse 70% 90% at 80% 50%, #000 30%, transparent 78%);
+          mask-image:radial-gradient(ellipse 70% 90% at 80% 50%, #000 30%, transparent 78%);
 }
+.hero-rayos i{
+  position:absolute;top:-40%;height:180%;width:12%;
+  background:linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--hero-grafico-color) 50%, transparent) 50%, transparent 100%);
+  filter:blur(13px);transform:rotate(13deg);
+}
+.hero-rayos i:nth-child(1){ left:48%; opacity:.16; }
+.hero-rayos i:nth-child(2){ left:68%; width:9%; opacity:.11; }
+.hero-rayos i:nth-child(3){ left:32%; width:8%; opacity:.08; }
 .hero-orbe{
   position:absolute;z-index:0;left:10%;top:15%;width:28px;height:28px;border-radius:50%;
   pointer-events:none;filter:blur(7px);
   background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%);
 }
 @media(prefers-reduced-motion:no-preference){
-  .hero-malla{ animation:hero-malla-onda 11s ease-in-out infinite; }
-  @keyframes hero-malla-onda{
-    0%,100%{ background-position:0 0, 0 0; }
-    50%{ background-position:7px 5px, -5px 7px; }
+  .hero-rayos i{ animation:hero-rayo-mov 10s ease-in-out infinite; }
+  .hero-rayos i:nth-child(2){ animation-duration:13s; animation-delay:-3s; }
+  .hero-rayos i:nth-child(3){ animation-duration:11.5s; animation-delay:-6s; }
+  @keyframes hero-rayo-mov{
+    0%,100%{ transform:rotate(13deg) translateX(0); }
+    50%{ transform:rotate(7deg) translateX(22px); }
   }
-  .hero-orbe{ animation:hero-orbita 20s ease-in-out infinite; }
+  .hero-orbe{ animation:hero-orbita 38s ease-in-out infinite; }
   @keyframes hero-orbita{
-    0%{ left:6%; top:12%; }
-    25%{ left:72%; top:6%; }
-    50%{ left:88%; top:62%; }
-    75%{ left:28%; top:78%; }
-    100%{ left:6%; top:12%; }
+    0%{ left:8%; top:10%; }
+    14%{ left:35%; top:26%; }
+    28%{ left:58%; top:8%; }
+    42%{ left:80%; top:30%; }
+    57%{ left:55%; top:14%; }
+    71%{ left:32%; top:33%; }
+    85%{ left:14%; top:20%; }
+    100%{ left:8%; top:10%; }
   }
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
@@ -3526,7 +3539,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
 
     <div class="hero-mascot">
-      <div class="hero-malla" aria-hidden="true"></div>
+      <div class="hero-rayos" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="hero-orbe" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
         <div class="hero-mascot-tint" aria-hidden="true"></div>
@@ -7439,7 +7452,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <span class="telegram-banner-btn">UNIRME</span>
       </a>
 
-      <p class="site-footer-phrase" aria-hidden="true">Todo gratis. <span class="acc">Siempre.</span></p>
+      <p class="site-footer-phrase" aria-hidden="true">Hecho para la <span class="acc-cursiva">Manada</span>. <span class="acc">Gratis.</span></p>
 
       <div class="site-footer-cols">
         <div class="site-footer-col-brand">
