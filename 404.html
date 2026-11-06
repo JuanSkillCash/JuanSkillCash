@@ -1022,7 +1022,7 @@ button{font-family:inherit;color:inherit}
    consistente con el resto del sitio - pero a proposito SIN ninguno de los efectos de esas
    cajas (nada de inclinacion 3D, glow que sigue el mouse, ripple de click, etc.): esto es
    solo una tarjeta quieta, pedido explicito de Juan. */
-.indic-index-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 16px 20px}
+.indic-index-cards{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:14px;padding:0 16px 20px}
 @media(max-width:640px){ .indic-index-cards{grid-template-columns:1fr} }
 .indic-index-card{
   border-radius:14px;border:1px solid var(--border2);overflow:hidden;
@@ -1031,10 +1031,10 @@ button{font-family:inherit;color:inherit}
 .indic-index-card-top{display:flex;align-items:stretch}
 .indic-index-card-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:13px 6px 13px 13px;background:none;border:0;color:var(--white);cursor:pointer;text-align:left;font-family:inherit}
 .indic-index-card-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.indic-index-card-title{font-size:13.5px;font-weight:700;line-height:1.3}
+.indic-index-card-title{font-size:15.5px;font-weight:700;line-height:1.3}
 .indic-index-card-short{font-size:11.5px;color:var(--muted2);line-height:1.4}
-.indic-index-card-chevron{flex-shrink:0;width:38px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--muted2);cursor:pointer}
-.indic-index-card-chevron svg{transition:transform var(--dur-base) var(--ease-out)}
+.indic-index-card-chevron{flex-shrink:0;width:34px;height:34px;margin:auto 12px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted2);cursor:pointer}
+.indic-index-card-chevron svg{width:16px;height:16px;transition:transform var(--dur-base) var(--ease-out)}
 .indic-index-card.open .indic-index-card-chevron svg{transform:rotate(180deg)}
 .indic-index-card-detail{display:none;padding:0 14px 14px}
 .indic-index-card.open .indic-index-card-detail{display:block}
@@ -11620,70 +11620,64 @@ document.querySelectorAll('.sb-item[data-indic-jump]').forEach(item => {
 const CURATED_INDICATORS = ['pisomercado', 'ciclosoporte', 'rsimensual', 'picycle', 'btcxau', 'domratio', 'domall', 'ethlogreg', 'ethvwap', 'total2', 'others', 'altfever', 'ma4y', 'ethvsalt'];
 // descripcion corta (1 linea) de cada indicador para el Indice de Indicadores - ver renderIndicIndexList()
 const INDIC_DESC = {
-  bitcoinguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  whitepaper: 'El documento original de Satoshi Nakamoto, para quien quiera ir a la fuente.',
-  halving: 'Dónde estamos en el ciclo de 4 años, y qué suele venir después.',
-  btcmacro: 'Cómo se mueve BTC frente a las decisiones de la Fed y los datos económicos.',
-  pisomercado: 'El ritmo de fondo del mercado, para no confundir ruido con tendencia.',
-  rsimensual: 'Qué tan sobrecomprado o sobrevendido está BTC, mes a mes.',
-  ciclosoporte: 'El techo del ciclo anterior, que hoy suele actuar como soporte.',
-  rainbow: 'Bandas de colores que ubican el precio dentro de su tendencia histórica de largo plazo.',
-  picycle: 'Un cruce de medias móviles que ha marcado techos de ciclo con buena puntería.',
-  ma4y: 'La media móvil de 4 años, para ver la tendencia de fondo sin el ruido diario.',
-  ema200: 'La media móvil de 200 semanas, el soporte de largo plazo más vigilado de BTC.',
-  treasuries: 'Cuánto BTC acumulan las empresas que lo tienen en su balance.',
-  govtreasuries: 'Cuánto BTC tienen acumulado los gobiernos del mundo.',
-  btcxau: 'El precio de BTC medido en onzas de oro, no en dólares.',
-  btcaapl: 'Cómo le ha ido a BTC frente a una acción tradicional como Apple.',
-  btcreturns: 'Los retornos históricos de BTC, mes a mes y año a año.',
-  sthmvrv: 'Si los compradores recientes están en ganancia o en pérdida, en promedio.',
-  treascb: 'El precio promedio al que compraron las instituciones que tienen BTC.',
-  epochpl: 'Qué porcentaje del supply está en pérdida, comparado con ciclos pasados.',
-  ethereumguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  ethlogreg: 'Canal de precio en escala logarítmica para ubicar extremos históricos.',
-  ethvwap: 'El precio promedio ponderado desde un punto de referencia clave.',
-  ethpmi: 'Cómo se mueve ETH frente a la actividad manufacturera global.',
-  ethreturns: 'Los retornos históricos de ETH, mes a mes y año a año.',
-  tradingguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  cbpremium: 'Si Coinbase paga más o menos que el resto — una pista de demanda institucional.',
-  longshort: 'Cuántos traders apuestan al alza contra cuántos apuestan a la baja.',
-  optionsoi: 'Cuánto dinero hay abierto en opciones, y en qué precios se concentra.',
-  delistradar: 'Qué monedas están siendo retiradas de los exchanges, antes de que te tome por sorpresa.',
-  newlistradar: 'Las monedas más recientes en listarse en los exchanges grandes.',
-  tvchart: 'Un gráfico completo de TradingView para analizar a tu manera.',
-  fng: 'Qué tan extremo está el sentimiento del mercado hoy.',
-  btctrends: 'Cuánta gente está buscando Bitcoin en Google ahora mismo.',
-  cryptobubbles: 'Todo el mercado cripto de un vistazo — el tamaño de cada burbuja es su capitalización.',
-  macroguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  dxy: 'La fuerza del dólar frente a otras monedas — cuando sube, suele presionar a cripto.',
-  pmius: 'Si la industria de EEUU está creciendo o contrayéndose.',
-  payrolls: 'Cuántos empleos nuevos creó EEUU el mes pasado.',
-  unrate: 'El porcentaje de la fuerza laboral de EEUU que está sin empleo.',
-  icsa: 'Las solicitudes nuevas de desempleo, semana a semana.',
-  cpi: 'La inflación oficial de EEUU, con y sin alimentos y energía.',
-  cpiyoy: 'Cuánto ha subido el costo de vida comparado con hace un año.',
-  pce: 'La medida de inflación que más vigila la Reserva Federal.',
-  ppi: 'La inflación que pagan las empresas antes de que llegue al consumidor.',
-  fedfundsrate: 'La tasa de interés que fija la Fed, el dato que mueve todos los mercados.',
-  m2supply: 'Cuánto dinero hay circulando en la economía — más M2 suele ser bueno para los activos de riesgo.',
-  vixindex: 'El índice del miedo en los mercados tradicionales.',
-  netliquidity: 'Cuánto efectivo real tiene disponible el sistema financiero.',
-  gdpgrowth: 'Si la economía de EEUU está creciendo o encogiéndose.',
-  fedbalance: 'Cuántos activos tiene acumulados la Reserva Federal en su balance.',
-  econcalendar: 'Las próximas publicaciones económicas importantes, para saber qué viene.',
-  dominanciaguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  domratio: 'Si el dinero está rotando hacia ETH o hacia BTC en este momento.',
-  domall: 'Qué tan repartido está el mercado entre BTC, ETH y el resto de monedas.',
-  dombtc: 'Qué porcentaje de todo el mercado cripto representa Bitcoin.',
-  domusdt: 'Qué tanto dinero está parqueado en stablecoins, esperando entrar al mercado.',
-  ethbtc: 'Si ETH le está ganando o perdiendo terreno a Bitcoin.',
-  altcoinsguia: 'Para entender los gráficos de esta categoría antes de usarlos.',
-  othersbtc: 'Cómo le va al resto de altcoins (sin BTC ni ETH) frente a Bitcoin.',
-  altfever: 'Qué tan caliente está la temporada de altcoins en este momento.',
-  ethvsalt: 'Si ETH está caro o barato comparado con el resto de altcoins.',
-  total2: 'La capitalización de todo el mercado cripto, sin contar a Bitcoin.',
-  others: 'La capitalización del resto de altcoins, sin contar BTC ni ETH.',
-  macroguia: 'Qué significa cada indicador macro cuando sube o cuando baja, y qué pasa cuando combinas dos a la vez.',
+  whitepaper: 'El documento original de Satoshi Nakamoto, de 2008, donde se presentó Bitcoin por primera vez. Para quien quiera ir a la fuente en vez de quedarse con la versión de segunda mano.',
+  halving: 'Cada 4 años (cada 210.000 bloques) la recompensa de minar un bloque se parte a la mitad, lo que reduce la nueva oferta de BTC. Históricamente, después de cada halving ha venido una subida fuerte de precio, aunque con meses de rezago.',
+  btcmacro: 'Pone el precio de BTC al lado de las decisiones de la Fed y los datos económicos de EEUU, para ver si realmente se mueve junto con ellos. Útil para saber si BTC se está comportando como "oro digital" o más como un activo de riesgo tradicional.',
+  pisomercado: 'El ritmo de fondo del mercado, pensado para no confundir un rebote de corto plazo con un verdadero cambio de tendencia. Ayuda a separar el ruido diario del movimiento real de fondo.',
+  rsimensual: 'Qué tan sobrecomprado o sobrevendido está BTC, calculado mes a mes en vez de día a día. Al ser mensual, filtra el ruido de corto plazo y suele marcar mejor los extremos de ciclo.',
+  ciclosoporte: 'El techo del ciclo alcista anterior, que en ciclos pasados ha terminado actuando como soporte una vez el precio lo vuelve a tocar desde arriba. Sirve como referencia de "piso" en la siguiente fase del mercado.',
+  rainbow: 'Bandas de colores (del rojo al verde) que ubican el precio dentro de su tendencia histórica de largo plazo. Cuando el precio entra en las bandas rojas se ha asociado con zonas de euforia; en las azules/verdes, con zonas de oportunidad.',
+  picycle: 'Un cruce entre dos medias móviles (111 y 350 días) que ha coincidido con los techos de los ciclos alcistas anteriores de Bitcoin con buena puntería histórica. No predice el futuro, pero es una señal de alerta que vale la pena vigilar cerca de máximos.',
+  ma4y: 'La media móvil de 4 años, que suaviza por completo el ruido diario y muestra la tendencia de fondo real de Bitcoin. Al cubrir un ciclo completo de halving, ayuda a ver si el precio sigue por encima o por debajo de su propia tendencia de largo plazo.',
+  ema200: 'La media móvil exponencial de 200 semanas, el soporte de largo plazo más vigilado de Bitcoin. En toda su historia, el precio casi nunca ha cerrado una semana por debajo de esta línea — cuando se acerca, suele generar atención de compradores de largo plazo.',
+  treasuries: 'Cuánto BTC acumulan las empresas que lo guardan como parte de su tesorería (balance corporativo), con el ranking de las que más tienen. Es una forma de medir la adopción institucional real, no solo el discurso.',
+  govtreasuries: 'Cuánto BTC tienen acumulado los gobiernos del mundo, ya sea por compra directa o por decomisos. Un monto grande "dormido" en manos de un gobierno puede convertirse en oferta repentina si deciden venderlo.',
+  btcxau: 'El precio de Bitcoin medido en onzas de oro, en vez de en dólares. Sirve para ver si BTC le está ganando o perdiendo terreno al activo de refugio más tradicional, sin que la inflación del dólar distorsione la comparación.',
+  btcaapl: 'Compara el desempeño de BTC contra el de una acción tradicional de referencia como Apple, en el mismo periodo de tiempo. Útil para ver si Bitcoin realmente le ha ganado a "quedarse en acciones" o si es más percepción que realidad.',
+  btcreturns: 'Los retornos históricos de BTC, organizados mes a mes y año a año, para ver patrones estacionales (por ejemplo, si septiembre tiende a ser flojo). No es garantía de que se repita, pero da contexto antes de operar.',
+  sthmvrv: 'Mide si los compradores recientes (semanas o meses, no años) están en ganancia o en pérdida en promedio sobre lo que pagaron. Cuando la mayoría está en pérdida profunda suele coincidir con capitulación; en ganancia extrema, con euforia de corto plazo.',
+  treascb: 'El precio promedio al que compraron las instituciones que hoy tienen BTC en su balance — su "costo base" real. Sirve como un soporte psicológico: muchas instituciones no sueltan sus posiciones si el precio sigue por encima de lo que pagaron.',
+  epochpl: 'Qué porcentaje de todas las monedas en circulación están en pérdida ahora mismo, comparado con el mismo punto de ciclos pasados. Un porcentaje alto suele coincidir con fondos de mercado; uno muy bajo, con euforia.',
+  ethlogreg: 'Un canal de precio dibujado en escala logarítmica (no lineal), que ayuda a ubicar los extremos históricos de ETH sin que los movimientos antiguos se vean aplastados por los recientes. Útil para ver qué tan "caro" o "barato" está el precio dentro de su propia historia.',
+  ethvwap: 'El precio promedio de ETH ponderado por volumen, calculado desde un punto de referencia clave (como un máximo o mínimo importante). Muestra a qué precio promedio se ha estado operando realmente desde ese punto, no solo dónde cerró el precio.',
+  ethpmi: 'Pone el precio de ETH al lado del PMI manufacturero global, el indicador que mide si la actividad industrial del mundo está creciendo o contrayéndose. Sirve para ver si ETH reacciona a la economía real tanto como reacciona a las noticias cripto.',
+  ethreturns: 'Los retornos históricos de ETH, mes a mes y año a año, para detectar patrones estacionales propios (distintos a los de BTC). Da contexto histórico antes de tomar una posición.',
+  cbpremium: 'La diferencia entre el precio de BTC en Coinbase (más usado por inversionistas de EEUU) y en exchanges internacionales. Cuando Coinbase paga más, suele leerse como una señal de demanda institucional entrando desde EEUU.',
+  longshort: 'Cuántos traders tienen posiciones apostando al alza (long) contra cuántos apuestan a la baja (short) en ese momento. Una proporción muy desbalanceada de un lado suele preceder una liquidación en cadena hacia el lado contrario.',
+  optionsoi: 'Cuánto dinero hay abierto en contratos de opciones y en qué precios (strikes) se concentra. Los precios con mayor interés abierto suelen actuar como imanes o barreras para el precio cerca de su vencimiento.',
+  delistradar: 'Qué monedas están siendo retiradas de los exchanges grandes, para enterarte antes de que te tome por sorpresa con fondos atrapados. Se revisa constantemente contra los anuncios oficiales de cada exchange.',
+  newlistradar: 'Las monedas más recientes en listarse en los exchanges grandes, para detectar oportunidades (y riesgos) apenas se abren a trading. Un listado nuevo suele traer volatilidad fuerte en ambas direcciones.',
+  tvchart: 'Un gráfico completo de TradingView, con todas sus herramientas de dibujo e indicadores, para analizar cualquier mercado a tu manera. Útil cuando ya sabes lo que buscas y solo necesitas el lienzo.',
+  fng: 'Qué tan extremo está el sentimiento del mercado hoy, en una escala de miedo extremo a codicia extrema. Los extremos (en cualquiera de los dos lados) históricamente han sido mejores momentos para actuar en contra de la multitud que para seguirla.',
+  btctrends: 'Cuánta gente está buscando "Bitcoin" en Google ahora mismo, comparado con su propio promedio histórico. Picos de búsqueda suelen coincidir con el público general entrando tarde a un movimiento que ya lleva rato corriendo.',
+  cryptobubbles: 'Todo el mercado cripto de un vistazo, donde el tamaño de cada burbuja representa su capitalización de mercado y el color su desempeño reciente. Rápido para ver qué está liderando el mercado hoy sin revisar moneda por moneda.',
+  dxy: 'La fuerza del dólar estadounidense frente a una canasta de otras monedas fuertes. Cuando el dólar sube con fuerza, suele presionar a la baja a los activos de riesgo (incluido cripto), y viceversa.',
+  pmius: 'Si la industria manufacturera de EEUU está creciendo o contrayéndose, medido con encuestas a gerentes de compra. Por debajo de 50 se considera contracción; por encima, expansión — un termómetro adelantado de la economía real.',
+  payrolls: 'Cuántos empleos nuevos (fuera del sector agrícola) creó EEUU el mes pasado. Es uno de los datos que más mueve los mercados: sorpresas fuertes en cualquier dirección suelen generar volatilidad inmediata en cripto también.',
+  unrate: 'El porcentaje de la fuerza laboral de EEUU que está sin empleo mientras lo busca activamente. Una tasa que sube rápido suele ser señal temprana de que la economía se está enfriando.',
+  icsa: 'Las solicitudes nuevas de desempleo en EEUU, reportadas cada semana — un dato más rápido de reaccionar que el reporte mensual de empleo. Varias semanas seguidas al alza suelen anticipar un deterioro mayor en el mercado laboral.',
+  cpi: 'La inflación oficial de EEUU, mostrada tanto general como "núcleo" (sin alimentos ni energía, que son más volátiles). Es uno de los datos que más mueve las expectativas de tasas de interés de la Fed.',
+  cpiyoy: 'Cuánto ha subido el costo de vida en EEUU comparado con el mismo mes del año anterior. Es la forma más común de hablar de "la inflación" en las noticias.',
+  pce: 'La medida de inflación que más vigila la Reserva Federal para decidir sobre las tasas de interés, incluso por encima del CPI. Suele moverse parecido al CPI pero con metodología distinta, así que a veces discrepan.',
+  ppi: 'La inflación que pagan las empresas por sus insumos, antes de que ese costo (si se traslada) llegue al consumidor final. Sirve como un adelanto de hacia dónde podría ir el CPI en los meses siguientes.',
+  fedfundsrate: 'La tasa de interés de referencia que fija la Reserva Federal, el dato individual que más mueve todos los mercados financieros del mundo. Tasas más altas suelen presionar a la baja a los activos de riesgo; tasas más bajas, al alza.',
+  m2supply: 'Cuánto dinero en sentido amplio (efectivo, cuentas corrientes, ahorros, fondos de corto plazo) hay circulando en la economía de EEUU. Más M2 creciendo rápido suele ser un viento a favor para los activos de riesgo, incluido cripto.',
+  vixindex: 'El "índice del miedo" de los mercados tradicionales, que mide la volatilidad esperada del S&P 500. Picos fuertes del VIX suelen coincidir con ventas de pánico en todos los mercados de riesgo, cripto incluido.',
+  netliquidity: 'Una estimación de cuánto efectivo real tiene disponible el sistema financiero de EEUU para fluir hacia activos de riesgo (balance de la Fed menos cuentas del Tesoro y repos inversos). Cuando esta liquidez sube, históricamente ha coincidido con subidas en cripto y acciones.',
+  gdpgrowth: 'Si la economía de EEUU está creciendo o encogiéndose, medido trimestre a trimestre. Dos trimestres seguidos en contracción es la definición técnica más común de recesión.',
+  fedbalance: 'Cuántos activos (bonos, hipotecas) tiene acumulados la Reserva Federal en su balance. Cuando el balance crece, se está inyectando liquidez al sistema; cuando se reduce (quantitative tightening), se está retirando.',
+  econcalendar: 'Las próximas publicaciones económicas importantes de EEUU y la Eurozona, con fecha y hora exacta, para saber qué dato viene y cuándo puede mover el mercado. Filtrado a los eventos que más suelen afectar a cripto.',
+  domratio: 'Si el dinero dentro de cripto está rotando hacia ETH o hacia BTC en este momento, comparando sus dominancias. Suele usarse para detectar los cambios de "temporada" entre Bitcoin y el resto del mercado.',
+  domall: 'Qué tan repartido está el mercado entre BTC, ETH y el resto de las monedas (un mapa de descompresión de dominancia). Cuando BTC y ETH pierden dominancia a la vez, suele ser señal de que el dinero se está esparciendo hacia altcoins.',
+  dombtc: 'Qué porcentaje de toda la capitalización del mercado cripto representa Bitcoin. Cuando sube, el mercado suele estar en "temporada de Bitcoin"; cuando baja con fuerza, suele ser temporada de altcoins.',
+  domusdt: 'Qué tanto dinero dentro de cripto está parqueado en stablecoins como USDT, en vez de en BTC, ETH u otras monedas. Un aumento fuerte puede significar que hay capital esperando a entrar (o que acaba de salir asustado).',
+  ethbtc: 'Si ETH le está ganando o perdiendo terreno a Bitcoin, midiendo el precio de uno en términos del otro directamente. Es la forma más simple de ver cuál de los dos lidera el mercado en un periodo dado.',
+  othersbtc: 'Cómo le va al resto de altcoins (sin contar BTC ni ETH) frente a Bitcoin. Sirve para ver si el apetito por riesgo dentro de cripto se está moviendo más allá de las dos monedas más grandes.',
+  altfever: 'Qué tan caliente está la temporada de altcoins en este momento, combinando varias señales de rotación de capital. Entre más alto, más probable que el dinero esté saliendo de BTC/ETH hacia monedas más pequeñas y volátiles.',
+  ethvsalt: 'Si ETH está caro o barato comparado con el resto de altcoins en este momento, no solo contra BTC. Ayuda a decidir si conviene rotar capital hacia ETH o hacia otras monedas más pequeñas.',
+  total2: 'La capitalización de todo el mercado cripto, sin contar a Bitcoin — una forma de ver "el resto del mercado" como un solo bloque. Su media móvil de 200 ayuda a ver la tendencia de fondo de las altcoins en conjunto.',
+  others: 'La capitalización del resto de altcoins, sin contar ni BTC ni ETH — el mercado "small-cap" de cripto como un solo bloque. Suele ser la parte más volátil del mercado, en ambas direcciones.',
+  macroguia: 'Qué significa cada indicador macro cuando sube o cuando baja, con una tarjeta por indicador y un combinador para cruzar dos a la vez ("¿qué pasa si el dólar sube y la Fed baja tasas?"). Pensada para entender la relación entre estos datos antes de solo mirar el número.',
 };
 // descripcion cortita (4-5 palabras) para cuando la tarjeta esta cerrada - la de arriba
 // (INDIC_DESC) se usa como la descripcion larga, al desplegar
