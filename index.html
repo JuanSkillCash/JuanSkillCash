@@ -1010,16 +1010,38 @@ button{font-family:inherit;color:inherit}
 .indic-index-depth-rail{width:14px;flex-shrink:0;background:var(--bg2);display:flex;justify-content:center}
 .indic-index-depth-rail::after{content:'';width:2px;margin:20px 0;border-radius:2px;background:linear-gradient(180deg,#22d3ee 0%,#7c7ff5 50%,#a855f7 100%)}
 .indic-index-depth-body{flex:1;display:flex;flex-direction:column;min-width:0}
-.indic-index-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:20px 16px 8px}
+.indic-index-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:26px 16px 12px}
 .indic-index-header:first-child{padding-top:16px}
-.indic-index-header-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.indic-index-header-label{font-family:'Poppins',sans-serif !important;font-size:21px;font-weight:800;letter-spacing:-.01em;text-transform:none}
 .indic-index-header-zone{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.03em}
-.indic-index-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:transparent;border:0;border-top:1px solid var(--border);color:var(--white);cursor:pointer;text-align:left;font-family:inherit;width:100%;transition:background var(--dur-base) var(--ease-out)}
-.indic-index-row:hover{background:rgba(255,255,255,.03)}
 .indic-index-row-icon{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center}
-.indic-index-row-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.indic-index-row-title{font-size:13.5px;font-weight:600;line-height:1.3}
-.indic-index-row-desc{font-size:11.5px;color:var(--muted2);line-height:1.4}
+/* tarjetas del Indice de Indicadores (antes era una lista plana de filas separadas por una
+   linea delgada - Juan pidio pasarlo a tarjetas separadas en 2 columnas, estilo cryptobruj,
+   SIN tocar el riel/degrade de "profundidad" ni el banner de arriba, que siguen igual).
+   Mismo fondo degradado que las cajas de la portada (.cat-overview-card) para que se sienta
+   consistente con el resto del sitio - pero a proposito SIN ninguno de los efectos de esas
+   cajas (nada de inclinacion 3D, glow que sigue el mouse, ripple de click, etc.): esto es
+   solo una tarjeta quieta, pedido explicito de Juan. */
+.indic-index-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 16px 20px}
+@media(max-width:640px){ .indic-index-cards{grid-template-columns:1fr} }
+.indic-index-card{
+  border-radius:14px;border:1px solid var(--border2);overflow:hidden;
+  background:radial-gradient(120% 70% at 100% 0%, #0f1b3d 0%, var(--card) 70%);
+}
+.indic-index-card-top{display:flex;align-items:stretch}
+.indic-index-card-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:13px 6px 13px 13px;background:none;border:0;color:var(--white);cursor:pointer;text-align:left;font-family:inherit}
+.indic-index-card-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.indic-index-card-title{font-size:13.5px;font-weight:700;line-height:1.3}
+.indic-index-card-short{font-size:11.5px;color:var(--muted2);line-height:1.4}
+.indic-index-card-chevron{flex-shrink:0;width:38px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--muted2);cursor:pointer}
+.indic-index-card-chevron svg{transition:transform var(--dur-base) var(--ease-out)}
+.indic-index-card.open .indic-index-card-chevron svg{transform:rotate(180deg)}
+.indic-index-card-detail{display:none;padding:0 14px 14px}
+.indic-index-card.open .indic-index-card-detail{display:block}
+.indic-index-card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.indic-index-card-tag{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.02em;color:var(--muted2);background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:20px;padding:4px 10px}
+.indic-index-card-long{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0 0 12px}
+.indic-index-card-cta{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--accent);background:none;border:1.5px solid var(--accent);border-radius:20px;padding:7px 14px;cursor:pointer}
 /* ---- boletos de Predicciones de Precio: cada predicción queda como un ticket con el talón
    perforado (fecha) y un sello de resultado en la esquina ---- */
 .pred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:stretch}
@@ -10419,9 +10441,9 @@ function indicDepthColor(t){
   return '#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 const INDIC_GROUPS = {
-  bitcoin: [{ id: 'bitcoinguia', label: 'Guía: ¿Cómo leer los indicadores de BTC?' }, { id: 'whitepaper', label: 'Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de halving' }, { id: 'btcmacro', label: 'BTC + datos macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de fondo' }, { id: 'rsimensual', label: 'RSI mensual' }, { id: 'ciclosoporte', label: 'Techo anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media móvil de 4 años' }, { id: 'ema200', label: 'Medias móviles 200' }, { id: 'treasuries', label: 'Balances corporativos' }, { id: 'govtreasuries', label: 'Reservas gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo base institucional' }, { id: 'epochpl', label: '% Supply en pérdida por época' }],
-  ethereum: [{ id: 'ethereumguia', label: 'Guía: ¿Cómo leer los indicadores de ETH?' }, { id: 'ethlogreg', label: 'Bandas log de ETH' }, { id: 'ethvwap', label: 'VWAP anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
-  trading: [{ id: 'tradingguia', label: 'Guía: ¿Cómo leer los indicadores de trading?' }, { id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio largo/corto' }, { id: 'optionsoi', label: 'Interés abierto en opciones' }, { id: 'delistradar', label: 'Radar de deslistados' }, { id: 'newlistradar', label: 'Radar de nuevos listados' }, { id: 'tvchart', label: 'Gráfico avanzado' }],
+  bitcoin: [{ id: 'whitepaper', label: 'Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de halving' }, { id: 'btcmacro', label: 'BTC + datos macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de fondo' }, { id: 'rsimensual', label: 'RSI mensual' }, { id: 'ciclosoporte', label: 'Techo anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media móvil de 4 años' }, { id: 'ema200', label: 'Medias móviles 200' }, { id: 'treasuries', label: 'Balances corporativos' }, { id: 'govtreasuries', label: 'Reservas gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo base institucional' }, { id: 'epochpl', label: '% Supply en pérdida por época' }],
+  ethereum: [{ id: 'ethlogreg', label: 'Bandas log de ETH' }, { id: 'ethvwap', label: 'VWAP anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
+  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio largo/corto' }, { id: 'optionsoi', label: 'Interés abierto en opciones' }, { id: 'delistradar', label: 'Radar de deslistados' }, { id: 'newlistradar', label: 'Radar de nuevos listados' }, { id: 'tvchart', label: 'Gráfico avanzado' }],
   sentimiento: [{ id: 'fng', label: 'Índice de miedo y codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas cripto' }],
   mineria: [],
   macro: [
@@ -10444,8 +10466,8 @@ const INDIC_GROUPS = {
     { id: 'econcalendar', label: 'Calendario económico' },
   ],
   onchain: [],
-  dominancia: [{ id: 'dominanciaguia', label: 'Guía: ¿Cómo leer los indicadores de dominancia?' }, { id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
-  altcoins: [{ id: 'altcoinsguia', label: 'Guía: ¿Cómo leer los indicadores de altcoins?' }, { id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de altcoins' }, { id: 'ethvsalt', label: 'Valoración relativa ETH vs altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
+  dominancia: [{ id: 'domratio', label: 'Rotación ETH.D/BTC.D' }, { id: 'domall', label: 'Descompresión cripto' }, { id: 'dombtc', label: 'Dominancia BTC' }, { id: 'domusdt', label: 'Dominancia USDT' }, { id: 'ethbtc', label: 'ETH/BTC' }],
+  altcoins: [{ id: 'othersbtc', label: 'OTHERS/BTC' }, { id: 'altfever', label: 'Euforia de altcoins' }, { id: 'ethvsalt', label: 'Valoración relativa ETH vs altcoins' }, { id: 'total2', label: 'TOTAL2 EMA200' }, { id: 'others', label: 'OTHERS EMA200' }],
 };
 // el numero en la tarjeta de "Indicadores de Mercado" (panorama de categorias) se calcula solo
 // a partir de INDIC_GROUPS - asi nunca se vuelve a desactualizar cuando se agregue/quite un
@@ -10556,6 +10578,10 @@ function renderIndicSubtabs(group){
   if(group === 'guia' || group === 'predicciones'){
     const wrap = document.getElementById('indicSubTabs');
     if(wrap) wrap.innerHTML = '';
+    // se reconstruye desde cero cada vez que se vuelve a esta pestaña, para que las tarjetas
+    // que se hayan quedado abiertas (ver chevron en renderIndicIndexList) arranquen cerradas
+    // otra vez - pedido de Juan ("si le doy atrás y vuelvo, ya están todos contraídos")
+    if(group === 'guia' && typeof renderIndicIndexList === 'function') renderIndicIndexList();
     showIndicPanel(group);
     return;
   }
@@ -11657,6 +11683,131 @@ const INDIC_DESC = {
   ethvsalt: 'Si ETH está caro o barato comparado con el resto de altcoins.',
   total2: 'La capitalización de todo el mercado cripto, sin contar a Bitcoin.',
   others: 'La capitalización del resto de altcoins, sin contar BTC ni ETH.',
+  macroguia: 'Qué significa cada indicador macro cuando sube o cuando baja, y qué pasa cuando combinas dos a la vez.',
+};
+// descripcion cortita (4-5 palabras) para cuando la tarjeta esta cerrada - la de arriba
+// (INDIC_DESC) se usa como la descripcion larga, al desplegar
+const INDIC_SHORT = {
+  whitepaper: 'El documento original de Satoshi',
+  halving: 'Dónde vamos en el ciclo',
+  btcmacro: 'BTC frente a la Fed',
+  pisomercado: 'El ritmo de fondo real',
+  rsimensual: 'Sobrecompra o sobreventa mensual',
+  ciclosoporte: 'El techo de ayer, soporte hoy',
+  rainbow: 'Bandas de precio por tendencia',
+  picycle: 'El cruce que marca techos',
+  ma4y: 'Tendencia de fondo, sin ruido',
+  ema200: 'El soporte más vigilado de BTC',
+  treasuries: 'BTC en balances corporativos',
+  govtreasuries: 'BTC acumulado por gobiernos',
+  btcxau: 'BTC medido en oro',
+  btcaapl: 'BTC contra una acción real',
+  btcreturns: 'Retornos históricos mes a mes',
+  sthmvrv: 'Compradores recientes, ¿ganan o pierden?',
+  treascb: 'Precio promedio institucional de BTC',
+  epochpl: '% de supply en pérdida',
+  ethlogreg: 'Canal logarítmico de precio',
+  ethvwap: 'Precio promedio ponderado de ETH',
+  ethpmi: 'ETH frente a manufactura global',
+  ethreturns: 'Retornos históricos de ETH',
+  cbpremium: 'Pista de demanda institucional',
+  longshort: 'Alcistas contra bajistas, en vivo',
+  optionsoi: 'Dinero abierto en opciones',
+  delistradar: 'Monedas saliendo de exchanges',
+  newlistradar: 'Las monedas más nuevas listadas',
+  tvchart: 'Gráfico libre de TradingView',
+  fng: 'Qué tan extremo está el sentimiento',
+  btctrends: 'Búsquedas de Bitcoin en Google',
+  cryptobubbles: 'Todo el mercado, de un vistazo',
+  dxy: 'La fuerza del dólar',
+  pmius: 'Industria de EEUU, ¿crece o no?',
+  payrolls: 'Empleos nuevos del mes pasado',
+  unrate: 'Porcentaje de gente sin empleo',
+  icsa: 'Solicitudes de desempleo, semanales',
+  cpi: 'Inflación oficial de EEUU',
+  cpiyoy: 'Costo de vida, año contra año',
+  pce: 'La inflación que vigila la Fed',
+  ppi: 'Inflación que pagan las empresas',
+  fedfundsrate: 'La tasa que mueve todo',
+  m2supply: 'Dinero circulando en la economía',
+  vixindex: 'El índice del miedo tradicional',
+  netliquidity: 'Efectivo real disponible del sistema',
+  gdpgrowth: 'La economía de EEUU, ¿crece?',
+  fedbalance: 'Activos acumulados por la Fed',
+  econcalendar: 'Qué publicación económica viene',
+  domratio: 'Rotación de dinero ETH o BTC',
+  domall: 'Qué tan repartido está el mercado',
+  dombtc: '% del mercado que es Bitcoin',
+  domusdt: 'Dinero parqueado en stablecoins',
+  ethbtc: 'ETH, ¿gana o pierde terreno?',
+  othersbtc: 'El resto de altcoins contra BTC',
+  altfever: 'Qué tan caliente está la temporada',
+  ethvsalt: 'ETH, ¿caro o barato hoy?',
+  total2: 'Capitalización cripto sin Bitcoin',
+  others: 'Capitalización sin BTC ni ETH',
+  macroguia: 'Cómo leer y combinar lo macro',
+};
+// 2-3 etiquetas cortas por indicador, mismo espiritu que las de cryptobruj ("Gráficos",
+// "Alertas", "Cualquier mercado") - categorizan de un vistazo sin repetir el titulo
+const INDIC_TAGS = {
+  whitepaper: ['Bitcoin', 'Lectura'],
+  halving: ['Bitcoin', 'Ciclos', 'Historial'],
+  btcmacro: ['Bitcoin', 'Macro'],
+  pisomercado: ['Bitcoin', 'Tendencia'],
+  rsimensual: ['Bitcoin', 'Momentum'],
+  ciclosoporte: ['Bitcoin', 'Soporte/Resistencia'],
+  rainbow: ['Bitcoin', 'Largo plazo'],
+  picycle: ['Bitcoin', 'Techos de ciclo'],
+  ma4y: ['Bitcoin', 'Tendencia', 'Largo plazo'],
+  ema200: ['Bitcoin', 'Soporte/Resistencia'],
+  treasuries: ['Bitcoin', 'Institucional'],
+  govtreasuries: ['Bitcoin', 'Institucional'],
+  btcxau: ['Bitcoin', 'Oro'],
+  btcaapl: ['Bitcoin', 'Comparativa'],
+  btcreturns: ['Bitcoin', 'Historial'],
+  sthmvrv: ['Bitcoin', 'On-chain'],
+  treascb: ['Bitcoin', 'Institucional'],
+  epochpl: ['Bitcoin', 'On-chain', 'Ciclos'],
+  ethlogreg: ['Ethereum', 'Largo plazo'],
+  ethvwap: ['Ethereum', 'Precio'],
+  ethpmi: ['Ethereum', 'Macro'],
+  ethreturns: ['Ethereum', 'Historial'],
+  cbpremium: ['Trading', 'Institucional'],
+  longshort: ['Trading', 'Derivados'],
+  optionsoi: ['Trading', 'Derivados'],
+  delistradar: ['Trading', 'Alertas', 'Exchanges'],
+  newlistradar: ['Trading', 'Alertas', 'Exchanges'],
+  tvchart: ['Trading', 'Gráficos', 'Cualquier mercado'],
+  fng: ['Sentimiento'],
+  btctrends: ['Sentimiento', 'Búsquedas'],
+  cryptobubbles: ['Sentimiento', 'Mercado completo'],
+  dxy: ['Macro', 'Dólar'],
+  pmius: ['Macro', 'EEUU'],
+  payrolls: ['Macro', 'Empleo', 'EEUU'],
+  unrate: ['Macro', 'Empleo', 'EEUU'],
+  icsa: ['Macro', 'Empleo', 'EEUU'],
+  cpi: ['Macro', 'Inflación', 'EEUU'],
+  cpiyoy: ['Macro', 'Inflación', 'EEUU'],
+  pce: ['Macro', 'Inflación', 'EEUU'],
+  ppi: ['Macro', 'Inflación', 'EEUU'],
+  fedfundsrate: ['Macro', 'Tasas', 'Fed'],
+  m2supply: ['Macro', 'Liquidez'],
+  vixindex: ['Macro', 'Volatilidad'],
+  netliquidity: ['Macro', 'Liquidez'],
+  gdpgrowth: ['Macro', 'EEUU'],
+  fedbalance: ['Macro', 'Fed'],
+  econcalendar: ['Macro', 'Calendario', 'EEUU'],
+  domratio: ['Dominancia', 'Rotación'],
+  domall: ['Dominancia', 'Mercado completo'],
+  dombtc: ['Dominancia', 'Bitcoin'],
+  domusdt: ['Dominancia', 'Stablecoins'],
+  ethbtc: ['Dominancia', 'Ethereum', 'Bitcoin'],
+  othersbtc: ['Altcoins', 'Comparativa'],
+  altfever: ['Altcoins', 'Sentimiento'],
+  ethvsalt: ['Altcoins', 'Ethereum', 'Comparativa'],
+  total2: ['Altcoins', 'Mercado completo'],
+  others: ['Altcoins', 'Mercado completo'],
+  macroguia: ['Macro', 'Guía', 'Combinador'],
 };
 // ---- Índice de Indicadores: lista generada a partir de INDIC_GROUPS (la misma fuente que ya
 // maneja las pestañas) en vez de ~70 tarjetas escritas a mano - con tantas categorías ya no cabía
@@ -11697,7 +11848,7 @@ function renderIndicIndexList(){
     </div>
     <button type="button" class="indic-index-standalone" data-jump="predicciones">
       ${indicRowIconHtml('target', nextColor())}
-      <span class="indic-index-row-title">Predicciones de Precio</span>
+      <span class="indic-index-card-title">Predicciones de Precio</span>
     </button>
     <div class="indic-index-depth-wrap">
       <div class="indic-index-depth-rail"></div>
@@ -11707,24 +11858,50 @@ function renderIndicIndexList(){
     const items = INDIC_GROUPS[cat.group];
     const headerColor = indicDepthColor(totalRows > 1 ? rowIndex / (totalRows - 1) : 0);
     html += `<div class="indic-index-header"${catIdx === 0 ? '' : ' style="border-top:1px solid var(--border)"'}><span class="indic-index-header-label" style="color:${headerColor}">${cat.label}</span><span class="indic-index-header-zone">${INDIC_DEPTH_ZONES[cat.group] || ''}</span></div>`;
+    html += `<div class="indic-index-cards">`;
     items.forEach(it => {
       const key = INDIC_ICON_KEY[it.id] || 'target';
-      const desc = INDIC_DESC[it.id] || '';
+      const short = INDIC_SHORT[it.id] || '';
+      const long = INDIC_DESC[it.id] || '';
+      const tags = INDIC_TAGS[it.id] || [];
       html += `
-        <button type="button" class="indic-index-row" data-jump="${it.id}">
-          ${indicRowIconHtml(key, nextColor())}
-          <span class="indic-index-row-text">
-            <span class="indic-index-row-title">${it.label}</span>
-            ${desc ? `<span class="indic-index-row-desc">${desc}</span>` : ''}
-          </span>
-        </button>
+        <div class="indic-index-card">
+          <div class="indic-index-card-top">
+            <button type="button" class="indic-index-card-main" data-jump="${it.id}">
+              ${indicRowIconHtml(key, nextColor())}
+              <span class="indic-index-card-text">
+                <span class="indic-index-card-title">${it.label}</span>
+                ${short ? `<span class="indic-index-card-short">${short}</span>` : ''}
+              </span>
+            </button>
+            <button type="button" class="indic-index-card-chevron" aria-label="Ver más" aria-expanded="false">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="indic-index-card-detail">
+            ${tags.length ? `<div class="indic-index-card-tags">${tags.map(t => `<span class="indic-index-card-tag">${t}</span>`).join('')}</div>` : ''}
+            ${long ? `<p class="indic-index-card-long">${long}</p>` : ''}
+            <button type="button" class="indic-index-card-cta" data-jump="${it.id}">Ver indicador →</button>
+          </div>
+        </div>
       `;
     });
+    html += `</div>`;
   });
   html += `</div></div>`;
   grid.innerHTML = html;
   grid.querySelectorAll('[data-jump]').forEach(el => {
     el.addEventListener('click', () => jumpToIndicator(el.dataset.jump));
+  });
+  // el chevron NO salta al indicador - solo abre/cierra el detalle de SU tarjeta. Varias
+  // tarjetas pueden quedar abiertas a la vez (no es un acordeon exclusivo); al volver a entrar
+  // a esta pestaña se vuelve a llamar renderIndicIndexList() y arrancan todas cerradas otra vez.
+  grid.querySelectorAll('.indic-index-card-chevron').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.indic-index-card');
+      const open = card.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
   });
 }
 renderIndicIndexList();
