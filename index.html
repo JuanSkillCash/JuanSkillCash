@@ -2083,7 +2083,10 @@ img[src=""]{display:none}
 .partner-block-pending{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--border2);border-radius:99px;padding:6px 14px;margin-left:auto}
 
 /* FOOTER */
-.site-footer{margin-top:48px;padding-top:28px;border-top:1px solid rgba(91,141,239,.3);position:relative;overflow:hidden}
+.site-footer{
+  margin-top:48px;padding:28px max(40px, env(safe-area-inset-right,0px)) 0 max(40px, env(safe-area-inset-left,0px));
+  border-top:1px solid rgba(91,141,239,.3);position:relative;overflow:hidden;box-sizing:border-box;
+}
 /* frase gigante + 3 columnas + iconos redondos (rediseño pedido por Juan, referencia visual:
    cryptobruj.com) */
 .site-footer-phrase{
@@ -2098,11 +2101,12 @@ img[src=""]{display:none}
 .site-footer-col-email{font-size:12.5px;color:var(--muted2)}
 .site-footer-social-round{display:flex;flex-wrap:wrap;gap:10px}
 .footer-social-round{
-  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:var(--card);border:1.5px solid rgba(91,141,239,.3);color:var(--muted2);
-  transition:border-color .2s,color .2s,transform .2s;flex-shrink:0;
+  width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--card);border:1.5px solid var(--hover);color:var(--hover);
+  transition:background .2s,transform .2s;flex-shrink:0;
 }
-.footer-social-round:hover{border-color:var(--hover);color:var(--hover);transform:translateY(-2px)}
+.footer-social-round svg{width:21px;height:21px}
+.footer-social-round:hover{background:color-mix(in srgb, var(--hover) 18%, var(--card));transform:translateY(-2px)}
 .site-footer-col{flex:1 1 150px;min-width:140px;display:flex;flex-direction:column;gap:11px}
 .site-footer-col-title{font-weight:700;font-size:13.5px;color:var(--white)}
 .site-footer-col-link{
@@ -7459,7 +7463,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <div class="site-footer-cols">
         <div class="site-footer-col-brand">
-          <span class="sb-logo-text" style="font-size:15px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
+          <span class="sb-logo-text" style="font-size:19px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
           <div class="site-footer-col-email">contacto@juanskillcash.com</div>
           <div class="site-footer-social-round">
             <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#25F4EE" aria-label="TikTok">
