@@ -70,7 +70,8 @@
   --cat-cyan:#22d3ee;
   --cat-indigo:#7c7ff5;
   --cat-pink:#ec4899;
-  --cat-teal:#2dd4bf;
+  --cat-teal:#5d7ad1; /* pese al nombre, ahora es el acento "azul medianoche" que eligio Juan
+                          para las cajas de inicio (antes era un teal/aguamarina que no le gusto) */
   --white:#f7f6fb;
   --muted:#7d808a;
   --muted2:#b3b6bf;
@@ -2504,7 +2505,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    elevacion (pedido de Juan, inspirado en cryptobruj.com/exchanges pero con nuestros propios
    colores - ver docs/referencia si hace falta el prompt original). */
 .cat-overview-card, .cat-flip-back{
-  background:radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--cat-teal) 15%, var(--card)) 0%, var(--card) 75%) !important;
+  background:radial-gradient(120% 70% at 100% 0%, #0f1b3d 0%, var(--card) 70%) !important;
   border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
   box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
 }
