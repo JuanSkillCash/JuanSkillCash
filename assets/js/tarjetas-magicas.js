@@ -76,6 +76,14 @@
   var raf = null;
   var ultimo = null;
 
+  // el botoncito de girar vive fuera de .cat-flip-inner (para nunca voltearse junto con la
+  // tarjeta) - eso lo dejaba quieto mientras la tarjeta se inclinaba con el mouse, como flotando
+  // aparte ("mundo aparte", reporte de Juan). Se precalcula aqui (una sola vez) el par
+  // outer/toggle de cada tarjeta para copiarle la misma inclinacion mas abajo, sin tener que
+  // buscarlo en el DOM en cada cuadro de animacion.
+  var outers = tarjetas.map(function(t){ return t.closest('.cat-flip-outer'); });
+  var toggles = outers.map(function(outer){ return outer ? outer.querySelector(':scope > .cat-flip-toggle') : null; });
+
   // en vez de pointerenter/pointerleave (que con el tilt 3D se confundian solos y se quedaban
   // "pegados" en false para siempre) calculamos cada cuadro, con la posicion real del mouse,
   // si esta encima de cada tarjeta - se autocorrige cada frame, nunca se puede quedar trabado
@@ -92,7 +100,8 @@
     foco.style.transform = 'translate(' + (e.clientX - sb.left) + 'px,' + (e.clientY - sb.top) + 'px)';
     foco.style.opacity = focoOpacidad.toFixed(2);
 
-    tarjetas.forEach(function(t){
+    tarjetas.forEach(function(t, i){
+      var toggle = toggles[i];
       var c = t.getBoundingClientRect();
       var encima = e.clientX >= c.left && e.clientX <= c.right && e.clientY >= c.top && e.clientY <= c.bottom;
       t.classList.toggle('mg-viva', encima);
@@ -101,14 +110,24 @@
         var y = (e.clientY - c.top) / c.height - 0.5;
         // sin perspective() propio: la tarjeta ya vive dentro de .cat-flip-outer, que trae su
         // propio perspective - anidar un segundo perspective() aqui confundia el hit-testing
-        t.style.transform = 'rotateX(' + (-y * 6).toFixed(2) + 'deg) rotateY(' +
-          (x * 6).toFixed(2) + 'deg) translate(' + (x * 8).toFixed(1) + 'px,' + (y * 8).toFixed(1) +
-          'px) translateY(-2px)';
+        var inclinacion = 'rotateX(' + (-y * 6).toFixed(2) + 'deg) rotateY(' +
+          (x * 6).toFixed(2) + 'deg) translate(' + (x * 8).toFixed(1) + 'px,' + (y * 8).toFixed(1) + 'px)';
+        // el translateZ va SOLO aqui, mientras se esta inclinando - no como propiedad fija en el
+        // CSS (eso se probo y se revirtio: dejaba la tarjeta borrosa todo el tiempo, no solo al
+        // pasar el mouse, por la capa 3D que arma Chrome con el zoom de Windows en 125%).
+        // Empuja la cara del frente delante del plano de .cat-flip-inner para que el clic no le
+        // caiga a el en vez de al boton cuando la tarjeta esta inclinada.
+        t.style.transform = 'translateZ(30px) ' + inclinacion + ' translateY(-2px)';
+        // mismo giro para el botoncito de voltear (sin el translateZ, que no le hace falta a
+        // el) para que se sienta pegado a la caja en vez de quieto aparte; si la tarjeta esta
+        // volteada se le mantiene el rotate(180deg) de siempre, sumado a la inclinacion
+        if(toggle) toggle.style.transform = (outers[i].classList.contains('flipped') ? 'rotate(180deg) ' : '') + inclinacion;
         t.style.setProperty('--glow-x', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%');
         t.style.setProperty('--glow-y', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%');
         t.style.setProperty('--glow-i', '1');
       } else {
         t.style.transform = '';
+        if(toggle) toggle.style.transform = '';
         t.style.setProperty('--glow-i', '0');
       }
     });
