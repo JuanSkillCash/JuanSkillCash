@@ -1042,7 +1042,11 @@ button{font-family:inherit;color:inherit}
 .indic-index-card-chevron svg{width:16px;height:16px;transition:transform var(--dur-base) var(--ease-out)}
 .indic-index-card.open .indic-index-card-chevron svg{transform:rotate(180deg)}
 .indic-index-card-detail{display:none;padding:0 14px 14px}
-.indic-index-card.open .indic-index-card-detail{display:block}
+/* min-height fijo (medido: la mas larga de las 58 llega a ~150px de contenido) para que todas
+   las tarjetas abiertas se vean del mismo tamaño siempre, sin importar cuanto texto tenga cada
+   una - pedido de Juan. La que tiene menos texto simplemente deja espacio vacio abajo. */
+.indic-index-card.open .indic-index-card-detail{display:flex;flex-direction:column;min-height:168px}
+.indic-index-card.open .indic-index-card-cta{margin-top:auto}
 .indic-index-card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .indic-index-card-tag{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.02em;color:var(--muted2);background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:20px;padding:4px 10px}
 .indic-index-card-long{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0 0 12px}
