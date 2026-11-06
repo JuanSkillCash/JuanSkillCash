@@ -2388,29 +2388,31 @@ img[src=""]{display:none}
   --hero-grafico-color:#ff2f4f;
 }
 .hero-mascot-imgwrap, .hero-mascot-text{position:relative;z-index:1}
-/* fondo del hero: sonar (anillos que laten desde un punto) + un resplandor que orbita por toda
-   la zona - reemplaza el intento anterior con canvas/lineas onduladas (ver
-   docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5): mas simple, sin mouse,
-   sin el bug de ver las lineas "a traves" del tiburon (su imagen se desvanece abajo con una
-   mascara CSS, y una forma blureada de fondo se nota mucho menos ahi que una linea nitida). */
-.hero-sonar{
-  position:absolute;z-index:0;right:18%;top:32%;width:46px;height:46px;pointer-events:none;
-}
-.hero-sonar i{
-  position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--hero-grafico-color);
-  opacity:0;transform:scale(.2);
+/* fondo del hero: malla/rejilla con lineas difuminadas (bordes suaves tipo neon apagado, no
+   lineas nitidas) + una bolita de resplandor chiquita (tamano de una "O" del titulo) que orbita
+   lento por toda la zona, como un animalito que se mueve. Reemplaza intentos anteriores (ver
+   docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5). Todo muy tenue/blureado
+   a proposito para que se sienta "al fondo" y no choque con el tiburon ni el titulo. */
+.hero-malla{
+  position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.22;filter:blur(2.5px);
+  background-image:
+    repeating-linear-gradient(0deg, var(--hero-grafico-color) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(90deg, var(--hero-grafico-color) 0 1px, transparent 1px 34px);
+  -webkit-mask-image:radial-gradient(ellipse 55% 70% at 85% 50%, #000 25%, transparent 70%);
+          mask-image:radial-gradient(ellipse 55% 70% at 85% 50%, #000 25%, transparent 70%);
 }
 .hero-orbe{
-  position:absolute;z-index:0;left:10%;top:15%;width:150px;height:150px;border-radius:50%;
-  pointer-events:none;filter:blur(22px);
-  background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 55%, transparent) 0%, transparent 72%);
+  position:absolute;z-index:0;left:10%;top:15%;width:28px;height:28px;border-radius:50%;
+  pointer-events:none;filter:blur(7px);
+  background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%);
 }
 @media(prefers-reduced-motion:no-preference){
-  .hero-sonar i{ animation:hero-sonar-ping 3.2s ease-out infinite; }
-  .hero-sonar i:nth-child(2){ animation-delay:1.07s; }
-  .hero-sonar i:nth-child(3){ animation-delay:2.14s; }
-  @keyframes hero-sonar-ping{ 0%{ transform:scale(.2); opacity:.55; } 100%{ transform:scale(3.2); opacity:0; } }
-  .hero-orbe{ animation:hero-orbita 18s ease-in-out infinite; }
+  .hero-malla{ animation:hero-malla-onda 11s ease-in-out infinite; }
+  @keyframes hero-malla-onda{
+    0%,100%{ background-position:0 0, 0 0; }
+    50%{ background-position:7px 5px, -5px 7px; }
+  }
+  .hero-orbe{ animation:hero-orbita 20s ease-in-out infinite; }
   @keyframes hero-orbita{
     0%{ left:6%; top:12%; }
     25%{ left:72%; top:6%; }
@@ -3524,7 +3526,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
 
     <div class="hero-mascot">
-      <div class="hero-sonar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="hero-malla" aria-hidden="true"></div>
       <div class="hero-orbe" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
         <div class="hero-mascot-tint" aria-hidden="true"></div>
