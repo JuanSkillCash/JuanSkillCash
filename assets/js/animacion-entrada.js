@@ -45,6 +45,10 @@
   if(titulo && !titulo.getAttribute('aria-label')){
     titulo.setAttribute('aria-label', titulo.textContent);
     partir(titulo, 'chars');
+    // el <script> inline justo despues del <h1> en el HTML lo escondio de una con esta clase
+    // (pre-split) para que no se alcance a ver completo antes de separarlo en letras - ya
+    // separado, se quita: cada letra (.sp) ya trae su propia animacion de entrada
+    titulo.classList.remove('pre-split');
   }
 
   var idx = 0;
