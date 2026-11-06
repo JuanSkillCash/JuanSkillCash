@@ -123,7 +123,15 @@ button{font-family:inherit;color:inherit}
   box-shadow:none;
 }
 .sidebar::-webkit-scrollbar{width:0;height:0;display:none}
-.sidebar.collapsed{width:var(--sidebar-w-collapsed)}
+/* en escritorio "colapsado" ahora significa oculto del todo (ancho 0), no la barrita angosta
+   de solo iconos que habia antes - Juan pidio que el sidebar de escritorio se comporte igual
+   que el de celular: por defecto nada mas se ve el botoncito de hamburguesa (abajo, en
+   .topbar-brand), y al picarle se abre el menu completo, empujando el contenido (el ancho del
+   sidebar es un item mas de .app{display:flex}, asi que .main se reacomoda solo, sea cual sea
+   la pagina que este abierta adentro). En celular esto no cambia nada: el sidebar sigue
+   oculto con transform fuera de pantalla y esta clase "collapsed" ahi la pisa la regla de
+   abajo (dentro de @media(max-width:860px)), mostrando el menu completo con texto como siempre */
+.sidebar.collapsed{width:0;border-right:0}
 .sidebar.collapsed .sb-top{gap:10px;padding:16px 8px}
 .sb-top{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 14px 8px}
 .sb-top-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}
@@ -148,6 +156,9 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed .sb-logo-text{display:none}
 .sb-toggle{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(91,141,239,.3);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s,color .2s}
 .sb-toggle:hover{background:rgba(91,141,239,.14);color:var(--white)}
+/* botoncito de hamburguesa - antes solo tenia estilo en el media query de celular; ahora se usa
+   en escritorio tambien (ver .topbar-brand mas abajo), asi que su estilo base vive aqui */
+.mobile-menu-btn{width:38px;height:38px;border-radius:8px;background:var(--bg);border:1px solid rgba(91,141,239,.3);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
 .sb-section-label{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:20px 20px 10px;white-space:nowrap}
 .sidebar.collapsed .sb-section-label{opacity:0}
 .sb-search-wrap{position:relative;margin:2px 18px 12px;display:flex;align-items:center}
@@ -2365,7 +2376,6 @@ img[src=""]{display:none}
   .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-logo-text,.sidebar.collapsed .sb-back span,.sidebar.collapsed .sb-item-badge{display:block}
   .sidebar.collapsed .sb-item{justify-content:flex-start}
   .main{padding:20px 18px 50px}
-  .mobile-menu-btn{width:38px;height:38px;border-radius:8px;background:var(--bg);border:1px solid rgba(91,141,239,.3);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;display:none}
   .sb-backdrop.show{display:block}
   .calc{padding:22px 18px 24px}
@@ -2390,7 +2400,11 @@ img[src=""]{display:none}
   .account-mini{margin-left:6px}
 }
 @media(min-width:861px){
+  /* el botoncito de hamburguesa en escritorio solo se ve cuando el menu esta cerrado
+     (.sidebar.collapsed, ver el ancho:0 de esa clase mas arriba) - con el menu abierto para
+     cerrarlo se usa la flechita de adentro (#sbToggle), no hace falta mostrar los dos a la vez */
   .topbar-brand{display:none}
+  .sidebar.collapsed ~ .main .topbar-brand{display:flex}
   .mobile-topbar{position:relative;min-height:58px}
 }
 
@@ -2921,7 +2935,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
   <div class="sb-backdrop" id="sbBackdrop"></div>
 
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar collapsed" id="sidebar">
     <div class="sb-sticky-head">
       <div class="sb-top">
         <a href="#" class="sb-logo" id="sbLogo">
@@ -10803,8 +10817,16 @@ sbToggle.addEventListener('click', () => {
   }
 });
 mobileMenuBtn.addEventListener('click', () => {
-  sidebar.classList.add('mobile-open');
-  sbBackdrop.classList.add('show');
+  if(window.innerWidth <= 860){
+    sidebar.classList.add('mobile-open');
+    sbBackdrop.classList.add('show');
+  } else {
+    // en escritorio este mismo botoncito (visible solo cuando el menu esta cerrado, ver CSS de
+    // .topbar-brand) abre el sidebar quitandole "collapsed" - el ancho es parte de
+    // .app{display:flex}, asi que .main se achica solo para hacerle espacio, sea cual sea la
+    // pagina que este abierta en ese momento
+    sidebar.classList.remove('collapsed');
+  }
   // el sidebar tiene su propio scroll interno (overflow-y:auto) que queda pegado donde se dejó
   // la última vez (ej. al marcar un indicador como activo, más abajo en la lista) - sin esto el
   // menú se abre ya desplazado en vez de mostrar el inicio
