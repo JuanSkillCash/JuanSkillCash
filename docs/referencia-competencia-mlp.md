@@ -18,6 +18,47 @@ Usa esto como especificación de referencia para diseñar mi propia versión (mi
 
 ---
 
+## PENDIENTE: ideas de esta investigación que Juan quiere implementar después
+
+> Agregado 6-nov-2026 a pedido de Juan, para que quede guardado (no se pierda) que todo esto
+> es trabajo futuro, no algo ya decidido o en curso. Nada de esta sección está implementado en
+> SkillCash todavía.
+
+**Lo más importante: el Arsenal de herramientas desbloqueables por volumen (ver sección 2 y 3
+más abajo para el detalle completo investigado).** Ellos atan rango Y herramienta al MISMO
+umbral de volumen mensual; nosotros ya tenemos "Rango de Manada" calculando el volumen y el
+rango correctamente, pero hoy es un cascarón: ningún rango desbloquea ninguna herramienta
+todavía. Esa es la pieza central que falta:
+
+| Herramienta de ellos | Se desbloquea en (volumen mensual) | Qué es (ver detalle en sección 3) |
+|---|---|---|
+| Calculadora | Siempre libre | Calculadora de trading |
+| Radar | $1 | Señales en vivo (entrada, SL, TPs, DCA, winrate) — ver sección 3.1 |
+| La Cubierta | $1 | Red social de trading: posts, "calls" con % de acierto, salas en vivo |
+| Bitácora | $10.000 | Diario de trading (+ bitácora de un "Capitán" para copiar) |
+| **Mapa Tendencial** | **$50.000** | **La del gráfico de Bitcoin que recordaba Juan** — gráfico con una línea horizontal por timeframe (1m a 1d) marcando tendencia, y un puntaje de confluencia entre timeframes (ver sección 3.4) |
+| Sniper | $100.000 | Señales de 1 minuto |
+| Tendencial | $150.000 | Indicador propio de TradingView |
+| Tactical | $300.000 | Indicador avanzado, triple confirmación multi-timeframe |
+
+No implementar con sus mismos umbrales/nombres tal cual — son de referencia para definir los
+propios de SkillCash en Rango de Manada.
+
+**Nota sin confirmar (6-nov-2026):** Juan recuerda que el Radar también marcaba algo tipo
+"sobrecomprado/sobrevendido" (tipo RSI) en las señales. Esto NO aparece en la investigación ya
+hecha (ver sección 3.1 - ahí solo hay entrada/SL/TPs/DCA/winrate, nada de sobrecompra/
+sobreventa). Puede ser: (a) un dato real del Radar que no se alcanzó a capturar en esta pasada,
+(b) parte del Mapa Tendencial (su `bullScore`/`bearScore`/`sentiment` por confluencia de
+timeframes es conceptualmente parecido, aunque no es un RSI), o (c) de otra pestaña no
+investigada todavía. Falta volver a entrar a melapela.ai con cuenta real para confirmar esto
+antes de diseñar la herramienta propia basada en ello.
+
+**El resto de ideas sueltas de esta investigación** (logros reales, calendario P&L, calls
+públicas tipo "La Cubierta", lienzo de widgets, etc.) están listadas en la sección "SÍNTESIS"
+y en "E) Extras aprovechables" más abajo en este mismo documento.
+
+---
+
 ## 0. Arquitectura observada
 
 - Frontend: Next.js (App Router, build Turbopack, chunks en `/_next/static/immutable/chunks/*.js`, minificados). Analítica: Microsoft Clarity + Vercel Insights.
