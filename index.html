@@ -2515,6 +2515,10 @@ img[src=""]{display:none}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
 .hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
 .hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(30px,5vw,62px);color:var(--white)}
+/* ver el <script> justo despues del <h1 class="hero-mascot-title"> en el HTML: oculta el
+   titulo de una vez apenas el navegador llega a el, para que animacion-entrada.js (que corre
+   diferido, mas tarde) no alcance a dejarlo ver completo antes de separarlo en letras */
+.hero-mascot-title.pre-split{opacity:0}
 .hero-mascot-title .ht-cash{color:var(--red)}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
 .hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
@@ -3605,6 +3609,21 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="hero-mascot-text">
         <div class="hero-mascot-eyebrow">Bienvenido a</div>
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
+        <script>
+        /* evita el flash de "aparece el titulo normal -> desaparece -> arranca la animacion
+           letra por letra" que reporto Juan: assets/js/animacion-entrada.js corre diferido
+           (defer), despues de que el navegador ya pinto el titulo una primera vez tal cual -
+           cuando ese script por fin separa las letras, el titulo "desaparece" un instante antes
+           de empezar a animarse. Este script SI corre en el momento exacto en que el parser
+           llega hasta aqui (antes de pintar), asi que oculta el titulo de una (ver
+           .hero-mascot-title.pre-split en el CSS) y nunca se alcanza a ver completo de entrada.
+           animacion-entrada.js quita esta clase en cuanto separa las letras de verdad; el
+           setTimeout es solo un seguro por si ese script no llegara a correr. */
+        if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+          var hmt = document.querySelector('.hero-mascot-title');
+          if(hmt){ hmt.classList.add('pre-split'); setTimeout(function(){ hmt.classList.remove('pre-split'); }, 2500); }
+        }
+        </script>
       </div>
     </div>
 
