@@ -2,6 +2,12 @@
 
 Antes de trabajar en el screener/dashboard, lee docs/referencia-bcd-dashboard.md
 
+Antes de diagnosticar un indicador/dato "desactualizado" o decidir de dónde
+traer un dato nuevo, lee docs/fuentes-de-datos-indicadores.md — ahí está
+mapeado, indicador por indicador, con qué fuente y mecanismo (en vivo desde
+el navegador vs. robot de GitHub Actions + qué script + qué frecuencia) se
+actualiza cada cosa del sitio.
+
 ## Íconos de las tool-card (tarjetas de herramientas con banner de foto)
 
 Los íconos chiquitos junto al número en `.tool-card-head .tool-icon` (Zona de
