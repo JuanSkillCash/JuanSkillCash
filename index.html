@@ -1167,10 +1167,16 @@ button{font-family:inherit;color:inherit}
 .cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--card);border:1.5px solid var(--cat-teal);color:var(--cat-teal);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
 .cat-flip-toggle:hover{background:rgba(91,141,239,.14)}
 .cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
-.cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+/* el "translate" (propiedad individual, no el shorthand transform) separa cada cara del plano
+   z=0 de .cat-flip-inner sin pisar el transform inline que arma tarjetas-magicas.js en el
+   frente (rotateX/rotateY del tilt al mouse) - se componen los dos. Sin esto, al inclinar la
+   tarjeta con el mouse una parte de su superficie queda detras de ese plano (preserve-3d) y
+   Chrome de escritorio le daba el clic a .cat-flip-inner en vez de al boton: la tarjeta se
+   sentia "muerta" al clic, solo con mouse (en touch nunca se inclina, por eso ahi si abria) */
+.cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden;translate:0 0 30px}
 .cat-flip-front:hover{transform:none}
 .cat-flip-back{
-  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);translate:0 0 30px;
   border-radius:16px;padding:20px;box-sizing:border-box;border:1px solid var(--bc);cursor:pointer;
   background:
     radial-gradient(ellipse 130% 100% at 100% 0%, var(--tint), transparent 65%),
@@ -10245,8 +10251,19 @@ function showCategoryOverview(){
   // saltaba todo eso (bug reportado por Juan: la casita del menú "scrolleaba hacia abajo")
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-document.querySelectorAll('.cat-overview-card').forEach(card => {
-  card.addEventListener('click', () => showCategoryDetail(card.dataset.category));
+/* delegado en .cat-flip-outer (el contenedor de TODO: frente, reverso y el botoncito de
+   girar) en vez de un listener puesto directo en el botón del frente - así, sin importar en
+   qué elemento exacto caiga el clic dentro de la tarjeta (frente, reverso, o el contenedor 3D
+   de en medio si el hit-test de Chrome se confunde con la inclinación del mouse - ver el
+   "translate" nuevo arriba en .cat-flip-front/.cat-flip-back, que ataca la causa real), el
+   clic SIEMPRE termina abriendo la categoría. De paso esto hace real lo que ya decía el
+   comentario de abajo: el reverso de la tarjeta también abre la categoría, no solo el frente */
+document.querySelectorAll('.cat-flip-outer').forEach(outer => {
+  outer.addEventListener('click', (e) => {
+    if(e.target.closest('.cat-flip-toggle')) return;
+    const cara = outer.querySelector('.cat-overview-card, .cat-flip-back');
+    if(cara) showCategoryDetail(cara.dataset.category);
+  });
 });
 /* las tarjetas del menú principal ya no giran solas al pasar el mouse (molestaba) - ahora
    solo giran al picarle a este botoncito; el resto de la tarjeta sigue abriendo la categoría
