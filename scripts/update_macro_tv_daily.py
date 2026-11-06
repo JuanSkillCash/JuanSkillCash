@@ -30,6 +30,14 @@ MACRO_TV_SYMBOLS = [
 ]
 N_BARS_DAILY_UPDATE = 45  # margen de sobra: el PMI solo publica una vez al mes
 
+# VIX: a diferencia de los de arriba (que van a su propia tabla macro_tv_history), este se guarda
+# en fred_series_history con series_id=VIXCLS - la misma tabla/columna que ya lee el frontend -
+# para no tener que tocar nada del lado del sitio. Antes este dato venia de FRED (cierre oficial,
+# 1-2 dias de rezago); ahora viene del ultimo precio de TradingView, que se actualiza intradia.
+VIX_TV_SYMBOL = {"exchange": "TVC", "symbol": "VIX"}
+VIX_FRED_SERIES_ID = "VIXCLS"
+FRED_TABLE = "fred_series_history"
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TABLE = "macro_tv_history"
@@ -54,6 +62,21 @@ def upsert_rows(rows: list[dict]):
     if not rows:
         return
     url = f"{SUPABASE_URL}/rest/v1/{TABLE}?on_conflict=symbol,datetime"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates,return=minimal",
+    }
+    resp = requests.post(url, json=rows, headers=headers, timeout=30)
+    if resp.status_code >= 300:
+        raise RuntimeError(f"Supabase respondio {resp.status_code}: {resp.text}")
+
+
+def upsert_fred_rows(rows: list[dict]):
+    if not rows:
+        return
+    url = f"{SUPABASE_URL}/rest/v1/{FRED_TABLE}?on_conflict=series_id,date"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -90,6 +113,28 @@ def main():
         except Exception as e:
             failed.append((symbol_full, str(e)))
             log.error(f"{symbol_full}: FALLO -> {e}")
+
+    vix_full = f"{VIX_TV_SYMBOL['exchange']}:{VIX_TV_SYMBOL['symbol']}"
+    try:
+        df = tv.get_hist(
+            symbol=VIX_TV_SYMBOL["symbol"],
+            exchange=VIX_TV_SYMBOL["exchange"],
+            interval=Interval.in_daily,
+            n_bars=N_BARS_DAILY_UPDATE,
+        )
+        if df is None or df.empty:
+            raise RuntimeError("get_hist devolvio vacio")
+        rows = [
+            {"series_id": VIX_FRED_SERIES_ID, "date": ts.date().isoformat(), "value": float(r["close"])}
+            for ts, r in df.iterrows()
+        ]
+        upsert_fred_rows(rows)
+        ultima_fecha = max((r["date"] for r in rows), default="(sin datos)")
+        ok.append((vix_full, len(rows)))
+        log.info(f"{vix_full}: {len(rows)} datos subidos/actualizados, ultima fecha={ultima_fecha}")
+    except Exception as e:
+        failed.append((vix_full, str(e)))
+        log.error(f"{vix_full}: FALLO -> {e}")
 
     print("\n=== Resumen ===")
     for s, n in ok:

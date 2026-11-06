@@ -70,7 +70,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_fred_series_daily.py
 
-      - name: Actualizar DXY y PMI (TradingView)
+      - name: Actualizar DXY, PMI y VIX (TradingView)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

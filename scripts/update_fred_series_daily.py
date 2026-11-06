@@ -29,10 +29,14 @@ log = logging.getLogger("update_fred_daily")
 FRED_URL = "https://api.stlouisfed.org/fred/series/observations"
 FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 
+# VIXCLS se quito de aqui: FRED solo tiene el cierre diario con 1-2 dias de
+# rezago - ahora se trae casi en tiempo real desde TradingView, ver
+# update_macro_tv_daily.py (escribe en esta misma tabla, mismo series_id).
+# Los 5 plazos de bonos del Tesoro (DGS2/5/10/20/30) y T10Y2Y se quitaron
+# porque no se usan en ninguna pagina del sitio.
 FRED_SERIES = [
     "CPIAUCSL", "CPILFESL", "PAYEMS", "UNRATE", "DFF",
-    "DGS10", "PCEPI", "PPIACO", "M2SL", "VIXCLS", "WALCL",
-    "DGS2", "DGS5", "DGS20", "DGS30", "T10Y2Y", "ICSA",
+    "PCEPI", "PPIACO", "M2SL", "WALCL", "ICSA",
     "A191RL1Q225SBEA", "WTREGEN", "RRPONTSYD",
 ]
 DAYS_MARGIN = 730  # ~2 anos de margen, para agarrar revisiones de datos ya publicados
