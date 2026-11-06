@@ -12320,7 +12320,42 @@ Herramienta educativa. No constituye asesoría financiera.`;
 /* ========= SIMULADOR DE PORTAFOLIO ========= */
 const SUPABASE_URL = 'https://nbvgyouzjscwtfukzxok.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uxAz2gqnTnMQup_lonppvw_0_EdXlRz';
-const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* si el <script> de supabase-js (CDN) no cargó - red lenta/filtrada, CDN caído, bloqueador -
+   "supabase" queda undefined y supabase.createClient(...) tiraba un error sin atrapar. Al ser
+   un throw en el nivel superior de ESTE <script> (que sigue por 15 mil líneas más, hasta el
+   final del archivo), eso abortaba TODA la ejecución restante del script: nunca se llegaba a
+   declarar currentUser, ni a registrar el resto de los addEventListener - de ahí que ninguna
+   cajita de categoría reaccionara. Con el stub de abajo, si el CDN falla, el resto del sitio
+   sigue funcionando igual; solo cuenta/portafolio/comunidad/journal quedan sin datos. */
+function crearSbClientSinConexion(){
+  const offlineError = { message: 'Supabase no disponible (sin conexión al CDN)' };
+  const authStub = {
+    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } }),
+    signInWithPassword: () => Promise.resolve({ data: null, error: offlineError }),
+    signUp: () => Promise.resolve({ data: null, error: offlineError }),
+    signOut: () => Promise.resolve({ error: null }),
+    signInWithOAuth: () => Promise.resolve({ error: offlineError }),
+    resetPasswordForEmail: () => Promise.resolve({ error: offlineError }),
+    updateUser: () => Promise.resolve({ data: null, error: offlineError }),
+  };
+  // proxy generico para .from()/.rpc()/.functions()/.storage(): cualquier encadenamiento
+  // (.select().eq().order()...) sigue devolviendo este mismo stub, y al final es "thenable"
+  // (await / .then) y resuelve con error - nunca tira, asi un fallo offline queda aislado a
+  // esa llamada puntual en vez de volver a romper todo el script.
+  const queryStub = new Proxy(function(){}, {
+    get(_t, prop){
+      if(prop === 'then') return (resolve) => resolve({ data: null, error: offlineError });
+      if(prop === 'catch' || prop === 'finally') return () => queryStub;
+      return queryStub;
+    },
+    apply(){ return queryStub; }
+  });
+  return { auth: authStub, from: queryStub, rpc: queryStub, functions: queryStub, storage: queryStub };
+}
+const sbClient = (typeof supabase !== 'undefined')
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : (console.error('[SkillCash] Supabase no cargó del CDN - el resto del sitio sigue funcionando, pero cuenta/portafolio/comunidad/journal no van a tener datos hasta recargar con conexión.'), crearSbClientSinConexion());
 
 const portfolioModal = document.getElementById('portfolioModal');
 const portfolioPanel = portfolioModal.querySelector('.modal-panel');
