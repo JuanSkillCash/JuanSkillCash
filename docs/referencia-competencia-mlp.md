@@ -163,6 +163,11 @@ Hitos dibujados: 1 trade · 10.000 · 50.000 · 100.000 · 150.000 · 300.000 (c
   - TPs = niveles de timeframes superiores (1h/4h/1d); `profit_pct` = % de movimiento de precio sin apalancamiento. Se omiten TPs que no aplican.
   - `points: "3/3"` coincide con el "pts x/3" del Mapa Tendencial (confluencia).
   - Cierres en 7 días (muestra): 15 por `sl`, 4 por `time`.
+- **NO CONFIRMADO/PENDIENTE (captura de pantalla, 6-nov-2026):** la UI de "Radar en Vivo" tiene
+  un filtro/toggle "Bolas asimétricas" (se vio con el número 2 al lado, junto a un ícono de ojo
+  y uno de silenciar) que no está en ningún endpoint documentado arriba. Sin investigar qué
+  significa ni de dónde sale el dato - falta entrar en vivo y revisarlo antes de diseñar algo
+  basado en esto.
 
 ### 3.2 La Cubierta (unlockAt 1) — red social de trading
 - `GET /cubierta/me` → `{"user":{id,username},"canPost":true,"canComment":true,"canCreateItercom":false,"itercomLock":{"reason":"rank"},"effectiveVolume":0,"rank":{"name":"Polizonte","min":0},"followerCount","followingCount","telegramLinked","latestPostAt","maxReservableRankMin":300000,"canPostLinks":false}` → los permisos vienen calculados del servidor según rango/volumen.
