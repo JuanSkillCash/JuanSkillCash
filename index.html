@@ -2467,9 +2467,67 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !important; }
 .page-sparks, .spark{ display:none !important; }
 .cat-overview-preview svg, .cat-overview-preview>div>div{ filter:none !important; }
-/* cajas de la pagina principal con relleno propio (--card) para dar profundidad frente al
-   fondo (pedido de Juan) - antes eran sin relleno, solo contorno; ver CLAUDE.md */
-.cat-overview-card, .cat-flip-back{ background:var(--card) !important; border-color:rgba(91,141,239,.35) !important; }
+/* cajas de la pagina principal: degradado de profundidad (mezcla --accent con --card desde la
+   esquina superior derecha) + sombra suave de elevacion (pedido de Juan, inspirado en
+   cryptobruj.com/exchanges pero con nuestros propios colores - ver docs/referencia si hace
+   falta el prompt original). Antes era un relleno plano; antes de eso, sin relleno. */
+.cat-overview-card, .cat-flip-back{
+  background:radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--accent) 20%, var(--card)) 0%, var(--card) 60%) !important;
+  border-color:rgba(91,141,239,.35) !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+}
+.cat-overview-card{ --glow-x:50%; --glow-y:50%; --glow-i:0; }
+@media (hover:hover) and (pointer:fine){
+  .cat-overview-card{ transition:transform .25s ease-out, box-shadow .3s; will-change:transform; }
+  .cat-overview-card.mg-viva{
+    box-shadow:0 20px 40px -20px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.35),
+      0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  /* borde que se ilumina donde esta el mouse (solo la cara frontal, no la de atras al voltear) */
+  .cat-overview-card::after{
+    content:'';position:absolute;inset:0;z-index:3;padding:2px;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(220px circle at var(--glow-x) var(--glow-y),
+      color-mix(in srgb, var(--accent) calc(var(--glow-i) * 90%), transparent) 0%,
+      color-mix(in srgb, var(--accent) calc(var(--glow-i) * 40%), transparent) 35%, transparent 65%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+}
+/* foco que sigue el cursor por la pantalla cuando esta cerca de las cajas (assets/js/tarjetas-magicas.js) */
+.mg-foco{
+  position:fixed;left:0;top:0;z-index:40;width:700px;height:700px;margin:-350px 0 0 -350px;
+  border-radius:50%;pointer-events:none;opacity:0;mix-blend-mode:screen;transition:opacity .3s;
+  background:radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 8%, transparent) 25%, transparent 60%);
+}
+/* onda al hacer click sobre una caja */
+.mg-onda{
+  position:absolute;z-index:4;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle, color-mix(in srgb, var(--accent) 50%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 20%, transparent) 40%, transparent 70%);
+  animation:mg-onda .8s ease-out forwards;
+}
+@keyframes mg-onda{ to{ transform:scale(30); opacity:0; } }
+@media (prefers-reduced-motion:reduce){ .mg-onda{ animation:none !important; display:none; } }
+
+/* animacion de entrada (solo si JS confirma que no hay prefers-reduced-motion - ver
+   assets/js/animacion-entrada.js): titulo letra por letra y cajas de la pagina principal en
+   cascada al cargar. Sin JS o con reduced-motion, todo se ve normal de una vez. */
+.split-js{ --desde:0ms; }
+.split-js .split .sp{
+  display:inline-block;opacity:0;transform:translateY(.55em) rotate(2deg);transform-origin:0 100%;
+  animation:sp-entra .7s cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay:calc(var(--desde,0ms) + var(--i,0) * 40ms);
+}
+.split-js .split .sw{ display:inline-block; white-space:nowrap; }
+@keyframes sp-entra{ to{ opacity:1; transform:none; } }
+.split-js .cat-flip-outer{
+  opacity:0;transform:translateY(16px);
+  animation:mx-entra .9s cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay:calc(220ms + var(--i,0) * 90ms);
+}
+@keyframes mx-entra{ to{ opacity:1; transform:none; } }
 .cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
@@ -28114,6 +28172,8 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
 <script src="/assets/js/livechart.js?v=6" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
+<script src="/assets/js/animacion-entrada.js?v=1" defer></script>
+<script src="/assets/js/tarjetas-magicas.js?v=1" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
