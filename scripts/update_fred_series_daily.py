@@ -107,7 +107,8 @@ def main():
             if rows:
                 upsert_rows(TABLE, "series_id,date", rows)
             ok.append((series_id, len(rows)))
-            log.info(f"{series_id}: {len(rows)} datos subidos/actualizados")
+            ultima_fecha = max((r["date"] for r in rows), default="(sin datos)")
+            log.info(f"{series_id}: {len(rows)} datos subidos/actualizados, ultima fecha={ultima_fecha}")
             if series_id == "DFF":
                 dff_rows = rows
         except Exception as e:
