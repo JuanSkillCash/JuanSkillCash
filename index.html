@@ -2467,39 +2467,47 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !important; }
 .page-sparks, .spark{ display:none !important; }
 .cat-overview-preview svg, .cat-overview-preview>div>div{ filter:none !important; }
-/* cajas de la pagina principal: degradado de profundidad (mezcla --accent con --card desde la
-   esquina superior derecha) + sombra suave de elevacion (pedido de Juan, inspirado en
-   cryptobruj.com/exchanges pero con nuestros propios colores - ver docs/referencia si hace
-   falta el prompt original). Antes era un relleno plano; antes de eso, sin relleno. */
+/* cajas de la pagina principal: degradado de profundidad azul oscuro -> azul aguamarina
+   (--cat-teal, ya definido mas arriba) desde la esquina superior derecha, + sombra suave de
+   elevacion (pedido de Juan, inspirado en cryptobruj.com/exchanges pero con nuestros propios
+   colores - ver docs/referencia si hace falta el prompt original). */
 .cat-overview-card, .cat-flip-back{
-  background:radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--accent) 20%, var(--card)) 0%, var(--card) 60%) !important;
+  background:radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--cat-teal) 24%, #0d2847) 0%, var(--card) 65%) !important;
   border-color:rgba(91,141,239,.35) !important;
   box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
 }
 .cat-overview-card{ --glow-x:50%; --glow-y:50%; --glow-i:0; }
+/* el "mordisco" (bite-mark) de la esquina inferior derecha se quita - con el relleno nuevo se
+   notaba demasiado; las cajas quedan redonditas parejo, igual que el resto del sitio */
+.cat-overview-card .bite-mark, .cat-flip-back .bite-mark{ display:none; }
 @media (hover:hover) and (pointer:fine){
   .cat-overview-card{ transition:transform .25s ease-out, box-shadow .3s; will-change:transform; }
   .cat-overview-card.mg-viva{
     box-shadow:0 20px 40px -20px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.35),
-      0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+      0 0 0 1px color-mix(in srgb, var(--cat-teal) 25%, transparent);
   }
   /* borde que se ilumina donde esta el mouse (solo la cara frontal, no la de atras al voltear) */
   .cat-overview-card::after{
     content:'';position:absolute;inset:0;z-index:3;padding:2px;border-radius:inherit;pointer-events:none;
     background:radial-gradient(220px circle at var(--glow-x) var(--glow-y),
-      color-mix(in srgb, var(--accent) calc(var(--glow-i) * 90%), transparent) 0%,
-      color-mix(in srgb, var(--accent) calc(var(--glow-i) * 40%), transparent) 35%, transparent 65%);
+      color-mix(in srgb, var(--cat-teal) calc(var(--glow-i) * 90%), transparent) 0%,
+      color-mix(in srgb, var(--cat-teal) calc(var(--glow-i) * 40%), transparent) 35%, transparent 65%);
     -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
   }
 }
-/* foco que sigue el cursor por la pantalla cuando esta cerca de las cajas (assets/js/tarjetas-magicas.js) */
+/* foco que sigue el cursor, acotado a la seccion de las 7 cajas (assets/js/tarjetas-magicas.js
+   lo mete como hijo de #categoryOverviewGrid, no de <body>, y calcula su propia opacidad para
+   que se desvanezca suave cerca del borde de la seccion - no lo recorta de un tajo con
+   overflow:hidden, por eso no se ve una linea donde "corta"). Azul oscurito, sin screen blend
+   (ese blend era lo que lo hacia verse blanco/lavado sobre el fondo oscuro) */
+#categoryOverviewGrid{ isolation:isolate; }
+#categoryOverviewGrid > .cat-overview-featured, #categoryOverviewGrid > .cat-overview-grid{ position:relative; z-index:1; }
 .mg-foco{
-  position:fixed;left:0;top:0;z-index:40;width:700px;height:700px;margin:-350px 0 0 -350px;
-  border-radius:50%;pointer-events:none;opacity:0;mix-blend-mode:screen;transition:opacity .3s;
-  background:radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0%,
-    color-mix(in srgb, var(--accent) 8%, transparent) 25%, transparent 60%);
+  position:absolute;left:0;top:0;z-index:0;width:600px;height:600px;margin:-300px 0 0 -300px;
+  border-radius:50%;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:radial-gradient(circle, rgba(26,58,107,.55) 0%, rgba(26,58,107,.22) 35%, transparent 68%);
 }
 /* onda al hacer click sobre una caja */
 .mg-onda{
@@ -2528,6 +2536,61 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   animation-delay:calc(220ms + var(--i,0) * 90ms);
 }
 @keyframes mx-entra{ to{ opacity:1; transform:none; } }
+
+/* linea de "grafico" decorativa dentro de cada caja (dato inventado, no son precios reales -
+   ver assets/js/tarjetas-magicas.js). Va detras del contenido real, por eso el contenido real
+   necesita su propio z-index por encima. */
+.cat-overview-card > :not(.mg-linea):not(.mg-onda):not(.bite-mark){ position:relative; z-index:2; }
+.cat-overview-card > .bite-mark{ z-index:2; }
+.mg-linea{
+  position:absolute;left:0;right:0;bottom:0;z-index:1;width:100%;height:34%;
+  pointer-events:none;opacity:.45;color:var(--accent);
+}
+.mg-linea path:not(.area){ fill:none;stroke:var(--accent);stroke-width:1.5; }
+.mg-linea .area{ stroke:none;opacity:0;transition:opacity .5s; }
+@media (hover:hover) and (pointer:fine){
+  .cat-overview-card.mg-viva .mg-linea path:not(.area){ animation:mg-dibuja 1.1s cubic-bezier(.2,.8,.2,1) forwards; }
+  .cat-overview-card.mg-viva .mg-linea .area{ opacity:1; }
+}
+@keyframes mg-dibuja{ to{ stroke-dashoffset:0; } }
+
+/* pie de pagina tipo "cortina": en escritorio el contenido (.main) se desliza hacia arriba al
+   hacer scroll y el pie queda pegado detras, revelandose por el hueco que deja .telon (100vh +
+   clip-path - el clip-path de paso vuelve a .telon el contenedor de posicion del pie fijo, por
+   eso "fixed" aqui se comporta pegado a la caja de .telon y no a toda la ventana). Mismo truco
+   100% CSS que cryptobruj.com/exchanges, con nuestro footer real (la "frase gigante" de marca
+   del prompt original queda pendiente de que Juan la escriba). En movil (<=720px) sencillamente
+   no aplica nada de esto y el pie se ve normal, de corrido. */
+@media(min-width:721px){
+  .main{ position:relative; z-index:1; background:var(--bg); }
+  .telon{ position:relative; height:100vh; clip-path:inset(0); }
+  .telon .site-footer{
+    position:fixed; left:0; bottom:0; width:100%; height:100vh; box-sizing:border-box;
+    margin-top:0; padding:40px 30px max(28px, env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden;
+    border-top:0; background:var(--bg);
+  }
+  .site-footer-luz{
+    position:absolute; left:50%; top:35%; width:60vw; height:45vh; transform:translate(-50%,-50%);
+    border-radius:50%; pointer-events:none; filter:blur(60px);
+    background:radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 20%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 8%, transparent) 45%, transparent 70%);
+  }
+  @media(prefers-reduced-motion:no-preference){
+    .telon{ view-timeline-name:--telon; }
+    .site-footer-luz{ animation:pie-respira 8s ease-in-out infinite alternate; }
+    @keyframes pie-respira{
+      from{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
+      to{ transform:translate(-50%,-50%) scale(1.12); opacity:1; }
+    }
+    @supports (animation-timeline: scroll()){
+      .telon .site-footer > :not(.site-footer-luz){
+        animation:pie-sube linear both; animation-timeline:--telon; animation-range:entry 20%;
+      }
+      @keyframes pie-sube{ from{ opacity:0; transform:translateY(40px); } to{ opacity:1; transform:none; } }
+    }
+  }
+}
 .cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
@@ -7306,7 +7369,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
 
+  </main>
+</div>
+
+<div class="telon">
     <footer class="site-footer">
+      <div class="site-footer-luz" aria-hidden="true"></div>
       <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner">
         <div class="telegram-banner-left">
           <div class="telegram-banner-icon">
@@ -7373,8 +7441,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       <p class="site-footer-note">SkillCash Tools es contenido educativo. Nada de lo que encuentres aquí constituye asesoría financiera, de inversión ni una recomendación de compra o venta — opera siempre bajo tu propio criterio y asumiendo tu propio riesgo.</p>
     </footer>
-
-  </main>
 </div>
 
 <!-- ===== MODAL: CALCULADORA ===== -->
@@ -11620,6 +11686,11 @@ document.querySelectorAll('[data-cat-home]').forEach(btn => {
 
 /* ---- sección de favoritos, arriba de todo, debajo de la publicidad de Bitunix ---- */
 function renderFavoritesSection(){
+  // pedido de Juan: quitar la seccion de "Favoritos" de la pagina principal (la estrellita
+  // para marcar favoritos en otros lados del sitio se deja tal cual, solo esta vitrina se quita)
+  const section0 = document.getElementById('favoritesSection');
+  if(section0) section0.innerHTML = '';
+  return;
   const section = document.getElementById('favoritesSection');
   const favs = loadFavorites();
   if(favs.length === 0){ section.innerHTML = ''; return; }

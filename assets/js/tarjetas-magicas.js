@@ -1,10 +1,12 @@
 /* Efectos "Magic Bento" en las cajas de la pagina principal (.cat-overview-card): borde que
  * se ilumina donde esta el mouse, foco que sigue el cursor por la pantalla, inclinacion 3D
- * leve al pasar por encima, y una ondita al hacer click. Inspirado en cryptobruj.com/exchanges
- * pero con nuestro --accent unico (nada de paleta nueva por tarjeta).
+ * leve al pasar por encima, una ondita al hacer click, y una lineita de "grafico" (dato
+ * inventado, no son precios reales) que se dibuja al pasar el mouse. Inspirado en
+ * cryptobruj.com/exchanges pero con nuestro --accent unico (nada de paleta nueva por tarjeta).
  *
- * El tilt/glow/foco solo corren en escritorio con mouse real y nunca si el usuario pidio menos
- * movimiento (prefers-reduced-motion). La ondita de click si corre en cualquier dispositivo.
+ * El tilt/glow/foco/linea solo corren en escritorio con mouse real y nunca si el usuario pidio
+ * menos movimiento (prefers-reduced-motion). La ondita de click si corre en cualquier
+ * dispositivo.
  */
 (function(){
   var tarjetas = [].slice.call(document.querySelectorAll('.cat-overview-card'));
@@ -12,6 +14,36 @@
 
   var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hoverFino = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // lineita decorativa tipo "grafico" en el tercio inferior de cada caja - paseo aleatorio
+  // reproducible (mismo generador congruencial lineal sembrado por el indice de la tarjeta),
+  // oculta de entrada; solo "se dibuja" si hay hover (ver mas abajo, clase mg-viva)
+  var NS = 'http://www.w3.org/2000/svg';
+  tarjetas.forEach(function(t, i){
+    var pts = [];
+    var y = 60, s = i * 7 + 3;
+    for(var x = 0; x <= 100; x += 5){
+      s = (s * 9301 + 49297) % 233280;
+      y = Math.max(14, Math.min(90, y + (s / 233280 - 0.52) * 24));
+      pts.push([x, y]);
+    }
+    var p = pts.map(function(q, k){ return (k ? 'L' : 'M') + q[0] + ' ' + q[1]; }).join(' ');
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'mg-linea');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+    var id = 'mg-area-' + i;
+    svg.innerHTML = '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="currentColor" stop-opacity=".22"/>' +
+      '<stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>' +
+      '<path class="area" fill="url(#' + id + ')" d="' + p + ' L100 100 L0 100 Z"/><path d="' + p + '"/>';
+    t.appendChild(svg);
+    var linea = svg.lastElementChild;
+    var L = linea.getTotalLength();
+    linea.style.strokeDasharray = L;
+    linea.style.strokeDashoffset = L;
+  });
 
   tarjetas.forEach(function(t){
     t.addEventListener('click', function(e){
@@ -29,56 +61,61 @@
 
   if(reduceMotion || !hoverFino) return;
 
+  // la sección completa de cajas (las 3 grandes + las 4 chicas) - el foco vive adentro de esta
+  // misma caja (no de document.body) para no "escaparse" a otras partes de la página
+  var seccion = document.getElementById('categoryOverviewGrid');
+  if(!seccion) return;
+  seccion.style.position = 'relative';
+
   var foco = document.createElement('div');
   foco.className = 'mg-foco';
   foco.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(foco);
+  seccion.appendChild(foco);
 
-  var R = 300;
+  var MARGEN_DESVANECE = 140; // px: que tan lejos del borde de la seccion empieza a desvanecerse
   var raf = null;
   var ultimo = null;
 
+  // en vez de pointerenter/pointerleave (que con el tilt 3D se confundian solos y se quedaban
+  // "pegados" en false para siempre) calculamos cada cuadro, con la posicion real del mouse,
+  // si esta encima de cada tarjeta - se autocorrige cada frame, nunca se puede quedar trabado
   function actualizar(){
     raf = null;
     var e = ultimo;
     if(!e) return;
-    var dentro = tarjetas.some(function(t){
-      var b = t.getBoundingClientRect();
-      return e.clientX > b.left - R && e.clientX < b.right + R && e.clientY > b.top - R && e.clientY < b.bottom + R;
-    });
-    foco.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
-    foco.style.opacity = dentro ? '1' : '0';
+
+    var sb = seccion.getBoundingClientRect();
+    var dxs = Math.max(sb.left - e.clientX, 0, e.clientX - sb.right);
+    var dys = Math.max(sb.top - e.clientY, 0, e.clientY - sb.bottom);
+    var distSeccion = Math.hypot(dxs, dys);
+    var focoOpacidad = distSeccion > MARGEN_DESVANECE ? 0 : 1 - distSeccion / MARGEN_DESVANECE;
+    foco.style.transform = 'translate(' + (e.clientX - sb.left) + 'px,' + (e.clientY - sb.top) + 'px)';
+    foco.style.opacity = focoOpacidad.toFixed(2);
 
     tarjetas.forEach(function(t){
       var c = t.getBoundingClientRect();
-      var dx = Math.max(c.left - e.clientX, 0, e.clientX - c.right);
-      var dy = Math.max(c.top - e.clientY, 0, e.clientY - c.bottom);
-      var dist = Math.hypot(dx, dy);
-      var i = dist > R ? 0 : 1 - dist / R;
-      t.style.setProperty('--glow-x', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%');
-      t.style.setProperty('--glow-y', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%');
-      t.style.setProperty('--glow-i', i.toFixed(2));
+      var encima = e.clientX >= c.left && e.clientX <= c.right && e.clientY >= c.top && e.clientY <= c.bottom;
+      t.classList.toggle('mg-viva', encima);
+      if(encima){
+        var x = (e.clientX - c.left) / c.width - 0.5;
+        var y = (e.clientY - c.top) / c.height - 0.5;
+        // sin perspective() propio: la tarjeta ya vive dentro de .cat-flip-outer, que trae su
+        // propio perspective - anidar un segundo perspective() aqui confundia el hit-testing
+        t.style.transform = 'rotateX(' + (-y * 6).toFixed(2) + 'deg) rotateY(' +
+          (x * 6).toFixed(2) + 'deg) translate(' + (x * 8).toFixed(1) + 'px,' + (y * 8).toFixed(1) +
+          'px) translateY(-2px)';
+        t.style.setProperty('--glow-x', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%');
+        t.style.setProperty('--glow-y', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%');
+        t.style.setProperty('--glow-i', '1');
+      } else {
+        t.style.transform = '';
+        t.style.setProperty('--glow-i', '0');
+      }
     });
   }
 
   document.addEventListener('pointermove', function(e){
     ultimo = e;
     if(raf == null) raf = requestAnimationFrame(actualizar);
-  });
-
-  tarjetas.forEach(function(t){
-    t.addEventListener('pointermove', function(e){
-      var c = t.getBoundingClientRect();
-      var x = (e.clientX - c.left) / c.width - 0.5;
-      var y = (e.clientY - c.top) / c.height - 0.5;
-      t.style.transform = 'perspective(1000px) rotateX(' + (-y * 6).toFixed(2) + 'deg) rotateY(' +
-        (x * 6).toFixed(2) + 'deg) translate(' + (x * 8).toFixed(1) + 'px,' + (y * 8).toFixed(1) +
-        'px) translateY(-2px)';
-    });
-    t.addEventListener('pointerenter', function(){ t.classList.add('mg-viva'); });
-    t.addEventListener('pointerleave', function(){
-      t.classList.remove('mg-viva');
-      t.style.transform = '';
-    });
   });
 })();
