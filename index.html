@@ -1163,7 +1163,7 @@ button{font-family:inherit;color:inherit}
 .cat-flip-outer{perspective:1600px;height:100%;position:relative}
 .cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
 .cat-flip-outer.flipped .cat-flip-inner{transform:rotateY(180deg)}
-.cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--card);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
+.cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--card);border:1.5px solid var(--cat-teal);color:var(--cat-teal);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
 .cat-flip-toggle:hover{background:rgba(91,141,239,.14)}
 .cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
 .cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -2505,7 +2505,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    colores - ver docs/referencia si hace falta el prompt original). */
 .cat-overview-card, .cat-flip-back{
   background:radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--cat-teal) 15%, var(--card)) 0%, var(--card) 75%) !important;
-  border-color:rgba(91,141,239,.35) !important;
+  border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
   box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
 }
 .cat-overview-card{ --glow-x:50%; --glow-y:50%; --glow-i:0; }
@@ -2607,7 +2607,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     to{ transform:translate(-50%,-50%) scale(1.12); opacity:1; }
   }
 }
-.cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
+.cat-overview-card:hover{ border-color:color-mix(in srgb, var(--cat-teal) 60%, transparent) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
 .cat-flip-back, .cat-flip-back::before, .cat-flip-back::after,
@@ -2629,8 +2629,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .indic-cat-label{ color:var(--white) !important; font-size:13px; font-weight:600; letter-spacing:0; }
 
 
-/* cajas del inicio: numerito, "N HERRAMIENTAS", palomitas y "Explorar" en azul (--accent) */
-.cat-overview-card, .cat-flip-back{ --c:var(--accent) !important; }
+/* cajas del inicio: numerito, "N HERRAMIENTAS", icono y "Explorar" en aguamarina (--cat-teal),
+   para que combine con el fondo degradado de la caja - antes estaba en --accent (azul) y
+   chocaba con el aguamarina del fondo */
+.cat-overview-card, .cat-flip-back{ --c:var(--cat-teal) !important; }
 /* si una caja del inicio no trae subtitulo ("N HERRAMIENTAS"), igual se reserva su renglon
    para que el dibujo y el texto queden a la misma altura que en las demas cajas */
 .cat-overview-head + .cat-overview-preview{ margin-top:calc(3px + 1.5em + 14px); }
