@@ -2082,7 +2082,34 @@ img[src=""]{display:none}
 .partner-block-pending{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--border2);border-radius:99px;padding:6px 14px;margin-left:auto}
 
 /* FOOTER */
-.site-footer{margin-top:48px;padding-top:28px;border-top:1px solid rgba(91,141,239,.3)}
+.site-footer{margin-top:48px;padding-top:28px;border-top:1px solid rgba(91,141,239,.3);position:relative;overflow:hidden}
+/* frase gigante + 3 columnas + iconos redondos (rediseño pedido por Juan, referencia visual:
+   cryptobruj.com) */
+.site-footer-phrase{
+  position:relative;font-family:'Poppins',sans-serif;font-weight:800;line-height:1.05;
+  letter-spacing:-.02em;font-size:clamp(28px,5vw,52px);color:var(--white);margin:8px 0 36px;
+  text-wrap:balance;max-width:720px;
+}
+.site-footer-phrase .acc{ color:var(--cat-teal); }
+.site-footer-cols{position:relative;display:flex;flex-wrap:wrap;gap:36px;margin-bottom:28px}
+.site-footer-col-brand{flex:1 1 220px;min-width:200px;display:flex;flex-direction:column;gap:14px}
+.site-footer-col-email{font-size:12.5px;color:var(--muted2)}
+.site-footer-social-round{display:flex;flex-wrap:wrap;gap:10px}
+.footer-social-round{
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--card);border:1.5px solid rgba(91,141,239,.3);color:var(--muted2);
+  transition:border-color .2s,color .2s,transform .2s;flex-shrink:0;
+}
+.footer-social-round:hover{border-color:var(--hover);color:var(--hover);transform:translateY(-2px)}
+.site-footer-col{flex:1 1 150px;min-width:140px;display:flex;flex-direction:column;gap:11px}
+.site-footer-col-title{font-weight:700;font-size:13.5px;color:var(--white)}
+.site-footer-col-link{
+  font-size:12.5px;color:var(--muted2);text-decoration:none;background:none;border:none;
+  text-align:left;padding:0;cursor:pointer;font-family:inherit;width:fit-content;
+  transition:color .2s;
+}
+.site-footer-col-link:hover{ color:var(--white); }
+.site-footer-divider{position:relative;height:1px;background:rgba(91,141,239,.2);margin-bottom:18px}
 .site-footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
 
 .telegram-banner{
@@ -2554,41 +2581,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 }
 @keyframes mg-dibuja{ to{ stroke-dashoffset:0; } }
 
-/* pie de pagina tipo "cortina": en escritorio el contenido (.main) se desliza hacia arriba al
-   hacer scroll y el pie queda pegado detras, revelandose por el hueco que deja .telon (100vh +
-   clip-path - el clip-path de paso vuelve a .telon el contenedor de posicion del pie fijo, por
-   eso "fixed" aqui se comporta pegado a la caja de .telon y no a toda la ventana). Mismo truco
-   100% CSS que cryptobruj.com/exchanges, con nuestro footer real (la "frase gigante" de marca
-   del prompt original queda pendiente de que Juan la escriba). En movil (<=720px) sencillamente
-   no aplica nada de esto y el pie se ve normal, de corrido. */
-@media(min-width:721px){
-  .main{ position:relative; z-index:1; background:var(--bg); }
-  .telon{ position:relative; height:100vh; clip-path:inset(0); }
-  .telon .site-footer{
-    position:fixed; left:0; bottom:0; width:100%; height:100vh; box-sizing:border-box;
-    margin-top:0; padding:40px 30px max(28px, env(safe-area-inset-bottom,0px));
-    display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden;
-    border-top:0; background:var(--bg);
-  }
-  .site-footer-luz{
-    position:absolute; left:50%; top:35%; width:60vw; height:45vh; transform:translate(-50%,-50%);
-    border-radius:50%; pointer-events:none; filter:blur(60px);
-    background:radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 20%, transparent) 0%,
-      color-mix(in srgb, var(--accent) 8%, transparent) 45%, transparent 70%);
-  }
-  @media(prefers-reduced-motion:no-preference){
-    .telon{ view-timeline-name:--telon; }
-    .site-footer-luz{ animation:pie-respira 8s ease-in-out infinite alternate; }
-    @keyframes pie-respira{
-      from{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
-      to{ transform:translate(-50%,-50%) scale(1.12); opacity:1; }
-    }
-    @supports (animation-timeline: scroll()){
-      .telon .site-footer > :not(.site-footer-luz){
-        animation:pie-sube linear both; animation-timeline:--telon; animation-range:entry 20%;
-      }
-      @keyframes pie-sube{ from{ opacity:0; transform:translateY(40px); } to{ opacity:1; transform:none; } }
-    }
+/* Pie de pagina rediseñado (referencia visual que mando Juan: frase gigante + 3 columnas +
+   iconos de redes redondos). El truco de "cortina" (pie fijo revelado con scroll) se quito:
+   en la practica el pie aparecia de una, completo, sin revelarse progresivo (el contenedor de
+   posicion via clip-path no se comporto como en la referencia en este navegador), y encima
+   dejaba un bug real reportado por Juan (al seguir bajando del todo se veia como una segunda
+   "cortina" tapando el texto). Un pie normal, de corrido, es mas confiable en cualquier
+   dispositivo/navegador - el resplandor ambiental (--site-footer-luz) se queda, solo que ahora
+   vive dentro del flujo normal de la pagina en vez de un panel fijo de 100vh. */
+.site-footer-luz{
+  position:absolute; left:50%; top:20%; width:60vw; height:300px; transform:translate(-50%,-50%);
+  max-width:600px; border-radius:50%; pointer-events:none; filter:blur(60px); z-index:0;
+  background:radial-gradient(ellipse at center, color-mix(in srgb, var(--cat-teal) 16%, transparent) 0%,
+    color-mix(in srgb, var(--cat-teal) 6%, transparent) 45%, transparent 70%);
+}
+@media(prefers-reduced-motion:no-preference){
+  .site-footer-luz{ animation:pie-respira 8s ease-in-out infinite alternate; }
+  @keyframes pie-respira{
+    from{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
+    to{ transform:translate(-50%,-50%) scale(1.12); opacity:1; }
   }
 }
 .cat-overview-card:hover{ border-color:rgba(91,141,239,.6) !important; }
@@ -7388,56 +7399,52 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <span class="telegram-banner-btn">UNIRME</span>
       </a>
 
-      <div class="site-footer-social-label">Seguime en mis otras redes</div>
-      <div class="site-footer-social">
-        <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#25F4EE">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg>
-            <span>TikTok</span>
+      <p class="site-footer-phrase" aria-hidden="true">Todo gratis. <span class="acc">Siempre.</span></p>
+
+      <div class="site-footer-cols">
+        <div class="site-footer-col-brand">
+          <span class="sb-logo-text" style="font-size:15px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
+          <div class="site-footer-col-email">contacto@juanskillcash.com</div>
+          <div class="site-footer-social-round">
+            <a href="https://tiktok.com/@juanskll" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#25F4EE" aria-label="TikTok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8c-.9-.9-1.4-2.1-1.4-3.4h-3.1v13.7c0 1.5-1.2 2.7-2.7 2.7s-2.7-1.2-2.7-2.7 1.2-2.7 2.7-2.7c.3 0 .6 0 .8.1v-3.1c-.3 0-.6-.1-.8-.1-3.2 0-5.8 2.6-5.8 5.8s2.6 5.8 5.8 5.8 5.8-2.6 5.8-5.8V9.1c1.2.9 2.7 1.4 4.3 1.4V7.4c-1 0-2-.4-2.9-1.6z"/></svg>
+            </a>
+            <a href="https://www.facebook.com/share/1BHKVvnWbo/" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#4267B2" aria-label="Facebook">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.1c0-5.5-4.5-10-10-10S2 6.6 2 12.1c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.9c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7c4.7-.8 8.4-4.9 8.4-9.9z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/juanskillcash" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#e0479e" aria-label="Instagram">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.7 0-3.1 0-4.1.1-1.1 0-1.8.2-2.4.4-.7.3-1.2.6-1.8 1.2-.6.6-.9 1.1-1.2 1.8-.2.6-.4 1.3-.4 2.4C2 8.9 2 9.3 2 12s0 3.1.1 4.1c0 1.1.2 1.8.4 2.4.3.7.6 1.2 1.2 1.8.6.6 1.1.9 1.8 1.2.6.2 1.3.4 2.4.4C8.9 22 9.3 22 12 22s3.1 0 4.1-.1c1.1 0 1.8-.2 2.4-.4.7-.3 1.2-.6 1.8-1.2.6-.6.9-1.1 1.2-1.8.2-.6.4-1.3.4-2.4.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c0-1.1-.2-1.8-.4-2.4-.3-.7-.6-1.2-1.2-1.8-.6-.6-1.1-.9-1.8-1.2-.6-.2-1.3-.4-2.4-.4C15.1 2 14.7 2 12 2zm0 1.8c2.6 0 2.9 0 4 .1.9 0 1.5.2 1.8.3.5.2.8.4 1.1.7.3.3.5.6.7 1.1.1.3.3.9.3 1.8.1 1.1.1 1.4.1 4s0 2.9-.1 4c0 .9-.2 1.5-.3 1.8-.2.5-.4.8-.7 1.1-.3.3-.6.5-1.1.7-.3.1-.9.3-1.8.3-1.1.1-1.4.1-4 .1s-2.9 0-4-.1c-.9 0-1.5-.2-1.8-.3-.5-.2-.8-.4-1.1-.7-.3-.3-.5-.6-.7-1.1-.1-.3-.3-.9-.3-1.8-.1-1.1-.1-1.4-.1-4s0-2.9.1-4c0-.9.2-1.5.3-1.8.2-.5.4-.8.7-1.1.3-.3.6-.5 1.1-.7.3-.1.9-.3 1.8-.3 1.1-.1 1.4-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
+            </a>
+            <a href="https://www.threads.com/@juanskillcash" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#ffffff" aria-label="Threads">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 11.3c-.1-2.8-1.7-5.2-4.8-5.2-2.9 0-4.9 1.9-4.9 5.1v1.6c0 3.2 2 5.1 4.9 5.1 2.1 0 3.5-1 4.2-2.6l1.9.9c-1 2.3-3.1 3.6-6.1 3.6-4.1 0-7-2.7-7-7v-1.6c0-4.3 2.9-7 7-7 4.3 0 6.9 2.9 7 6.7v.8c0 1.6-.5 2.8-1.7 2.8-1 0-1.5-.6-1.6-1.5-.7.8-1.7 1.3-3 1.3-2 0-3.3-1.2-3.3-3s1.4-2.9 3.5-2.9c.8 0 1.5.1 2 .4 0-.9-.7-1.6-1.9-1.6-.9 0-1.6.3-2.2.8l-1.3-1.3c.9-.8 2.1-1.3 3.6-1.3 2.5 0 4.2 1.5 4.4 3.8.1.6.1 1.2.1 1.7v.1c0 .6.1 1 .5 1 .5 0 .6-.6.6-1.3v-.5zm-5.4 3.1c1 0 1.9-.5 1.9-1.6 0-.9-.7-1.3-1.7-1.3-1.2 0-1.9.5-1.9 1.4 0 .8.7 1.5 1.7 1.5z"/></svg>
+            </a>
+            <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener" class="footer-social-round" style="--hover:#f0b23d" aria-label="Beacons">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>
+            </a>
           </div>
-          <div class="footer-social-handle">@juanskll</div>
-        </a>
-        <a href="https://www.facebook.com/share/1BHKVvnWbo/" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#4267B2">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#4267B2"><path d="M22 12.1c0-5.5-4.5-10-10-10S2 6.6 2 12.1c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.9c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7c4.7-.8 8.4-4.9 8.4-9.9z"/></svg>
-            <span>Facebook</span>
-          </div>
-          <div class="footer-social-handle">@juanskillcash</div>
-        </a>
-        <a href="https://www.instagram.com/juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#e0479e">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#e0479e"><path d="M12 2c-2.7 0-3.1 0-4.1.1-1.1 0-1.8.2-2.4.4-.7.3-1.2.6-1.8 1.2-.6.6-.9 1.1-1.2 1.8-.2.6-.4 1.3-.4 2.4C2 8.9 2 9.3 2 12s0 3.1.1 4.1c0 1.1.2 1.8.4 2.4.3.7.6 1.2 1.2 1.8.6.6 1.1.9 1.8 1.2.6.2 1.3.4 2.4.4C8.9 22 9.3 22 12 22s3.1 0 4.1-.1c1.1 0 1.8-.2 2.4-.4.7-.3 1.2-.6 1.8-1.2.6-.6.9-1.1 1.2-1.8.2-.6.4-1.3.4-2.4.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c0-1.1-.2-1.8-.4-2.4-.3-.7-.6-1.2-1.2-1.8-.6-.6-1.1-.9-1.8-1.2-.6-.2-1.3-.4-2.4-.4C15.1 2 14.7 2 12 2zm0 1.8c2.6 0 2.9 0 4 .1.9 0 1.5.2 1.8.3.5.2.8.4 1.1.7.3.3.5.6.7 1.1.1.3.3.9.3 1.8.1 1.1.1 1.4.1 4s0 2.9-.1 4c0 .9-.2 1.5-.3 1.8-.2.5-.4.8-.7 1.1-.3.3-.6.5-1.1.7-.3.1-.9.3-1.8.3-1.1.1-1.4.1-4 .1s-2.9 0-4-.1c-.9 0-1.5-.2-1.8-.3-.5-.2-.8-.4-1.1-.7-.3-.3-.5-.6-.7-1.1-.1-.3-.3-.9-.3-1.8-.1-1.1-.1-1.4-.1-4s0-2.9.1-4c0-.9.2-1.5.3-1.8.2-.5.4-.8.7-1.1.3-.3.6-.5 1.1-.7.3-.1.9-.3 1.8-.3 1.1-.1 1.4-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
-            <span>Instagram</span>
-          </div>
-          <div class="footer-social-handle">@juanskillcash</div>
-        </a>
-        <a href="https://www.threads.com/@juanskillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#ffffff">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 11.3c-.1-2.8-1.7-5.2-4.8-5.2-2.9 0-4.9 1.9-4.9 5.1v1.6c0 3.2 2 5.1 4.9 5.1 2.1 0 3.5-1 4.2-2.6l1.9.9c-1 2.3-3.1 3.6-6.1 3.6-4.1 0-7-2.7-7-7v-1.6c0-4.3 2.9-7 7-7 4.3 0 6.9 2.9 7 6.7v.8c0 1.6-.5 2.8-1.7 2.8-1 0-1.5-.6-1.6-1.5-.7.8-1.7 1.3-3 1.3-2 0-3.3-1.2-3.3-3s1.4-2.9 3.5-2.9c.8 0 1.5.1 2 .4 0-.9-.7-1.6-1.9-1.6-.9 0-1.6.3-2.2.8l-1.3-1.3c.9-.8 2.1-1.3 3.6-1.3 2.5 0 4.2 1.5 4.4 3.8.1.6.1 1.2.1 1.7v.1c0 .6.1 1 .5 1 .5 0 .6-.6.6-1.3v-.5zm-5.4 3.1c1 0 1.9-.5 1.9-1.6 0-.9-.7-1.3-1.7-1.3-1.2 0-1.9.5-1.9 1.4 0 .8.7 1.5 1.7 1.5z"/></svg>
-            <span>Threads</span>
-          </div>
-          <div class="footer-social-handle">@juanskillcash</div>
-        </a>
-        <a href="https://beacons.ai/skillcash" target="_blank" rel="noopener" class="footer-social-btn" style="--hover:#f0b23d">
-          <div class="footer-social-top">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0b23d" stroke-width="1.8" stroke-linecap="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="#f0b23d" stroke="none"/></svg>
-            <span>Beacons</span>
-          </div>
-          <div class="footer-social-handle">@skillcash</div>
-        </a>
+        </div>
+        <div class="site-footer-col">
+          <div class="site-footer-col-title">Aprende</div>
+          <button type="button" class="site-footer-col-link" onclick="openGlossaryModal()">Glosario</button>
+          <button type="button" class="site-footer-col-link" onclick="openManualModal()">Manual</button>
+          <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="site-footer-col-link">Comunidad de Telegram</a>
+        </div>
+        <div class="site-footer-col">
+          <div class="site-footer-col-title">SkillCash</div>
+          <a href="#categoryOverviewGrid" class="site-footer-col-link">Tus herramientas</a>
+          <a href="https://bitunix.com" target="_blank" rel="noopener" class="site-footer-col-link">Opera en Bitunix</a>
+        </div>
+        <div class="site-footer-col">
+          <div class="site-footer-col-title">Legal</div>
+          <a href="#" class="site-footer-col-link legal-footer-link" data-legal="terminos">Términos y Condiciones</a>
+          <a href="#" class="site-footer-col-link legal-footer-link" data-legal="privacidad">Política de Privacidad</a>
+          <a href="#" class="site-footer-col-link legal-footer-link" data-legal="cookies">Política de Cookies</a>
+        </div>
       </div>
 
-      <div class="site-footer-brand-center">
-        <span class="sb-logo-text" style="font-size:15px">SKILL<span style="color:var(--red)">CASH</span><span class="sb-logo-tools">Tools</span></span>
-      </div>
+      <div class="site-footer-divider"></div>
       <div class="site-footer-bottom">
         <span>© <span id="footerYear"></span> SkillCash. Todos los derechos reservados.</span>
-        <span>·</span>
-        <a href="#" class="legal-footer-link" data-legal="terminos">Términos y Condiciones</a>
-        <span>·</span>
-        <a href="#" class="legal-footer-link" data-legal="privacidad">Política de Privacidad</a>
-        <span>·</span>
-        <a href="#" class="legal-footer-link" data-legal="cookies">Política de Cookies</a>
       </div>
       <p class="site-footer-note">SkillCash Tools es contenido educativo. Nada de lo que encuentres aquí constituye asesoría financiera, de inversión ni una recomendación de compra o venta — opera siempre bajo tu propio criterio y asumiendo tu propio riesgo.</p>
     </footer>
