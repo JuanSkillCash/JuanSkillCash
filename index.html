@@ -2671,8 +2671,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .split-js{ --desde:0ms; }
 .split-js .split .sp{
   display:inline-block;opacity:0;transform:translateY(.55em) rotate(2deg);transform-origin:0 100%;
-  animation:sp-entra .7s cubic-bezier(.2,.8,.2,1) forwards;
-  animation-delay:calc(var(--desde,0ms) + var(--i,0) * 40ms);
+  animation:sp-entra 1s cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay:calc(var(--desde,0ms) + var(--i,0) * 65ms);
 }
 .split-js .split .sw{ display:inline-block; white-space:nowrap; }
 @keyframes sp-entra{ to{ opacity:1; transform:none; } }
