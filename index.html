@@ -2109,8 +2109,8 @@ img[src=""]{display:none}
 /* frase gigante + 3 columnas + iconos redondos (rediseño pedido por Juan, referencia visual:
    cryptobruj.com) */
 .site-footer-phrase{
-  position:relative;font-family:'Poppins',sans-serif;font-weight:800;line-height:1.05;
-  letter-spacing:-.02em;font-size:clamp(22px,4.2vw,52px);color:var(--white);margin:8px auto 36px;
+  position:relative;font-weight:900;line-height:1.05;
+  letter-spacing:-.03em;font-size:clamp(26px,5.5vw,72px);color:var(--white);margin:34px auto 36px;
   white-space:nowrap;text-align:center;
 }
 .site-footer-phrase .acc{ color:var(--red); }
@@ -2524,7 +2524,8 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 .main-head h1, .main-head h1 *,
 .calc-eyebrow, .calc-eyebrow *,
 .calc-title, .calc-title *,
-.hero-mascot-title, .hero-mascot-title *
+.hero-mascot-title, .hero-mascot-title *,
+.site-footer-phrase
 { font-family:'Poppins', sans-serif !important; }
 .sb-logo-tools,
 .main-head h1 em,
@@ -2664,21 +2665,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    posicion via clip-path no se comporto como en la referencia en este navegador), y encima
    dejaba un bug real reportado por Juan (al seguir bajando del todo se veia como una segunda
    "cortina" tapando el texto). Un pie normal, de corrido, es mas confiable en cualquier
-   dispositivo/navegador - el resplandor ambiental (--site-footer-luz) se queda, solo que ahora
-   vive dentro del flujo normal de la pagina en vez de un panel fijo de 100vh. */
-.site-footer-luz{
-  position:absolute; left:50%; top:20%; width:60vw; height:300px; transform:translate(-50%,-50%);
-  max-width:600px; border-radius:50%; pointer-events:none; filter:blur(60px); z-index:0;
-  background:radial-gradient(ellipse at center, color-mix(in srgb, var(--cat-teal) 16%, transparent) 0%,
-    color-mix(in srgb, var(--cat-teal) 6%, transparent) 45%, transparent 70%);
-}
-@media(prefers-reduced-motion:no-preference){
-  .site-footer-luz{ animation:pie-respira 8s ease-in-out infinite alternate; }
-  @keyframes pie-respira{
-    from{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
-    to{ transform:translate(-50%,-50%) scale(1.12); opacity:1; }
-  }
-}
+   dispositivo/navegador. El resplandor ambiental que quedaba detras de la frase (pulsando sin
+   parar con una animacion infinita) se quito del todo: Juan lo reporto como "un degrade azul
+   raro" - era .site-footer-luz, que ya no se usa (el <div> vacio que queda en el HTML no pinta
+   nada sin esta clase). */
 .cat-overview-card:hover{ border-color:color-mix(in srgb, var(--cat-teal) 60%, transparent) !important; }
 /* cara de atras (al voltear) y dibujos: sin degradés ni puntitos, y la esquinita mordida en
    gris como el borde en vez de roja */
@@ -7465,9 +7455,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   </main>
 </div>
 
-<div class="telon">
     <footer class="site-footer">
-      <div class="site-footer-luz" aria-hidden="true"></div>
       <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner">
         <div class="telegram-banner-left">
           <div class="telegram-banner-icon">
@@ -7530,7 +7518,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       <p class="site-footer-note">SkillCash Tools es contenido educativo. Nada de lo que encuentres aquí constituye asesoría financiera, de inversión ni una recomendación de compra o venta — opera siempre bajo tu propio criterio y asumiendo tu propio riesgo.</p>
     </footer>
-</div>
 
 <!-- ===== MODAL: CALCULADORA ===== -->
 <div class="modal-overlay" id="calcModal" data-tool="calculadora">
