@@ -1167,16 +1167,18 @@ button{font-family:inherit;color:inherit}
 .cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--card);border:1.5px solid var(--cat-teal);color:var(--cat-teal);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
 .cat-flip-toggle:hover{background:rgba(91,141,239,.14)}
 .cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
-/* el "translate" (propiedad individual, no el shorthand transform) separa cada cara del plano
-   z=0 de .cat-flip-inner sin pisar el transform inline que arma tarjetas-magicas.js en el
-   frente (rotateX/rotateY del tilt al mouse) - se componen los dos. Sin esto, al inclinar la
-   tarjeta con el mouse una parte de su superficie queda detras de ese plano (preserve-3d) y
-   Chrome de escritorio le daba el clic a .cat-flip-inner en vez de al boton: la tarjeta se
-   sentia "muerta" al clic, solo con mouse (en touch nunca se inclina, por eso ahi si abria) */
-.cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden;translate:0 0 30px}
+/* el empuje en Z que arregla el hit-test del tilt (ver tarjetas-magicas.js, funcion
+   actualizar()) va SOLO en el transform inline que pone ese JS mientras el mouse esta encima -
+   no aqui como propiedad fija. Un translateZ fijo en el CSS (probado y revertido) deja a Chrome
+   componiendo esa tarjeta en una capa 3D todo el tiempo, y con el zoom de Windows en 125% esa
+   capa se ve borrosa SIEMPRE, no solo durante el hover - Juan lo reporto como "como si hubiera
+   una tela" tapando el texto/la imagen incluso en reposo. Poniendolo solo en el hover deja la
+   tarjeta nitida en reposo (que es como se ve el 99% del tiempo) y el borroneo, si acaso, solo
+   aparece mientras se esta inclinando con el mouse encima. */
+.cat-flip-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .cat-flip-front:hover{transform:none}
 .cat-flip-back{
-  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);translate:0 0 30px;
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);
   border-radius:16px;padding:20px;box-sizing:border-box;border:1px solid var(--bc);cursor:pointer;
   background:
     radial-gradient(ellipse 130% 100% at 100% 0%, var(--tint), transparent 65%),
