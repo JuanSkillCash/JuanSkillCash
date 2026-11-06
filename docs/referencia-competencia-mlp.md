@@ -812,6 +812,113 @@ Todo es **polling en el cliente** (no WebSocket) con `setInterval` en el bundle 
 
 ---
 
+## Investigación de cryptobruj.com (nov 2026) — efectos visuales, no gamificación
+
+A diferencia de todo lo anterior en este documento (melapela.ai, sistema de rangos/Arsenal/
+economía de puntos), esta sección es sobre **efectos visuales de interfaz** de otro sitio,
+`cryptobruj.com` (CryptoBruj / TradeAudit SLU) — leídos de su CSS y JS públicos. Se guarda aquí,
+junto con melapela.ai, porque es la misma clase de material: referencia técnica de un
+competidor para inspirar (no copiar) piezas de SkillCash. **No se copia texto, logos ni código
+de ellos — solo el mecanismo.**
+
+Juan fue explícito: "Hazlo algo diferente, para que no se note que copiamos" — por eso varias
+piezas implementadas en SkillCash se adaptaron con un tratamiento visual distinto al de la
+referencia (ver "Qué se implementó" en cada bloque), no una copia 1:1.
+
+### 1. Tarjetas "Magic Bento" (cajitas con profundidad + interacción al mouse)
+
+Efecto tipo "Magic Bento" de React Bits, reimplementado en JS puro por cryptobruj para sus
+tarjetas de exchanges (`/exchanges`). 5 capas:
+- **Degradado de profundidad**: radial-gradient desde la esquina superior derecha, mezclando
+  ~20% del color de acento de la tarjeta con su fondo oscuro.
+- **Inclinación 3D (tilt)** siguiendo el mouse: `perspective(1000px) rotateX/rotateY` ±3°,
+  `translate` ±4px, vía un solo listener de `pointermove` por tarjeta.
+- **Borde que se ilumina** donde está el mouse: un `::after` del tamaño de la tarjeta, con
+  `padding` + `mask-composite:exclude` (deja ver solo el borde), relleno de un radial-gradient
+  centrado en la posición del cursor. Las tarjetas vecinas también se iluminan un poco según la
+  distancia al cursor (radio de influencia ~300px).
+- **Foco/spotlight** que sigue el cursor por toda la pantalla (un div `position:fixed`, 700px,
+  `mix-blend-mode:screen`), visible solo si el mouse está cerca de la rejilla de tarjetas.
+- **Onda (ripple)** al hacer click: un círculo que crece con `transform:scale(30)` y se
+  desvanece, ignorando clicks sobre botones/links internos.
+- Guardas: todo respeta `prefers-reduced-motion` y `(hover:hover) and (pointer:fine)` (desktop
+  con mouse real, nunca en touch).
+
+**Qué se implementó en SkillCash:** las 5 capas, en las 7 cajas de "Tus herramientas" de la
+página principal (`.cat-overview-card`), con nuestro `--accent`/`--cat-teal` único (nunca un
+color por tarjeta como en la referencia). Bugs reales encontrados y corregidos en el camino:
+(a) anidar un `perspective()` propio dentro de una tarjeta que ya vivía en un contenedor 3D
+existente (el volteo de la tarjeta) hacía que el navegador "perdiera" el hover solo — se
+resolvió recalculando el estado de hover cada frame por posición real del mouse en vez de
+depender de `pointerenter`/`pointerleave`; (b) `mix-blend-mode:screen` en el foco se veía
+blanco/lavado sobre nuestro fondo oscuro — se quitó el blend mode y se recoloreó; (c) el foco se
+escapaba a otras partes de la página — se acotó como hijo de la sección de cajas, con
+desvanecido suave en vez de corte duro.
+
+### 2. Línea de "gráfico" decorativa dentro de cada tarjeta (dato inventado)
+
+Dentro de cada tarjeta de exchange, en el tercio inferior: un SVG generado en JS con un "paseo
+aleatorio" determinista (generador congruencial lineal sembrado por el índice de la tarjeta —
+misma forma siempre, para la misma tarjeta), con área degradada debajo. Oculto de entrada
+(`stroke-dasharray`/`stroke-dashoffset` = longitud total del trazo); al pasar el mouse, la línea
+"se dibuja" animando `stroke-dashoffset` a 0.
+
+**Qué se implementó:** igual mecanismo, en las mismas 7 cajas, dato igual de decorativo (no son
+precios reales). Bug real encontrado: `vector-effect:non-scaling-stroke` en el trazo rompía por
+completo el truco de ocultar con `stroke-dasharray`/`dashoffset` en este navegador (dejaba un
+pedazo del trazo siempre visible) — se quitó esa propiedad.
+
+### 3. Animación de entrada (título letra por letra + tarjetas en cascada)
+
+Al cargar la página: el `<h1>` se parte en `<span>` por letra (función `partir()`, generador
+congruencial para el orden) y cada letra entra con `translateY` + rotación leve, 40ms de
+diferencia entre letra y letra; los bloques/tarjetas entran en cascada con `translateY(16px)` +
+opacidad, escalonados por índice. Todo guardado detrás de `prefers-reduced-motion`.
+
+**Qué se implementó:** igual mecanismo, en el título "SKILLCASH Tools" del hero y en las 7 cajas
+de la página principal.
+
+### 4. Pie de página tipo "cortina" — INTENTADO Y REVERTIDO
+
+El truco (100% CSS, sin JS): un contenedor `.telon` de `100vh` con `clip-path:inset(0)` —
+`clip-path` (junto con `transform`/`filter`/`perspective`) vuelve a ese contenedor el
+"containing block" de los descendientes `position:fixed`, así que un pie `position:fixed`
+adentro queda pegado a la caja de `.telon` (no a toda la ventana) y se revela progresivamente a
+medida que `.telon` sube por la pantalla al hacer scroll, dando el efecto de cortina que se
+descorre. Se liga a esto una animación de entrada por scroll (`animation-timeline:scroll()`,
+`view-timeline-name`) para que el contenido del pie aparezca con el scroll, sin JS.
+
+**Qué pasó al implementarlo:** en las pruebas automatizadas (Playwright/Chromium) el pie
+aparecía COMPLETO desde el primer instante en que `.telon` entraba en pantalla — nada se
+revelaba progresivo — y Juan reportó un bug real navegando en su propio dispositivo: al seguir
+bajando después del final del pie, se veía "como si se abriera otra cortina inferior" que
+borraba el texto. Se decidió **revertir el mecanismo de cortina por completo** y dejar el pie
+como un bloque normal, de corrido, al final de la página — mucho más confiable entre navegadores/
+dispositivos. El rediseño del CONTENIDO del pie (frase gigante + 3 columnas + íconos redondos,
+ver más abajo "Sesión 2026-11-06") se mantuvo, solo sin el mecanismo de scroll.
+
+### 5. Gráfico de precio animado de fondo en el hero (detrás del titular)
+
+En la portada de cryptobruj.com, detrás del titular: un `<canvas>` a pantalla completa
+(`position:absolute;inset:0`) dibujando una línea de precio (paseo aleatorio con leve tendencia
+alcista) que avanza sola (nuevo punto cada 700ms, con deslizamiento continuo, no a saltos), con
+área degradada debajo y un punto que "late" al final en reposo. Con el mouse: la línea se
+ilumina desde el inicio hasta la posición del cursor, aparece una guía vertical punteada, un
+punto marca el precio exacto interpolado en esa X, con persecución suavizada (easing) del
+cursor, no pegado 1:1. La escala vertical se reajusta sola al rango visible. El hero es
+`position:sticky` y, al hacer scroll, el titular + el gráfico se alejan (fade + translateY +
+scale) con `animation-timeline:scroll(root)`, sin JS. Rendimiento: se pausa con
+`IntersectionObserver` cuando el hero no es visible, respeta `prefers-reduced-motion`, DPR
+máximo 2.
+
+**Qué se decidió para SkillCash:** Juan pidió explícitamente que esta pieza NO sea una copia del
+mecanismo (un gráfico bursátil clásico con guía vertical punteada) — algo distinto, pensado para
+encajar con el tema tiburón/océano del sitio en vez del tema "gráfico de trading" de la
+referencia. Ver sección de implementación propia más abajo (pendiente de mostrarle a Juan antes
+de dejarlo definitivo).
+
+---
+
 ## Nota de Juan (3 nov 2026): consistencia visual
 
 Todo el panel de Noticias — a pesar de mezclar datos propios, iframes de TradingView, de
