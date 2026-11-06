@@ -2462,35 +2462,41 @@ img[src=""]{display:none}
 .hero-orbe2{ left:60%; top:8%; width:20px; height:20px; }
 .hero-orbe3{ left:35%; top:30%; width:23px; height:23px; }
 @media(prefers-reduced-motion:no-preference){
+  /* animan transform (translate), nunca left/top - esas se quedan fijas en la regla de arriba
+     como posicion base. Las 3 "moscas" ANTES movian left/top/margin en bucle infinito -
+     propiedades de layout - lo que obligaba al navegador a recalcular el layout de TODA la
+     pagina cada ~33ms, sin parar, mientras la animacion corria (confirmado con
+     PerformanceObserver de layout-shift en vivo). transform/opacity nunca disparan layout, solo
+     composicion en GPU - mismo efecto visual (deriva lenta e irregular), sin ese costo. */
   .hero-orbe{ animation:hero-orbita 38s ease-in-out infinite; }
   @keyframes hero-orbita{
-    0%{ left:8%; top:10%; }
-    14%{ left:35%; top:26%; }
-    28%{ left:58%; top:8%; }
-    42%{ left:80%; top:30%; }
-    57%{ left:55%; top:14%; }
-    71%{ left:32%; top:33%; }
-    85%{ left:14%; top:20%; }
-    100%{ left:8%; top:10%; }
+    0%{ transform:translate(0,0); }
+    14%{ transform:translate(40px,18px); }
+    28%{ transform:translate(75px,-12px); }
+    42%{ transform:translate(110px,22px); }
+    57%{ transform:translate(70px,2px); }
+    71%{ transform:translate(30px,28px); }
+    85%{ transform:translate(8px,10px); }
+    100%{ transform:translate(0,0); }
   }
   .hero-orbe2{ animation:hero-orbita2 29s ease-in-out infinite; }
   @keyframes hero-orbita2{
-    0%{ left:70%; top:6%; }
-    20%{ left:40%; top:18%; }
-    40%{ left:18%; top:9%; }
-    60%{ left:30%; top:34%; }
-    80%{ left:62%; top:28%; }
-    100%{ left:70%; top:6%; }
+    0%{ transform:translate(0,0); }
+    20%{ transform:translate(-35px,16px); }
+    40%{ transform:translate(-60px,-4px); }
+    60%{ transform:translate(-45px,30px); }
+    80%{ transform:translate(-10px,24px); }
+    100%{ transform:translate(0,0); }
   }
   .hero-orbe3{ animation:hero-orbita3 45s ease-in-out infinite; }
   @keyframes hero-orbita3{
-    0%{ left:20%; top:32%; }
-    16%{ left:50%; top:12%; }
-    33%{ left:78%; top:22%; }
-    50%{ left:60%; top:5%; }
-    66%{ left:40%; top:28%; }
-    83%{ left:10%; top:16%; }
-    100%{ left:20%; top:32%; }
+    0%{ transform:translate(0,0); }
+    16%{ transform:translate(35px,-22px); }
+    33%{ transform:translate(65px,-12px); }
+    50%{ transform:translate(45px,-30px); }
+    66%{ transform:translate(22px,-6px); }
+    83%{ transform:translate(-12px,-18px); }
+    100%{ transform:translate(0,0); }
   }
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
