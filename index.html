@@ -61,6 +61,10 @@
      archivo DESDE AQUI, en paralelo con el resto del parseo, así que para cuando el parser
      POR FIN llega hasta ese <script> (varias miles de lineas de HTML despues), el archivo ya
      deberia estar completo en cache - lo unico que falta ahi es ejecutarlo, no descargarlo -->
+<!-- preload de la imagen LCP (Largest Contentful Paint) de la portada: el navegador normalmente
+     no descubre esta imagen hasta que parsea su <img> (varias miles de líneas de HTML después);
+     con el preload arranca la descarga desde el principio -->
+<link rel="preload" as="image" href="/logo-skillcash-1050.webp" fetchpriority="high">
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 <link rel="preconnect" href="https://api.alternative.me">
 <link rel="preconnect" href="https://skillcash-api-proxy.juanchodigital86.workers.dev">
@@ -3048,7 +3052,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="sb-sticky-head">
       <div class="sb-top">
         <a href="#" class="sb-logo" id="sbLogo">
-          <span class="sb-logo-mark"><img src="/logo-skillcash-600.webp" alt="SkillCash"></span>
+          <span class="sb-logo-mark"><img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async"></span>
           <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
         </a>
         <div class="sb-top-actions">
@@ -3594,7 +3598,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-sidebar">
         <div class="promo-note-head">
-          <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash">
+          <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <span class="promo-note-name">Juan SkillCash</span>
         </div>
         <p class="promo-note-text">El exchange que uso yo. <strong>20% de cashback</strong> en tus comisiones.</p>
@@ -3681,8 +3685,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="hero-orbe3" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
         <div class="hero-mascot-tint" aria-hidden="true"></div>
-        <img class="hero-mascot-glow" src="/logo-skillcash-1050.webp" alt="" aria-hidden="true">
-        <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash">
+        <img class="hero-mascot-glow" src="/logo-skillcash-1050.webp" alt="" aria-hidden="true" width="700" height="700" fetchpriority="high">
+        <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash" width="700" height="700" loading="lazy" decoding="async">
       </div>
       <div class="hero-mascot-text">
         <div class="hero-mascot-eyebrow">Bienvenido a</div>
@@ -3843,7 +3847,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub" id="indicCountBadge">50 INDICADORES</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/sonar.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/sonar.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Indicadores de Mercado: ciclos de halving, dominancia, sentimiento y más señales de mercado en un solo lugar, organizadas por pestañas.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3862,7 +3866,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag soon">ALIANZAS</div>
         </div>
         <div class="cat-overview-sub">BITUNIX Y MENTORÍA</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/aliados.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/aliados.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Partners: Los exchanges y plataformas con los que tengo alianza real — beneficios concretos para ti, sin letra pequeña.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3881,7 +3885,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag soon">PRÓXIMAMENTE</div>
         </div>
         <div class="cat-overview-sub">RANGOS POR VOLUMEN</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/rango.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/rango.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Indicadores de trading en vivo para ayudarte a operar mejor.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3903,7 +3907,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/portafolio.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/portafolio.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Simulador de Portafolio: Diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real — compara capitalizaciones de mercado y calcula cuándo podrías vivir de tus inversiones.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3922,7 +3926,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">10 HERRAMIENTAS</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/zonacaza.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/zonacaza.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Calculadoras de Trading e Inversión: Calcula tu precio de liquidación, break-even, comisiones y ganancia real, simula tus compras periódicas (DCA), y resuelve rápido conversiones, porcentajes y zonas horarias — todo en un solo lugar.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3941,7 +3945,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">5 HERRAMIENTAS</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/seguridad.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/seguridad.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Checklists de Seguridad: Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -3960,7 +3964,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">3 HERRAMIENTAS</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/aprender.webp" alt="" loading="lazy"></div>
+        <div class="cat-overview-banner"><img src="/assets/menu-principal/aprender.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
         <div class="cat-overview-desc">Guías y Glosario: Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -4286,7 +4290,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🔮 Predicciones de Precio</h2>
@@ -4304,7 +4308,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="BTC">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-001</div>
                       <div class="pred-month">FEB 2026</div>
@@ -4323,7 +4327,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="BTC">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-002</div>
                       <div class="pred-month">AGO 2026</div>
@@ -4342,7 +4346,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="ETH">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-003</div>
                       <div class="pred-month">AGO 2026</div>
@@ -4361,7 +4365,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="SOL">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-004</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4380,7 +4384,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="XRP">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-005</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4399,7 +4403,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="NEAR">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-006</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4418,7 +4422,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="RENDER">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-007</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4437,7 +4441,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="DOGE">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-008</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4456,7 +4460,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="LINK">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-009</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4475,7 +4479,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="ETH">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2026-010</div>
                       <div class="pred-month">SEP 2026</div>
@@ -4494,7 +4498,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="BTC">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2025-001</div>
                       <div class="pred-month">ABR 2025</div>
@@ -4514,7 +4518,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <div class="pred-ticket" data-coin="BTC">
                     <div class="pred-watermark">SKILLCASH</div>
                     <div class="pred-stub">
-                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo">
+                      <img src="/logo-skillcash-600.webp" alt="" class="pred-logo" width="256" height="256" loading="lazy" decoding="async">
                       <div class="pred-ticket-no-label">N° de boleto</div>
                       <div class="pred-ticket-no">2025-002</div>
                       <div class="pred-month">NOV 2025 – ENE 2026</div>
@@ -4545,7 +4549,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🫧 Burbujas Cripto</h2>
@@ -4569,7 +4573,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               <div id="fngCaptureAll">
                 <div class="calc-head">
                   <div class="calc-eyebrow">
-                    <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                    <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                     <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                   </div>
                   <h2 class="calc-title" id="fngDetailTitleEl">😐 Índice de Miedo y Codicia</h2>
@@ -4661,7 +4665,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📜 Whitepaper de Bitcoin</h2>
@@ -5016,7 +5020,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">⏳ Ciclos de Halving de Bitcoin</h2>
@@ -5038,7 +5042,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="halvingChartBody">
                 <div class="indic-chart-soon" id="halvingLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin desde 2010 para alinear cada ciclo de halving.</div>
                 </div>
@@ -5064,7 +5068,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🏛 BTC + Datos Macroeconómicos</h2>
@@ -5080,7 +5084,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="btcmacroChartBody">
                 <div class="indic-chart-soon" id="btcmacroLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el precio de BTC y los datos macroeconómicos.</div>
                 </div>
@@ -5110,7 +5114,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🔍 BTC + Google Trends</h2>
@@ -5126,7 +5130,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="btctrendsChartBody">
                 <div class="indic-chart-soon" id="btctrendsLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el precio de BTC y el interés de búsqueda en Google Trends.</div>
                 </div>
@@ -5157,7 +5161,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🌈 Rainbow Chart de Bitcoin</h2>
@@ -5172,7 +5176,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="rainbowChartBody">
                 <div class="indic-chart-soon" id="rainbowLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio diario de Bitcoin para calcular la curva de tendencia.</div>
                 </div>
@@ -5202,7 +5206,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">Ξ Bandas Logarítmicas de Ethereum</h2>
@@ -5217,7 +5221,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethlogregChartBody">
                 <div class="indic-chart-soon" id="ethlogregLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio diario completo de ETH desde su lanzamiento.</div>
                 </div>
@@ -5245,7 +5249,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📍 VWAP Anclado de Ethereum</h2>
@@ -5260,7 +5264,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethvwapChartBody">
                 <div class="indic-chart-soon" id="ethvwapLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el precio y volumen diario de ETH/USDT en Binance desde agosto de 2017.</div>
                 </div>
@@ -5290,7 +5294,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🏭 Precio de ETH + PMI Manufacturero</h2>
@@ -5305,7 +5309,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethpmiChartBody">
                 <div class="indic-chart-soon" id="ethpmiLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el histórico de ETH y del PMI Manufacturero.</div>
                 </div>
@@ -5334,7 +5338,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🥈 TOTAL2 con EMA 200 Semanal</h2>
@@ -5349,7 +5353,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="total2ChartBody">
                 <div class="indic-chart-soon" id="total2Loading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el histórico semanal de TOTAL2.</div>
                 </div>
@@ -5379,7 +5383,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🌱 OTHERS con EMA 200 Semanal</h2>
@@ -5394,7 +5398,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="othersChartBody">
                 <div class="indic-chart-soon" id="othersLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el histórico semanal de OTHERS.</div>
                 </div>
@@ -5424,7 +5428,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📐 Techo Pi Cycle de Bitcoin</h2>
@@ -5439,7 +5443,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="picycleChartBody">
                 <div class="indic-chart-soon" id="picycleLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando los promedios móviles sobre el precio diario de Bitcoin.</div>
                 </div>
@@ -5467,7 +5471,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📏 Media Móvil de 4 Años de Bitcoin</h2>
@@ -5482,7 +5486,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ma4yChartBody">
                 <div class="indic-chart-soon" id="ma4yLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el promedio de 4 años sobre el precio real de Bitcoin.</div>
                 </div>
@@ -5511,7 +5515,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">⚓ Pulso de Fondo de Bitcoin</h2>
@@ -5526,7 +5530,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="mfloorChartBody">
                 <div class="indic-chart-soon" id="mfloorLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el Canal de Keltner semanal y el Costo de Producción sobre datos reales de Binance y blockchain.info.</div>
                 </div>
@@ -5557,7 +5561,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📉 Medias Móviles 200 de Bitcoin</h2>
@@ -5572,7 +5576,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ema200ChartBody">
                 <div class="indic-chart-soon" id="ema200Loading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando la EMA 200 y la SMA 200 sobre el precio diario real de Bitcoin.</div>
                 </div>
@@ -5600,7 +5604,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🪜 Techo Anterior como Soporte</h2>
@@ -5615,7 +5619,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ciclosoporteChartBody">
                 <div class="indic-chart-soon" id="ciclosoporteLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Buscando el techo de cada ciclo y dónde el precio volvió a tocarlo.</div>
                 </div>
@@ -5643,7 +5647,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📶 RSI Mensual de Bitcoin</h2>
@@ -5658,7 +5662,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="rsiChartBody">
                 <div class="indic-chart-soon" id="rsiLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el RSI mensual sobre el precio real de Bitcoin.</div>
                 </div>
@@ -5689,7 +5693,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">♾️ Coinbase Premium</h2>
@@ -5705,7 +5709,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="cbpChartBody">
                 <div class="indic-chart-soon" id="cbpLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Consultando precios de Coinbase y Binance.</div>
                 </div>
@@ -5737,7 +5741,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">⚖️ Ratio Largo/Corto (BTC)</h2>
@@ -5767,7 +5771,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="lsChartBody">
                 <div class="indic-chart-soon" id="lsLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando datos…</div>
                   <div class="indic-placeholder-text">Consultando Binance y Bybit.</div>
                 </div>
@@ -5798,7 +5802,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head" style="padding-bottom:8px;margin-bottom:14px">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title" style="margin-bottom:2px">📐 Interés Abierto en Opciones</h2>
@@ -5815,7 +5819,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="optionsoiChartBody">
                 <div class="indic-chart-soon" id="optionsoiLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando datos…</div>
                   <div class="indic-placeholder-text">Consultando la API pública de Deribit.</div>
                 </div>
@@ -5851,7 +5855,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head" style="padding-bottom:8px;margin-bottom:14px">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title" style="margin-bottom:2px">🚨 Radar de Deslistados</h2>
@@ -5859,7 +5863,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="delistRadarBody">
                 <div class="indic-chart-soon" id="delistRadarLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando avisos de deslistado…</div>
                   <div class="indic-placeholder-text">Consultando Bitunix, BingX, OKX, Bitget, KuCoin, Bybit, Binance, Gate, MEXC, Kraken, LBank, Pionex, CoinW, Weex y Blofin.</div>
                 </div>
@@ -5937,7 +5941,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head" style="padding-bottom:8px;margin-bottom:14px">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title" style="margin-bottom:2px">🆕 Radar de Nuevos Listados</h2>
@@ -5945,7 +5949,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="newListRadarBody">
                 <div class="indic-chart-soon" id="newListRadarLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando nuevos listados…</div>
                   <div class="indic-placeholder-text">Consultando Binance, OKX, Bybit, Bitget, Gate, KuCoin, MEXC, BingX, Kraken, LBank, Pionex, CoinW, Weex, Bitunix y Blofin.</div>
                 </div>
@@ -6023,7 +6027,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🕯️ Gráfico Avanzado</h2>
@@ -6049,7 +6053,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🏢 Bitcoin en Balances Corporativos</h2>
@@ -6086,7 +6090,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🏛️ Reservas Gubernamentales de Bitcoin</h2>
@@ -6119,7 +6123,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🔄 Rotación ETH.D/BTC.D</h2>
@@ -6127,7 +6131,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="domratioChartBody">
                 <div class="indic-chart-soon" id="domratioLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el market cap histórico de BTC y ETH.</div>
                 </div>
@@ -6157,7 +6161,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🗜️ Descompresión Cripto</h2>
@@ -6172,7 +6176,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="domallChartBody">
                 <div class="indic-chart-soon" id="domallLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el histórico real de BTC.D + ETH.D + USDT.D + USDC.D.</div>
                 </div>
@@ -6228,7 +6232,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">₿ Dominancia BTC</h2>
@@ -6243,7 +6247,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="dombtcChartBody">
                 <div class="indic-chart-soon" id="dombtcLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el histórico real de BTC.D y el precio de BTC.</div>
                 </div>
@@ -6275,7 +6279,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">💵 Dominancia USDT</h2>
@@ -6290,7 +6294,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="domusdtChartBody">
                 <div class="indic-chart-soon" id="domusdtLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Trayendo el histórico real de USDT.D y el precio de BTC.</div>
                 </div>
@@ -6324,7 +6328,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🪙 OTHERS/BTC</h2>
@@ -6332,7 +6336,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="othersbtcChartBody">
                 <div class="indic-chart-soon" id="othersbtcLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el histórico de OTHERS y de BTC.</div>
                 </div>
@@ -6374,7 +6378,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🔁 ETH/BTC</h2>
@@ -6382,7 +6386,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethbtcChartBody">
                 <div class="indic-chart-soon" id="ethbtcLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el histórico de ETH y de BTC.</div>
                 </div>
@@ -6422,7 +6426,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🔥 Euforia de Altcoins</h2>
@@ -6430,7 +6434,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="altfeverChartBody">
                 <div class="indic-chart-soon" id="altfeverLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el histórico de OTHERS y de TOTAL3.</div>
                 </div>
@@ -6460,7 +6464,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">⚖️ Valoración Relativa ETH vs Altcoins</h2>
@@ -6469,7 +6473,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethvsaltChartBody">
                 <div class="indic-chart-soon" id="ethvsaltLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el histórico de TOTAL3, TOTAL, USDT.D y ETH.</div>
                 </div>
@@ -6500,7 +6504,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📖 Guía: ¿Cómo Leer los Indicadores Macro?</h2>
@@ -6544,7 +6548,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📅 Calendario Económico</h2>
@@ -6569,7 +6573,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🥇 BTC/XAU</h2>
@@ -6583,7 +6587,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="btcxauChartBody">
                 <div class="indic-chart-soon" id="btcxauLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el precio histórico del oro y de Bitcoin.</div>
                 </div>
@@ -6612,7 +6616,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🍎 BTC/AAPL</h2>
@@ -6626,7 +6630,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="btcaaplChartBody">
                 <div class="indic-chart-soon" id="btcaaplLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Descargando el precio histórico de Apple y de Bitcoin.</div>
                 </div>
@@ -6656,7 +6660,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📅 Retornos de Bitcoin</h2>
@@ -6671,7 +6675,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="btcreturnsChartBody">
                 <div class="indic-chart-soon" id="btcreturnsLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el retorno de Bitcoin por período sobre su precio histórico.</div>
                 </div>
@@ -6697,7 +6701,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">⚓ MVRV de Holders de Corto Plazo (STH-MVRV)</h2>
@@ -6712,7 +6716,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="sthmvrvChartBody">
                 <div class="indic-chart-soon" id="sthmvrvLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el costo base y el MVRV de los holders de corto plazo.</div>
                 </div>
@@ -6743,7 +6747,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">🪙 % Supply en Pérdida por Época de Halving</h2>
@@ -6758,7 +6762,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="epochplChartBody">
                 <div class="indic-chart-soon" id="epochplLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando qué porcentaje del supply de cada época de halving está en pérdida.</div>
                 </div>
@@ -6789,7 +6793,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">💎 Costo Base Institucional</h2>
@@ -6811,7 +6815,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="calc">
               <div class="calc-head">
                 <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                   <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
                 </div>
                 <h2 class="calc-title">📅 Retornos de Ethereum</h2>
@@ -6826,7 +6830,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="indic-chart-body" id="ethreturnsChartBody">
                 <div class="indic-chart-soon" id="ethreturnsLoading">
-                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                  <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                   <div class="indic-placeholder-title">Cargando historial…</div>
                   <div class="indic-placeholder-text">Calculando el retorno de Ethereum por período sobre su precio histórico.</div>
                 </div>
@@ -6869,7 +6873,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">USDT-M Y COIN-M</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/trading.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/trading.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Calcula liquidación, SL, TP, riesgo/beneficio y tamaño de posición — para futuros lineales (USDT-M) o inversos (Coin-M), con un botón para cambiar entre ambos.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6881,7 +6885,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">COMISIONES Y CASHBACK</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/breakeven.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/breakeven.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Cuánto tiene que moverse el precio solo para cubrir las comisiones — y cuánto bajas ese número con el cashback de Bitunix.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6893,7 +6897,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">MAKER Y TAKER</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/fees.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/fees.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Cuánto te come el exchange en maker/taker según tu volumen mensual — y cuánto recuperas con cashback.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6905,7 +6909,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">PRECIOS EN VIVO</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/rentabilidad.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/rentabilidad.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Simula cuánto ganarías comprando y vendiendo un activo, con precios de cripto en vivo.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6917,7 +6921,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">COMPRA Y VENTA POR PARTES</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/dca-buy.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/dca-buy.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Simula cuánto acumularías comprando por partes con precios reales, o cómo ir retirando ganancias vendiendo por tramos — con un botón para cambiar entre Compra y Venta.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6929,7 +6933,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">SATS · GWEI · WEI</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/unitconverter.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/unitconverter.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Sats↔BTC, gwei↔ETH, wei↔ETH — las conversiones que se buscan en Google todo el tiempo, en un solo lugar.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6941,7 +6945,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">CÁLCULO RÁPIDO</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/pctcalc.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/pctcalc.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Qué % es un número de otro, cuánto es el X%, o cuál es el precio nuevo tras subir o bajar un %.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6953,7 +6957,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">DOS ZONAS HORARIAS</div>
-          <div class="tool-card-banner"><img src="/assets/zona-caza/tzclock.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/zona-caza/tzclock.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Compara la hora de dos países que elijas — útil para coordinar un live o llamada con tu comunidad.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6972,7 +6976,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">6 PREGUNTAS RÁPIDAS</div>
-          <div class="tool-card-banner"><img src="/assets/mi-arrecife/riesgo.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/mi-arrecife/riesgo.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Responde 6 preguntas cortas y descubre si eres conservador, moderado o agresivo.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6984,7 +6988,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">ASIGNACIÓN Y HOLDINGS</div>
-          <div class="tool-card-banner"><img src="/assets/mi-arrecife/portafolio-sim.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/mi-arrecife/portafolio-sim.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Arma tu plan de asignación por activo o registra tus holdings reales, con valor en vivo.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -6996,7 +7000,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">HASTA 5 MONEDAS</div>
-          <div class="tool-card-banner"><img src="/assets/mi-arrecife/correlacion.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/mi-arrecife/correlacion.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Compara hasta 5 monedas y descubre si realmente estás diversificado o se mueven todas juntas.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7008,7 +7012,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">SIMULA OTRO MARKET CAP</div>
-          <div class="tool-card-banner"><img src="/assets/mi-arrecife/mcap.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/mi-arrecife/mcap.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>¿Y si tu moneda tuviera la capitalización de otra? Mira a qué precio estaría y cuánto valdrían tus monedas.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7020,7 +7024,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">APORTE Y RENDIMIENTO</div>
-          <div class="tool-card-banner"><img src="/assets/mi-arrecife/libertad.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/mi-arrecife/libertad.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Con tu aporte mensual y un rendimiento esperado conservador, cuánto tardarías en llegar a tu meta.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7039,7 +7043,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">WALLET Y EXCHANGE</div>
-          <div class="tool-card-banner"><img src="/assets/blindaje/checklist.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/blindaje/checklist.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Verifica que tu wallet y tus cuentas de exchange estén correctamente protegidas.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7051,7 +7055,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">HOT VS COLD</div>
-          <div class="tool-card-banner"><img src="/assets/blindaje/wallets.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/blindaje/wallets.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Hot vs Cold — cuál te conviene más según cuánto tienes y qué tan seguido operas.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7063,7 +7067,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">REVOCA PERMISOS</div>
-          <div class="tool-card-banner"><img src="/assets/blindaje/aprobaciones.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/blindaje/aprobaciones.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Guía paso a paso para revisar y revocar los permisos peligrosos que le diste a contratos inteligentes.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7075,7 +7079,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">ACCESO PARA TU FAMILIA</div>
-          <div class="tool-card-banner"><img src="/assets/blindaje/herencia.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/blindaje/herencia.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Qué le dejarías a tu familia si te pasa algo — cómo dejarles acceso sin comprometer tu seguridad hoy.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7087,7 +7091,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">CONTRATO Y LIQUIDEZ</div>
-          <div class="tool-card-banner"><img src="/assets/blindaje/token.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/blindaje/token.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Busca cualquier token y revisa seguridad del contrato, liquidez, impuestos de compra/venta y desbloqueos pendientes.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7106,7 +7110,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">MÁS DE 100 TÉRMINOS</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/glosario.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/aprender/glosario.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Más de 100 términos explicados sin jerga — con buscador, categorías y ejemplos.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7118,7 +7122,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">CASOS REALES</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/errores.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/aprender/errores.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Casos reales de cómo la gente pierde dinero en cripto — y la lección de cada uno. Por categoría: Spot, Futuros, Wallets, Exchanges y Estafas.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7130,7 +7134,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">GUÍA POR SECCIONES</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/manual.webp" alt="" loading="lazy"></div>
+          <div class="tool-card-banner"><img src="/assets/aprender/manual.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Cómo usar cada herramienta de la plataforma — con buscador, organizado por secciones. Ideal si no sabes por dónde empezar.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
@@ -7259,7 +7263,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <div class="partner-block" style="--pc:var(--red);--pbc:rgba(255,47,79,.3);--pt:rgba(255,47,79,.12)">
         <div class="partner-block-top">
-          <div class="partner-block-logo"><img src="/logo-skillcash-600.webp" alt="SkillCash"></div>
+          <div class="partner-block-logo"><img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async"></div>
           <div>
             <div class="partner-block-kicker">Plazas VIP limitadas</div>
             <div class="partner-block-name">Mentoría SkillCash</div>
@@ -7384,8 +7388,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="colm-hero-main">
               <div class="colm-hero-floor-shadow" id="colmillosFloorShadow"></div>
               <div class="colm-hero-pedestal-group" id="colmillosPedestalGroup">
-                <img class="colm-hero-pedestal-img" src="/assets/hero/pedestal.png" alt="" aria-hidden="true">
-                <img class="colm-hero-pedestal-img colm-hero-pedestal-glow" src="/assets/hero/pedestal-glow.png" alt="" aria-hidden="true">
+                <img class="colm-hero-pedestal-img" src="/assets/hero/pedestal.png" alt="" aria-hidden="true" width="384" height="160" loading="lazy" decoding="async">
+                <img class="colm-hero-pedestal-img colm-hero-pedestal-glow" src="/assets/hero/pedestal-glow.png" alt="" aria-hidden="true" width="384" height="160" loading="lazy" decoding="async">
               </div>
               <div class="colm-hero-contact-shadow" id="colmillosContactShadow"></div>
               <div class="colm-hero-char" id="colmillosHeroShark"></div>
@@ -7490,8 +7494,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="colm-help-panel active" data-helppanel="general">
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/coin_tooth.png" alt="">
-                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="" width="384" height="384" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">¿Qué es Sharkoins?</p>
@@ -7552,21 +7556,21 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               <div class="colm-rarity-ladder">
                 <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#9d9d9d"></div><b>Común</b><span>el punto de partida</span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#3b82f6"></div><b>Raro</b><span>75 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#3b82f6"></div><b>Raro</b><span>75 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin" width="96" height="96" loading="lazy" decoding="async"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#a335ee"></div><b>Épico</b><span>150 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#a335ee"></div><b>Épico</b><span>150 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin" width="96" height="96" loading="lazy" decoding="async"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#f0a020"></div><b>Legendario</b><span>275 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:#f0a020"></div><b>Legendario</b><span>275 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin" width="96" height="96" loading="lazy" decoding="async"></span></div>
                 <div class="colm-rarity-arrow">→</div>
-                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>450 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin"></span></div>
+                <div class="colm-rarity-step"><div class="colm-rarity-step-gem" style="background:linear-gradient(135deg,#ff5f6d,#a78bfa,#38bdf8)"></div><b>Mítico</b><span>450 <img src="/assets/mascot/coin_tooth.png" alt="" class="colm-rarity-step-coin" width="96" height="96" loading="lazy" decoding="async"></span></div>
               </div>
 
               <p class="auth-note" style="margin:0 auto 16px">🧬 <b>Nivel de Héroe:</b> tu ficha en Inicio muestra un Nivel (0 a 100) y hasta 5 estrellas — mide qué tanto del catálogo completo llevas comprado y evolucionado. Cada fondo que tenés vale 1 punto; cada skin o accesorio vale según su rareza actual (Común = 1 punto, hasta Mítico = 5). Subir los primeros niveles es rápido, pero llegar a 100 significa tener TODO el catálogo al máximo — es la meta de coleccionista completo, no algo para lograr en unas semanas.</p>
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/variants/shark_skin_oroliquido.png" alt="">
-                  <img src="/assets/mascot/accessories/acc_crown.png" alt="">
+                  <img src="/assets/mascot/variants/shark_skin_oroliquido.png" alt="" width="384" height="384" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_crown.png" alt="" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🎨 Cada skin y cada accesorio, su propia familia</p>
@@ -7576,7 +7580,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="" style="width:76px;height:76px">
+                  <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="" style="width:76px;height:76px" width="640" height="400" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🌊 Los fondos y los boletos de sorteo, aparte</p>
@@ -7586,8 +7590,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card" style="border-color:var(--gold)">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/coin_tooth.png" alt="">
-                  <img src="/assets/mascot/coin_charcoins.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/coin_charcoins.png" alt="" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">✨ 100% para presumir</p>
@@ -7601,9 +7605,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="" class="small">
-                  <img src="/assets/mascot/variants/shark_skin_galaxy.png" alt="" class="small">
-                  <img src="/assets/mascot/variants/shark_skin_dragon.png" alt="" class="small">
+                  <img src="/assets/mascot/variants/shark_skin_cyan.png" alt="" class="small" width="384" height="384" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/variants/shark_skin_galaxy.png" alt="" class="small" width="384" height="384" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/variants/shark_skin_dragon.png" alt="" class="small" width="384" height="384" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🧬 Instinto — el color</p>
@@ -7620,8 +7624,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/accessories/acc_sombrero.png" alt="" class="small">
-                  <img src="/assets/mascot/accessories/acc_crown.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_sombrero.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_crown.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🧠 Astucia — la cabeza</p>
@@ -7638,8 +7642,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/accessories/acc_shades.png" alt="" class="small">
-                  <img src="/assets/mascot/accessories/acc_ojos_ojos_laser.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_shades.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_ojos_ojos_laser.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">👁️ Visión — la cara</p>
@@ -7656,8 +7660,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/accessories/acc_chain.png" alt="" class="small">
-                  <img src="/assets/mascot/accessories/acc_cape.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_chain.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_cape.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">🛡️ Resistencia — el cuerpo</p>
@@ -7674,8 +7678,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/accessories/acc_guantes.png" alt="" class="small">
-                  <img src="/assets/mascot/accessories/acc_espada.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_guantes.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_espada.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">💪 Fuerza — las manos</p>
@@ -7692,8 +7696,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/accessories/acc_patines.png" alt="" class="small">
-                  <img src="/assets/mascot/accessories/acc_aletasbuceo.png" alt="" class="small">
+                  <img src="/assets/mascot/accessories/acc_patines.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/accessories/acc_aletasbuceo.png" alt="" class="small" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">⚡ Velocidad — los pies</p>
@@ -7712,10 +7716,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="colm-help-panel" data-helppanel="fondos">
               <p class="auth-note" style="margin:0 auto 14px">Los fondos no tienen rareza ni evolución — son de precio único. Hay normales (temática de mar/fantasía) y 6 especiales de cripto, que son el escalón más caro de toda la tienda.</p>
               <div class="colm-help-bg-grid">
-                <img src="/assets/mascot/backgrounds/bg_reef.png" alt="Arrecife" title="Arrecife (normal)">
-                <img src="/assets/mascot/backgrounds/bg_night.png" alt="Noche Estrellada" title="Noche Estrellada (normal)">
-                <img src="/assets/mascot/backgrounds/bg_neon.png" alt="Ciudad Neón" title="Ciudad Neón (normal, premium)">
-                <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="Bóveda Minera Bitcoin" title="Bóveda Minera · Bitcoin (especial)">
+                <img src="/assets/mascot/backgrounds/bg_reef.png" alt="Arrecife" title="Arrecife (normal)" width="640" height="400" loading="lazy" decoding="async">
+                <img src="/assets/mascot/backgrounds/bg_night.png" alt="Noche Estrellada" title="Noche Estrellada (normal)" width="640" height="400" loading="lazy" decoding="async">
+                <img src="/assets/mascot/backgrounds/bg_neon.png" alt="Ciudad Neón" title="Ciudad Neón (normal, premium)" width="640" height="400" loading="lazy" decoding="async">
+                <img src="/assets/mascot/backgrounds/fondo_cripto_bitcoin.png" alt="Bóveda Minera Bitcoin" title="Bóveda Minera · Bitcoin (especial)" width="640" height="400" loading="lazy" decoding="async">
               </div>
               <p class="auth-note" style="margin:14px auto 0;border-color:var(--gold)">✨ Los fondos cripto (Bitcoin, Ethereum, Solana, Monero, Dogecoin, Pepe) cuestan entre 350 y 500 Sharkoins — el ítem más caro de toda la tienda es el de Bitcoin.</p>
             </div>
@@ -7770,7 +7774,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="colm-wallet-page">
               <div class="colm-section-label" style="text-align:center">🦈 Tu Billetera Sharkoin</div>
               <div class="colm-coin colm-coin-big" id="colmillosBigCoin">
-                <img src="/assets/mascot/coin_tooth.png" alt="" style="height:auto;image-rendering:pixelated;image-rendering:crisp-edges">
+                <img src="/assets/mascot/coin_tooth.png" alt="" style="height:auto;image-rendering:pixelated;image-rendering:crisp-edges" width="96" height="96" loading="lazy" decoding="async">
               </div>
               <p class="colm-tap-hint colm-tap-hint-big">👆 Tócala</p>
               <div class="colm-balance-display colm-balance-display-big" id="colmillosBigBalance">0</div>
@@ -7796,8 +7800,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               <div class="colm-section-label">📖 De dónde salieron los Sharkoins</div>
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/coin_tooth.png" alt="">
-                  <img src="/assets/mascot/coin_charcoins.png" alt="">
+                  <img src="/assets/mascot/coin_tooth.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+                  <img src="/assets/mascot/coin_charcoins.png" alt="" width="96" height="96" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 1 — El arrecife que brillaba distinto</p>
@@ -7806,7 +7810,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               </div>
               <div class="colm-story-card reverse">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/backgrounds/bg_reef.png" alt="" style="width:76px;height:76px">
+                  <img src="/assets/mascot/backgrounds/bg_reef.png" alt="" style="width:76px;height:76px" width="640" height="400" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 2 — Nace la Manada</p>
@@ -7815,7 +7819,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               </div>
               <div class="colm-story-card">
                 <div class="colm-story-card-art">
-                  <img src="/assets/mascot/variants/shark_skin_gold.png" alt="">
+                  <img src="/assets/mascot/variants/shark_skin_gold.png" alt="" width="384" height="384" loading="lazy" decoding="async">
                 </div>
                 <div class="colm-story-card-body">
                   <p class="colm-story-card-eyebrow">Capítulo 3 — Hoy</p>
@@ -7905,7 +7909,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="calcTitleEl">🧮 Calculadora de Futuros</h2>
@@ -8231,7 +8235,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="profitTitleEl">📈 Calculadora de Rentabilidad</h2>
@@ -8354,7 +8358,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="breakevenTitleEl">⚖️ Calculadora de Break-even</h2>
@@ -8447,7 +8451,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
         <div class="promo-note-head">
-          <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash">
+          <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <span class="promo-note-name">Juan SkillCash</span>
         </div>
         <p class="promo-note-text" id="promoTextBreakeven">El exchange que yo uso para operar — tiene buena liquidez y soporte en español. Desde aquí obtienes <strong>20% de cashback</strong> en tus comisiones, directo a tu cuenta spot.</p>
@@ -8485,7 +8489,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="dcaTitleEl">🪙 Simulador de DCA</h2>
@@ -8671,7 +8675,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="mcapCompareTitleEl">⚖️ Comparador de Market Cap</h2>
@@ -8752,7 +8756,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
           <div class="promo-note-head">
-            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash">
+            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
             <span class="promo-note-name">Juan SkillCash</span>
           </div>
           <p class="promo-note-text" id="promoTextMcap">El exchange que yo uso para operar estas comparaciones — buena liquidez en altcoins. <strong>20% de cashback</strong> en tus comisiones.</p>
@@ -8766,7 +8770,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="mcap-result-row" id="mcapRankingSection" style="display:none">
           <div class="mcap-rank-head" id="mcapRankHead">¿Y si Moneda A alcanzara la capitalización de...?</div>
           <div class="indic-chart-soon" id="mcapRankLoading">
-            <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+            <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
             <div class="indic-placeholder-title">Cargando datos…</div>
             <div class="indic-placeholder-text">Descargando el top del mercado.</div>
           </div>
@@ -8800,7 +8804,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="fiFreedomTitleEl">🏝️ Tiempo hasta la Libertad Financiera</h2>
@@ -8873,7 +8877,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
           <div class="promo-note-head">
-            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash">
+            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
             <span class="promo-note-name">Juan SkillCash</span>
           </div>
           <p class="promo-note-text" id="promoTextFi">El exchange que yo uso para hacer mis aportes periódicos. <strong>20% de cashback</strong> en tus comisiones, directo a tu cuenta.</p>
@@ -8905,7 +8909,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="unitConverterTitleEl">🔁 Conversor de Unidades</h2>
@@ -8970,7 +8974,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="pctCalcTitleEl">📐 Calculadora de Porcentajes</h2>
@@ -9084,7 +9088,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="tzClockTitleEl">🕐 Reloj de Zona Horaria</h2>
@@ -9182,7 +9186,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="feesTitleEl">🧾 Calculadora de Comisiones</h2>
@@ -9272,7 +9276,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
         <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-modal">
           <div class="promo-note-head">
-            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash">
+            <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
             <span class="promo-note-name">Juan SkillCash</span>
           </div>
           <p class="promo-note-text" id="promoTextFees">El exchange que yo uso — comisiones bajas y <strong>20% de cashback</strong> automático en cada operación, directo a tu cuenta.</p>
@@ -9304,7 +9308,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="quizTitleEl">🎯 Perfil de Riesgo</h2>
@@ -9364,7 +9368,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="correlationTitleEl">🔗 Monitor de Correlación</h2>
@@ -9420,7 +9424,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="glossaryTitleEl">📖 Glosario Cripto</h2>
@@ -9460,7 +9464,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="mistakesTitleEl">⚠️ Biblioteca de errores comunes</h2>
@@ -9500,7 +9504,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="manualTitleEl">📘 Manual Completo</h2>
@@ -9536,7 +9540,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="walletCompareTitleEl">👛 Comparador de Wallets</h2>
@@ -9612,7 +9616,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="approvalsTitleEl">✅ Verificar Aprobaciones</h2>
@@ -9660,7 +9664,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="inheritanceTitleEl">🔑 Herencia Digital</h2>
@@ -9708,7 +9712,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="tokenScannerTitleEl">🔎 Analizador de Token</h2>
@@ -9762,7 +9766,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="checklistTitleEl">🛡️ Checklist de Seguridad</h2>
@@ -9808,7 +9812,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="authTitleEl" style="font-size:22px">🔐 Tu cuenta</h2>
@@ -9866,7 +9870,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="profileTitleEl" style="font-size:22px">👤 Mi perfil</h2>
@@ -9917,7 +9921,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="telegramTitleEl" style="font-size:22px">📲 Telegram</h2>
@@ -9973,7 +9977,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="bitunixTitleEl" style="font-size:22px">🦈 Bitunix</h2>
@@ -10076,7 +10080,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="colmGameTitleEl" style="font-size:22px">🦈 Salto del Tiburón</h2>
@@ -10117,7 +10121,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="colmRouletteTitleEl" style="font-size:22px">🎰 Ruleta</h2>
@@ -10147,7 +10151,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="legalTitleEl" style="font-size:22px">📄 Legal</h2>
@@ -10205,7 +10209,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="assetDetailTitleEl" style="font-size:22px">—</h2>
@@ -10236,7 +10240,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="calc">
       <div class="calc-head">
         <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash">
+          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
           <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
         </div>
         <h2 class="calc-title" id="portfolioTitleEl">📊 Simulador de Portafolio</h2>
@@ -12211,7 +12215,7 @@ function renderIndicIndexList(){
 
   let html = `
     <div class="indic-index-banner">
-      <img src="/assets/sonar/profundidad-banner.webp" alt="" loading="lazy">
+      <img src="/assets/sonar/profundidad-banner.webp" alt="" loading="lazy" width="1920" height="985" decoding="async">
       <div class="indic-index-banner-text">
         <div class="indic-index-banner-title">Índice de Indicadores</div>
         <div class="indic-index-banner-sub">${realCount} INDICADORES · ORGANIZADOS POR PROFUNDIDAD</div>
@@ -23899,7 +23903,7 @@ function renderMacroPanels(){
           <div class="calc">
             <div class="calc-head">
               <div class="calc-eyebrow">
-                <img src="/logo-skillcash-600.webp" alt="SkillCash">
+                <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
                 <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
               </div>
               <h2 class="calc-title">${m.icon} ${m.title}</h2>
@@ -23912,7 +23916,7 @@ function renderMacroPanels(){
             </div>
             <div class="indic-chart-body" id="${id}ChartBody">
               <div class="indic-chart-soon" id="${id}Loading">
-                <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt=""></div>
+                <div class="indic-placeholder-icon indic-loading-logo"><img src="/logo-skillcash-600.webp" alt="" width="256" height="256" loading="lazy" decoding="async"></div>
                 <div class="indic-placeholder-title">Cargando historial…</div>
                 <div class="indic-placeholder-text">${m.loading}</div>
               </div>
@@ -24286,7 +24290,7 @@ function buildGuiaPanelHtml(id, title, hasCombinator){
         <div class="calc">
           <div class="calc-head">
             <div class="calc-eyebrow">
-              <img src="/logo-skillcash-600.webp" alt="SkillCash">
+              <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
               <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
             </div>
             <h2 class="calc-title">📖 ${title}</h2>
@@ -28757,7 +28761,7 @@ async function awardColmillos(eventType, periodKey, amount){
     ['SPX','SPX6900','spx6900']
   ];
   function itemHtml(c){
-    return '<span class="ticker-item"><img data-cid="'+c[2]+'" alt="" onerror="this.style.display=\'none\'"><b>'+c[0]+'</b> '+c[1]+'</span><span class="ticker-sep">•</span>';
+    return '<span class="ticker-item"><img data-cid="'+c[2]+'" alt="" width="20" height="20" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"><b>'+c[0]+'</b> '+c[1]+'</span><span class="ticker-sep">•</span>';
   }
   var track = document.getElementById('cryptoTickerTrack');
   if (track){
@@ -28768,7 +28772,7 @@ async function awardColmillos(eventType, periodKey, amount){
     // se cachean en localStorage para siempre, así este navegador solo pide la lista UNA vez
     // en total (no en cada carga de página) — si algún ícono cambia, hay que borrar la llave
     // 'skc_ticker_icons_v1' de localStorage (o subir la versión del nombre) para forzar un refresh
-    var CACHE_KEY = 'skc_ticker_icons_v2';
+    var CACHE_KEY = 'skc_ticker_icons_v3'; // v3: ahora guarda la version "small" (antes "large")
     function applyIcons(imgById){
       track.querySelectorAll('img[data-cid]').forEach(function(img){
         var url = imgById[img.dataset.cid];
@@ -28785,7 +28789,10 @@ async function awardColmillos(eventType, periodKey, amount){
         .then(function(r){ return r.json(); })
         .then(function(list){
           var imgById = {};
-          (list || []).forEach(function(c){ imgById[c.id] = c.image; });
+          // CoinGecko manda por defecto la version "large" del logo - de sobra para un icono
+          // que se ve a 20x20px (56 monedas x esa diferencia de peso sí se nota). "small" pesa
+          // bastante menos y se ve igual de nitido a este tamaño
+          (list || []).forEach(function(c){ imgById[c.id] = (c.image || '').replace('/large/', '/small/'); });
           applyIcons(imgById);
           try{ localStorage.setItem(CACHE_KEY, JSON.stringify(imgById)); } catch(e){}
         })
