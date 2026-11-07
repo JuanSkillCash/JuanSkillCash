@@ -3933,7 +3933,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <p class="community-lead">Calendario económico de impacto alto y transmisiones en vivo, sin salir de SkillCash.</p>
       <div class="events-grid">
         <div class="events-card">
-          <div class="events-card-head">🎥 Conferencias en Vivo</div>
+          <div class="events-card-head">🎥 Conferencias en Vivo <span class="live-pill" id="eventsYtLivePill" style="display:none"><i></i>EN VIVO</span></div>
           <div class="events-yt-controls">
             <select id="eventsYtSelect" class="events-yt-select" aria-label="Elegir canal"></select>
             <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
@@ -3996,11 +3996,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       { label: 'Noticias Telemundo', id: 'UCRwA1NUcUnwsly35ikGhp0A' },
       { label: 'Negocios TV', id: 'UCwd8Byi93KbnsYmCcKLExvQ' },
     ];
+    // URL del Worker de Cloudflare que revisa si un canal está en vivo ahora mismo (ver
+    // workers/youtube-live-check/ en el repo para el código fuente y cómo desplegarlo).
+    // Mientras diga 'PENDIENTE_URL_WORKER', el botón "Buscar directo" solo refresca la lista
+    // de subidas y lo dice honestamente - en cuanto Juan despliegue el Worker y me pase su URL
+    // real (https://algo.workers.dev), se reemplaza este único valor.
+    var EVENTS_YT_LIVE_CHECK_URL = 'PENDIENTE_URL_WORKER';
     (function(){
       var sel = document.getElementById('eventsYtSelect');
       var btn = document.getElementById('eventsYtRefresh');
       var f = document.getElementById('eventsYtIframe');
       var empty = document.getElementById('eventsYtEmpty');
+      var livePill = document.getElementById('eventsYtLivePill');
+      var foot = document.querySelector('#eventsBlock .events-card:first-child .events-card-foot');
       if(!sel || !f) return;
       sel.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
         var disabled = !ch.id;
@@ -4010,7 +4018,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         return 'https://www.youtube-nocookie.com/embed/videoseries?list=UULF' + id.slice(2) +
           '&enablejsapi=1&playsinline=1&mute=1&cc_load_policy=0&iv_load_policy=3&rel=0';
       }
+      function liveEmbedUrl(videoId){
+        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=0&mute=0&rel=0';
+      }
+      var liveCheckAbort = null;
+      var autoCheckTimer = null;
       function showChannel(i){
+        if(liveCheckAbort){ liveCheckAbort(); liveCheckAbort = null; }
+        if(autoCheckTimer){ clearInterval(autoCheckTimer); autoCheckTimer = null; }
+        if(livePill) livePill.style.display = 'none';
         var ch = EVENTS_YT_CHANNELS[i];
         if(!ch || !ch.id){
           f.style.display = 'none';
@@ -4020,6 +4036,35 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         f.src = uploadsEmbedUrl(ch.id);
         f.style.display = 'block';
         if(empty) empty.style.display = 'none';
+        if(foot) foot.textContent = 'Si el canal no tiene un directo en este momento, se muestra su video más reciente.';
+        checkLiveAndMaybeSwitch(ch.id);
+        // revisa solo al canal elegido, no los 9 - cada tanto, mientras siga elegido
+        autoCheckTimer = setInterval(function(){ checkLiveAndMaybeSwitch(ch.id); }, 90000);
+      }
+      // consulta al Worker si ESTE canal está en vivo ahora mismo; si sí, cambia el iframe al
+      // video real del directo (más confiable que live_stream?channel=, que nos falló antes) y
+      // prende la pastilla "EN VIVO". Si no, deja la lista de subidas tal cual
+      function checkLiveAndMaybeSwitch(channelId, manual){
+        if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
+          if(manual && foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
+          return Promise.resolve();
+        }
+        var aborted = false;
+        liveCheckAbort = function(){ aborted = true; };
+        return fetch(EVENTS_YT_LIVE_CHECK_URL + '?channel=' + channelId)
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            if(aborted) return;
+            if(data && data.live && data.videoId){
+              f.src = liveEmbedUrl(data.videoId);
+              if(livePill) livePill.style.display = 'inline-flex';
+              if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
+            } else {
+              if(livePill) livePill.style.display = 'none';
+              if(manual && foot) foot.textContent = 'No hay transmisión en vivo en este momento - mostrando el video más reciente.';
+            }
+          })
+          .catch(function(){ /* si falla la consulta, se deja tal cual estaba (la lista de subidas) */ });
       }
       // arranca en el primer canal que SÍ tenga ID listo (hoy ninguno de los 3 sin ID puede
       // quedar seleccionado por default, quedarían con el aviso de "falta configurar")
@@ -4029,17 +4074,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       showChannel(startIdx);
       sel.addEventListener('change', function(){ showChannel(Number(sel.value)); });
       if(btn) btn.addEventListener('click', function(){
-        // Detectar si un canal está transmitiendo en vivo AHORA necesita revisarlo desde un
-        // servidor propio (así lo hace melapela, confirmado que tienen su propio backend para
-        // esto) - no se puede desde solo el navegador sin exponer una llave de la API de YouTube,
-        // y un iframe de otro dominio no deja ver desde afuera si lo que cargó adentro es un
-        // video real o un aviso de error. Por ahora el botón solo refresca la lista de subidas
-        // (por si hay un video nuevo) y lo dice honestamente en vez de fingir que sí revisó si
-        // hay directo - cuando Juan decida cuál camino tomar (API key propia, o un Cloudflare
-        // Worker nuevo que lea el RSS del canal) se conecta acá.
-        if(f.src) f.src = f.src;
-        var foot = btn.closest('.events-card').querySelector('.events-card-foot');
-        if(foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
+        var ch = EVENTS_YT_CHANNELS[Number(sel.value)];
+        if(!ch || !ch.id) return;
+        if(f.src) f.src = f.src; // refresca la lista de subidas por si hay un video nuevo
+        checkLiveAndMaybeSwitch(ch.id, true);
       });
     })();
     </script>
