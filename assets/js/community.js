@@ -154,20 +154,32 @@ function renderReviewsList(){
   }
   if(more) more.style.display = reviewsCache.length > reviewsShown ? 'block' : 'none';
 }
-async function loadReviews(){
-  const { data, error } = await sbClient.from('platform_reviews')
-    .select('id,user_id,display_name,rating,comment,hidden,created_at,updated_at')
-    .order('created_at', { ascending: false }).limit(200);
-  if(error){
-    const list = $('reviewsList');
-    if(list) list.innerHTML = '<div class="review-empty">Las reseñas todavía no están disponibles.</div>';
-    return;
-  }
-  reviewsCache = data || [];
-  myReview = currentUser ? (reviewsCache.find(r => r.user_id === currentUser.id) || null) : null;
-  renderReviewsList();
-  renderReviewForm();
-  loadAboutStats();
+// se llamaba dos veces casi al mismo tiempo en cada carga de la portada (una directa, otra
+// disparada por sbClient.auth.onAuthStateChange, que YA dispara solo con suscribirse) -
+// confirmado viéndolo duplicado en la pestaña Network (platform_reviews Y, adentro,
+// get_public_stats). En vez de apostarle a en qué orden exacto llega cada una, se comparte
+// una sola promesa "en vuelo": si ya hay una consulta corriendo, la segunda llamada espera
+// esa misma en vez de disparar una nueva
+let loadReviewsInFlight = null;
+function loadReviews(){
+  if(loadReviewsInFlight) return loadReviewsInFlight;
+  loadReviewsInFlight = (async () => {
+    const { data, error } = await sbClient.from('platform_reviews')
+      .select('id,user_id,display_name,rating,comment,hidden,created_at,updated_at')
+      .order('created_at', { ascending: false }).limit(200);
+    if(error){
+      const list = $('reviewsList');
+      if(list) list.innerHTML = '<div class="review-empty">Las reseñas todavía no están disponibles.</div>';
+      return;
+    }
+    reviewsCache = data || [];
+    myReview = currentUser ? (reviewsCache.find(r => r.user_id === currentUser.id) || null) : null;
+    renderReviewsList();
+    renderReviewForm();
+    loadAboutStats();
+  })();
+  loadReviewsInFlight.finally(() => { loadReviewsInFlight = null; });
+  return loadReviewsInFlight;
 }
 
 function paintStars(){
@@ -245,6 +257,11 @@ if(deleteBtn){
 const moreBtn = $('reviewsMoreBtn');
 if(moreBtn) moreBtn.addEventListener('click', () => { reviewsShown += PAGE; renderReviewsList(); });
 
+// onAuthStateChange por sí solo YA dispara una vez apenas se suscribe (con la sesión
+// restaurada o null, el evento inicial que manda supabase-js) - antes también se llamaba
+// loadReviews() aquí abajo, directo, pensando que hacía falta un primer disparo aparte; en
+// realidad esas dos llamadas corrían casi al mismo tiempo en cada carga de la página,
+// duplicando por partida doble tanto esta consulta (platform_reviews) como la de
+// loadAboutStats() de adentro (get_public_stats) - confirmado viéndolo en la pestaña Network.
 sbClient.auth.onAuthStateChange(() => { setTimeout(() => { loadReviews(); bindAdminLiveBtn(); }, 0); });
-loadReviews();
 })();
