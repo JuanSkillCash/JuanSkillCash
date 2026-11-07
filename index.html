@@ -2535,10 +2535,6 @@ img[src=""]{display:none}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
 .hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
 .hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(30px,5vw,62px);color:var(--white)}
-/* ver el <script> justo despues del <h1 class="hero-mascot-title"> en el HTML: oculta el
-   titulo de una vez apenas el navegador llega a el, para que animacion-entrada.js (que corre
-   diferido, mas tarde) no alcance a dejarlo ver completo antes de separarlo en letras */
-.hero-mascot-title.pre-split{opacity:0}
 .hero-mascot-title .ht-cash{color:var(--red)}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
 .hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
@@ -2685,21 +2681,32 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 @keyframes mg-onda{ to{ transform:scale(30); opacity:0; } }
 @media (prefers-reduced-motion:reduce){ .mg-onda{ animation:none !important; display:none; } }
 
-/* animacion de entrada (solo si JS confirma que no hay prefers-reduced-motion - ver
-   assets/js/animacion-entrada.js): titulo letra por letra y cajas de la pagina principal en
-   cascada al cargar. Sin JS o con reduced-motion, todo se ve normal de una vez. */
+/* animacion de entrada (solo si JS confirma que no hay prefers-reduced-motion - ver el
+   <script> justo despues del <h1 class="hero-mascot-title">, que es quien agrega "split-js"
+   y separa el titulo en letras, YA en el primer pintado, no diferido). Sin JS o con
+   reduced-motion, todo se ve normal de una vez.
+   Duracion/retraso acortados (antes 1s/65ms por letra, ahora .55s/35ms) - medido en vivo que
+   el titulo completo tardaba hasta 2.8s en verse, entre el retraso de cada letra y lo tarde
+   que arrancaba; con el titulo ya separado desde el parseo esto ya no debería pasar, pero una
+   animacion mas corta igual se siente mas inmediata. */
 .split-js{ --desde:0ms; }
 .split-js .split .sp{
   display:inline-block;opacity:0;transform:translateY(.55em) rotate(2deg);transform-origin:0 100%;
-  animation:sp-entra 1s cubic-bezier(.2,.8,.2,1) forwards;
-  animation-delay:calc(var(--desde,0ms) + var(--i,0) * 65ms);
+  animation:sp-entra .55s cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay:calc(var(--desde,0ms) + var(--i,0) * 35ms);
 }
 .split-js .split .sw{ display:inline-block; white-space:nowrap; }
 @keyframes sp-entra{ to{ opacity:1; transform:none; } }
+/* las 7 cajas de categoria ya NO dependen de un script diferido para dejar de estar en
+   opacity:0 (antes: animacion-entrada.js les asignaba --i una por una, y hasta que ese script
+   diferido corriera - tarde, despues de parsear 2MB+ - las cajas se veian de golpe y recien
+   ahi "desaparecian" para re-aparecer animadas). Ahora es solo CSS, sin cascada por caja (se
+   quita el --i por caja a proposito, ver nota arriba) - todas entran juntas, un solo retraso
+   fijo, nada que dependa de JS corriendo a tiempo */
 .split-js .cat-flip-outer{
   opacity:0;transform:translateY(16px);
-  animation:mx-entra .9s cubic-bezier(.2,.8,.2,1) forwards;
-  animation-delay:calc(220ms + var(--i,0) * 90ms);
+  animation:mx-entra .6s cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay:120ms;
 }
 @keyframes mx-entra{ to{ opacity:1; transform:none; } }
 
@@ -3668,18 +3675,39 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="hero-mascot-eyebrow">Bienvenido a</div>
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
         <script>
-        /* evita el flash de "aparece el titulo normal -> desaparece -> arranca la animacion
-           letra por letra" que reporto Juan: assets/js/animacion-entrada.js corre diferido
-           (defer), despues de que el navegador ya pinto el titulo una primera vez tal cual -
-           cuando ese script por fin separa las letras, el titulo "desaparece" un instante antes
-           de empezar a animarse. Este script SI corre en el momento exacto en que el parser
-           llega hasta aqui (antes de pintar), asi que oculta el titulo de una (ver
-           .hero-mascot-title.pre-split en el CSS) y nunca se alcanza a ver completo de entrada.
-           animacion-entrada.js quita esta clase en cuanto separa las letras de verdad; el
-           setTimeout es solo un seguro por si ese script no llegara a correr. */
+        /* la version anterior de este script escondia el titulo (opacity:0 via .pre-split) y
+           esperaba a que assets/js/animacion-entrada.js (defer, corre solo DESPUES de parsear
+           todo el HTML/CSS/JS de la pagina - 2MB+) separara las letras una por una - eso hacia
+           que el titulo tardara hasta 2.8s en verse completo (medido en vivo), la causa
+           principal de la sensacion de lentitud reportada. Ahora la separacion en letras pasa
+           AQUI MISMO, en el momento exacto en que el parser llega a este punto (antes del
+           primer pintado) - el titulo nunca llega a ocultarse, ya nace separado en letras y
+           empieza a animarse de una vez. document.documentElement tambien recibe "split-js"
+           aqui (antes lo ponia animacion-entrada.js) para que las 7 cajas de categorias (que
+           usan la misma clase para su propia entrada) tampoco dependan de ese script diferido */
         if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+          document.documentElement.classList.add('split-js');
           var hmt = document.querySelector('.hero-mascot-title');
-          if(hmt){ hmt.classList.add('pre-split'); setTimeout(function(){ hmt.classList.remove('pre-split'); }, 2500); }
+          if(hmt && !hmt.getAttribute('aria-label')){
+            hmt.setAttribute('aria-label', hmt.textContent);
+            var i = 0;
+            [].slice.call(hmt.childNodes).forEach(function(n){
+              if(n.nodeType !== 3){
+                if(n.nodeType === 1){ n.classList.add('sp'); n.style.setProperty('--i', i++); }
+                return;
+              }
+              var frag = document.createDocumentFragment();
+              [].slice.call(n.textContent).forEach(function(ch){
+                var c = document.createElement('span');
+                c.className = 'sp';
+                c.textContent = ch;
+                c.style.setProperty('--i', i++);
+                frag.appendChild(c);
+              });
+              hmt.replaceChild(frag, n);
+            });
+            hmt.classList.add('split');
+          }
         }
         </script>
       </div>
@@ -28789,7 +28817,7 @@ async function awardColmillos(eventType, periodKey, amount){
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
 <script src="/assets/js/livechart.js?v=6" defer></script>
 <script src="/assets/js/colmillos.js?v=20" defer></script>
-<script src="/assets/js/animacion-entrada.js?v=1" defer></script><script src="/assets/js/tarjetas-magicas.js?v=1" defer></script>
+<script src="/assets/js/tarjetas-magicas.js?v=1" defer></script>
 <!-- skillcash-adn · skc-origin-juan · Charly19 · SkillCash Tools © hecho-por-skillcash -->
 </body>
 </html>
