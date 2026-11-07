@@ -2815,6 +2815,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-yt-refresh:hover{border-color:var(--accent)}
 .events-video-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
 .events-video-wrap iframe{display:block;width:100%;height:100%;border:none}
+.events-video-facade{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg2),#000);cursor:pointer}
+.events-video-facade img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
+.events-video-facade-label{position:relative;z-index:1;color:var(--muted2);font-size:13px;font-weight:600;text-align:center;padding:0 24px}
+.events-video-play{position:relative;z-index:2;width:62px;height:62px;border-radius:50%;background:rgba(255,47,79,.92);border:3px solid rgba(255,255,255,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding-left:4px}
+.events-video-play:hover{background:var(--red)}
 .events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
 .events-card-foot{font-size:12px;color:var(--muted);line-height:1.6}
 .events-card-foot a{color:var(--muted2)}
@@ -3975,6 +3980,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
           </div>
           <div class="events-video-wrap">
+            <!-- patron "fachada": no se crea el reproductor real de YouTube (pesado, descarga su
+                 propio JS) hasta que la persona le da clic - antes se cargaba completo apenas se
+                 entraba a la página, sin que nadie lo pidiera. Con video real conocido (cuando el
+                 Worker confirma que SÍ hay un directo) se usa su miniatura de verdad
+                 (i.ytimg.com); si no, un cartel genérico con el nombre del canal -->
+            <div class="events-video-facade" id="eventsYtFacade">
+              <img id="eventsYtThumb" alt="" loading="lazy" decoding="async" style="display:none">
+              <div class="events-video-facade-label" id="eventsYtFacadeLabel"></div>
+              <button type="button" class="events-video-play" id="eventsYtPlayBtn" aria-label="Reproducir video">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
             <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
             <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
           </div>
@@ -3993,7 +4010,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                  widget y por eso se ignoraban, dejando el blanco/logo por defecto. El recorte del
                  header (el iframe más alto + translateY) va en el CSS, ver nota en .events-calendar-iframe -->
             <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
             </div>
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
@@ -4043,6 +4060,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var f = document.getElementById('eventsYtIframe');
       var empty = document.getElementById('eventsYtEmpty');
       var livePill = document.getElementById('eventsYtLivePill');
+      var facade = document.getElementById('eventsYtFacade');
+      var thumb = document.getElementById('eventsYtThumb');
+      var facadeLabel = document.getElementById('eventsYtFacadeLabel');
+      var playBtn = document.getElementById('eventsYtPlayBtn');
       var foot = document.querySelector('#eventsBlock .events-card:first-child .events-card-foot');
       if(!sel || !f) return;
       sel.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
@@ -4054,7 +4075,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           '&enablejsapi=1&playsinline=1&mute=1&cc_load_policy=0&iv_load_policy=3&rel=0';
       }
       function liveEmbedUrl(videoId){
-        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=0&mute=0&rel=0';
+        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?mute=0&rel=0';
+      }
+      // "fachada" (patron facade): mientras la persona no le dé clic al botón de play, NO se crea
+      // el reproductor real de YouTube (ese es el que de verdad pesa y descarga su propio JS) -
+      // solo se guarda a dónde apuntaría (pendingSrc) y se muestra una miniatura. Si ya se le dio
+      // play (played=true) y justo ahí el Worker confirma que entró en vivo, sí se actualiza el
+      // iframe real de una (la persona ya está viendo algo, tiene sentido pasarla al directo).
+      var pendingSrc = null, played = false;
+      function setFacade(videoIdForThumb, label){
+        facadeLabel.textContent = label || '';
+        if(videoIdForThumb){
+          thumb.src = 'https://i.ytimg.com/vi/' + videoIdForThumb + '/hqdefault.jpg';
+          thumb.style.display = 'block';
+          facadeLabel.style.display = 'none';
+        } else {
+          thumb.removeAttribute('src');
+          thumb.style.display = 'none';
+          facadeLabel.style.display = 'block';
+        }
       }
       var liveCheckAbort = null;
       var autoCheckTimer = null;
@@ -4062,23 +4101,27 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         if(liveCheckAbort){ liveCheckAbort(); liveCheckAbort = null; }
         if(autoCheckTimer){ clearInterval(autoCheckTimer); autoCheckTimer = null; }
         if(livePill) livePill.style.display = 'none';
+        played = false;
+        f.removeAttribute('src');
+        f.style.display = 'none';
         var ch = EVENTS_YT_CHANNELS[i];
         if(!ch || !ch.id){
-          f.style.display = 'none';
+          facade.style.display = 'none';
           if(empty) empty.style.display = 'flex';
           return;
         }
-        f.src = uploadsEmbedUrl(ch.id);
-        f.style.display = 'block';
         if(empty) empty.style.display = 'none';
+        facade.style.display = 'flex';
+        pendingSrc = uploadsEmbedUrl(ch.id);
+        setFacade(null, ch.label);
         if(foot) foot.textContent = 'Si el canal no tiene un directo en este momento, se muestra su video más reciente.';
         checkLiveAndMaybeSwitch(ch.id);
         // revisa solo al canal elegido, no los 9 - cada tanto, mientras siga elegido
         autoCheckTimer = setInterval(function(){ checkLiveAndMaybeSwitch(ch.id); }, 90000);
       }
-      // consulta al Worker si ESTE canal está en vivo ahora mismo; si sí, cambia el iframe al
-      // video real del directo (más confiable que live_stream?channel=, que nos falló antes) y
-      // prende la pastilla "EN VIVO". Si no, deja la lista de subidas tal cual
+      // consulta al Worker si ESTE canal está en vivo ahora mismo; si sí, deja listo el video real
+      // del directo para cuando le den play (o, si ya le habían dado play antes, lo cambia de
+      // una) y prende la pastilla "EN VIVO". Si no, deja la fachada con la lista de subidas
       function checkLiveAndMaybeSwitch(channelId, manual){
         if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
           if(manual && foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
@@ -4091,7 +4134,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .then(function(data){
             if(aborted) return;
             if(data && data.live && data.videoId){
-              f.src = liveEmbedUrl(data.videoId);
+              pendingSrc = liveEmbedUrl(data.videoId);
+              setFacade(data.videoId, '');
+              if(played) f.src = pendingSrc + '&autoplay=1';
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
             } else {
@@ -4101,6 +4146,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           })
           .catch(function(){ /* si falla la consulta, se deja tal cual estaba (la lista de subidas) */ });
       }
+      function playNow(){
+        if(!pendingSrc) return;
+        f.src = pendingSrc + (pendingSrc.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1';
+        f.style.display = 'block';
+        facade.style.display = 'none';
+        played = true;
+      }
+      if(playBtn) playBtn.addEventListener('click', playNow);
+      if(facade) facade.addEventListener('click', function(e){ if(e.target === facade) playNow(); });
       // arranca en el primer canal que SÍ tenga ID listo (hoy ninguno de los 3 sin ID puede
       // quedar seleccionado por default, quedarían con el aviso de "falta configurar")
       var firstReady = EVENTS_YT_CHANNELS.findIndex(function(ch){ return !!ch.id; });
@@ -4111,9 +4165,32 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       if(btn) btn.addEventListener('click', function(){
         var ch = EVENTS_YT_CHANNELS[Number(sel.value)];
         if(!ch || !ch.id) return;
-        if(f.src) f.src = f.src; // refresca la lista de subidas por si hay un video nuevo
+        if(played && f.src) f.src = f.src; // si ya está reproduciendo, refresca por si hay video nuevo
         checkLiveAndMaybeSwitch(ch.id, true);
       });
+    })();
+    // El calendario de Investing.com (sslecal2.investing.com) tardaba 2.7s en cargar en cada
+    // visita a la portada, aunque la persona nunca llegara a desplazarse hasta verlo -
+    // loading="lazy" nativo del navegador ya ayuda un poco, pero en conexiones rápidas el
+    // margen que usa Chrome es chico y casi no alcanza a notarse. Con IntersectionObserver se
+    // controla el margen a mano (200px): el iframe solo pide su src cuando la sección está por
+    // entrar en pantalla de verdad, nunca antes.
+    (function(){
+      var iframe = document.querySelector('.events-calendar-iframe');
+      var section = document.getElementById('eventsBlock');
+      if(!iframe || !section || typeof IntersectionObserver === 'undefined'){
+        if(iframe && iframe.dataset.src) iframe.src = iframe.dataset.src;
+        return;
+      }
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            iframe.src = iframe.dataset.src;
+            obs.disconnect();
+          }
+        });
+      }, { rootMargin: '200px' });
+      obs.observe(section);
     })();
     </script>
 
