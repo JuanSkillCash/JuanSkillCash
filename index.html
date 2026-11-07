@@ -26,7 +26,7 @@
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
      a un servidor que no sea uno de los que ya usamos - connect-src es una lista blanca exacta
      de las APIs que esta pagina realmente llama, nada mas puede recibir una peticion del navegador -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://sslecal2.investing.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://sslecal2.investing.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>SkillCash Tools – Herramientas</title>
 <meta name="description" content="Herramientas SkillCash: calculadora de trading de futuros y más recursos para operar con criterio.">
@@ -2790,7 +2790,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    parejos uno al lado del otro, como pidio ("así como el de Melapela") */
 .events-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:860px){ .events-grid{grid-template-columns:1fr} }
-@media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} }
+@media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} .events-calendar-clip{height:320px} .events-calendar-iframe{height:358px} }
 .events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px}
 .events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px}
 .events-yt-controls{display:flex;gap:8px}
@@ -2798,10 +2798,23 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-yt-select option:disabled{color:var(--muted)}
 .events-yt-refresh{flex-shrink:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .events-yt-refresh:hover{border-color:var(--accent)}
-.events-video-wrap,.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
-.events-video-wrap iframe,.events-calendar-wrap iframe{display:block;width:100%;height:100%;border:none}
+.events-video-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
+.events-video-wrap iframe{display:block;width:100%;height:100%;border:none}
 .events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
 .events-card-foot{font-size:12px;color:var(--muted);line-height:1.6}
+.events-card-foot a{color:var(--muted2)}
+/* Calendario Económico: el iframe de Investing.com siempre trae su propio logo + iconos de
+   Android/Apple + selector de fechas arriba (no existe un parámetro que los quite - confirmado
+   investigando en vivo cómo lo hace melapela.ai) - el truco real es recortarlo: el iframe se
+   dibuja MÁS ALTO que la cajita visible y se empuja hacia arriba con translateY, así esa franja
+   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. El filtro CSS
+   invert+hue-rotate+saturate convierte el widget (blanco, pensado para tema claro) a algo que
+   combina con el resto del sitio (oscuro) sin tener que pelear con sus propios parámetros de
+   color, que son limitados. pointer-events:none porque no usamos el selector de fechas propio
+   de Investing (el "Semana actual"/filtros son decoración nuestra, afuera del iframe) */
+.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
+.events-calendar-clip{position:relative;overflow:clip;height:420px;min-width:590px}
+.events-calendar-iframe{display:block;width:100%;height:458px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -3926,7 +3939,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
           </div>
           <div class="events-video-wrap">
-            <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="autoplay; encrypted-media" allowfullscreen style="display:none"></iframe>
+            <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
             <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
           </div>
           <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
@@ -3937,20 +3950,36 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <!-- "Este contenido está bloqueado..." que vimos antes NO era un bloqueo real de
                  Investing.com (el widget carga bien si abres este mismo link directo en el
                  navegador) - era el bloqueador de anuncios del navegador de Juan interceptando
-                 el iframe por venir incrustado de otro sitio. Confirmado, se vuelve a este. -->
-            <iframe src="https://sslecal2.investing.com/?ecoDayBackground=%230c0f1c&amp;innerBorderColor=%231b2138&amp;borderColor=%231b2138&amp;defaultFont=%23f7f6fb&amp;features=datepicker&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4&amp;importance=3" title="Calendario económico" loading="lazy"></iframe>
+                 el iframe por venir incrustado de otro sitio.
+                 Parámetros de color (ecoDayBackground/ecoDayFontColor/defaultFont/innerBorderColor/
+                 borderColor) y columns= confirmados viendo en vivo el src real que usa melapela.ai -
+                 los que habíamos puesto antes (adivinados a mano) no existían en esta versión del
+                 widget y por eso se ignoraban, dejando el blanco/logo por defecto. El recorte del
+                 header (el iframe más alto + translateY) va en el CSS, ver nota en .events-calendar-iframe -->
+            <div class="events-calendar-clip">
+              <iframe class="events-calendar-iframe" src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+            </div>
           </div>
-          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por Investing.com. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
+          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
         </div>
       </div>
     </section>
     <script>
     // Lista de canales para "Conferencias en Vivo" - para agregar/editar uno, solo tocar este
-    // arreglo. id debe ser el ID real del canal (empieza con "UC..."), no el @usuario - el embed
-    // de YouTube (youtube.com/embed/live_stream?channel=) solo acepta ese formato, no el @handle.
+    // arreglo. id debe ser el ID real del canal (empieza con "UC..."), no el @usuario.
     // Cómo sacar el ID de un canal: entrar al canal en YouTube -> "..." o el botón de compartir ->
     // "Copiar enlace del canal" - ese link YA viene en formato youtube.com/channel/UCxxxxxxxx.
     // id:null = todavía falta ese ID (se muestra en la lista pero deshabilitado).
+    //
+    // Por qué youtube-nocookie.com/embed/videoseries?list=UULF<id sin "UC"> y no
+    // youtube.com/embed/live_stream?channel=<id>: se probó primero con live_stream (muestra el
+    // directo si existe, o lo último transmitido si no) pero con el canal de la Casa Blanca daba
+    // "Este video no está disponible" - investigando en vivo cómo lo arma melapela.ai (a ELLOS sí
+    // les carga ese mismo canal oficial) se confirmó que usan esta otra URL: "UULF" + el ID del
+    // canal sin el prefijo "UC" es la lista automática de videos largos subidos por ese canal -
+    // siempre existe y siempre es insertable (a diferencia de live_stream, que en nuestras pruebas
+    // parece fallar fuera de un directo real). El costo es que ya no es necesariamente "en vivo
+    // ahora mismo", es el último video subido.
     //
     // Los 9 canales de Juan, todos con su ID real ya confirmado.
     // El orden y los nombres de los primeros 7 son un supuesto (el mismo orden del menú
@@ -3977,6 +4006,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         var disabled = !ch.id;
         return '<option value="' + i + '"' + (disabled ? ' disabled' : '') + '>' + ch.label + (disabled ? ' (falta ID)' : '') + '</option>';
       }).join('');
+      function uploadsEmbedUrl(id){
+        return 'https://www.youtube-nocookie.com/embed/videoseries?list=UULF' + id.slice(2) +
+          '&enablejsapi=1&playsinline=1&mute=1&cc_load_policy=0&iv_load_policy=3&rel=0';
+      }
       function showChannel(i){
         var ch = EVENTS_YT_CHANNELS[i];
         if(!ch || !ch.id){
@@ -3984,7 +4017,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           if(empty) empty.style.display = 'flex';
           return;
         }
-        f.src = 'https://www.youtube.com/embed/live_stream?channel=' + ch.id;
+        f.src = uploadsEmbedUrl(ch.id);
         f.style.display = 'block';
         if(empty) empty.style.display = 'none';
       }
@@ -3996,9 +4029,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       showChannel(startIdx);
       sel.addEventListener('change', function(){ showChannel(Number(sel.value)); });
       if(btn) btn.addEventListener('click', function(){
-        // "Buscar directo" (igual al botón de melapela): fuerza a YouTube a revisar de nuevo si
-        // el canal ya entró en vivo, recargando el iframe con su mismo src
+        // Detectar si un canal está transmitiendo en vivo AHORA necesita revisarlo desde un
+        // servidor propio (así lo hace melapela, confirmado que tienen su propio backend para
+        // esto) - no se puede desde solo el navegador sin exponer una llave de la API de YouTube,
+        // y un iframe de otro dominio no deja ver desde afuera si lo que cargó adentro es un
+        // video real o un aviso de error. Por ahora el botón solo refresca la lista de subidas
+        // (por si hay un video nuevo) y lo dice honestamente en vez de fingir que sí revisó si
+        // hay directo - cuando Juan decida cuál camino tomar (API key propia, o un Cloudflare
+        // Worker nuevo que lea el RSS del canal) se conecta acá.
         if(f.src) f.src = f.src;
+        var foot = btn.closest('.events-card').querySelector('.events-card-foot');
+        if(foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
       });
     })();
     </script>
