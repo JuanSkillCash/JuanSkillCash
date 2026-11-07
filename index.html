@@ -45,6 +45,17 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#ff2f4f">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<!-- preconnect: adelanta el DNS+TLS de los orígenes externos que se piden apenas carga la
+     página (fuentes, y las APIs del panel de Dominancia/Miedo y Codicia que se ve de
+     primero) para que esa conexión ya esté lista cuando el fetch/<link> real la necesite,
+     en vez de arrancarla desde cero en ese momento - ayuda sobre todo en conexiones lentas
+     o la primera visita (sin caché), que es cuando más se siente el "trancado" -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://api.alternative.me">
+<link rel="preconnect" href="https://skillcash-api-proxy.juanchodigital86.workers.dev">
+<link rel="preconnect" href="https://nbvgyouzjscwtfukzxok.supabase.co">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,700;0,800;0,900;1,900&family=Space+Grotesk:wght@300;400;500;600;700&family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&family=Bungee&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -4342,7 +4353,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               </div>
 
               <div class="bubbles-iframe-wrap chart-breakout">
-                <iframe src="https://cryptobubbles.net" title="Crypto Bubbles" allowfullscreen></iframe>
+                <iframe src="https://cryptobubbles.net" title="Crypto Bubbles" loading="lazy" allowfullscreen></iframe>
               </div>
 
               <div class="calc-disclaimer" style="margin-top:18px">
