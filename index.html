@@ -2792,7 +2792,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:860px){ .events-grid{grid-template-columns:1fr} }
 @media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} .events-calendar-clip{height:320px} .events-calendar-iframe{height:358px} }
-.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px}
+/* min-width:0 es necesario porque .events-card es hijo de un grid (.events-grid) - sin esto,
+   el calendario de adentro (que fuerza min-width:590px para que el widget de Investing no se
+   vea aplastado, iguaql que hace melapela) empuja el ANCHO DE TODA LA GRILLA (y por lo tanto de
+   toda la página) a ser al menos esos 590px, en vez de quedarse contenido y scrollable solo
+   adentro de su cajita - bug real reportado por Juan (página corrida/con scroll lateral en
+   celular). Un grid/flex item sin min-width explícito usa por defecto el tamaño mínimo de su
+   contenido más ancho como piso, así sea mucho más ancho que el espacio real disponible */
+.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px}
 .events-yt-controls{display:flex;gap:8px}
 .events-yt-select{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 10px}
