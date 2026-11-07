@@ -19243,6 +19243,24 @@ function chartWatermarkHtml(totalW, totalH){
     `<tspan font-style="italic" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
     `</text>`;
 }
+/* la nota de arriba de "Poppins ya esta garantizada" resulto ser falsa justo en el caso que
+   Juan reporto: entrando por un link directo a un indicador (ej. /indicadores/rsi-mensual),
+   ese grafico se dibuja casi de inmediato - si Poppins todavia no habia terminado de bajar en
+   ese momento (conexion lenta, o es de los primeros recursos pedidos), el SVG se queda pintado
+   con la fuente de respaldo para siempre, sin reintentar solo. document.fonts.ready avisa
+   cuando YA cargaron todas las fuentes declaradas en el CSS - en ese momento se fuerza un
+   repintado (quitar y volver a poner el mismo font-family) de cualquier watermark que ya
+   estuviera dibujado con la fuente de respaldo. */
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){
+    document.querySelectorAll('svg text[style*="Poppins"]').forEach(function(t){
+      const ff = t.style.fontFamily;
+      t.style.fontFamily = '';
+      void t.getBoundingClientRect();
+      t.style.fontFamily = ff;
+    });
+  });
+}
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
    Halving — reusado por Rainbow Chart y Pi Cycle para no duplicar la misma lógica dos veces ---- */
 function wireChartHover(cfg){
