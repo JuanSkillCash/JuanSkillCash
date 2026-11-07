@@ -1152,6 +1152,14 @@ button{font-family:inherit;color:inherit}
   font-family:'Poppins',sans-serif !important;font-weight:900;font-style:italic;font-size:clamp(17px,4.6vw,38px);
   color:rgba(255,47,79,.07);pointer-events:none;z-index:-1;white-space:nowrap;
 }
+/* marca de agua DENTRO de un SVG (chartWatermarkHtml en el script): el <text> trae varios
+   <tspan> hijos (uno por palabra/color) y la regla global "body, body *{font-family:Inter
+   !important}" alcanza a cada <tspan> DIRECTAMENTE (no por herencia desde el <text> padre) -
+   un <tspan> sin su propio font-family pierde siempre contra una regla que sí lo matchea a
+   él mismo, sin importar que el padre lo tenga con !important. Por eso no basta con ponerle
+   el font-family al <text>: hay que protegerlo aquí con una regla propia que también
+   alcance a los tspan hijos */
+.chart-watermark, .chart-watermark *{font-family:'Poppins',sans-serif !important}
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
    lo tuvieran, al no compartir el mismo origen (el gráfico es más ancho por el
    "breakout") las líneas quedaban desfasadas y se veían como dos cuadrículas encimadas */
@@ -19230,36 +19238,19 @@ function rainbowBandForResidual(res){
 function chartWatermarkHtml(totalW, totalH){
   // mismos colores del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILL" en blanco,
   // "CASH" y "Tools" en rojo - "Tools" va en Poppins itálica (no en Caveat, la fuente cursiva que
-  // sí usa el logo real): un <tspan> con una fuente nueva dentro de un <text> inyectado por
-  // innerHTML a veces queda pintado con la fuente de respaldo si esa fuente (Caveat) todavía no
-  // había terminado de cargar en el navegador la primera vez que ese gráfico se dibuja, y un SVG
-  // no se repinta solo cuando la fuente llega tarde (a diferencia del texto HTML normal) - Poppins
-  // ya está garantizada (es la fuente de encabezados de todo el sitio), así que no tiene ese riesgo
+  // sí usa el logo real). La clase "chart-watermark" (ver CSS) es la que de verdad protege la
+  // tipografía: un <tspan> hijo sin su propio font-family queda alcanzado DIRECTAMENTE por la
+  // regla global "body, body *{font-family:Inter !important}" y esa gana sobre lo que el <text>
+  // padre tenga puesto (!important incluido) porque match directo siempre le gana a herencia -
+  // por eso el style inline de acá abajo, puesto solo en el <text>, no alcanzaba a corregir los
+  // tspan de adentro, que son los que de verdad pintan las letras visibles
   const fontSize = Math.round(totalW * 0.05);
   const cx = (totalW / 2).toFixed(1), cy = (totalH / 2 + fontSize * 0.3).toFixed(1);
-  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" font-size="${fontSize}" style="font-family:'Poppins',sans-serif !important;letter-spacing:-.01em;pointer-events:none">` +
+  return `<text class="chart-watermark" x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" font-size="${fontSize}" style="font-family:'Poppins',sans-serif !important;letter-spacing:-.01em;pointer-events:none">` +
     `<tspan fill="rgba(247,246,251,.055)">SKILL</tspan>` +
     `<tspan fill="rgba(255,47,79,.07)">CASH</tspan>` +
     `<tspan font-style="italic" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
     `</text>`;
-}
-/* la nota de arriba de "Poppins ya esta garantizada" resulto ser falsa justo en el caso que
-   Juan reporto: entrando por un link directo a un indicador (ej. /indicadores/rsi-mensual),
-   ese grafico se dibuja casi de inmediato - si Poppins todavia no habia terminado de bajar en
-   ese momento (conexion lenta, o es de los primeros recursos pedidos), el SVG se queda pintado
-   con la fuente de respaldo para siempre, sin reintentar solo. document.fonts.ready avisa
-   cuando YA cargaron todas las fuentes declaradas en el CSS - en ese momento se fuerza un
-   repintado (quitar y volver a poner el mismo font-family) de cualquier watermark que ya
-   estuviera dibujado con la fuente de respaldo. */
-if(document.fonts && document.fonts.ready){
-  document.fonts.ready.then(function(){
-    document.querySelectorAll('svg text[style*="Poppins"]').forEach(function(t){
-      const ff = t.style.fontFamily;
-      t.style.fontFamily = '';
-      void t.getBoundingClientRect();
-      t.style.fontFamily = ff;
-    });
-  });
 }
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
    Halving — reusado por Rainbow Chart y Pi Cycle para no duplicar la misma lógica dos veces ---- */
