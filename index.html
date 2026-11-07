@@ -1144,12 +1144,12 @@ button{font-family:inherit;color:inherit}
    que lean como una sola palabra */
 .sc-chart-watermark::before{
   content:"SKILLCASH";position:absolute;top:50%;left:50%;transform:translate(-100%,-50%);
-  font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(17px,4.6vw,38px);
+  font-family:'Poppins',sans-serif !important;font-weight:900;font-size:clamp(17px,4.6vw,38px);
   letter-spacing:-.01em;color:rgba(247,246,251,.055);pointer-events:none;z-index:-1;white-space:nowrap;
 }
 .sc-chart-watermark::after{
   content:"Tools";position:absolute;top:50%;left:50%;transform:translate(3px,-50%);
-  font-family:'Poppins',sans-serif;font-weight:900;font-style:italic;font-size:clamp(17px,4.6vw,38px);
+  font-family:'Poppins',sans-serif !important;font-weight:900;font-style:italic;font-size:clamp(17px,4.6vw,38px);
   color:rgba(255,47,79,.07);pointer-events:none;z-index:-1;white-space:nowrap;
 }
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
@@ -19237,7 +19237,7 @@ function chartWatermarkHtml(totalW, totalH){
   // ya está garantizada (es la fuente de encabezados de todo el sitio), así que no tiene ese riesgo
   const fontSize = Math.round(totalW * 0.05);
   const cx = (totalW / 2).toFixed(1), cy = (totalH / 2 + fontSize * 0.3).toFixed(1);
-  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="'Poppins',sans-serif" font-weight="900" font-size="${fontSize}" style="letter-spacing:-.01em;pointer-events:none">` +
+  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" font-size="${fontSize}" style="font-family:'Poppins',sans-serif !important;letter-spacing:-.01em;pointer-events:none">` +
     `<tspan fill="rgba(247,246,251,.055)">SKILL</tspan>` +
     `<tspan fill="rgba(255,47,79,.07)">CASH</tspan>` +
     `<tspan font-style="italic" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
