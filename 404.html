@@ -11019,6 +11019,7 @@ function jumpToIndicator(id){
   renderIndicSubtabs(group);
   if(!standalone){
     showIndicPanel(id);
+    if(id === 'fng') ensureFngLoaded();
     if(id === 'cbpremium') ensureCbpLoaded();
     if(id === 'halving') ensureHalvingLoaded();
     if(id === 'rainbow') ensureRainbowLoaded();
@@ -18864,6 +18865,19 @@ document.querySelectorAll('#fngRangeToggle .mode-btn').forEach(btn => {
   });
 });
 
+// cmc_fng_latest lo piden tanto el widget resumen de la portada (loadFearGreedIndex) como
+// este panel de detalle - cachear la respuesta un ratito corto evita una segunda consulta
+// idéntica si se entra al detalle justo después de ver la portada (el dato real solo cambia
+// cada hora en el servidor, así que 60s de caché acá no deja ver nada desactualizado)
+let cmcFngLatestCache = null, cmcFngLatestFetchedAt = 0;
+const CMC_FNG_LATEST_TTL_MS = 60000;
+async function fetchCmcFngLatest(){
+  if(cmcFngLatestCache !== null && (Date.now() - cmcFngLatestFetchedAt) < CMC_FNG_LATEST_TTL_MS) return cmcFngLatestCache;
+  const { data } = await sbClient.from('cmc_fng_latest').select('value,value_classification').eq('id', 1).maybeSingle();
+  cmcFngLatestCache = data || null;
+  cmcFngLatestFetchedAt = Date.now();
+  return cmcFngLatestCache;
+}
 async function loadFngDetail(){
   document.getElementById('fngDetailLoading').style.display = 'block';
   document.getElementById('fngDetailError').style.display = 'none';
@@ -18898,7 +18912,7 @@ async function loadFngDetail(){
     // termina el día) — se pisa aparte con el valor EN VIVO (mismo que usa el widget de portada),
     // para que el número grande y la punta del gráfico coincidan con lo que se ve ahora mismo en CMC
     try{
-      const { data: cmcLatest } = await sbClient.from('cmc_fng_latest').select('value,value_classification').eq('id', 1).maybeSingle();
+      const cmcLatest = await fetchCmcFngLatest();
       if(cmcLatest && data.length){
         data = [
           { timestamp: data[0].timestamp, value: String(cmcLatest.value), value_classification: cmcLatest.value_classification },
@@ -18953,7 +18967,13 @@ async function loadFngDetail(){
     document.getElementById('fngDetailError').style.display = 'block';
   }
 }
-loadFngDetail();
+// antes loadFngDetail() corría sin condición en TODA carga de la portada (consultaba
+// cmc_fng_history Y cmc_fng_latest aunque la persona nunca abriera este panel de detalle) -
+// cmc_fng_latest además ya la pide por su cuenta el widget resumen de la portada
+// (loadFearGreedIndex, más abajo), duplicando esa consulta en cada carga. Ahora, igual que
+// el resto de indicadores, solo se carga la primera vez que de verdad se entra a este panel
+let fngDetailLoaded = false;
+function ensureFngLoaded(){ if(!fngDetailLoaded){ fngDetailLoaded = true; loadFngDetail(); } }
 document.getElementById('fngSectionBox').addEventListener('click', () => {
   showCategoryDetail('indicadores');
   jumpToIndicator('fng');
@@ -27141,8 +27161,7 @@ async function loadFearGreedIndex(){
     let val, classEs;
     let cmcLatest = null;
     try{
-      const { data } = await sbClient.from('cmc_fng_latest').select('value,value_classification').eq('id', 1).maybeSingle();
-      cmcLatest = data;
+      cmcLatest = await fetchCmcFngLatest();
     } catch(e){ /* sigue con alternative.me si falla */ }
 
     if(cmcLatest){
