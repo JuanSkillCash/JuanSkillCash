@@ -3941,22 +3941,20 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     // "Copiar enlace del canal" - ese link YA viene en formato youtube.com/channel/UCxxxxxxxx.
     // id:null = todavía falta ese ID (se muestra en la lista pero deshabilitado).
     //
-    // Juan mandó 9 links; a estos 6 los mandó ya en formato /channel/UCxxxx (quedan listos de
-    // una). Los otros 3 (Casa Blanca oficial, @noticias y @NegociosTV) los mandó como /@usuario -
-    // falta que los vuelva a copiar con "Copiar enlace del canal" para tener su ID real.
+    // Los 9 canales de Juan, todos con su ID real ya confirmado.
     // El orden y los nombres de los primeros 7 son un supuesto (el mismo orden del menú
     // desplegable de canales que ya vimos en melapela) - OJO Juan, confirma que los nombres
     // correspondan de verdad a cada canal que mandaste, por si el orden no fue ese.
     var EVENTS_YT_CHANNELS = [
-      { label: 'Casa Blanca (oficial)', id: null },
+      { label: 'Casa Blanca (oficial)', id: 'UCYxRlFDqcWM4y7FfpiAN3KQ' },
       { label: 'USA en Vivo', id: 'UCi6-pNJPwSbUzZOO6P3UmNQ' },
       { label: 'EVTV Miami', id: 'UCshe7-1A5MN_ArHsG_3V41g' },
       { label: 'NTN24', id: 'UCEJs1fTF3KszRJGxJY14VrA' },
       { label: 'Voz de América', id: 'UCJ46VgZgCMLFUvOT671AOJw' },
       { label: 'CNN en Español', id: 'UC_lEiu6917IJz03TnntWUaQ' },
       { label: 'CoinDesk', id: 'UC7TghOL755nBk7HelHoi9LQ' },
-      { label: '@noticias', id: null },
-      { label: 'Negocios TV', id: null },
+      { label: 'Noticias Telemundo', id: 'UCRwA1NUcUnwsly35ikGhp0A' },
+      { label: 'Negocios TV', id: 'UCwd8Byi93KbnsYmCcKLExvQ' },
     ];
     (function(){
       var sel = document.getElementById('eventsYtSelect');
