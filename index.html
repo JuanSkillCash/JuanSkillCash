@@ -2782,6 +2782,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 @media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} }
 .events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px}
 .events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px}
+.events-yt-controls{display:flex;gap:8px}
+.events-yt-select{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 10px}
+.events-yt-select option:disabled{color:var(--muted)}
+.events-yt-refresh{flex-shrink:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.events-yt-refresh:hover{border-color:var(--accent)}
 .events-video-wrap,.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
 .events-video-wrap iframe,.events-calendar-wrap iframe{display:block;width:100%;height:100%;border:none}
 .events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
@@ -3905,37 +3910,102 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="events-grid">
         <div class="events-card">
           <div class="events-card-head">🎥 Conferencias en Vivo</div>
+          <div class="events-yt-controls">
+            <select id="eventsYtSelect" class="events-yt-select" aria-label="Elegir canal"></select>
+            <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
+          </div>
           <div class="events-video-wrap">
             <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="autoplay; encrypted-media" allowfullscreen style="display:none"></iframe>
-            <div class="events-video-empty" id="eventsYtEmpty">Falta configurar el canal de YouTube</div>
+            <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
           </div>
-          <div class="events-card-foot">Transmisión oficial de la Casa Blanca — si no hay directo en este momento, YouTube muestra la última transmisión disponible.</div>
+          <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
         </div>
         <div class="events-card">
           <div class="events-card-head">📅 Calendario Económico</div>
           <div class="events-calendar-wrap">
-            <iframe src="https://sslecal2.investing.com/?ecoDayBackground=%230c0f1c&amp;innerBorderColor=%231b2138&amp;borderColor=%231b2138&amp;defaultFont=%23f7f6fb&amp;features=datepicker&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4&amp;importance=3" title="Calendario económico" loading="lazy"></iframe>
+            <!-- el iframe directo de Investing.com (sslecal2.investing.com) devolvía "Este
+                 contenido está bloqueado. Comunícate con el propietario del sitio" - ese widget
+                 de Investing exige registrar el dominio en su sistema de "Widgets" antes de
+                 poder usarlo, cosa que no hicimos. Se cambia por el widget de Calendario
+                 Económico de TradingView (gratis, público, sin necesidad de registrar el
+                 dominio - mismo proveedor que ya usamos en otros gráficos del sitio) -->
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+              {
+                "colorTheme": "dark",
+                "isTransparent": true,
+                "width": "100%",
+                "height": "100%",
+                "locale": "es",
+                "importanceFilter": "-1,0,1",
+                "countryFilter": "us"
+              }
+              </script>
+            </div>
           </div>
-          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por Investing.com</div>
+          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por TradingView</div>
         </div>
       </div>
     </section>
     <script>
-    // channel de YouTube para "Conferencias en Vivo" - cambiar solo este ID para usar otro canal.
-    // Cómo sacar el ID de un canal: entrar al canal en YouTube -> "..." o "Acerca de" -> "Compartir
-    // canal" -> "Copiar enlace". Si el link ya es youtube.com/channel/UCxxxxxxxx, ese es el ID. Si
-    // es youtube.com/@nombre, hay que abrir el código fuente de esa página (Ctrl+U) y buscar
-    // "channelId":"UC... (la primera coincidencia es la del canal).
+    // Lista de canales para "Conferencias en Vivo" - para agregar/editar uno, solo tocar este
+    // arreglo. id debe ser el ID real del canal (empieza con "UC..."), no el @usuario - el embed
+    // de YouTube (youtube.com/embed/live_stream?channel=) solo acepta ese formato, no el @handle.
+    // Cómo sacar el ID de un canal: entrar al canal en YouTube -> "..." o el botón de compartir ->
+    // "Copiar enlace del canal" - ese link YA viene en formato youtube.com/channel/UCxxxxxxxx.
+    // id:null = todavía falta ese ID (se muestra en la lista pero deshabilitado).
+    //
+    // Juan mandó 9 links; a estos 6 los mandó ya en formato /channel/UCxxxx (quedan listos de
+    // una). Los otros 3 (Casa Blanca oficial, @noticias y @NegociosTV) los mandó como /@usuario -
+    // falta que los vuelva a copiar con "Copiar enlace del canal" para tener su ID real.
+    // El orden y los nombres de los primeros 7 son un supuesto (el mismo orden del menú
+    // desplegable de canales que ya vimos en melapela) - OJO Juan, confirma que los nombres
+    // correspondan de verdad a cada canal que mandaste, por si el orden no fue ese.
+    var EVENTS_YT_CHANNELS = [
+      { label: 'Casa Blanca (oficial)', id: null },
+      { label: 'USA en Vivo', id: 'UCi6-pNJPwSbUzZOO6P3UmNQ' },
+      { label: 'EVTV Miami', id: 'UCshe7-1A5MN_ArHsG_3V41g' },
+      { label: 'NTN24', id: 'UCEJs1fTF3KszRJGxJY14VrA' },
+      { label: 'Voz de América', id: 'UCJ46VgZgCMLFUvOT671AOJw' },
+      { label: 'CNN en Español', id: 'UC_lEiu6917IJz03TnntWUaQ' },
+      { label: 'CoinDesk', id: 'UC7TghOL755nBk7HelHoi9LQ' },
+      { label: '@noticias', id: null },
+      { label: 'Negocios TV', id: null },
+    ];
     (function(){
-      var EVENTS_YT_CHANNEL_ID = 'PENDIENTE_ID_CANAL'; // reemplazar por el ID real (ver nota arriba)
+      var sel = document.getElementById('eventsYtSelect');
+      var btn = document.getElementById('eventsYtRefresh');
       var f = document.getElementById('eventsYtIframe');
       var empty = document.getElementById('eventsYtEmpty');
-      if(EVENTS_YT_CHANNEL_ID === 'PENDIENTE_ID_CANAL') return; // deja el aviso de "falta configurar"
-      if(f){
-        f.src = 'https://www.youtube.com/embed/live_stream?channel=' + EVENTS_YT_CHANNEL_ID;
+      if(!sel || !f) return;
+      sel.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
+        var disabled = !ch.id;
+        return '<option value="' + i + '"' + (disabled ? ' disabled' : '') + '>' + ch.label + (disabled ? ' (falta ID)' : '') + '</option>';
+      }).join('');
+      function showChannel(i){
+        var ch = EVENTS_YT_CHANNELS[i];
+        if(!ch || !ch.id){
+          f.style.display = 'none';
+          if(empty) empty.style.display = 'flex';
+          return;
+        }
+        f.src = 'https://www.youtube.com/embed/live_stream?channel=' + ch.id;
         f.style.display = 'block';
+        if(empty) empty.style.display = 'none';
       }
-      if(empty) empty.style.display = 'none';
+      // arranca en el primer canal que SÍ tenga ID listo (hoy ninguno de los 3 sin ID puede
+      // quedar seleccionado por default, quedarían con el aviso de "falta configurar")
+      var firstReady = EVENTS_YT_CHANNELS.findIndex(function(ch){ return !!ch.id; });
+      var startIdx = firstReady === -1 ? 0 : firstReady;
+      sel.value = String(startIdx);
+      showChannel(startIdx);
+      sel.addEventListener('change', function(){ showChannel(Number(sel.value)); });
+      if(btn) btn.addEventListener('click', function(){
+        // "Buscar directo" (igual al botón de melapela): fuerza a YouTube a revisar de nuevo si
+        // el canal ya entró en vivo, recargando el iframe con su mismo src
+        if(f.src) f.src = f.src;
+      });
     })();
     </script>
 
