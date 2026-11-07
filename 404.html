@@ -2773,6 +2773,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .community-block{margin-top:44px}
 .community-title{font-size:26px;font-weight:700;margin:0 0 8px}
 .community-lead{color:var(--muted2);font-size:15px;margin:0 0 18px}
+/* ===== Eventos y Noticias (calendario economico + conferencias en vivo) =====
+   YouTube a la izquierda, Calendario a la derecha - orden pedido por Juan, igual
+   al de melapela.ai pero invertido. Misma altura fija en los dos para que se vean
+   parejos uno al lado del otro, como pidio ("así como el de Melapela") */
+.events-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){ .events-grid{grid-template-columns:1fr} }
+@media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} }
+.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px}
+.events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px}
+.events-video-wrap,.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
+.events-video-wrap iframe,.events-calendar-wrap iframe{display:block;width:100%;height:100%;border:none}
+.events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
+.events-card-foot{font-size:12px;color:var(--muted);line-height:1.6}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -3882,8 +3895,50 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
     </div>
 
-    <!-- secciones fijas del inicio (no flotantes): quien hace SkillCash y reseñas de la comunidad.
-         Se muestran/ocultan junto con #categoryOverviewGrid (ver assets/js/community.js) -->
+    <!-- secciones fijas del inicio (no flotantes): eventos en vivo, quien hace SkillCash y
+         reseñas de la comunidad. Se muestran/ocultan junto con #categoryOverviewGrid (ver
+         assets/js/community.js) -->
+    <section class="home-mirror community-block" id="eventsBlock">
+      <div class="section-eyebrow">En vivo</div>
+      <h2 class="community-title">Eventos y Noticias</h2>
+      <p class="community-lead">Calendario económico de impacto alto y transmisiones en vivo, sin salir de SkillCash.</p>
+      <div class="events-grid">
+        <div class="events-card">
+          <div class="events-card-head">🎥 Conferencias en Vivo</div>
+          <div class="events-video-wrap">
+            <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="autoplay; encrypted-media" allowfullscreen style="display:none"></iframe>
+            <div class="events-video-empty" id="eventsYtEmpty">Falta configurar el canal de YouTube</div>
+          </div>
+          <div class="events-card-foot">Transmisión oficial de la Casa Blanca — si no hay directo en este momento, YouTube muestra la última transmisión disponible.</div>
+        </div>
+        <div class="events-card">
+          <div class="events-card-head">📅 Calendario Económico</div>
+          <div class="events-calendar-wrap">
+            <iframe src="https://sslecal2.investing.com/?ecoDayBackground=%230c0f1c&amp;innerBorderColor=%231b2138&amp;borderColor=%231b2138&amp;defaultFont=%23f7f6fb&amp;features=datepicker&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4&amp;importance=3" title="Calendario económico" loading="lazy"></iframe>
+          </div>
+          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por Investing.com</div>
+        </div>
+      </div>
+    </section>
+    <script>
+    // channel de YouTube para "Conferencias en Vivo" - cambiar solo este ID para usar otro canal.
+    // Cómo sacar el ID de un canal: entrar al canal en YouTube -> "..." o "Acerca de" -> "Compartir
+    // canal" -> "Copiar enlace". Si el link ya es youtube.com/channel/UCxxxxxxxx, ese es el ID. Si
+    // es youtube.com/@nombre, hay que abrir el código fuente de esa página (Ctrl+U) y buscar
+    // "channelId":"UC... (la primera coincidencia es la del canal).
+    (function(){
+      var EVENTS_YT_CHANNEL_ID = 'PENDIENTE_ID_CANAL'; // reemplazar por el ID real (ver nota arriba)
+      var f = document.getElementById('eventsYtIframe');
+      var empty = document.getElementById('eventsYtEmpty');
+      if(EVENTS_YT_CHANNEL_ID === 'PENDIENTE_ID_CANAL') return; // deja el aviso de "falta configurar"
+      if(f){
+        f.src = 'https://www.youtube.com/embed/live_stream?channel=' + EVENTS_YT_CHANNEL_ID;
+        f.style.display = 'block';
+      }
+      if(empty) empty.style.display = 'none';
+    })();
+    </script>
+
     <section class="home-mirror community-block" id="aboutJuanBlock">
       <div class="section-eyebrow">Quién está detrás</div>
       <h2 class="community-title">Juan SkillCash</h2>
