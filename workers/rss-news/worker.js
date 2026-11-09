@@ -120,15 +120,36 @@ async function fetchFeed(feed) {
 // volúmenes chicos como este. Si no responde bien (medio caído, límite diario alcanzado,
 // texto raro que no logra traducir) se devuelve el título original en inglés - mejor eso que
 // tumbar toda la tarjeta de noticias.
-async function traduceTitulo(texto) {
+// El parámetro `debug` es opcional (solo se usa con ?debug=1 en la URL, ver más abajo) - es
+// un objeto donde se anota qué pasó de verdad en la llamada, para diagnosticar sin adivinar
+// cuando algo falla solo del lado de Cloudflare y no se puede reproducir desde un navegador
+// normal (ver nota de Juan: la misma consulta a mano SÍ funciona, desde el Worker no).
+async function traduceTitulo(texto, debug) {
   try {
     const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(texto) + '&langpair=en|es';
-    const resp = await fetch(url);
-    if (!resp.ok) return texto;
+    const resp = await fetch(url, {
+      headers: {
+        // algunas APIs gratuitas rechazan o limitan peticiones sin User-Agent de navegador -
+        // los Workers de Cloudflare no mandan uno por defecto como sí hace un navegador real
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+      },
+    });
+    if (debug) debug.httpStatus = resp.status;
+    if (!resp.ok) {
+      if (debug) debug.motivo = 'MyMemory respondió HTTP ' + resp.status;
+      return texto;
+    }
     const data = await resp.json();
+    if (debug) debug.respuestaCruda = data;
     const traducido = data && data.responseData && data.responseData.translatedText;
-    return (traducido && traducido.trim()) ? decodeEntities(traducido.trim()) : texto;
+    if (!traducido || !traducido.trim()) {
+      if (debug) debug.motivo = 'MyMemory respondió 200 pero sin responseData.translatedText usable';
+      return texto;
+    }
+    return decodeEntities(traducido.trim());
   } catch (err) {
+    if (debug) debug.motivo = 'Excepción al llamar/leer MyMemory: ' + String(err);
     return texto;
   }
 }
@@ -165,11 +186,21 @@ export default {
     items.sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
     items = items.slice(0, MAX_ITEMS);
 
+    // ?debug=1 (temporal, para diagnosticar por qué la traducción no está funcionando en
+    // producción aunque la misma consulta a MyMemory sí funcione desde un navegador normal) -
+    // anota en el primer titular qué pasó de verdad con la llamada a MyMemory, sin tener que
+    // adivinar. Quitar esto una vez resuelto, no debe quedar permanente.
+    const debugWanted = url.searchParams.get('debug') === '1';
+    const debugInfo = debugWanted ? {} : null;
+
     // traducir solo los que de verdad se van a mostrar (ya recortado a MAX_ITEMS) - traducir
     // antes del slice() desperdiciaría llamadas en titulares que ni siquiera se usan
-    items = await Promise.all(items.map(async (it) => ({ ...it, title: await traduceTitulo(it.title) })));
+    items = await Promise.all(items.map(async (it, idx) => ({
+      ...it,
+      title: await traduceTitulo(it.title, (debugWanted && idx === 0) ? debugInfo : null),
+    })));
 
-    const body = JSON.stringify({ items, checkedAt: Date.now() });
+    const body = JSON.stringify({ items, checkedAt: Date.now(), ...(debugWanted ? { debug: debugInfo } : {}) });
     const response = new Response(body, {
       headers: {
         'Content-Type': 'application/json',
