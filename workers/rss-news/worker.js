@@ -31,7 +31,10 @@ const FEEDS = {
   ],
   macro: [
     { url: 'https://feeds.content.dowjones.io/public/rss/mw_topstories', source: 'MarketWatch' },
-    { url: 'https://www.investing.com/rss/news.rss', source: 'Investing.com' },
+    // news_14.rss es la categoria "Economy News" de Investing.com (no el feed general
+    // news.rss, que en la prueba real de Juan trajo puras transcripciones de resultados de
+    // empresas sueltas como Pagaya o KKR - eso no es "macro y economia")
+    { url: 'https://www.investing.com/rss/news_14.rss', source: 'Investing.com' },
   ],
 };
 
@@ -41,12 +44,18 @@ function stripCdata(s) {
   return (m ? m[1] : s).trim();
 }
 function decodeEntities(s) {
+  // Ademas de las entidades con nombre de siempre, MarketWatch/Investing.com usan bastante
+  // las entidades numericas para comillas tipograficas y acentos (ej. &#x2019; para el
+  // apostrofe curvo "'") - sin estas dos ultimas lineas, esos titulos salian con el codigo
+  // crudo en vez del caracter real.
   return s
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+    .replace(/&#39;/g, "'")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)));
 }
 function stripTags(s) {
   return s.replace(/<[^>]*>/g, '').trim();
