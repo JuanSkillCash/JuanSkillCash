@@ -11,8 +11,8 @@
  * se arregla actualizando el patrón de abajo, no es nada grave si pasa.
  *
  * Uso desde el sitio: GET https://<tu-worker>.workers.dev/?channel=UCxxxxxxxx
- * Responde: {"live":true,"videoId":"abc123","channelId":"UCxxxxxxxx","checkedAt":169...}
- *           {"live":false,"videoId":null,"channelId":"UCxxxxxxxx","checkedAt":169...}
+ * Responde: {"live":true,"videoId":"abc123","title":"De qué trata el directo","channelId":"UCxxxxxxxx","checkedAt":169...}
+ *           {"live":false,"videoId":null,"title":null,"channelId":"UCxxxxxxxx","checkedAt":169...}
  *
  * Cacheado 60 segundos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
  * visitante) - así, aunque el sitio tenga miles de visitas, YouTube solo recibe como máximo
@@ -50,6 +50,7 @@ export default {
 
     let live = false;
     let videoId = null;
+    let title = null;
 
     try {
       const ytResp = await fetch(`https://www.youtube.com/channel/${channelId}/live`, {
@@ -64,6 +65,11 @@ export default {
         live = true;
         const m = html.match(/"videoId":"([\w-]{11})"/);
         if (m) videoId = m[1];
+        // el título real del directo (para el "Buscar directo" mejorado: mostrar de qué trata
+        // cada canal en vivo, no solo que está en vivo) - og:title es más confiable que el
+        // <title> de la pestaña, que YouTube a veces le pega " - YouTube" al final
+        const t = html.match(/<meta property="og:title" content="([^"]*)"/);
+        if (t) title = t[1].replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
       }
     } catch (err) {
       // si falla la consulta a YouTube (red, timeout, etc.), se responde "no en vivo" en vez
@@ -71,7 +77,7 @@ export default {
       live = false;
     }
 
-    const body = JSON.stringify({ live, videoId, channelId, checkedAt: Date.now() });
+    const body = JSON.stringify({ live, videoId, title, channelId, checkedAt: Date.now() });
     const response = new Response(body, {
       headers: {
         'Content-Type': 'application/json',
