@@ -2880,7 +2880,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 #eventsNewsMacro .events-news-item{border-left-color:var(--gold)}
 .events-news-item-body{flex:1;min-width:0}
 .events-news-item-title{font-size:13px;font-weight:600;color:var(--white);line-height:1.4}
-.events-news-item-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.02em}
+.events-news-item-why{font-size:11.5px;color:var(--muted2);line-height:1.4;margin-top:3px}
+.events-news-item-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.events-news-sent{font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.01em}
+.events-news-sent-alcista{color:var(--green);background:rgba(46,204,113,.12)}
+.events-news-sent-bajista{color:var(--red);background:rgba(255,47,79,.12)}
+.events-news-sent-neutral{color:var(--muted2);background:rgba(255,255,255,.06)}
 .events-news-item-ext{flex-shrink:0;color:var(--muted);margin-top:3px}
 .events-news-skel{height:46px;border-radius:0 8px 8px 0;margin-bottom:2px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:newsSkelShine 1.4s infinite}
 @keyframes newsSkelShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -4513,13 +4518,21 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         return 'https://translate.google.com/translate?sl=en&tl=es&u=' + encodeURIComponent(originalUrl);
       }
 
+      var SENTIMIENTO_LABEL = { alcista: 'Alcista', bajista: 'Bajista', neutral: 'Neutral' };
+
+      function sentimientoChipHtml(sentimiento){
+        if(!sentimiento || !SENTIMIENTO_LABEL[sentimiento]) return '';
+        return '<span class="events-news-sent events-news-sent-' + sentimiento + '">' + SENTIMIENTO_LABEL[sentimiento] + '</span>';
+      }
+
       function renderNews(listEl, items){
         if(!items || !items.length){ listEl.innerHTML = newsEmptyHtml(); return; }
         listEl.innerHTML = items.map(function(it){
           return '<a class="events-news-item" href="' + escapeHtml(translatedLink(it.link)) + '" target="_blank" rel="noopener">' +
             '<div class="events-news-item-body">' +
               '<div class="events-news-item-title">' + escapeHtml(it.title) + '</div>' +
-              '<div class="events-news-item-meta">' + escapeHtml([timeAgo(it.publishedAt), it.source].filter(Boolean).join(' · ')) + '</div>' +
+              (it.resumen ? '<div class="events-news-item-why">' + escapeHtml(it.resumen) + '</div>' : '') +
+              '<div class="events-news-item-meta">' + sentimientoChipHtml(it.sentimiento) + escapeHtml([timeAgo(it.publishedAt), it.source].filter(Boolean).join(' · ')) + '</div>' +
             '</div>' +
             '<svg class="events-news-item-ext" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>' +
           '</a>';

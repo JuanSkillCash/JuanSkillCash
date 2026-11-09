@@ -208,6 +208,33 @@ function setMsg(text, kind){
   el.className = 'review-msg' + (kind ? ' ' + kind : '');
 }
 
+/* Moderación automática de reseñas, via el Worker de Cloudflare que ya usa Eventos y Noticias
+   para traducir/analizar (reutiliza el mismo binding "AI", ver workers/rss-news/worker.js) -
+   pedido de Juan, para no tener que revisar a mano cada reseña nueva. Si la IA la marca como
+   insulto/odio/spam, la reseña igual se guarda (nunca se bloquea el envío), solo queda oculta
+   (hidden=true) hasta que Juan la revise desde el panel de administración que ya existe. Si el
+   Worker falla o tarda, se deja pasar sin marcar - mejor eso que bloquear una reseña honesta
+   por un problema técnico que no tiene nada que ver con lo que la persona escribió. */
+async function moderaReseña(texto){
+  if(typeof EVENTS_NEWS_URL === 'undefined') return false;
+  try{
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 6000);
+    const resp = await fetch(EVENTS_NEWS_URL + '?action=moderate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: texto }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timeout);
+    if(!resp.ok) return false;
+    const data = await resp.json();
+    return !!(data && data.flagged);
+  } catch(err){
+    return false;
+  }
+}
+
 document.querySelectorAll('#reviewStarsInput button').forEach(b => {
   b.addEventListener('click', () => { pickedRating = Number(b.dataset.v); $('reviewForm').dataset.touched = '1'; paintStars(); });
 });
@@ -232,14 +259,17 @@ if(reviewForm){
     const btn = $('reviewSubmitBtn');
     btn.disabled = true;
     setMsg('Guardando…');
-    const payload = { rating: pickedRating, comment };
+    const flagged = await moderaReseña(comment);
+    const payload = { rating: pickedRating, comment, hidden: flagged };
     const { error } = myReview
       ? await sbClient.from('platform_reviews').update(payload).eq('id', myReview.id)
       : await sbClient.from('platform_reviews').insert({ ...payload, user_id: currentUser.id });
     btn.disabled = false;
     if(error){ setMsg(typeof friendlyErrMsg === 'function' ? friendlyErrMsg(error) : error.message, 'err'); return; }
     delete reviewForm.dataset.touched;
-    setMsg(myReview ? '¡Reseña actualizada!' : '¡Gracias por tu reseña!', 'ok');
+    setMsg(flagged
+      ? 'Tu reseña se guardó. Como el texto podría no ser apropiado, queda pendiente de revisión antes de mostrarse.'
+      : (myReview ? '¡Reseña actualizada!' : '¡Gracias por tu reseña!'), flagged ? '' : 'ok');
     await loadReviews();
   });
 }

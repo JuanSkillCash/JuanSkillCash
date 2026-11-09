@@ -1,6 +1,9 @@
 /* Cloudflare Worker: junta titulares de varios RSS públicos (cripto y macro/economía) y los
  * devuelve ya ordenados en JSON, para las tarjetas "Noticias Cripto" / "Macro y Economía" de
- * Eventos y Noticias (replicando lo que hace melapela.ai).
+ * Eventos y Noticias (replicando lo que hace melapela.ai). También sirve, en el mismo Worker,
+ * la moderación automática de las reseñas de la plataforma (ver moderaTexto más abajo) - se
+ * reutiliza este Worker en vez de crear uno nuevo porque ambas cosas ya necesitan el mismo
+ * binding "AI" de Workers AI, así no hay que configurar nada de Cloudflare dos veces.
  *
  * Por qué hace falta este Worker: casi ningún RSS público trae cabeceras CORS, así que el
  * navegador no puede pedirlos directo desde juanskillcash.com (el propio sitio del medio los
@@ -8,9 +11,14 @@
  * no en el navegador de la visita) y se los pasa al sitio ya limpios. Mismo patrón que el
  * Worker de YouTube en vivo (ver workers/youtube-live-check/).
  *
- * Uso desde el sitio: GET https://<tu-worker>.workers.dev/?category=crypto
- *                      GET https://<tu-worker>.workers.dev/?category=macro
- * Responde: {"items":[{"title":"...","link":"...","source":"CoinDesk","publishedAt":169...}, ...],"checkedAt":169...}
+ * Uso desde el sitio:
+ *   GET  https://<tu-worker>.workers.dev/?category=crypto
+ *   GET  https://<tu-worker>.workers.dev/?category=macro
+ *   POST https://<tu-worker>.workers.dev/?action=moderate   cuerpo JSON: {"text":"..."}
+ * Las de noticias responden:
+ *   {"items":[{"title":"...","link":"...","source":"CoinDesk","publishedAt":169...,
+ *              "resumen":"...","sentimiento":"alcista|bajista|neutral"}, ...],"checkedAt":169...}
+ * La de moderación responde: {"flagged":true|false}
  *
  * Cacheado 30 minutos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
  * visitante) - las noticias no cambian segundo a segundo, no tiene sentido pedirle a cada
@@ -159,11 +167,73 @@ async function traduceTitulo(texto, env, debug) {
   }
 }
 
+// Resumen "por qué importa" + etiqueta de sentimiento (alcista/bajista/neutral), en UNA sola
+// llamada a un modelo de texto (Llama 3.1 8b) en vez de dos llamadas separadas - cada llamada
+// a Workers AI cuesta "neuronas" del cupo gratis diario de la cuenta de Cloudflare de Juan, así
+// que combinar ambas cosas en un solo pedido ahorra la mitad de ese costo para esta función.
+// Se le pide al modelo que responda en un formato fijo de dos líneas (no JSON) porque es más
+// fácil de leer con una expresión regular sin que un modelo de lenguaje "invente" un JSON mal
+// formado y rompa el parseo.
+async function analizaTitulo(tituloOriginalIngles, env, debug) {
+  const vacio = { resumen: null, sentimiento: null };
+  try {
+    const prompt = 'Eres un analista que explica noticias de cripto y economía a principiantes, en español.\n' +
+      'Para la siguiente noticia (el título viene en inglés), responde EXACTAMENTE en este formato, sin nada antes ni después:\n' +
+      'SENTIMIENTO: alcista, bajista o neutral\n' +
+      'RESUMEN: una frase corta en español (máximo 20 palabras) explicando por qué le podría importar a alguien que invierte en cripto\n\n' +
+      'Noticia: "' + tituloOriginalIngles + '"';
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 120,
+    });
+    if (debug) debug.respuestaCrudaAnalisis = result;
+    const texto = (result && result.response) || '';
+    const sentMatch = texto.match(/SENTIMIENTO:\s*(alcista|bajista|neutral)/i);
+    const resMatch = texto.match(/RESUMEN:\s*(.+)/i);
+    return {
+      sentimiento: sentMatch ? sentMatch[1].toLowerCase() : null,
+      resumen: resMatch ? decodeEntities(resMatch[1].trim()) : null,
+    };
+  } catch (err) {
+    if (debug) debug.motivoAnalisis = 'Excepción al pedir resumen/sentimiento: ' + String(err);
+    return vacio;
+  }
+}
+
+// Modera un comentario de reseña (platform_reviews) con la misma IA - detecta insultos, odio,
+// spam o publicidad de otro sitio. Una crítica negativa normal ("este sitio es lento", "no me
+// gustó tal herramienta") NO debe marcarse como inapropiada, solo contenido realmente tóxico o
+// spam. Se usa para decidir si una reseña nueva se guarda visible de una o queda oculta
+// (hidden=true) pendiente de que Juan la revise a mano desde el panel de administración que ya
+// existe - nunca para bloquear el envío por completo, así un falso positivo no le quita a nadie
+// la reseña que escribió, solo la deja pendiente de revisión.
+async function moderaTexto(texto, env, debug) {
+  try {
+    const prompt = 'Eres un moderador de contenido para reseñas de un sitio de herramientas cripto, en español.\n' +
+      'Responde con una sola palabra, "SI" o "NO" (sin comillas, sin nada más):\n' +
+      'Responde "SI" solo si el texto tiene insultos, lenguaje de odio, spam o publicidad de otro sitio/servicio.\n' +
+      'Responde "NO" si es una reseña normal, aunque sea una crítica negativa (las críticas negativas normales están permitidas).\n\n' +
+      'Texto: "' + texto + '"';
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 5,
+    });
+    if (debug) debug.respuestaCrudaModeracion = result;
+    const respuesta = ((result && result.response) || '').trim().toUpperCase();
+    return { flagged: respuesta.startsWith('SI'), motivo: null };
+  } catch (err) {
+    // si la IA falla, mejor dejar pasar la reseña (visible) que bloquear a alguien por un
+    // problema técnico que no tiene nada que ver con lo que escribió
+    return { flagged: false, motivo: 'Excepción al moderar: ' + String(err) };
+  }
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
     };
 
     if (request.method === 'OPTIONS') {
@@ -171,6 +241,33 @@ export default {
     }
 
     const url = new URL(request.url);
+
+    // ?action=moderate (POST, cuerpo {"text":"..."}) - moderación de reseñas de la plataforma
+    // (platform_reviews), ver moderaTexto() más arriba. Va antes de lo de noticias porque no
+    // usa "category" ni el caché de RSS - cada reseña es única, no tiene sentido cachearla.
+    if (request.method === 'POST' && url.searchParams.get('action') === 'moderate') {
+      let payload;
+      try {
+        payload = await request.json();
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'cuerpo JSON inválido' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
+      const texto = (payload && typeof payload.text === 'string') ? payload.text : '';
+      if (!texto.trim()) {
+        return new Response(JSON.stringify({ error: 'falta "text" (string) en el cuerpo' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
+      const resultado = await moderaTexto(texto, env);
+      return new Response(JSON.stringify(resultado), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
     const category = url.searchParams.get('category') || '';
     const feeds = FEEDS[category];
 
@@ -197,12 +294,18 @@ export default {
     const debugWanted = url.searchParams.get('debug') === '1';
     const debugInfo = debugWanted ? {} : null;
 
-    // traducir solo los que de verdad se van a mostrar (ya recortado a MAX_ITEMS) - traducir
-    // antes del slice() desperdiciaría llamadas en titulares que ni siquiera se usan
-    items = await Promise.all(items.map(async (it, idx) => ({
-      ...it,
-      title: await traduceTitulo(it.title, env, (debugWanted && idx === 0) ? debugInfo : null),
-    })));
+    // traducir Y analizar (resumen + sentimiento) solo los que de verdad se van a mostrar (ya
+    // recortado a MAX_ITEMS) - antes del slice() desperdiciaría llamadas en titulares que ni
+    // siquiera se usan. Las dos llamadas de IA por titular corren en paralelo (Promise.all),
+    // no una detrás de otra, para no duplicar el tiempo de espera.
+    items = await Promise.all(items.map(async (it, idx) => {
+      const dbg = (debugWanted && idx === 0) ? debugInfo : null;
+      const [titulo, analisis] = await Promise.all([
+        traduceTitulo(it.title, env, dbg),
+        analizaTitulo(it.title, env, dbg),
+      ]);
+      return { ...it, title: titulo, resumen: analisis.resumen, sentimiento: analisis.sentimiento };
+    }));
 
     const body = JSON.stringify({ items, checkedAt: Date.now(), ...(debugWanted ? { debug: debugInfo } : {}) });
     const response = new Response(body, {
