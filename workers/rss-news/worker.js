@@ -21,8 +21,13 @@
  *
  * Los titulares llegan en inglés (así los publican los medios) y se traducen al español antes
  * de responder - pedido explícito de Juan, que por defecto los vea en español sin tener que
- * traducir él mismo. Se usa la API gratuita de MyMemory (sin necesitar cuenta ni llave) - si
- * por lo que sea falla o no traduce bien, se deja el titular en inglés en vez de romper nada.
+ * traducir él mismo. Se usa el endpoint gratuito (no oficial, sin llave) de Google Translate
+ * que usan de hecho la mayoría de herramientas gratuitas de este tipo - se probó primero con
+ * la API de MyMemory, pero su límite diario ya estaba agotado para TODO Cloudflare (lo
+ * comparten todos los Workers del mundo que la usan, no es un límite por sitio) y devolvía
+ * HTTP 429 siempre, aunque la misma consulta funcionaba bien desde un navegador normal. Si
+ * por lo que sea esto también falla o no traduce bien, se deja el titular en inglés en vez de
+ * romper nada.
  *
  * Mantenimiento: si algún día un medio cambia su URL de RSS o la quita, solo hay que
  * actualizar/quitar esa entrada en FEEDS de abajo - no rompe a los demás (cada feed se pide
@@ -116,40 +121,50 @@ async function fetchFeed(feed) {
   }
 }
 
-// MyMemory (api.mymemory.translated.net) es gratuita, sin llave/cuenta, pensada justo para
-// volúmenes chicos como este. Si no responde bien (medio caído, límite diario alcanzado,
-// texto raro que no logra traducir) se devuelve el título original en inglés - mejor eso que
-// tumbar toda la tarjeta de noticias.
+// Endpoint gratuito (no documentado/oficial, sin llave) de Google Translate - el mismo que usan
+// por dentro herramientas conocidas como el paquete "googletrans". Se cambió aquí después de
+// confirmar con el modo ?debug=1 que la API de MyMemory devolvía HTTP 429 (límite agotado,
+// compartido entre TODOS los Workers de Cloudflare que la usan, no por sitio) de forma
+// consistente, aunque la misma consulta funcionaba bien desde un navegador normal. Este
+// endpoint tolera muchísimo más volumen que el de MyMemory, pero sigue sin ser una API
+// soportada oficialmente por Google - si algún día deja de funcionar, hay que buscar otra
+// (la señal sería que debug.motivo empiece a decir "Google Translate respondió HTTP...").
+// Si no responde bien (caído, formato inesperado, texto raro que no logra traducir) se
+// devuelve el título original en inglés - mejor eso que tumbar toda la tarjeta de noticias.
 // El parámetro `debug` es opcional (solo se usa con ?debug=1 en la URL, ver más abajo) - es
 // un objeto donde se anota qué pasó de verdad en la llamada, para diagnosticar sin adivinar
 // cuando algo falla solo del lado de Cloudflare y no se puede reproducir desde un navegador
 // normal (ver nota de Juan: la misma consulta a mano SÍ funciona, desde el Worker no).
 async function traduceTitulo(texto, debug) {
   try {
-    const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(texto) + '&langpair=en|es';
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=' + encodeURIComponent(texto);
     const resp = await fetch(url, {
       headers: {
         // algunas APIs gratuitas rechazan o limitan peticiones sin User-Agent de navegador -
         // los Workers de Cloudflare no mandan uno por defecto como sí hace un navegador real
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
       },
     });
     if (debug) debug.httpStatus = resp.status;
     if (!resp.ok) {
-      if (debug) debug.motivo = 'MyMemory respondió HTTP ' + resp.status;
+      if (debug) debug.motivo = 'Google Translate respondió HTTP ' + resp.status;
       return texto;
     }
     const data = await resp.json();
     if (debug) debug.respuestaCruda = data;
-    const traducido = data && data.responseData && data.responseData.translatedText;
+    // La respuesta no es un objeto normal, es un arreglo anidado raro: data[0] es una lista de
+    // fragmentos [textoTraducido, textoOriginal, ...] - el titulo puede venir partido en varios
+    // fragmentos, por eso se unen todos en vez de solo tomar el primero.
+    const traducido = Array.isArray(data) && Array.isArray(data[0])
+      ? data[0].map((seg) => (seg && seg[0]) || '').join('')
+      : '';
     if (!traducido || !traducido.trim()) {
-      if (debug) debug.motivo = 'MyMemory respondió 200 pero sin responseData.translatedText usable';
+      if (debug) debug.motivo = 'Google Translate respondió 200 pero sin texto traducido usable';
       return texto;
     }
     return decodeEntities(traducido.trim());
   } catch (err) {
-    if (debug) debug.motivo = 'Excepción al llamar/leer MyMemory: ' + String(err);
+    if (debug) debug.motivo = 'Excepción al llamar/leer Google Translate: ' + String(err);
     return texto;
   }
 }
