@@ -371,6 +371,8 @@ button{font-family:inherit;color:inherit}
   padding:9px 13px;display:flex;flex-direction:column;gap:4px;position:relative
 }
 .session-card-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted2);padding-right:20px}
+.session-flag{font-size:13px;line-height:1}
+.session-hours{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted2);letter-spacing:.01em;margin-top:1px}
 .session-bell-btn{
   position:absolute;top:7px;right:7px;background:none;border:none;padding:4px;margin:0;
   color:var(--muted);cursor:pointer;line-height:0;border-radius:7px;flex-shrink:0;
@@ -27592,10 +27594,20 @@ document.getElementById('usdtDomCard').addEventListener('click', () => {
 // Horarios de apertura/cierre en la hora LOCAL de cada plaza (con su propio horario de verano
 // resuelto automáticamente por Intl — nunca hay que actualizar esto a mano).
 const MARKET_SESSIONS = [
-  { id: 'tokyo', name: 'Asia (Tokio)', tz: 'Asia/Tokyo', openSec: 9 * 3600, closeSec: 15 * 3600 },
-  { id: 'london', name: 'Europa (Londres)', tz: 'Europe/London', openSec: 8 * 3600, closeSec: 16.5 * 3600 },
-  { id: 'ny', name: 'EE. UU. (N. York)', tz: 'America/New_York', openSec: 9.5 * 3600, closeSec: 16 * 3600 }
+  { id: 'tokyo', name: 'Asia (Tokio)', flag: '🇯🇵', tz: 'Asia/Tokyo', openSec: 9 * 3600, closeSec: 15 * 3600 },
+  { id: 'london', name: 'Europa (Londres)', flag: '🇬🇧', tz: 'Europe/London', openSec: 8 * 3600, closeSec: 16.5 * 3600 },
+  { id: 'ny', name: 'EE. UU. (N. York)', flag: '🇺🇸', tz: 'America/New_York', openSec: 9.5 * 3600, closeSec: 16 * 3600 }
 ];
+
+// Horario de apertura/cierre de cada bolsa, en SU PROPIA hora local (no convertida a la
+// del visitante) - pedido explícito de Juan: "que aparezca a qué horas va a estar abierta".
+function sessionLocalHoursLabel(session){
+  const openHour = Math.floor(session.openSec / 3600);
+  const openMin = Math.round((session.openSec % 3600) / 60);
+  const closeHour = Math.floor(session.closeSec / 3600);
+  const closeMin = Math.round((session.closeSec % 3600) / 60);
+  return formatTime12h(openHour, openMin) + ' – ' + formatTime12h(closeHour, closeMin);
+}
 
 // Festivos oficiales 2026 de cada bolsa (Tokyo Stock Exchange, London Stock Exchange, NYSE).
 // Nota de mantenimiento: esta lista es específica del año 2026 — hay que actualizarla a mano
@@ -27667,9 +27679,10 @@ function renderMarketSessions(){
         '<button type="button" class="session-bell-btn" id="bell-' + session.id + '" aria-label="Avisarme cuando ' + session.name + ' abra o cierre" title="Sonido solo cuando ' + session.name + ' abre o cierra">' +
           '<svg id="bellIcon-' + session.id + '" width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/></svg>' +
         '</button>' +
-        '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span>' + session.name + '</div>' +
+        '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span><span class="session-flag" aria-hidden="true">' + session.flag + '</span>' + session.name + '</div>' +
         '<div class="session-time" id="time-' + session.id + '">—</div>' +
         '<div class="session-time-label">Hora local</div>' +
+        '<div class="session-hours">' + sessionLocalHoursLabel(session) + '</div>' +
         '<div class="session-status-row"><span class="session-status" id="status-' + session.id + '">—</span></div>' +
         '<div class="session-countdown" id="countdown-' + session.id + '">—</div>';
       row.appendChild(card);
