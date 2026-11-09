@@ -12,16 +12,24 @@
  *                      GET https://<tu-worker>.workers.dev/?category=macro
  * Responde: {"items":[{"title":"...","link":"...","source":"CoinDesk","publishedAt":169...}, ...],"checkedAt":169...}
  *
- * Cacheado 5 minutos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
+ * Cacheado 30 minutos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
  * visitante) - las noticias no cambian segundo a segundo, no tiene sentido pedirle a cada
- * feed en cada visita al sitio.
+ * feed (ni traducir de nuevo) en cada visita al sitio. El caché más largo que el del Worker
+ * de YouTube (60s) es a propósito: aquí cada refresco también dispara varias llamadas a la
+ * API de traducción gratuita (ver traduceTitulo más abajo), que tiene un límite diario - entre
+ * más seguido se refresque, antes se acaba ese límite para todo el sitio.
+ *
+ * Los titulares llegan en inglés (así los publican los medios) y se traducen al español antes
+ * de responder - pedido explícito de Juan, que por defecto los vea en español sin tener que
+ * traducir él mismo. Se usa la API gratuita de MyMemory (sin necesitar cuenta ni llave) - si
+ * por lo que sea falla o no traduce bien, se deja el titular en inglés en vez de romper nada.
  *
  * Mantenimiento: si algún día un medio cambia su URL de RSS o la quita, solo hay que
  * actualizar/quitar esa entrada en FEEDS de abajo - no rompe a los demás (cada feed se pide
  * por separado y uno caído simplemente no aporta noticias, no tumba la respuesta completa).
  */
 
-const CACHE_SECONDS = 300;
+const CACHE_SECONDS = 1800;
 const MAX_ITEMS = 8;
 
 const FEEDS = {
@@ -108,6 +116,23 @@ async function fetchFeed(feed) {
   }
 }
 
+// MyMemory (api.mymemory.translated.net) es gratuita, sin llave/cuenta, pensada justo para
+// volúmenes chicos como este. Si no responde bien (medio caído, límite diario alcanzado,
+// texto raro que no logra traducir) se devuelve el título original en inglés - mejor eso que
+// tumbar toda la tarjeta de noticias.
+async function traduceTitulo(texto) {
+  try {
+    const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(texto) + '&langpair=en|es';
+    const resp = await fetch(url);
+    if (!resp.ok) return texto;
+    const data = await resp.json();
+    const traducido = data && data.responseData && data.responseData.translatedText;
+    return (traducido && traducido.trim()) ? decodeEntities(traducido.trim()) : texto;
+  } catch (err) {
+    return texto;
+  }
+}
+
 export default {
   async fetch(request) {
     const corsHeaders = {
@@ -139,6 +164,10 @@ export default {
     let items = results.flat();
     items.sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
     items = items.slice(0, MAX_ITEMS);
+
+    // traducir solo los que de verdad se van a mostrar (ya recortado a MAX_ITEMS) - traducir
+    // antes del slice() desperdiciaría llamadas en titulares que ni siquiera se usan
+    items = await Promise.all(items.map(async (it) => ({ ...it, title: await traduceTitulo(it.title) })));
 
     const body = JSON.stringify({ items, checkedAt: Date.now() });
     const response = new Response(body, {
