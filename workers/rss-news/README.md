@@ -6,19 +6,27 @@ completa en los comentarios de `worker.js`).
 
 ## Cómo desplegarlo (igual que hiciste con el de YouTube en vivo)
 
-1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers y Pages** → **Crear**.
-2. Elige **"Crear Worker"** (no "Pages"). Dale el nombre `skillcash-news-feed` — **importante
-   que sea ese nombre exacto, sin mezclarlo con el nombre al azar que propone Cloudflare**
-   (borra por completo lo que venga puesto por defecto antes de escribir el tuyo).
-3. Una vez creado, dale a **"Editar código"**.
-4. Borra todo el código de ejemplo que trae por defecto, y pega **todo** el contenido del
-   archivo `worker.js` de esta misma carpeta.
-5. Dale a **"Desplegar"** (Deploy) — guardar el código no es suficiente, tiene que quedar
+Ya está desplegado como `skillcash-noticias` (`https://skillcash-noticias.juanchodigital86.workers.dev`),
+así quedó conectado en el sitio. Estos pasos son para cuando haya que volver a pegar el código
+actualizado ahí (o, si algún día hay que crear uno desde cero):
+
+1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers y Pages** →
+   `skillcash-noticias` (o **Crear** → **"Crear Worker"** si es uno nuevo; en ese caso dale el
+   nombre `skillcash-noticias` — **importante que sea ese nombre exacto, sin mezclarlo con el
+   nombre al azar que propone Cloudflare**, borrando por completo lo que venga puesto por
+   defecto antes de escribir el tuyo).
+2. Dale a **"Editar código"**.
+3. Borra todo el código que haya, y pega **todo** el contenido del archivo `worker.js` de esta
+   misma carpeta.
+4. Dale a **"Desplegar"** (Deploy) — guardar el código no es suficiente, tiene que quedar
    publicado.
-6. Cualquier URL que te dé Cloudflare (sea `skillcash-news-feed...` o, si quedó mezclada con
-   el nombre al azar, algo como `jolly-waterfall-723askillcash-news-feed...`), mándamela y
-   ajusto el sitio para que apunte ahí exacto — no hace falta que coincida con un nombre fijo,
-   solo que me la pases tal cual.
+5. **Paso extra, una sola vez** (solo si el Worker es nuevo o todavía no tiene este binding):
+   en la pestaña **"Settings"** → **"Bindings"** (o "Variables y bindings") → **"Add"** → elige
+   **"Workers AI"** → en el nombre del binding escribe exactamente `AI` (mayúsculas) → guarda.
+   Sin este paso, la traducción al español no funciona (el Worker sigue respondiendo todo en
+   inglés, sin romperse).
+6. Si Cloudflare te da una URL distinta a `https://skillcash-noticias.juanchodigital86.workers.dev`,
+   avísame para ajustarla en el sitio.
 
 ## Cómo probarlo tú mismo (opcional)
 
