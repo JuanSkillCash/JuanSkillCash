@@ -1751,7 +1751,7 @@ function hideColmillosPage(){
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 colmillosBackBtn.addEventListener('click', hideColmillosPage);
-colmillosWalletBtn.addEventListener('click', showColmillosPage);
+// el click de #colmillosWalletBtn ya NO se engancha aquí - ver la misma nota en journal.js
 colmillosBigCoin.addEventListener('click', (e) => {
   const coin = e.currentTarget;
   coin.classList.remove('spin');

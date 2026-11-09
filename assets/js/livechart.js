@@ -364,15 +364,7 @@ window.closeLiveChartPage = function(){
   if(chart){ chart.remove(); chart = null; candleSeries = null; }
   return true;
 };
-document.querySelectorAll('[data-open-livechart]').forEach(btn => btn.addEventListener('click', () => {
-  if(typeof isWipLockedForCurrentUser === 'function' && isWipLockedForCurrentUser('rangos')){
-    if(typeof showWipToast === 'function') showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
-    return;
-  }
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
-  window.openLiveChartPage();
-}));
+// el botón [data-open-livechart] ya NO se engancha aquí - ver la misma nota en journal.js
 const backBtn = $('liveChartBackBtn');
 if(backBtn) backBtn.addEventListener('click', () => {
   if(history.state && history.state.skillcashDepth === 'category' && location.pathname.startsWith('/grafico-en-vivo')){

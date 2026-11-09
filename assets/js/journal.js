@@ -1012,18 +1012,9 @@ window.closeJournalPage = function(){
   document.querySelectorAll('.jr-modal').forEach(m => m.remove());
   return true;
 };
-/* la Bitacora es una herramienta de Rango de Manada: se abre desde su tarjeta dentro de esa
-   seccion y desde el menu lateral. Mientras Rango de Manada este en construccion
-   (WIP_OWNER_ONLY_CATEGORIES), solo el dueño la puede abrir */
-document.querySelectorAll('[data-open-journal]').forEach(btn => btn.addEventListener('click', () => {
-  if(typeof isWipLockedForCurrentUser === 'function' && isWipLockedForCurrentUser('rangos')){
-    if(typeof showWipToast === 'function') showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.');
-    return;
-  }
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
-  window.openJournalPage();
-}));
+// el botón [data-open-journal] (tarjeta + menú lateral) ya NO se engancha aquí - ahora que
+// este archivo carga bajo demanda, index.html mismo le pone el click listener (sería tarde
+// enganchar el disparador adentro del archivo que ese mismo clic tiene que pedir primero)
 // igual que adminBackBtn (assets/js/admin.js): si openJournalPage() de verdad empujo /bitacora
 // al historial (se entro desde adentro del sitio), "Volver" hace history.back() - un solo paso
 // atras, a donde sea que la persona estuviera antes (no siempre "Rango de Manada"). Si no hay
