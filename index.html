@@ -26,7 +26,7 @@
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
      a un servidor que no sea uno de los que ya usamos - connect-src es una lista blanca exacta
      de las APIs que esta pagina realmente llama, nada mas puede recibir una peticion del navegador -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com https://i.ytimg.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://skillcash-youtube-live.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://sslecal2.investing.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com https://i.ytimg.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://skillcash-youtube-live.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://sslecal2.investing.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>SkillCash Tools – Herramientas</title>
 <meta name="description" content="Herramientas SkillCash: calculadora de trading de futuros y más recursos para operar con criterio.">
@@ -2858,6 +2858,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-video-play{position:relative;z-index:2;width:62px;height:62px;border-radius:50%;background:rgba(255,47,79,.92);border:3px solid rgba(255,255,255,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding-left:4px}
 .events-video-play:hover{background:var(--red)}
 .events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
+/* controles propios de video (play/pausa + volumen), por fuera del reproductor de YouTube */
+.events-video-controls{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2)}
+.events-vc-btn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid var(--border2);color:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.events-vc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.events-vc-volume{flex:1;accent-color:var(--accent);cursor:pointer}
 .events-card-foot{font-size:12px;color:var(--muted);line-height:1.6}
 .events-card-foot a{color:var(--muted2)}
 /* Calendario Económico: el iframe de Investing.com siempre trae su propio logo + iconos de
@@ -2870,6 +2875,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    color, que son limitados. pointer-events:none porque no usamos el selector de fechas propio
    de Investing (el "Semana actual"/filtros son decoración nuestra, afuera del iframe) */
 .events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
+/* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
+   del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
+   estilo ya usado en otras listas scrolleables del sitio */
+.events-calendar-wrap::-webkit-scrollbar{width:8px;height:8px}
+.events-calendar-wrap::-webkit-scrollbar-track{background:transparent}
+.events-calendar-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
+.events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .events-calendar-clip{position:relative;overflow:clip;height:420px;min-width:590px}
 .events-calendar-iframe{display:block;width:100%;height:458px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
@@ -4043,6 +4056,23 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
             <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
           </div>
+          <!-- controles propios (play/pausa + volumen), por fuera del reproductor de YouTube -
+               pedido de Juan, que vio que melapela.ai tiene los suyos en vez de depender de los
+               controles nativos de YouTube. Se manejan con la YouTube IFrame API (postMessage
+               al iframe, que ya trae enablejsapi=1) - solo se cargan cuando ya hay un video real
+               reproduciendo, nunca antes (misma filosofía de "nada pesado hasta que haga falta"
+               del resto de esta sección) -->
+          <div class="events-video-controls" id="eventsYtControls" style="display:none">
+            <button type="button" class="events-vc-btn" id="eventsYtPlayPauseBtn" aria-label="Pausar">
+              <svg class="ic-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+              <svg class="ic-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button type="button" class="events-vc-btn" id="eventsYtMuteBtn" aria-label="Silenciar">
+              <svg class="ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>
+              <svg class="ic-mute" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M4 9v6h4l5 5V4L8 9H4z"/><line x1="16" y1="9" x2="21" y2="14"/><line x1="21" y1="9" x2="16" y2="14"/></svg>
+            </button>
+            <input type="range" class="events-vc-volume" id="eventsYtVolumeRange" min="0" max="100" value="100" aria-label="Volumen">
+          </div>
           <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
         </div>
         <div class="events-card">
@@ -4055,8 +4085,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             Calendario Económico
           </div>
           <div class="events-chips">
-            <span class="events-chip"><i></i>Impacto alto</span>
-            <span class="events-chip">Semana actual</span>
+            <span class="events-chip"><i></i>Mayor movimiento esperado</span>
           </div>
           <div class="events-calendar-wrap">
             <!-- "Este contenido está bloqueado..." que vimos antes NO era un bloqueo real de
@@ -4163,6 +4192,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         played = false;
         f.removeAttribute('src');
         f.style.display = 'none';
+        if(controlsBar) controlsBar.style.display = 'none';
         var ch = EVENTS_YT_CHANNELS[i];
         if(!ch || !ch.id){
           facade.style.display = 'none';
@@ -4195,7 +4225,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             if(data && data.live && data.videoId){
               pendingSrc = liveEmbedUrl(data.videoId);
               setFacade(data.videoId, '');
-              if(played) f.src = pendingSrc + '&autoplay=1';
+              if(played){ f.src = pendingSrc + '&autoplay=1'; wireCustomControls(); }
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
             } else {
@@ -4205,12 +4235,75 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           })
           .catch(function(){ /* si falla la consulta, se deja tal cual estaba (la lista de subidas) */ });
       }
+      // controles propios (play/pausa + volumen) via la YouTube IFrame API - el iframe ya trae
+      // enablejsapi=1, así que se le puede hablar por postMessage en vez de depender de los
+      // controles nativos de YouTube (pedido de Juan, comparando con melapela.ai)
+      var ytPlayer = null, ytApiReady = null;
+      var controlsBar = document.getElementById('eventsYtControls');
+      var playPauseBtn = document.getElementById('eventsYtPlayPauseBtn');
+      var muteBtn = document.getElementById('eventsYtMuteBtn');
+      var volumeRange = document.getElementById('eventsYtVolumeRange');
+      function ensureYtApi(){
+        if(window.YT && window.YT.Player) return Promise.resolve();
+        if(ytApiReady) return ytApiReady;
+        ytApiReady = new Promise(function(resolve, reject){
+          var prevCb = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = function(){ if(prevCb) prevCb(); resolve(); };
+          var s = document.createElement('script');
+          s.src = 'https://www.youtube.com/iframe_api';
+          s.onerror = function(){ ytApiReady = null; reject(new Error('no se pudo cargar la API de YouTube')); };
+          document.head.appendChild(s);
+        });
+        return ytApiReady;
+      }
+      function setIconsPlaying(isPlaying){
+        playPauseBtn.querySelector('.ic-pause').style.display = isPlaying ? 'block' : 'none';
+        playPauseBtn.querySelector('.ic-play').style.display = isPlaying ? 'none' : 'block';
+      }
+      function setIconsMuted(isMuted){
+        muteBtn.querySelector('.ic-vol').style.display = isMuted ? 'none' : 'block';
+        muteBtn.querySelector('.ic-mute').style.display = isMuted ? 'block' : 'none';
+      }
+      function wireCustomControls(){
+        ensureYtApi().then(function(){
+          if(ytPlayer){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer = null; }
+          ytPlayer = new YT.Player(f, {
+            events: {
+              onReady: function(){
+                controlsBar.style.display = 'flex';
+                setIconsPlaying(true);
+                setIconsMuted(false);
+                volumeRange.value = 100;
+              },
+              onStateChange: function(e){ setIconsPlaying(e.data === YT.PlayerState.PLAYING); },
+            },
+          });
+        }).catch(function(){ /* si la API no carga (red, bloqueador), el video sigue andando con
+          los controles nativos de YouTube adentro del iframe - no se pierde nada, solo la
+          barra propia no aparece */ });
+      }
+      if(playPauseBtn) playPauseBtn.addEventListener('click', function(){
+        if(!ytPlayer) return;
+        if(ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+      });
+      if(muteBtn) muteBtn.addEventListener('click', function(){
+        if(!ytPlayer) return;
+        if(ytPlayer.isMuted()){ ytPlayer.unMute(); setIconsMuted(false); } else { ytPlayer.mute(); setIconsMuted(true); }
+      });
+      if(volumeRange) volumeRange.addEventListener('input', function(){
+        if(!ytPlayer) return;
+        var v = Number(volumeRange.value);
+        ytPlayer.setVolume(v);
+        if(v === 0){ ytPlayer.mute(); setIconsMuted(true); }
+        else if(ytPlayer.isMuted()){ ytPlayer.unMute(); setIconsMuted(false); }
+      });
       function playNow(){
         if(!pendingSrc) return;
         f.src = pendingSrc + (pendingSrc.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1';
         f.style.display = 'block';
         facade.style.display = 'none';
         played = true;
+        wireCustomControls();
       }
       if(playBtn) playBtn.addEventListener('click', playNow);
       if(facade) facade.addEventListener('click', function(e){ if(e.target === facade) playNow(); });
