@@ -182,7 +182,7 @@ async function analizaTitulo(tituloOriginalIngles, env, debug) {
       'SENTIMIENTO: alcista, bajista o neutral\n' +
       'RESUMEN: una frase corta en español (máximo 20 palabras) explicando por qué le podría importar a alguien que invierte en cripto\n\n' +
       'Noticia: "' + tituloOriginalIngles + '"';
-    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 120,
     });
@@ -214,7 +214,7 @@ async function moderaTexto(texto, env, debug) {
       'Responde "SI" solo si el texto tiene insultos, lenguaje de odio, spam o publicidad de otro sitio/servicio.\n' +
       'Responde "NO" si es una reseña normal, aunque sea una crítica negativa (las críticas negativas normales están permitidas).\n\n' +
       'Texto: "' + texto + '"';
-    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 5,
     });
