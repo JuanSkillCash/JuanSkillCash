@@ -4504,10 +4504,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         return '<div class="events-news-empty">No se pudieron cargar las noticias por ahora. Intenta de nuevo más tarde.</div>';
       }
 
+      // El titular ya sale traducido (ver el Worker), pero la nota completa vive en el sitio
+      // del medio (CoinDesk, MarketWatch, etc.) y esa sí está en inglés siempre - Juan pidió
+      // que también se vea en español al entrar. Se manda al visor de páginas traducidas de
+      // Google (translate.google.com/translate?...) en vez de al link original - abre la misma
+      // nota pero ya traducida, con un aviso arriba para volver al original si alguien quiere.
+      function translatedLink(originalUrl){
+        return 'https://translate.google.com/translate?sl=en&tl=es&u=' + encodeURIComponent(originalUrl);
+      }
+
       function renderNews(listEl, items){
         if(!items || !items.length){ listEl.innerHTML = newsEmptyHtml(); return; }
         listEl.innerHTML = items.map(function(it){
-          return '<a class="events-news-item" href="' + escapeHtml(it.link) + '" target="_blank" rel="noopener">' +
+          return '<a class="events-news-item" href="' + escapeHtml(translatedLink(it.link)) + '" target="_blank" rel="noopener">' +
             '<div class="events-news-item-body">' +
               '<div class="events-news-item-title">' + escapeHtml(it.title) + '</div>' +
               '<div class="events-news-item-meta">' + escapeHtml([timeAgo(it.publishedAt), it.source].filter(Boolean).join(' · ')) + '</div>' +
