@@ -2675,14 +2675,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 /* foco que sigue el cursor, acotado a la seccion de las 7 cajas (assets/js/tarjetas-magicas.js
    lo mete como hijo de #categoryOverviewGrid, no de <body>, y calcula su propia opacidad para
    que se desvanezca suave cerca del borde de la seccion - no lo recorta de un tajo con
-   overflow:hidden, por eso no se ve una linea donde "corta"). Azul oscurito, sin screen blend
-   (ese blend era lo que lo hacia verse blanco/lavado sobre el fondo oscuro) */
+   overflow:hidden, por eso no se ve una linea donde "corta"). Rojo tenue (var(--red-dim) en
+   rgba, bajo en opacidad para que no quede "rojo vivo"), sin screen blend (ese blend era lo
+   que lo hacia verse blanco/lavado sobre el fondo oscuro) */
 #categoryOverviewGrid{ isolation:isolate; }
 #categoryOverviewGrid > .cat-overview-featured, #categoryOverviewGrid > .cat-overview-grid{ position:relative; z-index:1; }
 .mg-foco{
   position:absolute;left:0;top:0;z-index:0;width:600px;height:600px;margin:-300px 0 0 -300px;
   border-radius:50%;pointer-events:none;opacity:0;transition:opacity .4s;
-  background:radial-gradient(circle, rgba(26,58,107,.55) 0%, rgba(26,58,107,.22) 35%, transparent 68%);
+  background:radial-gradient(circle, rgba(201,31,59,.38) 0%, rgba(201,31,59,.14) 35%, transparent 68%);
 }
 /* onda al hacer click sobre una caja */
 .mg-onda{
