@@ -11375,6 +11375,38 @@ function ensureLiveChartLoaded(){
   return loadScriptOnce('https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js')
     .then(() => loadScriptOnce('/assets/js/livechart.js?v=6'));
 }
+// BUG real reportado por Juan tras el cambio de arriba: los botones "Bitácora de trading",
+// "Gráfico en Vivo" y la píldora de Sharkoins dejaron de abrir nada. Causa: esos 3 archivos,
+// cuando cargaban siempre con <script defer>, se encargaban ELLOS MISMOS de buscar sus propios
+// botones ([data-open-journal], [data-open-livechart], #colmillosWalletBtn) y ponerles su
+// addEventListener - al volverlos de carga bajo demanda, nadie dispara esa carga al hacer clic
+// en esos botones (el archivo que debía reaccionar al clic es justo el que nunca se pidió) -
+// ahora esos 3 listeners se registran aquí, bien temprano, y lo primero que hacen es pedir el
+// archivo correspondiente antes de llamar a la función real
+document.querySelectorAll('[data-open-journal]').forEach(btn => btn.addEventListener('click', () => {
+  if(isWipLockedForCurrentUser('rangos')){ showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.'); return; }
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
+  ensureJournalLoaded()
+    .then(() => { if(typeof window.openJournalPage === 'function') window.openJournalPage(); })
+    .catch(() => showWipToast('⚠️ No se pudo cargar la Bitácora, revisa tu conexión e intenta de nuevo.'));
+}));
+document.querySelectorAll('[data-open-livechart]').forEach(btn => btn.addEventListener('click', () => {
+  if(isWipLockedForCurrentUser('rangos')){ showWipToast('🔒 Todavía estamos construyendo esto — vuelve pronto.'); return; }
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  const bd = document.getElementById('sbBackdrop'); if(bd) bd.classList.remove('show');
+  ensureLiveChartLoaded()
+    .then(() => { if(typeof window.openLiveChartPage === 'function') window.openLiveChartPage(); })
+    .catch(() => showWipToast('⚠️ No se pudo cargar el Gráfico en Vivo, revisa tu conexión e intenta de nuevo.'));
+}));
+{
+  const colmBtn = document.getElementById('colmillosWalletBtn');
+  if(colmBtn) colmBtn.addEventListener('click', () => {
+    ensureColmillosLoaded()
+      .then(() => { if(typeof showColmillosPage === 'function') showColmillosPage(); })
+      .catch(() => showWipToast('⚠️ No se pudo cargar Sharkoins, revisa tu conexión e intenta de nuevo.'));
+  });
+}
 function applyRoute(path){
   path = path.replace(/\/+$/, '') || '/';
   closeAnyOpenToolInline();
@@ -11400,16 +11432,22 @@ function applyRoute(path){
   } else if(segs[0] === 'administrador'){
     if(typeof window.openAdminPage === 'function') window.openAdminPage();
   } else if(segs[0] === 'bitacora'){
-    ensureJournalLoaded().then(() => { if(typeof window.openJournalPage === 'function') window.openJournalPage(); });
+    ensureJournalLoaded()
+      .then(() => { if(typeof window.openJournalPage === 'function') window.openJournalPage(); })
+      .catch(() => showWipToast('⚠️ No se pudo cargar la Bitácora, revisa tu conexión e intenta de nuevo.'));
   } else if(segs[0] === 'grafico-en-vivo'){
-    ensureLiveChartLoaded().then(() => { if(typeof window.openLiveChartPage === 'function') window.openLiveChartPage(segs[1]); });
+    ensureLiveChartLoaded()
+      .then(() => { if(typeof window.openLiveChartPage === 'function') window.openLiveChartPage(segs[1]); })
+      .catch(() => showWipToast('⚠️ No se pudo cargar el Gráfico en Vivo, revisa tu conexión e intenta de nuevo.'));
   } else if(segs[0] === 'sharkoins'){
     // segs[1] (ej. "ayuda", "minijuegos") deja a la persona en la MISMA pestaña de Sharkoins
     // en la que estaba si recarga la pagina, en vez de siempre caer al menu principal -
     // showColmillosPage (en colmillos.js) es quien traduce ese pedazo de URL a la pestaña
     // real, no se duplica ese mapeo aca
     const sharkoinsSlug = segs[1] || '';
-    ensureColmillosLoaded().then(() => { if(typeof showColmillosPage === 'function') showColmillosPage(sharkoinsSlug); });
+    ensureColmillosLoaded()
+      .then(() => { if(typeof showColmillosPage === 'function') showColmillosPage(sharkoinsSlug); })
+      .catch(() => showWipToast('⚠️ No se pudo cargar Sharkoins, revisa tu conexión e intenta de nuevo.'));
   } else {
     showCategoryOverview();
   }
