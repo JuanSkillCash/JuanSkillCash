@@ -2660,7 +2660,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    (--cat-teal, ya definido mas arriba) desde la esquina superior derecha, + sombra suave de
    elevacion (pedido de Juan, inspirado en cryptobruj.com/exchanges pero con nuestros propios
    colores - ver docs/referencia si hace falta el prompt original). */
-.cat-overview-card, .cat-flip-back{
+/* fondo de la cara frontal de las 7 cajas de la portada - propuesta 14 ("Contraste extremo")
+   de la maqueta de degradados que Juan eligio, aplicada SOLO aqui por ahora. El reverso
+   (.cat-flip-back, cuando se voltea la caja) se queda con el degradado anterior a proposito -
+   Juan quiere hacerle cambios aparte despues, no tocar ese todavia. */
+.cat-overview-card{
+  background:radial-gradient(100% 70% at 100% 0%, #100f38 0%, #05071c 80%) !important;
+  border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+}
+.cat-flip-back{
   background:radial-gradient(120% 70% at 100% 0%, #0f1b3d 0%, var(--card) 70%) !important;
   border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
   box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
