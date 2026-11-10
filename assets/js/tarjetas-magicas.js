@@ -61,18 +61,11 @@
 
   if(reduceMotion || !hoverFino) return;
 
-  // la sección completa de cajas (las 3 grandes + las 4 chicas) - el foco vive adentro de esta
-  // misma caja (no de document.body) para no "escaparse" a otras partes de la página
+  // la sección completa de cajas (las 3 grandes + las 4 chicas)
   var seccion = document.getElementById('categoryOverviewGrid');
   if(!seccion) return;
   seccion.style.position = 'relative';
 
-  var foco = document.createElement('div');
-  foco.className = 'mg-foco';
-  foco.setAttribute('aria-hidden', 'true');
-  seccion.appendChild(foco);
-
-  var MARGEN_DESVANECE = 140; // px: que tan lejos del borde de la seccion empieza a desvanecerse
   var raf = null;
   var ultimo = null;
 
