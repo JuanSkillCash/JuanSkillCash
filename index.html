@@ -370,8 +370,8 @@ button{font-family:inherit;color:inherit}
   border:none;
   padding:11px 14px 10px;display:flex;flex-direction:column;gap:7px;position:relative
 }
-.session-card-label{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--muted2);padding-right:20px}
-.session-flag{display:inline-flex;width:24px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.session-card-label{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--muted2);padding-right:20px}
+.session-flag{display:inline-flex;width:32px;height:23px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 .session-flag svg{width:100%;height:100%;display:block}
 .session-bell-btn{
   position:absolute;top:7px;right:7px;background:none;border:none;padding:4px;margin:0;
@@ -395,13 +395,13 @@ button{font-family:inherit;color:inherit}
 @media(max-width:620px){
   .session-stats{flex-direction:column;align-items:flex-start;gap:2px}
 }
-/* estado + cuenta regresiva en un solo renglon ("ABIERTO · Cierra en...") en vez de dos -
-   une lo que antes eran session-status-row y session-countdown como lineas separadas */
-.session-status-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.session-status{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;flex-shrink:0}
+/* Abierto/Cerrado ahora bien grande, llenando el espacio que antes quedaba vacio en la
+   tarjeta - pedido explicito de Juan, con un dibujo marcado a mano sobre una captura. La
+   cuenta regresiva se queda del mismo tamaño chiquito de antes, debajo. */
+.session-status-row{display:flex;flex-direction:column;gap:1px;margin-top:2px}
+.session-status{font-family:'Poppins',sans-serif;font-size:24px;letter-spacing:-.01em;text-transform:uppercase;font-weight:900;line-height:1.05}
 .session-status.open{color:var(--green)}
 .session-status.closed{color:var(--red)}
-.session-status + .session-countdown::before{content:'· ';color:var(--border2)}
 .session-countdown{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
 .market-sessions-footer{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);margin-top:6px;margin-bottom:14px}
 .market-sessions-footer b{color:var(--white)}
