@@ -370,8 +370,8 @@ button{font-family:inherit;color:inherit}
   border:none;
   padding:11px 14px 10px;display:flex;flex-direction:column;gap:7px;position:relative
 }
-.session-card-label{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--muted2);padding-right:20px}
-.session-flag{display:inline-flex;width:24px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.session-card-label{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--muted2);padding-right:20px}
+.session-flag{display:inline-flex;width:32px;height:23px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 .session-flag svg{width:100%;height:100%;display:block}
 .session-bell-btn{
   position:absolute;top:7px;right:7px;background:none;border:none;padding:4px;margin:0;
@@ -384,25 +384,26 @@ button{font-family:inherit;color:inherit}
 .session-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 1.4s infinite}
 .session-dot.open{background:var(--green);box-shadow:0 0 0 transparent}
 .session-dot.closed{background:var(--red);box-shadow:0 0 0 transparent}
-/* "Hora local" y "Horario" van lado a lado en pantallas anchas (mismo renglon, cada uno con
-   su etiqueta arriba) - antes eran 4 lineas apiladas y la caja se sentia muy alta y vacia en
-   escritorio, con puro espacio en blanco a los lados sin usar. En celular (poco ancho) se
-   apilan de vuelta, igual que antes, porque ahi si no caben lado a lado. */
-.session-stats{display:flex;gap:18px;align-items:flex-end}
+/* "Hora local" y "Horario" a la izquierda, Abierto/Cerrado grande empujado a la derecha, en
+   la misma fila (.session-main) - Juan marco a mano sobre una captura que el estado tenia que
+   ir justo en ese espacio vacio de la derecha que no se estaba usando, no debajo de todo (eso
+   se probo primero y no era lo que pedia). En celular (poco ancho, no cabe todo en una fila)
+   se apila: primero los datos, despues el estado. */
+.session-main{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.session-stats{display:flex;gap:18px;align-items:flex-end;flex-shrink:0}
 .session-stat-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:1px}
 .session-time{font-family:'Poppins',sans-serif;font-weight:900;font-size:17px;color:var(--white);letter-spacing:-.01em;white-space:nowrap}
 .session-hours{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:.01em;white-space:nowrap}
-@media(max-width:620px){
-  .session-stats{flex-direction:column;align-items:flex-start;gap:2px}
-}
-/* estado + cuenta regresiva en un solo renglon ("ABIERTO · Cierra en...") en vez de dos -
-   une lo que antes eran session-status-row y session-countdown como lineas separadas */
-.session-status-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.session-status{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;flex-shrink:0}
+.session-status-row{display:flex;flex-direction:column;gap:1px;align-items:flex-end;text-align:right}
+.session-status{font-family:'Poppins',sans-serif;font-size:22px;letter-spacing:-.01em;text-transform:uppercase;font-weight:900;line-height:1.05;white-space:nowrap}
 .session-status.open{color:var(--green)}
 .session-status.closed{color:var(--red)}
-.session-status + .session-countdown::before{content:'· ';color:var(--border2)}
-.session-countdown{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
+.session-countdown{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);white-space:nowrap}
+@media(max-width:620px){
+  .session-stats{flex-direction:column;align-items:flex-start;gap:2px}
+  .session-main{flex-direction:column;align-items:flex-start;gap:8px}
+  .session-status-row{align-items:flex-start;text-align:left}
+}
 .market-sessions-footer{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);margin-top:6px;margin-bottom:14px}
 .market-sessions-footer b{color:var(--white)}
 .dom-card-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.02em}
@@ -2500,7 +2501,7 @@ img[src=""]{display:none}
    tiburon (su imagen se desvanece a partir de la mitad hacia abajo - mask-image en
    .hero-mascot-imgwrap img - asi que ninguna pasa por ahi). Reemplaza intentos anteriores (ver
    docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5). */
-.hero-orbe, .hero-orbe2, .hero-orbe3{
+.hero-orbe, .hero-orbe2, .hero-orbe3, .hero-orbe4{
   position:absolute;z-index:0;width:28px;height:28px;border-radius:50%;
   pointer-events:none;filter:blur(7px);
   background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%);
@@ -2508,6 +2509,7 @@ img[src=""]{display:none}
 .hero-orbe{ left:10%; top:15%; }
 .hero-orbe2{ left:60%; top:8%; width:20px; height:20px; }
 .hero-orbe3{ left:35%; top:30%; width:23px; height:23px; }
+.hero-orbe4{ left:48%; top:20%; width:18px; height:18px; }
 @media(prefers-reduced-motion:no-preference){
   /* animan transform (translate), nunca left/top - esas se quedan fijas en la regla de arriba
      como posicion base. Las 3 "moscas" ANTES movian left/top/margin en bucle infinito -
@@ -2543,6 +2545,19 @@ img[src=""]{display:none}
     50%{ transform:translate(45px,-30px); }
     66%{ transform:translate(22px,-6px); }
     83%{ transform:translate(-12px,-18px); }
+    100%{ transform:translate(0,0); }
+  }
+  /* la cuarta mosca, agregada despues - mismo espiritu (ruta irregular propia, solo
+     transform/opacity) pero mas rapida que las otras 3 (20s en vez de 29-45s), pedido
+     explicito de Juan */
+  .hero-orbe4{ animation:hero-orbita4 20s ease-in-out infinite; }
+  @keyframes hero-orbita4{
+    0%{ transform:translate(0,0); }
+    18%{ transform:translate(-28px,14px); }
+    36%{ transform:translate(-18px,-20px); }
+    54%{ transform:translate(20px,-10px); }
+    72%{ transform:translate(32px,16px); }
+    88%{ transform:translate(6px,24px); }
     100%{ transform:translate(0,0); }
   }
 }
@@ -3766,6 +3781,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="hero-orbe" aria-hidden="true"></div>
       <div class="hero-orbe2" aria-hidden="true"></div>
       <div class="hero-orbe3" aria-hidden="true"></div>
+      <div class="hero-orbe4" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
         <div class="hero-mascot-tint" aria-hidden="true"></div>
         <img class="hero-mascot-glow" src="/logo-skillcash-1050.webp" alt="" aria-hidden="true" width="700" height="700" fetchpriority="high">
@@ -27852,17 +27868,19 @@ function renderMarketSessions(){
           '<svg id="bellIcon-' + session.id + '" width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/></svg>' +
         '</button>' +
         '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span><span class="session-flag" role="img" aria-label="' + session.flagAlt + '">' + MARKET_FLAG_SVG[session.id] + '</span>' + session.name + '</div>' +
-        '<div class="session-stats">' +
-          '<div class="session-stat">' +
-            '<div class="session-stat-label">Hora local</div>' +
-            '<div class="session-time" id="time-' + session.id + '">—</div>' +
+        '<div class="session-main">' +
+          '<div class="session-stats">' +
+            '<div class="session-stat">' +
+              '<div class="session-stat-label">Hora local</div>' +
+              '<div class="session-time" id="time-' + session.id + '">—</div>' +
+            '</div>' +
+            '<div class="session-stat">' +
+              '<div class="session-stat-label">Horario</div>' +
+              '<div class="session-hours">' + sessionLocalHoursLabel(session) + '</div>' +
+            '</div>' +
           '</div>' +
-          '<div class="session-stat">' +
-            '<div class="session-stat-label">Horario</div>' +
-            '<div class="session-hours">' + sessionLocalHoursLabel(session) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="session-status-row"><span class="session-status" id="status-' + session.id + '">—</span><span class="session-countdown" id="countdown-' + session.id + '">—</span></div>';
+          '<div class="session-status-row"><span class="session-status" id="status-' + session.id + '">—</span><span class="session-countdown" id="countdown-' + session.id + '">—</span></div>' +
+        '</div>';
       row.appendChild(card);
 
       const bellBtn = card.querySelector('#bell-' + session.id);
