@@ -84,6 +84,11 @@
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
   --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
+  /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo", de la maqueta de
+     degradados) - una sola variable para poder reusarlo en todas las cajas del sitio
+     (categorías, panorama del mercado, sesiones, eventos y noticias, quién está detrás) y
+     que un ajuste futuro de tono se aplique en todos lados a la vez */
+  --grad-caja:radial-gradient(100% 70% at 100% 0%, #100f38 0%, #05071c 80%);
   --red-dim:#c91f3b;
   --red-glow:rgba(255,47,79,.35);
   --gold:#f0b23d;
@@ -308,7 +313,7 @@ button{font-family:inherit;color:inherit}
   .market-overview .dom-card.halving{grid-column:1 / -1}
 }
 
-.fng-section{background:#090b16;border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
+.fng-section{background:var(--grad-caja);border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
@@ -346,11 +351,8 @@ button{font-family:inherit;color:inherit}
 }
 
 .dom-card{
-  background:#090b16;border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
+  background:var(--grad-caja);border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
 }
-.dom-card.btc{background:#090b16}
-.dom-card.usdt{background:#090b16}
-.dom-card.halving{background:#090b16}
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -362,11 +364,17 @@ button{font-family:inherit;color:inherit}
 /* Sesiones de mercado */
 .market-sessions-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--white);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(91,141,239,.3)}
 .market-sessions-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(91,141,239,.3);border:1px solid rgba(91,141,239,.3);border-radius:16px;overflow:hidden}
+/* en celular angosto, 3 columnas ya no caben de verdad (ni la bandera+nombre entran en ese
+   ancho) - la tercera tarjeta terminaba cortada fuera de la pantalla. Pasa a una sola columna,
+   una tarjeta por renglón, igual que ya hacen el resto de las grillas del sitio en celular. */
+@media(max-width:760px){
+  .market-sessions-row{grid-template-columns:1fr}
+}
 @media(max-width:480px){
   .market-sessions-row{gap:0}
 }
 .session-card{
-  background:#090b16;
+  background:var(--grad-caja);
   border:none;
   padding:11px 14px 10px;display:flex;flex-direction:column;gap:7px;position:relative
 }
@@ -2676,11 +2684,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    elevacion (pedido de Juan, inspirado en cryptobruj.com/exchanges pero con nuestros propios
    colores - ver docs/referencia si hace falta el prompt original). */
 /* fondo de la cara frontal de las 7 cajas de la portada - propuesta 14 ("Contraste extremo")
-   de la maqueta de degradados que Juan eligio, aplicada SOLO aqui por ahora. El reverso
+   de la maqueta de degradados que Juan eligio (ver --grad-caja en :root). El reverso
    (.cat-flip-back, cuando se voltea la caja) se queda con el degradado anterior a proposito -
    Juan quiere hacerle cambios aparte despues, no tocar ese todavia. */
 .cat-overview-card{
-  background:radial-gradient(100% 70% at 100% 0%, #100f38 0%, #05071c 80%) !important;
+  background:var(--grad-caja) !important;
   border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
   box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
 }
@@ -2858,7 +2866,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    adentro de su cajita - bug real reportado por Juan (página corrida/con scroll lateral en
    celular). Un grid/flex item sin min-width explícito usa por defecto el tamaño mínimo de su
    contenido más ancho como piso, así sea mucho más ancho que el espacio real disponible */
-.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--grad-caja);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 /* barra de arriba de cada tarjeta (ojito/"eyebrow" + pildora) - mismo patron que Juan señalo
    que tiene melapela ("AGENDA"/"COBERTURA" a la izquierda, una pildorita a la derecha) */
 .events-card-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -2947,7 +2955,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-calendar-clip{position:relative;overflow:clip;height:420px;min-width:590px}
 .events-calendar-iframe{display:block;width:100%;height:458px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center}
+.about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
 .about-stat-label{color:var(--muted);font-size:13px;margin-top:6px}
 .reviews-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
