@@ -2847,6 +2847,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .live-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid rgba(74,222,128,.45);color:#4ade80;font-size:11px;font-weight:700;letter-spacing:.12em;text-decoration:none;white-space:nowrap}
 .live-pill i{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pillDotPulse 1.6s ease-in-out infinite}
 .live-pill:hover{background:rgba(74,222,128,.08)}
+/* pildora "en construccion" - pedido de Juan para las 4 cajas de Eventos y Noticias, que
+   siente que aun no estan al 100%. Mismo estilo de .live-pill pero sin el punto animado
+   (no es un estado "en vivo", es solo un aviso) y en tono ambar (--gold) en vez de verde. */
+.wip-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;border:1px solid rgba(240,178,61,.4);color:var(--gold);font-size:9.5px;font-weight:700;letter-spacing:.1em;white-space:nowrap}
 .admin-live-btn{border:1px solid #f87171;background:transparent;color:#f87171;border-radius:20px;padding:6px 14px;font-weight:700;cursor:pointer}
 .admin-live-btn.on{border-color:#4ade80;color:#4ade80}
 .admin-live-btn:disabled{opacity:.5;cursor:default}
@@ -2874,7 +2878,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-card-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .events-card-eyebrow{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .events-card-badge{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:20px;background:rgba(91,141,239,.14);color:var(--accent);border:1px solid rgba(91,141,239,.35);white-space:nowrap}
-.events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px}
+.events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .events-card-head svg{flex-shrink:0;color:var(--accent)}
 /* chips descriptivos (lo que Juan vio como "Impacto alto"/"Semana actual" en el de melapela) -
    son decoracion fija, no filtros interactivos: describen los parametros reales que YA trae el
@@ -4101,7 +4105,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10.5 20 7v10l-5-3.5"/><rect x="2" y="6" width="13" height="12" rx="2"/></svg>
-            Conferencias en Vivo <span class="live-pill" id="eventsYtLivePill" style="display:none"><i></i>EN VIVO</span>
+            Conferencias en Vivo <span class="live-pill" id="eventsYtLivePill" style="display:none"><i></i>EN VIVO</span> <span class="wip-pill">EN CONSTRUCCIÓN</span>
           </div>
           <div class="events-yt-controls">
             <select id="eventsYtSelect" class="events-yt-select" aria-label="Elegir canal"></select>
@@ -4154,7 +4158,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-            Calendario Económico
+            Calendario Económico <span class="wip-pill">EN CONSTRUCCIÓN</span>
           </div>
           <div class="events-chips">
             <span class="events-chip"><i></i>Mayor movimiento esperado</span>
@@ -4182,7 +4186,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-            Noticias Cripto
+            Noticias Cripto <span class="wip-pill">EN CONSTRUCCIÓN</span>
           </div>
           <div class="events-news-list" id="eventsNewsCrypto">
             <div class="events-news-skel"></div>
@@ -4198,7 +4202,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 7-9"/><path d="M14 6h5v5"/></svg>
-            Macro y Economía
+            Macro y Economía <span class="wip-pill">EN CONSTRUCCIÓN</span>
           </div>
           <div class="events-news-list" id="eventsNewsMacro">
             <div class="events-news-skel"></div>
