@@ -84,11 +84,13 @@
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
   --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
-  /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo", de la maqueta de
-     degradados) - una sola variable para poder reusarlo en todas las cajas del sitio
-     (categorías, panorama del mercado, sesiones, eventos y noticias, quién está detrás) y
-     que un ajuste futuro de tono se aplique en todos lados a la vez */
-  --grad-caja:radial-gradient(100% 70% at 100% 0%, #100f38 0%, #05071c 80%);
+  /* degradado "caja" elegido por Juan - una sola variable para poder reusarlo en todas las
+     cajas del sitio (categorías, panorama del mercado, sesiones, eventos y noticias, quién
+     está detrás) y que un ajuste futuro de tono se aplique en todos lados a la vez.
+     Izquierda = --bg (fondo del sitio) para que se note que la caja "nace" del fondo;
+     derecha = un azul moderado, claramente azul pero sin acercarse a blanco/gris. Nada de
+     capas translúcidas claras encima: Juan rechazó esa variante varias veces (se ve lavado). */
+  --grad-caja:linear-gradient(90deg, var(--bg) 0%, #1d2953 100%);
   --red-dim:#c91f3b;
   --red-glow:rgba(255,47,79,.35);
   --gold:#f0b23d;
