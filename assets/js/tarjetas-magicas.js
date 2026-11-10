@@ -1,10 +1,14 @@
 /* Efectos "Magic Bento" en las cajas de la pagina principal (.cat-overview-card): borde que
- * se ilumina donde esta el mouse, foco que sigue el cursor por la pantalla, inclinacion 3D
- * leve al pasar por encima, una ondita al hacer click, y una lineita de "grafico" (dato
- * inventado, no son precios reales) que se dibuja al pasar el mouse. Inspirado en
- * cryptobruj.com/exchanges pero con nuestro --accent unico (nada de paleta nueva por tarjeta).
+ * se ilumina donde esta el mouse, inclinacion 3D leve al pasar por encima, una ondita al hacer
+ * click, y una lineita de "grafico" (dato inventado, no son precios reales) que se dibuja al
+ * pasar el mouse. Inspirado en cryptobruj.com/exchanges pero con nuestro --accent unico (nada
+ * de paleta nueva por tarjeta).
  *
- * El tilt/glow/foco/linea solo corren en escritorio con mouse real y nunca si el usuario pidio
+ * (Hubo tambien un foco/resplandor que seguia el cursor por toda la seccion - Juan pidio
+ * quitarlo, ver historial de commits. El tilt/glow/linea de aqui NUNCA fueron parte de esa
+ * queja, se quedan igual que siempre.)
+ *
+ * El tilt/glow/linea solo corren en escritorio con mouse real y nunca si el usuario pidio
  * menos movimiento (prefers-reduced-motion). La ondita de click si corre en cualquier
  * dispositivo.
  */
@@ -61,11 +65,6 @@
 
   if(reduceMotion || !hoverFino) return;
 
-  // la sección completa de cajas (las 3 grandes + las 4 chicas)
-  var seccion = document.getElementById('categoryOverviewGrid');
-  if(!seccion) return;
-  seccion.style.position = 'relative';
-
   var raf = null;
   var ultimo = null;
 
@@ -84,14 +83,6 @@
     raf = null;
     var e = ultimo;
     if(!e) return;
-
-    var sb = seccion.getBoundingClientRect();
-    var dxs = Math.max(sb.left - e.clientX, 0, e.clientX - sb.right);
-    var dys = Math.max(sb.top - e.clientY, 0, e.clientY - sb.bottom);
-    var distSeccion = Math.hypot(dxs, dys);
-    var focoOpacidad = distSeccion > MARGEN_DESVANECE ? 0 : 1 - distSeccion / MARGEN_DESVANECE;
-    foco.style.transform = 'translate(' + (e.clientX - sb.left) + 'px,' + (e.clientY - sb.top) + 'px)';
-    foco.style.opacity = focoOpacidad.toFixed(2);
 
     tarjetas.forEach(function(t, i){
       var toggle = toggles[i];
