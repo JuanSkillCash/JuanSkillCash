@@ -148,8 +148,8 @@ button{font-family:inherit;color:inherit}
 
 /* SIDEBAR */
 .sidebar{
-  width:var(--sidebar-w);flex-shrink:0;background:rgba(9,11,22,.72);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
-  border-right:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;
+  width:var(--sidebar-w);flex-shrink:0;background:var(--bg);
+  border-right:0;display:flex;flex-direction:column;
   position:sticky;top:0;height:100vh;transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
   scrollbar-width:none;-ms-overflow-style:none;
   box-shadow:none;
@@ -464,6 +464,11 @@ button{font-family:inherit;color:inherit}
 #openTelegramPillBtn.connected{color:#54c3f5}
 #openTelegramPillBtn.connected svg{color:#29a9eb}
 #openTelegramPillBtn.connected .pill-dot{background:#29a9eb;box-shadow:0 0 0 transparent;animation:pillDotPulse 1.6s ease-in-out infinite}
+/* Juan pidió quitar la píldora de saldo de Sharkoins de arriba del todo - el elemento sigue en
+   el DOM a propósito (colmillosBalance.js hace colmillosWalletBtn.style.display='inline-flex'
+   sin verificar que exista cuando hay sesión, y borrar el nodo rompería eso con un error de JS);
+   el !important gana sobre ese inline-flex que pone el JS. */
+#colmillosWalletBtn{display:none !important}
 .colmillos-pill{border-color:rgba(240,178,61,.35);color:var(--gold);font-family:'Space Mono',monospace}
 .colmillos-pill:hover{border-color:var(--gold)}
 .colmillos-pill svg{opacity:1}
@@ -2079,7 +2084,12 @@ img[src=""]{display:none}
 .pf-headline-chip.neg{color:var(--red);border-color:rgba(255,47,79,.35);background:rgba(255,47,79,.1)}
 
 /* SESIÓN GLOBAL (sidebar) */
-.sb-session{margin:0 12px 12px;padding:11px 12px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:12px;display:none;flex-direction:column;gap:8px}
+/* display:none!important a propósito: Juan pidió quitar este bloque (Mi perfil/Cerrar sesión)
+   de la vista del menú lateral (queda duplicado en el dropdown de la cuenta, arriba a la
+   derecha) - pero el elemento sigue en el DOM porque renderAuthState() en el JS de más abajo
+   le pone display:'flex' sin verificar que exista; sin el !important ese flex pisaría este
+   display:none apenas alguien inicia sesión. */
+.sb-session{margin:0 12px 12px;padding:11px 12px;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:12px;display:none !important;flex-direction:column;gap:8px}
 .sb-session-row{display:flex;align-items:center;gap:8px}
 .sb-session-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0}
 .sb-session-email{font-size:11px;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
@@ -3698,6 +3708,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </nav>
 
     <div class="sb-bottom">
+      <!-- sbSession (Mi perfil/Cerrar sesión) sigue en el DOM a proposito: renderAuthState() y
+           los addEventListener de sbSessionLogout/sbSessionProfileBtn lo buscan sin verificar
+           que exista, asi que borrarlo del HTML rompe el login/logout de todo el sitio. Juan
+           pidio quitarlo de la vista del menu (ya esta duplicado en el dropdown de la cuenta,
+           arriba a la derecha) - se oculta por CSS en vez de borrarlo del DOM. -->
       <div class="sb-session" id="sbSession">
         <div class="sb-session-row">
           <span class="sb-session-dot"></span>
@@ -3708,13 +3723,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <button class="sb-session-logout" id="sbSessionLogout" type="button">Cerrar sesión</button>
         </div>
       </div>
-      <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="promo-note promo-note-sidebar">
-        <div class="promo-note-head">
-          <img class="promo-note-avatar" src="/logo-skillcash-600.webp" alt="Juan SkillCash" width="256" height="256" loading="lazy" decoding="async">
-          <span class="promo-note-name">Juan SkillCash</span>
-        </div>
-        <p class="promo-note-text">El exchange que uso yo. <strong>20% de cashback</strong> en tus comisiones.</p>
-      </a>
       <a href="#" class="sb-back" id="sbBackToMenu">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
         <span>Volver al menú</span>
@@ -3841,10 +3849,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         }
         </script>
       </div>
-    </div>
-
-    <div class="crypto-ticker" aria-hidden="true">
-      <div class="crypto-ticker-track" id="cryptoTickerTrack"></div>
     </div>
 
     <div id="marketDashboardBlock">
