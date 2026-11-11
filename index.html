@@ -2828,9 +2828,20 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
 /* titulos del menu lateral: blancos y mas grandes (el rojo se veia chillon) */
 .sb-cat-label, .sb-cat-label.tool-open, #indicNavTitle, #indicNavTitle.tool-open{ color:var(--white) !important; font-size:15px; font-weight:600; letter-spacing:0; padding-top:16px; }
-/* el grupo "Comunidad" del menú se pinta ámbar (como en la maqueta) - necesita más
-   especificidad que la regla de arriba (selector por atributo > clase sola) para ganarle */
-.sb-cat-label[data-category="__comunidad"]{ color:var(--gold) !important; }
+/* los 3 encabezados de grupo (Herramientas/Comunidad/Noticias) se pintan de azul (--accent)
+   para que se lean como títulos de sección, distintos de las categorías reales que contienen -
+   necesita más especificidad que la regla de arriba (selector por atributo > clase sola) para
+   ganarle. Juan vio el menú en vivo y pidió este contraste de color (antes Comunidad era
+   ámbar, ahora los 3 van iguales). */
+.sb-cat-label[data-category="__herramientas"],
+.sb-cat-label[data-category="__comunidad"],
+.sb-cat-label[data-category="eventos"]{ color:var(--accent) !important; }
+/* las categorías reales de "Tus Herramientas" (Sonar de Mercado, Zona de Caza, etc.) se
+   indentan un poco para que se lean como contenidas DENTRO de "Herramientas", no como títulos
+   de sección al mismo nivel */
+.sb-cat-label:not([data-category="__herramientas"]):not([data-category="__comunidad"]):not([data-category="eventos"]){
+  padding-left:20px;
+}
 .indic-cat-label{ color:var(--white) !important; font-size:13px; font-weight:600; letter-spacing:0; }
 
 
@@ -3508,7 +3519,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
            que las demas categorias (sb-cat-label + su boton data-cat-home) para que abra de
            verdad la categoria "eventos" (ver data-category="eventos" mas abajo en
            categoryDetailView) - ahi se movio el contenido real de Eventos y Noticias. -->
-      <div class="sb-cat-label" data-category="__comunidad" style="color:var(--gold)">Comunidad</div>
+      <div class="sb-cat-label" data-category="__comunidad">Comunidad</div>
       <button class="sb-item" type="button">
         <span class="sb-item-icon">🏆</span><span class="sb-item-label">Tu Rango</span>
       </button>
