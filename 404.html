@@ -2842,6 +2842,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .sb-cat-label:not([data-category="__herramientas"]):not([data-category="__comunidad"]):not([data-category="eventos"]){
   padding-left:20px;
 }
+/* "Comunidad" y "Noticias" no tienen nada que plegar (1-2 ítems nada más) - Juan pidió que
+   se queden siempre abiertos, sin la flechita, nunca como un acordeón. Se les quita el ::after
+   (la flechita) y el JS (más abajo) ya no los engancha a wireCollapsibleLabel/filterSidebarNav/
+   setAllIndicCatLabelsCollapsed, así que su clase "collapsed" nunca se activa y sus ítems
+   (que viven en el flujo normal del documento, sin ningún display:none puesto por JS) quedan
+   siempre visibles. */
+.sb-cat-label-static{ cursor:default; }
+.sb-cat-label-static::after{ content:none; }
+/* "Tu Rango", "Skins del Tiburón" y "Eventos y Noticias" - mismo tamaño/color que una categoría
+   (ej. "Blindaje"), aunque sean .sb-item y no .sb-cat-label - pedido explícito de Juan */
+.sb-item-section{ color:var(--white); }
+.sb-item-section .sb-item-label{ font-size:15px; font-weight:600; }
 .indic-cat-label{ color:var(--white) !important; font-size:13px; font-weight:600; letter-spacing:0; }
 
 
@@ -3519,15 +3531,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
            que las demas categorias (sb-cat-label + su boton data-cat-home) para que abra de
            verdad la categoria "eventos" (ver data-category="eventos" mas abajo en
            categoryDetailView) - ahi se movio el contenido real de Eventos y Noticias. -->
-      <div class="sb-cat-label" data-category="__comunidad">Comunidad</div>
-      <button class="sb-item" type="button">
+      <div class="sb-cat-label sb-cat-label-static" data-category="__comunidad">Comunidad</div>
+      <button class="sb-item sb-item-section" type="button">
         <span class="sb-item-icon">🏆</span><span class="sb-item-label">Tu Rango</span>
       </button>
-      <button class="sb-item" type="button">
+      <button class="sb-item sb-item-section" type="button">
         <span class="sb-item-icon">🦈</span><span class="sb-item-label">Skins del Tiburón</span>
       </button>
-      <div class="sb-cat-label" data-category="eventos">Noticias</div>
-      <button class="sb-item" id="sbEventosLink" data-cat-home="eventos">
+      <div class="sb-cat-label sb-cat-label-static" data-category="eventos">Noticias</div>
+      <button class="sb-item sb-item-section" id="sbEventosLink" data-cat-home="eventos">
         <span class="sb-item-icon">📰</span><span class="sb-item-label">Eventos y Noticias</span>
       </button>
 
@@ -10917,6 +10929,14 @@ function filterSidebarNav(cat){
     // recorre tanto .sb-item como los sub-encabezados .indic-cat-label (ej. "Piso de Mercado"
     // dentro de Indicadores) — solo se detiene al llegar al siguiente .sb-cat-label real
     while(el && !el.classList.contains('sb-cat-label')){ items.push(el); el = el.nextElementSibling; }
+    if(label.classList.contains('sb-cat-label-static')){
+      // Comunidad/Noticias: pedido de Juan - siempre visibles y siempre desplegados, sin
+      // importar qué categoría esté abierta (a diferencia de las demás, que se ocultan
+      // mientras se ve otra distinta)
+      label.style.display = '';
+      setGroupItemsVisibility(items, true);
+      return;
+    }
     if(cat === null){
       label.style.display = '';
       label.classList.add('collapsed');
@@ -12939,6 +12959,7 @@ function wireCollapsibleLabel(label){
   });
 }
 document.querySelectorAll('.sb-cat-label').forEach(label => {
+  if(label.classList.contains('sb-cat-label-static')) return; // Comunidad/Noticias: siempre abiertos, no se pliegan
   wireCollapsibleLabel(label); // empiezan desplegadas - el usuario las puede plegar a mano
 });
 document.querySelectorAll('.indic-cat-label').forEach(label => {
@@ -12952,6 +12973,7 @@ document.querySelectorAll('.indic-cat-label').forEach(label => {
    móvil de indicadores, sin importar cuál esté visible en ese momento ---- */
 function setAllIndicCatLabelsCollapsed(collapsed){
   document.querySelectorAll('.sb-cat-label').forEach(label => {
+    if(label.classList.contains('sb-cat-label-static')) return; // Comunidad/Noticias: nunca se pliegan, ni con "Contraer categorías"
     label.classList.toggle('collapsed', collapsed);
     const items = [];
     let sib = label.nextElementSibling;
