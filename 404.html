@@ -2828,6 +2828,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
 /* titulos del menu lateral: blancos y mas grandes (el rojo se veia chillon) */
 .sb-cat-label, .sb-cat-label.tool-open, #indicNavTitle, #indicNavTitle.tool-open{ color:var(--white) !important; font-size:15px; font-weight:600; letter-spacing:0; padding-top:16px; }
+/* el grupo "Comunidad" del menú se pinta ámbar (como en la maqueta) - necesita más
+   especificidad que la regla de arriba (selector por atributo > clase sola) para ganarle */
+.sb-cat-label[data-category="__comunidad"]{ color:var(--gold) !important; }
 .indic-cat-label{ color:var(--white) !important; font-size:13px; font-weight:600; letter-spacing:0; }
 
 
@@ -3196,6 +3199,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
     <nav class="sb-nav">
+      <div class="sb-cat-label" data-category="__herramientas">Herramientas</div>
       <div class="sb-cat-label" data-category="indicadores">Sonar de Mercado</div>
       <button class="sb-item" data-indic-jump="guia">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
@@ -3494,6 +3498,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </button>
       <button class="sb-item" data-tool="manual">
         <span class="sb-item-icon">📘</span><span class="sb-item-label">Manual completo</span>
+      </button>
+
+      <!-- Comunidad y Noticias: grupos nuevos pedidos por Juan (ver maqueta "Versión 3" del
+           rediseño). "Comunidad" por ahora son solo 2 botones sin destino (a propósito - Juan
+           dijo "de momento no te llevan a ningún lado"): sin data-tool/data-cat-home no los
+           agarra NINGUN listener delegado (todos buscan '[data-tool]'/'[data-cat-home]'), asi
+           que un clic ahi simplemente no hace nada, sin error. "Noticias" sigue el MISMO patron
+           que las demas categorias (sb-cat-label + su boton data-cat-home) para que abra de
+           verdad la categoria "eventos" (ver data-category="eventos" mas abajo en
+           categoryDetailView) - ahi se movio el contenido real de Eventos y Noticias. -->
+      <div class="sb-cat-label" data-category="__comunidad" style="color:var(--gold)">Comunidad</div>
+      <button class="sb-item" type="button">
+        <span class="sb-item-icon">🏆</span><span class="sb-item-label">Tu Rango</span>
+      </button>
+      <button class="sb-item" type="button">
+        <span class="sb-item-icon">🦈</span><span class="sb-item-label">Skins del Tiburón</span>
+      </button>
+      <div class="sb-cat-label" data-category="eventos">Noticias</div>
+      <button class="sb-item" id="sbEventosLink" data-cat-home="eventos">
+        <span class="sb-item-icon">📰</span><span class="sb-item-label">Eventos y Noticias</span>
       </button>
 
     </nav>
@@ -4094,10 +4118,56 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
     </div>
 
-    <!-- secciones fijas del inicio (no flotantes): eventos en vivo, quien hace SkillCash y
-         reseñas de la comunidad. Se muestran/ocultan junto con #categoryOverviewGrid (ver
-         assets/js/community.js) -->
-    <section class="home-mirror community-block" id="eventsBlock">
+    <!-- secciones fijas del inicio (no flotantes): quien hace SkillCash y reseñas de la
+         comunidad. Se muestran/ocultan junto con #categoryOverviewGrid (ver
+         assets/js/community.js). "Eventos y Noticias" YA NO vive aquí - se movió a su propia
+         categoría (data-category="eventos" dentro de #categoryDetailView, ver sb-cat-label
+         "Noticias" en el menú lateral) para que no compita por espacio en el home. -->
+
+    <section class="home-mirror community-block" id="aboutJuanBlock">
+      <div class="section-eyebrow">Quién está detrás</div>
+      <h2 class="community-title">Juan SkillCash</h2>
+      <p class="community-lead">Herramientas para aprender y operar cripto con criterio, hechas para la manada. Estos son los números reales, sin inflar.</p>
+      <div class="about-stats" id="aboutStats">
+        <div class="about-stat"><div class="about-stat-num">10.000+</div><div class="about-stat-label">Seguidores en TikTok</div></div>
+        <div class="about-stat"><div class="about-stat-num">43.000+</div><div class="about-stat-label">Líneas de código</div></div>
+        <div class="about-stat"><div class="about-stat-num" id="aboutStatTools">—</div><div class="about-stat-label">Herramientas</div></div>
+        <div class="about-stat"><div class="about-stat-num" id="aboutStatIndic">—</div><div class="about-stat-label">Indicadores</div></div>
+        <div class="about-stat"><div class="about-stat-num">200+</div><div class="about-stat-label">Miembros en Telegram</div></div>
+      </div>
+    </section>
+
+    <section class="home-mirror community-block" id="reviewsBlock">
+      <div class="section-eyebrow">Opiniones de la manada</div>
+      <div class="reviews-head">
+        <h2 class="community-title">Reseñas</h2>
+        <div class="reviews-summary" id="reviewsSummary"></div>
+      </div>
+      <div class="review-form-box" id="reviewFormBox">
+        <div class="review-login-note" id="reviewLoginNote">Inicia sesión para dejar tu reseña. <button type="button" class="review-link-btn" id="reviewLoginBtn">Iniciar sesión</button></div>
+        <form class="review-form" id="reviewForm" style="display:none">
+          <div class="review-form-row">
+            <span class="review-form-label" id="reviewFormLabel">Tu calificación</span>
+            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Calificación">
+              <button type="button" data-v="1" aria-label="1 estrella">★</button><button type="button" data-v="2" aria-label="2 estrellas">★</button><button type="button" data-v="3" aria-label="3 estrellas">★</button><button type="button" data-v="4" aria-label="4 estrellas">★</button><button type="button" data-v="5" aria-label="5 estrellas">★</button>
+            </div>
+          </div>
+          <textarea id="reviewComment" maxlength="500" rows="3" placeholder="¿Qué te parece la plataforma? ¿Qué te sirve, qué mejorarías?"></textarea>
+          <div class="review-form-foot">
+            <span class="review-counter" id="reviewCounter">0/500</span>
+            <span class="review-msg" id="reviewMsg"></span>
+            <button type="button" class="review-link-btn" id="reviewDeleteBtn" style="display:none">Borrar mi reseña</button>
+            <button type="submit" class="review-submit" id="reviewSubmitBtn">Publicar reseña</button>
+          </div>
+        </form>
+      </div>
+      <div class="reviews-list" id="reviewsList"></div>
+      <button type="button" class="review-more" id="reviewsMoreBtn" style="display:none">Ver más reseñas</button>
+    </section>
+
+    <div id="categoryDetailView" style="display:none">
+    <div class="tool-section" data-category="eventos">
+    <section class="community-block" id="eventsBlock">
       <div class="section-eyebrow">En vivo</div>
       <h2 class="community-title">Eventos y Noticias</h2>
       <p class="community-lead">Calendario económico de impacto alto y transmisiones en vivo, sin salir de SkillCash.</p>
@@ -4621,49 +4691,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       obs.observe(section);
     })();
     </script>
-
-    <section class="home-mirror community-block" id="aboutJuanBlock">
-      <div class="section-eyebrow">Quién está detrás</div>
-      <h2 class="community-title">Juan SkillCash</h2>
-      <p class="community-lead">Herramientas para aprender y operar cripto con criterio, hechas para la manada. Estos son los números reales, sin inflar.</p>
-      <div class="about-stats" id="aboutStats">
-        <div class="about-stat"><div class="about-stat-num">10.000+</div><div class="about-stat-label">Seguidores en TikTok</div></div>
-        <div class="about-stat"><div class="about-stat-num">43.000+</div><div class="about-stat-label">Líneas de código</div></div>
-        <div class="about-stat"><div class="about-stat-num" id="aboutStatTools">—</div><div class="about-stat-label">Herramientas</div></div>
-        <div class="about-stat"><div class="about-stat-num" id="aboutStatIndic">—</div><div class="about-stat-label">Indicadores</div></div>
-        <div class="about-stat"><div class="about-stat-num">200+</div><div class="about-stat-label">Miembros en Telegram</div></div>
-      </div>
-    </section>
-
-    <section class="home-mirror community-block" id="reviewsBlock">
-      <div class="section-eyebrow">Opiniones de la manada</div>
-      <div class="reviews-head">
-        <h2 class="community-title">Reseñas</h2>
-        <div class="reviews-summary" id="reviewsSummary"></div>
-      </div>
-      <div class="review-form-box" id="reviewFormBox">
-        <div class="review-login-note" id="reviewLoginNote">Inicia sesión para dejar tu reseña. <button type="button" class="review-link-btn" id="reviewLoginBtn">Iniciar sesión</button></div>
-        <form class="review-form" id="reviewForm" style="display:none">
-          <div class="review-form-row">
-            <span class="review-form-label" id="reviewFormLabel">Tu calificación</span>
-            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Calificación">
-              <button type="button" data-v="1" aria-label="1 estrella">★</button><button type="button" data-v="2" aria-label="2 estrellas">★</button><button type="button" data-v="3" aria-label="3 estrellas">★</button><button type="button" data-v="4" aria-label="4 estrellas">★</button><button type="button" data-v="5" aria-label="5 estrellas">★</button>
-            </div>
-          </div>
-          <textarea id="reviewComment" maxlength="500" rows="3" placeholder="¿Qué te parece la plataforma? ¿Qué te sirve, qué mejorarías?"></textarea>
-          <div class="review-form-foot">
-            <span class="review-counter" id="reviewCounter">0/500</span>
-            <span class="review-msg" id="reviewMsg"></span>
-            <button type="button" class="review-link-btn" id="reviewDeleteBtn" style="display:none">Borrar mi reseña</button>
-            <button type="submit" class="review-submit" id="reviewSubmitBtn">Publicar reseña</button>
-          </div>
-        </form>
-      </div>
-      <div class="reviews-list" id="reviewsList"></div>
-      <button type="button" class="review-more" id="reviewsMoreBtn" style="display:none">Ver más reseñas</button>
-    </section>
-
-    <div id="categoryDetailView" style="display:none">
+    </div>
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
 
       <div class="cat-pill-tabs-wrap" id="catPillTabsWrap" style="display:none">
@@ -11293,6 +11321,10 @@ const CATEGORY_LABELS = {};
 document.querySelectorAll('.cat-overview-card[data-category]').forEach(card => {
   CATEGORY_LABELS[card.dataset.category] = safeText(card.querySelector('.cat-overview-title'));
 });
+// "eventos" no tiene una cajita en la cuadrícula de Tus Herramientas (Juan pidió sacarla del
+// home, no agregarle una 8va cajita) - se asigna el título a mano para que setPageTitle() no
+// quede en "undefined" al entrar a esta categoría.
+CATEGORY_LABELS.eventos = 'Eventos y Noticias';
 const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
@@ -12784,6 +12816,16 @@ document.querySelectorAll('[data-cat-home]').forEach(btn => {
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sbBackdrop').classList.remove('show');
   });
+});
+// "Eventos y Noticias" (grupo "Noticias" del menú) es el único ítem del menú lateral que SÍ
+// necesita abrir su categoría desde cero (no solo "ya estando adentro", como data-cat-home/
+// showCategoryGrid asumen) porque no tiene una cajita propia en "Tus Herramientas" - sin una
+// cajita no hay un .cat-flip-outer con su click que llame a showCategoryDetail('eventos'), así
+// que se llama directo aquí.
+document.getElementById('sbEventosLink').addEventListener('click', () => {
+  showCategoryDetail('eventos');
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbBackdrop').classList.remove('show');
 });
 
 /* ---- sección de favoritos, arriba de todo, debajo de la publicidad de Bitunix ---- */
