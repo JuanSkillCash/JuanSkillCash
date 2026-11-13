@@ -1746,7 +1746,8 @@ button{font-family:inherit;color:inherit}
 .bubbles-iframe-wrap iframe{display:block;width:100%;height:100%;border:none}
 @media(max-width:700px){.bubbles-iframe-wrap{height:600px}}
 
-/* ===== GRAFICO AVANZADO (embed de TradingView) ===== */
+/* ===== Contenedor de embeds de TradingView (Gráfico Avanzado se quitó - esta clase la sigue
+   usando el Calendario Económico, #tvCalendarContainer) ===== */
 .tv-chart-wrap{position:relative;height:650px;max-height:80vh;border-radius:12px;overflow:hidden;border:1px solid rgba(91,141,239,.3);background:#090b16}
 @media(max-width:700px){.tv-chart-wrap{height:480px}}
 .be-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 22px;margin-bottom:20px;padding:18px 0;border-top:1px solid rgba(91,141,239,.3);border-bottom:1px solid rgba(91,141,239,.3)}
@@ -3359,9 +3360,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <button class="sb-item sb-item--sub" data-indic-jump="newlistradar">
         <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de nuevos listados</span>
       </button>
-      <button class="sb-item sb-item--sub" data-indic-jump="tvchart">
-        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico avanzado</span>
-      </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button class="sb-item sb-item--sub" data-indic-jump="fng">
         <span class="sb-item-icon">😐</span><span class="sb-item-label">Índice de miedo y codicia</span>
@@ -3684,9 +3682,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </button>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="newlistradar">
         <span class="sb-item-icon">🆕</span><span class="sb-item-label">Radar de nuevos listados</span>
-      </button>
-      <button type="button" class="sb-item indic-mobile-active" data-indic-jump="tvchart">
-        <span class="sb-item-icon">🕯️</span><span class="sb-item-label">Gráfico avanzado</span>
       </button>
       <div class="indic-cat-label">Sentimiento</div>
       <button type="button" class="sb-item indic-mobile-active" data-indic-jump="fng">
@@ -6520,32 +6515,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 📈📊🥇 Usa el filtro para ver solo acciones, índices u oro/commodities tokenizados — lo que no tiene ícono es cripto normal.<br>
                 🔎 Toca una moneda para abrir el anuncio original del exchange.<br>
                 <strong>Un aviso de nuevo listado NO es una señal de compra ni de venta. Herramienta educativa. No constituye asesoría financiera.</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="indic-panel" data-indic="tvchart" style="display:none">
-          <div class="indic-chart-card">
-            <div class="calc">
-              <div class="calc-head">
-                <div class="calc-eyebrow">
-                  <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
-                  <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-                </div>
-                <h2 class="calc-title">🕯️ Gráfico Avanzado</h2>
-              </div>
-
-              <div class="tv-chart-wrap chart-breakout">
-                <div class="tradingview-widget-container" id="tvChartContainer" style="height:100%;width:100%">
-                  <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
-                  <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-                </div>
-              </div>
-
-              <div class="calc-disclaimer" style="margin-top:18px">
-                🕯️ Gráfico en vivo de <strong>TradingView</strong> — cambia el símbolo con la lupa, agrega indicadores técnicos (RSI, MACD, medias móviles, etc.) y dibuja directo sobre el gráfico.<br>
-                <strong>Herramienta educativa. No constituye asesoría financiera.</strong>
               </div>
             </div>
           </div>
@@ -11283,7 +11252,7 @@ const ICON_SVG = {
 const INDIC_ICON_KEY = {
   bitcoinguia:'book', whitepaper:'scroll', halving:'hourglass', btcmacro:'bank', pisomercado:'anchor', rsimensual:'bars', ciclosoporte:'trendline', rainbow:'bands', picycle:'cycle', ma4y:'trendline', ema200:'trendline', treasuries:'briefcase', govtreasuries:'bank', btcxau:'scale', btcaapl:'scale', btcreturns:'calendar', sthmvrv:'wave', treascb:'diamond', epochpl:'piepercent',
   ethereumguia:'book', ethlogreg:'bands', ethvwap:'target', ethpmi:'house', ethreturns:'calendar',
-  tradingguia:'book', cbpremium:'badge', longshort:'scale', optionsoi:'layers', delistradar:'warning', newlistradar:'pluscircle', tvchart:'candles',
+  tradingguia:'book', cbpremium:'badge', longshort:'scale', optionsoi:'layers', delistradar:'warning', newlistradar:'pluscircle',
   fng:'gauge', btctrends:'search', cryptobubbles:'bubbles',
   macroguia:'book', dxy:'dollar', pmius:'house', payrolls:'briefcase', unrate:'badge', icsa:'calendar', cpi:'basket', cpiyoy:'trendline', pce:'basket', ppi:'house', fedfundsrate:'bank', m2supply:'coins', vixindex:'gauge', netliquidity:'droplet', gdpgrowth:'trendline', fedbalance:'bank', econcalendar:'calendar',
   dominanciaguia:'book', domratio:'scale', domall:'burst', dombtc:'pie', domusdt:'pie', ethbtc:'scale',
@@ -11314,7 +11283,7 @@ function indicDepthColor(t){
 const INDIC_GROUPS = {
   bitcoin: [{ id: 'whitepaper', label: 'Whitepaper de Bitcoin' }, { id: 'halving', label: 'Ciclos de halving' }, { id: 'btcmacro', label: 'BTC + datos macroeconómicos' }, { id: 'pisomercado', label: 'Pulso de fondo' }, { id: 'rsimensual', label: 'RSI mensual' }, { id: 'ciclosoporte', label: 'Techo anterior' }, { id: 'rainbow', label: 'Rainbow Chart' }, { id: 'picycle', label: 'Techo Pi Cycle' }, { id: 'ma4y', label: 'Media móvil de 4 años' }, { id: 'ema200', label: 'Medias móviles 200' }, { id: 'treasuries', label: 'Balances corporativos' }, { id: 'govtreasuries', label: 'Reservas gubernamentales' }, { id: 'btcxau', label: 'BTC/XAU' }, { id: 'btcaapl', label: 'BTC/AAPL' }, { id: 'btcreturns', label: 'Retornos de Bitcoin' }, { id: 'sthmvrv', label: 'STH-MVRV' }, { id: 'treascb', label: 'Costo base institucional' }, { id: 'epochpl', label: '% Supply en pérdida por época' }],
   ethereum: [{ id: 'ethlogreg', label: 'Bandas log de ETH' }, { id: 'ethvwap', label: 'VWAP anclado de ETH' }, { id: 'ethpmi', label: 'Precio de ETH + PMI manufacturero' }, { id: 'ethreturns', label: 'Retornos de Ethereum' }],
-  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio largo/corto' }, { id: 'optionsoi', label: 'Interés abierto en opciones' }, { id: 'delistradar', label: 'Radar de deslistados' }, { id: 'newlistradar', label: 'Radar de nuevos listados' }, { id: 'tvchart', label: 'Gráfico avanzado' }],
+  trading: [{ id: 'cbpremium', label: 'Coinbase Premium' }, { id: 'longshort', label: 'Ratio largo/corto' }, { id: 'optionsoi', label: 'Interés abierto en opciones' }, { id: 'delistradar', label: 'Radar de deslistados' }, { id: 'newlistradar', label: 'Radar de nuevos listados' }],
   sentimiento: [{ id: 'fng', label: 'Índice de miedo y codicia' }, { id: 'btctrends', label: 'BTC + Google Trends' }, { id: 'cryptobubbles', label: 'Burbujas cripto' }],
   mineria: [],
   macro: [
@@ -11350,7 +11319,7 @@ const INDIC_GROUPS = {
   const count = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   el.textContent = count + ' INDICADORES';
 })();
-const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', newlistradar: 'trading', tvchart: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
+const INDIC_ID_TO_GROUP = { whitepaper: 'bitcoin', bitcoinguia: 'bitcoin', ethereumguia: 'ethereum', tradingguia: 'trading', dominanciaguia: 'dominancia', altcoinsguia: 'altcoins', halving: 'bitcoin', btcmacro: 'bitcoin', pisomercado: 'bitcoin', rsimensual: 'bitcoin', ciclosoporte: 'bitcoin', rainbow: 'bitcoin', picycle: 'bitcoin', ma4y: 'bitcoin', ema200: 'bitcoin', treasuries: 'bitcoin', govtreasuries: 'bitcoin', btcxau: 'bitcoin', btcaapl: 'bitcoin', btcreturns: 'bitcoin', sthmvrv: 'bitcoin', treascb: 'bitcoin', epochpl: 'bitcoin', ethlogreg: 'ethereum', ethvwap: 'ethereum', ethpmi: 'ethereum', ethreturns: 'ethereum', cbpremium: 'trading', longshort: 'trading', optionsoi: 'trading', delistradar: 'trading', newlistradar: 'trading', fng: 'sentimiento', btctrends: 'sentimiento', cryptobubbles: 'sentimiento', domratio: 'dominancia', domall: 'dominancia', dombtc: 'dominancia', domusdt: 'dominancia', ethbtc: 'dominancia', othersbtc: 'altcoins', altfever: 'altcoins', ethvsalt: 'altcoins', total2: 'altcoins', others: 'altcoins', macroguia: 'macro', dxy: 'macro', pmius: 'macro', payrolls: 'macro', unrate: 'macro', icsa: 'macro', cpi: 'macro', cpiyoy: 'macro', pce: 'macro', ppi: 'macro', fedfundsrate: 'macro', m2supply: 'macro', vixindex: 'macro', netliquidity: 'macro', gdpgrowth: 'macro', fedbalance: 'macro', econcalendar: 'macro' };
 
 /* ========= RUTEO CON URLs REALES (/indicadores/<slug>, /herramientas/<categoria>/<tool>) =========
    El slug de cada indicador sale de su label (INDIC_GROUPS) en vez de una lista aparte a mano —
@@ -11501,7 +11470,6 @@ function renderIndicSubtabs(group){
       if(btn.dataset.indic === 'optionsoi') ensureOptionsOiLoaded();
       if(btn.dataset.indic === 'delistradar') ensureDelistRadarLoaded();
       if(btn.dataset.indic === 'newlistradar') ensureNewListRadarLoaded();
-      if(btn.dataset.indic === 'tvchart') ensureTvChartLoaded();
       if(btn.dataset.indic === 'econcalendar') ensureTvCalendarLoaded();
       if(btn.dataset.indic === 'domratio') ensureDomRatioLoaded();
       if(btn.dataset.indic === 'domall') ensureDomAllLoaded();
@@ -11564,7 +11532,6 @@ function jumpToIndicator(id){
     if(id === 'optionsoi') ensureOptionsOiLoaded();
     if(id === 'delistradar') ensureDelistRadarLoaded();
     if(id === 'newlistradar') ensureNewListRadarLoaded();
-    if(id === 'tvchart') ensureTvChartLoaded();
     if(id === 'econcalendar') ensureTvCalendarLoaded();
     if(id === 'domratio') ensureDomRatioLoaded();
     if(id === 'domall') ensureDomAllLoaded();
@@ -12581,7 +12548,6 @@ const INDIC_DESC = {
   optionsoi: 'Cuánto dinero hay abierto en contratos de opciones y en qué precios (strikes) se concentra. Los precios con mayor interés abierto suelen actuar como imanes o barreras para el precio cerca de su vencimiento.',
   delistradar: 'Qué monedas están siendo retiradas de los exchanges grandes, para enterarte antes de que te tome por sorpresa con fondos atrapados. Se revisa constantemente contra los anuncios oficiales de cada exchange.',
   newlistradar: 'Las monedas más recientes en listarse en los exchanges grandes, para detectar oportunidades (y riesgos) apenas se abren a trading. Un listado nuevo suele traer volatilidad fuerte en ambas direcciones.',
-  tvchart: 'Un gráfico completo de TradingView, con todas sus herramientas de dibujo e indicadores, para analizar cualquier mercado a tu manera. Útil cuando ya sabes lo que buscas y solo necesitas el lienzo.',
   fng: 'Qué tan extremo está el sentimiento del mercado hoy, en una escala de miedo extremo a codicia extrema. Los extremos (en cualquiera de los dos lados) históricamente han sido mejores momentos para actuar en contra de la multitud que para seguirla.',
   btctrends: 'Cuánta gente está buscando "Bitcoin" en Google ahora mismo, comparado con su propio promedio histórico. Picos de búsqueda suelen coincidir con el público general entrando tarde a un movimiento que ya lleva rato corriendo.',
   cryptobubbles: 'Todo el mercado cripto de un vistazo, donde el tamaño de cada burbuja representa su capitalización de mercado y el color su desempeño reciente. Rápido para ver qué está liderando el mercado hoy sin revisar moneda por moneda.',
@@ -12643,7 +12609,6 @@ const INDIC_SHORT = {
   optionsoi: 'Dinero abierto en opciones',
   delistradar: 'Monedas saliendo de exchanges',
   newlistradar: 'Las monedas más nuevas listadas',
-  tvchart: 'Gráfico libre de TradingView',
   fng: 'Qué tan extremo está el sentimiento',
   btctrends: 'Búsquedas de Bitcoin en Google',
   cryptobubbles: 'Todo el mercado, de un vistazo',
@@ -12705,7 +12670,6 @@ const INDIC_TAGS = {
   optionsoi: ['Trading', 'Derivados'],
   delistradar: ['Trading', 'Alertas', 'Exchanges'],
   newlistradar: ['Trading', 'Alertas', 'Exchanges'],
-  tvchart: ['Trading', 'Gráficos', 'Cualquier mercado'],
   fng: ['Sentimiento'],
   btctrends: ['Sentimiento', 'Búsquedas'],
   cryptobubbles: ['Sentimiento', 'Mercado completo'],
@@ -19001,7 +18965,7 @@ function renderGlossaryList(){
    en vez de alfabetico, para que funcione como manual navegable por capitulos ademas de
    buscador. Contenido generado leyendo el codigo real de cada categoria/herramienta -
    excluye a proposito el panel de Admin (solo Juan). ========= */
-const MANUAL_DATA = [{"id":"empezar","icon":"🚀","titulo":"Empezar","intro":"Lo básico antes de tocar cualquier herramienta: crear tu cuenta y conocer tu perfil.","items":[{"pregunta":"¿Cómo me registro?","respuesta":"<ol><li>Dale clic al botón 👤 arriba a la derecha.</li><li>Elige <b>Iniciar sesión</b>.</li><li>Regístrate con tu correo y una contraseña, o con un clic usando tu cuenta de Google.</li></ol>No hace falta tarjeta ni nada de pago — toda la plataforma es gratis.","keywords":["registro","crear cuenta","login","iniciar sesion","google"]},{"pregunta":"¿Qué es \"Mi perfil\"?","respuesta":"Es tu panel personal: ahí cambias tu nombre de usuario, tu foto, tu contraseña, ves el correo con el que te registraste, conectas Telegram y, si algún día quieres, borras tu cuenta. Se abre desde el botón 👤 → <b>Mi perfil</b>.","keywords":["mi perfil","perfil","configuracion","cuenta"]},{"pregunta":"¿Cómo cambio mi nombre de usuario o mi foto?","respuesta":"En <b>Mi perfil</b>, escribe el nombre que quieras en el campo \"Nombre de usuario\" y dale <b>Guardar cambios</b>. Para la foto, usa el botón \"🦈 Cambiar imagen\" justo arriba del campo de nombre.","keywords":["cambiar nombre","username","avatar","foto de perfil"]},{"pregunta":"¿Cómo cambio mi contraseña?","respuesta":"<ol><li>Entra a <b>Mi perfil</b>.</li><li>Dale clic a \"Cambiar mi contraseña\".</li><li>Revisa tu correo — te llega un enlace para definir una nueva.</li></ol>Si te registraste con Google, no tienes contraseña propia aquí: entras siempre con tu cuenta de Google.","keywords":["contraseña","password","recuperar clave","olvide contraseña"]},{"pregunta":"¿Puedo borrar mi cuenta?","respuesta":"Sí. <ol><li>Entra a <b>Mi perfil</b>.</li><li>Baja hasta la sección \"Zona de peligro\".</li><li>Dale clic a \"🗑️ Eliminar mi cuenta\" y confirma.</li></ol>Es permanente: borra también todos tus portafolios guardados y no se puede deshacer.","keywords":["borrar cuenta","eliminar cuenta","dar de baja"]},{"pregunta":"¿Cómo me muevo por el sitio?","respuesta":"Todo está organizado en categorías grandes que ves al entrar: <b>Sonar de Mercado</b> (indicadores), <b>Mi Arrecife</b> (portafolio), <b>Zona de Caza</b> (calculadoras de trading), <b>Blindaje</b> (seguridad), <b>Manual del Depredador</b> (guías) y <b>Aliados de Manada</b>. Haz clic en cualquiera para entrar, y usa \"← Volver a categorías\" o el logo para regresar. En el menú lateral (el ícono ☰ en celular) tienes acceso directo a cada herramienta sin pasar por la categoría.","keywords":["navegar","menu","categorias","sidebar","como funciona el sitio"]}]},{"id":"sonar-bitcoin","icon":"₿","titulo":"Sonar de Mercado — Bitcoin","intro":"Dentro de \"Sonar de Mercado\" (la categoría de indicadores), la pestaña <b>₿ BTC</b> trae 18 gráficos distintos sobre Bitcoin. Haz clic en cualquiera desde el menú lateral o desde la pestaña \"Guía\" de esa sección.","items":[{"pregunta":"¿Qué es el Whitepaper de Bitcoin?","respuesta":"El documento original de 2008 donde Satoshi Nakamoto describió Bitcoin por primera vez — aquí está traducido al español, con sus diagramas originales, para leerlo directo en la página sin buscar un PDF en inglés.","keywords":["whitepaper","satoshi","documento original","paper"]},{"pregunta":"¿Qué son los Ciclos de Halving?","respuesta":"Cuenta el tiempo desde el último halving: el evento que cada ~4 años le baja a la mitad la recompensa que reciben los mineros. Históricamente este evento marca el ritmo de los ciclos alcistas y bajistas de BTC, así que este gráfico te ubica en qué parte del ciclo estás.","keywords":["halving","ciclo","recompensa minero"]},{"pregunta":"¿Qué muestra BTC + Datos Macroeconómicos?","respuesta":"El precio de BTC con PMI, inflación, tasas de interés y/o el balance de la Fed superpuestos en el mismo gráfico. Activa los que quieras comparar y mira si la forma del precio se parece a la de esos datos económicos.","keywords":["btc macro","btc + macro","overlay macro"]},{"pregunta":"¿Qué es Pulso de Fondo?","respuesta":"Un modelo estadístico que mide qué tan cerca o lejos está el precio actual de las zonas donde BTC históricamente tocó fondo — útil para saber si estás en una zona de riesgo bajo o ya lejos de ahí.","keywords":["pulso de fondo","piso de mercado","fondo de mercado"]},{"pregunta":"¿Qué es el RSI Mensual?","respuesta":"La fuerza relativa del precio, pero calculada en velas mensuales (el timeframe más grande) — te dice si BTC está sobrecomprado o sobrevendido visto en el largo plazo, no en el ruido diario.","keywords":["rsi","rsi mensual","sobrecomprado","sobrevendido"]},{"pregunta":"¿Qué es Techo Anterior?","respuesta":"Compara el precio de hoy contra el máximo del ciclo alcista pasado. Ese techo viejo suele actuar después como soporte o resistencia — útil para saber qué nivel está vigilando el mercado.","keywords":["techo anterior","resistencia","soporte","maximo anterior"]},{"pregunta":"¿Qué es el Rainbow Chart?","respuesta":"Bandas de colores dibujadas sobre una regresión logarítmica del precio: van de azul (zona barata) a rojo (zona de burbuja). Es visual rápido para ubicar en qué franja de valoración está BTC hoy.","keywords":["rainbow","rainbow chart","arcoiris"]},{"pregunta":"¿Qué es el Techo Pi Cycle?","respuesta":"El cruce de dos medias móviles que, históricamente, ha coincidido con bastante precisión con los techos de ciclo de Bitcoin. Cuando esas dos líneas se acercan a cruzarse, vale la pena prestar atención.","keywords":["pi cycle","techo pi cycle","pi cycle top"]},{"pregunta":"¿Qué es la Media Móvil de 4 Años?","respuesta":"Una media móvil de ~1458 días (4 años) — la línea de tendencia de muy largo plazo de BTC, que filtra todo el ruido de corto y mediano plazo.","keywords":["media movil 4 años","ma4y","tendencia largo plazo"]},{"pregunta":"¿Qué son las Medias Móviles 200?","respuesta":"La media móvil de 200 (semanal o diaria, según elijas) que tradicionalmente separa la tendencia alcista de la bajista de largo plazo — cuando el precio está por encima, se lee como tendencia alcista; por debajo, bajista.","keywords":["media movil 200","ema200","mm200"]},{"pregunta":"¿Qué son los Balances Corporativos?","respuesta":"Cuánto BTC tienen acumulado empresas que cotizan en bolsa, como MicroStrategy — te muestra el apetito institucional en números reales, no en especulación.","keywords":["balances corporativos","microstrategy","empresas btc","treasuries"]},{"pregunta":"¿Qué son las Reservas Gubernamentales?","respuesta":"Cuánto BTC tienen acumulado distintos gobiernos del mundo, ya sea por confiscación, reserva estratégica o compra directa — desde EEUU hasta El Salvador.","keywords":["reservas gubernamentales","gobiernos btc","btc estados"]},{"pregunta":"¿Qué es BTC/XAU?","respuesta":"El precio de Bitcoin medido en onzas de oro en vez de en dólares — una forma de comparar los dos activos que la gente llama \"refugio de valor\" entre sí.","keywords":["btc xau","btc oro","bitcoin vs oro"]},{"pregunta":"¿Qué es BTC/AAPL?","respuesta":"El precio de Bitcoin medido en acciones de Apple en vez de en dólares — otra comparación relativa, esta vez contra una de las acciones más grandes del mundo.","keywords":["btc aapl","bitcoin vs apple"]},{"pregunta":"¿Qué son los Retornos de Bitcoin?","respuesta":"Cómo le ha ido a BTC año por año, trimestre, mes o semana, organizado en pestañas — te deja ver de un vistazo si hay estacionalidad (por ejemplo, si septiembre suele ser rojo).","keywords":["retornos","rendimientos btc","estacionalidad"]},{"pregunta":"¿Qué es STH-MVRV?","respuesta":"Compara el precio de BTC contra el costo base promedio de quienes compraron hace menos de 150 días. Por encima de 1, ese comprador reciente está en ganancia; por debajo, en pérdida — útil para detectar capitulaciones y momentos de euforia de corto plazo.","keywords":["sth mvrv","mvrv","costo base reciente"]},{"pregunta":"¿Qué es el Costo Base Institucional?","respuesta":"El precio promedio al que compraron BTC los grandes holders institucionales: empresas públicas (como MicroStrategy) y ETFs spot (como IBIT, FBTC), combinados y también cada uno por separado.","keywords":["costo base institucional","treascb","precio promedio institucional"]},{"pregunta":"¿Qué es % Supply en Pérdida por Época?","respuesta":"Qué porcentaje del BTC acuñado en cada época de halving sigue sin moverse de wallet y hoy vale menos de lo que costó cuando se minó. Las monedas más viejas casi siempre están en ganancia; la época más reciente es la que más fluctúa entre ganancia y pérdida.","keywords":["supply en perdida","epochpl","monedas en perdida"]}]},{"id":"sonar-ethereum","icon":"Ξ","titulo":"Sonar de Mercado — Ethereum","intro":"La pestaña <b>Ξ ETH</b> trae 4 gráficos enfocados solo en Ethereum.","items":[{"pregunta":"¿Qué son las Bandas Log de ETH?","respuesta":"El mismo concepto del Rainbow Chart de Bitcoin, pero aplicado a Ethereum: bandas de regresión logarítmica que van de zona barata a zona cara.","keywords":["bandas log eth","rainbow eth","eth log"]},{"pregunta":"¿Qué es el VWAP Anclado de ETH?","respuesta":"El precio promedio ponderado por volumen desde un punto de referencia que tú eliges (por ejemplo, un máximo o un mínimo importante) — una vara de medir para saber si el precio de hoy está caro o barato frente a ese punto.","keywords":["vwap","vwap anclado","eth vwap"]},{"pregunta":"¿Qué muestra Precio de ETH + PMI Manufacturero?","respuesta":"El precio de ETH superpuesto con el PMI Manufacturero de EEUU, para ver si las subidas y bajadas de ETH coinciden con la economía expandiéndose (PMI por encima de 50) o contrayéndose (por debajo de 50).","keywords":["eth pmi","eth macro"]},{"pregunta":"¿Qué son los Retornos de Ethereum?","respuesta":"Cómo le ha ido a ETH por año, trimestre, mes o semana, en pestañas — igual que los Retornos de Bitcoin pero para ETH.","keywords":["retornos eth","rendimientos ethereum"]}]},{"id":"sonar-derivados","icon":"💹","titulo":"Sonar de Mercado — Trading","intro":"La pestaña <b>💹 Trading</b> trae indicadores de mercado de derivados y dos radares de alertas en vivo.","items":[{"pregunta":"¿Qué es Coinbase Premium?","respuesta":"La diferencia de precio de BTC entre Coinbase (EEUU) y Binance. Positivo y alto suele significar que instituciones de EEUU están comprando fuerte; negativo, que están vendiendo o hay poca demanda institucional.","keywords":["coinbase premium","cb premium"]},{"pregunta":"¿Qué es el Ratio Largo/Corto?","respuesta":"Cuántos traders apuestan a que el precio sube (posiciones largas) contra cuántos apuestan a que baja (cortas), en futuros. Lecturas muy extremas hacia cualquier lado suelen avisar de un mercado sobre-apalancado, con riesgo de liquidaciones en cadena.","keywords":["largo corto","long short","ratio largo corto"]},{"pregunta":"¿Qué es el Interés Abierto en Opciones?","respuesta":"Cuánto capital hay posicionado ahora mismo en contratos de opciones abiertos — muestra en qué precios (\"strikes\") hay más dinero apostado, útil para ver dónde podría \"imantarse\" el mercado.","keywords":["interes abierto","opciones","open interest"]},{"pregunta":"¿Qué es el Radar de Deslistados?","respuesta":"Avisos reales de cuándo una moneda va a dejar de poderse comprar o vender en un exchange, juntando 8 exchanges distintos, con cuenta regresiva, historial completo y filtro por exchange y tipo de activo. Puedes marcar cualquier moneda con la estrella para seguirla de cerca — mira la sección <b>Mi Lista</b> de este manual para los detalles.","keywords":["radar deslistados","delisting","deslistado"]},{"pregunta":"¿Qué es el Radar de Nuevos Listados?","respuesta":"Avisos reales de cuándo una moneda (o incluso acciones, índices u oro, cuando el exchange los lista en futuros perpetuos) se lista por primera vez en un exchange, juntando 6 exchanges, con filtro por exchange y tipo de activo.","keywords":["radar nuevos listados","new listing","nuevo listado"]},{"pregunta":"¿Qué es el Gráfico Avanzado?","respuesta":"Un gráfico de velas en vivo de verdad, con indicadores técnicos reales, cambio libre de símbolo y herramientas de dibujo — no un modelo propio, sino un gráfico de trading profesional integrado en el sitio.","keywords":["grafico avanzado","tvchart","velas","trading view"]}]},{"id":"sonar-sentimiento","icon":"😐","titulo":"Sonar de Mercado — Sentimiento","intro":"La pestaña <b>Sentimiento</b> mide el ánimo general del mercado, no el precio en sí.","items":[{"pregunta":"¿Qué es el Índice de Miedo y Codicia?","respuesta":"Un medidor de 0 a 100 (como un velocímetro) que resume el ánimo del mercado cripto en un solo número: cerca de 0 es miedo extremo, cerca de 100 es codicia extrema. Se actualiza con la fuente de CoinMarketCap y también se postea automáticamente en el canal de Telegram de la comunidad cada mañana.","keywords":["miedo y codicia","fear and greed","fng","indice miedo"]},{"pregunta":"¿Qué es BTC + Google Trends?","respuesta":"El precio de BTC superpuesto con el interés de búsqueda en Google de la palabra \"Bitcoin\" (normalizado de 0 a 100 por el propio Google). Cuando el interés de búsqueda se dispara junto con el precio, suele ser señal de euforia minorista — el FOMO del público general entrando tarde.","keywords":["google trends","interes de busqueda","btc trends"]},{"pregunta":"¿Qué son las Burbujas Cripto?","respuesta":"Un mapa visual (burbujas de distinto tamaño) de todo el mercado cripto en vivo, donde el tamaño de cada burbuja representa su capitalización y el color su desempeño reciente — una forma rápida de ver de un vistazo qué está moviéndose.","keywords":["burbujas cripto","cryptobubbles","mapa de burbujas"]}]},{"id":"sonar-macro","icon":"🏛","titulo":"Sonar de Mercado — Macro","intro":"La pestaña <b>🏛 Macro</b> trae los datos de la economía de EEUU que más mueven a los mercados de riesgo, incluida la cripto. Cada tarjeta de la \"Guía\" de esta sección te muestra qué significa cuando el dato sube y cuando baja.","items":[{"pregunta":"¿Qué es el Índice del Dólar (DXY)?","respuesta":"Qué tan fuerte está el dólar frente a una canasta de otras monedas. Dólar fuerte suele presionar en contra de los activos de riesgo (incluida cripto); dólar débil suele favorecerlos.","keywords":["dxy","dolar","indice dolar"]},{"pregunta":"¿Qué es el PMI Manufacturero?","respuesta":"Una encuesta mensual a gerentes de compras en EEUU: por encima de 50 significa que la actividad industrial se está expandiendo (señal de crecimiento), por debajo de 50 que se está contrayendo (señal de posible recesión).","keywords":["pmi","pmi manufacturero"]},{"pregunta":"¿Qué es la Nómina No Agrícola?","respuesta":"Cuántos empleos nuevos creó EEUU el mes pasado, en miles — el dato de empleo más vigilado del mundo. Muchos empleos nuevos es señal de crecimiento y presiona a la Fed hacia tasas altas; pocos empleos es señal de posible recesión y presiona hacia tasas bajas.","keywords":["nomina no agricola","payrolls","empleo eeuu"]},{"pregunta":"¿Qué es la Tasa de Desempleo?","respuesta":"El porcentaje de la fuerza laboral de EEUU que está sin trabajo. Si sube, es señal de posible recesión; si baja, señal de crecimiento.","keywords":["tasa de desempleo","unrate","desempleo"]},{"pregunta":"¿Qué son las Solicitudes Semanales de Desempleo?","respuesta":"Lo mismo que la tasa de desempleo, pero medido cada semana en vez de cada mes — reacciona mucho más rápido a cambios reales en el mercado laboral.","keywords":["solicitudes de desempleo","icsa","desempleo semanal"]},{"pregunta":"¿Qué es la Inflación CPI?","respuesta":"Cuánto subieron los precios al consumidor, en general y también excluyendo alimentos y energía (el \"núcleo\", que es el que de verdad mira la Fed por ser menos volátil). Inflación alta presiona a la Fed hacia tasas altas; inflación baja, hacia tasas bajas.","keywords":["cpi","inflacion cpi","inflacion general"]},{"pregunta":"¿Qué es la Inflación Interanual (CPI YoY)?","respuesta":"El % de cambio del CPI comparado con el mismo mes del año anterior — es el número exacto que la gente dice cuando habla de \"la inflación está en X%\".","keywords":["cpi yoy","inflacion interanual"]},{"pregunta":"¿Qué es PCE?","respuesta":"Otra forma de medir la inflación, mucho más técnica, pero la favorita de la Reserva Federal para decidir sus tasas de interés.","keywords":["pce","inflacion pce"]},{"pregunta":"¿Qué es PPI?","respuesta":"Inflación mayorista: lo que pagan las empresas por sus insumos, antes de que ese costo le llegue al consumidor final. Suele anticipar hacia dónde va el CPI.","keywords":["ppi","inflacion mayorista"]},{"pregunta":"¿Qué es la Tasa de la Fed?","respuesta":"La tasa de interés que fija la Reserva Federal de EEUU — mueve prácticamente todos los mercados del mundo cuando cambia. Tasas altas suelen presionar en contra de los activos de riesgo; tasas bajas, a favor.","keywords":["tasa de la fed","fed funds rate","tasa de interes"]},{"pregunta":"¿Qué es M2?","respuesta":"Cuánto dinero hay circulando en la economía. Cuando M2 crece hay más liquidez disponible y suele favorecer a los activos de riesgo; cuando se contrae, pasa lo contrario.","keywords":["m2","oferta monetaria","m2 supply"]},{"pregunta":"¿Qué es el VIX?","respuesta":"El \"índice del miedo\" de Wall Street — mide cuánto movimiento espera el mercado de acciones en los próximos 30 días. Sube cuando el mercado se asusta (en contra del riesgo), baja en momentos de calma o complacencia.","keywords":["vix","indice del miedo wall street"]},{"pregunta":"¿Qué es la Liquidez Neta?","respuesta":"Se calcula como Balance de la Fed menos la Cuenta General del Tesoro menos el Reverse Repo — es el indicador de liquidez que más sigue la gente de cripto, como referencia de cuánto dinero hay realmente disponible para activos de riesgo.","keywords":["liquidez neta","net liquidity"]},{"pregunta":"¿Qué es el PIB (Crecimiento Real)?","respuesta":"Cuánto creció (o se contrajo) la economía de EEUU, en porcentaje trimestral anualizado — el tamaño total de la economía, sale cada trimestre.","keywords":["pib","gdp","crecimiento economico"]},{"pregunta":"¿Qué es el Balance de la Reserva Federal?","respuesta":"Sube cuando la Fed \"imprime\" dinero y compra activos (QE, a favor del riesgo), baja cuando los vende o deja vencer (QT, en contra del riesgo).","keywords":["balance de la fed","fed balance","qe","qt"]},{"pregunta":"¿Qué es el Calendario Económico?","respuesta":"Un calendario con las próximas publicaciones de todos estos datos macro, para que sepas qué días vienen sorpresas que pueden mover el mercado.","keywords":["calendario economico","proximos datos"]}]},{"id":"sonar-dominancia","icon":"🔄","titulo":"Sonar de Mercado — Dominancia","intro":"La pestaña <b>Dominancia</b> mide hacia dónde está rotando el capital dentro del propio mercado cripto (BTC vs ETH vs stablecoins vs altcoins).","items":[{"pregunta":"¿Qué es la Rotación ETH.D/BTC.D?","respuesta":"Compara la dominancia de ETH contra la de BTC. Si sube, el capital está rotando hacia ETH; si baja, está rotando de vuelta hacia BTC.","keywords":["eth.d","btc.d","rotacion eth btc","dominancia relativa"]},{"pregunta":"¿Qué es Descompresión Cripto?","respuesta":"La dominancia combinada de BTC+ETH+USDT+USDC sobre el total del mercado. Cuando está alta, el mercado está concentrado en esos cuatro (dominancia de BTC); cuando baja, se está \"descomprimiendo\" el dinero hacia las altcoins.","keywords":["descompresion cripto","domall"]},{"pregunta":"¿Qué es la Dominancia BTC?","respuesta":"Qué porcentaje de todo el mercado cripto es Bitcoin. Si sube, BTC domina; si baja, las altcoins están ganando terreno.","keywords":["dominancia btc","btc dominance","dombtc"]},{"pregunta":"¿Qué es la Dominancia USDT?","respuesta":"Qué porcentaje del mercado está parqueado en el stablecoin USDT. Si sube, la gente se está refugiando en stablecoins (cautela); si baja, está saliendo de ahí hacia activos con más riesgo.","keywords":["dominancia usdt","usdt dominance"]},{"pregunta":"¿Qué es ETH/BTC?","respuesta":"El precio de Ethereum medido en Bitcoin, en vez de en dólares — la forma más directa de ver si ETH le está ganando o perdiendo terreno a BTC.","keywords":["eth btc","ethbtc"]}]},{"id":"sonar-altcoins","icon":"🪙","titulo":"Sonar de Mercado — Altcoins","intro":"La pestaña <b>🪙 Altcoins</b> se enfoca en el resto del mercado, fuera de BTC y ETH.","items":[{"pregunta":"¿Qué es OTHERS/BTC?","respuesta":"El valor de las altcoins pequeñas (las que quedan fuera del top 10) medido en Bitcoin. Si sube, esas altcoins están caras en BTC (señal de temporada de altcoins); si baja, están baratas.","keywords":["others btc","othersbtc"]},{"pregunta":"¿Qué es la Euforia de Altcoins?","respuesta":"Qué tan caliente está la \"cola larga\" de altcoins frente a las grandes. Cuando la euforia está muy alta, históricamente ha coincidido con techos de ciclo — no es señal para ignorar.","keywords":["euforia de altcoins","altfever"]},{"pregunta":"¿Qué es la Valoración Relativa ETH vs Altcoins?","respuesta":"Compara el tamaño de Ethereum contra el resto de las altcoins. Si ETH se ve barato frente a ellas, suele ser momento de acumular ETH; si se ve caro, de rotar hacia altcoins.","keywords":["eth vs altcoins","ethvsalt"]},{"pregunta":"¿Qué es TOTAL2 EMA200?","respuesta":"La capitalización de todo el mercado cripto SIN Bitcoin, comparada contra su media móvil de 200 semanas. Por encima de la media es señal de temporada de altcoins; por debajo, de dominio de BTC.","keywords":["total2","total2 ema200"]},{"pregunta":"¿Qué es OTHERS EMA200?","respuesta":"Lo mismo que TOTAL2 pero solo para la cola larga (sin el top 10), contra su propia media de 200 semanas — la versión más \"pura\" de medir si las altcoins chiquitas están calientes o frías.","keywords":["others ema200","others"]}]},{"id":"radar-seguimiento","icon":"⭐","titulo":"Seguir una moneda (Mi Lista)","intro":"Tanto el Radar de Deslistados como el de Nuevos Listados dejan marcar monedas específicas para que te avisen justo a ti cuando pase algo con ellas.","items":[{"pregunta":"¿Qué es \"Mi Lista\"?","respuesta":"Es tu lista personal de monedas que decides seguir de cerca, dentro del Radar de Deslistados y del Radar de Nuevos Listados. Cuando una moneda de tu lista aparece en un aviso real, te llega una notificación.","keywords":["mi lista","seguimiento","watchlist"]},{"pregunta":"¿Cómo sigo una moneda?","respuesta":"<ol><li>Entra al Radar de Deslistados o al Radar de Nuevos Listados.</li><li>Busca la moneda que te interesa.</li><li>Dale clic a la estrella ⭐ (\"Agregar a Mi Lista\").</li></ol>Necesitas tener sesión iniciada para que se guarde.","keywords":["seguir moneda","agregar a mi lista","estrella"]},{"pregunta":"¿Dónde me llegan los avisos de Mi Lista?","respuesta":"Por dos lados a la vez: la campanita 🔔 de notificaciones dentro del sitio, y por Telegram si tienes tu cuenta vinculada (ver la sección Telegram de este manual) — así te enteras aunque no tengas la página abierta en ese momento.","keywords":["avisos","notificaciones mi lista","campana"]}]},{"id":"mi-arrecife","icon":"🐠","titulo":"Mi Arrecife","intro":"La categoría de portafolio: 5 herramientas para planear o registrar tus inversiones, todas con precios actualizados en vivo.","items":[{"pregunta":"¿Qué es Mi Arrecife?","respuesta":"Es tu rincón de portafolio: desde ahí puedes diseñar cómo repartirías tu dinero, o registrar lo que ya compraste de verdad, con el valor actualizado en vivo y tu ganancia o pérdida real calculada sola.","keywords":["mi arrecife","portafolio","portfolio"]},{"pregunta":"¿Qué es el Perfil de Riesgo?","respuesta":"Respondes 6 preguntas cortas y te dice si eres un inversor conservador, moderado o agresivo — útil como punto de partida antes de armar tu portafolio.","keywords":["perfil de riesgo","quiz de riesgo","test de riesgo"]},{"pregunta":"¿Cómo uso el Simulador de Portafolio?","respuesta":"Arma un plan de cómo repartirías tu dinero entre distintos activos (modo simulación), o registra tus holdings reales tal como los compraste (modo real) — en los dos casos ves el valor actualizado en vivo y tu ganancia o pérdida.","keywords":["simulador de portafolio","registrar inversiones","mis holdings"]},{"pregunta":"¿Qué es el Monitor de Correlación?","respuesta":"Compara hasta 5 monedas a la vez y te muestra qué tan parecido se mueven entre sí — útil para descubrir si de verdad estás diversificado o si, sin darte cuenta, todas tus monedas suben y bajan juntas.","keywords":["monitor de correlacion","correlacion","diversificacion"]},{"pregunta":"¿Qué es el Comparador de Market Cap?","respuesta":"Simula qué pasaría si tu moneda tuviera la capitalización de mercado de otra moneda más grande: a qué precio estaría, y cuánto valdrían tus monedas en ese escenario.","keywords":["comparador de market cap","market cap","capitalizacion"]},{"pregunta":"¿Qué es Tiempo hasta la Libertad Financiera?","respuesta":"Con tu aporte mensual y un rendimiento esperado conservador, calcula cuánto tiempo tardarías en llegar a la meta de dinero que te propongas.","keywords":["libertad financiera","fi freedom","meta financiera"]}]},{"id":"zona-caza","icon":"🦈","titulo":"Zona de Caza","intro":"La categoría de calculadoras de trading e inversión: 8 herramientas para resolver cuentas rápido mientras operas.","items":[{"pregunta":"¿Qué es Zona de Caza?","respuesta":"Es la caja de herramientas de cálculo para trading: desde liquidación y break-even hasta conversiones rápidas de unidades — todo en un solo lugar, sin tener que buscarlas sueltas por internet.","keywords":["zona de caza","calculadoras de trading"]},{"pregunta":"¿Qué hace la Calculadora de Futuros?","respuesta":"Calcula tu precio de liquidación, stop loss, take profit, relación riesgo/beneficio y el tamaño de posición que deberías usar en futuros, según tu capital y apalancamiento — con un botón para cambiar entre USDT-M (margen en dólares) y Coin-M (margen en la propia moneda, donde además suma o resta lo que gana o pierde tu margen por la revalorización de la moneda).","keywords":["calculadora de futuros","calculadora de trading","liquidacion","stop loss","take profit","tamaño de posicion","coin-m","futuros coin margined"]},{"pregunta":"¿Qué hace la Calculadora de Break-even?","respuesta":"Te dice cuánto tiene que moverse el precio solo para cubrir las comisiones de tu operación — y cuánto baja ese número si usas el cashback de Bitunix.","keywords":["break even","punto de equilibrio"]},{"pregunta":"¿Qué hace la Calculadora de Comisiones?","respuesta":"Calcula cuánto te está cobrando el exchange en comisiones maker/taker según tu volumen mensual de trading, y cuánto recuperas si tienes cashback activo.","keywords":["comisiones","fees","maker taker"]},{"pregunta":"¿Qué hace la Calculadora de Rentabilidad?","respuesta":"Simula cuánto ganarías comprando y vendiendo un activo en dos momentos distintos, usando precios de cripto en vivo.","keywords":["rentabilidad","ganancia simulada"]},{"pregunta":"¿Qué hace el Simulador de DCA?","respuesta":"Simula cuánto acumularías si compraras un monto fijo de forma periódica (semanal, mensual, etc.), en vez de intentar adivinar el mejor momento para entrar todo de una vez — o, en el modo Venta, cómo te iría retirando tus ganancias poco a poco, por partes, en vez de vender todo de una sola vez. Un botón cambia entre Compra y Venta.","keywords":["dca","dollar cost average","compra periodica","dca de venta","venta periodica"]},{"pregunta":"¿Qué hace el Conversor de Unidades?","respuesta":"Convierte entre las unidades que se buscan todo el tiempo en Google: satoshis↔BTC, gwei↔ETH, wei↔ETH, todo en un solo lugar.","keywords":["conversor de unidades","satoshis","gwei","wei"]},{"pregunta":"¿Qué hace la Calculadora de Porcentajes?","respuesta":"Resuelve rápido: qué porcentaje es un número de otro, cuánto es el X% de algo, o cuál sería el precio nuevo después de subir o bajar un porcentaje.","keywords":["calculadora de porcentajes","porcentajes"]},{"pregunta":"¿Qué hace el Reloj de Zona Horaria?","respuesta":"Compara la hora de dos países que elijas — útil para coordinar un live o una llamada con gente de tu comunidad en otro huso horario.","keywords":["reloj","zona horaria","huso horario"]}]},{"id":"blindaje","icon":"🛡️","titulo":"Blindaje","intro":"La categoría de seguridad: 5 herramientas para proteger tus fondos, tu wallet y lo que le dejarías a tu familia.","items":[{"pregunta":"¿Qué es Blindaje?","respuesta":"Es la zona de seguridad del sitio: revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos ahora mismo, y deja todo listo para que tu familia pueda heredar sin problemas si algo te pasa.","keywords":["blindaje","seguridad","proteccion"]},{"pregunta":"¿Qué hace el Checklist de Seguridad?","respuesta":"Te guía paso a paso para verificar que tu wallet y tus cuentas de exchange estén correctamente protegidas — 2FA, frase semilla, dispositivos, todo lo básico que mucha gente se salta.","keywords":["checklist de seguridad","2fa","frase semilla"]},{"pregunta":"¿Qué hace el Comparador de Wallets?","respuesta":"Compara wallet caliente (hot, conectada a internet) contra wallet fría (cold, offline) y te ayuda a decidir cuál te conviene más según cuánto tienes guardado y qué tan seguido operas.","keywords":["comparador de wallets","hot wallet","cold wallet"]},{"pregunta":"¿Qué hace Verificar Aprobaciones?","respuesta":"Una guía paso a paso para revisar qué permisos (aprobaciones) le has dado a contratos inteligentes en tu wallet, y cómo revocar los peligrosos — muchos robos pasan por aprobaciones viejas que la gente olvidó quitar.","keywords":["verificar aprobaciones","revocar permisos","approvals"]},{"pregunta":"¿Qué hace Herencia Digital?","respuesta":"Te ayuda a pensar qué le dejarías a tu familia si te pasa algo, y cómo darles acceso a tus fondos sin comprometer tu seguridad mientras tanto.","keywords":["herencia digital","heredar cripto","plan de herencia"]},{"pregunta":"¿Qué hace el Analizador de Token?","respuesta":"Buscas cualquier token y revisa la seguridad de su contrato, la liquidez disponible, los impuestos de compra/venta y si hay desbloqueos de tokens pendientes — antes de meterle dinero a algo nuevo.","keywords":["analizador de token","token scanner","seguridad de contrato"]}]},{"id":"manual-depredador","icon":"📖","titulo":"Manual del Depredador","intro":"Las otras dos herramientas de esta misma categoría, además de este manual.","items":[{"pregunta":"¿Qué es el Glosario Cripto?","respuesta":"Más de 100 términos cripto explicados sin tecnicismos, con buscador, categorías y ejemplos — para entender la jerga sin tener que salir a buscarla en otro lado.","keywords":["glosario","terminos cripto","jerga"]},{"pregunta":"¿Qué es la Biblioteca de Errores Comunes?","respuesta":"Casos reales de cómo la gente ha perdido dinero en cripto, organizados por categoría (Spot, Futuros, Wallets, Exchanges y Estafas), cada uno con la lección concreta que te saca de ese mismo error.","keywords":["errores comunes","biblioteca de errores","estafas"]}]},{"id":"telegram","icon":"📲","titulo":"Notificaciones por Telegram","intro":"Vincula tu cuenta para recibir avisos al instante, sin depender de tener el sitio abierto.","items":[{"pregunta":"¿Cómo vinculo Telegram?","respuesta":"<ol><li>Entra a <b>Mi perfil → Telegram y notificaciones</b> (o a la pestaña Telegram desde cualquier otro lado del sitio).</li><li>Dale clic al botón de conectar — te manda directo a abrir el bot <b>@SkillCashAltasBajasBot</b> en Telegram con un comando ya preparado.</li><li>Dale enviar (Start) dentro de Telegram.</li></ol>Si el botón no te abre la app, el mismo modal te da el comando exacto para copiar y pegar a mano.","keywords":["vincular telegram","conectar telegram","bot telegram","skillcashaltasbajasbot"]},{"pregunta":"¿Qué avisos me llegan por Telegram?","respuesta":"Los avisos de \"Mi Lista\" (cuando una moneda que sigues aparece en el Radar de Deslistados o de Nuevos Listados) y los posteos diarios automáticos del canal (Dominancia BTC y el Índice de Miedo y Codicia). Todo esto además de la campanita 🔔 del propio sitio.","keywords":["avisos telegram","notificaciones telegram","que me llega"]},{"pregunta":"¿Cómo me desconecto de Telegram?","respuesta":"En el mismo modal de Telegram (o desde Mi perfil), con la cuenta ya conectada, aparece el botón \"Desconectar Telegram\".","keywords":["desconectar telegram","quitar telegram"]},{"pregunta":"¿Dónde está el grupo de comunidad de Telegram?","respuesta":"Es un destino distinto a la conexión personal: el botón \"UNIRME\" que ves arriba del todo en el modal de Telegram te lleva al grupo público (t.me/juanskll), con análisis, trading, noticias y la comunidad — no hace falta vincular tu cuenta para entrar ahí.","keywords":["grupo de telegram","comunidad telegram","canal publico"]}]},{"id":"sharkoins","icon":"🦈","titulo":"Sharkoins","intro":"Una moneda de coleccionable/engagement, totalmente separada del trading real — se gana por usar la plataforma, nunca por volumen operado.","items":[{"pregunta":"¿Qué son los Sharkoins?","respuesta":"Son una moneda de coleccionable dentro del sitio, sin ningún valor monetario real — se ganan por usar la plataforma (entrar a herramientas, conectar Telegram o Bitunix, completar tu perfil, jugar), nunca por cuánto operas. A propósito no están atados al volumen de trading, para no empujarte a sobreoperar solo por ganar puntos.","keywords":["sharkoins","que son los sharkoins","colmillos"]},{"pregunta":"¿Cómo gano Sharkoins?","respuesta":"Entrando a distintas categorías de herramientas del sitio cada día, completando hitos como conectar tu Telegram o tu Bitunix, y jugando el minijuego. Tu saldo total es la suma de todo lo que has ganado — lo ves en el botón de tu saldo, arriba del sitio.","keywords":["ganar sharkoins","como ganar","saldo sharkoins"]},{"pregunta":"¿Qué puedo comprar con Sharkoins?","respuesta":"Hay una tienda dentro de Sharkoins con ítems coleccionables (incluido un boleto de sorteo mensual con premio real) — entra a la sección Sharkoins y revisa la pestaña de tienda para ver qué hay disponible y a qué precio.","keywords":["tienda sharkoins","comprar con sharkoins","sorteo"]},{"pregunta":"¿Qué es el sistema de rareza y evolución?","respuesta":"Los ítems que compras en la tienda tienen una rareza (de más común a más rara) y se pueden evolucionar pagando más Sharkoins para subirlos de tier — mientras más alta la rareza, más vistoso el ítem. Hay una pestaña \"Ayuda\" dentro de Sharkoins con la explicación completa de cómo funciona.","keywords":["rareza","evolucion","tiers","mitico"]},{"pregunta":"¿Qué es el minijuego \"Salto del Tiburón\"?","respuesta":"Un minijuego corto dentro de la sección Sharkoins donde controlas a tu tiburón saltando obstáculos — cada partida te da un puntaje que entra automáticamente al ranking.","keywords":["salto del tiburon","minijuego","shark runner","juego"]},{"pregunta":"¿Cómo funciona el ranking del minijuego?","respuesta":"Hay un top 10 semanal y uno mensual con los mejores puntajes de \"Salto del Tiburón\", que se reinician cada semana/mes — los primeros lugares de cada periodo reciben un premio en Sharkoins automáticamente.","keywords":["ranking","leaderboard","top 10","premio semanal"]},{"pregunta":"¿Qué es la Ficha del Personaje?","respuesta":"Tu tiburón tiene una ficha con 6 \"poderes\" distintos que van mejorando según los ítems de rareza que tengas equipados — es la parte más coleccionable de Sharkoins, puramente cosmética.","keywords":["ficha del personaje","poderes","equipo","personaje"]},{"pregunta":"¿Dónde encuentro más ayuda sobre Sharkoins?","respuesta":"Dentro de la propia sección Sharkoins hay una pestaña \"Ayuda\" con sub-pestañas: General, Sharkoins, Recompensas, Rareza y Evolución, Poderes del Personaje y Fondos — ahí está todo explicado con detalle e ilustraciones.","keywords":["ayuda sharkoins","mas informacion sharkoins"]}]},{"id":"aliados-manada","icon":"🤝","titulo":"Aliados de Manada","intro":"Los exchanges y plataformas con los que Juan tiene alianza real, con beneficios concretos y sin letra pequeña.","items":[{"pregunta":"¿Qué beneficios tengo con Bitunix?","respuesta":"Registrándote con el link de afiliado de Juan (o usando el código <b>SKLL20</b> si ya te registras por tu cuenta) activas 20% de cashback en comisiones, soporte en español de verdad (no un bot), spot y futuros, y buena liquidez.","keywords":["bitunix","codigo skll20","cashback","aliado bitunix"]},{"pregunta":"¿Hay más alianzas aparte de Bitunix?","respuesta":"Por ahora Bitunix es la alianza principal activa; esta sección va a ir sumando más exchanges y plataformas con beneficios reales a medida que se negocien — revisa \"Aliados de Manada\" de vez en cuando para ver qué se agrega.","keywords":["mas alianzas","partners","proximas alianzas"]}]}];
+const MANUAL_DATA = [{"id":"empezar","icon":"🚀","titulo":"Empezar","intro":"Lo básico antes de tocar cualquier herramienta: crear tu cuenta y conocer tu perfil.","items":[{"pregunta":"¿Cómo me registro?","respuesta":"<ol><li>Dale clic al botón 👤 arriba a la derecha.</li><li>Elige <b>Iniciar sesión</b>.</li><li>Regístrate con tu correo y una contraseña, o con un clic usando tu cuenta de Google.</li></ol>No hace falta tarjeta ni nada de pago — toda la plataforma es gratis.","keywords":["registro","crear cuenta","login","iniciar sesion","google"]},{"pregunta":"¿Qué es \"Mi perfil\"?","respuesta":"Es tu panel personal: ahí cambias tu nombre de usuario, tu foto, tu contraseña, ves el correo con el que te registraste, conectas Telegram y, si algún día quieres, borras tu cuenta. Se abre desde el botón 👤 → <b>Mi perfil</b>.","keywords":["mi perfil","perfil","configuracion","cuenta"]},{"pregunta":"¿Cómo cambio mi nombre de usuario o mi foto?","respuesta":"En <b>Mi perfil</b>, escribe el nombre que quieras en el campo \"Nombre de usuario\" y dale <b>Guardar cambios</b>. Para la foto, usa el botón \"🦈 Cambiar imagen\" justo arriba del campo de nombre.","keywords":["cambiar nombre","username","avatar","foto de perfil"]},{"pregunta":"¿Cómo cambio mi contraseña?","respuesta":"<ol><li>Entra a <b>Mi perfil</b>.</li><li>Dale clic a \"Cambiar mi contraseña\".</li><li>Revisa tu correo — te llega un enlace para definir una nueva.</li></ol>Si te registraste con Google, no tienes contraseña propia aquí: entras siempre con tu cuenta de Google.","keywords":["contraseña","password","recuperar clave","olvide contraseña"]},{"pregunta":"¿Puedo borrar mi cuenta?","respuesta":"Sí. <ol><li>Entra a <b>Mi perfil</b>.</li><li>Baja hasta la sección \"Zona de peligro\".</li><li>Dale clic a \"🗑️ Eliminar mi cuenta\" y confirma.</li></ol>Es permanente: borra también todos tus portafolios guardados y no se puede deshacer.","keywords":["borrar cuenta","eliminar cuenta","dar de baja"]},{"pregunta":"¿Cómo me muevo por el sitio?","respuesta":"Todo está organizado en categorías grandes que ves al entrar: <b>Sonar de Mercado</b> (indicadores), <b>Mi Arrecife</b> (portafolio), <b>Zona de Caza</b> (calculadoras de trading), <b>Blindaje</b> (seguridad), <b>Manual del Depredador</b> (guías) y <b>Aliados de Manada</b>. Haz clic en cualquiera para entrar, y usa \"← Volver a categorías\" o el logo para regresar. En el menú lateral (el ícono ☰ en celular) tienes acceso directo a cada herramienta sin pasar por la categoría.","keywords":["navegar","menu","categorias","sidebar","como funciona el sitio"]}]},{"id":"sonar-bitcoin","icon":"₿","titulo":"Sonar de Mercado — Bitcoin","intro":"Dentro de \"Sonar de Mercado\" (la categoría de indicadores), la pestaña <b>₿ BTC</b> trae 18 gráficos distintos sobre Bitcoin. Haz clic en cualquiera desde el menú lateral o desde la pestaña \"Guía\" de esa sección.","items":[{"pregunta":"¿Qué es el Whitepaper de Bitcoin?","respuesta":"El documento original de 2008 donde Satoshi Nakamoto describió Bitcoin por primera vez — aquí está traducido al español, con sus diagramas originales, para leerlo directo en la página sin buscar un PDF en inglés.","keywords":["whitepaper","satoshi","documento original","paper"]},{"pregunta":"¿Qué son los Ciclos de Halving?","respuesta":"Cuenta el tiempo desde el último halving: el evento que cada ~4 años le baja a la mitad la recompensa que reciben los mineros. Históricamente este evento marca el ritmo de los ciclos alcistas y bajistas de BTC, así que este gráfico te ubica en qué parte del ciclo estás.","keywords":["halving","ciclo","recompensa minero"]},{"pregunta":"¿Qué muestra BTC + Datos Macroeconómicos?","respuesta":"El precio de BTC con PMI, inflación, tasas de interés y/o el balance de la Fed superpuestos en el mismo gráfico. Activa los que quieras comparar y mira si la forma del precio se parece a la de esos datos económicos.","keywords":["btc macro","btc + macro","overlay macro"]},{"pregunta":"¿Qué es Pulso de Fondo?","respuesta":"Un modelo estadístico que mide qué tan cerca o lejos está el precio actual de las zonas donde BTC históricamente tocó fondo — útil para saber si estás en una zona de riesgo bajo o ya lejos de ahí.","keywords":["pulso de fondo","piso de mercado","fondo de mercado"]},{"pregunta":"¿Qué es el RSI Mensual?","respuesta":"La fuerza relativa del precio, pero calculada en velas mensuales (el timeframe más grande) — te dice si BTC está sobrecomprado o sobrevendido visto en el largo plazo, no en el ruido diario.","keywords":["rsi","rsi mensual","sobrecomprado","sobrevendido"]},{"pregunta":"¿Qué es Techo Anterior?","respuesta":"Compara el precio de hoy contra el máximo del ciclo alcista pasado. Ese techo viejo suele actuar después como soporte o resistencia — útil para saber qué nivel está vigilando el mercado.","keywords":["techo anterior","resistencia","soporte","maximo anterior"]},{"pregunta":"¿Qué es el Rainbow Chart?","respuesta":"Bandas de colores dibujadas sobre una regresión logarítmica del precio: van de azul (zona barata) a rojo (zona de burbuja). Es visual rápido para ubicar en qué franja de valoración está BTC hoy.","keywords":["rainbow","rainbow chart","arcoiris"]},{"pregunta":"¿Qué es el Techo Pi Cycle?","respuesta":"El cruce de dos medias móviles que, históricamente, ha coincidido con bastante precisión con los techos de ciclo de Bitcoin. Cuando esas dos líneas se acercan a cruzarse, vale la pena prestar atención.","keywords":["pi cycle","techo pi cycle","pi cycle top"]},{"pregunta":"¿Qué es la Media Móvil de 4 Años?","respuesta":"Una media móvil de ~1458 días (4 años) — la línea de tendencia de muy largo plazo de BTC, que filtra todo el ruido de corto y mediano plazo.","keywords":["media movil 4 años","ma4y","tendencia largo plazo"]},{"pregunta":"¿Qué son las Medias Móviles 200?","respuesta":"La media móvil de 200 (semanal o diaria, según elijas) que tradicionalmente separa la tendencia alcista de la bajista de largo plazo — cuando el precio está por encima, se lee como tendencia alcista; por debajo, bajista.","keywords":["media movil 200","ema200","mm200"]},{"pregunta":"¿Qué son los Balances Corporativos?","respuesta":"Cuánto BTC tienen acumulado empresas que cotizan en bolsa, como MicroStrategy — te muestra el apetito institucional en números reales, no en especulación.","keywords":["balances corporativos","microstrategy","empresas btc","treasuries"]},{"pregunta":"¿Qué son las Reservas Gubernamentales?","respuesta":"Cuánto BTC tienen acumulado distintos gobiernos del mundo, ya sea por confiscación, reserva estratégica o compra directa — desde EEUU hasta El Salvador.","keywords":["reservas gubernamentales","gobiernos btc","btc estados"]},{"pregunta":"¿Qué es BTC/XAU?","respuesta":"El precio de Bitcoin medido en onzas de oro en vez de en dólares — una forma de comparar los dos activos que la gente llama \"refugio de valor\" entre sí.","keywords":["btc xau","btc oro","bitcoin vs oro"]},{"pregunta":"¿Qué es BTC/AAPL?","respuesta":"El precio de Bitcoin medido en acciones de Apple en vez de en dólares — otra comparación relativa, esta vez contra una de las acciones más grandes del mundo.","keywords":["btc aapl","bitcoin vs apple"]},{"pregunta":"¿Qué son los Retornos de Bitcoin?","respuesta":"Cómo le ha ido a BTC año por año, trimestre, mes o semana, organizado en pestañas — te deja ver de un vistazo si hay estacionalidad (por ejemplo, si septiembre suele ser rojo).","keywords":["retornos","rendimientos btc","estacionalidad"]},{"pregunta":"¿Qué es STH-MVRV?","respuesta":"Compara el precio de BTC contra el costo base promedio de quienes compraron hace menos de 150 días. Por encima de 1, ese comprador reciente está en ganancia; por debajo, en pérdida — útil para detectar capitulaciones y momentos de euforia de corto plazo.","keywords":["sth mvrv","mvrv","costo base reciente"]},{"pregunta":"¿Qué es el Costo Base Institucional?","respuesta":"El precio promedio al que compraron BTC los grandes holders institucionales: empresas públicas (como MicroStrategy) y ETFs spot (como IBIT, FBTC), combinados y también cada uno por separado.","keywords":["costo base institucional","treascb","precio promedio institucional"]},{"pregunta":"¿Qué es % Supply en Pérdida por Época?","respuesta":"Qué porcentaje del BTC acuñado en cada época de halving sigue sin moverse de wallet y hoy vale menos de lo que costó cuando se minó. Las monedas más viejas casi siempre están en ganancia; la época más reciente es la que más fluctúa entre ganancia y pérdida.","keywords":["supply en perdida","epochpl","monedas en perdida"]}]},{"id":"sonar-ethereum","icon":"Ξ","titulo":"Sonar de Mercado — Ethereum","intro":"La pestaña <b>Ξ ETH</b> trae 4 gráficos enfocados solo en Ethereum.","items":[{"pregunta":"¿Qué son las Bandas Log de ETH?","respuesta":"El mismo concepto del Rainbow Chart de Bitcoin, pero aplicado a Ethereum: bandas de regresión logarítmica que van de zona barata a zona cara.","keywords":["bandas log eth","rainbow eth","eth log"]},{"pregunta":"¿Qué es el VWAP Anclado de ETH?","respuesta":"El precio promedio ponderado por volumen desde un punto de referencia que tú eliges (por ejemplo, un máximo o un mínimo importante) — una vara de medir para saber si el precio de hoy está caro o barato frente a ese punto.","keywords":["vwap","vwap anclado","eth vwap"]},{"pregunta":"¿Qué muestra Precio de ETH + PMI Manufacturero?","respuesta":"El precio de ETH superpuesto con el PMI Manufacturero de EEUU, para ver si las subidas y bajadas de ETH coinciden con la economía expandiéndose (PMI por encima de 50) o contrayéndose (por debajo de 50).","keywords":["eth pmi","eth macro"]},{"pregunta":"¿Qué son los Retornos de Ethereum?","respuesta":"Cómo le ha ido a ETH por año, trimestre, mes o semana, en pestañas — igual que los Retornos de Bitcoin pero para ETH.","keywords":["retornos eth","rendimientos ethereum"]}]},{"id":"sonar-derivados","icon":"💹","titulo":"Sonar de Mercado — Trading","intro":"La pestaña <b>💹 Trading</b> trae indicadores de mercado de derivados y dos radares de alertas en vivo.","items":[{"pregunta":"¿Qué es Coinbase Premium?","respuesta":"La diferencia de precio de BTC entre Coinbase (EEUU) y Binance. Positivo y alto suele significar que instituciones de EEUU están comprando fuerte; negativo, que están vendiendo o hay poca demanda institucional.","keywords":["coinbase premium","cb premium"]},{"pregunta":"¿Qué es el Ratio Largo/Corto?","respuesta":"Cuántos traders apuestan a que el precio sube (posiciones largas) contra cuántos apuestan a que baja (cortas), en futuros. Lecturas muy extremas hacia cualquier lado suelen avisar de un mercado sobre-apalancado, con riesgo de liquidaciones en cadena.","keywords":["largo corto","long short","ratio largo corto"]},{"pregunta":"¿Qué es el Interés Abierto en Opciones?","respuesta":"Cuánto capital hay posicionado ahora mismo en contratos de opciones abiertos — muestra en qué precios (\"strikes\") hay más dinero apostado, útil para ver dónde podría \"imantarse\" el mercado.","keywords":["interes abierto","opciones","open interest"]},{"pregunta":"¿Qué es el Radar de Deslistados?","respuesta":"Avisos reales de cuándo una moneda va a dejar de poderse comprar o vender en un exchange, juntando 8 exchanges distintos, con cuenta regresiva, historial completo y filtro por exchange y tipo de activo. Puedes marcar cualquier moneda con la estrella para seguirla de cerca — mira la sección <b>Mi Lista</b> de este manual para los detalles.","keywords":["radar deslistados","delisting","deslistado"]},{"pregunta":"¿Qué es el Radar de Nuevos Listados?","respuesta":"Avisos reales de cuándo una moneda (o incluso acciones, índices u oro, cuando el exchange los lista en futuros perpetuos) se lista por primera vez en un exchange, juntando 6 exchanges, con filtro por exchange y tipo de activo.","keywords":["radar nuevos listados","new listing","nuevo listado"]}]},{"id":"sonar-sentimiento","icon":"😐","titulo":"Sonar de Mercado — Sentimiento","intro":"La pestaña <b>Sentimiento</b> mide el ánimo general del mercado, no el precio en sí.","items":[{"pregunta":"¿Qué es el Índice de Miedo y Codicia?","respuesta":"Un medidor de 0 a 100 (como un velocímetro) que resume el ánimo del mercado cripto en un solo número: cerca de 0 es miedo extremo, cerca de 100 es codicia extrema. Se actualiza con la fuente de CoinMarketCap y también se postea automáticamente en el canal de Telegram de la comunidad cada mañana.","keywords":["miedo y codicia","fear and greed","fng","indice miedo"]},{"pregunta":"¿Qué es BTC + Google Trends?","respuesta":"El precio de BTC superpuesto con el interés de búsqueda en Google de la palabra \"Bitcoin\" (normalizado de 0 a 100 por el propio Google). Cuando el interés de búsqueda se dispara junto con el precio, suele ser señal de euforia minorista — el FOMO del público general entrando tarde.","keywords":["google trends","interes de busqueda","btc trends"]},{"pregunta":"¿Qué son las Burbujas Cripto?","respuesta":"Un mapa visual (burbujas de distinto tamaño) de todo el mercado cripto en vivo, donde el tamaño de cada burbuja representa su capitalización y el color su desempeño reciente — una forma rápida de ver de un vistazo qué está moviéndose.","keywords":["burbujas cripto","cryptobubbles","mapa de burbujas"]}]},{"id":"sonar-macro","icon":"🏛","titulo":"Sonar de Mercado — Macro","intro":"La pestaña <b>🏛 Macro</b> trae los datos de la economía de EEUU que más mueven a los mercados de riesgo, incluida la cripto. Cada tarjeta de la \"Guía\" de esta sección te muestra qué significa cuando el dato sube y cuando baja.","items":[{"pregunta":"¿Qué es el Índice del Dólar (DXY)?","respuesta":"Qué tan fuerte está el dólar frente a una canasta de otras monedas. Dólar fuerte suele presionar en contra de los activos de riesgo (incluida cripto); dólar débil suele favorecerlos.","keywords":["dxy","dolar","indice dolar"]},{"pregunta":"¿Qué es el PMI Manufacturero?","respuesta":"Una encuesta mensual a gerentes de compras en EEUU: por encima de 50 significa que la actividad industrial se está expandiendo (señal de crecimiento), por debajo de 50 que se está contrayendo (señal de posible recesión).","keywords":["pmi","pmi manufacturero"]},{"pregunta":"¿Qué es la Nómina No Agrícola?","respuesta":"Cuántos empleos nuevos creó EEUU el mes pasado, en miles — el dato de empleo más vigilado del mundo. Muchos empleos nuevos es señal de crecimiento y presiona a la Fed hacia tasas altas; pocos empleos es señal de posible recesión y presiona hacia tasas bajas.","keywords":["nomina no agricola","payrolls","empleo eeuu"]},{"pregunta":"¿Qué es la Tasa de Desempleo?","respuesta":"El porcentaje de la fuerza laboral de EEUU que está sin trabajo. Si sube, es señal de posible recesión; si baja, señal de crecimiento.","keywords":["tasa de desempleo","unrate","desempleo"]},{"pregunta":"¿Qué son las Solicitudes Semanales de Desempleo?","respuesta":"Lo mismo que la tasa de desempleo, pero medido cada semana en vez de cada mes — reacciona mucho más rápido a cambios reales en el mercado laboral.","keywords":["solicitudes de desempleo","icsa","desempleo semanal"]},{"pregunta":"¿Qué es la Inflación CPI?","respuesta":"Cuánto subieron los precios al consumidor, en general y también excluyendo alimentos y energía (el \"núcleo\", que es el que de verdad mira la Fed por ser menos volátil). Inflación alta presiona a la Fed hacia tasas altas; inflación baja, hacia tasas bajas.","keywords":["cpi","inflacion cpi","inflacion general"]},{"pregunta":"¿Qué es la Inflación Interanual (CPI YoY)?","respuesta":"El % de cambio del CPI comparado con el mismo mes del año anterior — es el número exacto que la gente dice cuando habla de \"la inflación está en X%\".","keywords":["cpi yoy","inflacion interanual"]},{"pregunta":"¿Qué es PCE?","respuesta":"Otra forma de medir la inflación, mucho más técnica, pero la favorita de la Reserva Federal para decidir sus tasas de interés.","keywords":["pce","inflacion pce"]},{"pregunta":"¿Qué es PPI?","respuesta":"Inflación mayorista: lo que pagan las empresas por sus insumos, antes de que ese costo le llegue al consumidor final. Suele anticipar hacia dónde va el CPI.","keywords":["ppi","inflacion mayorista"]},{"pregunta":"¿Qué es la Tasa de la Fed?","respuesta":"La tasa de interés que fija la Reserva Federal de EEUU — mueve prácticamente todos los mercados del mundo cuando cambia. Tasas altas suelen presionar en contra de los activos de riesgo; tasas bajas, a favor.","keywords":["tasa de la fed","fed funds rate","tasa de interes"]},{"pregunta":"¿Qué es M2?","respuesta":"Cuánto dinero hay circulando en la economía. Cuando M2 crece hay más liquidez disponible y suele favorecer a los activos de riesgo; cuando se contrae, pasa lo contrario.","keywords":["m2","oferta monetaria","m2 supply"]},{"pregunta":"¿Qué es el VIX?","respuesta":"El \"índice del miedo\" de Wall Street — mide cuánto movimiento espera el mercado de acciones en los próximos 30 días. Sube cuando el mercado se asusta (en contra del riesgo), baja en momentos de calma o complacencia.","keywords":["vix","indice del miedo wall street"]},{"pregunta":"¿Qué es la Liquidez Neta?","respuesta":"Se calcula como Balance de la Fed menos la Cuenta General del Tesoro menos el Reverse Repo — es el indicador de liquidez que más sigue la gente de cripto, como referencia de cuánto dinero hay realmente disponible para activos de riesgo.","keywords":["liquidez neta","net liquidity"]},{"pregunta":"¿Qué es el PIB (Crecimiento Real)?","respuesta":"Cuánto creció (o se contrajo) la economía de EEUU, en porcentaje trimestral anualizado — el tamaño total de la economía, sale cada trimestre.","keywords":["pib","gdp","crecimiento economico"]},{"pregunta":"¿Qué es el Balance de la Reserva Federal?","respuesta":"Sube cuando la Fed \"imprime\" dinero y compra activos (QE, a favor del riesgo), baja cuando los vende o deja vencer (QT, en contra del riesgo).","keywords":["balance de la fed","fed balance","qe","qt"]},{"pregunta":"¿Qué es el Calendario Económico?","respuesta":"Un calendario con las próximas publicaciones de todos estos datos macro, para que sepas qué días vienen sorpresas que pueden mover el mercado.","keywords":["calendario economico","proximos datos"]}]},{"id":"sonar-dominancia","icon":"🔄","titulo":"Sonar de Mercado — Dominancia","intro":"La pestaña <b>Dominancia</b> mide hacia dónde está rotando el capital dentro del propio mercado cripto (BTC vs ETH vs stablecoins vs altcoins).","items":[{"pregunta":"¿Qué es la Rotación ETH.D/BTC.D?","respuesta":"Compara la dominancia de ETH contra la de BTC. Si sube, el capital está rotando hacia ETH; si baja, está rotando de vuelta hacia BTC.","keywords":["eth.d","btc.d","rotacion eth btc","dominancia relativa"]},{"pregunta":"¿Qué es Descompresión Cripto?","respuesta":"La dominancia combinada de BTC+ETH+USDT+USDC sobre el total del mercado. Cuando está alta, el mercado está concentrado en esos cuatro (dominancia de BTC); cuando baja, se está \"descomprimiendo\" el dinero hacia las altcoins.","keywords":["descompresion cripto","domall"]},{"pregunta":"¿Qué es la Dominancia BTC?","respuesta":"Qué porcentaje de todo el mercado cripto es Bitcoin. Si sube, BTC domina; si baja, las altcoins están ganando terreno.","keywords":["dominancia btc","btc dominance","dombtc"]},{"pregunta":"¿Qué es la Dominancia USDT?","respuesta":"Qué porcentaje del mercado está parqueado en el stablecoin USDT. Si sube, la gente se está refugiando en stablecoins (cautela); si baja, está saliendo de ahí hacia activos con más riesgo.","keywords":["dominancia usdt","usdt dominance"]},{"pregunta":"¿Qué es ETH/BTC?","respuesta":"El precio de Ethereum medido en Bitcoin, en vez de en dólares — la forma más directa de ver si ETH le está ganando o perdiendo terreno a BTC.","keywords":["eth btc","ethbtc"]}]},{"id":"sonar-altcoins","icon":"🪙","titulo":"Sonar de Mercado — Altcoins","intro":"La pestaña <b>🪙 Altcoins</b> se enfoca en el resto del mercado, fuera de BTC y ETH.","items":[{"pregunta":"¿Qué es OTHERS/BTC?","respuesta":"El valor de las altcoins pequeñas (las que quedan fuera del top 10) medido en Bitcoin. Si sube, esas altcoins están caras en BTC (señal de temporada de altcoins); si baja, están baratas.","keywords":["others btc","othersbtc"]},{"pregunta":"¿Qué es la Euforia de Altcoins?","respuesta":"Qué tan caliente está la \"cola larga\" de altcoins frente a las grandes. Cuando la euforia está muy alta, históricamente ha coincidido con techos de ciclo — no es señal para ignorar.","keywords":["euforia de altcoins","altfever"]},{"pregunta":"¿Qué es la Valoración Relativa ETH vs Altcoins?","respuesta":"Compara el tamaño de Ethereum contra el resto de las altcoins. Si ETH se ve barato frente a ellas, suele ser momento de acumular ETH; si se ve caro, de rotar hacia altcoins.","keywords":["eth vs altcoins","ethvsalt"]},{"pregunta":"¿Qué es TOTAL2 EMA200?","respuesta":"La capitalización de todo el mercado cripto SIN Bitcoin, comparada contra su media móvil de 200 semanas. Por encima de la media es señal de temporada de altcoins; por debajo, de dominio de BTC.","keywords":["total2","total2 ema200"]},{"pregunta":"¿Qué es OTHERS EMA200?","respuesta":"Lo mismo que TOTAL2 pero solo para la cola larga (sin el top 10), contra su propia media de 200 semanas — la versión más \"pura\" de medir si las altcoins chiquitas están calientes o frías.","keywords":["others ema200","others"]}]},{"id":"radar-seguimiento","icon":"⭐","titulo":"Seguir una moneda (Mi Lista)","intro":"Tanto el Radar de Deslistados como el de Nuevos Listados dejan marcar monedas específicas para que te avisen justo a ti cuando pase algo con ellas.","items":[{"pregunta":"¿Qué es \"Mi Lista\"?","respuesta":"Es tu lista personal de monedas que decides seguir de cerca, dentro del Radar de Deslistados y del Radar de Nuevos Listados. Cuando una moneda de tu lista aparece en un aviso real, te llega una notificación.","keywords":["mi lista","seguimiento","watchlist"]},{"pregunta":"¿Cómo sigo una moneda?","respuesta":"<ol><li>Entra al Radar de Deslistados o al Radar de Nuevos Listados.</li><li>Busca la moneda que te interesa.</li><li>Dale clic a la estrella ⭐ (\"Agregar a Mi Lista\").</li></ol>Necesitas tener sesión iniciada para que se guarde.","keywords":["seguir moneda","agregar a mi lista","estrella"]},{"pregunta":"¿Dónde me llegan los avisos de Mi Lista?","respuesta":"Por dos lados a la vez: la campanita 🔔 de notificaciones dentro del sitio, y por Telegram si tienes tu cuenta vinculada (ver la sección Telegram de este manual) — así te enteras aunque no tengas la página abierta en ese momento.","keywords":["avisos","notificaciones mi lista","campana"]}]},{"id":"mi-arrecife","icon":"🐠","titulo":"Mi Arrecife","intro":"La categoría de portafolio: 5 herramientas para planear o registrar tus inversiones, todas con precios actualizados en vivo.","items":[{"pregunta":"¿Qué es Mi Arrecife?","respuesta":"Es tu rincón de portafolio: desde ahí puedes diseñar cómo repartirías tu dinero, o registrar lo que ya compraste de verdad, con el valor actualizado en vivo y tu ganancia o pérdida real calculada sola.","keywords":["mi arrecife","portafolio","portfolio"]},{"pregunta":"¿Qué es el Perfil de Riesgo?","respuesta":"Respondes 6 preguntas cortas y te dice si eres un inversor conservador, moderado o agresivo — útil como punto de partida antes de armar tu portafolio.","keywords":["perfil de riesgo","quiz de riesgo","test de riesgo"]},{"pregunta":"¿Cómo uso el Simulador de Portafolio?","respuesta":"Arma un plan de cómo repartirías tu dinero entre distintos activos (modo simulación), o registra tus holdings reales tal como los compraste (modo real) — en los dos casos ves el valor actualizado en vivo y tu ganancia o pérdida.","keywords":["simulador de portafolio","registrar inversiones","mis holdings"]},{"pregunta":"¿Qué es el Monitor de Correlación?","respuesta":"Compara hasta 5 monedas a la vez y te muestra qué tan parecido se mueven entre sí — útil para descubrir si de verdad estás diversificado o si, sin darte cuenta, todas tus monedas suben y bajan juntas.","keywords":["monitor de correlacion","correlacion","diversificacion"]},{"pregunta":"¿Qué es el Comparador de Market Cap?","respuesta":"Simula qué pasaría si tu moneda tuviera la capitalización de mercado de otra moneda más grande: a qué precio estaría, y cuánto valdrían tus monedas en ese escenario.","keywords":["comparador de market cap","market cap","capitalizacion"]},{"pregunta":"¿Qué es Tiempo hasta la Libertad Financiera?","respuesta":"Con tu aporte mensual y un rendimiento esperado conservador, calcula cuánto tiempo tardarías en llegar a la meta de dinero que te propongas.","keywords":["libertad financiera","fi freedom","meta financiera"]}]},{"id":"zona-caza","icon":"🦈","titulo":"Zona de Caza","intro":"La categoría de calculadoras de trading e inversión: 8 herramientas para resolver cuentas rápido mientras operas.","items":[{"pregunta":"¿Qué es Zona de Caza?","respuesta":"Es la caja de herramientas de cálculo para trading: desde liquidación y break-even hasta conversiones rápidas de unidades — todo en un solo lugar, sin tener que buscarlas sueltas por internet.","keywords":["zona de caza","calculadoras de trading"]},{"pregunta":"¿Qué hace la Calculadora de Futuros?","respuesta":"Calcula tu precio de liquidación, stop loss, take profit, relación riesgo/beneficio y el tamaño de posición que deberías usar en futuros, según tu capital y apalancamiento — con un botón para cambiar entre USDT-M (margen en dólares) y Coin-M (margen en la propia moneda, donde además suma o resta lo que gana o pierde tu margen por la revalorización de la moneda).","keywords":["calculadora de futuros","calculadora de trading","liquidacion","stop loss","take profit","tamaño de posicion","coin-m","futuros coin margined"]},{"pregunta":"¿Qué hace la Calculadora de Break-even?","respuesta":"Te dice cuánto tiene que moverse el precio solo para cubrir las comisiones de tu operación — y cuánto baja ese número si usas el cashback de Bitunix.","keywords":["break even","punto de equilibrio"]},{"pregunta":"¿Qué hace la Calculadora de Comisiones?","respuesta":"Calcula cuánto te está cobrando el exchange en comisiones maker/taker según tu volumen mensual de trading, y cuánto recuperas si tienes cashback activo.","keywords":["comisiones","fees","maker taker"]},{"pregunta":"¿Qué hace la Calculadora de Rentabilidad?","respuesta":"Simula cuánto ganarías comprando y vendiendo un activo en dos momentos distintos, usando precios de cripto en vivo.","keywords":["rentabilidad","ganancia simulada"]},{"pregunta":"¿Qué hace el Simulador de DCA?","respuesta":"Simula cuánto acumularías si compraras un monto fijo de forma periódica (semanal, mensual, etc.), en vez de intentar adivinar el mejor momento para entrar todo de una vez — o, en el modo Venta, cómo te iría retirando tus ganancias poco a poco, por partes, en vez de vender todo de una sola vez. Un botón cambia entre Compra y Venta.","keywords":["dca","dollar cost average","compra periodica","dca de venta","venta periodica"]},{"pregunta":"¿Qué hace el Conversor de Unidades?","respuesta":"Convierte entre las unidades que se buscan todo el tiempo en Google: satoshis↔BTC, gwei↔ETH, wei↔ETH, todo en un solo lugar.","keywords":["conversor de unidades","satoshis","gwei","wei"]},{"pregunta":"¿Qué hace la Calculadora de Porcentajes?","respuesta":"Resuelve rápido: qué porcentaje es un número de otro, cuánto es el X% de algo, o cuál sería el precio nuevo después de subir o bajar un porcentaje.","keywords":["calculadora de porcentajes","porcentajes"]},{"pregunta":"¿Qué hace el Reloj de Zona Horaria?","respuesta":"Compara la hora de dos países que elijas — útil para coordinar un live o una llamada con gente de tu comunidad en otro huso horario.","keywords":["reloj","zona horaria","huso horario"]}]},{"id":"blindaje","icon":"🛡️","titulo":"Blindaje","intro":"La categoría de seguridad: 5 herramientas para proteger tus fondos, tu wallet y lo que le dejarías a tu familia.","items":[{"pregunta":"¿Qué es Blindaje?","respuesta":"Es la zona de seguridad del sitio: revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos ahora mismo, y deja todo listo para que tu familia pueda heredar sin problemas si algo te pasa.","keywords":["blindaje","seguridad","proteccion"]},{"pregunta":"¿Qué hace el Checklist de Seguridad?","respuesta":"Te guía paso a paso para verificar que tu wallet y tus cuentas de exchange estén correctamente protegidas — 2FA, frase semilla, dispositivos, todo lo básico que mucha gente se salta.","keywords":["checklist de seguridad","2fa","frase semilla"]},{"pregunta":"¿Qué hace el Comparador de Wallets?","respuesta":"Compara wallet caliente (hot, conectada a internet) contra wallet fría (cold, offline) y te ayuda a decidir cuál te conviene más según cuánto tienes guardado y qué tan seguido operas.","keywords":["comparador de wallets","hot wallet","cold wallet"]},{"pregunta":"¿Qué hace Verificar Aprobaciones?","respuesta":"Una guía paso a paso para revisar qué permisos (aprobaciones) le has dado a contratos inteligentes en tu wallet, y cómo revocar los peligrosos — muchos robos pasan por aprobaciones viejas que la gente olvidó quitar.","keywords":["verificar aprobaciones","revocar permisos","approvals"]},{"pregunta":"¿Qué hace Herencia Digital?","respuesta":"Te ayuda a pensar qué le dejarías a tu familia si te pasa algo, y cómo darles acceso a tus fondos sin comprometer tu seguridad mientras tanto.","keywords":["herencia digital","heredar cripto","plan de herencia"]},{"pregunta":"¿Qué hace el Analizador de Token?","respuesta":"Buscas cualquier token y revisa la seguridad de su contrato, la liquidez disponible, los impuestos de compra/venta y si hay desbloqueos de tokens pendientes — antes de meterle dinero a algo nuevo.","keywords":["analizador de token","token scanner","seguridad de contrato"]}]},{"id":"manual-depredador","icon":"📖","titulo":"Manual del Depredador","intro":"Las otras dos herramientas de esta misma categoría, además de este manual.","items":[{"pregunta":"¿Qué es el Glosario Cripto?","respuesta":"Más de 100 términos cripto explicados sin tecnicismos, con buscador, categorías y ejemplos — para entender la jerga sin tener que salir a buscarla en otro lado.","keywords":["glosario","terminos cripto","jerga"]},{"pregunta":"¿Qué es la Biblioteca de Errores Comunes?","respuesta":"Casos reales de cómo la gente ha perdido dinero en cripto, organizados por categoría (Spot, Futuros, Wallets, Exchanges y Estafas), cada uno con la lección concreta que te saca de ese mismo error.","keywords":["errores comunes","biblioteca de errores","estafas"]}]},{"id":"telegram","icon":"📲","titulo":"Notificaciones por Telegram","intro":"Vincula tu cuenta para recibir avisos al instante, sin depender de tener el sitio abierto.","items":[{"pregunta":"¿Cómo vinculo Telegram?","respuesta":"<ol><li>Entra a <b>Mi perfil → Telegram y notificaciones</b> (o a la pestaña Telegram desde cualquier otro lado del sitio).</li><li>Dale clic al botón de conectar — te manda directo a abrir el bot <b>@SkillCashAltasBajasBot</b> en Telegram con un comando ya preparado.</li><li>Dale enviar (Start) dentro de Telegram.</li></ol>Si el botón no te abre la app, el mismo modal te da el comando exacto para copiar y pegar a mano.","keywords":["vincular telegram","conectar telegram","bot telegram","skillcashaltasbajasbot"]},{"pregunta":"¿Qué avisos me llegan por Telegram?","respuesta":"Los avisos de \"Mi Lista\" (cuando una moneda que sigues aparece en el Radar de Deslistados o de Nuevos Listados) y los posteos diarios automáticos del canal (Dominancia BTC y el Índice de Miedo y Codicia). Todo esto además de la campanita 🔔 del propio sitio.","keywords":["avisos telegram","notificaciones telegram","que me llega"]},{"pregunta":"¿Cómo me desconecto de Telegram?","respuesta":"En el mismo modal de Telegram (o desde Mi perfil), con la cuenta ya conectada, aparece el botón \"Desconectar Telegram\".","keywords":["desconectar telegram","quitar telegram"]},{"pregunta":"¿Dónde está el grupo de comunidad de Telegram?","respuesta":"Es un destino distinto a la conexión personal: el botón \"UNIRME\" que ves arriba del todo en el modal de Telegram te lleva al grupo público (t.me/juanskll), con análisis, trading, noticias y la comunidad — no hace falta vincular tu cuenta para entrar ahí.","keywords":["grupo de telegram","comunidad telegram","canal publico"]}]},{"id":"sharkoins","icon":"🦈","titulo":"Sharkoins","intro":"Una moneda de coleccionable/engagement, totalmente separada del trading real — se gana por usar la plataforma, nunca por volumen operado.","items":[{"pregunta":"¿Qué son los Sharkoins?","respuesta":"Son una moneda de coleccionable dentro del sitio, sin ningún valor monetario real — se ganan por usar la plataforma (entrar a herramientas, conectar Telegram o Bitunix, completar tu perfil, jugar), nunca por cuánto operas. A propósito no están atados al volumen de trading, para no empujarte a sobreoperar solo por ganar puntos.","keywords":["sharkoins","que son los sharkoins","colmillos"]},{"pregunta":"¿Cómo gano Sharkoins?","respuesta":"Entrando a distintas categorías de herramientas del sitio cada día, completando hitos como conectar tu Telegram o tu Bitunix, y jugando el minijuego. Tu saldo total es la suma de todo lo que has ganado — lo ves en el botón de tu saldo, arriba del sitio.","keywords":["ganar sharkoins","como ganar","saldo sharkoins"]},{"pregunta":"¿Qué puedo comprar con Sharkoins?","respuesta":"Hay una tienda dentro de Sharkoins con ítems coleccionables (incluido un boleto de sorteo mensual con premio real) — entra a la sección Sharkoins y revisa la pestaña de tienda para ver qué hay disponible y a qué precio.","keywords":["tienda sharkoins","comprar con sharkoins","sorteo"]},{"pregunta":"¿Qué es el sistema de rareza y evolución?","respuesta":"Los ítems que compras en la tienda tienen una rareza (de más común a más rara) y se pueden evolucionar pagando más Sharkoins para subirlos de tier — mientras más alta la rareza, más vistoso el ítem. Hay una pestaña \"Ayuda\" dentro de Sharkoins con la explicación completa de cómo funciona.","keywords":["rareza","evolucion","tiers","mitico"]},{"pregunta":"¿Qué es el minijuego \"Salto del Tiburón\"?","respuesta":"Un minijuego corto dentro de la sección Sharkoins donde controlas a tu tiburón saltando obstáculos — cada partida te da un puntaje que entra automáticamente al ranking.","keywords":["salto del tiburon","minijuego","shark runner","juego"]},{"pregunta":"¿Cómo funciona el ranking del minijuego?","respuesta":"Hay un top 10 semanal y uno mensual con los mejores puntajes de \"Salto del Tiburón\", que se reinician cada semana/mes — los primeros lugares de cada periodo reciben un premio en Sharkoins automáticamente.","keywords":["ranking","leaderboard","top 10","premio semanal"]},{"pregunta":"¿Qué es la Ficha del Personaje?","respuesta":"Tu tiburón tiene una ficha con 6 \"poderes\" distintos que van mejorando según los ítems de rareza que tengas equipados — es la parte más coleccionable de Sharkoins, puramente cosmética.","keywords":["ficha del personaje","poderes","equipo","personaje"]},{"pregunta":"¿Dónde encuentro más ayuda sobre Sharkoins?","respuesta":"Dentro de la propia sección Sharkoins hay una pestaña \"Ayuda\" con sub-pestañas: General, Sharkoins, Recompensas, Rareza y Evolución, Poderes del Personaje y Fondos — ahí está todo explicado con detalle e ilustraciones.","keywords":["ayuda sharkoins","mas informacion sharkoins"]}]},{"id":"aliados-manada","icon":"🤝","titulo":"Aliados de Manada","intro":"Los exchanges y plataformas con los que Juan tiene alianza real, con beneficios concretos y sin letra pequeña.","items":[{"pregunta":"¿Qué beneficios tengo con Bitunix?","respuesta":"Registrándote con el link de afiliado de Juan (o usando el código <b>SKLL20</b> si ya te registras por tu cuenta) activas 20% de cashback en comisiones, soporte en español de verdad (no un bot), spot y futuros, y buena liquidez.","keywords":["bitunix","codigo skll20","cashback","aliado bitunix"]},{"pregunta":"¿Hay más alianzas aparte de Bitunix?","respuesta":"Por ahora Bitunix es la alianza principal activa; esta sección va a ir sumando más exchanges y plataformas con beneficios reales a medida que se negocien — revisa \"Aliados de Manada\" de vez en cuando para ver qué se agrega.","keywords":["mas alianzas","partners","proximas alianzas"]}]}];
 let manualActiveSection = 'all';
 function manualStripAccents(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 function renderManualFilterRow(){
@@ -20523,32 +20487,49 @@ function wireDualPanelHover(cfg){
 }
 /* ---- hover genérico para gráficos de barras (Coinbase Premium): a diferencia de
    wireChartHover no interpola entre puntos — resalta la barra más cercana al mouse ---- */
+// pointermove/pointerleave + teclado (flechas mueven la barra, Esc oculta) y tooltip armado con
+// createElement/textContent (nunca innerHTML) - usado solo por Coinbase Premium e Interés Abierto
+// en Opciones, los dos únicos que llaman esta función, así que se actualiza aquí directamente en
+// vez de duplicarla con un nombre dv- (ver .claude/skills/dataviz)
 function wireBarChartHover(cfg){
   const catcher = document.getElementById(cfg.catcherId);
   const hoverLine = document.getElementById(cfg.lineId);
   const tooltip = document.getElementById(cfg.tooltipId);
   if(!catcher) return;
-  function showAt(clientX){
+  let hoverIdx = cfg.n - 1;
+  function showAtIndex(idx){
+    hoverIdx = Math.max(0, Math.min(idx, cfg.n - 1));
+    const barCenterX = cfg.xFor(hoverIdx) + cfg.barW / 2;
     const rect = cfg.svg.getBoundingClientRect();
-    const scaleX = cfg.totalW / rect.width;
-    const svgX = (clientX - rect.left) * scaleX;
-    let idx = Math.floor((svgX - cfg.marginLeft) / (cfg.drawW / cfg.n));
-    idx = Math.max(0, Math.min(cfg.n - 1, idx));
-    const barCenterX = cfg.xFor(idx) + cfg.barW / 2;
     hoverLine.setAttribute('x1', barCenterX.toFixed(1));
     hoverLine.setAttribute('x2', barCenterX.toFixed(1));
     hoverLine.style.display = 'block';
-    tooltip.innerHTML = cfg.tooltipHtml(idx);
+    dvRenderTooltip(tooltip, cfg.buildContent(hoverIdx));
     tooltip.style.display = 'block';
     const px = (barCenterX / cfg.totalW) * rect.width;
     tooltip.style.left = Math.min(Math.max(px, 70), rect.width - 70) + 'px';
     tooltip.style.top = '4px';
   }
-  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
-  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
-  catcher.addEventListener('mouseleave', () => {
+  function showAt(clientX){
+    const rect = cfg.svg.getBoundingClientRect();
+    const scaleX = cfg.totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    let idx = Math.floor((svgX - cfg.marginLeft) / (cfg.drawW / cfg.n));
+    showAtIndex(idx);
+  }
+  function hideHover(){
     hoverLine.style.display = 'none';
     tooltip.style.display = 'none';
+  }
+  catcher.addEventListener('pointermove', (e) => showAt(e.clientX));
+  catcher.addEventListener('pointerleave', hideHover);
+  cfg.svg.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+      e.preventDefault();
+      showAtIndex(hoverIdx + (e.key === 'ArrowRight' ? 1 : -1));
+    } else if(e.key === 'Escape'){
+      hideHover();
+    }
   });
 }
 const RAINBOW_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
@@ -20894,7 +20875,8 @@ function renderEthLogRegChart(){
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
   const yFontSize = isMobileChart ? 9 : 11;
   const xFontSize = isMobileChart ? 11 : 12;
-  const marginLeft = isMobileChart ? 46 : 58;
+  // más ancho que el resto de los gráficos (46/58): en "Todo el historial" la banda inferior de la regresión en los primeros días de ETH (2015) da valores muy chicos (ej. "$0.000200"), encontrado con Playwright/getBBox - un label así de largo no cabía con el margen normal
+  const marginLeft = isMobileChart ? 58 : 72;
   const marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
@@ -20921,8 +20903,8 @@ function renderEthLogRegChart(){
     if(label === lastTickLabel) return '';
     lastTickLabel = label;
     return `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}"/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${label}</text>
   `;
   }).join('');
 
@@ -20942,54 +20924,55 @@ function renderEthLogRegChart(){
   const lastPx = xFor(endMs), lastPy = yFor(lastPoint.c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
+  const ariaLabel = `Precio de Ethereum en escala logarítmica con bandas de regresión, precio actual ${fmtEthExactPrice(lastPoint.c)}`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="ethlogregChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg dv-chart-svg" id="ethlogregChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         <path d="${fillD.trim()}Z" fill="#2ecc71" opacity=".1"/>
         ${yGridHtml}
         <path d="${pathFor(upperAt)}" fill="none" stroke="#ff2f4f" stroke-width="1.6" stroke-linecap="round"/>
         <path d="${pathFor(mainAt)}" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round"/>
         <path d="${pathFor(lowerAt)}" fill="none" stroke="#2ecc71" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="ethlogregHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="ethlogregHoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="ethlogregHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="ethlogregHoverDot" r="5" fill="#fff" style="display:none"/>
         <rect id="ethlogregHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="ethlogregHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="ethlogregHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="ethlogregHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="ethlogregHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="ethlogregTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const elSvg = document.getElementById('ethlogregChartSvg');
-  wireChartHover({
+  dvWireHover({
     svg: elSvg, catcherId: 'ethlogregHoverCatcher', lineId: 'ethlogregHoverLine', dotId: 'ethlogregHoverDot',
     dateLabelId: 'ethlogregHoverDateLabel', dateBgId: 'ethlogregHoverDateBg', tooltipId: 'ethlogregTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
-    tooltipHtml: i => {
+    buildRows: i => {
       const t = points[i].t;
       const base = ethLogRegPrice(t);
       const upper = base * P.upperMult + P.offset;
       const main = base * P.mainMult + P.offset;
       const lower = base * P.lowerMult + P.offset;
-      return `<b>${fmtEthExactPrice(points[i].c)}</b><br>
-        <span style="color:#8890ac">ETH/USD</span><br>
-        <span style="color:#ff2f4f">Superior: ${fmtEthExactPrice(upper)}</span><br>
-        <span style="color:#60a5fa">Central: ${fmtEthExactPrice(main)}</span><br>
-        <span style="color:#2ecc71">Inferior: ${fmtEthExactPrice(lower)}</span>`;
+      return [
+        { color: '#ffffff', text: fmtEthExactPrice(points[i].c) + ' (ETH/USD)' },
+        { color: '#ff2f4f', text: 'Superior: ' + fmtEthExactPrice(upper) },
+        { color: '#60a5fa', text: 'Central: ' + fmtEthExactPrice(main) },
+        { color: '#2ecc71', text: 'Inferior: ' + fmtEthExactPrice(lower) },
+      ];
     },
   });
 
@@ -21194,13 +21177,15 @@ function renderEthVwapChart(){
     if(label === lastTickLabel) return '';
     lastTickLabel = label;
     return `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${label}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}"/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${label}</text>
   `;
   }).join('');
 
   let pathD = '';
   points.forEach((p, i) => { pathD += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `; });
+  // relleno de área bajo el precio al ~4% de opacidad, mismo recurso de los demás gráficos ya tratados
+  const priceAreaD = dvAreaPathD(pathD, xFor(startMs), xFor(endMs), marginTop + drawH);
 
   // cada línea de VWAP solo se dibuja desde su propio punto de anclaje en adelante (antes de esa
   // fecha no existe VWAP todavía, así que no se traza nada)
@@ -21224,46 +21209,48 @@ function renderEthVwapChart(){
   const lastPx = xFor(endMs), lastPy = yFor(lastPoint.c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.4)" stroke-width="1" stroke-dasharray="3,3"/>
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
+  const ariaLabel = `Precio de Ethereum con VWAP anclado, precio actual ${fmtEthExactPrice(lastPoint.c)}`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="ethvwapChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg dv-chart-svg" id="ethvwapChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
+        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
         ${vwapPathsHtml}
-        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="ethvwapHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="ethvwapHoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="ethvwapHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="ethvwapHoverDot" r="5" fill="#fff" style="display:none"/>
         <rect id="ethvwapHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="ethvwapHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="ethvwapHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="ethvwapHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="ethvwapHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="ethvwapTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const evSvg = document.getElementById('ethvwapChartSvg');
-  wireChartHover({
+  dvWireHover({
     svg: evSvg, catcherId: 'ethvwapHoverCatcher', lineId: 'ethvwapHoverLine', dotId: 'ethvwapHoverDot',
     dateLabelId: 'ethvwapHoverDateLabel', dateBgId: 'ethvwapHoverDateBg', tooltipId: 'ethvwapTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].c),
-    tooltipHtml: i => {
-      const vwapRows = vwapSeries.map((a, idx) => {
+    buildRows: i => {
+      const rows = [{ color: '#ffffff', text: fmtEthExactPrice(points[i].c) + ' (ETH/USDT · Binance)' }];
+      vwapSeries.forEach((a, idx) => {
         const v = a.series[i];
-        return v != null ? `<span style="color:${a.color}">VWAP Anclado ${idx + 1}: ${fmtEthExactPrice(v)}</span>` : '';
-      }).filter(Boolean).join('<br>');
-      return `<b>${fmtEthExactPrice(points[i].c)}</b><br><span style="color:#8890ac">ETH/USDT · Binance</span>${vwapRows ? '<br>' + vwapRows : ''}`;
+        if(v != null) rows.push({ color: a.color, text: 'VWAP Anclado ' + (idx + 1) + ': ' + fmtEthExactPrice(v) });
+      });
+      return rows;
     },
   });
 
@@ -24155,9 +24142,14 @@ async function fetchBtcMacroOverlaySeries(){
 // el label muestra el término TAL CUAL se busca en Google Trends (entre comillas, como quien dice
 // "esto es exactamente lo que se busca") en vez de una descripción en español - más claro sobre
 // qué es cada línea, ya que total es solo interés de búsqueda de esa frase exacta
+// color de "buy bitcoin" re-validado con la skill dataviz (node validate_palette.js): el verde
+// original (#22c55e) y el rojo de "bitcoin crash" fallaban separación CVD (deltaE 5.8 deutan, por
+// debajo del piso de 6 - un daltónico rojo-verde no podía distinguir esas dos líneas). Este aqua
+// sí pasa separación CVD y piso de visión normal contra el resto de la paleta (mismo criterio ya
+// aplicado en BTC + Datos Macroeconómicos)
 const BTC_TRENDS_OVERLAY_DEFS = {
   bitcoin: { term: 'bitcoin', label: '"bitcoin"', color: '#60a5fa' },
-  buybitcoin: { term: 'buy bitcoin', label: '"buy bitcoin"', color: '#22c55e' },
+  buybitcoin: { term: 'buy bitcoin', label: '"buy bitcoin"', color: '#199e70' },
   bitcoincrash: { term: 'bitcoin crash', label: '"bitcoin crash"', color: '#ff2f4f' },
   altcoinseason: { term: 'altcoin season', label: '"altcoin season"', color: '#f0b23d' },
 };
@@ -24719,8 +24711,8 @@ function renderDomChart(key){
   // def.fmtVal, cuando el def lo trae, sustituye el formato "%" por el que ese indicador necesite
   const fmtDomVal = def.fmtVal || (v => v.toFixed(niceStep < 1 ? 1 : 0) + '%');
   const yGridHtml = yTicks.map(v => `
-    <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtDomVal(v)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}"/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtDomVal(v)}</text>
   `).join('');
 
   // eje secundario (derecho) para una serie en una escala totalmente distinta (ej. el balance
@@ -24813,13 +24805,14 @@ function renderDomChart(key){
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
+  const ariaLabel = `${def.series.map(s => s.label).join(' y ')}, valor actual ${fmtDomVal(lastP[def.series[0].key])}`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg dv-chart-svg" id="${key}ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${zonesHtml}
         ${yGridHtml}
@@ -24827,25 +24820,24 @@ function renderDomChart(key){
         ${refLineHtml}
         ${linesHtml}
         ${xLabelsHtml}
-        <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="${key}HoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="${key}HoverDot" r="5" fill="#fff" style="display:none"/>
         <rect id="${key}HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="${key}HoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="${key}HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="${key}HoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="${key}HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="${key}Tooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const domSvg = document.getElementById(key + 'ChartSvg');
-  wireChartHover({
+  dvWireHover({
     svg: domSvg, catcherId: key + 'HoverCatcher', lineId: key + 'HoverLine', dotId: key + 'HoverDot',
     dateLabelId: key + 'HoverDateLabel', dateBgId: key + 'HoverDateBg', tooltipId: key + 'Tooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i][def.series[0].key]),
-    tooltipHtml: i => def.series.map(s => `<b>${s.label}: ${fmtDomVal(points[i][s.key])}</b>`)
-      .concat((def.series2 || []).map(s => points[i][s.key] != null ? `<b>${s.label}: ${(fmtDomVal2 || fmtDomVal)(points[i][s.key])}</b>` : null).filter(Boolean))
-      .join('<br>'),
+    buildRows: i => def.series.map(s => ({ color: s.color, text: s.label + ': ' + fmtDomVal(points[i][s.key]) }))
+      .concat((def.series2 || []).map(s => points[i][s.key] != null ? { color: s.color, text: s.label + ': ' + (fmtDomVal2 || fmtDomVal)(points[i][s.key]) } : null).filter(Boolean)),
   });
 
   const legendSeries = def.series.concat(def.series2 || []);
@@ -25153,7 +25145,6 @@ const TRADING_GUIA_INDICATORS = [
   { id: 'optionsoi', icon: '📈', label: 'Interés Abierto en Opciones', def: 'Cuánto capital hay posicionado en contratos de opciones abiertos — muestra en qué precios ("strikes") hay más dinero apostado, útil para ver dónde podría "imantarse" el mercado.' },
   { id: 'delistradar', icon: '🚨', label: 'Radar de Deslistados', def: 'Avisos reales de deslistado (cuándo una moneda deja de poderse comprar/vender) de 8 exchanges, con cuenta regresiva, historial y filtro por exchange y tipo de activo — para enterarte antes de que te agarre con la guardia baja.' },
   { id: 'newlistradar', icon: '🆕', label: 'Radar de Nuevos Listados', def: 'Avisos reales de nuevo listado (cripto, y también acciones/índices/oro cuando el exchange los lista en futuros perpetuos) de 6 exchanges, con filtro por exchange y tipo de activo.' },
-  { id: 'tvchart', icon: '🕯️', label: 'Gráfico Avanzado', def: 'Gráfico de velas en vivo con indicadores técnicos reales, cambio de símbolo libre y herramientas de dibujo — un gráfico de trading de verdad, no un modelo propio.' },
 ];
 // las claves son el id REAL del panel (ej. 'bitcoinguia', no 'bitcoin') - tiene que coincidir con
 // el id del contenedor que genera buildGuiaPanelHtml (id + 'Grid'), si no, el grid queda vacío
@@ -25796,11 +25787,11 @@ function renderBtcTrendsChart(){
     return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}"/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
   `).join('');
   const pct2TicksHtml = [0, 25, 50, 75, 100].map(pct => `
-    <text x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(pct) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}" font-weight="700" fill="rgba(255,255,255,.4)" font-family="'Space Mono',monospace">${pct}</text>
+    <text class="dv-axis-text" x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(pct) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}">${pct}</text>
   `).join('');
 
   function pathFor(getV, yForFn){
@@ -25814,6 +25805,8 @@ function renderBtcTrendsChart(){
     return d.trim();
   }
   const btcPathD = pathFor(p => p.btc, yFor);
+  // relleno de área bajo el precio de BTC al ~6% de opacidad, mismo recurso de BTC + Datos Macroeconómicos
+  const btcAreaD = dvAreaPathD(btcPathD, xFor(startMs), xFor(endMs), marginTop + drawH);
 
   let overlayPathsHtml = '';
   const overlayLastVals = {};
@@ -25830,44 +25823,46 @@ function renderBtcTrendsChart(){
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
+  const ariaLabel = `Precio de Bitcoin con interés de búsqueda de Google Trends superpuesto, precio actual ${fmtHalvingPrice(points[points.length - 1].btc)}`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="btctrendsChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg dv-chart-svg" id="btctrendsChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${pct2TicksHtml}
-        <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcAreaD}" fill="#f7931a" fill-opacity=".06" stroke="none"/>
+        <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         ${overlayPathsHtml}
         ${xLabelsHtml}
-        <line id="btctrendsHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="btctrendsHoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="btctrendsHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="btctrendsHoverDot" r="5" fill="#fff" style="display:none"/>
         <rect id="btctrendsHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="btctrendsHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="btctrendsHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="btctrendsHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="btctrendsHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="btctrendsTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const svg = document.getElementById('btctrendsChartSvg');
-  wireChartHover({
+  dvWireHover({
     svg, catcherId: 'btctrendsHoverCatcher', lineId: 'btctrendsHoverLine', dotId: 'btctrendsHoverDot',
     dateLabelId: 'btctrendsHoverDateLabel', dateBgId: 'btctrendsHoverDateBg', tooltipId: 'btctrendsTooltip',
     points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
     yForIdx: i => yFor(points[i].btc),
-    tooltipHtml: i => {
+    buildRows: i => {
       const p = points[i];
-      let html = `<b>₿ ${fmtHalvingPrice(p.btc)}</b>`;
+      const rows = [{ color: '#f7931a', text: '₿ ' + fmtHalvingPrice(p.btc) }];
       btcTrendsActiveOverlays.forEach(key => {
         if(p[key] == null || overlayLastVals[key] === undefined) return;
         const def = BTC_TRENDS_OVERLAY_DEFS[key];
-        html += `<br><span style="color:${def.color}">${def.label}: ${Math.round(p[key])}/100</span>`;
+        rows.push({ color: def.color, text: def.label + ': ' + Math.round(p[key]) + '/100' });
       });
-      return html;
+      return rows;
     },
   });
 
@@ -26884,11 +26879,13 @@ function renderCbpChart(data){
     return '$' + v.toFixed(2);
   };
   const priceGridHtml = priceYTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtCbpPriceTick(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}"/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtCbpPriceTick(t)}</text>
   `).join('');
   let priceLine = '';
   data.forEach((d, i) => { priceLine += `${i === 0 ? 'M' : 'L'}${xForCenter(i).toFixed(1)},${yForPrice(d.bnClose).toFixed(1)} `; });
+  // relleno de área bajo el precio al ~4% de opacidad, mismo recurso de los demás gráficos ya tratados
+  const priceAreaD = dvAreaPathD(priceLine, xForCenter(0), xForCenter(n - 1), priceBottom);
 
   const maxAbs = Math.max(...data.map(d => Math.abs(d.premiumPct)), 0.02) * 1.2;
   const yFor = v => premiumTop + premiumH / 2 - (v / maxAbs) * (premiumH / 2);
@@ -26904,8 +26901,8 @@ function renderCbpChart(data){
 
   const yTickVals = [-maxAbs, -maxAbs / 2, 0, maxAbs / 2, maxAbs];
   const yGridHtml = yTickVals.map(v => `
-    <line x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" stroke="rgba(255,255,255,${v === 0 ? .18 : .08})" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${v.toFixed(2)}%</text>
+    <line ${v === 0 ? '' : 'class="dv-grid-line"'} x1="${marginLeft}" y1="${yFor(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(v).toFixed(1)}" ${v === 0 ? 'stroke="rgba(255,255,255,.18)" stroke-width="1"' : ''}/>
+    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yFor(v) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${v.toFixed(2)}%</text>
   `).join('');
 
   const dateFmt = ms => {
@@ -26913,20 +26910,22 @@ function renderCbpChart(data){
     if(cbpActiveTf === '1d') return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     return d.toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   };
+  const ariaLabel = `Precio de Bitcoin y Coinbase Premium, premium actual ${data[n - 1].premiumPct.toFixed(3)}%`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="dv-chart-svg" id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
-        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 0.9 : 1.2}" stroke-linecap="round" stroke-linejoin="round"/>
-        <line x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <line class="dv-grid-line" x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}"/>
         ${yGridHtml}
         ${barsHtml}
-        <text x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${dateFmt(data[0].t)}</text>
-        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
-        <rect id="cbpHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent"/>
-        <line id="cbpHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${premiumBottom}" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>
+        <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}">${dateFmt(data[0].t)}</text>
+        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
+        <rect id="cbpHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent" style="touch-action:none"/>
+        <line id="cbpHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${premiumBottom}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
       </svg>
       <div id="cbpTooltip" style="display:none;position:absolute;pointer-events:none;background:#0d0f1a;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)"></div>
     </div>
@@ -26936,10 +26935,17 @@ function renderCbpChart(data){
   wireBarChartHover({
     svg: document.getElementById('cbpChartSvg'), catcherId: 'cbpHoverCatcher', lineId: 'cbpHoverLine',
     tooltipId: 'cbpTooltip', marginLeft, drawW, totalW, n, xFor, barW,
-    tooltipHtml: i => {
+    buildContent: i => {
       const d = data[i];
       const sign = d.premiumPct >= 0 ? '+' : '';
-      return `₿ ${fmtUsd2(d.bnClose)}<br><b style="color:${d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f'}">${sign}${d.premiumPct.toFixed(3)}%</b> · ${fmtUsd2(d.cbClose)} vs ${fmtUsd2(d.bnClose)}<br><span style="color:#8890ac">${dateFmt(d.t)}</span>`;
+      const color = d.premiumPct >= 0 ? '#2ecc71' : '#ff2f4f';
+      return {
+        dateLabel: dateFmt(d.t),
+        rows: [
+          { color: '#ffffff', text: '₿ ' + fmtUsd2(d.bnClose) },
+          { color, text: sign + d.premiumPct.toFixed(3) + '% · ' + fmtUsd2(d.cbClose) + ' vs ' + fmtUsd2(d.bnClose) },
+        ],
+      };
     }
   });
 
@@ -27133,7 +27139,10 @@ function renderOptionsOiChart(){
   // el SVG escala siempre al ancho de la tarjeta (igual que el resto de los gráficos del sitio,
   // y que la propia app de Deribit en celular) - con muchos strikes las barras y el espaciado de
   // etiquetas simplemente se achican, en vez de forzar un scroll horizontal
-  const marginLeft = isMobileChart ? 40 : 58, marginRight = isMobileChart ? 36 : 58, marginTop = 26, marginBottom = isMobileChart ? 56 : 76;
+  // marginRight un poco más ancho que antes (36/58 → 48/66): con interés abierto notional grande
+  // (ej. "$120.00M") la etiqueta del eje de Máximo Dolor se salía por el borde derecho, encontrado
+  // con Playwright/getBBox
+  const marginLeft = isMobileChart ? 40 : 58, marginRight = isMobileChart ? 58 : 66, marginTop = 26, marginBottom = isMobileChart ? 56 : 76;
   const totalW = isMobileChart ? 420 : 1100;
   const drawW = totalW - marginLeft - marginRight;
   const barGroupW = drawW / n;
@@ -27162,8 +27171,8 @@ function renderOptionsOiChart(){
   const xForCenter = i => marginLeft + i * barGroupW + barGroupW / 2;
 
   const yGridHtml = yTicks.map(t => '' +
-    '<line x1="' + marginLeft + '" y1="' + yFor(t).toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + yFor(t).toFixed(1) + '" stroke="rgba(255,255,255,.08)" stroke-width="1"/>' +
-    '<text x="' + (marginLeft - 8) + '" y="' + (yFor(t) + 4).toFixed(1) + '" text-anchor="end" font-size="' + (isMobileChart ? 9 : 11) + '" font-weight="700" fill="#c8cde0" font-family="\'Space Mono\',monospace">' + optionsOiFmtNum(t) + '</text>'
+    '<line class="dv-grid-line" x1="' + marginLeft + '" y1="' + yFor(t).toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + yFor(t).toFixed(1) + '"/>' +
+    '<text class="dv-axis-text" x="' + (marginLeft - 8) + '" y="' + (yFor(t) + 4).toFixed(1) + '" text-anchor="end" font-size="' + (isMobileChart ? 9 : 11) + '">' + optionsOiFmtNum(t) + '</text>'
   ).join('');
   const yTicks2Html = yTicks2.map(t => '' +
     '<text x="' + (totalW - marginRight + 8) + '" y="' + (yFor2(t) + 4).toFixed(1) + '" text-anchor="start" font-size="' + (isMobileChart ? 9 : 11) + '" font-weight="700" fill="#ff8095" font-family="\'Space Mono\',monospace">' + optionsOiFmtUsd(t) + '</text>'
@@ -27202,16 +27211,18 @@ function renderOptionsOiChart(){
     '<line x1="' + maxPainX.toFixed(1) + '" y1="' + marginTop + '" x2="' + maxPainX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#ff2f4f" stroke-width="1.3" stroke-dasharray="4,3"/>' +
     '<text x="' + maxPainX.toFixed(1) + '" y="' + (marginTop - 10) + '" text-anchor="middle" font-size="' + (isMobileChart ? 9 : 10.5) + '" font-weight="700" fill="#ff2f4f" font-family="\'Space Grotesk\',sans-serif">Máximo Dolor: ' + optionsOiFmtPrice(maxPainStrike) + '</text>';
 
+  const ariaLabel = 'Interés abierto en opciones por precio de ejercicio, con la curva de Máximo Dolor, precio de máximo dolor ' + optionsOiFmtPrice(maxPainStrike);
+
   wrap.innerHTML = '<div style="position:relative">' +
-    '<svg id="optionsoiChartSvg" viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + totalW + '" height="' + totalH + '" style="width:100%;height:auto;display:block">' +
+    '<svg class="dv-chart-svg" id="optionsoiChartSvg" viewBox="0 0 ' + totalW + ' ' + totalH + '" width="' + totalW + '" height="' + totalH + '" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="' + ariaLabel + '">' +
     chartWatermarkHtml(totalW, totalH) +
     yGridHtml + yTicks2Html +
-    '<line x1="' + marginLeft + '" y1="' + baseY.toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.18)" stroke-width="1"/>' +
+    '<line class="dv-grid-line" x1="' + marginLeft + '" y1="' + baseY.toFixed(1) + '" x2="' + (totalW - marginRight) + '" y2="' + baseY.toFixed(1) + '"/>' +
     barsHtml + xLabelsHtml +
     '<path d="' + maxPainPath.trim() + '" fill="none" stroke="#ff2f4f" stroke-width="' + (isMobileChart ? 1.2 : 1.6) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
     maxPainDotsHtml + maxPainMarkerHtml +
-    '<line id="optionsoiHoverLine" x1="0" y1="' + marginTop + '" x2="0" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.4)" stroke-width="1" style="display:none"/>' +
-    '<rect id="optionsoiHoverCatcher" x="' + marginLeft + '" y="0" width="' + drawW + '" height="' + totalH + '" fill="transparent"/>' +
+    '<line id="optionsoiHoverLine" x1="0" y1="' + marginTop + '" x2="0" y2="' + baseY.toFixed(1) + '" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>' +
+    '<rect id="optionsoiHoverCatcher" x="' + marginLeft + '" y="0" width="' + drawW + '" height="' + totalH + '" fill="transparent" style="touch-action:none"/>' +
     '</svg>' +
     '<div id="optionsoiTooltip" style="display:none;position:absolute;pointer-events:none;background:#0d0f1a;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)"></div>' +
     '</div>';
@@ -27219,15 +27230,19 @@ function renderOptionsOiChart(){
   wireBarChartHover({
     svg: document.getElementById('optionsoiChartSvg'), catcherId: 'optionsoiHoverCatcher', lineId: 'optionsoiHoverLine',
     tooltipId: 'optionsoiTooltip', marginLeft, drawW, totalW, n, xFor: i => xForCenter(i), barW: 0,
-    tooltipHtml: i => {
+    buildContent: i => {
       const s = strikes[i];
       const d = byStrike.get(s);
       const notionalCalls = d.calls * (data.underlyingPrice || 0);
       const notionalPuts = d.puts * (data.underlyingPrice || 0);
-      return 'Precio de Ejercicio: <b>' + optionsOiFmtPrice(s) + '</b><br>' +
-        '<span style="color:#3b82f6">●</span> Compras: ' + optionsOiFmtNum(d.calls) + ' · ' + optionsOiFmtUsd(notionalCalls) + '<br>' +
-        '<span style="color:#f0b23d">●</span> Ventas: ' + optionsOiFmtNum(d.puts) + ' · ' + optionsOiFmtUsd(notionalPuts) + '<br>' +
-        '<span style="color:#ff2f4f">●</span> Valor Intrínseco: ' + optionsOiFmtUsd(maxPainCurve[i].value);
+      return {
+        dateLabel: 'Precio de Ejercicio: ' + optionsOiFmtPrice(s),
+        rows: [
+          { color: '#3b82f6', text: 'Compras: ' + optionsOiFmtNum(d.calls) + ' · ' + optionsOiFmtUsd(notionalCalls) },
+          { color: '#f0b23d', text: 'Ventas: ' + optionsOiFmtNum(d.puts) + ' · ' + optionsOiFmtUsd(notionalPuts) },
+          { color: '#ff2f4f', text: 'Valor Intrínseco: ' + optionsOiFmtUsd(maxPainCurve[i].value) },
+        ],
+      };
     }
   });
 
@@ -28170,39 +28185,6 @@ function renderGovTreasuries(){
 }
 let govTreasuriesLoadedOnce = false;
 function ensureGovTreasuriesLoaded(){ if(!govTreasuriesLoadedOnce){ govTreasuriesLoadedOnce = true; renderGovTreasuries(); } }
-
-/* ---- Grafico Avanzado: embed oficial de TradingView. El script que arma el widget SOLO se
-   ejecuta si queda "parseado" en el HTML o se inserta con createElement+appendChild - nunca
-   con innerHTML (asi lo exige TradingView en su propia documentacion). Por eso se crea el
-   <script> a mano aqui, en vez de construir el HTML como texto en otras partes del sitio. Se
-   carga una sola vez, la primera vez que el usuario abre esta herramienta (igual que el resto
-   de indicadores del sitio - nunca en cada carga de pagina, para no gastar recursos de
-   visitantes que ni siquiera la abren). ---- */
-let tvChartLoadedOnce = false;
-function ensureTvChartLoaded(){
-  if(tvChartLoadedOnce) return;
-  tvChartLoadedOnce = true;
-  const container = document.getElementById('tvChartContainer');
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-  script.async = true;
-  script.textContent = JSON.stringify({
-    autosize: true,
-    symbol: 'BINANCE:BTCUSDT',
-    interval: 'D',
-    timezone: 'exchange',
-    theme: 'dark',
-    backgroundColor: '#090b16',
-    gridColor: 'rgba(255,255,255,0.06)',
-    style: '1',
-    locale: 'es',
-    allow_symbol_change: true,
-    hide_side_toolbar: false,
-    studies: ['STD;RSI', 'STD;MACD'],
-  });
-  container.appendChild(script);
-}
 
 let tvCalendarLoadedOnce = false;
 function ensureTvCalendarLoaded(){
