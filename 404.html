@@ -151,10 +151,16 @@ button{font-family:inherit;color:inherit}
   width:var(--sidebar-w);flex-shrink:0;background:var(--bg);
   border-right:0;display:flex;flex-direction:column;
   position:sticky;top:0;height:100vh;transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
-  scrollbar-width:none;-ms-overflow-style:none;
+  /* antes el scroll quedaba completamente invisible (scrollbar-width:none + el webkit de abajo
+     en 0px) - sin ninguna pista de que había más opciones debajo, nadie bajaba a verlas. Ahora
+     se deja una barrita bien delgada y sutil (ver .sidebar::-webkit-scrollbar más abajo) */
+  scrollbar-width:thin;scrollbar-color:rgba(91,141,239,.35) transparent;
   box-shadow:none;
 }
-.sidebar::-webkit-scrollbar{width:0;height:0;display:none}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(91,141,239,.35);border-radius:4px}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(91,141,239,.55)}
 /* en escritorio "colapsado" significa oculto del todo (ancho 0), no la barrita angosta de solo
    iconos que habia antes. El sidebar de escritorio ahora viene SIN esta clase por defecto (el
    <aside id="sidebar"> no trae "collapsed" en el HTML) - se abre ya desplegado, y si el usuario
