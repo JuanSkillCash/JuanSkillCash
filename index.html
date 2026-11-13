@@ -1244,6 +1244,15 @@ button{font-family:inherit;color:inherit}
    del sitio, en vez del contorno azul por defecto del navegador que no sigue el radio --- */
 .halving-chart-svg{border-radius:12px}
 .halving-chart-svg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* --- BTC + Datos Macroeconómicos: mismo tratamiento de la skill dataviz que Ciclos de Halving
+   (rejilla/ejes recesivos, SVG enfocable), variantes locales con prefijo btcmacro-, sin tocar
+   wireChartHover/niceLogTicks/fmtHalvingPrice/chartWatermarkHtml ni la barrita de zoom
+   (createDateRangeSlider) que este gráfico sí conserva tal cual --- */
+#btcmacroChartWrap{border-radius:12px;background:rgba(255,255,255,.02)}
+.btcmacro-grid-line{stroke:rgba(255,255,255,.08);stroke-width:1}
+.btcmacro-axis-text{fill:#8a8fa3;font-weight:500;font-family:'Space Mono',monospace;font-variant-numeric:tabular-nums}
+.btcmacro-chart-svg{border-radius:12px}
+.btcmacro-chart-svg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* antes .indic-chart-body los centraba con flex; ahora se centran solos para que ese
    contenedor pueda quedar en flujo normal y el gráfico real (adentro) sí pueda "romper"
    el margen hacia los lados sin que el flex se lo impida */
@@ -23847,11 +23856,18 @@ const netLiquidityMacro = (() => {
 // unidad (PMI es un índice ~30-65, CPI ~100-300, la tasa de la Fed es %, el balance son billones
 // de USD), así que no caben juntas en un solo eje con su valor real - se normalizan a 0-100% (ver
 // renderBtcMacroChart) y el valor real de cada una queda disponible en la leyenda/tooltip
+// colores re-validados con la skill dataviz (node validate_palette.js): la paleta anterior
+// (azul/rojo/verde/violeta "de ojo") fallaba separación CVD entre fedfunds-verde y cpiyoy-rojo
+// (deltaE 5.8 deutan, por debajo del piso de 6 - un daltónico rojo-verde no podía distinguirlas).
+// Este set (naranja BTC fijo como marca + azul/aqua/rojo/violeta) pasa separación CVD y piso de
+// visión normal en pares adyacentes contra #f7931a (el naranja de BTC se deja igual a propósito,
+// es la identidad de marca de Bitcoin - solo falla el check de "banda de luminosidad", que no
+// aplica para preservar una marca ya establecida, igual que el dorado de Ciclos de Halving)
 const BTC_MACRO_OVERLAY_DEFS = {
-  pmi: { label: 'PMI Manufacturero', color: '#60a5fa', fmt: fmtPlainIndex },
-  cpiyoy: { label: 'Inflación Interanual (CPI YoY)', color: '#ff2f4f', fmt: v => v.toFixed(1) + '%' },
-  fedfunds: { label: 'Tasa de Interés de la Fed', color: '#22c55e', fmt: v => v.toFixed(2) + '%' },
-  fedbalance: { label: 'Balance de la Fed', color: '#c084fc', fmt: fmtUsdTrillions },
+  pmi: { label: 'PMI Manufacturero', color: '#3987e5', fmt: fmtPlainIndex },
+  cpiyoy: { label: 'Inflación Interanual (CPI YoY)', color: '#e66767', fmt: v => v.toFixed(1) + '%' },
+  fedfunds: { label: 'Tasa de Interés de la Fed', color: '#199e70', fmt: v => v.toFixed(2) + '%' },
+  fedbalance: { label: 'Balance de la Fed', color: '#9085e9', fmt: fmtUsdTrillions },
 };
 let btcMacroSeries = null, btcMacroPromise = null;
 async function fetchBtcMacroOverlaySeries(){
@@ -25137,6 +25153,39 @@ const BTC_MACRO_RANGE_YEARS = { todo: null, '10a': 10, '5a': 5, '2a': 2 };
 let btcMacroActiveRange = 'todo';
 let btcMacroCustomRange = null;
 let btcMacroSlider = null;
+
+// ---- helpers exclusivos de BTC + Datos Macroeconómicos (prefijo btcMacro-/btcmacro-, no tocar
+// los compartidos wireChartHover/niceLogTicks/fmtHalvingPrice/chartWatermarkHtml ni la barrita de
+// zoom createDateRangeSlider - mismo patrón que Ciclos de Halving, ver .claude/skills/dataviz) ----
+
+// área bajo la línea de precio de BTC: en escala log no puede cerrar a precio=0 (sería -infinito),
+// se cierra contra el fondo del área de dibujo en vez del eje real (igual que en Ciclos de Halving)
+function btcMacroAreaPathD(pathD, xFirst, xLast, bottomY){
+  return `${pathD.trim()} L${xLast.toFixed(1)},${bottomY.toFixed(1)} L${xFirst.toFixed(1)},${bottomY.toFixed(1)} Z`;
+}
+
+// tooltip armado con createElement/textContent (nunca innerHTML) - ver references/interaction.md
+// ("labels are untrusted data - use textContent"); rows[0] es siempre el precio de BTC, las demás
+// son los overlays macro activos en ese punto
+function btcMacroRenderTooltip(tooltip, { dateLabel, rows }){
+  tooltip.textContent = '';
+  const dateEl = document.createElement('div');
+  dateEl.style.cssText = 'font-weight:500;color:#e4e2de;margin-bottom:4px';
+  dateEl.textContent = dateLabel;
+  tooltip.appendChild(dateEl);
+  rows.forEach((row, i) => {
+    const rowEl = document.createElement('div');
+    rowEl.style.cssText = 'display:flex;align-items:center;gap:6px' + (i > 0 ? ';margin-top:3px' : '');
+    const key = document.createElement('span');
+    key.style.cssText = `display:inline-block;width:10px;height:2px;background:${row.color};flex-shrink:0`;
+    rowEl.appendChild(key);
+    const valueEl = document.createElement(i === 0 ? 'b' : 'span');
+    valueEl.style.cssText = i === 0 ? 'color:#fff;font-weight:500' : 'color:#c9c8c2;font-size:12px';
+    valueEl.textContent = row.text;
+    rowEl.appendChild(valueEl);
+    tooltip.appendChild(rowEl);
+  });
+}
 function renderBtcMacroToggles(){
   const row = document.getElementById('btcmacroOverlayToggles');
   if(!row) return;
@@ -25227,14 +25276,14 @@ function renderBtcMacroChart(){
     return y > marginTop + 2 && y < marginTop + drawH - 4;
   });
   const yGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+    <line class="btcmacro-grid-line" x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}"/>
+    <text class="btcmacro-axis-text" x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
   `).join('');
   // eje derecho fijo 0-100%: todos los overlays macro activos se normalizan a esa escala dentro
   // del rango visible actual (ver más abajo), así pueden compartir un solo eje aunque tengan
   // unidades distintas - el valor real de cada uno va en la leyenda y el tooltip, no en el eje
   const pct2TicksHtml = [0, 25, 50, 75, 100].map(pct => `
-    <text x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(pct) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}" font-weight="700" fill="rgba(255,255,255,.4)" font-family="'Space Mono',monospace">${pct}%</text>
+    <text class="btcmacro-axis-text" x="${(totalW - marginRight + 8).toFixed(1)}" y="${(yFor2(pct) + 4).toFixed(1)}" text-anchor="start" font-size="${yFontSize}">${pct}%</text>
   `).join('');
 
   function pathFor(getV, yForFn){
@@ -25269,45 +25318,112 @@ function renderBtcMacroChart(){
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text class="btcmacro-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
+  // relleno de área bajo la línea de precio (~6% de opacidad, cerrado contra el fondo del área
+  // de dibujo - ver btcMacroAreaPathD) - el naranja de BTC se mantiene exacto, solo se le agrega
+  // esta capa de fondo, igual que se hizo con el dorado de Ciclos de Halving
+  const btcAreaD = btcMacroAreaPathD(btcPathD, xFor(startMs), xFor(endMs), marginTop + drawH);
+  const ariaLabel = `Precio de Bitcoin en escala logarítmica con datos macroeconómicos superpuestos, precio actual ${fmtHalvingPrice(btcVals[btcVals.length - 1])}`;
 
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="btcmacroChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
+      <svg class="fng-chart-svg btcmacro-chart-svg" id="btcmacroChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${pct2TicksHtml}
-        <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcAreaD}" fill="#f7931a" fill-opacity=".06" stroke="none"/>
+        <path d="${btcPathD}" fill="none" stroke="#f7931a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         ${overlayPathsHtml}
         ${xLabelsHtml}
-        <line id="btcmacroHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.5)" stroke-width="1" style="display:none"/>
-        <circle id="btcmacroHoverDot" r="6" fill="#fff" style="display:none"/>
+        <line id="btcmacroHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="btcmacroHoverDotRing" r="7" fill="none" stroke="#090b16" stroke-width="2" style="display:none"/>
+        <circle id="btcmacroHoverDot" r="5" fill="#f7931a" style="display:none"/>
         <rect id="btcmacroHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="btcmacroHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="btcmacroHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="btcmacroHoverDateLabel" class="btcmacro-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="btcmacroHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="btcmacroTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
     </div>
   `;
 
   const svg = document.getElementById('btcmacroChartSvg');
-  wireChartHover({
-    svg, catcherId: 'btcmacroHoverCatcher', lineId: 'btcmacroHoverLine', dotId: 'btcmacroHoverDot',
-    dateLabelId: 'btcmacroHoverDateLabel', dateBgId: 'btcmacroHoverDateBg', tooltipId: 'btcmacroTooltip',
-    points, startMs, spanMs, marginLeft, marginRight, drawW, totalW, totalH, xFor,
-    yForIdx: i => yFor(points[i].btc),
-    tooltipHtml: i => {
-      const p = points[i];
-      let html = `<b>₿ ${fmtHalvingPrice(p.btc)}</b>`;
-      btcMacroActiveOverlays.forEach(key => {
-        if(p[key] == null || overlayLastVals[key] === undefined) return;
-        const def = BTC_MACRO_OVERLAY_DEFS[key];
-        html += `<br><span style="color:${def.color}">${def.label}: ${def.fmt(p[key])}</span>`;
-      });
-      return html;
-    },
+  const catcher = document.getElementById('btcmacroHoverCatcher');
+  const hoverLine = document.getElementById('btcmacroHoverLine');
+  const hoverDot = document.getElementById('btcmacroHoverDot');
+  const hoverDotRing = document.getElementById('btcmacroHoverDotRing');
+  const hoverDateLabel = document.getElementById('btcmacroHoverDateLabel');
+  const hoverDateBg = document.getElementById('btcmacroHoverDateBg');
+  const tooltip = document.getElementById('btcmacroTooltip');
+
+  // tooltip/hover propios (pointermove/pointerleave + teclado) en vez de wireChartHover (compartido
+  // con otros gráficos que siguen con mouse/touch por separado) - mismo patrón que Ciclos de Halving
+  let hoverIdx = points.length - 1;
+  function showAtIndex(idx){
+    hoverIdx = Math.max(0, Math.min(idx, points.length - 1));
+    const p = points[hoverIdx];
+    const px = xFor(p.t), py = yFor(p.btc);
+    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+    hoverLine.style.display = 'block';
+    hoverDotRing.setAttribute('cx', px); hoverDotRing.setAttribute('cy', py);
+    hoverDotRing.style.display = 'block';
+    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+    hoverDot.style.display = 'block';
+    const rect = svg.getBoundingClientRect();
+    tooltip.style.display = 'block';
+    const tipHalfW = tooltip.offsetWidth / 2;
+    tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
+    const clampedPx = Math.min(Math.max(px, marginLeft + 24), totalW - marginRight - 24);
+    hoverDateLabel.setAttribute('x', clampedPx);
+    // timeZone:'UTC' evita que, para usuarios al oeste de UTC, la medianoche UTC del dato caiga
+    // un día antes en hora local (mismo motivo que wireChartHover)
+    const dateLabel = new Date(p.t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    hoverDateLabel.textContent = dateLabel;
+    hoverDateLabel.style.display = 'block';
+    const bboxW = hoverDateLabel.getBBox().width;
+    hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
+    hoverDateBg.setAttribute('width', bboxW + 24);
+    hoverDateBg.style.display = 'block';
+    const rows = [{ color: '#f7931a', text: '₿ ' + fmtHalvingPrice(p.btc) }];
+    btcMacroActiveOverlays.forEach(key => {
+      if(p[key] == null || overlayLastVals[key] === undefined) return;
+      const def = BTC_MACRO_OVERLAY_DEFS[key];
+      rows.push({ color: def.color, text: def.label + ': ' + def.fmt(p[key]) });
+    });
+    btcMacroRenderTooltip(tooltip, { dateLabel, rows });
+  }
+  function showAt(clientX){
+    const rect = svg.getBoundingClientRect();
+    const scaleX = totalW / rect.width;
+    const svgX = (clientX - rect.left) * scaleX;
+    const targetMs = startMs + ((svgX - marginLeft) / drawW) * spanMs;
+    let idx = 0, bestDiff = Infinity;
+    for(let i = 0; i < points.length; i++){
+      const diff = Math.abs(points[i].t - targetMs);
+      if(diff < bestDiff){ bestDiff = diff; idx = i; }
+    }
+    showAtIndex(idx);
+  }
+  function hideHover(){
+    hoverLine.style.display = 'none';
+    hoverDot.style.display = 'none';
+    hoverDotRing.style.display = 'none';
+    hoverDateLabel.style.display = 'none';
+    hoverDateBg.style.display = 'none';
+    tooltip.style.display = 'none';
+  }
+  catcher.addEventListener('pointermove', (e) => showAt(e.clientX));
+  catcher.addEventListener('pointerleave', hideHover);
+  svg.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+      e.preventDefault();
+      const step = e.shiftKey ? 30 : 1;
+      showAtIndex(hoverIdx + (e.key === 'ArrowRight' ? step : -step));
+    } else if(e.key === 'Escape'){
+      hideHover();
+    }
   });
 
   let legendHtml = `<span class="perk-chip"><span class="perk-chip-dot" style="background:#f7931a"></span>Precio de BTC</span>`;
