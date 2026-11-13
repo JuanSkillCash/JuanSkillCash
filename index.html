@@ -384,7 +384,7 @@ button{font-family:inherit;color:inherit}
   padding:11px 14px 10px;display:flex;flex-direction:column;gap:7px;position:relative
 }
 .session-card-label{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--muted2);padding-right:20px}
-.session-flag{display:inline-flex;width:32px;height:23px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.session-flag{display:inline-flex;width:26px;height:19px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 .session-flag svg{width:100%;height:100%;display:block}
 .session-bell-btn{
   position:absolute;top:7px;right:7px;background:none;border:none;padding:4px;margin:0;
@@ -408,7 +408,7 @@ button{font-family:inherit;color:inherit}
 .session-time{font-family:'Poppins',sans-serif;font-weight:900;font-size:17px;color:var(--white);letter-spacing:-.01em;white-space:nowrap}
 .session-hours{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:.01em;white-space:nowrap}
 .session-status-row{display:flex;flex-direction:column;gap:1px;align-items:center;text-align:center;flex:1}
-.session-status{font-family:'Poppins',sans-serif;font-size:18px;letter-spacing:-.01em;text-transform:uppercase;font-weight:900;line-height:1.05;white-space:nowrap}
+.session-status{font-family:'Poppins',sans-serif;font-size:15px;letter-spacing:-.01em;text-transform:uppercase;font-weight:900;line-height:1.05;white-space:nowrap}
 .session-status.open{color:var(--green)}
 .session-status.closed{color:var(--red)}
 .session-countdown{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);white-space:nowrap}
@@ -434,6 +434,15 @@ button{font-family:inherit;color:inherit}
 }
 .notif-mini{position:relative;margin-left:auto;flex-shrink:0}
 @media(min-width:861px){ .notif-mini{margin-left:24px} }
+/* botón circular de ayuda ("?"), entre notificaciones y cuenta - abre un menú con las 3
+   herramientas que antes vivían en la categoría "Manual del Depredador" (se quitó esa caja del
+   inicio y del menú lateral; mismo patrón visual/de dropdown que .account-mini, reusa
+   .account-dropdown-item para los 3 botones) */
+.help-mini{position:relative;margin-left:14px;flex-shrink:0}
+.help-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid rgba(91,141,239,.3);color:var(--muted2);font-size:15px;font-weight:800;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+.help-mini-btn:hover{border-color:var(--accent);background:rgba(91,141,239,.08);color:var(--white)}
+.help-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
+.help-mini-dropdown.open{display:block}
 .account-mini{position:relative;margin-left:14px;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid rgba(91,141,239,.3);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .profile-avatar-row{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 20px}
@@ -2510,8 +2519,8 @@ img[src=""]{display:none}
   .exchange-pill img,.exchange-pill svg{width:16px;height:16px}
   .colmillos-pill{font-size:11.5px}
   .colmillos-pill span#colmillosWalletBalance{font-size:11.5px}
-  .notif-mini-btn,.account-mini-btn{width:34px;height:34px;font-size:15px}
-  .account-mini{margin-left:6px}
+  .notif-mini-btn,.account-mini-btn,.help-mini-btn{width:34px;height:34px;font-size:14px}
+  .account-mini,.help-mini{margin-left:6px}
 }
 @media(min-width:861px){
   /* el botoncito de hamburguesa en escritorio solo se ve cuando el menu esta cerrado
@@ -3524,20 +3533,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <span class="sb-item-icon">🔎</span><span class="sb-item-label">Analizador de token</span>
       </button>
 
-      <div class="sb-cat-label" data-category="aprender">Manual del Depredador</div>
-      <button class="sb-item" data-cat-home="aprender">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
-      </button>
-      <button class="sb-item" data-tool="glosario">
-        <span class="sb-item-icon">📖</span><span class="sb-item-label">Glosario cripto</span>
-      </button>
-      <button class="sb-item" data-tool="mistakes">
-        <span class="sb-item-icon">⚠️</span><span class="sb-item-label">Errores comunes</span>
-      </button>
-      <button class="sb-item" data-tool="manual">
-        <span class="sb-item-icon">📘</span><span class="sb-item-label">Manual completo</span>
-      </button>
-
       <!-- Comunidad y Noticias: grupos nuevos pedidos por Juan (ver maqueta "Versión 3" del
            rediseño). "Comunidad" por ahora son solo 2 botones sin destino (a propósito - Juan
            dijo "de momento no te llevan a ningún lado"): sin data-tool/data-cat-home no los
@@ -3838,6 +3833,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </div>
       </div>
 
+      <div class="help-mini" id="helpMini">
+        <button class="help-mini-btn" id="helpMiniBtn" type="button" aria-label="Ayuda" aria-haspopup="true" aria-expanded="false">?</button>
+        <div class="help-mini-dropdown" id="helpMiniDropdown">
+          <button type="button" class="account-dropdown-item" id="helpOpenGlossaryBtn">📖 Glosario Cripto</button>
+          <button type="button" class="account-dropdown-item" id="helpOpenMistakesBtn">⚠️ Errores comunes</button>
+          <button type="button" class="account-dropdown-item" id="helpOpenManualBtn">📘 Manual completo</button>
+        </div>
+      </div>
+
       <div class="account-mini" id="accountMini">
         <button class="account-mini-btn" id="accountMiniBtn" type="button" aria-label="Cuenta" aria-haspopup="true" aria-expanded="false">👤</button>
         <div class="account-mini-dropdown" id="accountMiniDropdown">
@@ -4086,26 +4090,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="cat-flip-back" data-category="seguridad" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Blindaje</div><div class="cat-flip-back-eyebrow">LAS 5 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Checklist de Seguridad</li><li><span class="cat-flip-back-check">✓</span>Comparador de Wallets</li><li><span class="cat-flip-back-check">✓</span>Verificar Aprobaciones</li><li><span class="cat-flip-back-check">✓</span>Herencia Digital</li><li><span class="cat-flip-back-check">✓</span>Analizador de Token</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
       </div>
       </div>
-
-      <div class="cat-flip-outer">
-      <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
-      <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card cat-flip-front" data-category="aprender" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)">
-        <div class="cat-overview-head">
-          <div class="cat-overview-num">7</div>
-          <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><path d="M10 5.5c-1.5-1.3-3.5-2-6-2v11c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2v-11c-2.5 0-4.5.7-6 2z"/><path d="M10 5.5v11"/></svg><span>Manual del Depredador</span></div>
-          <div class="cat-overview-tag">GRATIS</div>
-        </div>
-        <div class="cat-overview-sub">3 HERRAMIENTAS</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/aprender.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
-        <div class="cat-overview-desc">Guías y Glosario: Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</div>
-        <div class="cat-overview-btn">Explorar →</div>
-            <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
-      </button>
-      <div class="cat-flip-back" data-category="aprender" style="--c:var(--accent);--bc:rgba(255,255,255,.16);--tint:rgba(91,141,239,.07)"><div class="cat-flip-back-head"><div class="cat-flip-back-title">Manual del Depredador</div><div class="cat-flip-back-eyebrow">LAS 3 HERRAMIENTAS</div></div><ul class="cat-flip-back-list"><li><span class="cat-flip-back-check">✓</span>Glosario Cripto</li><li><span class="cat-flip-back-check">✓</span>Biblioteca de Errores Comunes</li><li><span class="cat-flip-back-check">✓</span>Manual Completo</li></ul><div class="cat-flip-back-cta">Abrir →</div><svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="#090b16"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-      </div>
-      </div>
-
 
     </div>
     </div>
@@ -7503,49 +7487,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="tool-card-sub">CONTRATO Y LIQUIDEZ</div>
           <div class="tool-card-banner"><img src="/assets/blindaje/token.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
           <p>Busca cualquier token y revisa seguridad del contrato, liquidez, impuestos de compra/venta y desbloqueos pendientes.</p>
-          <div class="tool-card-btn">Explorar →</div>
-        </button>
-      </div>
-    </div>
-
-    <div class="tool-section" data-category="aprender">
-      <div class="tool-cat-label">📖 Manual del Depredador</div>
-      <div class="section-intro-title">Bienvenido a Manual del Depredador</div>
-      <p class="section-intro-text">Entiende la jerga cripto sin tecnicismos, y aprende de los errores más comunes que le han costado dinero a otros, antes de que te cuesten a ti.</p>
-      <div class="tool-grid">
-<button class="tool-card" id="openGlossaryCard" data-tool="glosario">
-          <div class="tool-card-head">
-            <div class="tool-card-num">1</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">📖</span><h3>Glosario Cripto</h3></div>
-            <div class="tool-card-tag">GRATIS</div>
-          </div>
-          <div class="tool-card-sub">MÁS DE 100 TÉRMINOS</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/glosario.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
-          <p>Más de 100 términos explicados sin jerga — con buscador, categorías y ejemplos.</p>
-          <div class="tool-card-btn">Explorar →</div>
-        </button>
-
-        <button class="tool-card" id="openMistakesCard" data-tool="mistakes">
-          <div class="tool-card-head">
-            <div class="tool-card-num">2</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">⚠️</span><h3>Biblioteca de errores comunes</h3></div>
-            <div class="tool-card-tag">GRATIS</div>
-          </div>
-          <div class="tool-card-sub">CASOS REALES</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/errores.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
-          <p>Casos reales de cómo la gente pierde dinero en cripto — y la lección de cada uno. Por categoría: Spot, Futuros, Wallets, Exchanges y Estafas.</p>
-          <div class="tool-card-btn">Explorar →</div>
-        </button>
-
-        <button class="tool-card" id="openManualCard" data-tool="manual">
-          <div class="tool-card-head">
-            <div class="tool-card-num">3</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">📘</span><h3>Manual Completo</h3></div>
-            <div class="tool-card-tag">GRATIS</div>
-          </div>
-          <div class="tool-card-sub">GUÍA POR SECCIONES</div>
-          <div class="tool-card-banner"><img src="/assets/aprender/manual.webp" alt="" loading="lazy" width="720" height="369" decoding="async"></div>
-          <p>Cómo usar cada herramienta de la plataforma — con buscador, organizado por secciones. Ideal si no sabes por dónde empezar.</p>
           <div class="tool-card-btn">Explorar →</div>
         </button>
       </div>
@@ -13663,6 +13604,36 @@ document.getElementById('accountBarProfileBtn').addEventListener('click', () => 
   accountMiniDropdown.classList.remove('open');
 });
 
+/* ---- menú desplegable del botón circular de ayuda ("?") - mismo patrón que el de cuenta de
+   arriba. Las 3 herramientas que abre (openGlossaryModal/openMistakesModal/openManualModal)
+   están declaradas más abajo en el archivo, pero al ser "function" (no const/let) quedan
+   hoisteadas y disponibles igual desde aquí */
+const helpMiniBtn = document.getElementById('helpMiniBtn');
+const helpMiniDropdown = document.getElementById('helpMiniDropdown');
+helpMiniBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = helpMiniDropdown.classList.toggle('open');
+  helpMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+document.addEventListener('click', (e) => {
+  if(helpMiniDropdown.classList.contains('open') && !helpMiniDropdown.contains(e.target) && e.target !== helpMiniBtn){
+    helpMiniDropdown.classList.remove('open');
+    helpMiniBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+document.getElementById('helpOpenGlossaryBtn').addEventListener('click', () => {
+  helpMiniDropdown.classList.remove('open');
+  openGlossaryModal();
+});
+document.getElementById('helpOpenMistakesBtn').addEventListener('click', () => {
+  helpMiniDropdown.classList.remove('open');
+  openMistakesModal();
+});
+document.getElementById('helpOpenManualBtn').addEventListener('click', () => {
+  helpMiniDropdown.classList.remove('open');
+  openManualModal();
+});
+
 /* ---- modal de login (general de la página) ---- */
 const authModal = document.getElementById('authModal');
 const authPanel = authModal.querySelector('.modal-panel');
@@ -18679,8 +18650,6 @@ document.getElementById('mistakesSearch').addEventListener('input', renderMistak
 
 const mistakesModal = document.getElementById('mistakesModal');
 const mistakesPanel = mistakesModal.querySelector('.modal-panel');
-const openMistakesCard = document.getElementById('openMistakesCard');
-const sbMistakesItem = document.querySelector('.sb-item[data-tool="mistakes"]');
 const closeMistakes = document.getElementById('closeMistakes');
 
 function openMistakesModal(){
@@ -18689,16 +18658,11 @@ function openMistakesModal(){
   renderMistakesList();
 }
 function closeMistakesModal(){ closeModalGeneric(mistakesModal); }
-openMistakesCard.addEventListener('click', openMistakesModal);
-sbMistakesItem.addEventListener('click', openMistakesModal);
 closeMistakes.addEventListener('click', closeMistakesModal);
 mistakesModal.addEventListener('click', (e) => { if(e.target === mistakesModal) closeMistakesModal(); });
 
-
 const glossaryModal = document.getElementById('glossaryModal');
 const glossaryPanel = glossaryModal.querySelector('.modal-panel');
-const openGlossaryCard = document.getElementById('openGlossaryCard');
-const sbGlossaryItem = document.querySelector('.sb-item[data-tool="glosario"]');
 const closeGlossary = document.getElementById('closeGlossary');
 
 let glossActiveCategory = 'all';
@@ -18713,8 +18677,6 @@ function openGlossaryModal(){
   renderGlossaryList();
 }
 function closeGlossaryModal(){ closeModalGeneric(glossaryModal); }
-openGlossaryCard.addEventListener('click', openGlossaryModal);
-sbGlossaryItem.addEventListener('click', openGlossaryModal);
 closeGlossary.addEventListener('click', closeGlossaryModal);
 glossaryModal.addEventListener('click', (e) => { if(e.target === glossaryModal) closeGlossaryModal(); });
 
@@ -18981,8 +18943,6 @@ function renderManualList(){
 }
 const manualModal = document.getElementById('manualModal');
 const manualPanel = manualModal.querySelector('.modal-panel');
-const openManualCard = document.getElementById('openManualCard');
-const sbManualItem = document.querySelector('.sb-item[data-tool="manual"]');
 const closeManual = document.getElementById('closeManual');
 function openManualModal(){
   openModalGeneric(manualModal, manualPanel, closeManual);
@@ -18990,8 +18950,6 @@ function openManualModal(){
   renderManualList();
 }
 function closeManualModal(){ closeModalGeneric(manualModal); }
-openManualCard.addEventListener('click', openManualModal);
-sbManualItem.addEventListener('click', openManualModal);
 closeManual.addEventListener('click', closeManualModal);
 manualModal.addEventListener('click', (e) => { if(e.target === manualModal) closeManualModal(); });
 document.getElementById('manualSearch').addEventListener('input', renderManualList);
