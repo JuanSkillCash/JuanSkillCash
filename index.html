@@ -2933,6 +2933,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    parejos uno al lado del otro, como pidio ("así como el de Melapela") */
 .events-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:860px){ .events-grid{grid-template-columns:1fr} }
+/* "Conferencias en Vivo" y "Calendario Económico" quedaron con una sola tarjeta cada una (antes
+   compartían grilla de 2 columnas con otra tarjeta al lado) - sin esto, la única tarjeta ocupa
+   solo la mitad izquierda de la grilla de 2 columnas y deja un hueco vacío a la derecha. */
+.events-grid-solo{grid-template-columns:1fr;max-width:640px}
 @media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} .events-calendar-clip{height:320px} .events-calendar-iframe{height:358px} }
 /* min-width:0 es necesario porque .events-card es hijo de un grid (.events-grid) - sin esto,
    el calendario de adentro (que fuerza min-width:590px para que el widget de Investing no se
@@ -3544,9 +3548,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
            dijo "de momento no te llevan a ningún lado"): sin data-tool/data-cat-home no los
            agarra NINGUN listener delegado (todos buscan '[data-tool]'/'[data-cat-home]'), asi
            que un clic ahi simplemente no hace nada, sin error. "Noticias" sigue el MISMO patron
-           que las demas categorias (sb-cat-label + su boton data-cat-home) para que abra de
-           verdad la categoria "eventos" (ver data-category="eventos" mas abajo en
-           categoryDetailView) - ahi se movio el contenido real de Eventos y Noticias. -->
+           que las demas categorias (sb-cat-label + boton data-cat-home) para que cada boton abra
+           de verdad su propia categoria (ver data-category="eventos-youtube"/"eventos-calendario"/
+           "eventos-noticias" mas abajo en categoryDetailView) - Juan pidio separar lo que antes
+           era una sola categoria "eventos" con las 4 tarjetas juntas en 3 opciones distintas del
+           menu, una por tema (videos / calendario / noticias), aunque las 3 sigan agrupadas bajo
+           el mismo título "Noticias" del menú. -->
       <div class="sb-cat-label sb-cat-label-static" data-category="__comunidad">Comunidad</div>
       <button class="sb-item sb-item-section" type="button">
         <span class="sb-item-icon">🏆</span><span class="sb-item-label">Tu Rango</span>
@@ -3555,8 +3562,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <span class="sb-item-icon">🦈</span><span class="sb-item-label">Skins del Tiburón</span>
       </button>
       <div class="sb-cat-label sb-cat-label-static" data-category="eventos">Noticias</div>
-      <button class="sb-item sb-item-section" id="sbEventosLink" data-cat-home="eventos">
-        <span class="sb-item-icon">📰</span><span class="sb-item-label">Eventos y Noticias</span>
+      <button class="sb-item sb-item-section" id="sbEventosYoutubeLink" data-cat-home="eventos-youtube">
+        <span class="sb-item-icon">📺</span><span class="sb-item-label">Conferencias en Vivo</span>
+      </button>
+      <button class="sb-item sb-item-section" id="sbEventosCalendarioLink" data-cat-home="eventos-calendario">
+        <span class="sb-item-icon">📅</span><span class="sb-item-label">Calendario Económico</span>
+      </button>
+      <button class="sb-item sb-item-section" id="sbEventosNoticiasLink" data-cat-home="eventos-noticias">
+        <span class="sb-item-icon">📰</span><span class="sb-item-label">Noticias</span>
       </button>
 
     </nav>
@@ -4102,9 +4115,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
     <!-- secciones fijas del inicio (no flotantes): quien hace SkillCash y reseñas de la
          comunidad. Se muestran/ocultan junto con #categoryOverviewGrid (ver
-         assets/js/community.js). "Eventos y Noticias" YA NO vive aquí - se movió a su propia
-         categoría (data-category="eventos" dentro de #categoryDetailView, ver sb-cat-label
-         "Noticias" en el menú lateral) para que no compita por espacio en el home. -->
+         assets/js/community.js). "Eventos y Noticias" YA NO vive aquí - se movió a sus propias
+         3 categorías (data-category="eventos-youtube"/"eventos-calendario"/"eventos-noticias"
+         dentro de #categoryDetailView, ver sb-cat-label "Noticias" en el menú lateral) para que
+         no compita por espacio en el home. -->
 
     <section class="home-mirror community-block" id="aboutJuanBlock">
       <div class="section-eyebrow">Quién está detrás</div>
@@ -4148,12 +4162,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </section>
 
     <div id="categoryDetailView" style="display:none">
-    <div class="tool-section" data-category="eventos">
-    <section class="community-block" id="eventsBlock">
+    <div class="tool-section" data-category="eventos-youtube">
+    <section class="community-block" id="eventsYoutubeBlock">
       <div class="section-eyebrow">En vivo</div>
-      <h2 class="community-title">Eventos y Noticias</h2>
-      <p class="community-lead">Calendario económico de impacto alto y transmisiones en vivo, sin salir de SkillCash.</p>
-      <div class="events-grid">
+      <h2 class="community-title">Conferencias en Vivo</h2>
+      <p class="community-lead">Transmisiones en vivo de los canales que más mueven el mercado, sin salir de SkillCash.</p>
+      <div class="events-grid events-grid-solo">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Cobertura</div>
@@ -4207,6 +4221,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
         </div>
+      </div>
+    </section>
+    </div>
+    <div class="tool-section" data-category="eventos-calendario">
+    <section class="community-block" id="eventsCalendarBlock">
+      <div class="section-eyebrow">Agenda</div>
+      <h2 class="community-title">Calendario Económico</h2>
+      <p class="community-lead">Eventos de impacto alto en EE.UU. y la Eurozona, con fecha y hora exacta en tu zona horaria.</p>
+      <div class="events-grid events-grid-solo">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Agenda</div>
@@ -4235,6 +4258,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
         </div>
+      </div>
+    </section>
+    </div>
+    <div class="tool-section" data-category="eventos-noticias">
+    <section class="community-block" id="eventsNewsBlock">
+      <div class="section-eyebrow">Titulares</div>
+      <h2 class="community-title">Noticias</h2>
+      <p class="community-lead">Lo último de medios cripto y financieros, los más nuevos primero.</p>
+      <div class="events-grid">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Mercado</div>
@@ -4269,6 +4301,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </div>
       </div>
     </section>
+    </div>
+    <!-- los 3 scripts de abajo (canales de YouTube, lazy-load del calendario, fetch de
+         noticias) quedan fuera de cualquier tool-section puntual a propósito: cablean elementos
+         que ahora viven repartidos en las 3 secciones de arriba (eventos-youtube/-calendario/
+         -noticias), y una consulta de DOM funciona igual aunque su ancestro tenga display:none,
+         así que no hacía falta duplicarlos ni anidarlos dentro de una sección específica. -->
     <script>
     // Lista de canales para "Conferencias en Vivo" - para agregar/editar uno, solo tocar este
     // arreglo. id debe ser el ID real del canal (empieza con "UC..."), no el @usuario.
@@ -4316,7 +4354,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var thumb = document.getElementById('eventsYtThumb');
       var facadeLabel = document.getElementById('eventsYtFacadeLabel');
       var playBtn = document.getElementById('eventsYtPlayBtn');
-      var foot = document.querySelector('#eventsBlock .events-card:first-child .events-card-foot');
+      var foot = document.querySelector('#eventsYoutubeBlock .events-card:first-child .events-card-foot');
       if(!sel || !f) return;
       sel.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
         var disabled = !ch.id;
@@ -4570,7 +4608,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     // entrar en pantalla de verdad, nunca antes.
     (function(){
       var iframe = document.querySelector('.events-calendar-iframe');
-      var section = document.getElementById('eventsBlock');
+      var section = document.getElementById('eventsCalendarBlock');
       if(!iframe || !section || typeof IntersectionObserver === 'undefined'){
         if(iframe && iframe.dataset.src) iframe.src = iframe.dataset.src;
         return;
@@ -4615,15 +4653,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         return '<div class="events-news-empty">No se pudieron cargar las noticias por ahora. Intenta de nuevo más tarde.</div>';
       }
 
-      // El titular ya sale traducido (ver el Worker), pero la nota completa vive en el sitio
-      // del medio (CoinDesk, MarketWatch, etc.) y esa sí está en inglés siempre - Juan pidió
-      // que también se vea en español al entrar. Se manda al visor de páginas traducidas de
-      // Google (translate.google.com/translate?...) en vez de al link original - abre la misma
-      // nota pero ya traducida, con un aviso arriba para volver al original si alguien quiere.
-      function translatedLink(originalUrl){
-        return 'https://translate.google.com/translate?sl=en&tl=es&u=' + encodeURIComponent(originalUrl);
-      }
-
       var SENTIMIENTO_LABEL = { alcista: 'Alcista', bajista: 'Bajista', neutral: 'Neutral' };
 
       function sentimientoChipHtml(sentimiento){
@@ -4634,7 +4663,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       function renderNews(listEl, items){
         if(!items || !items.length){ listEl.innerHTML = newsEmptyHtml(); return; }
         listEl.innerHTML = items.map(function(it){
-          return '<a class="events-news-item" href="' + escapeHtml(translatedLink(it.link)) + '" target="_blank" rel="noopener">' +
+          return '<a class="events-news-item" href="' + escapeHtml(it.link) + '" target="_blank" rel="noopener">' +
             '<div class="events-news-item-body">' +
               '<div class="events-news-item-title">' + escapeHtml(it.title) + '</div>' +
               (it.resumen ? '<div class="events-news-item-why">' + escapeHtml(it.resumen) + '</div>' : '') +
@@ -4655,7 +4684,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .catch(function(){ listEl.innerHTML = newsEmptyHtml(); });
       }
 
-      var section = document.getElementById('eventsBlock');
+      var section = document.getElementById('eventsNewsBlock');
       if(!section || typeof IntersectionObserver === 'undefined'){
         loadCategory('crypto');
         loadCategory('macro');
@@ -4673,7 +4702,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       obs.observe(section);
     })();
     </script>
-    </div>
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
 
       <div class="cat-pill-tabs-wrap" id="catPillTabsWrap" style="display:none">
@@ -10929,6 +10957,13 @@ function showCategoryDetail(cat){
   if(typeof closeAdminPage === 'function') closeAdminPage();
   if(typeof closeLiveChartPage === 'function') closeLiveChartPage();
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
+  // "Conferencias en Vivo"/"Calendario Económico"/"Noticias" son 3 categorías hermanas que se
+  // puede saltar de una a otra SIN pasar por el overview (los 3 botones del menú llaman
+  // showCategoryDetail directo, a diferencia de las demás categorías) - sin esto, título,
+  // pastillas móviles y el resaltado "active" del menú se quedaban pegados en la categoría
+  // anterior porque todo lo de abajo solo se actualizaba "al entrar desde el overview".
+  const categoryChanged = enteringFromOverview || categoryDetailView.dataset.activeCategory !== cat;
+  categoryDetailView.dataset.activeCategory = cat;
   closeAnyOpenToolInline();
   setCatLabelToolOpen(false);
   categoryOverviewGrid.style.display = 'none';
@@ -10950,12 +10985,16 @@ function showCategoryDetail(cat){
   // exista para "afinarla" con el indicador real en vez de pisar la entrada anterior (home)
   if(enteringFromOverview && !closingFromPopstate){
     pushRoute({ skillcashDepth: 'category' }, routePathForCategory(cat));
+  } else if(categoryChanged && !enteringFromOverview && !closingFromPopstate){
+    // saltando de una categoría hermana a otra sin pasar por overview - se afina la URL con
+    // replaceRoute (no pushRoute) para no inflar el historial con una entrada por cada click
+    replaceRoute({ skillcashDepth: 'category' }, routePathForCategory(cat));
   }
   // si es 'indicadores' el título lo termina de poner jumpToIndicator('guia') más abajo
-  if(enteringFromOverview && cat !== 'indicadores') setPageTitle(CATEGORY_LABELS[cat]);
-  if(enteringFromOverview) renderCatPillTabs(cat);
+  if(categoryChanged && cat !== 'indicadores') setPageTitle(CATEGORY_LABELS[cat]);
+  if(categoryChanged) renderCatPillTabs(cat);
   if(enteringFromOverview && cat === 'indicadores') jumpToIndicator('guia');
-  if(enteringFromOverview && cat !== 'indicadores'){
+  if(categoryChanged && cat !== 'indicadores'){
     document.querySelectorAll('[data-cat-home]').forEach(item => {
       item.classList.toggle('active', item.dataset.catHome === cat);
     });
@@ -11242,10 +11281,12 @@ const CATEGORY_LABELS = {};
 document.querySelectorAll('.cat-overview-card[data-category]').forEach(card => {
   CATEGORY_LABELS[card.dataset.category] = safeText(card.querySelector('.cat-overview-title'));
 });
-// "eventos" no tiene una cajita en la cuadrícula de Tus Herramientas (Juan pidió sacarla del
-// home, no agregarle una 8va cajita) - se asigna el título a mano para que setPageTitle() no
-// quede en "undefined" al entrar a esta categoría.
-CATEGORY_LABELS.eventos = 'Eventos y Noticias';
+// "eventos-*" no tienen cajita en la cuadrícula de Tus Herramientas (Juan pidió sacarlas del
+// home, no agregarles una 8va/9va/10ma cajita) - se asigna el título a mano para que
+// setPageTitle() no quede en "undefined" al entrar a estas categorías.
+CATEGORY_LABELS['eventos-youtube'] = 'Conferencias en Vivo';
+CATEGORY_LABELS['eventos-calendario'] = 'Calendario Económico';
+CATEGORY_LABELS['eventos-noticias'] = 'Noticias';
 const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
@@ -12733,15 +12774,21 @@ document.querySelectorAll('[data-cat-home]').forEach(btn => {
     document.getElementById('sbBackdrop').classList.remove('show');
   });
 });
-// "Eventos y Noticias" (grupo "Noticias" del menú) es el único ítem del menú lateral que SÍ
-// necesita abrir su categoría desde cero (no solo "ya estando adentro", como data-cat-home/
-// showCategoryGrid asumen) porque no tiene una cajita propia en "Tus Herramientas" - sin una
-// cajita no hay un .cat-flip-outer con su click que llame a showCategoryDetail('eventos'), así
-// que se llama directo aquí.
-document.getElementById('sbEventosLink').addEventListener('click', () => {
-  showCategoryDetail('eventos');
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('sbBackdrop').classList.remove('show');
+// Los 3 ítems de "Noticias" (Conferencias en Vivo / Calendario Económico / Noticias) son los
+// únicos del menú lateral que SÍ necesitan abrir su categoría desde cero (no solo "ya estando
+// adentro", como data-cat-home/showCategoryGrid asumen) porque ninguno tiene una cajita propia
+// en "Tus Herramientas" - sin una cajita no hay un .cat-flip-outer con su click que llame a
+// showCategoryDetail(), así que se llama directo aquí para cada uno.
+[
+  ['sbEventosYoutubeLink', 'eventos-youtube'],
+  ['sbEventosCalendarioLink', 'eventos-calendario'],
+  ['sbEventosNoticiasLink', 'eventos-noticias'],
+].forEach(([id, cat]) => {
+  document.getElementById(id).addEventListener('click', () => {
+    showCategoryDetail(cat);
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sbBackdrop').classList.remove('show');
+  });
 });
 
 /* ---- sección de favoritos, arriba de todo, debajo de la publicidad de Bitunix ---- */
