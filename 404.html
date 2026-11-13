@@ -1218,13 +1218,32 @@ button{font-family:inherit;color:inherit}
 /* el fondo de cuadrícula vive solo acá (no también en .indic-chart-body) — si los dos
    lo tuvieran, al no compartir el mismo origen (el gráfico es más ancho por el
    "breakout") las líneas quedaban desfasadas y se veían como dos cuadrículas encimadas */
+/* skill dataviz (.claude/skills/dataviz): sin rejilla vertical - la textura de fondo vieja
+   traía una (columnas de 20px) además de las líneas horizontales reales del eje Y, dos
+   cuadrículas superpuestas sin falta. Ahora el fondo es liso; las únicas líneas de rejilla
+   son las horizontales reales que dibuja el SVG (.halving-grid-line), ligadas a los precios. */
 #halvingChartWrap{
   border-radius:12px;
-  background:
-    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/100% 15px,
-    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/20px 100%,
-    rgba(255,255,255,.02);
+  background:rgba(255,255,255,.02);
 }
+/* --- pestañas de ciclo (halving-tabs): variante local de .indic-chart-btn, sin tocar la
+   clase global (la usan otros gráficos con otro estilo de activa) --- */
+.halving-tabs .indic-chart-btn{border-color:rgba(255,255,255,.12);color:var(--muted2)}
+.halving-tabs .indic-chart-btn.active{background:rgba(57,135,229,.16);border-color:#3987e5;color:var(--white)}
+/* --- ejes/rejilla recesivos (ver references/marks-and-anatomy.md: hairline, solida, un paso
+   fuera de superficie) --- */
+.halving-grid-line{stroke:rgba(255,255,255,.06);stroke-width:1}
+.halving-axis-text{fill:#8a8fa3;font-weight:500;font-family:'Space Mono',monospace;font-variant-numeric:tabular-nums}
+/* --- pildora de marcador (linea de halving real / proyeccion) --- */
+.halving-pill-bg{fill:#12141c;stroke:rgba(255,255,255,.12);stroke-width:.5}
+.halving-pill-text{fill:#c9c8c2;font-size:11px;font-weight:500;font-family:'Space Mono',monospace}
+/* --- etiqueta "Hoy" + precio junto al punto actual --- */
+.halving-today-label{fill:#8a8fa3;font-weight:400;font-family:'Space Mono',monospace}
+.halving-today-price{fill:#fff;font-weight:500;font-family:'Space Mono',monospace}
+/* --- SVG enfocable: aro de foco visible al navegar con teclado (Tab), igual que el resto
+   del sitio, en vez del contorno azul por defecto del navegador que no sigue el radio --- */
+.halving-chart-svg{border-radius:12px}
+.halving-chart-svg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* antes .indic-chart-body los centraba con flex; ahora se centran solos para que ese
    contenedor pueda quedar en flujo normal y el gráfico real (adentro) sí pueda "romper"
    el margen hacia los lados sin que el flex se lo impida */
@@ -5493,12 +5512,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 <h2 class="calc-title">⏳ Ciclos de Halving de Bitcoin</h2>
               </div>
 
-              <div class="indic-chart-controls" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
-                <button type="button" class="indic-chart-btn active" data-cycle="all">Todo el historial</button>
-                <button type="button" class="indic-chart-btn" data-cycle="0">2012</button>
-                <button type="button" class="indic-chart-btn" data-cycle="1">2016</button>
-                <button type="button" class="indic-chart-btn" data-cycle="2">2020</button>
-                <button type="button" class="indic-chart-btn" data-cycle="3">2024</button>
+              <div class="indic-chart-controls halving-tabs" id="halvingCycleTabs" style="justify-content:center;margin-bottom:18px">
+                <button type="button" class="indic-chart-btn active" data-cycle="all" aria-pressed="true">Todo el historial</button>
+                <button type="button" class="indic-chart-btn" data-cycle="0" aria-pressed="false">2012</button>
+                <button type="button" class="indic-chart-btn" data-cycle="1" aria-pressed="false">2016</button>
+                <button type="button" class="indic-chart-btn" data-cycle="2" aria-pressed="false">2020</button>
+                <button type="button" class="indic-chart-btn" data-cycle="3" aria-pressed="false">2024</button>
               </div>
 
               <div class="dom-card" id="halvingMobileCountdown" style="display:none;margin-bottom:16px;background:#090b16;border-color:rgba(59,130,246,.3)">
@@ -19636,6 +19655,187 @@ function niceLogTicks(minV, maxV){
   return ticks;
 }
 
+// ---- helpers exclusivos de Ciclos de Halving (prefijo halving-/Halving, no tocar los
+// compartidos niceLogTicks/fmtHalvingPrice/chartWatermarkHtml) - ver .claude/skills/dataviz ----
+
+const halvingReduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// variante local de niceLogTicks: decide, por cada marca, si su etiqueta se dibuja o no -
+// la LINEA de rejilla siempre se queda, pero si dos etiquetas quedan a menos de ~22px una de
+// otra (pasa seguido en celular, o en un ciclo con poco rango de precio) se esconden las que
+// no son potencia de 10 (los pasos "2" y "5" de la escala 1-2-5), dejando solo 1/10/100/1000...
+function halvingLogTicks(minV, maxV, yForFn){
+  const ticks = niceLogTicks(minV, maxV);
+  const items = ticks.map(v => {
+    const p = Math.log10(v);
+    return { v, y: yForFn(v), isPow10: Math.abs(p - Math.round(p)) < 1e-6, showLabel: true };
+  });
+  items.sort((a, b) => a.y - b.y);
+  for(let i = 1; i < items.length; i++){
+    if(Math.abs(items[i].y - items[i - 1].y) < 22){
+      if(!items[i].isPow10) items[i].showLabel = false;
+      if(!items[i - 1].isPow10) items[i - 1].showLabel = false;
+    }
+  }
+  return items;
+}
+
+// true si "ms" cae a +-3 dias de alguno de los 4 halvings reales (no la proyeccion del
+// siguiente - ese ya tiene su propia pildora dorada aparte)
+function halvingNearbyLabel(ms){
+  const DAY = 86400000;
+  for(const h of HALVING_CYCLES){
+    if(Math.abs(ms - h.date.getTime()) <= 3 * DAY) return 'Halving ' + h.label;
+  }
+  return null;
+}
+
+// pildora de marcador (linea de halving real o de la proyeccion): rect redondeado + punto +
+// texto, medido de verdad con getBBox (no adivinado) y recortado para que nunca se salga del
+// SVG por ningun lado ni por arriba/abajo - se agrega como nodos reales de DOM, no como texto
+// de plantilla, justo porque necesita medirse una vez que ya esta "pegado" al documento
+function halvingAddPill(svg, cx, cy, text, dotColor, bounds){
+  const NS = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('class', 'halving-pill');
+  svg.appendChild(g);
+  const textEl = document.createElementNS(NS, 'text');
+  textEl.setAttribute('class', 'halving-pill-text');
+  textEl.setAttribute('dominant-baseline', 'central');
+  textEl.textContent = text;
+  g.appendChild(textEl);
+  const bbox = textEl.getBBox();
+  const dotR = 3, gap = 5, padX = 8, pillH = 18;
+  const pillW = padX + dotR * 2 + gap + bbox.width + padX;
+  let pillX = cx - pillW / 2;
+  pillX = Math.max(bounds.left, Math.min(pillX, bounds.right - pillW));
+  let pillY = cy - pillH / 2;
+  pillY = Math.max(bounds.top, Math.min(pillY, bounds.bottom - pillH));
+  const rect = document.createElementNS(NS, 'rect');
+  rect.setAttribute('class', 'halving-pill-bg');
+  rect.setAttribute('x', pillX.toFixed(1));
+  rect.setAttribute('y', pillY.toFixed(1));
+  rect.setAttribute('width', pillW.toFixed(1));
+  rect.setAttribute('height', pillH);
+  rect.setAttribute('rx', 9);
+  rect.setAttribute('ry', 9);
+  g.insertBefore(rect, textEl);
+  const dot = document.createElementNS(NS, 'circle');
+  const dotCy = pillY + pillH / 2;
+  dot.setAttribute('cx', (pillX + padX + dotR).toFixed(1));
+  dot.setAttribute('cy', dotCy.toFixed(1));
+  dot.setAttribute('r', dotR);
+  dot.setAttribute('fill', dotColor);
+  g.insertBefore(dot, textEl);
+  textEl.setAttribute('x', (pillX + padX + dotR * 2 + gap).toFixed(1));
+  textEl.setAttribute('y', dotCy.toFixed(1));
+  return { g, rect, bbox: g.getBBox() };
+}
+
+// quita (no solo esconde) cualquier tick de año/"Año N" que, ya medido de verdad con getBBox,
+// quede pisando la fecha de "hoy" del eje X - un cálculo a ojo (por posición del punto) fallaba
+// porque esa fecha va con text-anchor="end" y se extiende bastante hacia la izquierda de su x
+function halvingClearYearTickCollisions(svg){
+  const todayEl = svg.querySelector('#halvingTodayDateLabel');
+  if(!todayEl) return;
+  const todayBox = todayEl.getBBox();
+  svg.querySelectorAll('.halving-year-tick').forEach(el => {
+    const b = el.getBBox();
+    if(b.x + b.width > todayBox.x - 6 && b.x < todayBox.x + todayBox.width + 6) el.remove();
+  });
+}
+
+// construye el contenido del tooltip con createElement/textContent (nunca innerHTML) - ver
+// references/interaction.md ("labels are untrusted data - use textContent")
+function halvingRenderTooltip(tooltip, { dateLabel, priceLabel, dayLabel, halvingLabel }){
+  tooltip.textContent = '';
+  const dateEl = document.createElement('div');
+  dateEl.style.cssText = 'font-weight:500;color:#e4e2de;margin-bottom:4px';
+  dateEl.textContent = dateLabel;
+  tooltip.appendChild(dateEl);
+  const priceRow = document.createElement('div');
+  priceRow.style.cssText = 'display:flex;align-items:center;gap:6px';
+  const key = document.createElement('span');
+  key.style.cssText = 'display:inline-block;width:10px;height:2px;background:#f0b23d;flex-shrink:0';
+  const priceEl = document.createElement('b');
+  priceEl.style.cssText = 'color:#fff;font-weight:500';
+  priceEl.textContent = priceLabel;
+  priceRow.appendChild(key);
+  priceRow.appendChild(priceEl);
+  tooltip.appendChild(priceRow);
+  if(dayLabel){
+    const d = document.createElement('div');
+    d.style.cssText = 'color:#8a8fa3;font-size:11px;margin-top:3px';
+    d.textContent = dayLabel;
+    tooltip.appendChild(d);
+  }
+  if(halvingLabel){
+    const h = document.createElement('div');
+    h.style.cssText = 'color:#8a8fa3;font-size:11px;margin-top:2px';
+    h.textContent = halvingLabel;
+    tooltip.appendChild(h);
+  }
+}
+
+// barra de area bajo la linea de precio: en escala log no puede bajar a precio=0 (seria
+// -infinito), asi que se cierra contra el fondo del area de dibujo (marginTop+drawH) en vez
+// del eje de precio real
+function halvingAreaPathD(pathD, xFirst, xLast, bottomY){
+  return `${pathD.trim()} L${xLast.toFixed(1)},${bottomY.toFixed(1)} L${xFirst.toFixed(1)},${bottomY.toFixed(1)} Z`;
+}
+
+// mueve/oculta el tooltip + cruz + punto dorado del hover (comun a las 2 vistas) - separado de
+// "calcular que indice mostrar" para que tanto el mouse/touch (pointermove, por posicion) como
+// el teclado (flechas, por indice) puedan llamar al mismo render sin duplicar nada
+function halvingShowHoverAt({ svg, hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip, px, py, totalW, totalH, marginLeft, marginRight }){
+  hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
+  hoverLine.style.display = 'block';
+  hoverDotRing.setAttribute('cx', px); hoverDotRing.setAttribute('cy', py);
+  hoverDotRing.style.display = 'block';
+  hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+  hoverDot.style.display = 'block';
+  const rect = svg.getBoundingClientRect();
+  tooltip.style.display = 'block';
+  const tipHalfW = tooltip.offsetWidth / 2;
+  tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
+  tooltip.style.top = ((py / totalH) * rect.height) + 'px';
+  const clampedPx = Math.min(Math.max(px, marginLeft + 24), totalW - marginRight - 24);
+  hoverDateLabel.setAttribute('x', clampedPx);
+  hoverDateLabel.style.display = 'block';
+  const bboxW = hoverDateLabel.getBBox().width;
+  hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
+  hoverDateBg.setAttribute('width', bboxW + 24);
+  hoverDateBg.style.display = 'block';
+}
+function halvingHideHover({ hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip }){
+  hoverLine.style.display = 'none';
+  hoverDot.style.display = 'none';
+  hoverDotRing.style.display = 'none';
+  hoverDateLabel.style.display = 'none';
+  hoverDateBg.style.display = 'none';
+  tooltip.style.display = 'none';
+}
+
+// transicion al cambiar de pestaña (Todo el historial/2012/2016/2020/2024): deja el SVG
+// anterior a mitad de opacidad mientras se pinta el nuevo, con un min-height fijado a la
+// altura previa para que no haya salto/parpadeo de layout (pedido explicito del encargo)
+function halvingSwitchTab(cycle){
+  const wrap = document.getElementById('halvingChartWrap');
+  const prevH = wrap.offsetHeight;
+  if(prevH){
+    wrap.style.minHeight = prevH + 'px';
+    wrap.style.transition = 'opacity .15s ease';
+    wrap.style.opacity = '.5';
+  }
+  requestAnimationFrame(() => {
+    renderHalvingChart(cycle);
+    requestAnimationFrame(() => {
+      wrap.style.opacity = '1';
+      setTimeout(() => { wrap.style.minHeight = ''; }, 200);
+    });
+  });
+}
+
 function renderHalvingChart(cycleIndex){
   halvingActiveCycle = cycleIndex;
   const loadingEl = document.getElementById('halvingLoading');
@@ -19702,8 +19902,7 @@ function renderHalvingChart(cycleIndex){
   const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 12 : 13;
-  const lineStrokeWidth = isMobileChart ? 2 : 2.4;
-  const marginLeft = isMobileChart ? 46 : 58;
+  const marginLeft = isMobileChart ? 52 : 58;
   const marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30 + extraTop, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
@@ -19716,38 +19915,47 @@ function renderHalvingChart(cycleIndex){
 
   // se excluyen marcas demasiado pegadas al borde superior o inferior, para que no choquen
   // con la línea del halving/años de abajo ni se corten arriba
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yFor(t);
-    return y > marginTop + 2 && y < marginTop + drawH - 4;
+  const yTickItems = halvingLogTicks(minPrice, maxPrice, yFor).filter(it => {
+    return it.y > marginTop + 2 && it.y < marginTop + drawH - 4;
   });
-  const yGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  const yGridHtml = yTickItems.map(it => `
+    <line class="halving-grid-line" x1="${marginLeft}" y1="${it.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${it.y.toFixed(1)}"/>
+    ${it.showLabel ? `<text class="halving-axis-text" x="${marginLeft - 8}" y="${(it.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(it.v)}</text>` : ''}
   `).join('');
 
   let xLabelsHtml = '';
   for(let y = 0; y * 365 <= maxDay + 1; y++){
     const d = y * 365;
-    xLabelsHtml += `<text x="${xFor(d).toFixed(1)}" y="${totalH - 10}" text-anchor="${y === 0 ? 'start' : 'middle'}" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${y === 0 ? 'Halving' : 'Año ' + y}</text>`;
+    xLabelsHtml += `<text class="halving-axis-text halving-year-tick" x="${xFor(d).toFixed(1)}" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}">${y === 0 ? 'Halving' : 'Año ' + y}</text>`;
   }
 
   let pathD = '';
   points.forEach((p, i) => {
     pathD += `${i === 0 ? 'M' : 'L'}${xFor(days[i]).toFixed(1)},${yFor(p.c).toFixed(1)} `;
   });
+  const areaPathD = halvingAreaPathD(pathD, xFor(days[0]), xFor(days[days.length - 1]), marginTop + drawH);
 
   let todayMarkerHtml = '';
+  let todayPx = null, todayPy = null;
   if(isOngoing){
     const px = xFor(days[days.length - 1]), py = yFor(prices[prices.length - 1]);
+    todayPx = px; todayPy = py;
     const todayDateLabel = new Date(points[points.length - 1].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    // línea punteada que baja desde "HOY" hasta el eje, con la fecha exacta abajo — para ubicar
-    // el punto actual en el tiempo sin tener que pasar el mouse
+    const lastPriceLabel = fmtHalvingPrice(prices[prices.length - 1]);
+    // etiqueta "Hoy" + precio a la derecha del punto si hay espacio, si no arriba - nunca una
+    // línea punteada hasta el eje (eso era ruido); la fecha de abajo (eje X) se mantiene igual
+    const roomRight = px < totalW - marginRight - 70;
+    const labelX = roomRight ? px + 10 : Math.min(px, totalW - marginRight - 2);
+    const labelAnchor = roomRight ? 'start' : (px > totalW - marginRight - 20 ? 'end' : 'middle');
+    const line1Y = roomRight ? py - 6 : Math.max(py - 26, marginTop - 2);
+    const line2Y = roomRight ? py + 8 : Math.max(py - 12, marginTop + 12);
     todayMarkerHtml = `
-      <line x1="${px.toFixed(1)}" y1="${py.toFixed(1)}" x2="${px.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,3"/>
+      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="none" stroke="#090b16" stroke-width="2"/>
       <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="#fff"/>
-      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>
-      <text x="${Math.min(px, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(py - 14, marginTop - 16).toFixed(1)}" text-anchor="${px > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
-      <text x="${Math.min(px, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${px > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+      ${halvingReduceMotion ? '' : `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
+      <text class="halving-today-label" x="${labelX.toFixed(1)}" y="${line1Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">Hoy</text>
+      <text class="halving-today-price" x="${labelX.toFixed(1)}" y="${line2Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">${lastPriceLabel}</text>
+      <text id="halvingTodayDateLabel" class="halving-axis-text" x="${Math.min(px, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${px > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}">${todayDateLabel}</text>
     `;
   }
 
@@ -19769,19 +19977,24 @@ function renderHalvingChart(cycleIndex){
   const mobileCountdownEl = document.getElementById('halvingMobileCountdown');
   mobileCountdownEl.style.display = showCountdownOutside ? 'block' : 'none';
 
+  const ariaView = isOngoing ? 'ciclo ' + cycle.label + ' (en curso)' : 'ciclo ' + cycle.label;
+  const ariaLabel = `Precio de Bitcoin en escala logarítmica, ${ariaView}, precio actual ${fmtHalvingPrice(prices[prices.length - 1])}`;
+
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-        ${chartWatermarkHtml(totalW, totalH)}
+      <svg class="fng-chart-svg halving-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
+        ${chartWatermarkHtml(totalW, totalH, 0.6)}
         ${yGridHtml}
-        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="${lineStrokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${areaPathD}" fill="rgba(240,178,61,.06)" stroke="none"/>
+        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="display:none"/>
-        <circle id="halvingHoverDot" r="6" fill="#f0b23d" style="display:none"/>
+        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="halvingHoverDotRing" r="7" fill="none" stroke="#090b16" stroke-width="2" style="display:none"/>
+        <circle id="halvingHoverDot" r="5" fill="#f0b23d" style="display:none"/>
         <rect id="halvingHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="halvingHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="halvingHoverDateLabel" class="halving-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="halvingTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
       ${countdownOverlayHtml}
@@ -19789,13 +20002,32 @@ function renderHalvingChart(cycleIndex){
   `;
 
   const svg = document.getElementById('halvingChartSvg');
+  halvingClearYearTickCollisions(svg);
   const catcher = document.getElementById('halvingHoverCatcher');
   const hoverLine = document.getElementById('halvingHoverLine');
   const hoverDot = document.getElementById('halvingHoverDot');
+  const hoverDotRing = document.getElementById('halvingHoverDotRing');
   const hoverDateLabel = document.getElementById('halvingHoverDateLabel');
   const hoverDateBg = document.getElementById('halvingHoverDateBg');
   const tooltip = document.getElementById('halvingTooltip');
 
+  // pildoras de halving/proyeccion: esta vista de un solo ciclo no tiene ninguna linea de
+  // halving pasada que marcar (el dia 0 ya es "Halving" en el eje X) - nada que agregar aqui
+
+  let hoverIdx = days.length - 1;
+  function showAtIndex(idx){
+    hoverIdx = Math.max(0, Math.min(idx, days.length - 1));
+    const px = xFor(days[hoverIdx]), py = yFor(prices[hoverIdx]);
+    const dateLabel = new Date(points[hoverIdx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    hoverDateLabel.textContent = dateLabel;
+    halvingShowHoverAt({ svg, hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip, px, py, totalW, totalH, marginLeft, marginRight });
+    halvingRenderTooltip(tooltip, {
+      dateLabel,
+      priceLabel: fmtHalvingPrice(prices[hoverIdx]),
+      dayLabel: 'Día ' + Math.round(days[hoverIdx]) + ' desde el halving',
+      halvingLabel: halvingNearbyLabel(points[hoverIdx].t),
+    });
+  }
   function showAt(clientX){
     const rect = svg.getBoundingClientRect();
     const scaleX = totalW / rect.width;
@@ -19806,38 +20038,19 @@ function renderHalvingChart(cycleIndex){
       const diff = Math.abs(days[i] - targetDay);
       if(diff < bestDiff){ bestDiff = diff; idx = i; }
     }
-    const px = xFor(days[idx]), py = yFor(prices[idx]);
-    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
-    hoverLine.style.display = 'block';
-    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
-    hoverDot.style.display = 'block';
-    const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    tooltip.innerHTML = `<b>${fmtHalvingPrice(prices[idx])}</b><br>Día ${Math.round(days[idx])} · ${dateLabel}`;
-    tooltip.style.display = 'block';
-    // recorta el tooltip (centrado en el cursor) para que no se salga del gráfico cerca de los bordes
-    const tipHalfW = tooltip.offsetWidth / 2;
-    tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
-    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
-    // la fecha también queda fija abajo, en el eje, mientras se pasa el mouse — para leerla
-    // sin depender del cuadrito flotante que se mueve con el cursor; el rectángulo de fondo
-    // tapa cualquier etiqueta de "Año N" que quede justo debajo
-    const clampedPx = Math.min(Math.max(px, marginLeft + 24), totalW - marginRight - 24);
-    hoverDateLabel.setAttribute('x', clampedPx);
-    hoverDateLabel.textContent = dateLabel;
-    hoverDateLabel.style.display = 'block';
-    const bboxW = hoverDateLabel.getBBox().width;
-    hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
-    hoverDateBg.setAttribute('width', bboxW + 24);
-    hoverDateBg.style.display = 'block';
+    showAtIndex(idx);
   }
-  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
-  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
-  catcher.addEventListener('mouseleave', () => {
-    hoverLine.style.display = 'none';
-    hoverDot.style.display = 'none';
-    hoverDateLabel.style.display = 'none';
-    hoverDateBg.style.display = 'none';
-    tooltip.style.display = 'none';
+  function hideHover(){ halvingHideHover({ hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip }); }
+  catcher.addEventListener('pointermove', (e) => showAt(e.clientX));
+  catcher.addEventListener('pointerleave', hideHover);
+  svg.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+      e.preventDefault();
+      const step = e.shiftKey ? 30 : 1;
+      showAtIndex(hoverIdx + (e.key === 'ArrowRight' ? step : -step));
+    } else if(e.key === 'Escape'){
+      hideHover();
+    }
   });
 
   const startPrice = prices[0];
@@ -19888,8 +20101,7 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
-  const lineStrokeWidth = isMobileChart ? 2 : 2.4;
-  const marginLeft = isMobileChart ? 46 : 58;
+  const marginLeft = isMobileChart ? 52 : 58;
   const marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30 + extraTop, marginBottom = isMobileChart ? 30 : 34;
   const drawW = totalW - marginLeft - marginRight;
@@ -19900,60 +20112,74 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const xFor = t => marginLeft + ((t - startMs) / spanMs) * drawW;
   const yFor = p => marginTop + drawH - ((Math.log10(p) - logMin) / logRange) * drawH;
 
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yFor(t);
-    return y > marginTop + 2 && y < marginTop + drawH - 4;
+  const yTickItems = halvingLogTicks(minPrice, maxPrice, yFor).filter(it => {
+    return it.y > marginTop + 2 && it.y < marginTop + drawH - 4;
   });
-  const yGridHtml = yTicks.map(t => `
-    <line x1="${marginLeft}" y1="${yFor(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yFor(t).toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-    <text x="${marginLeft - 8}" y="${(yFor(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}" font-weight="700" fill="#c8cde0" font-family="'Space Mono',monospace">${fmtHalvingPrice(t)}</text>
+  const yGridHtml = yTickItems.map(it => `
+    <line class="halving-grid-line" x1="${marginLeft}" y1="${it.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${it.y.toFixed(1)}"/>
+    ${it.showLabel ? `<text class="halving-axis-text" x="${marginLeft - 8}" y="${(it.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(it.v)}</text>` : ''}
   `).join('');
 
-  // una línea vertical punteada por cada halving que ya haya ocurrido, con su año encima
+  const lastPx = xFor(points[points.length - 1].t), lastPy = yFor(points[points.length - 1].c);
+
+  // una línea vertical sólida (recesiva) por cada halving que ya haya ocurrido - la identidad
+  // la da el punto azul de la píldora, no el color de la línea ni del texto
   let halvingLinesHtml = '';
+  const pillQueue = []; // {cx, cy, text, dotColor} - se agregan como DOM real después de insertar el SVG (getBBox)
   HALVING_CYCLES.forEach(h => {
     const hMs = h.date.getTime();
     if(hMs < startMs || hMs > dataEndMs) return;
     const px = xFor(hMs);
-    halvingLinesHtml += `
-      <line x1="${px.toFixed(1)}" y1="${marginTop}" x2="${px.toFixed(1)}" y2="${marginTop + drawH}" stroke="rgba(96,165,250,.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <text x="${px.toFixed(1)}" y="${marginTop - 12}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#60a5fa" font-family="'Space Mono',monospace">${h.label}</text>
-    `;
+    halvingLinesHtml += `<line class="halving-marker-line" x1="${px.toFixed(1)}" y1="${marginTop}" x2="${px.toFixed(1)}" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.14)" stroke-width="1"/>`;
+    pillQueue.push({ cx: px, cy: marginTop - 12, text: h.label, dotColor: '#3987e5' });
   });
 
   // línea del próximo halving (todavía no ha pasado — es una estimación matemática por
-  // bloques, la misma que se ve en el "Próximo Halving" del dashboard), en un color distinto
-  // para que quede claro que es una proyección y no un dato confirmado
+  // bloques, la misma que se ve en el "Próximo Halving" del dashboard) - esta SÍ se deja
+  // punteada a propósito: es una proyección, no un dato confirmado, y el punteado comunica eso
   const projMs = HALVING_PROJECTED_DATE.getTime();
   let projLineHtml = '';
   if(projMs > dataEndMs && projMs <= axisEndMs){
     const projPx = xFor(projMs);
-    const projLabel = '≈' + HALVING_PROJECTED_DATE.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
-    projLineHtml = `
-      <line x1="${projPx.toFixed(1)}" y1="${marginTop}" x2="${projPx.toFixed(1)}" y2="${marginTop + drawH}" stroke="rgba(240,178,61,.55)" stroke-width="1.5" stroke-dasharray="1,4"/>
-      <text x="${Math.min(projPx, totalW - marginRight).toFixed(1)}" y="${marginTop - 12}" text-anchor="${projPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="var(--gold)" font-family="'Space Mono',monospace">${projLabel}</text>
-    `;
+    const projLabel = '≈ ' + HALVING_PROJECTED_DATE.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) + ' (estimado)';
+    projLineHtml = `<line class="halving-marker-line" x1="${projPx.toFixed(1)}" y1="${marginTop}" x2="${projPx.toFixed(1)}" y2="${marginTop + drawH}" stroke="rgba(240,178,61,.55)" stroke-width="1.5" stroke-dasharray="1,4"/>`;
+    pillQueue.push({ cx: projPx, cy: marginTop - 12, text: projLabel, dotColor: '#f0b23d' });
   }
 
-  // fecha de inicio, para ubicarse en el tiempo (el final ya lo marca el punto "HOY")
-  const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
-  const xLabelsHtml = `
-    <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-  `;
+  // un tick por año (cada 2 en celular), centrados - se omite el que choque con la fecha de "HOY"
+  const startYear = new Date(startMs).getUTCFullYear();
+  const endYear = new Date(dataEndMs).getUTCFullYear();
+  const yearStep = isMobileChart ? 2 : 1;
+  let xLabelsHtml = '';
+  for(let yr = startYear; yr <= endYear; yr += yearStep){
+    const tMs = Date.UTC(yr, 0, 1);
+    if(tMs < startMs || tMs > dataEndMs) continue;
+    const tx = xFor(tMs);
+    // el descarte real (medido con getBBox, no a ojo) pasa DESPUES de insertar el SVG en el
+    // documento - ver la limpieza de colisiones justo tras wrap.innerHTML mas abajo
+    xLabelsHtml += `<text class="halving-axis-text halving-year-tick" x="${tx.toFixed(1)}" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}">${yr}</text>`;
+  }
 
   let pathD = '';
   points.forEach((p, i) => {
     pathD += `${i === 0 ? 'M' : 'L'}${xFor(p.t).toFixed(1)},${yFor(p.c).toFixed(1)} `;
   });
+  const areaPathD = halvingAreaPathD(pathD, xFor(points[0].t), lastPx, marginTop + drawH);
 
-  const lastPx = xFor(points[points.length - 1].t), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(points[points.length - 1].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const lastPriceLabel = fmtHalvingPrice(points[points.length - 1].c);
+  const roomRight = lastPx < totalW - marginRight - 70;
+  const labelX = roomRight ? lastPx + 10 : Math.min(lastPx, totalW - marginRight - 2);
+  const labelAnchor = roomRight ? 'start' : (lastPx > totalW - marginRight - 20 ? 'end' : 'middle');
+  const line1Y = roomRight ? lastPy - 6 : Math.max(lastPy - 26, marginTop - 2);
+  const line2Y = roomRight ? lastPy + 8 : Math.max(lastPy - 12, marginTop + 12);
   const todayMarkerHtml = `
-    <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="7" fill="none" stroke="#090b16" stroke-width="2"/>
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    ${halvingReduceMotion ? '' : `<circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
+    <text class="halving-today-label" x="${labelX.toFixed(1)}" y="${line1Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">Hoy</text>
+    <text class="halving-today-price" x="${labelX.toFixed(1)}" y="${line2Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">${lastPriceLabel}</text>
+    <text id="halvingTodayDateLabel" class="halving-axis-text" x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}">${todayDateLabel}</text>
   `;
 
   let countdownOverlayHtml = '';
@@ -19971,21 +20197,25 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const mobileCountdownEl = document.getElementById('halvingMobileCountdown');
   mobileCountdownEl.style.display = showCountdownOutside ? 'block' : 'none';
 
+  const ariaLabel = `Precio de Bitcoin en escala logarítmica, todo el historial, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}`;
+
   wrap.innerHTML = `
     <div style="position:relative">
-      <svg class="fng-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block">
-        ${chartWatermarkHtml(totalW, totalH)}
+      <svg class="fng-chart-svg halving-chart-svg" id="halvingChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
+        ${chartWatermarkHtml(totalW, totalH, 0.6)}
         ${yGridHtml}
         ${halvingLinesHtml}
         ${projLineHtml}
-        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="${lineStrokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${areaPathD}" fill="rgba(240,178,61,.06)" stroke="none"/>
+        <path d="${pathD.trim()}" fill="none" stroke="#f0b23d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
-        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="display:none"/>
-        <circle id="halvingHoverDot" r="6" fill="#f0b23d" style="display:none"/>
+        <line id="halvingHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
+        <circle id="halvingHoverDotRing" r="7" fill="none" stroke="#090b16" stroke-width="2" style="display:none"/>
+        <circle id="halvingHoverDot" r="5" fill="#f0b23d" style="display:none"/>
         <rect id="halvingHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="halvingHoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
-        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
+        <text id="halvingHoverDateLabel" class="halving-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
+        <rect id="halvingHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
       </svg>
       <div id="halvingTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid rgba(91,141,239,.3);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
       ${countdownOverlayHtml}
@@ -19993,13 +20223,34 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   `;
 
   const svg = document.getElementById('halvingChartSvg');
+  halvingClearYearTickCollisions(svg);
   const catcher = document.getElementById('halvingHoverCatcher');
   const hoverLine = document.getElementById('halvingHoverLine');
   const hoverDot = document.getElementById('halvingHoverDot');
+  const hoverDotRing = document.getElementById('halvingHoverDotRing');
   const hoverDateLabel = document.getElementById('halvingHoverDateLabel');
   const hoverDateBg = document.getElementById('halvingHoverDateBg');
   const tooltip = document.getElementById('halvingTooltip');
 
+  // píldoras de cada halving + la proyectada, ya con el SVG insertado en el documento (getBBox
+  // real, no adivinado) - recortadas para que nunca se salgan del lienzo
+  const pillBounds = { left: marginLeft, right: totalW - marginRight, top: 2, bottom: marginTop - 2 };
+  pillQueue.forEach(p => halvingAddPill(svg, p.cx, p.cy, p.text, p.dotColor, pillBounds));
+
+  let hoverIdx = points.length - 1;
+  function showAtIndex(idx){
+    hoverIdx = Math.max(0, Math.min(idx, points.length - 1));
+    const px = xFor(points[hoverIdx].t), py = yFor(points[hoverIdx].c);
+    const dateLabel = new Date(points[hoverIdx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    hoverDateLabel.textContent = dateLabel;
+    halvingShowHoverAt({ svg, hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip, px, py, totalW, totalH, marginLeft, marginRight });
+    halvingRenderTooltip(tooltip, {
+      dateLabel,
+      priceLabel: fmtHalvingPrice(points[hoverIdx].c),
+      dayLabel: null,
+      halvingLabel: halvingNearbyLabel(points[hoverIdx].t),
+    });
+  }
   function showAt(clientX){
     const rect = svg.getBoundingClientRect();
     const scaleX = totalW / rect.width;
@@ -20010,35 +20261,19 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
       const diff = Math.abs(points[i].t - targetMs);
       if(diff < bestDiff){ bestDiff = diff; idx = i; }
     }
-    const px = xFor(points[idx].t), py = yFor(points[idx].c);
-    hoverLine.setAttribute('x1', px); hoverLine.setAttribute('x2', px);
-    hoverLine.style.display = 'block';
-    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
-    hoverDot.style.display = 'block';
-    const dateLabel = new Date(points[idx].t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    tooltip.innerHTML = `<b>${fmtHalvingPrice(points[idx].c)}</b><br>${dateLabel}`;
-    tooltip.style.display = 'block';
-    // recorta el tooltip (centrado en el cursor) para que no se salga del gráfico cerca de los bordes
-    const tipHalfW = tooltip.offsetWidth / 2;
-    tooltip.style.left = Math.min(Math.max((px / totalW) * rect.width, tipHalfW + 4), rect.width - tipHalfW - 4) + 'px';
-    tooltip.style.top = ((py / totalH) * rect.height) + 'px';
-    const clampedPx = Math.min(Math.max(px, marginLeft + 24), totalW - marginRight - 24);
-    hoverDateLabel.setAttribute('x', clampedPx);
-    hoverDateLabel.textContent = dateLabel;
-    hoverDateLabel.style.display = 'block';
-    const bboxW = hoverDateLabel.getBBox().width;
-    hoverDateBg.setAttribute('x', clampedPx - bboxW / 2 - 12);
-    hoverDateBg.setAttribute('width', bboxW + 24);
-    hoverDateBg.style.display = 'block';
+    showAtIndex(idx);
   }
-  catcher.addEventListener('mousemove', (e) => showAt(e.clientX));
-  catcher.addEventListener('touchmove', (e) => { if(e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
-  catcher.addEventListener('mouseleave', () => {
-    hoverLine.style.display = 'none';
-    hoverDot.style.display = 'none';
-    hoverDateLabel.style.display = 'none';
-    hoverDateBg.style.display = 'none';
-    tooltip.style.display = 'none';
+  function hideHover(){ halvingHideHover({ hoverLine, hoverDot, hoverDotRing, hoverDateLabel, hoverDateBg, tooltip }); }
+  catcher.addEventListener('pointermove', (e) => showAt(e.clientX));
+  catcher.addEventListener('pointerleave', hideHover);
+  svg.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+      e.preventDefault();
+      const step = e.shiftKey ? 30 : 1;
+      showAtIndex(hoverIdx + (e.key === 'ArrowRight' ? step : -step));
+    } else if(e.key === 'Escape'){
+      hideHover();
+    }
   });
 
   const firstPrice = points[0].c;
@@ -20056,9 +20291,13 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
 
 document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#halvingCycleTabs .indic-chart-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
-    renderHalvingChart(btn.dataset.cycle === 'all' ? 'all' : parseInt(btn.dataset.cycle, 10));
+    btn.setAttribute('aria-pressed', 'true');
+    halvingSwitchTab(btn.dataset.cycle === 'all' ? 'all' : parseInt(btn.dataset.cycle, 10));
   });
 });
 
@@ -20128,7 +20367,11 @@ function rainbowBandForResidual(res){
 // marca de agua de fondo (texto centrado, muy transparente) para todos los gráficos SVG del
 // sitio - un solo helper reusado en cada uno en vez de repetir el mismo <text> a mano por todos
 // lados. Se dibuja SIEMPRE como el primer hijo del <svg> (detrás de grid/zonas/líneas)
-function chartWatermarkHtml(totalW, totalH){
+function chartWatermarkHtml(totalW, totalH, opacityScale){
+  // opacityScale es opcional (default 1, igual que siempre) - Ciclos de Halving es el único
+  // que pasa un valor distinto (~0.6) para bajar su marca de agua al ~3-4%, pedido de Juan;
+  // ningún otro gráfico pasa este 3er argumento, así que todos quedan exactamente igual
+  if(opacityScale == null) opacityScale = 1;
   // mismos colores del logo real (ver .calc-eyebrow-word / .sb-logo-tools): "SKILL" en blanco,
   // "CASH" y "Tools" en rojo - "Tools" va en Poppins itálica (no en Caveat, la fuente cursiva que
   // sí usa el logo real). La clase "chart-watermark" (ver CSS) es la que de verdad protege la
@@ -20139,10 +20382,11 @@ function chartWatermarkHtml(totalW, totalH){
   // tspan de adentro, que son los que de verdad pintan las letras visibles
   const fontSize = Math.round(totalW * 0.05);
   const cx = (totalW / 2).toFixed(1), cy = (totalH / 2 + fontSize * 0.3).toFixed(1);
+  const a1 = (0.055 * opacityScale).toFixed(4), a2 = (0.07 * opacityScale).toFixed(4);
   return `<text class="chart-watermark" x="${cx}" y="${cy}" text-anchor="middle" font-weight="900" font-size="${fontSize}" style="font-family:'Poppins',sans-serif !important;letter-spacing:-.01em;pointer-events:none">` +
-    `<tspan fill="rgba(247,246,251,.055)">SKILL</tspan>` +
-    `<tspan fill="rgba(255,47,79,.07)">CASH</tspan>` +
-    `<tspan font-style="italic" fill="rgba(255,47,79,.07)" dx="3">Tools</tspan>` +
+    `<tspan fill="rgba(247,246,251,${a1})">SKILL</tspan>` +
+    `<tspan fill="rgba(255,47,79,${a2})">CASH</tspan>` +
+    `<tspan font-style="italic" fill="rgba(255,47,79,${a2})" dx="3">Tools</tspan>` +
     `</text>`;
 }
 /* ---- hover genérico (línea + punto + tooltip + fecha en el eje X), igual al de Ciclos de
