@@ -4247,13 +4247,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                  Investing.com (el widget carga bien si abres este mismo link directo en el
                  navegador) - era el bloqueador de anuncios del navegador de Juan interceptando
                  el iframe por venir incrustado de otro sitio.
-                 Parámetros de color (ecoDayBackground/ecoDayFontColor/defaultFont/innerBorderColor/
-                 borderColor) y columns= confirmados viendo en vivo el src real que usa melapela.ai -
-                 los que habíamos puesto antes (adivinados a mano) no existían en esta versión del
-                 widget y por eso se ignoraban, dejando el blanco/logo por defecto. El recorte del
-                 header (el iframe más alto + translateY) va en el CSS, ver nota en .events-calendar-iframe -->
+                 Los NOMBRES de los parámetros de color (ecoDayBackground/ecoDayFontColor/
+                 defaultFont/innerBorderColor/borderColor) y columns= están confirmados viendo en
+                 vivo el src real que usa melapela.ai - los que habíamos puesto antes (adivinados
+                 a mano) no existían en esta versión del widget y por eso se ignoraban, dejando el
+                 blanco/logo por defecto. Los VALORES de esos colores sí se copiaron tal cual de
+                 melapela al principio (su propio tema claro: fondo casi blanco, texto casi negro)
+                 y por eso se veía gris/claro encima del fondo oscuro de SkillCash, pedido de Juan
+                 de "que combine con las demás". Ahora los valores son los tokens oscuros propios
+                 del sitio (--surface/--muted2/--white y un tono de borde calculado a partir de
+                 --border2 sobre --surface) en vez de los de melapela - los NOMBRES de parámetro
+                 siguen siendo los mismos ya confirmados, solo cambiaron los valores. OJO: no se
+                 pudo confirmar visualmente porque este entorno de pruebas no tiene salida a
+                 internet hacia investing.com - revisar en el sitio real que el widget sí tome
+                 estos colores (podría haber superficies internas del widget, como el fondo de
+                 cada fila de datos, que Investing.com no deje personalizar con estos parámetros).
+                 El recorte del header (el iframe más alto + translateY) va en el CSS, ver nota en
+                 .events-calendar-iframe -->
             <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232B2F3C&amp;borderColor=%232B2F3C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
             </div>
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
