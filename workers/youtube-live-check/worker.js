@@ -57,6 +57,13 @@ export default {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept-Language': 'es-ES,es;q=0.9',
+          // sin esto, YouTube a veces le responde a Cloudflare (que sale desde IPs/ubicaciones
+          // variadas, muchas en Europa) con la pantalla de "antes de continuar a YouTube" en
+          // vez de la página real del canal - esa pantalla nunca trae "isLiveNow", así que el
+          // Worker reportaría "no está en vivo" SIEMPRE así el canal sí esté transmitiendo. Este
+          // cookie (truco documentado y usado por yt-dlp/Invidious para esto mismo) le dice a
+          // YouTube que el consentimiento ya se dio, y se salta esa pantalla.
+          'Cookie': 'CONSENT=YES+1; SOCS=CAI',
         },
         redirect: 'follow',
       });

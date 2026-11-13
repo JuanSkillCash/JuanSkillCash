@@ -3,6 +3,15 @@
 Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, sin necesitar una
 API key de YouTube (ver la explicación completa en los comentarios de `worker.js`).
 
+> **Juan: si ya tenías este Worker desplegado, vuelve a pegar el código actualizado** (pasos
+> abajo, sección "Cómo desplegarlo") - se le agregó una cabecera que le dice a YouTube que ya
+> se dio el consentimiento, porque sin eso es muy probable que el Worker SIEMPRE diga "no está
+> en vivo" (que es justo lo que reportaste - nunca lograste pillar un directo), así YouTube
+> esté transmitiendo. No lo pude probar en vivo porque este entorno no tiene salida a internet
+> hacia youtube.com ni hacia el Worker; después de volver a pegar el código, prueba con
+> "Buscar directo" en un canal que normalmente transmite seguido (NTN24, CNN en Español,
+> Noticias Telemundo) para confirmar que ahora sí detecta un directo real.
+
 ## Cómo desplegarlo (igual que hiciste con el de CoinGecko)
 
 1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers y Pages** → **Crear**.
