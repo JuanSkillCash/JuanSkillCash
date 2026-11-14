@@ -26,7 +26,7 @@
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
      a un servidor que no sea uno de los que ya usamos - connect-src es una lista blanca exacta
      de las APIs que esta pagina realmente llama, nada mas puede recibir una peticion del navegador -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com https://i.ytimg.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://skillcash-youtube-live.juanchodigital86.workers.dev https://skillcash-noticias.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://sslecal2.investing.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://assets.coingecko.com https://coin-images.coingecko.com https://i.ytimg.com; connect-src 'self' https://skillcash-api-proxy.juanchodigital86.workers.dev https://skillcash-youtube-live.juanchodigital86.workers.dev https://skillcash-noticias.juanchodigital86.workers.dev https://skillcash-calendario.juanchodigital86.workers.dev https://nbvgyouzjscwtfukzxok.supabase.co https://api.alternative.me https://api.binance.com wss://stream.binance.com:9443 https://api.blockchain.info https://api.bybit.com https://api.dexscreener.com https://api.exchange.coinbase.com https://api.hyperliquid.xyz https://api.llama.fi https://fapi.binance.com https://www.deribit.com https://api.gopluslabs.io https://community-api.coinmetrics.io https://api.coingecko.com; frame-src 'self' https://cryptobubbles.net https://www.tradingview.com https://s3.tradingview.com https://www.tradingview-widget.com https://s.tradingview.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>SkillCash Tools – Herramientas</title>
 <meta name="description" content="Herramientas SkillCash: calculadora de trading de futuros y más recursos para operar con criterio.">
@@ -2977,13 +2977,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-card-badge{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:20px;background:rgba(91,141,239,.14);color:var(--accent);border:1px solid rgba(91,141,239,.35);white-space:nowrap}
 .events-card-head{font-family:'Poppins',sans-serif;font-weight:800;font-size:15.5px;color:var(--white);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .events-card-head svg{flex-shrink:0;color:var(--accent)}
-/* chips descriptivos (lo que Juan vio como "Impacto alto"/"Semana actual" en el de melapela) -
-   son decoracion fija, no filtros interactivos: describen los parametros reales que YA trae el
-   iframe (importance=3 alto, calType=week), igual que en el de ellos (confirmado investigando
-   en vivo que esos chips tambien son UI propia suya, afuera del iframe, no controles reales) */
-.events-chips{display:flex;flex-wrap:wrap;gap:6px}
-.events-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted2);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:4px 10px}
-.events-chip i{width:6px;height:6px;border-radius:50%;background:#f0b23d;flex-shrink:0}
 .events-yt-controls{display:flex;gap:8px}
 .events-yt-refresh{flex-shrink:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .events-yt-refresh:hover{border-color:var(--accent)}
@@ -3058,56 +3051,58 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 @keyframes newsSkelShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media(prefers-reduced-motion:reduce){ .events-news-skel{animation:none} }
 .events-news-empty{font-size:12.5px;color:var(--muted);padding:10px 4px}
-/* Calendario Económico: el iframe de Investing.com siempre trae su propio logo + iconos de
-   Android/Apple + selector de fechas arriba (no existe un parámetro que los quite - confirmado
-   investigando en vivo cómo lo hace melapela.ai) - el truco real es recortarlo: el iframe se
-   dibuja MÁS ALTO que la cajita visible y se empuja hacia arriba con translateY, así esa franja
-   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. SÍ lleva un filtro
-   CSS invert(.9) hue-rotate(180deg) saturate(.72) - se intentó quitarlo 2 veces para usar colores
-   oscuros "de verdad" vía los parámetros del src, y las 2 veces salió peor (ver el comentario
-   junto al <iframe> en el HTML): los parámetros de color de este widget NO alcanzan el fondo de
-   las filas de datos (la mayoría de lo que se ve), que Investing.com deja fijo en blanco pase lo
-   que pase - sin el filtro, esas filas quedan blancas chocando con el sitio oscuro. El filtro
-   (con los colores CLAROS originales de melapela en el src, para que al invertirse den oscuro)
-   es la única forma que de verdad oscurece TODO el widget. pointer-events:none porque no usamos
-   el selector de fechas propio de Investing (el "Semana actual"/filtros son decoración nuestra,
-   afuera del iframe). Alto subido de 420 a 880 (Juan: "se ve muy chiquito... que ocupe toda la
-   página") - el iframe interno sube con él, translateY queda igual proporcionalmente (ver nota en
-   .events-calendar-iframe sobre el zoom, que es lo que de verdad lo agranda).
-   El ancho no lo controlamos: las columnas de este widget no se estiran para llenar todo el
-   espacio disponible (es de fábrica, no un error nuestro) - por eso queda un hueco vacío a la
-   derecha en pantallas anchas, el zoom de abajo ayuda a que ese hueco se note menos pero no lo
-   elimina del todo. */
-.events-calendar-wrap{position:relative;height:880px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
-/* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
-   del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
-   estilo ya usado en otras listas scrolleables del sitio */
-.events-calendar-wrap::-webkit-scrollbar{width:8px;height:8px}
-.events-calendar-wrap::-webkit-scrollbar-track{background:transparent}
-.events-calendar-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
-.events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-.events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.events-calendar-clip{position:relative;overflow:clip;height:880px;min-width:590px}
-/* zoom:1.3 - truco pedido por Juan para que el contenido (texto/filas) se vea más grande, no solo
-   la caja vacía alrededor; Juan aceptó el riesgo de no poder probarse en vivo desde este entorno.
-   zoom agranda TODO proporcionalmente (como si cada "pixel CSS" del widget fuera 1.3x más grande),
-   así que el recorte del header de arriba también hay que agrandarlo en la misma proporción:
-   translateY pasa de -38px a -49px (38*1.3=49.4) para seguir tapando esa franja completa aunque
-   ahora se vea más grande. height del iframe sube de 720 a 730 (un poco de margen extra) para que,
-   después del zoom y el corte de arriba, sigan sobrando los 880px de la ventana visible. */
-.events-calendar-iframe{display:block;width:100%;height:730px;border:none;transform:translateY(-49px);zoom:1.3;filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
-/* el zoom de arriba se deja solo para escritorio (experimento pedido por Juan, sin poder probarse
-   en vivo) - en celular se resetea a como estaba antes, para no sumarle más riesgo ahí. Esta
-   regla tiene que ir DESPUÉS de la de arriba (misma especificidad, gana la que está más abajo en
-   el archivo) - si quedara antes, la de escritorio la pisa sin importar el ancho de pantalla. */
-@media(max-width:480px){ .events-calendar-iframe{zoom:1;transform:translateY(-38px)} }
-/* este bloque de celular vivía mucho más arriba en el archivo (justo después de .events-grid-wide)
-   - se mueve aquí, DESPUÉS de las 4 reglas base que pisa (.events-video-wrap/.events-calendar-wrap/
-   -clip/-iframe), porque con la misma especificidad gana la regla que está más abajo en el
-   archivo sin importar qué tan angosta sea la pantalla: estando arriba, esta nunca ganaba en
-   celular y los 2 ajustes de "agrandar" de tareas anteriores (480px→880px en el calendario,
-   420px→480px en el video) se le colaban también al celular sin que nadie lo notara. */
-@media(max-width:480px){ .events-video-wrap{height:320px} .events-calendar-wrap{height:420px} .events-calendar-clip{height:420px} .events-calendar-iframe{height:458px} }
+/* ===== Calendario Económico propio (reemplaza el iframe de Investing.com - ver
+   workers/economic-calendar/worker.js para el backend y el porqué: sus filas de datos quedaban
+   fijas en blanco sin importar los parámetros de color, y su ancho no se estiraba) ===== */
+.cal-filters{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.cal-filter-group{display:flex;flex-wrap:wrap;gap:6px}
+.cal-filter-btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid var(--border2);color:var(--muted2);background:var(--bg2);cursor:pointer;transition:border-color .2s,color .2s,background .2s;white-space:nowrap}
+.cal-filter-btn:hover{color:var(--white)}
+.cal-filter-btn.active{border-color:var(--accent);color:var(--white);background:rgba(91,141,239,.12)}
+.cal-banner{font-size:12px;color:var(--gold);background:rgba(240,178,61,.1);border:1px solid rgba(240,178,61,.35);border-radius:8px;padding:8px 12px}
+.cal-wrap{position:relative;min-height:160px}
+.cal-skeleton{display:flex;flex-direction:column;gap:2px}
+.cal-skel-row{height:38px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:newsSkelShine 1.4s infinite}
+@media(prefers-reduced-motion:reduce){ .cal-skel-row{animation:none} }
+.cal-error{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;text-align:center}
+.cal-error-text{color:var(--muted2);font-size:13.5px}
+.cal-retry-btn{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid var(--border2);color:var(--white);background:var(--bg2);cursor:pointer}
+.cal-retry-btn:hover{border-color:var(--accent)}
+.cal-empty{color:var(--muted);font-size:13px;padding:30px 10px;text-align:center}
+/* tabla (escritorio) - fondo de cada fila con los tokens del sitio (--surface/--bg2), nunca el
+   blanco fijo del widget anterior; separador de día pintado con --accent como el resto del menú */
+.cal-table{width:100%;border-collapse:collapse;font-size:13px}
+.cal-table thead th{text-align:left;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border2)}
+.cal-table thead th:nth-child(5),.cal-table thead th:nth-child(6),.cal-table thead th:nth-child(7){text-align:right}
+.cal-day-row td{background:var(--surface);color:var(--white);font-weight:700;font-size:12.5px;padding:8px 10px;border-radius:8px}
+.cal-row td{padding:9px 10px;border-bottom:1px solid var(--border2);color:var(--muted2);vertical-align:middle}
+.cal-row:hover td{background:rgba(255,255,255,.03)}
+.cal-row.cal-row-next td{background:rgba(91,141,239,.08)}
+.cal-row.cal-row-next td:first-child{border-left:2px solid var(--accent)}
+.cal-cell-hora{font-family:'Space Mono',monospace;color:var(--white);white-space:nowrap}
+.cal-cell-divisa{font-weight:700;color:var(--white)}
+.cal-cell-evento{color:var(--white)}
+.cal-cell-countdown{display:block;font-size:10.5px;color:var(--accent);margin-top:2px}
+.cal-cell-actual,.cal-cell-prevision,.cal-cell-anterior{text-align:right;font-family:'Space Mono',monospace;white-space:nowrap}
+.cal-cell-actual.cal-bueno{color:var(--green)}
+.cal-cell-actual.cal-malo{color:var(--red)}
+.cal-pendiente{color:var(--muted);font-style:italic}
+.cal-imp{display:inline-flex;gap:2px;vertical-align:middle}
+.cal-imp i{width:6px;height:6px;border-radius:50%;background:var(--border2);display:inline-block}
+.cal-imp i.on{background:var(--accent)}
+/* tarjetas (celular) - mismos datos que la tabla, apilados verticalmente */
+.cal-cards{display:flex;flex-direction:column;gap:8px}
+.cal-card-day{font-weight:700;font-size:12.5px;color:var(--white);background:var(--surface);padding:7px 10px;border-radius:8px;margin-top:6px}
+.cal-card-day:first-child{margin-top:0}
+.cal-card{border:1px solid var(--border2);border-radius:10px;padding:10px 12px;background:var(--bg2)}
+.cal-card.cal-row-next{border-color:var(--accent);background:rgba(91,141,239,.08)}
+.cal-card-top{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2);margin-bottom:4px}
+.cal-card-top .cal-cell-hora{color:var(--white)}
+.cal-card-title{font-size:13.5px;font-weight:600;color:var(--white);margin-bottom:6px}
+.cal-card-vals{display:flex;gap:14px;font-size:12px}
+.cal-card-vals b{display:block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+@media(min-width:641px){ .cal-cards{display:none !important} }
+@media(max-width:640px){ .cal-table{display:none !important} }
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -4323,42 +4318,52 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Agenda</div>
-            <div class="events-card-badge">EE.UU.</div>
+            <div class="events-card-badge">EE.UU. + UE</div>
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
             Calendario Económico
           </div>
-          <div class="events-chips">
-            <span class="events-chip"><i></i>Mayor movimiento esperado</span>
-          </div>
-          <div class="events-calendar-wrap">
-            <!-- "Este contenido está bloqueado..." que vimos antes NO era un bloqueo real de
-                 Investing.com (el widget carga bien si abres este mismo link directo en el
-                 navegador) - era el bloqueador de anuncios del navegador de Juan interceptando
-                 el iframe por venir incrustado de otro sitio.
-                 Los NOMBRES de los parámetros de color (ecoDayBackground/ecoDayFontColor/
-                 defaultFont/innerBorderColor/borderColor) y columns= están confirmados viendo en
-                 vivo el src real que usa melapela.ai - PERO esos parámetros solo repintan la
-                 barra separadora de cada día y poco más; el fondo de las FILAS de datos (la
-                 mayoría del widget) Investing.com NO lo deja personalizar con nada, se queda
-                 blanco fijo sin importar qué se le mande. Se intentó 2 veces en sesiones
-                 anteriores arreglar esto solo con los parámetros de color (valores oscuros en vez
-                 de los claros de melapela) y las dos veces salió peor: una vez quedó gris/lavado
-                 (por un filtro CSS invert() que había quedado puesto encima, invirtiendo DOS
-                 VECES), y la otra vez (quitando ese filtro) quedaron las filas de datos en blanco
-                 crudo, chocando feo con el resto del sitio oscuro ("se ve horrible", captura de
-                 Juan). Se vuelve a los valores de melapela (claros) + el filtro CSS invert(.9)
-                 hue-rotate(180deg) saturate(.72) tal cual estaban ANTES de que empezáramos a
-                 tocar esto - es la única combinación que de verdad oscurece TODO el widget
-                 (incluidas las filas que los parámetros no alcanzan), aunque Investing.com no
-                 vuelva a quedar con el azul exacto del sitio. El recorte del header (el iframe
-                 más alto + translateY) va en el CSS, ver nota en .events-calendar-iframe -->
-            <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+          <!-- calendario propio (ya no es un widget de terceros) - ver workers/economic-calendar/
+               para el backend. Reemplaza al iframe de Investing.com (sus filas de datos quedaban
+               fijas en blanco sin importar qué colores se le mandaran por parámetro - ver historial
+               de intentos fallidos en commits anteriores) y al Web Component de TradingView (no
+               mostraba encabezados de columna, no se entendía cuál dato era la previsión/anterior). -->
+          <div class="cal-filters" id="calFilters">
+            <div class="cal-filter-group" role="group" aria-label="Importancia">
+              <button type="button" class="cal-filter-btn active" data-cal-filter="importancia" data-cal-value="3">Alta</button>
+              <button type="button" class="cal-filter-btn" data-cal-filter="importancia" data-cal-value="2">Media</button>
+              <button type="button" class="cal-filter-btn" data-cal-filter="importancia" data-cal-value="1">Baja</button>
+            </div>
+            <div class="cal-filter-group" role="group" aria-label="Divisa">
+              <button type="button" class="cal-filter-btn active" data-cal-filter="divisa" data-cal-value="USD">USD</button>
+              <button type="button" class="cal-filter-btn active" data-cal-filter="divisa" data-cal-value="EUR">EUR</button>
+            </div>
+            <div class="cal-filter-group" role="group" aria-label="Rango de fechas">
+              <button type="button" class="cal-filter-btn active" data-cal-range="semana">Esta semana</button>
+              <button type="button" class="cal-filter-btn" data-cal-range="hoy">Hoy</button>
             </div>
           </div>
-          <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
+          <div class="cal-banner" id="calBanner" style="display:none"></div>
+          <div class="cal-wrap" id="calWrap">
+            <div class="cal-skeleton" id="calSkeleton">
+              <div class="cal-skel-row"></div><div class="cal-skel-row"></div><div class="cal-skel-row"></div>
+              <div class="cal-skel-row"></div><div class="cal-skel-row"></div>
+            </div>
+            <div class="cal-error" id="calError" style="display:none">
+              <div class="cal-error-text">No se pudo cargar el calendario. Revisa tu conexión e intenta de nuevo.</div>
+              <button type="button" class="cal-retry-btn" id="calRetryBtn">Reintentar</button>
+            </div>
+            <div class="cal-empty" id="calEmpty" style="display:none">No hay eventos para este filtro en este rango de fechas.</div>
+            <table class="cal-table" id="calTable" style="display:none">
+              <thead>
+                <tr><th>Hora</th><th>Div.</th><th>Imp.</th><th>Evento</th><th>Actual</th><th>Previsión</th><th>Anterior</th></tr>
+              </thead>
+              <tbody id="calTbody"></tbody>
+            </table>
+            <div class="cal-cards" id="calCards" style="display:none"></div>
+          </div>
+          <div class="events-card-foot">Eventos de impacto alto/medio/bajo en EE.UU. y la Eurozona, en tu hora local · Datos por <span id="calFuenteLabel">TradingView</span> · Se actualiza solo cada minuto.</div>
         </div>
       </div>
     </section>
@@ -4741,28 +4746,254 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         }
       }
     })();
-    // El calendario de Investing.com (sslecal2.investing.com) tardaba 2.7s en cargar en cada
-    // visita a la portada, aunque la persona nunca llegara a desplazarse hasta verlo -
-    // loading="lazy" nativo del navegador ya ayuda un poco, pero en conexiones rápidas el
-    // margen que usa Chrome es chico y casi no alcanza a notarse. Con IntersectionObserver se
-    // controla el margen a mano (200px): el iframe solo pide su src cuando la sección está por
-    // entrar en pantalla de verdad, nunca antes.
+    // Calendario Económico propio (reemplaza el iframe de Investing.com) - ver
+    // workers/economic-calendar/worker.js para el backend (TradingView con respaldo en Forex
+    // Factory, ya traducido/formateado/coloreado en el JSON que devuelve).
     (function(){
-      var iframe = document.querySelector('.events-calendar-iframe');
+      var EVENTS_CAL_URL = 'https://skillcash-calendario.juanchodigital86.workers.dev';
+
+      var filtersEl = document.getElementById('calFilters');
+      var bannerEl = document.getElementById('calBanner');
+      var skelEl = document.getElementById('calSkeleton');
+      var errorEl = document.getElementById('calError');
+      var retryBtn = document.getElementById('calRetryBtn');
+      var emptyEl = document.getElementById('calEmpty');
+      var tableEl = document.getElementById('calTable');
+      var tbodyEl = document.getElementById('calTbody');
+      var cardsEl = document.getElementById('calCards');
+      var fuenteLabelEl = document.getElementById('calFuenteLabel');
       var section = document.getElementById('eventsCalendarBlock');
-      if(!iframe || !section || typeof IntersectionObserver === 'undefined'){
-        if(iframe && iframe.dataset.src) iframe.src = iframe.dataset.src;
-        return;
+      if(!filtersEl || !tbodyEl || !cardsEl) return;
+
+      var filtros = { importancias: new Set([3]), divisas: new Set(['USD', 'EUR']), rango: 'semana' };
+      var eventosCache = [];
+      var cargado = false;
+      var refreshTimer = null;
+      var countdownTimer = null;
+
+      function fechaBogotaHoyStr(){
+        var b = new Date(Date.now() - 5 * 3600 * 1000);
+        var y = b.getUTCFullYear(), m = String(b.getUTCMonth() + 1).padStart(2, '0'), d = String(b.getUTCDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
       }
-      var obs = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting){
-            iframe.src = iframe.dataset.src;
-            obs.disconnect();
-          }
+      function horaBogota(fechaUTC){
+        try { return new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(fechaUTC)); }
+        catch(e){ return '--:--'; }
+      }
+      function diaBogotaLargo(fechaUTC){
+        try {
+          var t = new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(fechaUTC));
+          return t.charAt(0).toUpperCase() + t.slice(1);
+        } catch(e){ return ''; }
+      }
+      function claveDiaBogota(fechaUTC){
+        try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(fechaUTC)); }
+        catch(e){ return fechaUTC.slice(0, 10); }
+      }
+      function impHtml(nivel){
+        var out = '';
+        for(var i = 1; i <= 3; i++) out += '<i class="' + (i <= nivel ? 'on' : '') + '"></i>';
+        return '<span class="cal-imp" aria-hidden="true">' + out + '</span>';
+      }
+      function flechaDireccion(direccion){
+        if(direccion === 'arriba') return ' ▲';
+        if(direccion === 'abajo') return ' ▼';
+        return '';
+      }
+      function celdaActualHtml(ev, ahoraMs){
+        var pasoLaHora = Date.parse(ev.fechaUTC) <= ahoraMs;
+        if(ev.actual == null){
+          if(pasoLaHora) return '<span class="cal-pendiente">Pendiente…</span>';
+          return '—';
+        }
+        var clase = ev.tendencia === 'bueno' ? ' cal-bueno' : ev.tendencia === 'malo' ? ' cal-malo' : '';
+        return '<span class="cal-cell-actual' + clase + '">' + escapeHtml(ev.actual) + flechaDireccion(ev.direccion) + '</span>';
+      }
+
+      function filtraEventos(){
+        return eventosCache.filter(function(ev){
+          return filtros.importancias.has(ev.importancia) && filtros.divisas.has(ev.divisa);
         });
-      }, { rootMargin: '200px' });
-      obs.observe(section);
+      }
+
+      function encuentraProximoId(eventosOrdenados, ahoraMs){
+        for(var i = 0; i < eventosOrdenados.length; i++){
+          if(Date.parse(eventosOrdenados[i].fechaUTC) > ahoraMs) return eventosOrdenados[i].id;
+        }
+        return null;
+      }
+
+      function textoCuentaRegresiva(fechaUTC, ahoraMs){
+        var ms = Date.parse(fechaUTC) - ahoraMs;
+        if(ms <= 0) return 'en curso';
+        var min = Math.round(ms / 60000);
+        if(min < 1) return 'en menos de 1 min';
+        if(min < 60) return 'en ' + min + ' min';
+        var h = Math.floor(min / 60), restoMin = min % 60;
+        return 'en ' + h + 'h' + (restoMin ? ' ' + restoMin + 'min' : '');
+      }
+
+      function render(){
+        var filtrados = filtraEventos().slice().sort(function(a, b){ return Date.parse(a.fechaUTC) - Date.parse(b.fechaUTC); });
+        skelEl.style.display = 'none';
+        errorEl.style.display = 'none';
+        if(!filtrados.length){
+          emptyEl.style.display = 'block';
+          tableEl.style.display = 'none';
+          cardsEl.style.display = 'none';
+          return;
+        }
+        emptyEl.style.display = 'none';
+        tableEl.style.display = '';
+        cardsEl.style.display = '';
+
+        var ahoraMs = Date.now();
+        var proximoId = encuentraProximoId(filtrados, ahoraMs);
+
+        var filasHtml = '', cardsHtml = '', diaActual = null;
+        filtrados.forEach(function(ev){
+          var clave = claveDiaBogota(ev.fechaUTC);
+          if(clave !== diaActual){
+            diaActual = clave;
+            var tituloDia = escapeHtml(diaBogotaLargo(ev.fechaUTC));
+            filasHtml += '<tr class="cal-day-row"><td colspan="7">' + tituloDia + '</td></tr>';
+            cardsHtml += '<div class="cal-card-day">' + tituloDia + '</div>';
+          }
+          var esProximo = ev.id === proximoId;
+          var countdown = esProximo ? '<span class="cal-cell-countdown">' + textoCuentaRegresiva(ev.fechaUTC, ahoraMs) + '</span>' : '';
+          var actualHtml = celdaActualHtml(ev, ahoraMs);
+          var previsionTxt = ev.prevision != null ? escapeHtml(ev.prevision) : '—';
+          var anteriorTxt = ev.anterior != null ? escapeHtml(ev.anterior) : '—';
+          filasHtml += '<tr class="cal-row' + (esProximo ? ' cal-row-next' : '') + '" data-cal-id="' + ev.id + '">' +
+            '<td class="cal-cell-hora">' + horaBogota(ev.fechaUTC) + countdown + '</td>' +
+            '<td class="cal-cell-divisa">' + escapeHtml(ev.divisa) + '</td>' +
+            '<td>' + impHtml(ev.importancia) + '</td>' +
+            '<td class="cal-cell-evento">' + escapeHtml(ev.eventoES || ev.evento) + '</td>' +
+            '<td class="cal-cell-actual">' + actualHtml + '</td>' +
+            '<td class="cal-cell-prevision">' + previsionTxt + '</td>' +
+            '<td class="cal-cell-anterior">' + anteriorTxt + '</td>' +
+          '</tr>';
+          cardsHtml += '<div class="cal-card' + (esProximo ? ' cal-row-next' : '') + '" data-cal-id="' + ev.id + '">' +
+            '<div class="cal-card-top">' + impHtml(ev.importancia) + '<span class="cal-cell-hora">' + horaBogota(ev.fechaUTC) + '</span>' +
+              '<span class="cal-cell-divisa">' + escapeHtml(ev.divisa) + '</span>' + countdown +
+            '</div>' +
+            '<div class="cal-card-title">' + escapeHtml(ev.eventoES || ev.evento) + '</div>' +
+            '<div class="cal-card-vals">' +
+              '<span><b>Actual</b>' + actualHtml + '</span>' +
+              '<span><b>Previsión</b>' + previsionTxt + '</span>' +
+              '<span><b>Anterior</b>' + anteriorTxt + '</span>' +
+            '</div>' +
+          '</div>';
+        });
+        tbodyEl.innerHTML = filasHtml;
+        cardsEl.innerHTML = cardsHtml;
+      }
+
+      function tickCountdown(){
+        if(!cargado) return;
+        var spans = document.querySelectorAll('#calTbody .cal-cell-countdown, #calCards .cal-cell-countdown');
+        if(!spans.length) return;
+        var filtrados = filtraEventos().slice().sort(function(a, b){ return Date.parse(a.fechaUTC) - Date.parse(b.fechaUTC); });
+        var ahoraMs = Date.now();
+        var proximoId = encuentraProximoId(filtrados, ahoraMs);
+        var proximo = filtrados.find(function(e){ return e.id === proximoId; });
+        if(!proximo) return;
+        var texto = textoCuentaRegresiva(proximo.fechaUTC, ahoraMs);
+        spans.forEach(function(s){ s.textContent = texto; });
+      }
+
+      function construyeUrl(){
+        var params = new URLSearchParams();
+        if(filtros.rango === 'hoy'){
+          var hoy = fechaBogotaHoyStr();
+          params.set('desde', hoy);
+          params.set('hasta', hoy);
+        }
+        params.set('paises', 'US,EU');
+        var qs = params.toString();
+        return EVENTS_CAL_URL + (qs ? '?' + qs : '');
+      }
+
+      function cargar(){
+        if(!cargado){
+          skelEl.style.display = '';
+          errorEl.style.display = 'none';
+          emptyEl.style.display = 'none';
+          tableEl.style.display = 'none';
+          cardsEl.style.display = 'none';
+        }
+        bannerEl.style.display = 'none';
+        fetch(construyeUrl())
+          .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function(data){
+            eventosCache = Array.isArray(data.eventos) ? data.eventos : [];
+            cargado = true;
+            if(fuenteLabelEl) fuenteLabelEl.textContent = data.fuente || 'TradingView';
+            if(data.desactualizado){
+              bannerEl.textContent = '⚠️ Mostrando la última copia guardada - no se pudo conectar a la fuente en vivo justo ahora.';
+              bannerEl.style.display = '';
+            }
+            render();
+          })
+          .catch(function(){
+            if(!cargado){
+              skelEl.style.display = 'none';
+              errorEl.style.display = 'flex';
+              tableEl.style.display = 'none';
+              cardsEl.style.display = 'none';
+              emptyEl.style.display = 'none';
+            } else {
+              bannerEl.textContent = '⚠️ No se pudo actualizar el calendario justo ahora - mostrando los últimos datos cargados.';
+              bannerEl.style.display = '';
+            }
+          });
+      }
+
+      filtersEl.addEventListener('click', function(e){
+        var btn = e.target.closest('.cal-filter-btn');
+        if(!btn) return;
+        if(btn.dataset.calRange){
+          if(btn.classList.contains('active')) return;
+          filtersEl.querySelectorAll('[data-cal-range]').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          filtros.rango = btn.dataset.calRange;
+          cargado = false;
+          cargar();
+          return;
+        }
+        var grupo = btn.dataset.calFilter;
+        var valor = btn.dataset.calValue;
+        var set = grupo === 'importancia' ? filtros.importancias : filtros.divisas;
+        var valorTyped = grupo === 'importancia' ? Number(valor) : valor;
+        var estaActivo = btn.classList.contains('active');
+        if(estaActivo && set.size <= 1) return; // siempre debe quedar al menos 1 activo en el grupo
+        if(estaActivo){ set.delete(valorTyped); btn.classList.remove('active'); }
+        else { set.add(valorTyped); btn.classList.add('active'); }
+        render();
+      });
+
+      if(retryBtn) retryBtn.addEventListener('click', function(){ cargado = false; cargar(); });
+
+      // igual que antes con el iframe: no se pide nada hasta que la sección esté por entrar en
+      // pantalla de verdad (rootMargin 200px), para no gastar la llamada al Worker en una visita
+      // que ni siquiera llega a desplazarse hasta acá
+      if(section && typeof IntersectionObserver !== 'undefined'){
+        var obs = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            if(entry.isIntersecting){
+              cargar();
+              refreshTimer = setInterval(cargar, 60000);
+              countdownTimer = setInterval(tickCountdown, 1000);
+              obs.disconnect();
+            }
+          });
+        }, { rootMargin: '200px' });
+        obs.observe(section);
+      } else {
+        cargar();
+        refreshTimer = setInterval(cargar, 60000);
+        countdownTimer = setInterval(tickCountdown, 1000);
+      }
     })();
     </script>
     <script>
