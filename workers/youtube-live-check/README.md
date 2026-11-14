@@ -1,62 +1,26 @@
-# Worker: ¿está este canal de YouTube en vivo?
+# Worker: ¿está este canal de YouTube en vivo? + temas recientes
 
-Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, sin necesitar una
-API key de YouTube (ver la explicación completa en los comentarios de `worker.js`).
+Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso trae sus últimos
+videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
+completa en los comentarios de `worker.js`).
 
-> **Juan: vuelve a pegar el código actualizado (14-nov-2026)** - la versión anterior buscaba
-> `"isLiveNow":true`/`"isLiveBroadcast":true` en la página de YouTube, pero esa señal ya NO
-> existe ahí (confirmado en navegador el 13-nov-2026, 0 coincidencias hasta en un canal que SÍ
-> estaba en vivo) - por eso nunca detectaba nada, así los canales sí estuvieran transmitiendo.
-> La versión nueva lee `ytInitialPlayerResponse` (el bloque que de verdad trae YouTube hoy) y
-> además ahora distingue "en vivo", "programado, todavía no empieza" y "en vivo pero no se
-> puede ver embebido aquí" (bloqueado por país o por el propio dueño del canal), y siempre
-> trae un bloque `"debug"` en la respuesta para poder revisar qué pasó sin tener que adivinar.
->
-> **No lo pude probar contra YouTube de verdad** porque este entorno no tiene salida a
-> internet hacia youtube.com ni hacia el propio Worker - solo se probó la lógica con HTML de
-> prueba armado a mano, imitando la forma real que confirmaste en el navegador. Por eso el
-> primer paso después de desplegar es la prueba de abajo con CNN en Español.
+> **Juan: vuelve a pegar el código actualizado (14-nov-2026)** - se agregó el campo `recientes`
+> (últimos videos subidos del canal, máximo 3, de las últimas 24h) usando el mismo truco de
+> siempre pero sobre la página `/videos` del canal en vez de `/live`. La detección de "en vivo"
+> en sí no cambió en este paso (ya se había arreglado y confirmado en producción antes).
 
-## Cómo desplegarlo (igual que hiciste con los otros Workers de este sitio)
+## Cómo desplegarlo
 
-1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers y Pages** → tu Worker
-   **`skillcash-youtube-live`** (si no existe todavía, **Crear** → **"Crear Worker"**, con ese
-   nombre exacto).
-2. **"Editar código"** → borra todo lo que haya → pega **todo** el contenido del archivo
-   `worker.js` de esta misma carpeta → **"Desplegar"**.
-
-## Primera prueba después de desplegar (importante, hacerla sí o sí)
-
-Abre en el navegador (cambia la URL por la tuya real) usando el ID de **CNN en Español**, que
-transmite 24/7 y por eso sirve para confirmar rápido que la detección básica funciona:
-
-```
-https://<tu-url>.workers.dev/?channel=UC_lEiu6917IJz03TnntWUaQ
-```
-
-Debería responder con `"live":true` y un `videoId` real. **Si sale `"live":false`**, mira el
-bloque `"debug"` de la respuesta antes de asumir que algo quedó mal:
-
-- `"consentPage":true` → YouTube sigue mandando la pantalla de "antes de continuar", pese a la
-  cabecera `Cookie` que ya intenta evitarla. Avísame.
-- `"botCheck":true` → YouTube detectó la IP de Cloudflare como tráfico de robot. Avísame (este
-  es el caso donde haría falta el "Plan B" con la API oficial de YouTube, ver abajo).
-- `"hasPlayerResponse":false` con `"httpStatus":200` y sin `consentPage`/`botCheck` → YouTube
-  cambió otra vez el formato de la página. Mándame el `"htmlLength"` que salió y lo reviso.
-- Cualquier otra cosa rara en `debug` (por ejemplo `httpStatus` distinto de 200) → mándamela tal
-  cual salió.
-
-Después de confirmar CNN en Español, prueba también con **DW Español**
-(`UCT4Jg8h03dD0iN3Pb5L0PMA`, 24/7) y con **NTN24** (`UCEJs1fTF3KszRJGxJY14VrA` - este puede salir
-`"live":true"` pero con `"embeddable":false` o `"playability"` distinto de `"OK"`, porque YouTube
-a veces lo restringe; en el sitio eso se ve como "En vivo, pero no se puede ver aquí" con un link
-directo a YouTube, en vez de intentar reproducirlo roto).
+1. Entra al Worker **`skillcash-youtube-live`** en Cloudflare → **"Edit code"** → borra todo →
+   pega **todo** el contenido del archivo `worker.js` de esta misma carpeta → **"Deploy"**.
 
 ## Forma de la respuesta
 
 ```json
 {"live":true,"videoId":"Qr61waJ6AZg","title":"CNN en Español en vivo","channelId":"UC_lEiu6917IJz03TnntWUaQ",
  "checkedAt":1762500000000,"upcoming":false,"playability":"OK","embeddable":true,
+ "recientes":[{"videoId":"zWfV3LJDnno","titulo":"La FAA levanta la suspensión de vuelos...","hace":"hace 4 h"},
+              {"videoId":"9xNy2G3dSxQ","titulo":"FAA ordena la suspensión de todos los vuelos...","hace":"hace 8 h"}],
  "debug":{"httpStatus":200,"finalUrl":"https://www.youtube.com/watch?v=Qr61waJ6AZg","htmlLength":612345,
           "hasPlayerResponse":true,"consentPage":false,"botCheck":false}}
 ```
@@ -65,22 +29,37 @@ directo a YouTube, en vez de intentar reproducirlo roto).
 - `playability`/`embeddable`: si `playability` no es `"OK"` o `embeddable` es `false`, el video
   no se debe intentar embeber aunque `live` sea `true` - el sitio ya maneja esto mostrando un
   link directo a YouTube.
-- Cacheado 60 segundos en el borde de Cloudflare en el caso normal, 15 segundos si hubo algún
-  error o página rara (para no quedarse mostrando un dato malo tanto tiempo).
+- `recientes`: hasta 3 de los últimos videos subidos del canal, solo si son de las últimas 24
+  horas (si no hay ninguno tan reciente, llega como arreglo vacío `[]`). Se usa en el sitio para
+  mostrar "de qué está hablando" cada canal, tanto en la lista de canales (2ª línea, "Último: …")
+  como debajo del reproductor ("Temas recientes en este canal").
+- Cacheado 60 segundos en el borde de Cloudflare la parte de "en vivo" (15 segundos si hubo algún
+  error o página rara). `recientes` se cachea aparte, 10 minutos (cambia mucho menos seguido), así
+  que no se escanea la página de videos del canal en cada chequeo de "en vivo".
+
+## Si `live` sale mal, revisa el `debug`
+
+- `"consentPage":true` → YouTube sigue mandando la pantalla de "antes de continuar", pese a la
+  cabecera `Cookie` que ya intenta evitarla. Avísame.
+- `"botCheck":true` → YouTube detectó la IP de Cloudflare como tráfico de robot. Avísame (este
+  es el caso donde haría falta el "Plan B" de abajo).
+- `"hasPlayerResponse":false` con `"httpStatus":200` y sin `consentPage`/`botCheck` → YouTube
+  cambió otra vez el formato de la página. Mándame el `"htmlLength"` que salió y lo reviso.
 
 ## Plan B (solo si `botCheck` sale en `true` seguido, es decir YouTube bloquea Cloudflare)
 
-No implementado todavía - documentado aquí como lo que seguiría si hace falta, para no tener
-que investigarlo de cero:
+No implementado todavía - documentado aquí como lo que seguiría si hace falta:
 
-1. Sacar IDs de video candidatos por canal desde `https://www.youtube.com/feeds/videos.xml?channel_id=<ID>`
-   (RSS público, sin llave) + una lista en KV de IDs de directos 24/7 ya conocidos (esos streams
-   viejos a veces no aparecen en el RSS).
-2. Una sola llamada a la API oficial de YouTube: `videos.list` con `part=snippet,liveStreamingDetails`
+1. Una sola llamada a la API oficial de YouTube: `videos.list` con `part=snippet,liveStreamingDetails`
    y hasta 50 IDs de video a la vez (cuesta solo **1 unidad** por llamada, de las 10.000
    unidades/día gratis) - **nunca** `search.list` (cuesta 100 unidades por llamada, se acabaría
-   la cuota del día enseguida entre varios canales).
-3. `snippet.liveBroadcastContent=="live"` = en vivo.
+   la cuota del día enseguida entre varios canales). `snippet.liveBroadcastContent=="live"` = en
+   vivo.
+2. El problema es conseguir el ID del video candidato sin la API oficial (que es lo que este
+   Worker hace hoy raspando la página) - el feed RSS que se había pensado para esto
+   (`youtube.com/feeds/videos.xml?channel_id=...`) **quedó confirmado muerto, da 404** (probado
+   el 14-nov-2026 con 3 canales distintos) - **no usarlo**. Si se llega a necesitar el Plan B,
+   hay que investigar de cero una forma de conseguir el ID del video candidato.
 
 Si llegas a necesitarlo, dímelo con el `debug` completo de un caso con `botCheck:true` y lo
 armamos con calma (necesita una API key de YouTube Data API v3 nueva, como secreto del Worker).

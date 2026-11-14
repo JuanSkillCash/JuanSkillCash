@@ -3015,8 +3015,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    de color. Se llena/oculta desde JS (setChannelSummary) cuando se confirma que SÍ hay directo -
    mientras no se sepa o no lo haya, el renglón no existe (display:none, puesto en el HTML). */
 .events-yt-channel-sub{font-size:10.5px;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 2ª línea, más tenue que .events-yt-channel-sub - "Último: <título> · hace X h", el video subido
+   más reciente del canal (no depende de si está en vivo o no, siempre que haya alguno de las
+   últimas 24h) - pedido para que la lista diga algo de "de qué habla" cada canal */
+.events-yt-channel-reciente{font-size:10px;font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .events-yt-channel-missing{font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap}
-@media(max-width:860px){ .events-yt-layout{flex-direction:column} .events-yt-channels{width:100%;max-height:220px} }
+/* bug real reportado por Juan ("se pone más angosta la ventana del YouTube" al picarle a un
+   canal, en celular): .events-yt-layout tiene align-items:flex-start, que en escritorio (fila)
+   solo afecta el alto - pero al pasar a flex-direction:column en celular, ese mismo
+   align-items:flex-start pasa a afectar el ANCHO (los ejes se invierten con column), dejando que
+   .events-yt-main se encoja a su contenido en vez de ocupar todo el ancho. width:100% explícito
+   lo fuerza sin importar el align-items heredado. */
+@media(max-width:860px){ .events-yt-layout{flex-direction:column} .events-yt-main{width:100%} .events-yt-channels{width:100%;max-height:220px} }
 .events-video-wrap{position:relative;height:480px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
 .events-video-wrap iframe{display:block;width:100%;height:100%;border:none}
 .events-video-facade{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg2),#000);cursor:pointer}
@@ -3033,6 +3043,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-video-blocked{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--muted2);font-size:13px;background:linear-gradient(160deg,var(--bg2),#000)}
 .events-video-blocked a{color:var(--accent);font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:20px;padding:7px 16px;font-size:12.5px}
 .events-video-blocked a:hover{background:var(--accent);color:#fff}
+/* contenedor del reproductor real - se llena/vacía por JS (mountPlayer/unmountPlayer) con un
+   <iframe> NUEVO cada vez, nunca el mismo reutilizado (YT.Player.destroy() lo elimina del DOM,
+   reusar la misma referencia después de eso deja la pantalla en negro) */
+.events-video-player-host{width:100%;height:100%}
 /* controles propios de video (play/pausa + volumen), por fuera del reproductor de YouTube */
 .events-video-controls{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2)}
 .events-vc-btn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid var(--border2);color:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -3040,6 +3054,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-vc-volume{flex:1;accent-color:var(--accent);cursor:pointer}
 .events-card-foot{font-size:12px;color:var(--muted);line-height:1.6}
 .events-card-foot a{color:var(--muted2)}
+/* título completo del directo activo, justo debajo del reproductor */
+.events-yt-live-info{font-size:13px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* "Temas recientes en este canal" - los últimos videos subidos (máx 3, últimas 24h), cada uno
+   clicable para reproducirlo en el mismo reproductor */
+.events-yt-recientes{display:flex;flex-direction:column;gap:6px}
+.events-yt-recientes-head{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.events-yt-recientes-list{display:flex;flex-direction:column;gap:3px}
+.events-yt-reciente-item{display:flex;align-items:baseline;gap:8px;padding:7px 9px;border-radius:8px;border:1px solid transparent;background:var(--bg2);color:var(--muted2);font-size:12px;font-weight:600;text-align:left;cursor:pointer;width:100%;transition:border-color .2s,color .2s}
+.events-yt-reciente-item:hover{border-color:rgba(91,141,239,.4);color:var(--white)}
+.events-yt-reciente-titulo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.events-yt-reciente-hace{flex-shrink:0;font-size:10.5px;font-weight:500;color:var(--muted)}
 
 /* "Noticias Cripto" / "Macro y Economía" - titulares traidos via Worker (RSS agregado, ver
    workers/rss-news/) con borde de color a la izquierda de cada fila, hora relativa + fuente,
@@ -4289,7 +4314,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   </button>
                 </div>
-                <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
+                <div id="eventsYtPlayerHost" class="events-video-player-host" style="display:none"></div>
                 <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
                 <div class="events-video-blocked" id="eventsYtBlocked" style="display:none">
                   <span id="eventsYtBlockedMsg">En vivo, pero no se puede ver aquí.</span>
@@ -4312,6 +4337,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                   <svg class="ic-mute" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M4 9v6h4l5 5V4L8 9H4z"/><line x1="16" y1="9" x2="21" y2="14"/><line x1="21" y1="9" x2="16" y2="14"/></svg>
                 </button>
                 <input type="range" class="events-vc-volume" id="eventsYtVolumeRange" min="0" max="100" value="100" aria-label="Volumen">
+              </div>
+              <div class="events-yt-live-info" id="eventsYtLiveInfo" style="display:none"></div>
+              <div class="events-yt-recientes" id="eventsYtRecientes" style="display:none">
+                <div class="events-yt-recientes-head">Temas recientes en este canal</div>
+                <div class="events-yt-recientes-list" id="eventsYtRecientesList"></div>
               </div>
               <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
             </div>
@@ -4478,7 +4508,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     var EVENTS_YT_LIVE_CHECK_URL = 'https://skillcash-youtube-live.juanchodigital86.workers.dev';
     (function(){
       var btn = document.getElementById('eventsYtRefresh');
-      var f = document.getElementById('eventsYtIframe');
+      var playerHost = document.getElementById('eventsYtPlayerHost');
       var empty = document.getElementById('eventsYtEmpty');
       var livePill = document.getElementById('eventsYtLivePill');
       var facade = document.getElementById('eventsYtFacade');
@@ -4490,7 +4520,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var blockedEl = document.getElementById('eventsYtBlocked');
       var blockedMsgEl = document.getElementById('eventsYtBlockedMsg');
       var blockedLinkEl = document.getElementById('eventsYtBlockedLink');
-      if(!listEl || !f) return;
+      var liveInfoEl = document.getElementById('eventsYtLiveInfo');
+      var recientesWrapEl = document.getElementById('eventsYtRecientes');
+      var recientesListEl = document.getElementById('eventsYtRecientesList');
+      if(!listEl || !playerHost) return;
       function escapeHtml(s){
         return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
           return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -4508,6 +4541,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           '<span class="events-yt-channel-body">' +
             '<span class="events-yt-channel-label">' + escapeHtml(ch.label) + '</span>' +
             '<span class="events-yt-channel-sub" style="display:none"></span>' +
+            '<span class="events-yt-channel-reciente" style="display:none"></span>' +
           '</span>' +
           (disabled ? '<span class="events-yt-channel-missing">falta ID</span>' : '') +
           '</button>';
@@ -4522,8 +4556,21 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       function setChannelSummary(i, text){
         var sub = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-sub');
         if(!sub) return;
-        if(text){ sub.textContent = text; sub.style.display = ''; }
-        else { sub.textContent = ''; sub.style.display = 'none'; }
+        if(text){ sub.textContent = text; sub.title = text; sub.style.display = ''; }
+        else { sub.textContent = ''; sub.removeAttribute('title'); sub.style.display = 'none'; }
+      }
+      // 2ª línea, más tenue - "Último: <título> · hace X h" (el video subido más reciente,
+      // siempre que haya alguno de las últimas 24h) - independiente de si está en vivo o no
+      function setChannelReciente(i, text){
+        var el = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-reciente');
+        if(!el) return;
+        if(text){ el.textContent = text; el.title = text; el.style.display = ''; }
+        else { el.textContent = ''; el.removeAttribute('title'); el.style.display = 'none'; }
+      }
+      function textoUltimoReciente(recientes){
+        var u = recientes && recientes[0];
+        if(!u || !u.titulo) return null;
+        return 'Último: ' + u.titulo + (u.hace ? ' · ' + u.hace : '');
       }
       function setDotState(i, state){
         var dot = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-dot');
@@ -4532,10 +4579,45 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       }
       function uploadsEmbedUrl(id){
         return 'https://www.youtube-nocookie.com/embed/videoseries?list=UULF' + id.slice(2) +
-          '&enablejsapi=1&playsinline=1&mute=1&cc_load_policy=0&iv_load_policy=3&rel=0';
+          '&enablejsapi=1&playsinline=1&cc_load_policy=0&iv_load_policy=3&rel=0';
       }
+      // enablejsapi=1 siempre - sin eso la IFrame API no puede controlar el iframe (bug real
+      // encontrado: faltaba acá, por eso los controles propios fallaban silenciosamente en vivo)
       function liveEmbedUrl(videoId){
-        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?mute=0&rel=0';
+        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?enablejsapi=1&playsinline=1&rel=0';
+      }
+      function videoEmbedUrl(videoId){
+        return 'https://www.youtube-nocookie.com/embed/' + videoId + '?enablejsapi=1&playsinline=1&rel=0';
+      }
+      // panel bajo el reproductor: título completo del directo activo (si hay) + lista de "temas
+      // recientes" del canal que se está viendo ahora mismo (independiente de si está en vivo) -
+      // se vuelve a llamar cada vez que cambian los datos que ya sabemos del canal activo
+      function renderRecientesPanel(i){
+        var known = lastResults[i];
+        if(liveInfoEl){
+          if(known && known.live && known.title){
+            liveInfoEl.textContent = '🔴 ' + known.title;
+            liveInfoEl.title = known.title;
+            liveInfoEl.style.display = '';
+          } else {
+            liveInfoEl.style.display = 'none';
+          }
+        }
+        if(recientesWrapEl && recientesListEl){
+          var recientes = (known && known.recientes) || [];
+          if(recientes.length){
+            recientesListEl.innerHTML = recientes.map(function(v){
+              return '<button type="button" class="events-yt-reciente-item" data-video-id="' + escapeHtml(v.videoId) + '" title="' + escapeHtml(v.titulo) + '">' +
+                '<span class="events-yt-reciente-titulo">' + escapeHtml(v.titulo) + '</span>' +
+                '<span class="events-yt-reciente-hace">' + escapeHtml(v.hace || '') + '</span>' +
+              '</button>';
+            }).join('');
+            recientesWrapEl.style.display = '';
+          } else {
+            recientesListEl.innerHTML = '';
+            recientesWrapEl.style.display = 'none';
+          }
+        }
       }
       // "fachada" (patron facade): mientras la persona no le dé clic al botón de play, NO se crea
       // el reproductor real de YouTube (ese es el que de verdad pesa y descarga su propio JS) -
@@ -4572,13 +4654,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       // la IFrame API - eso el Worker NUNCA puede saberlo, corre desde la ubicación de Cloudflare,
       // no la del visitante - caso real visto con NTN24 desde Colombia)
       function showBlockedFallback(videoId, mensaje){
-        if(controlsBar) controlsBar.style.display = 'none';
-        f.removeAttribute('src');
-        f.style.display = 'none';
+        unmountPlayer();
         facade.style.display = 'none';
         if(empty) empty.style.display = 'none';
         pendingSrc = null;
-        played = false;
         if(blockedEl){
           if(blockedMsgEl) blockedMsgEl.textContent = mensaje || 'En vivo, pero no se puede ver aquí.';
           if(blockedLinkEl) blockedLinkEl.href = 'https://www.youtube.com/watch?v=' + videoId;
@@ -4596,17 +4675,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         currentIdx = i;
         setActiveItem(i);
         if(livePill) livePill.style.display = 'none';
-        played = false;
-        f.removeAttribute('src');
-        f.style.display = 'none';
-        if(controlsBar) controlsBar.style.display = 'none';
+        unmountPlayer();
         var ch = EVENTS_YT_CHANNELS[i];
         if(!ch || !ch.id){
           facade.style.display = 'none';
           if(empty) empty.style.display = 'flex';
+          if(liveInfoEl) liveInfoEl.style.display = 'none';
+          if(recientesWrapEl) recientesWrapEl.style.display = 'none';
           return;
         }
         if(empty) empty.style.display = 'none';
+        renderRecientesPanel(i);
         var known = lastResults[i];
         if(known && noSePuedeVerAqui(known)){
           currentVideoId = known.videoId;
@@ -4651,13 +4730,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             if(aborted) return;
             var live = !!(data && data.live && data.videoId);
             var upcoming = !live && !!(data && data.upcoming);
+            var recientes = (data && Array.isArray(data.recientes)) ? data.recientes : [];
             lastResults[idx] = {
               live: live, videoId: data && data.videoId, title: data && data.title,
               upcoming: upcoming, playability: data && data.playability, embeddable: data && data.embeddable,
+              recientes: recientes,
             };
             setDotState(idx, live ? 'live' : (upcoming ? 'upcoming' : 'offline'));
             setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : (upcoming ? ('Programado' + (data.title ? ': ' + data.title : '')) : null));
+            setChannelReciente(idx, textoUltimoReciente(recientes));
             if(idx !== currentIdx) return;
+            renderRecientesPanel(idx);
             if(live && noSePuedeVerAqui(lastResults[idx])){
               currentVideoId = data.videoId;
               showBlockedFallback(data.videoId, 'En vivo, pero no se puede ver aquí.');
@@ -4667,7 +4750,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               currentVideoId = data.videoId;
               pendingSrc = liveEmbedUrl(data.videoId);
               setFacade(data.videoId, '');
-              if(played){ f.src = pendingSrc + '&autoplay=1'; wireCustomControls(); }
+              // cambio automático a directo SIN que la persona haya clicado nada (el Worker lo
+              // detectó solo) - el navegador no deja autoplay con sonido sin gesto del usuario,
+              // así que arranca muteado y el botón de silencio queda marcado como tal
+              if(played) mountPlayer(pendingSrc, true);
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
             } else if(upcoming){
@@ -4711,15 +4797,41 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         muteBtn.querySelector('.ic-vol').style.display = isMuted ? 'none' : 'block';
         muteBtn.querySelector('.ic-mute').style.display = isMuted ? 'block' : 'none';
       }
-      function wireCustomControls(){
+      // destruye el reproductor actual (si hay) y vacía el contenedor - IMPORTANTE: nunca se
+      // reutiliza el mismo <iframe> - YT.Player.destroy() lo elimina del DOM de verdad, así que
+      // guardar una referencia fija y reusarla después deja la pantalla en negro (bug real
+      // encontrado y confirmado: tras el 2º play o cambio de canal, el iframe guardado ya no
+      // estaba en la página)
+      function unmountPlayer(){
+        if(ytPlayer){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer = null; }
+        playerHost.innerHTML = '';
+        playerHost.style.display = 'none';
+        if(controlsBar) controlsBar.style.display = 'none';
+        played = false;
+      }
+      // crea un <iframe> NUEVO cada vez (nunca reutiliza uno viejo) y lo conecta a la IFrame API.
+      // mutadoInicial=true cuando el cambio a directo pasó solo, sin clic de la persona (el
+      // navegador no deja autoplay con sonido sin gesto del usuario) - false cuando sí hubo clic.
+      function mountPlayer(src, mutadoInicial){
+        if(ytPlayer){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer = null; }
+        playerHost.innerHTML = '';
+        var iframe = document.createElement('iframe');
+        iframe.title = 'Transmisión en vivo';
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture');
+        iframe.allowFullscreen = true;
+        iframe.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 'mute=' + (mutadoInicial ? '1' : '0') + '&autoplay=1';
+        playerHost.appendChild(iframe);
+        playerHost.style.display = 'block';
+        facade.style.display = 'none';
+        if(blockedEl) blockedEl.style.display = 'none';
+        played = true;
         ensureYtApi().then(function(){
-          if(ytPlayer){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer = null; }
-          ytPlayer = new YT.Player(f, {
+          ytPlayer = new YT.Player(iframe, {
             events: {
               onReady: function(){
                 controlsBar.style.display = 'flex';
                 setIconsPlaying(true);
-                setIconsMuted(false);
+                setIconsMuted(!!mutadoInicial);
                 volumeRange.value = 100;
               },
               onStateChange: function(e){ setIconsPlaying(e.data === YT.PlayerState.PLAYING); },
@@ -4731,7 +4843,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               onError: function(e){
                 var code = e && e.data;
                 if(code === 100 || code === 101 || code === 150){
-                  if(ytPlayer){ try{ ytPlayer.destroy(); }catch(err){} ytPlayer = null; }
+                  unmountPlayer();
                   showBlockedFallback(currentVideoId, 'En vivo, pero no se puede ver aquí (bloqueado para tu país).');
                 }
               },
@@ -4758,11 +4870,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       });
       function playNow(){
         if(!pendingSrc) return;
-        f.src = pendingSrc + (pendingSrc.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1';
-        f.style.display = 'block';
-        facade.style.display = 'none';
-        played = true;
-        wireCustomControls();
+        mountPlayer(pendingSrc, false); // clic explícito de la persona -> con sonido
       }
       if(playBtn) playBtn.addEventListener('click', playNow);
       if(facade) facade.addEventListener('click', function(e){ if(e.target === facade) playNow(); });
@@ -4776,6 +4884,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           var known = lastResults[idx];
           if(known && known.live && known.videoId && !noSePuedeVerAqui(known)) playNow();
         });
+      });
+      // clic en un "tema reciente" - lo reproduce en el mismo reproductor (es un video subido
+      // normal, no un directo, así que usa videoEmbedUrl en vez de liveEmbedUrl)
+      if(recientesListEl) recientesListEl.addEventListener('click', function(e){
+        var item = e.target.closest('.events-yt-reciente-item');
+        if(!item) return;
+        var videoId = item.dataset.videoId;
+        if(!videoId) return;
+        currentVideoId = videoId;
+        pendingSrc = videoEmbedUrl(videoId);
+        mountPlayer(pendingSrc, false); // clic explícito -> con sonido
+        if(livePill) livePill.style.display = 'none';
+        if(foot) foot.textContent = 'Reproduciendo un video subido de este canal.';
       });
       var sourcesBadge = document.getElementById('eventsYtSourcesBadge');
       if(sourcesBadge) sourcesBadge.textContent = EVENTS_YT_CHANNELS.filter(function(ch){ return !!ch.id; }).length + ' FUENTES';
@@ -4829,19 +4950,24 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 idx: x.idx, live: live, videoId: data && data.videoId, title: data && data.title,
                 upcoming: !live && !!(data && data.upcoming),
                 playability: data && data.playability, embeddable: data && data.embeddable,
+                recientes: (data && Array.isArray(data.recientes)) ? data.recientes : [],
               };
             })
-            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null }; });
+            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null, recientes: [] }; });
         })).then(function(results){
+          var yaEstabaReproduciendo = played;
           results.forEach(function(r){
             lastResults[r.idx] = {
               live: r.live, videoId: r.videoId, title: r.title,
               upcoming: r.upcoming, playability: r.playability, embeddable: r.embeddable,
+              recientes: r.recientes,
             };
             setDotState(r.idx, r.live ? 'live' : (r.upcoming ? 'upcoming' : 'offline'));
             setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : (r.upcoming ? ('Programado' + (r.title ? ': ' + r.title : '')) : null));
+            setChannelReciente(r.idx, textoUltimoReciente(r.recientes));
           });
           reorderChannelList();
+          if(currentIdx > -1) renderRecientesPanel(currentIdx);
           // si el canal YA elegido resultó en vivo, lo deja listo igual que antes (salvo que no
           // se pueda ver aquí, ahí se ofrece el link a YouTube en vez de un reproductor roto)
           var current = results.find(function(r){ return r.idx === currentIdx; });
@@ -4854,7 +4980,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             currentVideoId = current.videoId;
             pendingSrc = liveEmbedUrl(current.videoId);
             setFacade(current.videoId, '');
-            if(played) f.src = pendingSrc + '&autoplay=1';
+            // cambio automático SIN clic de la persona (venía reproduciendo otra cosa y este
+            // canal resultó en vivo al revisar todos) - arranca muteado, igual que en
+            // checkLiveAndMaybeSwitch
+            if(yaEstabaReproduciendo) mountPlayer(pendingSrc, true);
             if(livePill) livePill.style.display = 'inline-flex';
             if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
           }
@@ -4869,7 +4998,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
           btn.addEventListener('click', function(){
             var ch = EVENTS_YT_CHANNELS[currentIdx];
-            if(ch && ch.id){ if(played && f.src) f.src = f.src; checkLiveAndMaybeSwitch(ch.id, currentIdx, true); }
+            if(ch && ch.id) checkLiveAndMaybeSwitch(ch.id, currentIdx, true);
           });
         } else {
           btn.addEventListener('click', function(){ checkAllChannels(true); });
