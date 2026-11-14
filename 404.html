@@ -2883,15 +2883,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   padding-left:20px;
 }
 /* "Comunidad" y "Noticias" no tienen nada que plegar (1-2 ítems nada más) - Juan pidió que
-   se queden siempre abiertos, sin la flechita, nunca como un acordeón. "Herramientas" es otro
-   caso: no tiene NINGÚN ítem propio debajo (el siguiente elemento ya es el .sb-cat-label real
-   de "Sonar de Mercado"), así que antes traía la flechita como si se pudiera plegar/desplegar
-   pero el clic no cambiaba nada visible - Juan lo notó y pidió quitarla, confusión real, no solo
-   estética. Se les quita el ::after (la flechita) y el JS (más abajo) ya no los engancha a
-   wireCollapsibleLabel/filterSidebarNav/setAllIndicCatLabelsCollapsed, así que su clase
-   "collapsed" nunca se activa y sus ítems (que viven en el flujo normal del documento, sin
-   ningún display:none puesto por JS) quedan siempre visibles. */
+   se queden siempre abiertos, sin la flechita, nunca como un acordeón. Se les quita el ::after
+   (la flechita) y el JS (más abajo) ya no los engancha a wireCollapsibleLabel/filterSidebarNav/
+   setAllIndicCatLabelsCollapsed, así que su clase "collapsed" nunca se activa y sus ítems
+   (que viven en el flujo normal del documento, sin ningún display:none puesto por JS) quedan
+   siempre visibles. "Herramientas" NO lleva esta clase (a propósito, ver más abajo), aunque
+   también le sobraba la flechita. */
 .sb-cat-label-static{ cursor:default; }
+/* "Herramientas" no tiene NINGÚN ítem propio debajo (el siguiente elemento ya es el
+   .sb-cat-label real de "Sonar de Mercado"), así que traía la flechita como si se pudiera
+   plegar/desplegar pero el clic no cambiaba nada visible - Juan lo notó y pidió quitarla. PERO
+   a diferencia de Comunidad/Noticias, "Herramientas" si debe seguir ocultándose junto con sus
+   categorías reales cuando se está viendo otra sección (Noticias, Comunidad, etc.) - por eso NO
+   lleva sb-cat-label-static (esa clase lo dejaría SIEMPRE visible, incluso con sus categorías ya
+   escondidas - exactamente el bug que reportó Juan: "se perdieron todas las herramientas, solo
+   está el título"). Se le quita el ::after con un selector aparte, nada más, y sigue
+   enganchado a filterSidebarNav/wireCollapsibleLabel con normalidad (el clic no hace daño:
+   sigue sin tener items que mostrar/ocultar, solo que ahora no invita a hacer clic). */
+.sb-cat-label[data-category="__herramientas"]::after{ content:none; }
+.sb-cat-label[data-category="__herramientas"]{ cursor:default; }
 .sb-cat-label-static::after{ content:none; }
 /* "Tu Rango", "Skins del Tiburón" y "Eventos y Noticias" - mismo tamaño/color que una categoría
    (ej. "Blindaje"), aunque sean .sb-item y no .sb-cat-label - pedido explícito de Juan */
@@ -2947,7 +2957,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    compartían grilla de 2 columnas con otra tarjeta al lado) - sin esto, la única tarjeta ocupa
    solo la mitad izquierda de la grilla de 2 columnas y deja un hueco vacío a la derecha. */
 .events-grid-solo{grid-template-columns:1fr;max-width:640px}
-@media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} .events-calendar-clip{height:320px} .events-calendar-iframe{height:358px} }
+/* Calendario Económico y Conferencias en Vivo quedaron cada uno solo en su propia página (ya no
+   comparten espacio con otra tarjeta al lado, desde que se separó "Eventos y Noticias" en 3
+   opciones del menú) - Juan pidió que ocupen TODO el ancho en vez de quedar angostos como antes,
+   a diferencia de .events-grid-solo (pensada para cuando sí importaba un ancho fijo). */
+.events-grid-wide{grid-template-columns:1fr}
+@media(max-width:480px){ .events-video-wrap{height:320px} .events-calendar-wrap{height:420px} .events-calendar-clip{height:420px} .events-calendar-iframe{height:458px} }
 /* min-width:0 es necesario porque .events-card es hijo de un grid (.events-grid) - sin esto,
    el calendario de adentro (que fuerza min-width:590px para que el widget de Investing no se
    vea aplastado, iguaql que hace melapela) empuja el ANCHO DE TODA LA GRILLA (y por lo tanto de
@@ -2971,22 +2986,37 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted2);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:4px 10px}
 .events-chip i{width:6px;height:6px;border-radius:50%;background:#f0b23d;flex-shrink:0}
 .events-yt-controls{display:flex;gap:8px}
-.events-yt-select{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 10px}
-.events-yt-select option:disabled{color:var(--muted)}
 .events-yt-refresh{flex-shrink:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .events-yt-refresh:hover{border-color:var(--accent)}
 .events-yt-refresh:disabled{opacity:.6;cursor:default}
-.events-yt-results{display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto}
-.events-yt-result{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);font-size:12.5px;text-align:left}
-.events-yt-result.is-live{cursor:pointer;border-color:rgba(255,47,79,.35)}
-.events-yt-result.is-live:hover{border-color:var(--red)}
-.events-yt-result-dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--border2);margin-top:4px}
-.events-yt-result.is-live .events-yt-result-dot{background:#ff2f4f;animation:pillDotPulse 1.6s ease-in-out infinite}
-.events-yt-result-body{min-width:0;flex:1}
-.events-yt-result-channel{font-weight:700;color:var(--white)}
-.events-yt-result-title{color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.events-yt-result-empty{color:var(--muted);font-size:12.5px;padding:8px 2px}
-.events-video-wrap{position:relative;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
+/* layout de "Conferencias en Vivo" en 2 columnas, como una lista de reproducción de YouTube -
+   video a la izquierda, lista de canales fija a la derecha (reemplaza al <select> + la lista de
+   resultados de "Buscar directo" que antes se abría FLOTANDO ENCIMA del video, queja de Juan).
+   Se apila en 1 columna en celular (la lista de canales queda debajo del video, scrolleable). */
+.events-yt-layout{display:flex;gap:16px;align-items:flex-start}
+.events-yt-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.events-yt-channels{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px;max-height:556px;overflow-y:auto}
+.events-yt-channels::-webkit-scrollbar{width:6px}
+.events-yt-channels::-webkit-scrollbar-track{background:transparent}
+.events-yt-channels::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
+.events-yt-channels{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.events-yt-channels-head{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 6px 4px}
+.events-yt-channel-list{display:flex;flex-direction:column;gap:3px}
+.events-yt-channel-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:none;color:var(--muted2);font-size:13px;font-weight:600;text-align:left;cursor:pointer;transition:background .2s,border-color .2s,color .2s;width:100%}
+.events-yt-channel-item:hover{background:rgba(255,255,255,.05);color:var(--white)}
+.events-yt-channel-item.active{background:rgba(91,141,239,.12);border-color:rgba(91,141,239,.4);color:var(--white)}
+.events-yt-channel-item:disabled{opacity:.45;cursor:default}
+.events-yt-channel-item:disabled:hover{background:none;color:var(--muted2)}
+.events-yt-channel-dot{flex-shrink:0;width:9px;height:9px;border-radius:50%;background:var(--border2);transition:background .2s}
+/* vivo = verde, no vivo (ya revisado) = rojo, sin revisar todavía = el gris por defecto de arriba
+   - pedido explícito así por Juan (dot[data-state] en vez de clases, para que un solo selector
+   cubra los 3 estados sin tener que ir quitando/poniendo clases a mano) */
+.events-yt-channel-dot[data-state="live"]{background:var(--green);box-shadow:0 0 6px var(--green);animation:pillDotPulse 1.6s ease-in-out infinite}
+.events-yt-channel-dot[data-state="offline"]{background:var(--red)}
+.events-yt-channel-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.events-yt-channel-missing{font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap}
+@media(max-width:860px){ .events-yt-layout{flex-direction:column} .events-yt-channels{width:100%;max-height:220px} }
+.events-video-wrap{position:relative;height:480px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
 .events-video-wrap iframe{display:block;width:100%;height:100%;border:none}
 .events-video-facade{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg2),#000);cursor:pointer}
 .events-video-facade img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
@@ -3027,12 +3057,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    Android/Apple + selector de fechas arriba (no existe un parámetro que los quite - confirmado
    investigando en vivo cómo lo hace melapela.ai) - el truco real es recortarlo: el iframe se
    dibuja MÁS ALTO que la cajita visible y se empuja hacia arriba con translateY, así esa franja
-   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. El filtro CSS
-   invert+hue-rotate+saturate convierte el widget (blanco, pensado para tema claro) a algo que
-   combina con el resto del sitio (oscuro) sin tener que pelear con sus propios parámetros de
-   color, que son limitados. pointer-events:none porque no usamos el selector de fechas propio
-   de Investing (el "Semana actual"/filtros son decoración nuestra, afuera del iframe) */
-.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
+   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. YA NO lleva ningún
+   filtro CSS (invert/hue-rotate/saturate) - ese filtro era de cuando el widget todavía llevaba
+   los colores CLAROS originales de melapela y servía para invertirlo entero a oscuro; ahora que
+   el src ya manda sus propios colores oscuros (ver el comentario junto al <iframe> en el HTML),
+   el filtro sobraba y lo que hacía era invertir ESOS colores oscuros de vuelta a algo lavado/sin
+   contraste - justo lo que Juan reportó ("gris", "no se nota casi nada"). pointer-events:none
+   porque no usamos el selector de fechas propio de Investing (el "Semana actual"/filtros son
+   decoración nuestra, afuera del iframe). Alto subido de 420 a 680 (Juan: "se ve muy chiquito...
+   que ocupe toda la página") - el iframe interno sube con él (720, 680+40 del recorte de arriba),
+   translateY(-38px) queda igual porque esa franja recortada no cambia de tamaño. */
+.events-calendar-wrap{position:relative;height:680px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--surface)}
 /* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
    del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
    estilo ya usado en otras listas scrolleables del sitio */
@@ -3041,8 +3076,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-calendar-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
 .events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 .events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.events-calendar-clip{position:relative;overflow:clip;height:420px;min-width:590px}
-.events-calendar-iframe{display:block;width:100%;height:458px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
+.events-calendar-clip{position:relative;overflow:clip;height:680px;min-width:590px}
+.events-calendar-iframe{display:block;width:100%;height:720px;border:none;transform:translateY(-38px);pointer-events:none;background:var(--surface)}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -3269,7 +3304,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
     <nav class="sb-nav">
-      <div class="sb-cat-label sb-cat-label-static" data-category="__herramientas">Herramientas</div>
+      <div class="sb-cat-label" data-category="__herramientas">Herramientas</div>
       <div class="sb-cat-label" data-category="indicadores">Sonar de Mercado</div>
       <button class="sb-item" data-indic-jump="guia">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
@@ -4177,7 +4212,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="section-eyebrow">En vivo</div>
       <h2 class="community-title">Conferencias en Vivo</h2>
       <p class="community-lead">Transmisiones en vivo de los canales que más mueven el mercado, sin salir de SkillCash.</p>
-      <div class="events-grid events-grid-solo">
+      <div class="events-grid events-grid-wide">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Cobertura</div>
@@ -4187,49 +4222,60 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10.5 20 7v10l-5-3.5"/><rect x="2" y="6" width="13" height="12" rx="2"/></svg>
             Conferencias en Vivo <span class="live-pill" id="eventsYtLivePill" style="display:none"><i></i>EN VIVO</span> <span class="wip-pill">EN CONSTRUCCIÓN</span>
           </div>
-          <div class="events-yt-controls">
-            <select id="eventsYtSelect" class="events-yt-select" aria-label="Elegir canal"></select>
-            <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
-          </div>
-          <!-- resultado de "Buscar directo": revisa los 9 canales (no solo el elegido) y lista
-               cuáles tienen un directo ahora mismo y de qué están hablando (título real del
-               video, via el Worker) - pedido explícito de Juan, antes el botón solo refrescaba
-               el canal ya elegido sin decir nada de los demás -->
-          <div class="events-yt-results" id="eventsYtResults" style="display:none"></div>
-          <div class="events-video-wrap">
-            <!-- patron "fachada": no se crea el reproductor real de YouTube (pesado, descarga su
-                 propio JS) hasta que la persona le da clic - antes se cargaba completo apenas se
-                 entraba a la página, sin que nadie lo pidiera. Con video real conocido (cuando el
-                 Worker confirma que SÍ hay un directo) se usa su miniatura de verdad
-                 (i.ytimg.com); si no, un cartel genérico con el nombre del canal -->
-            <div class="events-video-facade" id="eventsYtFacade">
-              <img id="eventsYtThumb" alt="" loading="lazy" decoding="async" style="display:none">
-              <div class="events-video-facade-label" id="eventsYtFacadeLabel"></div>
-              <button type="button" class="events-video-play" id="eventsYtPlayBtn" aria-label="Reproducir video">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </button>
+          <!-- rediseño pedido por Juan: antes había un <select> para elegir canal + un botón
+               "Buscar directo" que abría una lista de resultados FLOTANDO ENCIMA del video ("se
+               me abre una cosa encima del video y me empieza a ocupar espacio" - queja textual).
+               Ahora es un layout de 2 columnas, como una lista de reproducción de YouTube: el
+               video a la izquierda, y a la derecha una barra fija con los 9 canales (siempre
+               visible, nunca tapa nada) - cada uno es ahora el selector de canal (reemplaza al
+               <select>) Y a la vez el resultado de "Buscar directo" (reemplaza la lista flotante):
+               el punto de cada canal se pone verde si está en vivo ahora mismo, rojo si ya se
+               revisó y no lo está, o gris si todavía no se ha revisado. -->
+          <div class="events-yt-layout">
+            <div class="events-yt-main">
+              <div class="events-yt-controls">
+                <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
+              </div>
+              <div class="events-video-wrap">
+                <!-- patron "fachada": no se crea el reproductor real de YouTube (pesado, descarga su
+                     propio JS) hasta que la persona le da clic - antes se cargaba completo apenas se
+                     entraba a la página, sin que nadie lo pidiera. Con video real conocido (cuando el
+                     Worker confirma que SÍ hay un directo) se usa su miniatura de verdad
+                     (i.ytimg.com); si no, un cartel genérico con el nombre del canal -->
+                <div class="events-video-facade" id="eventsYtFacade">
+                  <img id="eventsYtThumb" alt="" loading="lazy" decoding="async" style="display:none">
+                  <div class="events-video-facade-label" id="eventsYtFacadeLabel"></div>
+                  <button type="button" class="events-video-play" id="eventsYtPlayBtn" aria-label="Reproducir video">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
+                <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
+              </div>
+              <!-- controles propios (play/pausa + volumen), por fuera del reproductor de YouTube -
+                   pedido de Juan, que vio que melapela.ai tiene los suyos en vez de depender de los
+                   controles nativos de YouTube. Se manejan con la YouTube IFrame API (postMessage
+                   al iframe, que ya trae enablejsapi=1) - solo se cargan cuando ya hay un video real
+                   reproduciendo, nunca antes (misma filosofía de "nada pesado hasta que haga falta"
+                   del resto de esta sección) -->
+              <div class="events-video-controls" id="eventsYtControls" style="display:none">
+                <button type="button" class="events-vc-btn" id="eventsYtPlayPauseBtn" aria-label="Pausar">
+                  <svg class="ic-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  <svg class="ic-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button type="button" class="events-vc-btn" id="eventsYtMuteBtn" aria-label="Silenciar">
+                  <svg class="ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>
+                  <svg class="ic-mute" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M4 9v6h4l5 5V4L8 9H4z"/><line x1="16" y1="9" x2="21" y2="14"/><line x1="21" y1="9" x2="16" y2="14"/></svg>
+                </button>
+                <input type="range" class="events-vc-volume" id="eventsYtVolumeRange" min="0" max="100" value="100" aria-label="Volumen">
+              </div>
+              <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
             </div>
-            <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
-            <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
+            <aside class="events-yt-channels" aria-label="Lista de canales">
+              <div class="events-yt-channels-head">Canales</div>
+              <div class="events-yt-channel-list" id="eventsYtChannelList"></div>
+            </aside>
           </div>
-          <!-- controles propios (play/pausa + volumen), por fuera del reproductor de YouTube -
-               pedido de Juan, que vio que melapela.ai tiene los suyos en vez de depender de los
-               controles nativos de YouTube. Se manejan con la YouTube IFrame API (postMessage
-               al iframe, que ya trae enablejsapi=1) - solo se cargan cuando ya hay un video real
-               reproduciendo, nunca antes (misma filosofía de "nada pesado hasta que haga falta"
-               del resto de esta sección) -->
-          <div class="events-video-controls" id="eventsYtControls" style="display:none">
-            <button type="button" class="events-vc-btn" id="eventsYtPlayPauseBtn" aria-label="Pausar">
-              <svg class="ic-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-              <svg class="ic-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-            <button type="button" class="events-vc-btn" id="eventsYtMuteBtn" aria-label="Silenciar">
-              <svg class="ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>
-              <svg class="ic-mute" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M4 9v6h4l5 5V4L8 9H4z"/><line x1="16" y1="9" x2="21" y2="14"/><line x1="21" y1="9" x2="16" y2="14"/></svg>
-            </button>
-            <input type="range" class="events-vc-volume" id="eventsYtVolumeRange" min="0" max="100" value="100" aria-label="Volumen">
-          </div>
-          <div class="events-card-foot">Si el canal no tiene un directo en este momento, YouTube muestra la última transmisión disponible.</div>
         </div>
       </div>
     </section>
@@ -4239,7 +4285,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="section-eyebrow">Agenda</div>
       <h2 class="community-title">Calendario Económico</h2>
       <p class="community-lead">Eventos de impacto alto en EE.UU. y la Eurozona, con fecha y hora exacta en tu zona horaria.</p>
-      <div class="events-grid events-grid-solo">
+      <div class="events-grid events-grid-wide">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Agenda</div>
@@ -4247,7 +4293,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-            Calendario Económico <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Calendario Económico
           </div>
           <div class="events-chips">
             <span class="events-chip"><i></i>Mayor movimiento esperado</span>
@@ -4259,23 +4305,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                  el iframe por venir incrustado de otro sitio.
                  Los NOMBRES de los parámetros de color (ecoDayBackground/ecoDayFontColor/
                  defaultFont/innerBorderColor/borderColor) y columns= están confirmados viendo en
-                 vivo el src real que usa melapela.ai - los que habíamos puesto antes (adivinados
-                 a mano) no existían en esta versión del widget y por eso se ignoraban, dejando el
-                 blanco/logo por defecto. Los VALORES de esos colores sí se copiaron tal cual de
-                 melapela al principio (su propio tema claro: fondo casi blanco, texto casi negro)
-                 y por eso se veía gris/claro encima del fondo oscuro de SkillCash, pedido de Juan
-                 de "que combine con las demás". Ahora los valores son los tokens oscuros propios
-                 del sitio (--surface/--muted2/--white y un tono de borde calculado a partir de
-                 --border2 sobre --surface) en vez de los de melapela - los NOMBRES de parámetro
-                 siguen siendo los mismos ya confirmados, solo cambiaron los valores. OJO: no se
-                 pudo confirmar visualmente porque este entorno de pruebas no tiene salida a
-                 internet hacia investing.com - revisar en el sitio real que el widget sí tome
-                 estos colores (podría haber superficies internas del widget, como el fondo de
-                 cada fila de datos, que Investing.com no deje personalizar con estos parámetros).
+                 vivo el src real que usa melapela.ai.
+                 Por qué seguía viéndose gris/sin contraste después de poner valores oscuros en
+                 esos parámetros (lo que Juan reportó con captura): el .events-calendar-iframe de
+                 abajo TODAVÍA tenía puesto un filtro CSS invert()+hue-rotate()+saturate() (ver
+                 git blame/versión anterior) - ese filtro se había creado ANTES, cuando el widget
+                 llevaba los colores CLAROS originales de melapela (fondo casi blanco) y servía
+                 para invertirlo entero a oscuro sin pelear con sus parámetros. Al poner colores
+                 YA oscuros en el src y dejar el filtro puesto, quedaban invertidos DOS VECES (un
+                 oscuro invertido se ve claro/lavado otra vez) - de ahí el gris sin contraste. Se
+                 quita el filtro por completo: ahora el widget se ve con los colores reales que
+                 manda el src, sin ninguna transformación CSS encima.
+                 OJO: sigue sin poderse confirmar visualmente en este entorno (sin salida a
+                 internet hacia investing.com) - revisar en el sitio real. Es posible que algunos
+                 elementos del widget (ej. los iconitos de "toro/oso" de la columna Impacto) no
+                 sean personalizables con estos parámetros y se queden con su propio color fijo de
+                 Investing.com, fuera de nuestro control.
                  El recorte del header (el iframe más alto + translateY) va en el CSS, ver nota en
                  .events-calendar-iframe -->
             <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232B2F3C&amp;borderColor=%232B2F3C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232E3B5C&amp;borderColor=%232E3B5C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
             </div>
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
@@ -4296,7 +4345,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-            Noticias Cripto <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Noticias Cripto
           </div>
           <div class="events-news-list" id="eventsNewsCrypto">
             <div class="events-news-skel"></div>
@@ -4312,7 +4361,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 7-9"/><path d="M14 6h5v5"/></svg>
-            Macro y Economía <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Macro y Economía
           </div>
           <div class="events-news-list" id="eventsNewsMacro">
             <div class="events-news-skel"></div>
@@ -4367,7 +4416,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     // momento, que es justo la respuesta correcta ahí).
     var EVENTS_YT_LIVE_CHECK_URL = 'https://skillcash-youtube-live.juanchodigital86.workers.dev';
     (function(){
-      var sel = document.getElementById('eventsYtSelect');
       var btn = document.getElementById('eventsYtRefresh');
       var f = document.getElementById('eventsYtIframe');
       var empty = document.getElementById('eventsYtEmpty');
@@ -4377,11 +4425,35 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var facadeLabel = document.getElementById('eventsYtFacadeLabel');
       var playBtn = document.getElementById('eventsYtPlayBtn');
       var foot = document.querySelector('#eventsYoutubeBlock .events-card:first-child .events-card-foot');
-      if(!sel || !f) return;
-      sel.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
+      var listEl = document.getElementById('eventsYtChannelList');
+      if(!listEl || !f) return;
+      function escapeHtml(s){
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+      // rediseño: la lista de canales de la derecha reemplaza al <select> de antes - cada botón
+      // es a la vez el selector de canal Y el resultado de "Buscar directo" (su punto de color se
+      // actualiza en el lugar, nunca se abre nada flotando encima del video - queja textual de
+      // Juan sobre el diseño anterior: "se me abre una cosa encima del video y me empieza a
+      // ocupar espacio").
+      listEl.innerHTML = EVENTS_YT_CHANNELS.map(function(ch, i){
         var disabled = !ch.id;
-        return '<option value="' + i + '"' + (disabled ? ' disabled' : '') + '>' + ch.label + (disabled ? ' (falta ID)' : '') + '</option>';
+        return '<button type="button" class="events-yt-channel-item" data-idx="' + i + '"' + (disabled ? ' disabled' : '') + '>' +
+          '<span class="events-yt-channel-dot"></span>' +
+          '<span class="events-yt-channel-label">' + escapeHtml(ch.label) + '</span>' +
+          (disabled ? '<span class="events-yt-channel-missing">falta ID</span>' : '') +
+          '</button>';
       }).join('');
+      var itemEls = [].slice.call(listEl.querySelectorAll('.events-yt-channel-item'));
+      function setActiveItem(i){
+        itemEls.forEach(function(el){ el.classList.toggle('active', Number(el.dataset.idx) === i); });
+      }
+      function setDotState(i, state){
+        var dot = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-dot');
+        if(!dot) return;
+        if(state) dot.dataset.state = state; else delete dot.dataset.state;
+      }
       function uploadsEmbedUrl(id){
         return 'https://www.youtube-nocookie.com/embed/videoseries?list=UULF' + id.slice(2) +
           '&enablejsapi=1&playsinline=1&mute=1&cc_load_policy=0&iv_load_policy=3&rel=0';
@@ -4394,7 +4466,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       // solo se guarda a dónde apuntaría (pendingSrc) y se muestra una miniatura. Si ya se le dio
       // play (played=true) y justo ahí el Worker confirma que entró en vivo, sí se actualiza el
       // iframe real de una (la persona ya está viendo algo, tiene sentido pasarla al directo).
-      var pendingSrc = null, played = false;
+      var pendingSrc = null, played = false, currentIdx = -1;
+      // lo último que sabemos de cada canal (idx -> {live, videoId, title}), lo llena tanto el
+      // chequeo individual del canal activo como "Buscar directo" (los 9 a la vez) - así, al
+      // hacer clic en un canal que YA se sabe que está en vivo (por el punto verde), se reproduce
+      // directo en vez de mostrarse primero la lista de subidas y cambiar un instante después
+      var lastResults = {};
       function setFacade(videoIdForThumb, label){
         facadeLabel.textContent = label || '';
         if(videoIdForThumb){
@@ -4412,6 +4489,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       function showChannel(i){
         if(liveCheckAbort){ liveCheckAbort(); liveCheckAbort = null; }
         if(autoCheckTimer){ clearInterval(autoCheckTimer); autoCheckTimer = null; }
+        currentIdx = i;
+        setActiveItem(i);
         if(livePill) livePill.style.display = 'none';
         played = false;
         f.removeAttribute('src');
@@ -4425,17 +4504,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         }
         if(empty) empty.style.display = 'none';
         facade.style.display = 'flex';
-        pendingSrc = uploadsEmbedUrl(ch.id);
-        setFacade(null, ch.label);
-        if(foot) foot.textContent = 'Si el canal no tiene un directo en este momento, se muestra su video más reciente.';
-        checkLiveAndMaybeSwitch(ch.id);
+        var known = lastResults[i];
+        if(known && known.live && known.videoId){
+          pendingSrc = liveEmbedUrl(known.videoId);
+          setFacade(known.videoId, '');
+          if(livePill) livePill.style.display = 'inline-flex';
+          if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
+        } else {
+          pendingSrc = uploadsEmbedUrl(ch.id);
+          setFacade(null, ch.label);
+          if(foot) foot.textContent = 'Si el canal no tiene un directo en este momento, se muestra su video más reciente.';
+        }
+        checkLiveAndMaybeSwitch(ch.id, i);
         // revisa solo al canal elegido, no los 9 - cada tanto, mientras siga elegido
-        autoCheckTimer = setInterval(function(){ checkLiveAndMaybeSwitch(ch.id); }, 90000);
+        autoCheckTimer = setInterval(function(){ checkLiveAndMaybeSwitch(ch.id, i); }, 90000);
       }
       // consulta al Worker si ESTE canal está en vivo ahora mismo; si sí, deja listo el video real
       // del directo para cuando le den play (o, si ya le habían dado play antes, lo cambia de
-      // una) y prende la pastilla "EN VIVO". Si no, deja la fachada con la lista de subidas
-      function checkLiveAndMaybeSwitch(channelId, manual){
+      // una), prende la pastilla "EN VIVO" y pone en verde el punto de este canal en la lista de
+      // la derecha (en rojo si no). Si no, deja la fachada con la lista de subidas
+      function checkLiveAndMaybeSwitch(channelId, idx, manual){
         if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
           if(manual && foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
           return Promise.resolve();
@@ -4446,7 +4534,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .then(function(r){ return r.json(); })
           .then(function(data){
             if(aborted) return;
-            if(data && data.live && data.videoId){
+            var live = !!(data && data.live && data.videoId);
+            lastResults[idx] = { live: live, videoId: data && data.videoId, title: data && data.title };
+            setDotState(idx, live ? 'live' : 'offline');
+            if(idx !== currentIdx) return;
+            if(live){
               pendingSrc = liveEmbedUrl(data.videoId);
               setFacade(data.videoId, '');
               if(played){ f.src = pendingSrc + '&autoplay=1'; wireCustomControls(); }
@@ -4531,96 +4623,78 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       }
       if(playBtn) playBtn.addEventListener('click', playNow);
       if(facade) facade.addEventListener('click', function(e){ if(e.target === facade) playNow(); });
+      itemEls.forEach(function(el){
+        el.addEventListener('click', function(){
+          var idx = Number(el.dataset.idx);
+          showChannel(idx);
+          // ya sabíamos por "Buscar directo" que este canal está en vivo (punto verde) - se
+          // reproduce directo, sin obligar a un segundo clic sobre la fachada
+          var known = lastResults[idx];
+          if(known && known.live && known.videoId) playNow();
+        });
+      });
       var sourcesBadge = document.getElementById('eventsYtSourcesBadge');
       if(sourcesBadge) sourcesBadge.textContent = EVENTS_YT_CHANNELS.filter(function(ch){ return !!ch.id; }).length + ' FUENTES';
       // arranca en el primer canal que SÍ tenga ID listo (hoy ninguno de los 3 sin ID puede
       // quedar seleccionado por default, quedarían con el aviso de "falta configurar")
       var firstReady = EVENTS_YT_CHANNELS.findIndex(function(ch){ return !!ch.id; });
       var startIdx = firstReady === -1 ? 0 : firstReady;
-      sel.value = String(startIdx);
       showChannel(startIdx);
-      sel.addEventListener('change', function(){ showChannel(Number(sel.value)); resultsBox.style.display = 'none'; });
 
-      // "Buscar directo" mejorado - pedido de Juan: antes solo refrescaba el canal ya elegido
-      // sin decir nada de los demás. Ahora revisa LOS 9 canales a la vez (en paralelo, el
-      // Worker ya cachea 60s por canal así que esto no multiplica la carga real a YouTube) y
-      // lista cuáles están en vivo ahora mismo y de qué tratan (título real del video). Clic en
-      // un resultado en vivo cambia a ese canal y lo reproduce de una.
-      var resultsBox = document.getElementById('eventsYtResults');
-      function escapeHtml(s){
-        return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
-          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-      }
-      function renderResults(results){
-        if(!results.length){
-          resultsBox.innerHTML = '<div class="events-yt-result-empty">No se pudo revisar ningún canal ahora mismo.</div>';
-          resultsBox.style.display = 'flex';
-          return;
-        }
-        // los en vivo primero
-        results.sort(function(a, b){ return (b.live ? 1 : 0) - (a.live ? 1 : 0); });
-        var anyLive = results.some(function(r){ return r.live; });
-        resultsBox.innerHTML = (anyLive ? '' : '<div class="events-yt-result-empty">Ningún canal tiene un directo en este momento.</div>') +
-          results.map(function(r){
-            return '<div class="events-yt-result' + (r.live ? ' is-live' : '') + '" data-idx="' + r.idx + '">' +
-              '<div class="events-yt-result-dot"></div>' +
-              '<div class="events-yt-result-body">' +
-                '<div class="events-yt-result-channel">' + escapeHtml(r.label) + '</div>' +
-                '<div class="events-yt-result-title">' + (r.live ? escapeHtml(r.title || 'En vivo ahora') : 'Sin directo ahora') + '</div>' +
-              '</div>' +
-            '</div>';
-          }).join('');
-        resultsBox.style.display = 'flex';
-        resultsBox.querySelectorAll('.events-yt-result.is-live').forEach(function(row){
-          row.addEventListener('click', function(){
-            var idx = Number(row.dataset.idx);
-            var found = results.find(function(r){ return r.idx === idx; });
-            sel.value = String(idx);
-            showChannel(idx); // deja todo el estado del canal (select, pastilla, pie) consistente
-            resultsBox.style.display = 'none';
-            // ya sabemos por este mismo "Buscar directo" que SÍ está en vivo y cuál es el
-            // video real - se reproduce de una, sin obligar a un segundo clic sobre la fachada
-            if(found && found.videoId){
-              pendingSrc = liveEmbedUrl(found.videoId);
-              setFacade(found.videoId, '');
-              playNow();
-            }
-          });
-        });
-      }
-      if(btn) btn.addEventListener('click', function(){
-        if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
-          var ch = EVENTS_YT_CHANNELS[Number(sel.value)];
-          if(ch && ch.id){ if(played && f.src) f.src = f.src; checkLiveAndMaybeSwitch(ch.id, true); }
-          return;
-        }
-        btn.disabled = true;
-        var original = btn.textContent;
-        btn.textContent = '🔄 Buscando...';
+      // "Buscar directo" revisa LOS 9 canales a la vez (en paralelo, el Worker ya cachea 60s por
+      // canal así que esto no multiplica la carga real a YouTube) y prende/apaga el punto de cada
+      // uno en la lista de canales de la derecha - antes esto abría una lista flotando ENCIMA del
+      // video ("se me abre una cosa encima del video y me empieza a ocupar espacio", queja
+      // textual de Juan); ahora solo actualiza los puntos que ya están ahí, nada se superpone.
+      // Se corre una vez sola al entrar a la página (para que los puntos no se queden en gris
+      // esperando a que alguien le dé clic al botón) y de nuevo cada vez que se pica "Buscar
+      // directo".
+      function checkAllChannels(manual){
         var channels = EVENTS_YT_CHANNELS
           .map(function(ch, idx){ return { ch: ch, idx: idx }; })
           .filter(function(x){ return !!x.ch.id; });
-        Promise.all(channels.map(function(x){
+        if(manual){
+          btn.disabled = true;
+          btn.dataset.originalText = btn.textContent;
+          btn.textContent = '🔄 Buscando...';
+        }
+        return Promise.all(channels.map(function(x){
           return fetch(EVENTS_YT_LIVE_CHECK_URL + '?channel=' + x.ch.id)
             .then(function(r){ return r.json(); })
-            .then(function(data){ return { idx: x.idx, label: x.ch.label, live: !!(data && data.live), title: data && data.title, videoId: data && data.videoId }; })
-            .catch(function(){ return { idx: x.idx, label: x.ch.label, live: false, title: null, videoId: null }; });
+            .then(function(data){ return { idx: x.idx, live: !!(data && data.live && data.videoId), videoId: data && data.videoId, title: data && data.title }; })
+            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null }; });
         })).then(function(results){
-          renderResults(results);
+          results.forEach(function(r){
+            lastResults[r.idx] = { live: r.live, videoId: r.videoId, title: r.title };
+            setDotState(r.idx, r.live ? 'live' : 'offline');
+          });
           // si el canal YA elegido resultó en vivo, lo deja listo igual que antes
-          var current = results.find(function(r){ return r.idx === Number(sel.value); });
+          var current = results.find(function(r){ return r.idx === currentIdx; });
           if(current && current.live && current.videoId){
             pendingSrc = liveEmbedUrl(current.videoId);
             setFacade(current.videoId, '');
             if(played) f.src = pendingSrc + '&autoplay=1';
             if(livePill) livePill.style.display = 'inline-flex';
+            if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
           }
         }).finally(function(){
-          btn.disabled = false;
-          btn.textContent = original;
+          if(manual){
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText;
+          }
         });
-      });
+      }
+      if(btn){
+        if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
+          btn.addEventListener('click', function(){
+            var ch = EVENTS_YT_CHANNELS[currentIdx];
+            if(ch && ch.id){ if(played && f.src) f.src = f.src; checkLiveAndMaybeSwitch(ch.id, currentIdx, true); }
+          });
+        } else {
+          btn.addEventListener('click', function(){ checkAllChannels(true); });
+          checkAllChannels(false);
+        }
+      }
     })();
     // El calendario de Investing.com (sslecal2.investing.com) tardaba 2.7s en cargar en cada
     // visita a la portada, aunque la persona nunca llegara a desplazarse hasta verlo -
