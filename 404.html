@@ -2962,7 +2962,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    opciones del menú) - Juan pidió que ocupen TODO el ancho en vez de quedar angostos como antes,
    a diferencia de .events-grid-solo (pensada para cuando sí importaba un ancho fijo). */
 .events-grid-wide{grid-template-columns:1fr}
-@media(max-width:480px){ .events-video-wrap{height:320px} .events-calendar-wrap{height:420px} .events-calendar-clip{height:420px} .events-calendar-iframe{height:458px} }
 /* min-width:0 es necesario porque .events-card es hijo de un grid (.events-grid) - sin esto,
    el calendario de adentro (que fuerza min-width:590px para que el widget de Investing no se
    vea aplastado, iguaql que hace melapela) empuja el ANCHO DE TODA LA GRILLA (y por lo tanto de
@@ -3072,10 +3071,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    (con los colores CLAROS originales de melapela en el src, para que al invertirse den oscuro)
    es la única forma que de verdad oscurece TODO el widget. pointer-events:none porque no usamos
    el selector de fechas propio de Investing (el "Semana actual"/filtros son decoración nuestra,
-   afuera del iframe). Alto subido de 420 a 680 (Juan: "se ve muy chiquito... que ocupe toda la
-   página") - el iframe interno sube con él (720, 680+40 del recorte de arriba), translateY(-38px)
-   queda igual porque esa franja recortada no cambia de tamaño. */
-.events-calendar-wrap{position:relative;height:680px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
+   afuera del iframe). Alto subido de 420 a 880 (Juan: "se ve muy chiquito... que ocupe toda la
+   página") - el iframe interno sube con él, translateY queda igual proporcionalmente (ver nota en
+   .events-calendar-iframe sobre el zoom, que es lo que de verdad lo agranda).
+   El ancho no lo controlamos: las columnas de este widget no se estiran para llenar todo el
+   espacio disponible (es de fábrica, no un error nuestro) - por eso queda un hueco vacío a la
+   derecha en pantallas anchas, el zoom de abajo ayuda a que ese hueco se note menos pero no lo
+   elimina del todo. */
+.events-calendar-wrap{position:relative;height:880px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
 /* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
    del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
    estilo ya usado en otras listas scrolleables del sitio */
@@ -3084,8 +3087,27 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-calendar-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
 .events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 .events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.events-calendar-clip{position:relative;overflow:clip;height:680px;min-width:590px}
-.events-calendar-iframe{display:block;width:100%;height:720px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
+.events-calendar-clip{position:relative;overflow:clip;height:880px;min-width:590px}
+/* zoom:1.3 - truco pedido por Juan para que el contenido (texto/filas) se vea más grande, no solo
+   la caja vacía alrededor; Juan aceptó el riesgo de no poder probarse en vivo desde este entorno.
+   zoom agranda TODO proporcionalmente (como si cada "pixel CSS" del widget fuera 1.3x más grande),
+   así que el recorte del header de arriba también hay que agrandarlo en la misma proporción:
+   translateY pasa de -38px a -49px (38*1.3=49.4) para seguir tapando esa franja completa aunque
+   ahora se vea más grande. height del iframe sube de 720 a 730 (un poco de margen extra) para que,
+   después del zoom y el corte de arriba, sigan sobrando los 880px de la ventana visible. */
+.events-calendar-iframe{display:block;width:100%;height:730px;border:none;transform:translateY(-49px);zoom:1.3;filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
+/* el zoom de arriba se deja solo para escritorio (experimento pedido por Juan, sin poder probarse
+   en vivo) - en celular se resetea a como estaba antes, para no sumarle más riesgo ahí. Esta
+   regla tiene que ir DESPUÉS de la de arriba (misma especificidad, gana la que está más abajo en
+   el archivo) - si quedara antes, la de escritorio la pisa sin importar el ancho de pantalla. */
+@media(max-width:480px){ .events-calendar-iframe{zoom:1;transform:translateY(-38px)} }
+/* este bloque de celular vivía mucho más arriba en el archivo (justo después de .events-grid-wide)
+   - se mueve aquí, DESPUÉS de las 4 reglas base que pisa (.events-video-wrap/.events-calendar-wrap/
+   -clip/-iframe), porque con la misma especificidad gana la regla que está más abajo en el
+   archivo sin importar qué tan angosta sea la pantalla: estando arriba, esta nunca ganaba en
+   celular y los 2 ajustes de "agrandar" de tareas anteriores (480px→880px en el calendario,
+   420px→480px en el video) se le colaban también al celular sin que nadie lo notara. */
+@media(max-width:480px){ .events-video-wrap{height:320px} .events-calendar-wrap{height:420px} .events-calendar-clip{height:420px} .events-calendar-iframe{height:458px} }
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
