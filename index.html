@@ -1442,7 +1442,8 @@ button{font-family:inherit;color:inherit}
 .tool-card .tool-card-head h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;line-height:1.25;color:var(--white);margin:0;text-align:left;min-height:3.75em;display:flex;align-items:center}
 .tool-card-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;color:#4ade80;border:1px solid rgba(46,204,113,.35);background:rgba(46,204,113,.16);padding:3px 10px;border-radius:20px;flex-shrink:0;white-space:nowrap}
 .tool-card-sub{font-size:11px;color:var(--accent);font-family:'Space Mono',monospace;letter-spacing:.03em;margin:3px 0 14px;padding-left:36px;font-weight:600}
-.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--accent);padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);margin-top:auto;align-self:flex-start}
+.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.tool-card:hover .tool-card-btn{filter:brightness(1.12)}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
 .tool-card p{font-size:12.5px;color:var(--muted2);line-height:1.55;margin:0;padding-right:8px;min-height:4.65em}
@@ -1455,6 +1456,15 @@ button{font-family:inherit;color:inherit}
 
 .tool-card.disabled{cursor:default;opacity:.72}
 .tool-card.disabled:hover{transform:none;border-color:rgba(91,141,239,.3);box-shadow:none}
+
+/* animación de entrada al aparecer en viewport (Panorama del mercado + Tus Herramientas
+   dentro de cada categoría) - .sc-hide SOLO lo agrega el script de más abajo, nunca está
+   en el HTML/CSS por defecto, así que si ese script no corre (bloqueado, error) todo se ve
+   normal desde el inicio, sin depender de que termine ninguna animación */
+.sc-hide{opacity:0;transform:translateY(16px) scale(.96)}
+.sc-hide.sc-in{animation:scReveal .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes scReveal{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media (prefers-reduced-motion: reduce){ .sc-hide{opacity:1!important;transform:none!important} }
 
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(5,4,7,.72);backdrop-filter:blur(10px) saturate(150%);-webkit-backdrop-filter:blur(10px) saturate(150%);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
@@ -7929,7 +7939,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 <button class="tool-card" id="openCalcCard" data-tool="calculadora">
           <div class="tool-card-head">
             <div class="tool-card-num">1</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🧮</span><h3>Calculadora de Futuros</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/><line x1="16" y1="12" x2="16" y2="12.01"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="12" y1="16" x2="12" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/></svg></span><h3>Calculadora de Futuros</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">USDT-M Y COIN-M</div>
@@ -7941,7 +7951,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openBreakevenCard" data-tool="breakeven">
           <div class="tool-card-head">
             <div class="tool-card-num">2</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">⚖️</span><h3>Calculadora de Break-even</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7 2 13a4 4 0 0 0 6 0z"/><path d="M19 7 16 13a4 4 0 0 0 6 0z"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span><h3>Calculadora de Break-even</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">COMISIONES Y CASHBACK</div>
@@ -7953,7 +7963,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openFeesCard" data-tool="fees">
           <div class="tool-card-head">
             <div class="tool-card-num">3</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🧾</span><h3>Calculadora de Comisiones</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v16.5l-1.5-1-1.5 1-1.5-1-1.5 1-1.5-1-1.5 1-1.5-1-1.5 1z"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="12" x2="15.5" y2="12"/></svg></span><h3>Calculadora de Comisiones</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">MAKER Y TAKER</div>
@@ -7965,7 +7975,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openProfitCard" data-tool="rentabilidad">
           <div class="tool-card-head">
             <div class="tool-card-num">4</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">📈</span><h3>Calculadora de Rentabilidad</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="15,6 21,6 21,12"/></svg></span><h3>Calculadora de Rentabilidad</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">PRECIOS EN VIVO</div>
@@ -7977,7 +7987,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openDcaCard" data-tool="dca">
           <div class="tool-card-head">
             <div class="tool-card-num">5</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🪙</span><h3>Simulador de DCA</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.2"/></svg></span><h3>Simulador de DCA</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">COMPRA Y VENTA POR PARTES</div>
@@ -7989,7 +7999,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openUnitConverterCard" data-tool="unitconverter">
           <div class="tool-card-head">
             <div class="tool-card-num">6</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🔁</span><h3>Conversor de Unidades</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17,2 21,6 17,10"/><path d="M3 11V9a2 2 0 0 1 2-2h16"/><polyline points="7,22 3,18 7,14"/><path d="M21 13v2a2 2 0 0 1-2 2H3"/></svg></span><h3>Conversor de Unidades</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">SATS · GWEI · WEI</div>
@@ -8001,7 +8011,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openPctCalcCard" data-tool="pctcalc">
           <div class="tool-card-head">
             <div class="tool-card-num">7</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">📐</span><h3>Calculadora de Porcentajes</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><circle cx="7" cy="7" r="2.2"/><circle cx="17" cy="17" r="2.2"/></svg></span><h3>Calculadora de Porcentajes</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">CÁLCULO RÁPIDO</div>
@@ -8013,7 +8023,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openTzClockCard" data-tool="tzclock">
           <div class="tool-card-head">
             <div class="tool-card-num">8</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🕐</span><h3>Reloj de Zona Horaria</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 16,14"/></svg></span><h3>Reloj de Zona Horaria</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">DOS ZONAS HORARIAS</div>
@@ -8032,7 +8042,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 <button class="tool-card" id="openQuizCard" data-tool="quiz">
           <div class="tool-card-head">
             <div class="tool-card-num">1</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🎯</span><h3>Perfil de Riesgo</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><h3>Perfil de Riesgo</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">6 PREGUNTAS RÁPIDAS</div>
@@ -8044,7 +8054,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openPortfolioCard" data-tool="portafolio">
           <div class="tool-card-head">
             <div class="tool-card-num">2</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">📊</span><h3>Simulador de portafolio</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="21" x2="5" y2="10"/><line x1="12" y1="21" x2="12" y2="4"/><line x1="19" y1="21" x2="19" y2="14"/></svg></span><h3>Simulador de portafolio</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">ASIGNACIÓN Y HOLDINGS</div>
@@ -8056,7 +8066,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openCorrelationCard" data-tool="correlacion">
           <div class="tool-card-head">
             <div class="tool-card-num">3</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🔗</span><h3>Monitor de Correlación</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9"/><path d="M8 16l-1.5 1.5a3.5 3.5 0 0 1-5-5l2.5-2.5a3.5 3.5 0 0 1 5-0.2"/><path d="M16 8l1.5-1.5a3.5 3.5 0 0 1 5 5l-2.5 2.5a3.5 3.5 0 0 1-5 0.2"/></svg></span><h3>Monitor de Correlación</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">HASTA 5 MONEDAS</div>
@@ -8068,7 +8078,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openMcapCompareCard" data-tool="mcapcompare">
           <div class="tool-card-head">
             <div class="tool-card-num">4</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">⚖️</span><h3>Comparador de Market Cap</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7 2 13a4 4 0 0 0 6 0z"/><path d="M19 7 16 13a4 4 0 0 0 6 0z"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span><h3>Comparador de Market Cap</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">SIMULA OTRO MARKET CAP</div>
@@ -8080,7 +8090,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="tool-card" id="openFiFreedomCard" data-tool="fifreedom">
           <div class="tool-card-head">
             <div class="tool-card-num">5</div>
-            <div class="tool-card-headtitle"><span class="tool-icon">🏝️</span><h3>Tiempo hasta la Libertad Financiera</h3></div>
+            <div class="tool-card-headtitle"><span class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12"/><path d="M6 21h12"/><path d="M7 3v3a5 5 0 0 0 5 5 5 5 0 0 0 5-5V3"/><path d="M7 21v-3a5 5 0 0 1 5-5 5 5 0 0 1 5 5v3"/></svg></span><h3>Tiempo hasta la Libertad Financiera</h3></div>
             <div class="tool-card-tag">GRATIS</div>
           </div>
           <div class="tool-card-sub">APORTE Y RENDIMIENTO</div>
@@ -30644,6 +30654,40 @@ async function awardColmillos(eventType, periodKey, amount){
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+})();
+</script>
+<script>
+/* entrada de Panorama del mercado y Tus Herramientas: por defecto todo se ve normal (no se
+   toca nada todavía). Solo si puede, el script oculta cada tarjeta un instante y la revela
+   al cruzar el viewport - cada tarjeta se observa por separado (no el grupo completo) para
+   que funcione igual de bien en una fila corta que en una lista larga de una sola columna en
+   el teléfono. Si algo falla en cualquier punto, se queda en el estado normal visible */
+(function(){
+  try{
+    var targets = [];
+    document.querySelectorAll('.market-overview, .tool-grid').forEach(function(g){
+      [].slice.call(g.children).forEach(function(c){ targets.push(c); });
+    });
+    if(!targets.length) return;
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    targets.forEach(function(c){ c.classList.add('sc-hide'); });
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var el = entry.target;
+        if(!entry.isIntersecting) return;
+        el.classList.add('sc-in');
+        el.addEventListener('animationend', function handler(){
+          el.classList.remove('sc-hide', 'sc-in');
+          el.removeEventListener('animationend', handler);
+        });
+        obs.unobserve(el);
+      });
+    }, { threshold: 0.15 });
+    targets.forEach(function(el){ obs.observe(el); });
+    setTimeout(function(){ targets.forEach(function(el){ el.classList.remove('sc-hide', 'sc-in'); }); }, 6000);
+  }catch(e){
+    document.querySelectorAll('.sc-hide').forEach(function(el){ el.classList.remove('sc-hide', 'sc-in'); });
   }
 })();
 </script>
