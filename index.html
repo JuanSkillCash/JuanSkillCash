@@ -317,14 +317,14 @@ button{font-family:inherit;color:inherit}
 .account-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:16px;margin-bottom:22px;border-bottom:1px solid rgba(91,141,239,.3);flex-wrap:wrap}
 .account-bar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
-.market-overview{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:1px;background:rgba(91,141,239,.3);border:1px solid rgba(91,141,239,.3);border-radius:16px;overflow:hidden;margin-bottom:14px;align-items:stretch}
+.market-overview{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;align-items:stretch}
 @media(max-width:900px){
   .market-overview{grid-template-columns:1fr 1fr}
   .market-overview .fng-section{grid-column:1 / -1}
   .market-overview .dom-card.halving{grid-column:1 / -1}
 }
 
-.fng-section{background:var(--grad-caja);border:none;border-radius:0;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
+.fng-section{background:var(--grad-caja);border:none;border-radius:14px;padding:9px 14px 8px;margin-bottom:0;display:flex;flex-direction:column}
 .fng-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:10px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
@@ -362,7 +362,7 @@ button{font-family:inherit;color:inherit}
 }
 
 .dom-card{
-  background:var(--grad-caja);border:none;border-radius:0;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
+  background:var(--grad-caja);border:none;border-radius:14px;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
 }
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;color:var(--white);letter-spacing:-.01em}
@@ -373,20 +373,18 @@ button{font-family:inherit;color:inherit}
 .dom-card.halving .dom-card-bar-fill{background:linear-gradient(90deg,#ff2f4f,#ff8a9a);box-shadow:0 0 0 transparent}
 
 /* Sesiones de mercado */
-.market-sessions-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--white);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(91,141,239,.3)}
-.market-sessions-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(91,141,239,.3);border:1px solid rgba(91,141,239,.3);border-radius:16px;overflow:hidden}
+.market-sessions-title{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(91,141,239,.3)}
+.market-sessions-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 /* en celular angosto, 3 columnas ya no caben de verdad (ni la bandera+nombre entran en ese
    ancho) - la tercera tarjeta terminaba cortada fuera de la pantalla. Pasa a una sola columna,
    una tarjeta por renglón, igual que ya hacen el resto de las grillas del sitio en celular. */
 @media(max-width:760px){
   .market-sessions-row{grid-template-columns:1fr}
 }
-@media(max-width:480px){
-  .market-sessions-row{gap:0}
-}
 .session-card{
   background:var(--grad-caja);
   border:none;
+  border-radius:14px;
   padding:11px 14px 10px;display:flex;flex-direction:column;gap:7px;position:relative
 }
 .session-card-label{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--muted2);padding-right:20px}
@@ -1391,7 +1389,8 @@ button{font-family:inherit;color:inherit}
 @keyframes sparkTwinkle{0%,82%,100%{opacity:0;transform:scale(.3)}91%{opacity:var(--peak,1);transform:scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
-.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--c);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--bg);margin-top:auto;align-self:flex-start}
+.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--c);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.cat-overview-card:hover .cat-overview-btn{filter:brightness(1.12)}
 
 .cat-overview-featured{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:1100px){ .cat-overview-featured{grid-template-columns:1fr 1fr} }
@@ -4097,7 +4096,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <span id="dominanceUpdatedText">Dominancia — cargando…</span>
     </div>
 
-    <div class="market-sessions-title"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="10" cy="10" r="7"/><line x1="3" y1="10" x2="17" y2="10"/><path d="M10 3c2.2 2 3.5 4.5 3.5 7s-1.3 5-3.5 7c-2.2-2-3.5-4.5-3.5-7s1.3-5 3.5-7z"/></svg>Sesiones de mercado <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">— toca la 🔔 de la que te importa</span></div>
+    <div class="market-sessions-title">Sesiones de mercado <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">— toca la 🔔 de la que te importa</span></div>
     <div class="market-sessions-row" id="marketSessionsRow"></div>
     <div class="market-sessions-footer" id="marketSessionsFooter">Calculando tu hora local…</div>
 
