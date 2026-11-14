@@ -4378,7 +4378,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             </table>
             <div class="cal-cards" id="calCards" style="display:none"></div>
           </div>
-          <div class="events-card-foot">Eventos de impacto alto/medio/bajo en EE.UU. y la Eurozona, en tu hora local · Datos por <span id="calFuenteLabel">TradingView</span> · Se actualiza solo cada minuto.</div>
+          <div class="events-card-foot">Eventos de impacto alto/medio/bajo en EE.UU. y la Eurozona, en tu hora local · Horario: Forex Factory · Datos: Nasdaq / FRED · Se actualiza solo cada minuto.</div>
         </div>
       </div>
     </section>
@@ -4878,8 +4878,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       }
     })();
     // Calendario Económico propio (reemplaza el iframe de Investing.com) - ver
-    // workers/economic-calendar/worker.js para el backend (TradingView con respaldo en Forex
-    // Factory, ya traducido/formateado/coloreado en el JSON que devuelve).
+    // workers/economic-calendar/worker.js para el backend. Rediseño de fuentes 14-nov-2026:
+    // Forex Factory para horario/previsión/anterior + Nasdaq (y FRED de respaldo) para el dato
+    // "actual" - TradingView se descartó (su endpoint exige la cabecera Origin de su propia
+    // página, no se le va a fingir esa cabecera), ya traducido/formateado/coloreado en el JSON.
     (function(){
       var EVENTS_CAL_URL = 'https://skillcash-calendario.juanchodigital86.workers.dev';
 
@@ -4892,7 +4894,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var tableEl = document.getElementById('calTable');
       var tbodyEl = document.getElementById('calTbody');
       var cardsEl = document.getElementById('calCards');
-      var fuenteLabelEl = document.getElementById('calFuenteLabel');
       var section = document.getElementById('eventsCalendarBlock');
       if(!filtersEl || !tbodyEl || !cardsEl) return;
 
@@ -5059,7 +5060,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .then(function(data){
             eventosCache = Array.isArray(data.eventos) ? data.eventos : [];
             cargado = true;
-            if(fuenteLabelEl) fuenteLabelEl.textContent = data.fuente || 'TradingView';
             if(data.desactualizado){
               bannerEl.textContent = '⚠️ Mostrando la última copia guardada - no se pudo conectar a la fuente en vivo justo ahora.';
               bannerEl.style.display = '';

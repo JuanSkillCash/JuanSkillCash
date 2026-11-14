@@ -1,101 +1,82 @@
-# Worker: calendario económico propio (reemplaza Investing.com/TradingView widget)
+# Worker: calendario económico propio (Forex Factory + Nasdaq + FRED)
 
-Trae los eventos económicos (CPI, nóminas, tasas de interés, etc.) desde TradingView (con
-respaldo en Forex Factory si falla) y los devuelve ya traducidos, formateados y coloreados en
-JSON, para la tabla propia de "Calendario Económico" (ver la explicación completa en los
-comentarios de `worker.js`).
+Trae los eventos económicos (CPI, nóminas, tasas de interés, etc.), ya traducidos, formateados y
+coloreados en JSON, para la tabla propia de "Calendario Económico" del sitio (ver la explicación
+completa en los comentarios de `worker.js`).
 
-## Cómo desplegarlo (mismo patrón que los otros Workers de este sitio)
+## Rediseño de fuentes (14-nov-2026)
 
-1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers y Pages** → **Crear**
-   → **"Crear Worker"**. Dale el nombre **`skillcash-calendario`** (exacto, sin el nombre al azar
-   que propone Cloudflare).
-2. **"Editar código"** → borra todo el código de ejemplo → pega **todo** el contenido del archivo
-   `worker.js` de esta misma carpeta → **"Desplegar"**.
-3. **Crear y conectar el KV (una sola vez)** - esto es lo que guarda una copia de respaldo por si
-   algún día las dos fuentes (TradingView y Forex Factory) fallan al mismo tiempo:
-   - En el menú de la izquierda, **Almacenamiento y Bases de Datos** → **KV** → **Crear
-     namespace**. Nómbralo, por ejemplo, `skillcash-calendario-kv`.
-   - Vuelve al Worker `skillcash-calendario` → **"Settings"** → **"Bindings"** (o "Variables y
-     bindings") → **"Add"** → elige **"KV Namespace"** → en **"Variable name"** escribe
-     exactamente **`CALENDARIO_KV`** (así, en mayúsculas - el código lo busca con ese nombre
-     exacto) → selecciona el namespace que acabas de crear → Guardar/Deploy.
-   - Sin este paso el calendario sigue funcionando igual (TradingView/Forex Factory en vivo),
-     solo que no tendría ningún respaldo si las dos fuentes fallan a la vez al mismo tiempo.
-4. Cloudflare te va a dar una URL parecida a `https://skillcash-calendario.<tu-usuario>.workers.dev`
-   — **mándame esa URL exacta** para conectarla al sitio.
+**TradingView se descartó por completo.** Causa confirmada del error 403: su endpoint
+`economic-calendar.tradingview.com/events` solo acepta peticiones con la cabecera `Origin` de su
+propia página - no es bloqueo de IP ni límite de peticiones. Arreglarlo exigiría fingir esa
+cabecera, y la decisión de Juan fue **no hacerlo**.
 
-## Cómo probarlo tú mismo (opcional, muy recomendado la primera vez)
+Arquitectura nueva, 3 fuentes:
 
-Abre en el navegador (cambia la URL por la tuya real):
+1. **Forex Factory** (horario, importancia, previsión, anterior) - un **Cron Trigger la refresca
+   cada 30 minutos y la guarda en KV**; el sitio nunca le pega directo a Forex Factory en cada
+   visita (eso era lo que causaba los 429 con la versión anterior).
+2. **Nasdaq** (`api.nasdaq.com/api/calendar/economicevents`) - el dato "Actual" + consenso, sin
+   llave, verificado que no exige cabecera Origin.
+3. **FRED** (oficial, solo EE.UU., opcional) - respaldo si Nasdaq no trajo el dato. Necesita el
+   secreto `FRED_API_KEY` configurado en el Worker (ver abajo); si no está, simplemente no se usa.
+
+## Cómo desplegarlo
+
+1. Entra al Worker **`skillcash-calendario`** en Cloudflare → **"Edit code"** → borra todo → pega
+   el contenido de `worker.js` de esta carpeta → **"Deploy"**.
+2. **KV** (si no lo tenías ya de la versión anterior): **Storage & Databases → KV → Create** →
+   nómbralo como quieras → en el Worker, **Settings → Bindings → Add → KV Namespace** → nombre de
+   variable exacto **`CALENDARIO_KV`** → selecciona el namespace.
+3. **Cron Trigger** (nuevo, necesario para que Forex Factory no de 429): en el Worker →
+   **Settings → Triggers → Cron Triggers → Add** → **`*/30 * * * *`** (cada 30 minutos).
+4. **FRED_API_KEY (opcional, recomendado)**: si quieres que el dato "Actual" de indicadores de
+   EE.UU. tenga un respaldo oficial cuando Nasdaq no lo traiga, agrega el secreto: Worker →
+   **Settings → Variables and Secrets → Add** → nombre **`FRED_API_KEY`** → tipo **Secret** →
+   pega la llave de FRED que ya tienes (la misma que usan los scripts de Python del repo, o saca
+   una nueva gratis en `fred.stlouisfed.org/docs/api/api_key.html`). Sin esto, el calendario
+   sigue funcionando normal con Nasdaq solamente - solo se pierde el respaldo para los casos que
+   Nasdaq no cubra.
+
+## Cómo probarlo
 
 ```
 https://<tu-worker>.workers.dev/?debug=1
 ```
 
-Con `?debug=1` la respuesta trae un bloque `"debug"` extra que dice exactamente qué pasó: si
-TradingView respondió bien (`tvStatus`, `tvItems`) o si falló y por qué (`tvError`), y lo mismo
-para Forex Factory. Sin `?debug=1`, la respuesta normal se ve así:
+Con `?debug=1` la respuesta trae `debug.ff` (si la copia de Forex Factory en KV está fresca o
+desactualizada), `debug.nasdaq` (qué días se consultaron y cuántas filas trajo cada uno) y
+`debug.fred` (si se intentó FRED para algún evento). Revisa semana del 9 al 13 de noviembre: debe
+salir CPI 0,4% / Core CPI 0,3% / PPI 0,3% / Unemployment Claims 200K / Existing Home Sales 3,75M.
 
-```json
-{"fuente":"TradingView","actualizado":"2026-11-14T...","desactualizado":false,
- "eventos":[{"id":"tv-123","fechaUTC":"2026-11-14T13:30:00.000Z","divisa":"USD","pais":"US",
- "importancia":3,"evento":"Core CPI m/m","eventoES":"IPC subyacente m/m","actual":"0,3%",
- "prevision":"0,2%","anterior":"0,3%","tendencia":"bueno","direccion":"arriba", ...}]}
-```
+**Si `?debug=1` da un error 503 con `"Forex Factory respondió 429"`**: no es un error del código,
+es que Forex Factory está rechazando temporalmente por el límite de peticiones compartido entre
+todos los Workers de Cloudflare (no solo el tuyo) - reintenta en unos minutos. Con el Cron Trigger
+puesto, esto se va a arreglar solo apenas el cron corra una vez con éxito (máximo 30 min).
 
-**Cosa muy importante que avisarme apenas lo pruebes**: si ves `"fuente":"Forex Factory"` en
-vez de `"TradingView"` en una prueba normal (sin tumbar nada a propósito), o si `debug.tvError`
-dice algo como "403" o "Forbidden", probablemente TradingView empezó a exigir que la petición
-venga con cabeceras que digan que viene de su propia página (`Origin`/`Referer`) - en ese caso
-**no agregues esas cabeceras tú mismo ni me pidas que lo haga sin que lo hablemos primero**
-(podría no estar permitido por sus términos de uso). Avísame y lo revisamos con calma; mientras
-tanto el calendario sigue funcionando con Forex Factory, solo que sin el dato "Actual".
+## Verificado en producción (14-nov-2026)
 
-## Límites a tener en cuenta (plan gratis de Cloudflare)
+Desplegado y probado contra las fuentes reales (con un token de Cloudflare que Juan autorizó para
+esta tarea). La lógica de emparejamiento Forex Factory ↔ Nasdaq (con el desfase de 1 día en el
+parámetro `date` de Nasdaq, y la desambiguación de filas duplicadas por magnitud) está probada con
+un harness de Node contra los ejemplos reales documentados (CPI/Core CPI/PPI/Core PPI de la semana
+del 9-13 de noviembre) - todos los casos pasaron. Falta confirmar en vivo (apenas el cron tenga
+tiempo de correr sin toparse con el 429 de Forex Factory) que la respuesta real coincide con estos
+mismos números - avísenme si ven algo distinto a lo documentado arriba.
 
-- **KV**: el límite documentado por Cloudflare al momento de escribir esto es **1000 escrituras
-  por día** en el plan gratis (puede cambiar - conviene revisar la cifra vigente en
-  `developers.cloudflare.com/kv/platform/limits` de vez en cuando). El código ya está hecho para
-  escribir ahí como máximo una vez cada 10 minutos y solo si los datos cambiaron, así que en uso
-  normal no debería acercarse a ese límite ni de lejos.
-- **Cron Triggers** (la idea de "precalentar" la caché unos minutos antes de cada evento
-  importante): se dejó FUERA de esta primera versión - el plan gratis de Workers limita cuántos
-  Cron Triggers se pueden tener en la cuenta, y antes de sumar uno más conviene revisar cuántos
-  ya estás usando en el resto de Workers de este sitio. Si quieres que lo agreguemos después,
-  dímelo y lo revisamos con el panel de Cloudflare a la vista.
+### Pendiente: medir la velocidad real de Nasdaq/FRED
 
-## Ya desplegado y probado en producción (14-nov-2026)
+El 17-nov-2026 a las 8:30 ET (hora de publicación de Retail Sales) hay que medir cuántos minutos
+tardan Nasdaq y FRED (`RSAFS`) en mostrar el dato real después de publicado, para confirmar o
+ajustar el `latenciaMin` de `FRED_MAP` en el código. Programado un chequeo automático para ese
+momento (ver scheduled task en Claude Code) - si no se hizo, probar a mano con
+`?debug=1&desde=2026-11-17&hasta=2026-11-17&paises=US` varias veces esa mañana.
 
-Desplegado directamente desde Claude Code (con un token de Cloudflare que Juan autorizó para
-esta tarea) y confirmado en vivo:
+## Nota sobre `tendencia` (color verde/rojo) en CPI/PPI - no se tocó, queda para decidir aparte
 
-- **TradingView (fuente principal) respondió 403 (Forbidden)** apenas se desplegó - exactamente
-  el escenario que este mismo README avisaba que podía pasar. O sea: TradingView SÍ empezó a
-  exigir algo (probablemente las cabeceras `Origin`/`Referer` de su propia página) que este
-  Worker deliberadamente no manda. **No se agregó ese spoofing** - sigue pendiente de que Juan
-  decida si quiere intentarlo o no (ver "Decisión pendiente" abajo).
-- **Forex Factory (respaldo) respondió 429 (Too Many Requests)** en varias pruebas seguidas -
-  probablemente por el límite de peticiones que le pone a las IPs compartidas de Cloudflare
-  (parecido a lo que ya pasaba con MyMemory/Google Translate en el Worker de noticias), no algo
-  específico de este Worker. Con tráfico normal del sitio (una consulta real cada ~10 minutos,
-  no las pruebas seguidas que se le hicieron para verificar esto) debería fallar mucho menos.
-- **La copia de respaldo en KV sí funcionó como estaba pensada**: con las dos fuentes fallando,
-  el calendario siguió sirviendo la última copia buena guardada, marcada `"desactualizado":true`,
-  en vez de romperse con un error. El sitio NO se cayó en ningún momento de la prueba.
-
-### Decisión pendiente para Juan: ¿qué hacer con el 403 de TradingView?
-
-Mientras esto no se resuelva, el calendario funciona SOLO con Forex Factory (sin el dato
-"Actual", solo Previsión/Anterior) o con la copia de respaldo en KV si Forex Factory también
-falla en el momento. Opciones, sin tomar ninguna todavía:
-
-1. **Dejarlo así** - Forex Factory + respaldo en KV ya cubre el calendario, solo sin el dato
-   "Actual" publicado. Es lo más simple y lo que ya está funcionando ahora mismo.
-2. **Agregar las cabeceras `Origin`/`Referer` de tradingview.com** a la petición - probablemente
-   arreglaría el 403, pero es fingir que la petición viene de su propia página, algo que este
-   Worker evitó a propósito hasta no confirmar que no viola los términos de uso de TradingView.
-3. **Buscar otra fuente** para el dato "Actual" (alguna API de calendario económico de pago, o
-   revisar si hay otro endpoint público de TradingView que sí acepte la petición tal cual).
-
-No se hizo nada de esto sin que Juan lo decida primero.
+La lógica de "bueno/malo" (`INDICADORES_INVERTIDOS`) solo invierte el color para desempleo/
+solicitudes de subsidio/inventarios - CPI y PPI usan la regla por defecto ("actual > previsión =
+bueno"), que es la misma convención que ya traía este Worker desde antes de este rediseño. Hay un
+argumento para que CPI/PPI/Core-CPI/Core-PPI también estén invertidos (una inflación más alta de
+lo esperado se suele leer como mala noticia) - no se cambió porque no fue parte de lo pedido en
+este rediseño de fuentes. Si Juan quiere ese ajuste, es un cambio chiquito y aparte.

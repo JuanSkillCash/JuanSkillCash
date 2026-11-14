@@ -1,66 +1,74 @@
 /* Cloudflare Worker: calendario económico PROPIO de SkillCash (reemplaza el iframe de
  * sslecal2.investing.com y el componente <tv-economic-calendar> de TradingView).
  *
- * Por qué se construyó esto en vez de seguir con un widget de terceros (investigado a fondo
- * antes de escribir una sola línea de este archivo):
- * - El widget de Investing.com solo expone 5 parámetros de color (ecoDayBackground/
- *   ecoDayFontColor/defaultFont/innerBorderColor/borderColor) que pintan la barra separadora de
- *   cada día - el fondo de las FILAS de datos, que es la mayoría de lo que se ve, queda fijo en
- *   blanco sin importar qué se le mande (probado con ?theme/?darkMode/?bgColor/?background/
- *   ?backgroundColor/?width=100%/?responsive, ninguno tuvo efecto). Su ancho también es fijo
- *   (~618px), no se estira. Al ser un iframe cross-origin, tampoco se le puede meter CSS propio.
- * - El Web Component <tv-economic-calendar> de TradingView sí acepta tema oscuro y ancho 100%,
- *   pero no muestra encabezados de columna, así que no se entiende cuál número es la previsión y
- *   cuál el dato anterior - inservible para lo que pidió Juan.
+ * REDISEÑO DE FUENTES (14-nov-2026) - verificado en navegador, no re-investigar:
  *
- * Fuente principal: el mismo endpoint JSON (no documentado oficialmente, pero público y sin
- * llave) que usa la propia página de TradingView para pintar su calendario:
- *   GET https://economic-calendar.tradingview.com/events?from=<ISO UTC>&to=<ISO UTC>&countries=US,EU
- * Confirmado en vivo el 13-nov-2026 (ver comentarios de abajo para la forma exacta de la
- * respuesta). Como es un endpoint interno no documentado, NO se le manda ninguna cabecera
- * Origin/Referer fingiendo venir de tradingview.com - solo un fetch normal de servidor a
- * servidor con un User-Agent descriptivo, igual que los demás Workers de este sitio. Si
- * TradingView lo empieza a rechazar por eso, el código ya cae solo al respaldo de abajo; NO se
- * debe agregar spoofing de esas cabeceras sin confirmar primero que no viola sus términos de uso.
+ * TradingView (la fuente principal de la primera versión de este Worker) quedó DESCARTADA.
+ * Causa confirmada del error 403: el endpoint `economic-calendar.tradingview.com/events` tiene
+ * una lista blanca por la cabecera `Origin` - solo acepta peticiones que digan venir de su
+ * propia página (tradingview.com). No es bloqueo por IP de Cloudflare ni límite de peticiones.
+ * Usarlo exigiría fingir esa cabecera (simular que la petición viene de su propio sitio cuando
+ * no es así) - decisión explícita de Juan: NO hacerlo.
  *
- * Fuente de respaldo (si la de arriba falla): Forex Factory, también JSON público sin llave:
- *   GET https://nfs.faireconomy.media/ff_calendar_thisweek.json
- * Solo trae la semana en curso (no se le puede pedir un rango custom) y no trae el dato "actual"
- * (solo previsión y anterior) - por eso es respaldo y no la fuente principal.
+ * Arquitectura nueva, 3 fuentes combinadas:
  *
- * Caché en 2 capas:
- * 1. Cache API de Cloudflare (caches.default) - 10 min normalmente, baja a 1 min si hay algún
- *    evento de importancia alta dentro de la ventana [5 min antes, 30 min después] de su hora
- *    real, para que el dato "actual" aparezca rápido apenas se publica.
- * 2. KV (binding CALENDARIO_KV, hay que crearlo y conectarlo a mano una vez - ver README.md de
- *    esta carpeta) guarda la última respuesta buena conocida, para seguir sirviendo algo si
- *    fallan AMBAS fuentes a la vez. Se escribe como máximo cada 10 minutos y solo si los datos
- *    de verdad cambiaron (no en cada visita) - el plan gratis de Workers KV tiene un límite bajo
- *    de escrituras al día (revisar la cifra vigente en developers.cloudflare.com/kv/platform/limits,
- *    puede cambiar; al momento de escribir esto el límite documentado era 1000 escrituras/día).
+ * A) Forex Factory (horario/importancia/previsión/anterior) - GET
+ *    https://nfs.faireconomy.media/ff_calendar_thisweek.json . Solo trae la semana en curso y
+ *    NUNCA trae el dato "actual". Responde 429 seguido si se le pide en cada visita (límite por
+ *    las IPs compartidas de Cloudflare) - por eso NO se pide por petición: un Cron Trigger
+ *    (`scheduled()` abajo) la refresca cada 30 min y la guarda en KV; el handler normal SOLO lee
+ *    de KV. Si el KV está vacío (primera vez, antes de que corra el primer cron), se hace un
+ *    fetch directo una sola vez como arranque.
+ *
+ * B) Nasdaq (dato "actual" + consenso, de TODOS los países) - GET
+ *    https://api.nasdaq.com/api/calendar/economicevents?date=YYYY-MM-DD . Sin llave, sin
+ *    cabecera Origin (confirmado abriendo la URL directo en el navegador) - por eso NO se le
+ *    manda Origin/Referer fingido, solo un User-Agent descriptivo normal.
+ *    Rarezas verificadas (OJO si algo no cuadra en el futuro):
+ *      - El parámetro `date` viene DESFASADO 1 día: pedir date=D+1 para los eventos del día D.
+ *      - El campo `gmt` de cada fila en realidad está en hora de Nueva York, no en GMT de verdad.
+ *      - `country` viene en texto largo ("United States", "Euro Zone", "Germany"...), no en código.
+ *      - Puede haber 2 filas con el mismo nombre de evento sin distinguir m/m de y/y (ej. 2 filas
+ *        "PPI") - se desambigua comparando magnitud contra el forecast/previous de Forex Factory.
+ *      - No trae importancia (esa sigue viniendo de Forex Factory).
+ *
+ * C) FRED (respaldo oficial, solo EE.UU., opcional) - GET
+ *    https://api.stlouisfed.org/fred/series/observations?series_id=<ID>&api_key=<KEY>&file_type=json
+ *    Necesita el secreto `FRED_API_KEY` configurado en el Worker (Settings → Variables and
+ *    Secrets). Si no está configurado, este Worker simplemente no intenta FRED - Nasdaq ya cubre
+ *    la mayoría de los casos. Solo se usa cuando Nasdaq no trajo el dato, y solo después de pasado
+ *    el tiempo de publicación típico medido para cada serie (ver FRED_MAP) - así nunca se muestra
+ *    por error el dato del mes/trimestre ANTERIOR como si fuera el actual recién publicado.
+ *
+ * Descartadas (verificado, no reinvestigar): Trading Economics (cuenta de invitado discontinuada),
+ * BCE/Eurostat para zona euro (las series que se probaron quedaron desactualizadas o dan 404).
+ *
+ * Caché en 2 capas igual que antes: Cache API (caches.default) por petición completa, con TTL
+ * de 60s si hay algún evento de importancia alta dentro de [0, 30min] después de su hora sin
+ * dato "actual" todavía (para no tardar en mostrarlo apenas se publique), 15 min el resto del
+ * tiempo; y KV (binding CALENDARIO_KV) para la copia semanal de Forex Factory que mantiene el
+ * Cron Trigger.
  */
 
-const CACHE_SECONDS_DEFAULT = 600;
+const CACHE_SECONDS_DEFAULT = 900;
 const CACHE_SECONDS_NEAR_EVENT = 60;
-const NEAR_EVENT_BEFORE_MS = 5 * 60 * 1000;
-const NEAR_EVENT_AFTER_MS = 30 * 60 * 1000;
-const KV_MIN_WRITE_GAP_MS = 10 * 60 * 1000;
+const NEAR_EVENT_WINDOW_MS = 30 * 60 * 1000; // [hora del evento, hora del evento + 30 min]
 const MAX_RANGE_DAYS = 31;
 const BOGOTA_OFFSET_MS = 5 * 60 * 60 * 1000; // America/Bogota = UTC-5, sin horario de verano
 const FETCH_TIMEOUT_MS = 8000;
+const FF_KV_KEY = 'ff_cache_semana';
+const FF_STALE_AFTER_MS = 70 * 60 * 1000; // el cron corre cada 30 min - más de 70 min sin refrescar = algo falló
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 const COUNTRY_WHITELIST = ['US', 'EU'];
-// Forex Factory no distingue "país" de "divisa" - su campo `country` YA es el código de divisa
 const PAIS_A_DIVISA_FF = { US: 'USD', EU: 'EUR' };
 
-const TV_URL = 'https://economic-calendar.tradingview.com/events';
 const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
-const KV_KEY_PREFIX = 'calendario:';
+const NASDAQ_URL = 'https://api.nasdaq.com/api/calendar/economicevents';
+const FRED_URL = 'https://api.stlouisfed.org/fred/series/observations';
 
-// Traduce los títulos de indicadores de alta importancia más comunes (vienen en inglés de las 2
-// fuentes) - lista pedida explícitamente por Juan. Si un título no está acá, se deja en inglés
-// (mejor eso que una traducción inventada/incorrecta). Match por substring en minúsculas, para
-// que sufijos como "(Oct)" o "YoY" no rompan la coincidencia.
+// Traduce los títulos de indicadores de alta importancia más comunes (vienen en inglés de Forex
+// Factory). Si un título no está acá, se deja en inglés (mejor eso que una traducción inventada).
 const TRADUCCIONES = [
   ['core inflation rate mom', 'IPC subyacente m/m'],
   ['core cpi', 'IPC subyacente m/m'],
@@ -71,19 +79,65 @@ const TRADUCCIONES = [
   ['initial jobless claims', 'Peticiones de subsidio por desempleo'],
   ['unemployment claims', 'Peticiones de subsidio por desempleo'],
   ['non farm payrolls', 'Nóminas no agrícolas'],
+  ['non-farm employment change', 'Nóminas no agrícolas'],
   ['nonfarm payrolls', 'Nóminas no agrícolas'],
   ['unemployment rate', 'Tasa de desempleo'],
   ['fed interest rate decision', 'Decisión de tipos de la Fed'],
+  ['federal funds rate', 'Tasa de fondos federales'],
   ['existing home sales', 'Ventas de viviendas de segunda mano'],
   ['housing starts', 'Inicios de viviendas'],
   ['building permits', 'Permisos de construcción'],
   ['gdp growth rate', 'PIB'],
   ['ecb interest rate decision', 'Decisión de tipos del BCE'],
+  ['crude oil inventories', 'Inventarios de petróleo crudo'],
 ];
 
-// indicadores donde SUBIR es una mala señal (desempleo, solicitudes de subsidio, inventarios) -
-// para estos se invierte el color verde/rojo respecto al resto. Match por substring en inglés.
+// indicadores donde SUBIR es una mala señal - para estos se invierte el color verde/rojo
 const INDICADORES_INVERTIDOS = ['unemployment', 'jobless claims', 'crude oil inventories', 'inventories'];
+
+// --- alias Forex Factory -> nombre de evento en Nasdaq (match exacto, en minúsculas) ---
+const ALIAS_FF_A_NASDAQ = {
+  'cpi m/m': 'cpi',
+  'core cpi m/m': 'core cpi',
+  'ppi m/m': 'ppi',
+  'core ppi m/m': 'core ppi',
+  'unemployment claims': 'initial jobless claims',
+  'existing home sales': 'existing home sales',
+  'crude oil inventories': 'crude oil inventories',
+  'retail sales m/m': 'retail sales',
+  'core retail sales m/m': 'core retail sales',
+  'non-farm employment change': 'nonfarm payrolls',
+  'unemployment rate': 'unemployment rate',
+};
+
+// --- respaldo FRED: título FF (minúsculas) -> serie + cómo calcular el "actual" ---
+// latenciaMin = minutos medidos (14-nov-2026) entre la hora oficial de publicación y que FRED
+// muestre el dato nuevo - no se intenta FRED antes de ese tiempo, para no mostrar por error el
+// dato del periodo ANTERIOR como si fuera el recién publicado.
+const FRED_MAP = {
+  'cpi m/m': { serie: 'CPIAUCSL', calc: 'pctMoM', latenciaMin: 50, decimales: 1 },
+  'core cpi m/m': { serie: 'CPILFESL', calc: 'pctMoM', latenciaMin: 50, decimales: 1 },
+  'cpi y/y': { serie: 'CPIAUCNS', calc: 'pctYoY', latenciaMin: 50, decimales: 1 },
+  'ppi m/m': { serie: 'PPIFIS', calc: 'pctMoM', latenciaMin: 120, decimales: 1 },
+  'core ppi m/m': { serie: 'PPIFES', calc: 'pctMoM', latenciaMin: 120, decimales: 1 },
+  'unemployment claims': { serie: 'ICSA', calc: 'ultimoEntreMilK', latenciaMin: 15, decimales: 0 },
+  'non-farm employment change': { serie: 'PAYEMS', calc: 'diferenciaK', latenciaMin: 140, decimales: 0 },
+  'unemployment rate': { serie: 'UNRATE', calc: 'ultimoDirectoPct', latenciaMin: 140, decimales: 1 },
+  'average hourly earnings m/m': { serie: 'CES0500000003', calc: 'pctMoM', latenciaMin: 140, decimales: 1 },
+  'retail sales m/m': { serie: 'RSAFS', calc: 'pctMoM', latenciaMin: 15, decimales: 1 },
+  'core retail sales m/m': { serie: 'RSFSXMV', calc: 'pctMoM', latenciaMin: 15, decimales: 1 },
+  'gdp growth rate q/q': { serie: 'A191RL1Q225SBEA', calc: 'ultimoDirectoPct', latenciaMin: 40, decimales: 1 },
+  'core pce price index m/m': { serie: 'PCEPILFE', calc: 'pctMoM', latenciaMin: 20, decimales: 1 },
+  'building permits': { serie: 'PERMIT', calc: 'ultimoEntreMilM', latenciaMin: 10, decimales: 2 },
+  'housing starts': { serie: 'HOUST', calc: 'ultimoEntreMilM', latenciaMin: 10, decimales: 2 },
+  'existing home sales': { serie: 'EXHOSLUSM495S', calc: 'ultimoEntreMillonM', latenciaMin: 15, decimales: 2 },
+  'jolts job openings': { serie: 'JTSJOL', calc: 'ultimoEntreMilM', latenciaMin: 15, decimales: 2 },
+  'industrial production m/m': { serie: 'INDPRO', calc: 'pctMoM', latenciaMin: 10, decimales: 1 },
+  'federal funds rate': { serie: 'DFEDTARU', calc: 'ultimoDirectoPct', latenciaMin: 15, decimales: 2 },
+};
+// Sin equivalente en FRED (confirmado 14-nov-2026): ISM/S&P Global PMIs, CB Consumer Confidence,
+// UoM Consumer Sentiment (FRED UMCSENT va atrasado meses), Crude Oil/Natural Gas Inventories (son
+// de la EIA, no de FRED), ADP, discursos y subastas del Tesoro.
 
 function traduceEvento(tituloIngles) {
   const clave = String(tituloIngles || '').trim().toLowerCase();
@@ -104,23 +158,14 @@ function toNum(v) {
   return Number.isNaN(n) ? null : n;
 }
 
-// "0.3" + "%" -> "0,3%"; "1.268" + "M" -> "1,268M" - coma decimal (pedido explícito de Juan,
-// igual que el resto del sitio), escala pegada antes que la unidad (así vienen los ejemplos
-// reales que se confirmaron viendo la respuesta real de TradingView)
-function formatValorTV(valor, unidad, escala) {
-  const num = toNum(valor);
-  if (num == null) return null;
-  let texto = String(valor).replace('.', ',');
-  if (escala) texto += escala;
-  if (unidad) texto += unidad;
-  return texto;
-}
-
-// Forex Factory ya manda el texto formateado ("194K", "-0.6M", "0.3%") - solo se le cambia el
-// punto decimal por coma para que se vea igual de consistente que el resto del sitio
 function formatValorFF(texto) {
   if (texto == null || texto === '') return null;
   return String(texto).replace('.', ',');
+}
+
+function formatNumero(n, decimales) {
+  if (n == null || Number.isNaN(n)) return null;
+  return n.toFixed(decimales).replace('.', ',');
 }
 
 function calculaTendencia(actualNum, previsionNum, invertido) {
@@ -137,19 +182,15 @@ function calculaDireccion(actualNum, previsionNum) {
   return null;
 }
 
-// hash corto y determinista (no criptográfico, no hace falta) - solo para darle un id estable a
-// las filas de Forex Factory, que no traen uno propio
 function hashCorto(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
   return (h >>> 0).toString(36);
 }
 
-// lunes 00:00 a domingo 23:59:59 en hora de Bogotá (UTC-5 fijo, sin horario de verano),
-// devuelto ya convertido a instantes UTC reales
 function semanaActualBogotaUtc(ahora) {
   const bogotaAhora = new Date(ahora.getTime() - BOGOTA_OFFSET_MS);
-  const diaSemana = bogotaAhora.getUTCDay(); // 0=domingo .. 6=sabado
+  const diaSemana = bogotaAhora.getUTCDay();
   const diasDesdeLunes = (diaSemana + 6) % 7;
   const lunesBogota = Date.UTC(
     bogotaAhora.getUTCFullYear(), bogotaAhora.getUTCMonth(), bogotaAhora.getUTCDate() - diasDesdeLunes, 0, 0, 0
@@ -166,114 +207,263 @@ function fetchConTimeout(url, opts, ms) {
   return fetch(url, { ...opts, signal });
 }
 
-// Fuente principal - endpoint interno (no documentado oficialmente) de TradingView, confirmado
-// en vivo el 13-nov-2026. Forma de un item real (ejemplo visto de verdad, no inventado):
-//   { id, title:"Core Inflation Rate MoM", country:"US", indicator, comment, category, period,
-//     referenceDate, referencePeriod, source, source_url, actual:0.3, previous:0.3, forecast:0.2,
-//     actualRaw:0.3, previousRaw:0.3, forecastRaw:0.2, currency:"USD", importance:1,
-//     date:"2026-11-10T13:30:00.000Z", unit:"%", scale:null }
-// importance: -1 baja, 0 media, 1 alta. actual=null hasta que se publique el dato real.
-async function obtenerDeTradingView(desdeUtc, hastaUtc, paises, debug) {
-  const url = `${TV_URL}?from=${encodeURIComponent(desdeUtc.toISOString())}&to=${encodeURIComponent(hastaUtc.toISOString())}&countries=${paises.join(',')}`;
-  const resp = await fetchConTimeout(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json',
-    },
-  }, FETCH_TIMEOUT_MS);
-  if (debug) debug.tvStatus = resp.status;
-  if (!resp.ok) throw new Error('TradingView respondió ' + resp.status);
-  const data = await resp.json();
-  const items = (data && data.result) || [];
-  if (debug) debug.tvItems = items.length;
-  return items.map((it) => {
-    const importancia = it.importance === 1 ? 3 : it.importance === 0 ? 2 : 1;
-    const actualNum = toNum(it.actualRaw != null ? it.actualRaw : it.actual);
-    const previsionNum = toNum(it.forecastRaw != null ? it.forecastRaw : it.forecast);
-    const anteriorNum = toNum(it.previousRaw != null ? it.previousRaw : it.previous);
-    const invertido = esIndicadorInvertido(it.title);
+// fecha YYYY-MM-DD de un instante, en una zona horaria dada
+function fechaEnZona(fechaUTC, zona) {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: zona, year: 'numeric', month: '2-digit', day: '2-digit' });
+  return fmt.format(new Date(fechaUTC));
+}
+
+function sumaDias(fechaStr, dias) {
+  const [y, m, d] = fechaStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + dias);
+  return dt.toISOString().slice(0, 10);
+}
+
+// ===== Forex Factory (horario/importancia/previsión/anterior - la base de cada evento) =====
+// Forma real de un item (verificada): { title, country:"USD", date:"2026-11-10T08:30:00-05:00",
+// impact:"High", forecast:"0.2%", previous:"0.3%" }. country YA es el código de divisa, no el país.
+async function obtenerDeForexFactory() {
+  const resp = await fetchConTimeout(FF_URL, { headers: { 'User-Agent': UA } }, FETCH_TIMEOUT_MS);
+  if (!resp.ok) throw new Error('Forex Factory respondió ' + resp.status);
+  const items = await resp.json();
+  const impactMap = { Low: 1, Medium: 2, High: 3 };
+  return (Array.isArray(items) ? items : []).map((it) => {
+    const esFeriado = it.impact === 'Holiday';
+    const previsionNum = toNum(String(it.forecast || '').replace(/[%KMB]/gi, ''));
+    const anteriorNum = toNum(String(it.previous || '').replace(/[%KMB]/gi, ''));
     return {
-      id: 'tv-' + it.id,
-      fechaUTC: it.date,
-      divisa: it.currency || '',
+      id: 'ff-' + hashCorto(it.title + '|' + it.date),
+      fechaUTC: new Date(it.date).toISOString(),
+      divisa: it.country || '',
       pais: it.country || '',
-      importancia,
+      importancia: esFeriado ? 1 : (impactMap[it.impact] || 1),
       evento: it.title,
       eventoES: traduceEvento(it.title),
-      actual: formatValorTV(it.actual != null ? it.actual : it.actualRaw, it.unit, it.scale),
-      prevision: formatValorTV(it.forecast != null ? it.forecast : it.forecastRaw, it.unit, it.scale),
-      anterior: formatValorTV(it.previous != null ? it.previous : it.previousRaw, it.unit, it.scale),
-      actualNum,
+      actual: null,
+      prevision: formatValorFF(it.forecast),
+      anterior: formatValorFF(it.previous),
+      actualNum: null,
       previsionNum,
       anteriorNum,
-      tendencia: calculaTendencia(actualNum, previsionNum, invertido),
-      direccion: calculaDireccion(actualNum, previsionNum),
-      unidad: it.unit || '',
-      escala: it.scale || '',
-      fuente: 'TradingView',
+      tendencia: 'neutral',
+      direccion: null,
+      unidad: '',
+      escala: '',
+      fuente: 'Forex Factory',
+      fuenteActual: null,
+      consenso: null,
+      esFeriado,
     };
   });
 }
 
-// Respaldo - Forex Factory, solo trae la semana en curso (no admite rango custom) y nunca trae
-// "actual" (ver comentario arriba de la constante FF_URL). Forma real de un item:
-//   { title, country:"USD", date:"2026-11-10T08:30:00-05:00", impact:"High",
-//     forecast:"0.2%", previous:"0.3%" }
-async function obtenerDeForexFactory(desdeUtc, hastaUtc, paises, debug) {
-  const resp = await fetchConTimeout(FF_URL, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
-  }, FETCH_TIMEOUT_MS);
-  if (debug) debug.ffStatus = resp.status;
-  if (!resp.ok) throw new Error('Forex Factory respondió ' + resp.status);
-  const items = await resp.json();
-  if (debug) debug.ffItems = Array.isArray(items) ? items.length : 0;
-  const divisasPermitidas = new Set(paises.map((p) => PAIS_A_DIVISA_FF[p]).filter(Boolean));
-  const impactMap = { Low: 1, Medium: 2, High: 3 };
-  return (Array.isArray(items) ? items : [])
-    .filter((it) => {
-      const t = new Date(it.date).getTime();
-      if (Number.isNaN(t) || t < desdeUtc.getTime() || t > hastaUtc.getTime()) return false;
-      if (!divisasPermitidas.has(it.country)) return false;
-      return true;
-    })
-    .map((it) => {
-      const esFeriado = it.impact === 'Holiday';
-      const previsionNum = toNum(String(it.forecast || '').replace(/[%KMB]/gi, ''));
-      return {
-        id: 'ff-' + hashCorto(it.title + '|' + it.date),
-        fechaUTC: new Date(it.date).toISOString(),
-        divisa: it.country || '',
-        pais: it.country || '',
-        importancia: esFeriado ? 1 : (impactMap[it.impact] || 1),
-        evento: it.title,
-        eventoES: traduceEvento(it.title),
-        actual: null, // Forex Factory nunca trae el dato real publicado
-        prevision: formatValorFF(it.forecast),
-        anterior: formatValorFF(it.previous),
-        actualNum: null,
-        previsionNum,
-        anteriorNum: null,
-        tendencia: 'neutral', // sin "actual" no hay nada que comparar
-        direccion: null,
-        unidad: '',
-        escala: '',
-        fuente: 'Forex Factory',
-        esFeriado,
-      };
-    });
+async function refrescaCacheFF(env) {
+  const eventos = await obtenerDeForexFactory();
+  if (env.CALENDARIO_KV) {
+    await env.CALENDARIO_KV.put(FF_KV_KEY, JSON.stringify({ eventos, actualizado: new Date().toISOString() }));
+  }
+  return eventos;
+}
+
+// ===== Nasdaq (dato "actual" + consenso) =====
+// OJO: el parámetro `date` viene desfasado 1 día - para los eventos del día D hay que pedir D+1.
+async function obtenerDeNasdaq(fechaObjetivoStr, debug) {
+  const fechaParam = sumaDias(fechaObjetivoStr, 1);
+  const url = `${NASDAQ_URL}?date=${fechaParam}`;
+  try {
+    const resp = await fetchConTimeout(url, {
+      headers: { 'User-Agent': UA, 'Accept': 'application/json' },
+    }, FETCH_TIMEOUT_MS);
+    if (debug) debug[fechaObjetivoStr] = { status: resp.status };
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const filas = (data && data.data && Array.isArray(data.data.rows)) ? data.data.rows : [];
+    if (debug) debug[fechaObjetivoStr].filas = filas.length;
+    return filas;
+  } catch (err) {
+    if (debug) debug[fechaObjetivoStr] = { error: String(err) };
+    return [];
+  }
+}
+
+function paisNasdaqEsperado(evFF) {
+  const t = String(evFF.evento || '').toLowerCase();
+  if (evFF.divisa === 'USD') return 'united states';
+  if (t.startsWith('german')) return 'germany';
+  if (t.startsWith('french')) return 'france';
+  if (t.startsWith('italian')) return 'italy';
+  if (t.startsWith('spanish')) return 'spain';
+  return 'euro zone';
+}
+
+function limpiaValorNasdaq(v) {
+  if (v == null) return null;
+  const s = String(v).replace(/&nbsp;/g, '').trim();
+  return s === '' ? null : s;
+}
+
+function numeroDesdeTextoNasdaq(v) {
+  const limpio = limpiaValorNasdaq(v);
+  if (limpio == null) return null;
+  return toNum(limpio.replace(/[%KMB]/gi, ''));
+}
+
+// busca, entre las filas de Nasdaq de la fecha correcta, la que corresponde a este evento de
+// Forex Factory - por alias de nombre + país, desambiguando por magnitud si hay varias filas con
+// el mismo nombre (ej. 2 filas "PPI": una mensual y otra anual)
+function buscaFilaNasdaq(evFF, filasDelDia) {
+  const claveFF = String(evFF.evento || '').trim().toLowerCase();
+  const aliasNasdaq = ALIAS_FF_A_NASDAQ[claveFF];
+  if (!aliasNasdaq) return null;
+  const paisEsperado = paisNasdaqEsperado(evFF);
+  const candidatas = filasDelDia.filter((f) => {
+    const nombre = String(f.eventName || '').trim().toLowerCase();
+    const pais = String(f.country || '').trim().toLowerCase();
+    return nombre === aliasNasdaq && pais === paisEsperado;
+  });
+  if (candidatas.length === 0) return null;
+  if (candidatas.length === 1) return candidatas[0];
+  // varias filas con el mismo nombre - la que más se parezca en magnitud al forecast/previous de FF
+  const refFF = evFF.previsionNum != null ? evFF.previsionNum : evFF.anteriorNum;
+  if (refFF == null) return candidatas[0];
+  let mejor = candidatas[0], mejorDist = Infinity;
+  for (const c of candidatas) {
+    const refNasdaq = numeroDesdeTextoNasdaq(c.consensus) != null ? numeroDesdeTextoNasdaq(c.consensus) : numeroDesdeTextoNasdaq(c.previous);
+    if (refNasdaq == null) continue;
+    const dist = Math.abs(refNasdaq - refFF);
+    if (dist < mejorDist) { mejorDist = dist; mejor = c; }
+  }
+  return mejor;
+}
+
+// ===== FRED (respaldo oficial, solo si Nasdaq no trajo el dato) =====
+async function obtieneObservacionesFred(serie, apiKey) {
+  const url = `${FRED_URL}?series_id=${serie}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=14`;
+  const resp = await fetchConTimeout(url, { headers: { 'Accept': 'application/json' } }, FETCH_TIMEOUT_MS);
+  if (!resp.ok) throw new Error('FRED respondió ' + resp.status + ' (serie ' + serie + ')');
+  const data = await resp.json();
+  const obs = (data && data.observations) || [];
+  // solo observaciones numéricas válidas, ya en orden del más nuevo al más viejo
+  return obs.filter((o) => toNum(o.value) != null).map((o) => ({ fecha: o.date, valor: toNum(o.value) }));
+}
+
+function calculaActualFred(calc, obs, decimales) {
+  if (!obs.length) return null;
+  if (calc === 'ultimoDirectoPct' ) return formatoPct(obs[0].valor, decimales);
+  if (calc === 'ultimoEntreMilK') return Math.round(obs[0].valor / 1000) + 'K';
+  if (calc === 'ultimoEntreMilM') return formatNumero(obs[0].valor / 1000, decimales) + 'M';
+  if (calc === 'ultimoEntreMillonM') return formatNumero(obs[0].valor / 1000000, decimales) + 'M';
+  if (calc === 'diferenciaK') {
+    if (obs.length < 2) return null;
+    return Math.round(obs[0].valor - obs[1].valor) + 'K';
+  }
+  if (calc === 'pctMoM') {
+    if (obs.length < 2) return null;
+    const pct = (obs[0].valor - obs[1].valor) / obs[1].valor * 100;
+    return formatoPct(pct, decimales);
+  }
+  if (calc === 'pctYoY') {
+    if (obs.length < 13) return null;
+    const pct = (obs[0].valor - obs[12].valor) / obs[12].valor * 100;
+    return formatoPct(pct, decimales);
+  }
+  return null;
+}
+function formatoPct(n, decimales) {
+  const f = formatNumero(n, decimales);
+  return f == null ? null : f + '%';
+}
+function numeroDesdeActualFred(texto) {
+  if (texto == null) return null;
+  return toNum(String(texto).replace(/[%KM]/gi, ''));
+}
+
+async function intentaFred(evFF, env, debug) {
+  const clave = String(evFF.evento || '').trim().toLowerCase();
+  const cfg = FRED_MAP[clave];
+  if (!cfg) return null;
+  if (!env.FRED_API_KEY) return null;
+  const minutosDesdePublicacion = (Date.now() - Date.parse(evFF.fechaUTC)) / 60000;
+  if (minutosDesdePublicacion < cfg.latenciaMin) return null; // aún muy pronto, evita mostrar el dato del periodo anterior
+  try {
+    const obs = await obtieneObservacionesFred(cfg.serie, env.FRED_API_KEY);
+    // seguridad extra: la observación más nueva no debería tener más de ~110 días (cubre hasta
+    // series trimestrales como el PIB) - si es más vieja que eso, FRED probablemente no se ha
+    // actualizado todavía para este periodo, mejor no mostrar nada que mostrar algo viejo
+    if (!obs.length || (Date.now() - Date.parse(obs[0].fecha)) / 86400000 > 110) return null;
+    const actual = calculaActualFred(cfg.calc, obs, cfg.decimales);
+    if (debug) debug[clave] = { serie: cfg.serie, actual, obsMasNueva: obs[0] && obs[0].fecha };
+    return actual;
+  } catch (err) {
+    if (debug) debug[clave] = { error: String(err) };
+    return null;
+  }
+}
+
+// enriquece un evento de Forex Factory con el dato "actual" de Nasdaq (primero) o FRED (si
+// Nasdaq no lo trajo) y recalcula tendencia/dirección ya con el actual real
+async function enriqueceConActual(evFF, filasNasdaqPorDia, env, debugNasdaq, debugFred) {
+  const diaNY = fechaEnZona(evFF.fechaUTC, 'America/New_York');
+  const filasDelDia = filasNasdaqPorDia[diaNY] || [];
+  const filaNasdaq = buscaFilaNasdaq(evFF, filasDelDia);
+  let actualTxt = null, actualNum = null, consensoTxt = null, fuenteActual = null;
+
+  if (filaNasdaq) {
+    const valorActual = limpiaValorNasdaq(filaNasdaq.actual);
+    if (valorActual != null) {
+      actualTxt = formatValorFF(valorActual);
+      actualNum = numeroDesdeTextoNasdaq(valorActual);
+      fuenteActual = 'Nasdaq';
+    }
+    const valorConsenso = limpiaValorNasdaq(filaNasdaq.consensus);
+    if (valorConsenso != null) consensoTxt = formatValorFF(valorConsenso);
+  }
+
+  if (actualTxt == null) {
+    const actualFred = await intentaFred(evFF, env, debugFred);
+    if (actualFred != null) {
+      actualTxt = actualFred;
+      actualNum = numeroDesdeActualFred(actualFred);
+      fuenteActual = 'FRED (oficial)';
+    }
+  }
+
+  // evento de importancia alta, ya pasó su hora, y seguimos sin "actual" de ninguna fuente -
+  // vale la pena dejarlo en los logs (Cloudflare → pestaña Logs) para ir ampliando el diccionario
+  if (actualTxt == null && evFF.importancia === 3 && Date.parse(evFF.fechaUTC) <= Date.now()) {
+    console.log('[calendario] sin "actual" para evento de importancia alta:', evFF.evento, '|', evFF.fechaUTC, '| fila Nasdaq esperada:', ALIAS_FF_A_NASDAQ[String(evFF.evento || '').toLowerCase()] || '(sin alias)');
+  }
+
+  const invertido = esIndicadorInvertido(evFF.evento);
+  return {
+    ...evFF,
+    actual: actualTxt,
+    actualNum,
+    consenso: consensoTxt,
+    fuenteActual,
+    tendencia: calculaTendencia(actualNum, evFF.previsionNum, invertido),
+    direccion: calculaDireccion(actualNum, evFF.previsionNum),
+  };
 }
 
 function calculaTtlSegundos(eventos, ahoraMs) {
-  const cercaDeUnoImportante = eventos.some((e) => {
-    if (e.importancia !== 3) return false;
+  const faltaActualYaPublicable = eventos.some((e) => {
+    if (e.importancia !== 3 || e.actual != null) return false;
     const t = Date.parse(e.fechaUTC);
     if (Number.isNaN(t)) return false;
-    return ahoraMs >= t - NEAR_EVENT_BEFORE_MS && ahoraMs <= t + NEAR_EVENT_AFTER_MS;
+    return ahoraMs >= t && ahoraMs <= t + NEAR_EVENT_WINDOW_MS;
   });
-  return cercaDeUnoImportante ? CACHE_SECONDS_NEAR_EVENT : CACHE_SECONDS_DEFAULT;
+  return faltaActualYaPublicable ? CACHE_SECONDS_NEAR_EVENT : CACHE_SECONDS_DEFAULT;
 }
 
 export default {
+  // Cron Trigger (configurado en el Worker, cada 30 min) - refresca la copia de Forex Factory en
+  // KV. Pedirle esto a Forex Factory en cada visita del sitio es lo que causaba los 429.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(refrescaCacheFF(env).catch((err) => console.log('[calendario] cron: falló refrescar Forex Factory -', String(err))));
+  },
+
   async fetch(request, env) {
     const corsHeaders = {
       'Access-Control-Allow-Origin': 'https://juanskillcash.com',
@@ -324,73 +514,54 @@ export default {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
+    const divisasPermitidas = new Set(paises.map((p) => PAIS_A_DIVISA_FF[p]).filter(Boolean));
 
     const debugWanted = url.searchParams.get('debug') === '1';
-    const debugInfo = debugWanted ? {} : null;
-    const kvKey = KV_KEY_PREFIX + desdeUtc.toISOString() + '_' + hastaUtc.toISOString() + '_' + paises.join(',');
+    const debugInfo = debugWanted ? { nasdaq: {}, fred: {} } : null;
 
-    let eventos = null;
-    let fuenteUsada = null;
-    let desactualizado = false;
-
-    try {
-      eventos = await obtenerDeTradingView(desdeUtc, hastaUtc, paises, debugInfo);
-      fuenteUsada = 'TradingView';
-    } catch (err) {
-      if (debugInfo) debugInfo.tvError = String(err);
+    // 1) Forex Factory desde KV (actualizado por el cron) - si el KV está vacío (primera vez),
+    // se hace un fetch directo de arranque una sola vez.
+    let ffCache = env.CALENDARIO_KV ? await env.CALENDARIO_KV.get(FF_KV_KEY, 'json') : null;
+    let ffDesactualizado = false;
+    if (!ffCache) {
       try {
-        eventos = await obtenerDeForexFactory(desdeUtc, hastaUtc, paises, debugInfo);
-        fuenteUsada = 'Forex Factory';
-      } catch (err2) {
-        if (debugInfo) debugInfo.ffError = String(err2);
+        const eventos = await refrescaCacheFF(env);
+        ffCache = { eventos, actualizado: new Date().toISOString() };
+      } catch (err) {
+        if (debugInfo) debugInfo.ffError = String(err);
+        return new Response(JSON.stringify({
+          error: 'No se pudo obtener el calendario (Forex Factory falló y todavía no hay copia guardada en KV)',
+          ...(debugWanted ? { debug: debugInfo } : {}),
+        }), { status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
       }
+    } else if (Date.now() - Date.parse(ffCache.actualizado) > FF_STALE_AFTER_MS) {
+      ffDesactualizado = true;
     }
+    if (debugInfo) debugInfo.ff = { actualizado: ffCache.actualizado, eventos: ffCache.eventos.length, desactualizado: ffDesactualizado };
 
-    // ambas fuentes fallaron - se intenta servir la última copia buena guardada en KV
-    if (!eventos && env.CALENDARIO_KV) {
-      try {
-        const respaldo = await env.CALENDARIO_KV.get(kvKey, 'json');
-        if (respaldo && Array.isArray(respaldo.eventos)) {
-          eventos = respaldo.eventos;
-          fuenteUsada = respaldo.fuente + ' (copia de respaldo)';
-          desactualizado = true;
-        }
-      } catch (err3) {
-        if (debugInfo) debugInfo.kvReadError = String(err3);
-      }
-    }
+    // 2) filtra por rango de fechas y países pedidos
+    const filtrados = ffCache.eventos.filter((e) => {
+      const t = Date.parse(e.fechaUTC);
+      if (Number.isNaN(t) || t < desdeUtc.getTime() || t > hastaUtc.getTime()) return false;
+      return divisasPermitidas.has(e.divisa);
+    });
 
-    if (!eventos) {
-      return new Response(JSON.stringify({
-        error: 'No se pudo obtener el calendario (TradingView y Forex Factory fallaron, y no hay copia de respaldo en KV todavía)',
-        ...(debugWanted ? { debug: debugInfo } : {}),
-      }), { status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-    }
+    // 3) trae de Nasdaq SOLO los días (en hora de Nueva York) que de verdad hacen falta
+    const diasNecesarios = [...new Set(filtrados.map((e) => fechaEnZona(e.fechaUTC, 'America/New_York')))];
+    const filasNasdaqPorDia = {};
+    await Promise.all(diasNecesarios.map(async (dia) => {
+      filasNasdaqPorDia[dia] = await obtenerDeNasdaq(dia, debugInfo && debugInfo.nasdaq);
+    }));
 
+    // 4) enriquece cada evento con el "actual" (Nasdaq primero, FRED de respaldo si aplica)
+    const eventos = await Promise.all(filtrados.map((e) => enriqueceConActual(e, filasNasdaqPorDia, env, debugInfo && debugInfo.nasdaq, debugInfo && debugInfo.fred)));
     eventos.sort((a, b) => Date.parse(a.fechaUTC) - Date.parse(b.fechaUTC));
-
-    // guardar copia de respaldo en KV - como mucho cada 10 minutos, y solo si los datos
-    // realmente cambiaron (comparado contra lo último que ya había guardado ahí)
-    if (!desactualizado && env.CALENDARIO_KV) {
-      try {
-        const existente = await env.CALENDARIO_KV.get(kvKey, 'json');
-        const haPasadoElMinimo = !existente || (ahora.getTime() - Date.parse(existente.actualizado)) >= KV_MIN_WRITE_GAP_MS;
-        const cambio = !existente || JSON.stringify(existente.eventos) !== JSON.stringify(eventos);
-        if (haPasadoElMinimo && cambio) {
-          await env.CALENDARIO_KV.put(kvKey, JSON.stringify({ eventos, fuente: fuenteUsada, actualizado: ahora.toISOString() }), {
-            expirationTtl: 7 * 24 * 60 * 60, // 7 días - de sobra para ser solo un respaldo de corto plazo
-          });
-        }
-      } catch (err4) {
-        if (debugInfo) debugInfo.kvWriteError = String(err4);
-      }
-    }
 
     const ttlSegundos = calculaTtlSegundos(eventos, ahora.getTime());
     const body = JSON.stringify({
-      fuente: fuenteUsada,
+      fuente: ffDesactualizado ? 'Forex Factory (copia desactualizada)' : 'Forex Factory',
       actualizado: ahora.toISOString(),
-      desactualizado,
+      desactualizado: ffDesactualizado,
       eventos,
       ...(debugWanted ? { debug: debugInfo } : {}),
     });

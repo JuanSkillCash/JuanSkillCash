@@ -85,7 +85,7 @@ cada uno para cómo redesplegarlo si hay que actualizar el código.
 |---|---|---|---|
 | Noticias Cripto / Macro y Economía | RSS de CoinDesk/Cointelegraph (cripto) y MarketWatch/Investing.com (macro), traducidos y resumidos con Workers AI (Llama 3.1) | `workers/rss-news/` (`skillcash-noticias`) | 30 min |
 | Conferencias en Vivo (¿está este canal en vivo ahora?) | Scraping de la página pública `youtube.com/channel/<ID>/live` (no hay API oficial gratis que alcance para revisar 9 canales seguido) | `workers/youtube-live-check/` (`skillcash-youtube-live`) | 60 s |
-| **Calendario Económico** | TradingView (`economic-calendar.tradingview.com/events`, endpoint interno no documentado), con Forex Factory (`ff_calendar_thisweek.json`) como respaldo si TradingView falla | `workers/economic-calendar/` (`skillcash-calendario`) | 10 min (1 min si hay un evento de alta importancia a punto de publicarse) + copia de respaldo en KV si ambas fuentes fallan a la vez |
+| **Calendario Económico** | 3 fuentes combinadas (rediseñado 14-nov-2026, TradingView descartado - exigía fingir la cabecera Origin de su propia página): **Forex Factory** (`ff_calendar_thisweek.json`, horario/previsión/anterior, refrescada por un Cron Trigger cada 30 min y guardada en KV - nunca se le pide directo por visita, eso causaba 429) + **Nasdaq** (`api.nasdaq.com/api/calendar/economicevents`, dato "Actual"/consenso, sin llave) + **FRED** (respaldo oficial solo EE.UU., opcional, necesita el secreto `FRED_API_KEY` en el Worker) | `workers/economic-calendar/` (`skillcash-calendario`) | 15 min (1 min si hay un evento de alta importancia publicado hace menos de 30 min y todavía sin dato "Actual") |
 
 ## Telegram (no son indicadores del sitio, solo envíos)
 
