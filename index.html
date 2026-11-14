@@ -3005,6 +3005,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    cubra los 3 estados sin tener que ir quitando/poniendo clases a mano) */
 .events-yt-channel-dot[data-state="live"]{background:var(--green);box-shadow:0 0 6px var(--green);animation:pillDotPulse 1.6s ease-in-out infinite}
 .events-yt-channel-dot[data-state="offline"]{background:var(--red)}
+/* programado (isUpcoming=true): el canal tiene un directo anunciado pero todavía no empezó -
+   no se intenta reproducir nada, solo se avisa con el punto dorado + el título programado */
+.events-yt-channel-dot[data-state="upcoming"]{background:var(--gold);box-shadow:0 0 6px var(--gold-glow)}
 .events-yt-channel-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .events-yt-channel-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* de qué trata el directo ahora mismo (título real del video, vía el Worker) - Juan pidió que se
@@ -3022,6 +3025,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-video-play{position:relative;z-index:2;width:62px;height:62px;border-radius:50%;background:rgba(255,47,79,.92);border:3px solid rgba(255,255,255,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding-left:4px}
 .events-video-play:hover{background:var(--red)}
 .events-video-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--bg2)}
+/* casos donde SÍ hay un directo pero no se puede ver adentro del iframe: el propio canal lo
+   marcó como no-embebible (embeddable=false/playability!='OK'), o se puede embeber en general
+   pero YouTube lo bloquea para el país de quien está viendo justo ahora (geo-bloqueo, que solo
+   se nota del lado del navegador de la visita, nunca del lado del Worker) - en los dos casos se
+   ofrece el link directo a YouTube en vez de dejar un reproductor roto */
+.events-video-blocked{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--muted2);font-size:13px;background:linear-gradient(160deg,var(--bg2),#000)}
+.events-video-blocked a{color:var(--accent);font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:20px;padding:7px 16px;font-size:12.5px}
+.events-video-blocked a:hover{background:var(--accent);color:#fff}
 /* controles propios de video (play/pausa + volumen), por fuera del reproductor de YouTube */
 .events-video-controls{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2)}
 .events-vc-btn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid var(--border2);color:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -4280,6 +4291,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 </div>
                 <iframe id="eventsYtIframe" src="" title="Transmisión en vivo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen style="display:none"></iframe>
                 <div class="events-video-empty" id="eventsYtEmpty">Elige un canal con directo configurado</div>
+                <div class="events-video-blocked" id="eventsYtBlocked" style="display:none">
+                  <span id="eventsYtBlockedMsg">En vivo, pero no se puede ver aquí.</span>
+                  <a id="eventsYtBlockedLink" href="#" target="_blank" rel="noopener">Verlo en YouTube</a>
+                </div>
               </div>
               <!-- controles propios (play/pausa + volumen), por fuera del reproductor de YouTube -
                    pedido de Juan, que vio que melapela.ai tiene los suyos en vez de depender de los
@@ -4445,6 +4460,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       { label: 'CoinDesk', id: 'UC7TghOL755nBk7HelHoi9LQ' },
       { label: 'Noticias Telemundo', id: 'UCRwA1NUcUnwsly35ikGhp0A' },
       { label: 'Negocios TV', id: 'UCwd8Byi93KbnsYmCcKLExvQ' },
+      // agregados 14-nov-2026, verificados en vivo con playableInEmbed=true el 13-nov-2026
+      { label: 'DW Español', id: 'UCT4Jg8h03dD0iN3Pb5L0PMA' },
+      { label: 'FRANCE 24 Español', id: 'UCUdOoVWuWmgo1wByzcsyKDQ' },
+      { label: 'euronews en español', id: 'UCyoGb3SMlTlB8CLGVH4c8Rw' },
+      { label: 'RTVE Noticias (24H)', id: 'UC7QZIf0dta-XPXsp9Hv4dTw' },
+      { label: 'N+ (NMás)', id: 'UCUsm-fannqOY02PNN67C0KA' },
+      { label: 'MILENIO', id: 'UCFxHplbcoJK9m70c4VyTIxg' },
+      { label: 'Infobae', id: 'UCvsU0EGXN7Su7MfNqcTGNHg' },
+      { label: 'Yahoo Finance (EN)', id: 'UCEAZeUIeJs0IjQiqTCdVSIg' },
+      { label: 'CNBC Television (EN)', id: 'UCrp_UI8XtuYfpiqluWLD7Lw' },
     ];
     // URL del Worker de Cloudflare que revisa si un canal está en vivo ahora mismo (ver
     // workers/youtube-live-check/ en el repo para el código fuente). Ya desplegado y probado -
@@ -4462,6 +4487,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var playBtn = document.getElementById('eventsYtPlayBtn');
       var foot = document.querySelector('#eventsYoutubeBlock .events-card:first-child .events-card-foot');
       var listEl = document.getElementById('eventsYtChannelList');
+      var blockedEl = document.getElementById('eventsYtBlocked');
+      var blockedMsgEl = document.getElementById('eventsYtBlockedMsg');
+      var blockedLinkEl = document.getElementById('eventsYtBlockedLink');
       if(!listEl || !f) return;
       function escapeHtml(s){
         return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
@@ -4520,7 +4548,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       // hacer clic en un canal que YA se sabe que está en vivo (por el punto verde), se reproduce
       // directo en vez de mostrarse primero la lista de subidas y cambiar un instante después
       var lastResults = {};
+      var currentVideoId = null;
       function setFacade(videoIdForThumb, label){
+        if(blockedEl) blockedEl.style.display = 'none';
+        facade.style.display = 'flex';
+        // sin pendingSrc (caso "programado", todavía no hay nada que reproducir) el botón de play
+        // no debe aparecer - clicarlo no haría nada y confundiría
+        if(playBtn) playBtn.style.display = pendingSrc ? '' : 'none';
         facadeLabel.textContent = label || '';
         if(videoIdForThumb){
           thumb.src = 'https://i.ytimg.com/vi/' + videoIdForThumb + '/hqdefault.jpg';
@@ -4531,6 +4565,28 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           thumb.style.display = 'none';
           facadeLabel.style.display = 'block';
         }
+      }
+      // caso "sí hay directo pero no se puede ver adentro del iframe" - ya sea porque el propio
+      // canal lo marcó no-embebible/playability raro (lo sabe el Worker), o porque YouTube lo
+      // bloqueó para el país de quien está viendo justo ahora (geo-bloqueo, código 100/101/150 de
+      // la IFrame API - eso el Worker NUNCA puede saberlo, corre desde la ubicación de Cloudflare,
+      // no la del visitante - caso real visto con NTN24 desde Colombia)
+      function showBlockedFallback(videoId, mensaje){
+        if(controlsBar) controlsBar.style.display = 'none';
+        f.removeAttribute('src');
+        f.style.display = 'none';
+        facade.style.display = 'none';
+        if(empty) empty.style.display = 'none';
+        pendingSrc = null;
+        played = false;
+        if(blockedEl){
+          if(blockedMsgEl) blockedMsgEl.textContent = mensaje || 'En vivo, pero no se puede ver aquí.';
+          if(blockedLinkEl) blockedLinkEl.href = 'https://www.youtube.com/watch?v=' + videoId;
+          blockedEl.style.display = 'flex';
+        }
+      }
+      function noSePuedeVerAqui(data){
+        return !!(data && data.live && (data.embeddable === false || (data.playability && data.playability !== 'OK')));
       }
       var liveCheckAbort = null;
       var autoCheckTimer = null;
@@ -4551,13 +4607,22 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           return;
         }
         if(empty) empty.style.display = 'none';
-        facade.style.display = 'flex';
         var known = lastResults[i];
-        if(known && known.live && known.videoId){
+        if(known && noSePuedeVerAqui(known)){
+          currentVideoId = known.videoId;
+          showBlockedFallback(known.videoId, 'En vivo, pero no se puede ver aquí.');
+          if(livePill) livePill.style.display = 'inline-flex';
+          if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
+        } else if(known && known.live && known.videoId){
+          currentVideoId = known.videoId;
           pendingSrc = liveEmbedUrl(known.videoId);
           setFacade(known.videoId, '');
           if(livePill) livePill.style.display = 'inline-flex';
           if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
+        } else if(known && known.upcoming){
+          pendingSrc = null;
+          setFacade(null, known.title ? 'Programado: ' + known.title : 'Hay un directo programado, todavía no empieza');
+          if(foot) foot.textContent = 'Este canal tiene un directo programado que todavía no comenzó.';
         } else {
           pendingSrc = uploadsEmbedUrl(ch.id);
           setFacade(null, ch.label);
@@ -4570,7 +4635,9 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       // consulta al Worker si ESTE canal está en vivo ahora mismo; si sí, deja listo el video real
       // del directo para cuando le den play (o, si ya le habían dado play antes, lo cambia de
       // una), prende la pastilla "EN VIVO" y pone en verde el punto de este canal en la lista de
-      // la derecha (en rojo si no). Si no, deja la fachada con la lista de subidas
+      // la derecha (dorado si tiene un directo programado todavía sin empezar, rojo si no hay
+      // nada). Si el directo no se puede embeber aquí (no-embebible o bloqueado por país), se
+      // ofrece el link directo a YouTube en vez de un reproductor roto.
       function checkLiveAndMaybeSwitch(channelId, idx, manual){
         if(!EVENTS_YT_LIVE_CHECK_URL || EVENTS_YT_LIVE_CHECK_URL === 'PENDIENTE_URL_WORKER'){
           if(manual && foot) foot.textContent = 'Por ahora no podemos confirmar solos si un canal está en vivo justo ahora - esto refresca la lista de sus videos subidos.';
@@ -4583,16 +4650,31 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .then(function(data){
             if(aborted) return;
             var live = !!(data && data.live && data.videoId);
-            lastResults[idx] = { live: live, videoId: data && data.videoId, title: data && data.title };
-            setDotState(idx, live ? 'live' : 'offline');
-            setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : null);
+            var upcoming = !live && !!(data && data.upcoming);
+            lastResults[idx] = {
+              live: live, videoId: data && data.videoId, title: data && data.title,
+              upcoming: upcoming, playability: data && data.playability, embeddable: data && data.embeddable,
+            };
+            setDotState(idx, live ? 'live' : (upcoming ? 'upcoming' : 'offline'));
+            setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : (upcoming ? ('Programado' + (data.title ? ': ' + data.title : '')) : null));
             if(idx !== currentIdx) return;
-            if(live){
+            if(live && noSePuedeVerAqui(lastResults[idx])){
+              currentVideoId = data.videoId;
+              showBlockedFallback(data.videoId, 'En vivo, pero no se puede ver aquí.');
+              if(livePill) livePill.style.display = 'inline-flex';
+              if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
+            } else if(live){
+              currentVideoId = data.videoId;
               pendingSrc = liveEmbedUrl(data.videoId);
               setFacade(data.videoId, '');
               if(played){ f.src = pendingSrc + '&autoplay=1'; wireCustomControls(); }
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
+            } else if(upcoming){
+              if(livePill) livePill.style.display = 'none';
+              pendingSrc = null;
+              setFacade(null, data.title ? 'Programado: ' + data.title : 'Hay un directo programado, todavía no empieza');
+              if(manual && foot) foot.textContent = 'Este canal tiene un directo programado que todavía no comenzó.';
             } else {
               if(livePill) livePill.style.display = 'none';
               if(manual && foot) foot.textContent = 'No hay transmisión en vivo en este momento - mostrando el video más reciente.';
@@ -4641,6 +4723,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 volumeRange.value = 100;
               },
               onStateChange: function(e){ setIconsPlaying(e.data === YT.PlayerState.PLAYING); },
+              // códigos 100/101/150 = "no disponible"/"el propietario no permite reproducirlo
+              // embebido" - el caso real es geo-bloqueo (ej. NTN24 visto desde Colombia): el
+              // Worker no puede saberlo de antemano porque corre desde la ubicación de
+              // Cloudflare, no la del visitante, así que esto solo se puede detectar aquí, del
+              // lado del navegador, una vez que YouTube ya rechazó la reproducción
+              onError: function(e){
+                var code = e && e.data;
+                if(code === 100 || code === 101 || code === 150){
+                  if(ytPlayer){ try{ ytPlayer.destroy(); }catch(err){} ytPlayer = null; }
+                  showBlockedFallback(currentVideoId, 'En vivo, pero no se puede ver aquí (bloqueado para tu país).');
+                }
+              },
             },
           });
         }).catch(function(){ /* si la API no carga (red, bloqueador), el video sigue andando con
@@ -4677,9 +4771,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           var idx = Number(el.dataset.idx);
           showChannel(idx);
           // ya sabíamos por "Buscar directo" que este canal está en vivo (punto verde) - se
-          // reproduce directo, sin obligar a un segundo clic sobre la fachada
+          // reproduce directo, sin obligar a un segundo clic sobre la fachada (salvo que no se
+          // pueda ver aquí, ahí ya queda mostrado el link a YouTube en vez de un reproductor roto)
           var known = lastResults[idx];
-          if(known && known.live && known.videoId) playNow();
+          if(known && known.live && known.videoId && !noSePuedeVerAqui(known)) playNow();
         });
       });
       var sourcesBadge = document.getElementById('eventsYtSourcesBadge');
@@ -4690,7 +4785,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var startIdx = firstReady === -1 ? 0 : firstReady;
       showChannel(startIdx);
 
-      // "Buscar directo" revisa LOS 9 canales a la vez (en paralelo, el Worker ya cachea 60s por
+      // reordena la lista de canales para que los que SÍ están en vivo aparezcan primero, luego
+      // los que tienen un directo programado, y al final el resto - pedido explícito de Juan.
+      // Mueve los <button> de verdad en el DOM (no cambia su data-idx), así que todas las demás
+      // funciones que buscan por índice siguen funcionando igual.
+      function reorderChannelList(){
+        var orden = itemEls.map(function(el, i){ return i; });
+        function rango(i){
+          var r = lastResults[i];
+          if(r && r.live) return 0;
+          if(r && r.upcoming) return 1;
+          return 2;
+        }
+        orden.sort(function(a, b){
+          var ra = rango(a), rb = rango(b);
+          return ra !== rb ? ra - rb : a - b;
+        });
+        orden.forEach(function(i){ listEl.appendChild(itemEls[i]); });
+      }
+      // "Buscar directo" revisa LOS 9+ canales a la vez (en paralelo, el Worker ya cachea 60s por
       // canal así que esto no multiplica la carga real a YouTube) y prende/apaga el punto de cada
       // uno en la lista de canales de la derecha - antes esto abría una lista flotando ENCIMA del
       // video ("se me abre una cosa encima del video y me empieza a ocupar espacio", queja
@@ -4710,17 +4823,35 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         return Promise.all(channels.map(function(x){
           return fetch(EVENTS_YT_LIVE_CHECK_URL + '?channel=' + x.ch.id)
             .then(function(r){ return r.json(); })
-            .then(function(data){ return { idx: x.idx, live: !!(data && data.live && data.videoId), videoId: data && data.videoId, title: data && data.title }; })
-            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null }; });
+            .then(function(data){
+              var live = !!(data && data.live && data.videoId);
+              return {
+                idx: x.idx, live: live, videoId: data && data.videoId, title: data && data.title,
+                upcoming: !live && !!(data && data.upcoming),
+                playability: data && data.playability, embeddable: data && data.embeddable,
+              };
+            })
+            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null }; });
         })).then(function(results){
           results.forEach(function(r){
-            lastResults[r.idx] = { live: r.live, videoId: r.videoId, title: r.title };
-            setDotState(r.idx, r.live ? 'live' : 'offline');
-            setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : null);
+            lastResults[r.idx] = {
+              live: r.live, videoId: r.videoId, title: r.title,
+              upcoming: r.upcoming, playability: r.playability, embeddable: r.embeddable,
+            };
+            setDotState(r.idx, r.live ? 'live' : (r.upcoming ? 'upcoming' : 'offline'));
+            setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : (r.upcoming ? ('Programado' + (r.title ? ': ' + r.title : '')) : null));
           });
-          // si el canal YA elegido resultó en vivo, lo deja listo igual que antes
+          reorderChannelList();
+          // si el canal YA elegido resultó en vivo, lo deja listo igual que antes (salvo que no
+          // se pueda ver aquí, ahí se ofrece el link a YouTube en vez de un reproductor roto)
           var current = results.find(function(r){ return r.idx === currentIdx; });
-          if(current && current.live && current.videoId){
+          if(current && current.live && current.videoId && noSePuedeVerAqui(lastResults[current.idx])){
+            currentVideoId = current.videoId;
+            showBlockedFallback(current.videoId, 'En vivo, pero no se puede ver aquí.');
+            if(livePill) livePill.style.display = 'inline-flex';
+            if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
+          } else if(current && current.live && current.videoId){
+            currentVideoId = current.videoId;
             pendingSrc = liveEmbedUrl(current.videoId);
             setFacade(current.videoId, '');
             if(played) f.src = pendingSrc + '&autoplay=1';
