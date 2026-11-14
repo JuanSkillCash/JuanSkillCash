@@ -22648,7 +22648,11 @@ function renderRsiChart(){
   const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 480 : 540;
+  // totalH bajado de 480/540 a 400/450 (Juan: con los 2 paneles apilados y estirados a lo ancho
+  // de .chart-breakout, el alto renderizado en escritorio se iba por encima de 700px y ni
+  // tomando pantallazo cabía el título + los 2 paneles + el pie - ver el mismo ajuste en
+  // STH-MVRV/Epoch P&L/BTC-AAPL, los otros 3 gráficos de "panel superior + panel inferior")
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58, marginRight = isMobileChart ? 8 : 14; // 52 (antes 46): ajuste de overflow en mobile
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -22926,7 +22930,10 @@ function renderSthMvrvChart(){
   const minMvrv = Math.min(0.4, ...mvrvVals), maxMvrv = Math.max(1.6, ...mvrvVals);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 480 : 540;
+  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/Epoch P&L/BTC-AAPL - Juan:
+  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
+  // no cabía en un solo pantallazo junto con el título y el pie)
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -23186,7 +23193,10 @@ function renderEpochPlChart(){
   const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 480 : 540;
+  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/STH-MVRV/BTC-AAPL - Juan:
+  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
+  // no cabía en un solo pantallazo junto con el título y el pie)
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -26560,7 +26570,12 @@ function renderBtcAaplChart(){
   const minP = Math.min(...btcPrices), maxP = Math.max(...btcPrices);
 
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 460 : 520;
+  // totalH bajado de 460/520 a 400/440 (mismo ajuste que RSI Mensual/STH-MVRV/Epoch P&L - Juan:
+  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
+  // no cabía en un solo pantallazo junto con el título y el pie). Las líneas de tendencia NO se
+  // tocan aquí - se calculan en precio/fecha y pasan por yForRatio más abajo, así que se
+  // reacomodan solas con el nuevo alto, sin cambiar a qué precio/fecha apuntan.
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 440;
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -26796,7 +26811,10 @@ function renderCbpChart(data){
   const wrap = document.getElementById('cbpChartWrap');
   const statsEl = document.getElementById('cbpStats');
   const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 420 : 480;
+  // totalH bajado de 420/480 a 360/420 (mismo ajuste que RSI Mensual/STH-MVRV/Epoch P&L/
+  // BTC-AAPL - Juan: con los 2 paneles estirados a lo ancho de .chart-breakout, el alto
+  // renderizado en escritorio no cabía en un solo pantallazo junto con el título y el pie)
+  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 360 : 420;
   const yFontSize = isMobileChart ? 9 : 11, xFontSize = isMobileChart ? 10 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 14, marginBottom = isMobileChart ? 26 : 30;
