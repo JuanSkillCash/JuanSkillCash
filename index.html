@@ -1195,7 +1195,7 @@ button{font-family:inherit;color:inherit}
   border-radius:16px;padding:20px;border:1px solid rgba(59,130,246,.22);
   background:#090b16;
 }
-.indic-chart-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.indic-chart-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:10px}
 .indic-chart-eyebrow{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#60a5fa;margin-bottom:4px}
 .indic-chart-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;color:var(--white)}
 .indic-chart-sub{font-size:12.5px;color:var(--muted2);margin-top:3px}
@@ -1502,12 +1502,18 @@ button{font-family:inherit;color:inherit}
 
 /* ===== CALCULATOR ===== */
 .calc{padding:32px 32px 30px}
-.calc-head{text-align:center;margin:-32px -32px 26px -32px;padding:34px 32px 26px;position:relative;border-bottom:1px solid rgba(91,141,239,.3);border-radius:20px 20px 0 0}
+/* Juan: el título se veía muy lejos del gráfico (mucho espacio desperdiciado entre el logo/
+   título y el borde de abajo del header, y otro tanto más antes de llegar a los botones de rango/
+   el gráfico) - se achican el padding y los márgenes de abajo para acercarlo todo y ganar alto
+   de pantalla. La línea (border-bottom) se deja: separa el bloque de marca (logo+título) del
+   cuerpo del gráfico, igual que un encabezado de tarjeta normal - no es un error, solo quedaba
+   con demasiado aire alrededor. */
+.calc-head{text-align:center;margin:-32px -32px 14px -32px;padding:20px 32px 14px;position:relative;border-bottom:1px solid rgba(91,141,239,.3);border-radius:20px 20px 0 0}
 .calc-eyebrow{display:flex;align-items:center;justify-content:flex-start;gap:10px;font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;letter-spacing:-.01em;position:relative}
 .calc-eyebrow img{width:40px;height:40px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 0 transparent)}
 .calc-eyebrow-word{white-space:nowrap;color:var(--white)}
 .calc-eyebrow-word span{color:var(--accent)}
-.calc-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.5vw,32px);text-transform:uppercase;margin:9px 0 9px;letter-spacing:-.01em;background:linear-gradient(90deg,var(--white) 30%,var(--muted2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;position:relative}
+.calc-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.5vw,32px);text-transform:uppercase;margin:4px 0;letter-spacing:-.01em;background:linear-gradient(90deg,var(--white) 30%,var(--muted2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;position:relative}
 .calc-sub{font-family:'Space Mono',monospace;font-size:12px;color:var(--white);letter-spacing:.05em;text-transform:uppercase;line-height:1.6;position:relative}
 
 .estimate-banner{margin-top:16px;padding:13px 16px;border-radius:12px;background:linear-gradient(155deg,rgba(240,178,61,.14),rgba(240,178,61,.03));border:1px solid rgba(240,178,61,.4);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:12.5px;line-height:1.6;text-transform:none;letter-spacing:normal;position:relative;overflow:hidden}
@@ -2345,7 +2351,7 @@ img[src=""]{display:none}
 .calc-title-emoji{background:none;-webkit-background-clip:unset;background-clip:unset;-webkit-text-fill-color:initial;color:initial}
 .chart-breakout{margin:0 -52px;padding:0 8px}
 @media(max-width:900px){ .chart-breakout{margin:0 -38px;padding:0 4px} }
-.tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 20px}
+.tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
 .tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid rgba(91,141,239,.3);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
 .tf-pill:hover{border-color:var(--red);color:var(--white)}
 .tf-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -19601,6 +19607,33 @@ function niceLogTicks(minV, maxV){
   return ticks;
 }
 
+// decide, por cada marca de niceLogTicks, si su ETIQUETA se dibuja o no - la LINEA de rejilla
+// siempre se queda, pero si dos etiquetas quedan a menos de minGapPx una de otra se esconden las
+// que no son potencia de 10 (los pasos "2" y "5" de la escala 1-2-5), dejando solo 1/10/100/
+// 1000... Mismo patrón ya usado en Ciclos de Halving (ver halvingLogTicks más abajo, que es
+// exclusivo de esa herramienta y no se toca) - variante genérica para los gráficos de "panel
+// superior + panel inferior" (RSI Mensual, STH-MVRV, Epoch P&L, BTC/AAPL, Coinbase Premium):
+// Juan reportó números y líneas "muy pegados" en el panel de precio de esos 5 después de
+// achicarles el alto - con un rango de precio de BTC de varias décadas (desde centavos hasta
+// $100K+) caben muchas más marcas "nice" que espacio vertical real, y niceLogTicks no sabía
+// nada del alto disponible en px para decidir cuántas mostrar.
+function dvThinLogTicks(minV, maxV, yForFn, minGapPx){
+  const gap = minGapPx || 22;
+  const ticks = niceLogTicks(minV, maxV);
+  const items = ticks.map(v => {
+    const p = Math.log10(v);
+    return { v, y: yForFn(v), isPow10: Math.abs(p - Math.round(p)) < 1e-6, showLabel: true };
+  });
+  items.sort((a, b) => a.y - b.y);
+  for(let i = 1; i < items.length; i++){
+    if(Math.abs(items[i].y - items[i - 1].y) < gap){
+      if(!items[i].isPow10) items[i].showLabel = false;
+      if(!items[i - 1].isPow10) items[i - 1].showLabel = false;
+    }
+  }
+  return items;
+}
+
 // ---- helpers exclusivos de Ciclos de Halving (prefijo halving-/Halving, no tocar los
 // compartidos niceLogTicks/fmtHalvingPrice/chartWatermarkHtml) - ver .claude/skills/dataviz ----
 
@@ -22671,15 +22704,14 @@ function renderRsiChart(){
   const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
   const yForRsi = v => rsiBottom - (v / 100) * rsiH;
 
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yForPrice(t);
+  const yTicks = dvThinLogTicks(minPrice, maxPrice, yForPrice, 22).filter(t => {
     // margen mínimo — solo para evitar artefactos de redondeo justo en el borde, no para excluir
     // una marca real cercana al máximo/mínimo visible (ese descarte ya lo hace niceLogTicks)
-    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+    return t.y > priceTop - 0.5 && t.y < priceBottom + 0.5;
   });
   const priceGridHtml = yTicks.map(t => `
-    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}"/>
-    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${t.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${t.y.toFixed(1)}"/>
+    ${t.showLabel ? `<text class="dv-axis-text" x="${marginLeft - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t.v)}</text>` : ''}
   `).join('');
   const rsiGridHtml = [30, 50, 70].map(v => `
     <line ${v === 50 ? '' : 'class="dv-grid-line"'} x1="${marginLeft}" y1="${yForRsi(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForRsi(v).toFixed(1)}" ${v === 50 ? 'stroke="rgba(240,178,61,.35)" stroke-width="1" stroke-dasharray="4,3"' : ''}/>
@@ -22953,13 +22985,12 @@ function renderSthMvrvChart(){
   const mvrvRange = (maxMvrv - minMvrv) || 1;
   const yForMvrv = v => oscBottom - ((v - minMvrv) / mvrvRange) * oscH;
 
-  const yTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yForPrice(t);
-    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+  const yTicks = dvThinLogTicks(minPrice, maxPrice, yForPrice, 22).filter(t => {
+    return t.y > priceTop - 0.5 && t.y < priceBottom + 0.5;
   });
   const priceGridHtml = yTicks.map(t => `
-    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}"/>
-    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${t.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${t.y.toFixed(1)}"/>
+    ${t.showLabel ? `<text class="dv-axis-text" x="${marginLeft - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t.v)}</text>` : ''}
   `).join('');
   const oscTicksVals = [...new Set([minMvrv, 1, maxMvrv].map(v => Math.round(v * 10) / 10))].filter(v => v > minMvrv - 0.001 && v < maxMvrv + 0.001);
   const oscGridHtml = oscTicksVals.map(v => `
@@ -23215,13 +23246,12 @@ function renderEpochPlChart(){
   const yForPrice = p => priceBottom - ((Math.log10(p) - logMin) / logRange) * priceH;
   const yForPct = v => pctBottom - (v / 100) * pctH;
 
-  const priceTicks = niceLogTicks(minPrice, maxPrice).filter(t => {
-    const y = yForPrice(t);
-    return y > priceTop - 0.5 && y < priceBottom + 0.5;
+  const priceTicks = dvThinLogTicks(minPrice, maxPrice, yForPrice, 22).filter(t => {
+    return t.y > priceTop - 0.5 && t.y < priceBottom + 0.5;
   });
   const priceGridHtml = priceTicks.map(t => `
-    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}"/>
-    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${t.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${t.y.toFixed(1)}"/>
+    ${t.showLabel ? `<text class="dv-axis-text" x="${marginLeft - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t.v)}</text>` : ''}
   `).join('');
   const pctGridHtml = [0, 25, 50, 75, 100].map(v => `
     <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPct(v).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPct(v).toFixed(1)}"/>
@@ -26597,21 +26627,19 @@ function renderBtcAaplChart(){
   const logMinP = Math.log10(minP), logMaxP = Math.log10(maxP), logRangeP = (logMaxP - logMinP) || 1;
   const yForPrice = v => lowerTop + lowerH - ((Math.log10(v) - logMinP) / logRangeP) * lowerH;
 
-  const yTicksR = niceLogTicks(minR, maxR).filter(t => {
-    const y = yForRatio(t);
-    return y > upperTop + 2 && y < upperTop + upperH - 4;
+  const yTicksR = dvThinLogTicks(minR, maxR, yForRatio, 22).filter(t => {
+    return t.y > upperTop + 2 && t.y < upperTop + upperH - 4;
   });
   const yGridUpperHtml = yTicksR.map(t => `
-    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForRatio(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForRatio(t).toFixed(1)}"/>
-    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForRatio(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${t >= 1 ? t.toFixed(t >= 10 ? 0 : 1) : t.toFixed(3)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${t.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${t.y.toFixed(1)}"/>
+    ${t.showLabel ? `<text class="dv-axis-text" x="${marginLeft - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${t.v >= 1 ? t.v.toFixed(t.v >= 10 ? 0 : 1) : t.v.toFixed(3)}</text>` : ''}
   `).join('');
-  const yTicksP = niceLogTicks(minP, maxP).filter(t => {
-    const y = yForPrice(t);
-    return y > lowerTop + 2 && y < lowerTop + lowerH - 4;
+  const yTicksP = dvThinLogTicks(minP, maxP, yForPrice, 22).filter(t => {
+    return t.y > lowerTop + 2 && t.y < lowerTop + lowerH - 4;
   });
   const yGridLowerHtml = yTicksP.map(t => `
-    <line class="dv-grid-line" x1="${marginLeft}" y1="${yForPrice(t).toFixed(1)}" x2="${totalW - marginRight}" y2="${yForPrice(t).toFixed(1)}"/>
-    <text class="dv-axis-text" x="${marginLeft - 8}" y="${(yForPrice(t) + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t)}</text>
+    <line class="dv-grid-line" x1="${marginLeft}" y1="${t.y.toFixed(1)}" x2="${totalW - marginRight}" y2="${t.y.toFixed(1)}"/>
+    ${t.showLabel ? `<text class="dv-axis-text" x="${marginLeft - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end" font-size="${yFontSize}">${fmtHalvingPrice(t.v)}</text>` : ''}
   `).join('');
   const panelLabelHtml = `<text class="dv-axis-text" x="${marginLeft}" y="${(lowerTop - panelGap / 2 + 4).toFixed(1)}" font-size="${xFontSize}">Precio de BTC (USD)</text>`;
 
