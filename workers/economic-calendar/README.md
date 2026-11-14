@@ -65,11 +65,37 @@ tanto el calendario sigue funcionando con Forex Factory, solo que sin el dato "A
   ya estás usando en el resto de Workers de este sitio. Si quieres que lo agreguemos después,
   dímelo y lo revisamos con el panel de Cloudflare a la vista.
 
-## No se pudo probar en vivo
+## Ya desplegado y probado en producción (14-nov-2026)
 
-Este Worker se escribió y se probó con datos SINTÉTICOS que imitan la forma real de las dos
-fuentes (documentada en la investigación previa), porque el entorno donde se escribió esto no
-tiene salida a internet hacia tradingview.com ni hacia faireconomy.media. La lógica (traducción,
-colores, formato de números, respaldo entre fuentes) está probada; lo que falta confirmar
-contigo es que las dos fuentes de verdad respondan como se espera una vez desplegado - por eso
-el paso de `?debug=1` de arriba es tan importante la primera vez.
+Desplegado directamente desde Claude Code (con un token de Cloudflare que Juan autorizó para
+esta tarea) y confirmado en vivo:
+
+- **TradingView (fuente principal) respondió 403 (Forbidden)** apenas se desplegó - exactamente
+  el escenario que este mismo README avisaba que podía pasar. O sea: TradingView SÍ empezó a
+  exigir algo (probablemente las cabeceras `Origin`/`Referer` de su propia página) que este
+  Worker deliberadamente no manda. **No se agregó ese spoofing** - sigue pendiente de que Juan
+  decida si quiere intentarlo o no (ver "Decisión pendiente" abajo).
+- **Forex Factory (respaldo) respondió 429 (Too Many Requests)** en varias pruebas seguidas -
+  probablemente por el límite de peticiones que le pone a las IPs compartidas de Cloudflare
+  (parecido a lo que ya pasaba con MyMemory/Google Translate en el Worker de noticias), no algo
+  específico de este Worker. Con tráfico normal del sitio (una consulta real cada ~10 minutos,
+  no las pruebas seguidas que se le hicieron para verificar esto) debería fallar mucho menos.
+- **La copia de respaldo en KV sí funcionó como estaba pensada**: con las dos fuentes fallando,
+  el calendario siguió sirviendo la última copia buena guardada, marcada `"desactualizado":true`,
+  en vez de romperse con un error. El sitio NO se cayó en ningún momento de la prueba.
+
+### Decisión pendiente para Juan: ¿qué hacer con el 403 de TradingView?
+
+Mientras esto no se resuelva, el calendario funciona SOLO con Forex Factory (sin el dato
+"Actual", solo Previsión/Anterior) o con la copia de respaldo en KV si Forex Factory también
+falla en el momento. Opciones, sin tomar ninguna todavía:
+
+1. **Dejarlo así** - Forex Factory + respaldo en KV ya cubre el calendario, solo sin el dato
+   "Actual" publicado. Es lo más simple y lo que ya está funcionando ahora mismo.
+2. **Agregar las cabeceras `Origin`/`Referer` de tradingview.com** a la petición - probablemente
+   arreglaría el 403, pero es fingir que la petición viene de su propia página, algo que este
+   Worker evitó a propósito hasta no confirmar que no viola los términos de uso de TradingView.
+3. **Buscar otra fuente** para el dato "Actual" (alguna API de calendario económico de pago, o
+   revisar si hay otro endpoint público de TradingView que sí acepte la petición tal cual).
+
+No se hizo nada de esto sin que Juan lo decida primero.
