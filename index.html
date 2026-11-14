@@ -3063,17 +3063,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    Android/Apple + selector de fechas arriba (no existe un parámetro que los quite - confirmado
    investigando en vivo cómo lo hace melapela.ai) - el truco real es recortarlo: el iframe se
    dibuja MÁS ALTO que la cajita visible y se empuja hacia arriba con translateY, así esa franja
-   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. YA NO lleva ningún
-   filtro CSS (invert/hue-rotate/saturate) - ese filtro era de cuando el widget todavía llevaba
-   los colores CLAROS originales de melapela y servía para invertirlo entero a oscuro; ahora que
-   el src ya manda sus propios colores oscuros (ver el comentario junto al <iframe> en el HTML),
-   el filtro sobraba y lo que hacía era invertir ESOS colores oscuros de vuelta a algo lavado/sin
-   contraste - justo lo que Juan reportó ("gris", "no se nota casi nada"). pointer-events:none
-   porque no usamos el selector de fechas propio de Investing (el "Semana actual"/filtros son
-   decoración nuestra, afuera del iframe). Alto subido de 420 a 680 (Juan: "se ve muy chiquito...
-   que ocupe toda la página") - el iframe interno sube con él (720, 680+40 del recorte de arriba),
-   translateY(-38px) queda igual porque esa franja recortada no cambia de tamaño. */
-.events-calendar-wrap{position:relative;height:680px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--surface)}
+   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. SÍ lleva un filtro
+   CSS invert(.9) hue-rotate(180deg) saturate(.72) - se intentó quitarlo 2 veces para usar colores
+   oscuros "de verdad" vía los parámetros del src, y las 2 veces salió peor (ver el comentario
+   junto al <iframe> en el HTML): los parámetros de color de este widget NO alcanzan el fondo de
+   las filas de datos (la mayoría de lo que se ve), que Investing.com deja fijo en blanco pase lo
+   que pase - sin el filtro, esas filas quedan blancas chocando con el sitio oscuro. El filtro
+   (con los colores CLAROS originales de melapela en el src, para que al invertirse den oscuro)
+   es la única forma que de verdad oscurece TODO el widget. pointer-events:none porque no usamos
+   el selector de fechas propio de Investing (el "Semana actual"/filtros son decoración nuestra,
+   afuera del iframe). Alto subido de 420 a 680 (Juan: "se ve muy chiquito... que ocupe toda la
+   página") - el iframe interno sube con él (720, 680+40 del recorte de arriba), translateY(-38px)
+   queda igual porque esa franja recortada no cambia de tamaño. */
+.events-calendar-wrap{position:relative;height:680px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
 /* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
    del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
    estilo ya usado en otras listas scrolleables del sitio */
@@ -3083,7 +3085,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 .events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .events-calendar-clip{position:relative;overflow:clip;height:680px;min-width:590px}
-.events-calendar-iframe{display:block;width:100%;height:720px;border:none;transform:translateY(-38px);pointer-events:none;background:var(--surface)}
+.events-calendar-iframe{display:block;width:100%;height:720px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -4315,26 +4317,23 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                  el iframe por venir incrustado de otro sitio.
                  Los NOMBRES de los parámetros de color (ecoDayBackground/ecoDayFontColor/
                  defaultFont/innerBorderColor/borderColor) y columns= están confirmados viendo en
-                 vivo el src real que usa melapela.ai.
-                 Por qué seguía viéndose gris/sin contraste después de poner valores oscuros en
-                 esos parámetros (lo que Juan reportó con captura): el .events-calendar-iframe de
-                 abajo TODAVÍA tenía puesto un filtro CSS invert()+hue-rotate()+saturate() (ver
-                 git blame/versión anterior) - ese filtro se había creado ANTES, cuando el widget
-                 llevaba los colores CLAROS originales de melapela (fondo casi blanco) y servía
-                 para invertirlo entero a oscuro sin pelear con sus parámetros. Al poner colores
-                 YA oscuros en el src y dejar el filtro puesto, quedaban invertidos DOS VECES (un
-                 oscuro invertido se ve claro/lavado otra vez) - de ahí el gris sin contraste. Se
-                 quita el filtro por completo: ahora el widget se ve con los colores reales que
-                 manda el src, sin ninguna transformación CSS encima.
-                 OJO: sigue sin poderse confirmar visualmente en este entorno (sin salida a
-                 internet hacia investing.com) - revisar en el sitio real. Es posible que algunos
-                 elementos del widget (ej. los iconitos de "toro/oso" de la columna Impacto) no
-                 sean personalizables con estos parámetros y se queden con su propio color fijo de
-                 Investing.com, fuera de nuestro control.
-                 El recorte del header (el iframe más alto + translateY) va en el CSS, ver nota en
-                 .events-calendar-iframe -->
+                 vivo el src real que usa melapela.ai - PERO esos parámetros solo repintan la
+                 barra separadora de cada día y poco más; el fondo de las FILAS de datos (la
+                 mayoría del widget) Investing.com NO lo deja personalizar con nada, se queda
+                 blanco fijo sin importar qué se le mande. Se intentó 2 veces en sesiones
+                 anteriores arreglar esto solo con los parámetros de color (valores oscuros en vez
+                 de los claros de melapela) y las dos veces salió peor: una vez quedó gris/lavado
+                 (por un filtro CSS invert() que había quedado puesto encima, invirtiendo DOS
+                 VECES), y la otra vez (quitando ese filtro) quedaron las filas de datos en blanco
+                 crudo, chocando feo con el resto del sitio oscuro ("se ve horrible", captura de
+                 Juan). Se vuelve a los valores de melapela (claros) + el filtro CSS invert(.9)
+                 hue-rotate(180deg) saturate(.72) tal cual estaban ANTES de que empezáramos a
+                 tocar esto - es la única combinación que de verdad oscurece TODO el widget
+                 (incluidas las filas que los parámetros no alcanzan), aunque Investing.com no
+                 vuelva a quedar con el azul exacto del sitio. El recorte del header (el iframe
+                 más alto + translateY) va en el CSS, ver nota en .events-calendar-iframe -->
             <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232E3B5C&amp;borderColor=%232E3B5C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23F7F7F7&amp;ecoDayFontColor=%23737373&amp;defaultFont=%23161616&amp;innerBorderColor=%23E9E9E9&amp;borderColor=%23E9E9E9&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
             </div>
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
