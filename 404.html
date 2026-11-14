@@ -25412,8 +25412,38 @@ function renderDomChart(key){
   // antes esto pintaba la línea de un solo indicador en verde/rojo según la tendencia reciente —
   // se quitó: ahora cada serie usa siempre su color fijo (def.series[].color), igual que los
   // indicadores de varias líneas (ej. CPI general+núcleo) ya hacían desde el principio
-  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key], yFor)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`).join('')
-    + (yFor2 ? def.series2.map(s => `<path d="${pathFor(p => p[s.key], yFor2)}" fill="none" stroke="${s.color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>`).join('') : '');
+  // línea en 2px (antes 1.3px) - spec de la skill dataviz (mark "Line: 2px, round join/cap"),
+  // igual que ya se usa en Halving/Rainbow/el resto de gráficos ya rediseñados con esta skill
+  const linesHtml = def.series.map(s => `<path d="${pathFor(p => p[s.key], yFor)}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`).join('')
+    + (yFor2 ? def.series2.map(s => `<path d="${pathFor(p => p[s.key], yFor2)}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>`).join('') : '');
+
+  // relleno de área bajo la línea (spec "Area fill: la tonalidad de la serie a ~10% opacidad",
+  // acá 6% para igualar el mismo wash ya usado en Halving/BTC+Macro) - solo para indicadores de
+  // UNA sola serie (los de 2 líneas, como CPI general+núcleo, se dejan sin relleno para que no se
+  // confundan los rellenos donde las dos líneas se cruzan)
+  const areaHtml = def.series.length === 1 ? (() => {
+    const d = pathFor(p => p[def.series[0].key], yFor);
+    return d ? `<path d="${halvingAreaPathD(d, marginLeft, totalW - marginRight, marginTop + drawH)}" fill="${def.series[0].color}" fill-opacity="0.06" stroke="none"/>` : '';
+  })() : '';
+
+  // marcador fijo (no solo al pasar el mouse) en el último dato real de cada línea - anillo del
+  // color de fondo + punto del color de la serie, igual al marcador permanente ya usado en
+  // Halving - así "el valor del final" siempre se ve sin necesitar hover (spec "Lines -> value
+  // at the end"). Busca el último punto NO nulo de esa serie en particular, por si una serie se
+  // queda sin dato más reciente que la otra (ej. el balance de la Fed, que a veces se actualiza
+  // un día después que otras series)
+  function ultimoPuntoValido(getV){
+    for(let i = points.length - 1; i >= 0; i--){ const v = getV(points[i]); if(v != null && isFinite(v)) return { t: points[i].t, v }; }
+    return null;
+  }
+  function endMarkerHtml(getV, yForFn, color){
+    const u = ultimoPuntoValido(getV);
+    if(!u) return '';
+    const ex = xFor(u.t).toFixed(1), ey = yForFn(u.v).toFixed(1);
+    return `<circle cx="${ex}" cy="${ey}" r="7" fill="none" stroke="#090b16" stroke-width="2"/><circle cx="${ex}" cy="${ey}" r="5" fill="${color}"/>`;
+  }
+  const endMarkersHtml = def.series.map(s => endMarkerHtml(p => p[s.key], yFor, s.color)).join('')
+    + (yFor2 ? def.series2.map(s => endMarkerHtml(p => p[s.key], yFor2, s.color)).join('') : '');
 
   const lastP = points[points.length - 1];
   const lastPx = xFor(endMs);
@@ -25433,7 +25463,9 @@ function renderDomChart(key){
         ${yGridHtml}
         ${yTicks2Html}
         ${refLineHtml}
+        ${areaHtml}
         ${linesHtml}
+        ${endMarkersHtml}
         ${xLabelsHtml}
         <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="rgba(255,255,255,.3)" stroke-width="1" style="display:none"/>
         <circle id="${key}HoverDot" r="5" fill="#fff" style="display:none"/>
