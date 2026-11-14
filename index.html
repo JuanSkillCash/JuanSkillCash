@@ -2883,15 +2883,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   padding-left:20px;
 }
 /* "Comunidad" y "Noticias" no tienen nada que plegar (1-2 ítems nada más) - Juan pidió que
-   se queden siempre abiertos, sin la flechita, nunca como un acordeón. "Herramientas" es otro
-   caso: no tiene NINGÚN ítem propio debajo (el siguiente elemento ya es el .sb-cat-label real
-   de "Sonar de Mercado"), así que antes traía la flechita como si se pudiera plegar/desplegar
-   pero el clic no cambiaba nada visible - Juan lo notó y pidió quitarla, confusión real, no solo
-   estética. Se les quita el ::after (la flechita) y el JS (más abajo) ya no los engancha a
-   wireCollapsibleLabel/filterSidebarNav/setAllIndicCatLabelsCollapsed, así que su clase
-   "collapsed" nunca se activa y sus ítems (que viven en el flujo normal del documento, sin
-   ningún display:none puesto por JS) quedan siempre visibles. */
+   se queden siempre abiertos, sin la flechita, nunca como un acordeón. Se les quita el ::after
+   (la flechita) y el JS (más abajo) ya no los engancha a wireCollapsibleLabel/filterSidebarNav/
+   setAllIndicCatLabelsCollapsed, así que su clase "collapsed" nunca se activa y sus ítems
+   (que viven en el flujo normal del documento, sin ningún display:none puesto por JS) quedan
+   siempre visibles. "Herramientas" NO lleva esta clase (a propósito, ver más abajo), aunque
+   también le sobraba la flechita. */
 .sb-cat-label-static{ cursor:default; }
+/* "Herramientas" no tiene NINGÚN ítem propio debajo (el siguiente elemento ya es el
+   .sb-cat-label real de "Sonar de Mercado"), así que traía la flechita como si se pudiera
+   plegar/desplegar pero el clic no cambiaba nada visible - Juan lo notó y pidió quitarla. PERO
+   a diferencia de Comunidad/Noticias, "Herramientas" si debe seguir ocultándose junto con sus
+   categorías reales cuando se está viendo otra sección (Noticias, Comunidad, etc.) - por eso NO
+   lleva sb-cat-label-static (esa clase lo dejaría SIEMPRE visible, incluso con sus categorías ya
+   escondidas - exactamente el bug que reportó Juan: "se perdieron todas las herramientas, solo
+   está el título"). Se le quita el ::after con un selector aparte, nada más, y sigue
+   enganchado a filterSidebarNav/wireCollapsibleLabel con normalidad (el clic no hace daño:
+   sigue sin tener items que mostrar/ocultar, solo que ahora no invita a hacer clic). */
+.sb-cat-label[data-category="__herramientas"]::after{ content:none; }
+.sb-cat-label[data-category="__herramientas"]{ cursor:default; }
 .sb-cat-label-static::after{ content:none; }
 /* "Tu Rango", "Skins del Tiburón" y "Eventos y Noticias" - mismo tamaño/color que una categoría
    (ej. "Blindaje"), aunque sean .sb-item y no .sb-cat-label - pedido explícito de Juan */
@@ -2947,7 +2957,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    compartían grilla de 2 columnas con otra tarjeta al lado) - sin esto, la única tarjeta ocupa
    solo la mitad izquierda de la grilla de 2 columnas y deja un hueco vacío a la derecha. */
 .events-grid-solo{grid-template-columns:1fr;max-width:640px}
-@media(max-width:480px){ .events-video-wrap,.events-calendar-wrap{height:320px} .events-calendar-clip{height:320px} .events-calendar-iframe{height:358px} }
+/* Calendario Económico y Conferencias en Vivo quedaron cada uno solo en su propia página (ya no
+   comparten espacio con otra tarjeta al lado, desde que se separó "Eventos y Noticias" en 3
+   opciones del menú) - Juan pidió que ocupen TODO el ancho en vez de quedar angostos como antes,
+   a diferencia de .events-grid-solo (pensada para cuando sí importaba un ancho fijo). */
+.events-grid-wide{grid-template-columns:1fr}
+@media(max-width:480px){ .events-video-wrap{height:320px} .events-calendar-wrap{height:420px} .events-calendar-clip{height:420px} .events-calendar-iframe{height:458px} }
 /* min-width:0 es necesario porque .events-card es hijo de un grid (.events-grid) - sin esto,
    el calendario de adentro (que fuerza min-width:590px para que el widget de Investing no se
    vea aplastado, iguaql que hace melapela) empuja el ANCHO DE TODA LA GRILLA (y por lo tanto de
@@ -3027,12 +3042,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    Android/Apple + selector de fechas arriba (no existe un parámetro que los quite - confirmado
    investigando en vivo cómo lo hace melapela.ai) - el truco real es recortarlo: el iframe se
    dibuja MÁS ALTO que la cajita visible y se empuja hacia arriba con translateY, así esa franja
-   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. El filtro CSS
-   invert+hue-rotate+saturate convierte el widget (blanco, pensado para tema claro) a algo que
-   combina con el resto del sitio (oscuro) sin tener que pelear con sus propios parámetros de
-   color, que son limitados. pointer-events:none porque no usamos el selector de fechas propio
-   de Investing (el "Semana actual"/filtros son decoración nuestra, afuera del iframe) */
-.events-calendar-wrap{position:relative;height:420px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--bg2)}
+   de arriba queda fuera del área visible (overflow:clip) en vez de mostrarse. YA NO lleva ningún
+   filtro CSS (invert/hue-rotate/saturate) - ese filtro era de cuando el widget todavía llevaba
+   los colores CLAROS originales de melapela y servía para invertirlo entero a oscuro; ahora que
+   el src ya manda sus propios colores oscuros (ver el comentario junto al <iframe> en el HTML),
+   el filtro sobraba y lo que hacía era invertir ESOS colores oscuros de vuelta a algo lavado/sin
+   contraste - justo lo que Juan reportó ("gris", "no se nota casi nada"). pointer-events:none
+   porque no usamos el selector de fechas propio de Investing (el "Semana actual"/filtros son
+   decoración nuestra, afuera del iframe). Alto subido de 420 a 680 (Juan: "se ve muy chiquito...
+   que ocupe toda la página") - el iframe interno sube con él (720, 680+40 del recorte de arriba),
+   translateY(-38px) queda igual porque esa franja recortada no cambia de tamaño. */
+.events-calendar-wrap{position:relative;height:680px;border-radius:10px;overflow:auto;border:1px solid var(--border2);background:var(--surface)}
 /* la barra de scroll por defecto del navegador (gris/blanca, ancha) desentonaba con el resto
    del sitio ("se ve feíta", reportado) - una delgadita del mismo tono del acento, igual al
    estilo ya usado en otras listas scrolleables del sitio */
@@ -3041,8 +3061,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-calendar-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
 .events-calendar-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 .events-calendar-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.events-calendar-clip{position:relative;overflow:clip;height:420px;min-width:590px}
-.events-calendar-iframe{display:block;width:100%;height:458px;border:none;transform:translateY(-38px);filter:invert(.9) hue-rotate(180deg) saturate(.72);pointer-events:none;background:#fff}
+.events-calendar-clip{position:relative;overflow:clip;height:680px;min-width:590px}
+.events-calendar-iframe{display:block;width:100%;height:720px;border:none;transform:translateY(-38px);pointer-events:none;background:var(--surface)}
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .about-stat{border:1px solid rgba(91,141,239,.3);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
@@ -3269,7 +3289,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
     <nav class="sb-nav">
-      <div class="sb-cat-label sb-cat-label-static" data-category="__herramientas">Herramientas</div>
+      <div class="sb-cat-label" data-category="__herramientas">Herramientas</div>
       <div class="sb-cat-label" data-category="indicadores">Sonar de Mercado</div>
       <button class="sb-item" data-indic-jump="guia">
         <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
@@ -4239,7 +4259,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="section-eyebrow">Agenda</div>
       <h2 class="community-title">Calendario Económico</h2>
       <p class="community-lead">Eventos de impacto alto en EE.UU. y la Eurozona, con fecha y hora exacta en tu zona horaria.</p>
-      <div class="events-grid events-grid-solo">
+      <div class="events-grid events-grid-wide">
         <div class="events-card">
           <div class="events-card-topbar">
             <div class="events-card-eyebrow">Agenda</div>
@@ -4247,7 +4267,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-            Calendario Económico <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Calendario Económico
           </div>
           <div class="events-chips">
             <span class="events-chip"><i></i>Mayor movimiento esperado</span>
@@ -4259,23 +4279,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                  el iframe por venir incrustado de otro sitio.
                  Los NOMBRES de los parámetros de color (ecoDayBackground/ecoDayFontColor/
                  defaultFont/innerBorderColor/borderColor) y columns= están confirmados viendo en
-                 vivo el src real que usa melapela.ai - los que habíamos puesto antes (adivinados
-                 a mano) no existían en esta versión del widget y por eso se ignoraban, dejando el
-                 blanco/logo por defecto. Los VALORES de esos colores sí se copiaron tal cual de
-                 melapela al principio (su propio tema claro: fondo casi blanco, texto casi negro)
-                 y por eso se veía gris/claro encima del fondo oscuro de SkillCash, pedido de Juan
-                 de "que combine con las demás". Ahora los valores son los tokens oscuros propios
-                 del sitio (--surface/--muted2/--white y un tono de borde calculado a partir de
-                 --border2 sobre --surface) en vez de los de melapela - los NOMBRES de parámetro
-                 siguen siendo los mismos ya confirmados, solo cambiaron los valores. OJO: no se
-                 pudo confirmar visualmente porque este entorno de pruebas no tiene salida a
-                 internet hacia investing.com - revisar en el sitio real que el widget sí tome
-                 estos colores (podría haber superficies internas del widget, como el fondo de
-                 cada fila de datos, que Investing.com no deje personalizar con estos parámetros).
+                 vivo el src real que usa melapela.ai.
+                 Por qué seguía viéndose gris/sin contraste después de poner valores oscuros en
+                 esos parámetros (lo que Juan reportó con captura): el .events-calendar-iframe de
+                 abajo TODAVÍA tenía puesto un filtro CSS invert()+hue-rotate()+saturate() (ver
+                 git blame/versión anterior) - ese filtro se había creado ANTES, cuando el widget
+                 llevaba los colores CLAROS originales de melapela (fondo casi blanco) y servía
+                 para invertirlo entero a oscuro sin pelear con sus parámetros. Al poner colores
+                 YA oscuros en el src y dejar el filtro puesto, quedaban invertidos DOS VECES (un
+                 oscuro invertido se ve claro/lavado otra vez) - de ahí el gris sin contraste. Se
+                 quita el filtro por completo: ahora el widget se ve con los colores reales que
+                 manda el src, sin ninguna transformación CSS encima.
+                 OJO: sigue sin poderse confirmar visualmente en este entorno (sin salida a
+                 internet hacia investing.com) - revisar en el sitio real. Es posible que algunos
+                 elementos del widget (ej. los iconitos de "toro/oso" de la columna Impacto) no
+                 sean personalizables con estos parámetros y se queden con su propio color fijo de
+                 Investing.com, fuera de nuestro control.
                  El recorte del header (el iframe más alto + translateY) va en el CSS, ver nota en
                  .events-calendar-iframe -->
             <div class="events-calendar-clip">
-              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232B2F3C&amp;borderColor=%232B2F3C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
+              <iframe class="events-calendar-iframe" data-src="https://sslecal2.investing.com/?ecoDayBackground=%23141824&amp;ecoDayFontColor=%23B3B6BF&amp;defaultFont=%23F7F6FB&amp;innerBorderColor=%232E3B5C&amp;borderColor=%232E3B5C&amp;columns=exc_currency%2Cexc_importance%2Cexc_actual%2Cexc_forecast%2Cexc_previous&amp;importance=3&amp;countries=5&amp;calType=week&amp;timeZone=42&amp;lang=4" title="Calendario económico" loading="lazy"></iframe>
             </div>
           </div>
           <div class="events-card-foot">Eventos de impacto alto en EE.UU., semana actual, en tu hora local · Datos por <a href="https://www.investing.com/" target="_blank" rel="noopener">Investing.com ↗</a>. Si a ti o a alguien más le sale bloqueado, es el bloqueador de anuncios del navegador — funciona igual con él desactivado para este sitio.</div>
@@ -4296,7 +4319,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-            Noticias Cripto <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Noticias Cripto
           </div>
           <div class="events-news-list" id="eventsNewsCrypto">
             <div class="events-news-skel"></div>
@@ -4312,7 +4335,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-head">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 7-9"/><path d="M14 6h5v5"/></svg>
-            Macro y Economía <span class="wip-pill">EN CONSTRUCCIÓN</span>
+            Macro y Economía
           </div>
           <div class="events-news-list" id="eventsNewsMacro">
             <div class="events-news-skel"></div>
