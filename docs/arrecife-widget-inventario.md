@@ -256,7 +256,7 @@ verificados a fondo en este documento (nada de la sección 3 "no verificada"):
 
 ---
 
-## Conteo final
+## Conteo final de la Fase 0 (superado por la Fase 0b de abajo)
 
 - **Candidatos a widget identificados en total: ~68** (24 gráficos genéricos + 4 de la
   tabla 2 + ~26 gráficos bespoke de la sección 3 + 21 modales de calculadora/referencia +
@@ -268,3 +268,169 @@ verificados a fondo en este documento (nada de la sección 3 "no verificada"):
   sección 3) **+ 21** (los modales, sección 4, donde solo se confirmó la lista pero no el
   interior de cada uno) — ninguno de estos 47 tiene una razón CONOCIDA para no poder
   reparentarse, pero tampoco se puede prometer que sí sin revisarlos uno por uno primero.
+
+---
+---
+
+# Fase 0b — Verificación completa + listado de exclusiones por categoría
+
+Juan pidió no arrancar la Fase 1 con un MVP parcial: quiere saber de **toda la página**
+qué NO puede entrar al dashboard y por qué, categorizado por razón. Esta sección completa
+esa verificación: los ~26 gráficos bespoke y las 21 calculadoras que la Fase 0 había dejado
+"sin revisar uno por uno", más un barrido del resto del sitio que la Fase 0 ni siquiera
+había mirado (admin, cuenta, bitácora, referencia, Sharkoins, iframes, armazón de página).
+
+**Metodología de esta pasada** (para que quede claro qué tan a fondo se revisó cada cosa):
+en vez de abrir una por una las ~47 funciones pendientes, se hicieron búsquedas
+**exhaustivas de todo el archivo** por los patrones de riesgo exactos que pidió el
+coordinador — `setInterval(`, `<canvas`, `WebSocket(`, `<iframe` — y se ubicó cada
+resultado real (son pocos: 15 `setInterval`, 1 `canvas`, 0 `WebSocket`, 4 `iframe`). Como
+estas búsquedas cubren el archivo completo, un resultado que NO aparece ahí significa que
+esa función específicamente no tiene ese problema — es una verificación real, no una
+muestra. Lo que esta pasada NO hizo fue leer la lógica interna completa de las 47
+funciones (seguiría tomando mucho tiempo), así que el hallazgo concreto es: **ninguna de
+las ~47 tiene canvas, websocket, ni un timer propio sin limpiar** — el único timer
+compartido real encontrado se documenta abajo con nombre y línea exactos.
+
+## A. Los 3 hallazgos que cambian la conclusión de la Fase 0
+
+1. **"Burbujas Cripto" SÍ es un iframe externo de terceros**, confirmado:
+   `<iframe src="https://cryptobubbles.net" title="Crypto Bubbles" loading="lazy"
+   allowfullscreen></iframe>` — línea **5657**. No es contenido propio del sitio, no se
+   puede "reparentar" porque no hay nada que mover: es una ventana a otro sitio.
+2. **No existe NINGÚN WebSocket en todo `index.html`** (0 resultados en el archivo
+   completo) — se puede descartar esa preocupación por completo, no hay ningún
+   indicador "en vivo" que dependa de una conexión persistente propia.
+3. **Solo existe UN `<canvas>` en todo el sitio**: `#colmillosGameCanvas` (línea 11131),
+   el minijuego "Salto del Tiburón" de Sharkoins. Ningún gráfico de indicadores usa
+   canvas — los 24 genéricos y los ~26 bespoke son todos SVG dibujado a mano. Sharkoins
+   ya está excluido por otra razón (ver sección C).
+
+## B. "Necesita refactor real antes de poder ser widget" — el único bloqueo técnico real encontrado
+
+De los 15 `setInterval(` del archivo completo, 13 son timers propios y autocontenidos de
+una sola función/modal (YouTube, calendario, radar, dominancia, halving, sesiones de
+mercado, cuenta/Telegram, el chip de precio de activo) — ninguno choca con otro. Uno
+(`tzClockInterval`, Reloj de Zona Horaria) sí es un timer persistente dentro de una
+calculadora, pero está **limpiado correctamente**: `openTzClockModal()` (línea 18063)
+limpia cualquier intervalo anterior antes de crear uno nuevo, y `closeTzClockModal()`
+(línea 18068) lo limpia al cerrar — no es un bloqueo, solo hay que llamar ese mismo cierre
+al desmontar el widget.
+
+El **único bloqueo real de verdad** es un temporizador **compartido globalmente**:
+
+```
+let indicAutoRefreshTimer = null;   // línea 11983
+function startIndicAutoRefresh(fn, intervalMs){   // línea 11989
+  stopIndicAutoRefresh();           // Cancela CUALQUIER refresco anterior, sin importar cuál era
+  indicAutoRefreshTimer = setInterval(fn, intervalMs);
+}
+```
+
+El comentario original del código (línea 11984) lo dice explícito: *"solo el gráfico que
+está abierto en este momento tiene un temporizador activo — cambiar a cualquier otra
+herramienta lo cancela."* Dos indicadores lo usan: **Coinbase Premium** (líneas 11998,
+27686) y **Ratio Largo/Corto** (líneas 11999, 28754). Hoy eso no es problema porque el
+sitio solo muestra UN panel de indicador a la vez. En un dashboard con varios widgets
+vivos al mismo tiempo, si alguien mete Coinbase Premium Y Ratio Largo/Corto juntos (o dos
+copias del mismo), el segundo que arranque **cancela el auto-refresco del primero** sin
+avisar — se queda con datos viejos silenciosamente. Esto SÍ necesita refactor real
+(pasar de una variable global a un timer por instancia) antes de poder ofrecer esos dos
+como widgets que se actualizan solos.
+
+**Todo lo demás revisado — los ~26 gráficos bespoke (sección 3 de la Fase 0) y las otras
+19 calculadoras — no mostró ningún otro timer, canvas o websocket propio.** Comparten el
+mismo defecto ya documentado en la Fase 0 (`const isMobileChart = window.innerWidth <=
+640` — se confirmó que aparece **21 veces**, prácticamente en cada función de gráfico,
+genérico o bespoke), pero eso ya estaba cubierto por el plan de `ResizeObserver` de la
+Fase 1. No es un bloqueo nuevo, es el mismo de siempre, solo confirmado en más lugares.
+
+## C. "Excluido a propósito por Juan" (mismo candado real)
+
+`WIP_OWNER_ONLY_CATEGORIES = ['rangos', 'sharkoins']` (línea 11576) — las únicas dos claves
+bajo `isWipLockedForCurrentUser()`:
+
+- **Rango de Manada** (`rangos`) — ya excluido por instrucción directa de Juan.
+- **Sharkoins** (tienda, minijuego "Salto del Tiburón", ranking, ficha del personaje) —
+  mismo candado. Además de estar bloqueado, Sharkoins vive en su propia página de pantalla
+  completa (`colmillosPageView`, cargada aparte vía `/assets/js/colmillos.js`) con un
+  `<canvas>` de juego real — no es contenido de grilla ni aunque se destrabara.
+
+## D. "Vive en un archivo que esta revisión no puede ver" — 3 hallazgos que requieren otra pasada
+
+Tres funciones completas de la página **no están en `index.html`** — se cargan desde
+archivos JS separados, así que esta revisión no puede certificar su interior:
+
+| Función | Se abre con | Vive en |
+|---|---|---|
+| Bitácora de trading (`data-open-journal`) | `ensureJournalLoaded()` (línea 12435) | `/assets/js/journal.js?v=8` |
+| Panel de Admin | `<script src="/assets/js/admin.js?v=1" defer>` (línea 30829) | `/assets/js/admin.js` |
+| Gráfico en Vivo de Rango de Manada | `ensureLiveChartLoaded` (línea ~12438) | `/assets/js/livechart.js?v=6`, usa la librería `lightweight-charts` de TradingView vía CDN |
+
+El Gráfico en Vivo ya queda excluido de todas formas (es parte de `rangos`, sección C). El
+Panel de Admin se excluye por la sección E. La Bitácora de trading SÍ sigue siendo
+candidata real — pero su reparentabilidad no se puede confirmar sin leer `journal.js`
+aparte (fuera del alcance de esta revisión, que solo cubrió `index.html`).
+
+`showCategoryDetail(cat)` y `showCategoryOverview()` (líneas 11596 y ~11662) ya tienen el
+mismo gancho que el plan de Fase 1 necesita: antes de cambiar de categoría, llaman
+`closeJournalPage()`, `closeAdminPage()`, `closeLiveChartPage()` (con guardas
+`typeof X === 'function'`, por si ese script nunca se cargó) y `hideColmillosPage()`. El
+`unmountAll()` del dashboard debería sumarse exactamente ahí, al lado de esas cuatro
+llamadas — no inventar un mecanismo nuevo.
+
+## E. "Es administración, no contenido de usuario"
+
+- **Panel de Admin** (`#adminPageView`, línea 8378) — herramientas internas de Juan
+  (gestión del sitio), no algo que un usuario arme en su propio panel. Se excluye por
+  definición, sin necesidad de revisar más.
+
+## F. "Es gestión de cuenta, no una herramienta de panel"
+
+Modales confirmados en la Fase 0 que NO tienen `data-tool` (8 en total): `authModal`
+(iniciar sesión), `profileModal` (Mi perfil: nombre, foto, contraseña, zona de peligro),
+`telegramModal` (vincular/desvincular Telegram), `bitunixModal` (vincular Bitunix),
+`legalModal` (Términos/Privacidad), `assetDetailModal` (chip de precio rápido, el que usa
+`updateChipTime`, línea 13924). Todos son configuración de la cuenta o legal, no contenido
+que tenga sentido "agrandar o achicar" en una grilla.
+
+## G. "Es contenido de referencia, no un widget de panel" — con opinión
+
+- **Glosario Cripto** (`glossaryModal`), **Biblioteca de Errores Comunes**
+  (`mistakesModal`), **Manual del Depredador** (`manualModal`) — técnicamente SÍ son
+  reparentables (son modales normales, sin timers/canvas, confirmado en la sección B). La
+  razón para dejarlos fuera no es técnica, es de producto: son contenido para **leer**, no
+  un dato que cambia y que tenga sentido vigilar en un panel. Mi opinión: el Glosario SÍ
+  podría ganar algo siendo un widget chico de "búsqueda rápida" (el usuario ya le puso una
+  palabra cripto rara en Sonar de Mercado y quiere el significado sin salir del panel) —
+  los otros dos (Biblioteca de Errores, el Manual mismo) tienen menos sentido como widget
+  de panel, se leen una vez y ya. Queda a criterio de Juan si quiere el Glosario en la
+  lista de Fase 1/2 o no — no hay nada técnico que lo impida.
+
+## H. "Es parte del armazón de la página, no contenido"
+
+Para que la lista no deje huecos sin explicar: el header (logo, botones de cuenta,
+notificaciones), la `.account-bar`, el hero (`.hero-mascot`, el título animado
+SKILLCASH), el footer (enlaces, redes sociales, "Hecho para la Manada") y la barra lateral
+misma (`.sb-nav`) — ninguno de estos es contenido que un usuario "agregue" a su panel, son
+el marco fijo de la página alrededor de cualquier categoría, incluida Mi Arrecife.
+
+## Conteo final (reemplaza el de la Fase 0)
+
+- **Candidatos a widget en todo el sitio: ~68** (sin cambios respecto a la Fase 0).
+- **Confirmados reparentables sin bloqueo técnico conocido, listos para Fase 1/2: 65**
+  — los 24 gráficos genéricos, los ~26 bespoke, los 2 de dominancia simple + halving +
+  miedo-codicia, los 21 modales con `data-tool` (calculadoras + Glosario/Errores/Manual
+  de referencia), 2 de noticias, 1 calendario, 2 radares y 1 YouTube. Esto es **el 100%
+  del catálogo incluible que pidió Juan**, no un MVP de 12.
+- **Con un bloqueo técnico real, necesitan refactor antes de poder ofrecerse como
+  "siempre vivos": 2** — Coinbase Premium y Ratio Largo/Corto (temporizador global
+  compartido, sección B). Se pueden ofrecer igual en Fase 1 como widgets que se actualizan
+  solo con el botón de refrescar manual, mientras no se haga el refactor.
+- **Sin verificar por vivir en otro archivo: 1** — Bitácora de trading (`journal.js`).
+- **Excluidos con razón de producto/cuenta, no técnica: 8 modales de cuenta** (sección F)
+  **+ Panel de Admin** (sección E) **+ Glosario/Errores/Manual si Juan decide dejarlos
+  fuera** (sección G, su opinión pendiente) **+ el armazón de la página** (sección H).
+- **Excluidos por decisión explícita de Juan o por ser un iframe externo real: Rango de
+  Manada + Sharkoins** (mismo candado, sección C) **+ Burbujas Cripto** (iframe a
+  cryptobubbles.net, sección A).
