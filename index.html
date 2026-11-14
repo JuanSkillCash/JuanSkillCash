@@ -3013,7 +3013,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    cubra los 3 estados sin tener que ir quitando/poniendo clases a mano) */
 .events-yt-channel-dot[data-state="live"]{background:var(--green);box-shadow:0 0 6px var(--green);animation:pillDotPulse 1.6s ease-in-out infinite}
 .events-yt-channel-dot[data-state="offline"]{background:var(--red)}
-.events-yt-channel-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.events-yt-channel-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.events-yt-channel-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* de qué trata el directo ahora mismo (título real del video, vía el Worker) - Juan pidió que se
+   vea un resumen justo en el panel donde se muestra si el canal está en vivo, no solo el puntito
+   de color. Se llena/oculta desde JS (setChannelSummary) cuando se confirma que SÍ hay directo -
+   mientras no se sepa o no lo haya, el renglón no existe (display:none, puesto en el HTML). */
+.events-yt-channel-sub{font-size:10.5px;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .events-yt-channel-missing{font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap}
 @media(max-width:860px){ .events-yt-layout{flex-direction:column} .events-yt-channels{width:100%;max-height:220px} }
 .events-video-wrap{position:relative;height:480px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:#000}
@@ -4230,12 +4236,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                visible, nunca tapa nada) - cada uno es ahora el selector de canal (reemplaza al
                <select>) Y a la vez el resultado de "Buscar directo" (reemplaza la lista flotante):
                el punto de cada canal se pone verde si está en vivo ahora mismo, rojo si ya se
-               revisó y no lo está, o gris si todavía no se ha revisado. -->
+               revisó y no lo está, o gris si todavía no se ha revisado. El botón "Buscar directo"
+               va ANTES del layout de 2 columnas (no dentro de la columna del video) para que el
+               video y la lista de canales empiecen exactamente a la misma altura - Juan pidió
+               que no se vieran desproporcionados por el botón empujando solo al video hacia
+               abajo. -->
+          <div class="events-yt-controls">
+            <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
+          </div>
           <div class="events-yt-layout">
             <div class="events-yt-main">
-              <div class="events-yt-controls">
-                <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
-              </div>
               <div class="events-video-wrap">
                 <!-- patron "fachada": no se crea el reproductor real de YouTube (pesado, descarga su
                      propio JS) hasta que la persona le da clic - antes se cargaba completo apenas se
@@ -4441,13 +4451,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         var disabled = !ch.id;
         return '<button type="button" class="events-yt-channel-item" data-idx="' + i + '"' + (disabled ? ' disabled' : '') + '>' +
           '<span class="events-yt-channel-dot"></span>' +
-          '<span class="events-yt-channel-label">' + escapeHtml(ch.label) + '</span>' +
+          '<span class="events-yt-channel-body">' +
+            '<span class="events-yt-channel-label">' + escapeHtml(ch.label) + '</span>' +
+            '<span class="events-yt-channel-sub" style="display:none"></span>' +
+          '</span>' +
           (disabled ? '<span class="events-yt-channel-missing">falta ID</span>' : '') +
           '</button>';
       }).join('');
       var itemEls = [].slice.call(listEl.querySelectorAll('.events-yt-channel-item'));
       function setActiveItem(i){
         itemEls.forEach(function(el){ el.classList.toggle('active', Number(el.dataset.idx) === i); });
+      }
+      // de qué trata el directo ahora mismo (título real del video) - se muestra justo debajo
+      // del nombre del canal, en el mismo panel donde se ve el punto de en vivo/no en vivo
+      // (pedido explícito de Juan); se esconde el renglón entero si no hay nada que mostrar
+      function setChannelSummary(i, text){
+        var sub = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-sub');
+        if(!sub) return;
+        if(text){ sub.textContent = text; sub.style.display = ''; }
+        else { sub.textContent = ''; sub.style.display = 'none'; }
       }
       function setDotState(i, state){
         var dot = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-dot');
@@ -4537,6 +4559,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             var live = !!(data && data.live && data.videoId);
             lastResults[idx] = { live: live, videoId: data && data.videoId, title: data && data.title };
             setDotState(idx, live ? 'live' : 'offline');
+            setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : null);
             if(idx !== currentIdx) return;
             if(live){
               pendingSrc = liveEmbedUrl(data.videoId);
@@ -4667,6 +4690,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           results.forEach(function(r){
             lastResults[r.idx] = { live: r.live, videoId: r.videoId, title: r.title };
             setDotState(r.idx, r.live ? 'live' : 'offline');
+            setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : null);
           });
           // si el canal YA elegido resultó en vivo, lo deja listo igual que antes
           var current = results.find(function(r){ return r.idx === currentIdx; });
