@@ -74,6 +74,19 @@ alrededor de cada publicación oficial EEUU) + un respaldo diario a las 00:30 UT
 | Estado de conexión Bitunix | API de Bitunix | `user_exchange_connections` | `update_bitunix_connections.py` | Cada hora (`:20`) |
 | Bitácora (sincronización de operaciones) | API de Bitunix | `trade_journal_sync`, `trade_journal_trades` | `sync_journal_partner.py` | Diario (4:59 UTC) |
 
+## Eventos y Noticias (Workers de Cloudflare, no pasan por Supabase)
+
+En vivo desde el navegador, pero el navegador no le pega directo a la fuente externa (casi
+ninguna trae cabeceras CORS) - le pega a un Worker propio de Cloudflare que hace de intermediario,
+agrega/traduce/colorea, y cachea unos minutos en el borde. Ver `workers/<carpeta>/README.md` de
+cada uno para cómo redesplegarlo si hay que actualizar el código.
+
+| Indicador (UI) | Fuente real | Worker | Caché |
+|---|---|---|---|
+| Noticias Cripto / Macro y Economía | RSS de CoinDesk/Cointelegraph (cripto) y MarketWatch/Investing.com (macro), traducidos y resumidos con Workers AI (Llama 3.1) | `workers/rss-news/` (`skillcash-noticias`) | 30 min |
+| Conferencias en Vivo (¿está este canal en vivo ahora?) | Scraping de la página pública `youtube.com/channel/<ID>/live` (no hay API oficial gratis que alcance para revisar 9 canales seguido) | `workers/youtube-live-check/` (`skillcash-youtube-live`) | 60 s |
+| **Calendario Económico** | TradingView (`economic-calendar.tradingview.com/events`, endpoint interno no documentado), con Forex Factory (`ff_calendar_thisweek.json`) como respaldo si TradingView falla | `workers/economic-calendar/` (`skillcash-calendario`) | 10 min (1 min si hay un evento de alta importancia a punto de publicarse) + copia de respaldo en KV si ambas fuentes fallan a la vez |
+
 ## Telegram (no son indicadores del sitio, solo envíos)
 
 Los 3 workflows de Telegram (`post-crypto-bulletin-telegram-daily.yml`, `post-fng-telegram-daily.yml`,
