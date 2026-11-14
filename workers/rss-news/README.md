@@ -4,6 +4,14 @@ Junta titulares de varios medios (RSS público) y los devuelve ya ordenados en J
 tarjetas "Noticias Cripto" y "Macro y Economía" de Eventos y Noticias (ver la explicación
 completa en los comentarios de `worker.js`).
 
+> **Juan: vuelve a pegar el código actualizado** (pasos abajo) - se le agregó la bajada/
+> entradilla de la noticia (cuando el feed la trae) como contexto extra para el modelo que arma
+> el "resumen", porque antes solo tenía el título y terminaba parafraseándolo casi igual (lo que
+> reportaste: "a veces dice como lo mismo que dice el título"). No lo pude probar contra los
+> feeds reales porque este entorno de trabajo no tiene salida a internet hacia esos medios -
+> después de redesplegar, revisa unos cuantos resúmenes nuevos a ver si ya aportan algo que el
+> título no decía.
+
 ## Cómo desplegarlo (igual que hiciste con el de YouTube en vivo)
 
 Ya está desplegado como `skillcash-noticias` (`https://skillcash-noticias.juanchodigital86.workers.dev`),

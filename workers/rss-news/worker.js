@@ -94,6 +94,15 @@ function parseRssItems(xml, source) {
     const titleMatch = block.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
     const linkMatch = block.match(/<link\b[^>]*>([\s\S]*?)<\/link>/i);
     const dateMatch = block.match(/<(?:pubDate|published|dc:date)\b[^>]*>([\s\S]*?)<\/(?:pubDate|published|dc:date)>/i);
+    // description (o content:encoded si el feed no trae description, ej. algunos WordPress) -
+    // antes se descartaba por completo y solo se le pasaba el TÍTULO al modelo de IA para pedirle
+    // el resumen ("RESUMEN" más abajo) - sin nada más de contexto que el propio título, el modelo
+    // no tenía de dónde sacar algo distinto y terminaba simplemente parafraseándolo (queja de
+    // Juan: "a veces dice como lo mismo que dice el título"). La mayoría de RSS sí traen un
+    // párrafo corto acá, es la bajada/entradilla real de la nota - se le pasa de insumo para que
+    // el resumen pueda decir algo que el título no dice.
+    const descMatch = block.match(/<description\b[^>]*>([\s\S]*?)<\/description>/i)
+      || block.match(/<content:encoded\b[^>]*>([\s\S]*?)<\/content:encoded>/i);
     if (!titleMatch) continue;
     const title = decodeEntities(stripTags(stripCdata(titleMatch[1])));
     let link = linkMatch ? decodeEntities(stripTags(stripCdata(linkMatch[1]))) : '';
@@ -103,11 +112,15 @@ function parseRssItems(xml, source) {
     }
     const dateStr = dateMatch ? stripTags(stripCdata(dateMatch[1])) : '';
     const publishedAt = dateStr ? Date.parse(dateStr) : NaN;
+    // recortada a 500 caracteres - de sobra para darle contexto al modelo sin gastar tokens de
+    // más (algunos feeds, sobre todo content:encoded, traen el articulo casi completo)
+    const description = descMatch ? decodeEntities(stripTags(stripCdata(descMatch[1]))).slice(0, 500) : '';
     if (!title || !link) continue;
     items.push({
       title,
       link,
       source,
+      description,
       publishedAt: isNaN(publishedAt) ? null : publishedAt,
     });
   }
@@ -174,14 +187,18 @@ async function traduceTitulo(texto, env, debug) {
 // Se le pide al modelo que responda en un formato fijo de dos líneas (no JSON) porque es más
 // fácil de leer con una expresión regular sin que un modelo de lenguaje "invente" un JSON mal
 // formado y rompa el parseo.
-async function analizaTitulo(tituloOriginalIngles, env, debug) {
+async function analizaTitulo(tituloOriginalIngles, descripcionOriginalIngles, env, debug) {
   const vacio = { resumen: null, sentimiento: null };
   try {
+    // la bajada/entradilla real de la noticia (cuando el feed la trae) se le pasa aparte del
+    // título, como contexto - sin esto el modelo solo tenía el título para trabajar y el
+    // "resumen" terminaba siendo casi el mismo título parafraseado, sin aportar nada nuevo
+    const contexto = descripcionOriginalIngles ? '\nBajada de la noticia (más contexto, en inglés): "' + descripcionOriginalIngles + '"\n' : '';
     const prompt = 'Eres un analista que explica noticias de cripto y economía a principiantes, en español.\n' +
-      'Para la siguiente noticia (el título viene en inglés), responde EXACTAMENTE en este formato, sin nada antes ni después:\n' +
+      'Para la siguiente noticia (viene en inglés), responde EXACTAMENTE en este formato, sin nada antes ni después:\n' +
       'SENTIMIENTO: alcista, bajista o neutral\n' +
-      'RESUMEN: una frase corta en español (máximo 20 palabras) explicando por qué le podría importar a alguien que invierte en cripto\n\n' +
-      'Noticia: "' + tituloOriginalIngles + '"';
+      'RESUMEN: una frase corta en español (máximo 20 palabras) que agregue contexto o explique por qué le podría importar a alguien que invierte en cripto - NUNCA repitas ni parafrasees el título, di algo que el título no dice (el motivo, el dato detrás, la consecuencia)\n\n' +
+      'Título: "' + tituloOriginalIngles + '"' + contexto;
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 120,
@@ -302,9 +319,12 @@ export default {
       const dbg = (debugWanted && idx === 0) ? debugInfo : null;
       const [titulo, analisis] = await Promise.all([
         traduceTitulo(it.title, env, dbg),
-        analizaTitulo(it.title, env, dbg),
+        analizaTitulo(it.title, it.description, env, dbg),
       ]);
-      return { ...it, title: titulo, resumen: analisis.resumen, sentimiento: analisis.sentimiento };
+      // description solo era insumo para analizaTitulo (el "resumen" que sí se manda ya la
+      // reemplaza) - no hace falta mandarla también cruda al sitio
+      const { description, ...rest } = it;
+      return { ...rest, title: titulo, resumen: analisis.resumen, sentimiento: analisis.sentimiento };
     }));
 
     const body = JSON.stringify({ items, checkedAt: Date.now(), ...(debugWanted ? { debug: debugInfo } : {}) });
