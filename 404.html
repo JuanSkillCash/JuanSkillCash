@@ -129,7 +129,18 @@
   --icon-stroke:1.6;
   --skc-marca-de-agua:'tiburon-skillcash-2026';
 }
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  /* la barra de desplazamiento de la página (cuando el contenido es más alto que la pantalla,
+     ej. Mi Arrecife con varios widgets) venía con el estilo blanco/brillante por defecto del
+     navegador - Juan: "que sea más sutil, como tipo la del menú de hamburguesa". Mismo estilo
+     ya usado en .sidebar (ver más abajo), aplicado aquí a la página completa */
+  scrollbar-width:thin;scrollbar-color:rgba(91,141,239,.35) transparent;
+}
+html::-webkit-scrollbar{width:4px}
+html::-webkit-scrollbar-track{background:transparent}
+html::-webkit-scrollbar-thumb{background:rgba(91,141,239,.35);border-radius:4px}
+html::-webkit-scrollbar-thumb:hover{background:rgba(91,141,239,.55)}
 body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;min-height:100vh}
 body::after{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.045;mix-blend-mode:overlay;
@@ -1510,7 +1521,11 @@ button{font-family:inherit;color:inherit}
 .arrecife-widget-remove{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1px solid var(--border2);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .15s,border-color .15s}
 .arrecife-widget-remove:hover{color:var(--red);border-color:var(--red)}
 .arrecife-widget-remove svg{width:13px;height:13px}
-.arrecife-widget-body{flex:1;overflow:auto;padding:12px;min-height:0}
+.arrecife-widget-body{flex:1;overflow:auto;padding:12px;min-height:0;scrollbar-width:thin;scrollbar-color:rgba(91,141,239,.35) transparent}
+.arrecife-widget-body::-webkit-scrollbar{width:4px}
+.arrecife-widget-body::-webkit-scrollbar-track{background:transparent}
+.arrecife-widget-body::-webkit-scrollbar-thumb{background:rgba(91,141,239,.35);border-radius:4px}
+.arrecife-widget-body::-webkit-scrollbar-thumb:hover{background:rgba(91,141,239,.55)}
 /* la marca/branding y el título grande de SkillCash dentro de un panel de indicador o
    calculadora no tienen sentido repetidos en una tarjeta chica que ya tiene su propio título
    en la cabecera del widget (.arrecife-widget-head) - se ocultan solo aca adentro, en su
