@@ -1518,6 +1518,20 @@ button{font-family:inherit;color:inherit}
 .arrecife-widget-body .calc-head{display:none}
 .arrecife-widget-body .modal-close{display:none}
 .arrecife-widget-body .indic-chart-card,.arrecife-widget-body .calc{padding:0;border:none;background:none;box-shadow:none}
+/* .chart-breakout (todos los gráficos) usa margin negativo para "salirse" del padding de
+   .calc/.indic-chart-card y pegar contra el borde de la tarjeta grande normal - aquí arriba
+   ese padding ya se puso en 0, así que el margen negativo ya no tiene nada que cancelar: sin
+   este reseteo el gráfico se salía por fuera del propio cuerpo del widget (overflow:auto lo
+   mostraba como una barra de scroll horizontal, y la parte visible se veía "a la mitad") */
+.arrecife-widget-body .chart-breakout{margin:0;padding:0}
+/* .calc-body (inputs a la izquierda, resultados a la derecha) solo cambia a una sola
+   columna por @media(max-width:860px), que mide el ANCHO DE LA VENTANA, no el del widget -
+   en un monitor ancho con un widget angosto esa columna de 300px fijos nunca cede y el
+   contenido se desborda (barra de scroll horizontal). Dentro del dashboard se fuerza una sola
+   columna siempre, sin importar qué tan grande se haga el widget: así nunca hace falta
+   scroll horizontal y toda la información es visible apilada verticalmente (el cuerpo del
+   widget ya tiene overflow:auto para el scroll vertical) */
+.arrecife-widget-body .calc-body{grid-template-columns:1fr}
 .arrecife-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);gap:10px}
 .arrecife-empty-state-icon{font-size:32px}
 .arrecife-empty-state-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
@@ -1587,7 +1601,7 @@ button{font-family:inherit;color:inherit}
 .mode-btn{flex:1;padding:9px;border:1.5px solid transparent;border-radius:8px;background:none;color:var(--muted2);font-weight:700;font-size:13.5px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .mode-btn.active{background:none;border-color:var(--accent);color:var(--white);box-shadow:none}
 
-.calc-body{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+.calc-body{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start}
 .calc-inputs{min-width:0}
 .calc-results{min-width:0}
 .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:start}
@@ -1648,10 +1662,10 @@ button{font-family:inherit;color:inherit}
 .lev-chip.active{background:none;border-color:var(--accent);color:var(--white)}
 
 /* RESULT CARDS */
-.res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 22px;margin:24px 0;padding:18px 0;border-top:1px solid rgba(91,141,239,.3);border-bottom:1px solid rgba(91,141,239,.3)}
-.res-card{background:none;border:none;border-radius:0;padding:0 0 0 12px;text-align:left;position:relative}
+.res-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px 22px;margin:24px 0;padding:18px 0;border-top:1px solid rgba(91,141,239,.3);border-bottom:1px solid rgba(91,141,239,.3)}
+.res-card{background:none;border:none;border-radius:0;padding:0 0 0 12px;text-align:left;position:relative;min-width:0}
 .res-card::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;background:var(--border2)}
-.res-card .r-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.res-card .r-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;overflow-wrap:anywhere}
 .res-card .r-val{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(13px,2.4vw,17px);letter-spacing:-.01em;word-break:normal;overflow-wrap:break-word}
 .res-card.entry .r-val{color:var(--white)}
 .res-card.liq .r-val{color:var(--gold)}
@@ -1665,9 +1679,9 @@ button{font-family:inherit;color:inherit}
 
 /* SUMMARY */
 .summary-title{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:13px}
-.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:22px}
-.sum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);border:1.5px solid var(--accent);border-radius:8px;padding:13px 15px;font-size:13.5px}
-.sum-row .s-label{color:var(--muted2)}
+.summary-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px;margin-bottom:22px}
+.sum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);border:1.5px solid var(--accent);border-radius:8px;padding:13px 15px;font-size:13.5px;min-width:0}
+.sum-row .s-label{color:var(--muted2);min-width:0;overflow-wrap:anywhere}
 .sum-row .s-val{font-weight:700;font-family:'Space Mono',monospace;font-size:13px}
 .sum-row .s-val.pos{color:var(--green)}
 .sum-row .s-val.neg{color:var(--red)}
@@ -25426,7 +25440,13 @@ function renderDomChart(key){
   const pad = (maxV - minV) * 0.12 || 1;
   const yMin = Math.max(0, minV - pad), yMax = maxV + pad;
 
-  const isMobileChart = window.innerWidth <= 640;
+  // mide el ancho real del contenedor (el <div class="calc"> que envuelve el gráfico) en vez
+  // del ancho de TODA la ventana - así un widget angosto del dashboard de Mi Arrecife usa el
+  // layout compacto aunque la ventana sea ancha, y uno ancho usa el layout normal aunque la
+  // ventana sea angosta. Fuera del dashboard .calc ya ocupa casi todo el ancho del modal/panel
+  // (que a su vez sigue el ancho de la ventana), así que el comportamiento normal no cambia.
+  const chartContainerWidth = (wrap && wrap.parentElement && wrap.parentElement.clientWidth) || window.innerWidth;
+  const isMobileChart = chartContainerWidth <= 640;
   const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
