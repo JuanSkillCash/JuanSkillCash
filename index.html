@@ -5297,6 +5297,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       if(retryBtn) retryBtn.addEventListener('click', function(){ cargado = false; cargar(); });
 
+      // Mi Arrecife (dashboard) mueve .events-card a otra parte del DOM, pero el
+      // IntersectionObserver de abajo sigue vigilando ESTA sección en su ubicación original -
+      // que ahí nunca "entre en pantalla" (está dentro de otra categoría, oculta) no debe dejar
+      // el calendario cargando para siempre dentro del widget. ensureEventsCalendarLoaded() es
+      // la manera de forzar la carga sin depender de ese observer - cargado ya evita pedir dos
+      // veces si el observer normal también llega a disparar.
+      window.ensureEventsCalendarLoaded = cargar;
+
       // igual que antes con el iframe: no se pide nada hasta que la sección esté por entrar en
       // pantalla de verdad (rootMargin 200px), para no gastar la llamada al Worker en una visita
       // que ni siquiera llega a desplazarse hasta acá
@@ -5378,6 +5386,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           .then(function(data){ renderNews(listEl, data.items); })
           .catch(function(){ listEl.innerHTML = newsEmptyHtml(); });
       }
+      // mismo motivo que ensureEventsCalendarLoaded (ver más arriba, calendario económico): Mi
+      // Arrecife mueve cada .events-card a otra parte del DOM, y el IntersectionObserver de abajo
+      // sigue vigilando #eventsNewsBlock en su ubicación original, que ahí nunca entra en
+      // pantalla - esta función fuerza la carga de una categoría puntual sin depender de ese
+      // observer (loaded[category] ya evita pedir dos veces).
+      window.ensureEventsNewsLoaded = loadCategory;
 
       var section = document.getElementById('eventsNewsBlock');
       if(!section || typeof IntersectionObserver === 'undefined'){
@@ -30937,12 +30951,18 @@ async function awardColmillos(eventType, periodKey, amount){
     },
     'w-news-cripto': {
       id:'w-news-cripto', label:'Noticias — Mercado cripto', family:'news',
-      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsNewsCrypto'); return list ? list.closest('.events-card') : null; }),
+      // el fetch real de esta categoría solo arranca cuando #eventsNewsBlock (su ubicación
+      // original, NO lo que se mueve aquí) entra en pantalla - como ese contenedor se queda
+      // vacío y oculto en otra categoría mientras el widget vive en el dashboard, nunca pasaría
+      // eso solo - ensureEventsNewsLoaded fuerza la carga de "crypto" sin depender de eso
+      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsNewsCrypto'); return list ? list.closest('.events-card') : null; }, () => { if(typeof window.ensureEventsNewsLoaded === 'function') window.ensureEventsNewsLoaded('crypto'); }),
       unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsNewsCrypto') ? document.getElementById('eventsNewsCrypto').closest('.events-card') : null),
     },
     'w-calendario': {
       id:'w-calendario', label:'Calendario Económico', family:'calendar',
-      mount: arrecifeMountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }),
+      // mismo motivo que w-news-cripto: #eventsCalendarBlock (no lo que se mueve) es lo que
+      // vigila el IntersectionObserver real, así que se fuerza la carga aparte
+      mount: arrecifeMountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }, () => { if(typeof window.ensureEventsCalendarLoaded === 'function') window.ensureEventsCalendarLoaded(); }),
       unmount: arrecifeUnmountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }),
     },
     'w-youtube-live': {
@@ -30962,6 +30982,11 @@ async function awardColmillos(eventType, periodKey, amount){
   let arrecifeSaveTimer = null;
   let arrecifeMountedIds = new Set();
   let arrecifeSuppressSave = false; // true mientras se está CARGANDO un layout guardado, para no re-guardarlo de inmediato como si el usuario lo hubiera movido
+  // última versión conocida del layout (ya sanitizada) - se actualiza al cargar y al guardar.
+  // Sirve para reconstruir el panel al RE-entrar a Mi Arrecife en la misma sesión sin volver a
+  // pedirle nada a Supabase: salir de la categoría desarma la grilla entera
+  // (unmountAllArrecifeWidgets), así que sin esto el panel se quedaba vacío la segunda vez.
+  let arrecifeLastKnownLayout = [];
 
   function arrecifeLoadAssets(){
     if(arrecifeAssetsLoaded) return Promise.resolve();
@@ -31046,6 +31071,20 @@ async function awardColmillos(eventType, periodKey, amount){
   // una herramienta "atrapada" en un widget fantasma si algo sale mal al reconstruir después.
   function unmountAllArrecifeWidgets(){
     if(!arrecifeMountedIds.size) return;
+    // BUG real que reportó Juan: salir de Mi Arrecife borraba el panel guardado. Causa: esta
+    // función desarma la grilla (abajo), gridstack dispara su evento 'removed' por cada widget,
+    // y ese evento está enganchado a arrecifeScheduleSave - sin este freno, 800ms después se
+    // guardaba un layout VACÍO (arrecifeMountedIds ya está limpio) encima del que el usuario sí
+    // quería conservar. Si además había un guardado pendiente SIN disparar todavía (ej. el
+    // usuario agregó un widget y salió antes de los 800ms), hay que guardarlo YA, con los
+    // widgets tal como están ahora mismo, antes de tocar nada - si solo se cancelara ese
+    // guardado pendiente, lo que el usuario acababa de agregar nunca llegaría a guardarse.
+    if(arrecifeSaveTimer){
+      clearTimeout(arrecifeSaveTimer);
+      arrecifeSaveTimer = null;
+      arrecifeSaveLayoutNow();
+    }
+    arrecifeSuppressSave = true;
     Array.from(arrecifeMountedIds).forEach(widgetId => {
       const def = WIDGET_REGISTRY[widgetId];
       if(!def) return;
@@ -31057,6 +31096,7 @@ async function awardColmillos(eventType, periodKey, amount){
       try{ arrecifeGrid.removeAll(true); } catch(err){ /* ya pudo haber sido destruida */ }
     }
     arrecifeUpdateEmptyState();
+    arrecifeSuppressSave = false;
   }
   window.unmountAllArrecifeWidgets = unmountAllArrecifeWidgets;
 
@@ -31085,6 +31125,7 @@ async function awardColmillos(eventType, periodKey, amount){
 
   function arrecifeSaveLayoutNow(){
     const layout = arrecifeBuildLayoutArray();
+    arrecifeLastKnownLayout = layout;
     try{ localStorage.setItem(ARRECIFE_LS_KEY, JSON.stringify(layout)); } catch(err){ /* privado/lleno - no es critico */ }
     if(!currentUser || typeof sbClient === 'undefined') return;
     sbClient.from('user_dashboards').upsert({
@@ -31117,7 +31158,9 @@ async function awardColmillos(eventType, periodKey, amount){
 
   function arrecifeApplyLayout(layout){
     arrecifeSuppressSave = true;
-    arrecifeSanitizeLayout(layout).forEach(item => {
+    const sanitized = arrecifeSanitizeLayout(layout);
+    arrecifeLastKnownLayout = sanitized;
+    sanitized.forEach(item => {
       arrecifeAddWidgetToGrid(item.id, { x:item.x, y:item.y, w:item.w, h:item.h });
     });
     // deja que gridstack termine de acomodar antes de volver a permitir guardar - si no, el
@@ -31256,6 +31299,12 @@ async function awardColmillos(eventType, periodKey, amount){
       if(!arrecifeInitStarted){
         arrecifeInitStarted = true;
         arrecifeLoadLayout();
+      } else if(!arrecifeMountedIds.size && arrecifeLastKnownLayout.length){
+        // segunda vez (o más) que se entra a Mi Arrecife EN ESTA MISMA SESIÓN: ya se cargó el
+        // layout una vez, pero salir de la categoría desarma la grilla entera
+        // (unmountAllArrecifeWidgets) - hay que reconstruirla con lo último que se sabe, sin
+        // volver a pedirle nada a Supabase (eso sí sería ineficiente, no un bug, pero innecesario)
+        arrecifeApplyLayout(arrecifeLastKnownLayout);
       }
       arrecifeUpdateEmptyState();
     }).catch(err => console.error('[Mi Arrecife] no se pudo cargar gridstack', err));
