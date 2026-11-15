@@ -20334,6 +20334,20 @@ let halvingBtcHistory = null; // [{t: ms, c: precio}] histórico diario completo
 let halvingLoadFailed = false;
 let halvingHistoryInFlight = null;
 
+// último respaldo de fetchHalvingHistory() si Coin Metrics Y blockchain.info fallan los dos (raro,
+// pero posible) - mismo patrón que el respaldo de CoinGecko ya usado en Bandas Log de ETH
+// (fetchEthLogRegHistory, arriba): solo ~364 días (límite del plan gratis), mejor que nada. Esta
+// función se llamaba sin existir - bug real, nunca se notaba porque el llamador la envuelve en
+// try/catch en el camino feliz (cuando SÍ hay historial completo) y solo faltaba manejar el caso
+// de "ningún historial en absoluto", que casi nunca ocurre - hasta que un widget de Mi Arrecife
+// (OTHERS/BTC) lo disparó con la red bloqueada en un entorno de pruebas y salió
+// "fetchBtcPriceHistory is not defined" en vez de un error normal de "sin conexión".
+async function fetchBtcPriceHistory(){
+  const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily'));
+  const json = await res.json();
+  return (json.prices || []).filter(p => p[1] > 0);
+}
+
 // Coin Metrics (misma fuente ya usada en Pulso de Fondo) es la fuente principal: gratis, sin
 // registro, y en la práctica más estable que blockchain.info para este mismo historial diario de
 // BTC. Si falla, se reintenta con blockchain.info (histórico completo desde 2009, gratis, sin
