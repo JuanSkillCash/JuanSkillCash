@@ -31058,6 +31058,110 @@ async function awardColmillos(eventType, periodKey, amount){
       mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="netliquidity"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('netliquidity'); }),
       unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="netliquidity"]')),
     },
+    // ---- Fase 2 (lote 1): los 20 gráficos restantes que comparten el mismo patrón
+    // renderDomChart/DOM_CHART_DEFS que dombtc/m2supply/vixindex/netliquidity de arriba (ver
+    // docs/arrecife-widget-inventario.md, sección 1) - mismo mount/unmount genérico, cada uno
+    // con su propio ensureXLoaded ya existente (nunca se reimplementa el fetch) ----
+    'w-domratio': {
+      id:'w-domratio', label:'Rotación ETH.D/BTC.D', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="domratio"]'), () => { if(typeof ensureDomRatioLoaded === 'function') ensureDomRatioLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="domratio"]')),
+    },
+    'w-domall': {
+      id:'w-domall', label:'Descompresión Cripto', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="domall"]'), () => { if(typeof ensureDomAllLoaded === 'function') ensureDomAllLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="domall"]')),
+    },
+    'w-domusdt': {
+      id:'w-domusdt', label:'Dominancia USDT', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="domusdt"]'), () => { if(typeof ensureDomUsdtLoaded === 'function') ensureDomUsdtLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="domusdt"]')),
+    },
+    'w-othersbtc': {
+      id:'w-othersbtc', label:'OTHERS/BTC', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="othersbtc"]'), () => { if(typeof ensureOthersBtcLoaded === 'function') ensureOthersBtcLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="othersbtc"]')),
+    },
+    'w-ethpmi': {
+      id:'w-ethpmi', label:'ETH + PMI Manufacturero', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethpmi"]'), () => { if(typeof ensureEthPmiLoaded === 'function') ensureEthPmiLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethpmi"]')),
+    },
+    'w-ethbtc': {
+      id:'w-ethbtc', label:'ETH/BTC', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethbtc"]'), () => { if(typeof ensureEthBtcLoaded === 'function') ensureEthBtcLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethbtc"]')),
+    },
+    'w-altfever': {
+      id:'w-altfever', label:'Euforia de Altcoins', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="altfever"]'), () => { if(typeof ensureAltFeverLoaded === 'function') ensureAltFeverLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="altfever"]')),
+    },
+    'w-ethvsalt': {
+      id:'w-ethvsalt', label:'ETH vs Altcoins', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethvsalt"]'), () => { if(typeof ensureEthVsAltLoaded === 'function') ensureEthVsAltLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethvsalt"]')),
+    },
+    'w-dxy': {
+      id:'w-dxy', label:'Índice del Dólar (DXY)', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="dxy"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('dxy'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="dxy"]')),
+    },
+    'w-pmius': {
+      id:'w-pmius', label:'PMI Manufacturero', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="pmius"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('pmius'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="pmius"]')),
+    },
+    'w-payrolls': {
+      id:'w-payrolls', label:'Nómina No Agrícola', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="payrolls"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('payrolls'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="payrolls"]')),
+    },
+    'w-unrate': {
+      id:'w-unrate', label:'Tasa de Desempleo', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="unrate"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('unrate'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="unrate"]')),
+    },
+    'w-icsa': {
+      id:'w-icsa', label:'Solicitudes Semanales de Desempleo', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="icsa"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('icsa'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="icsa"]')),
+    },
+    'w-cpi': {
+      id:'w-cpi', label:'Inflación CPI', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="cpi"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('cpi'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="cpi"]')),
+    },
+    'w-cpiyoy': {
+      id:'w-cpiyoy', label:'Inflación Interanual (CPI YoY)', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="cpiyoy"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('cpiyoy'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="cpiyoy"]')),
+    },
+    'w-pce': {
+      id:'w-pce', label:'PCE', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="pce"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('pce'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="pce"]')),
+    },
+    'w-ppi': {
+      id:'w-ppi', label:'PPI', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ppi"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('ppi'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ppi"]')),
+    },
+    'w-fedfundsrate': {
+      id:'w-fedfundsrate', label:'Tasa de la Fed', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedfundsrate"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('fedfundsrate'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedfundsrate"]')),
+    },
+    'w-gdpgrowth': {
+      id:'w-gdpgrowth', label:'PIB (Crecimiento Real)', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="gdpgrowth"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('gdpgrowth'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="gdpgrowth"]')),
+    },
+    'w-fedbalance': {
+      id:'w-fedbalance', label:'Balance de la Fed', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedbalance"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('fedbalance'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedbalance"]')),
+    },
     'w-calc-futuros': {
       id:'w-calc-futuros', label:'Calculadora de Futuros', family:'calc',
       mount: arrecifeMountModalWidget('calcModal', () => { if(typeof setFuturesMode === 'function') setFuturesMode('usdtm'); }),
@@ -31379,6 +31483,26 @@ async function awardColmillos(eventType, periodKey, amount){
     'w-m2supply': () => { if(typeof renderDomChart === 'function') renderDomChart('m2supply'); },
     'w-vixindex': () => { if(typeof renderDomChart === 'function') renderDomChart('vixindex'); },
     'w-netliquidity': () => { if(typeof renderDomChart === 'function') renderDomChart('netliquidity'); },
+    'w-domratio': () => { if(typeof renderDomChart === 'function') renderDomChart('domratio'); },
+    'w-domall': () => { if(typeof renderDomChart === 'function') renderDomChart('domall'); },
+    'w-domusdt': () => { if(typeof renderDomChart === 'function') renderDomChart('domusdt'); },
+    'w-othersbtc': () => { if(typeof renderDomChart === 'function') renderDomChart('othersbtc'); },
+    'w-ethpmi': () => { if(typeof renderDomChart === 'function') renderDomChart('ethpmi'); },
+    'w-ethbtc': () => { if(typeof renderDomChart === 'function') renderDomChart('ethbtc'); },
+    'w-altfever': () => { if(typeof renderDomChart === 'function') renderDomChart('altfever'); },
+    'w-ethvsalt': () => { if(typeof renderDomChart === 'function') renderDomChart('ethvsalt'); },
+    'w-dxy': () => { if(typeof renderDomChart === 'function') renderDomChart('dxy'); },
+    'w-pmius': () => { if(typeof renderDomChart === 'function') renderDomChart('pmius'); },
+    'w-payrolls': () => { if(typeof renderDomChart === 'function') renderDomChart('payrolls'); },
+    'w-unrate': () => { if(typeof renderDomChart === 'function') renderDomChart('unrate'); },
+    'w-icsa': () => { if(typeof renderDomChart === 'function') renderDomChart('icsa'); },
+    'w-cpi': () => { if(typeof renderDomChart === 'function') renderDomChart('cpi'); },
+    'w-cpiyoy': () => { if(typeof renderDomChart === 'function') renderDomChart('cpiyoy'); },
+    'w-pce': () => { if(typeof renderDomChart === 'function') renderDomChart('pce'); },
+    'w-ppi': () => { if(typeof renderDomChart === 'function') renderDomChart('ppi'); },
+    'w-fedfundsrate': () => { if(typeof renderDomChart === 'function') renderDomChart('fedfundsrate'); },
+    'w-gdpgrowth': () => { if(typeof renderDomChart === 'function') renderDomChart('gdpgrowth'); },
+    'w-fedbalance': () => { if(typeof renderDomChart === 'function') renderDomChart('fedbalance'); },
   };
   let arrecifeResizeTimer = null;
   function arrecifeOnWidgetResizeStop(el){
