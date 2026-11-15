@@ -1562,6 +1562,15 @@ button{font-family:inherit;color:inherit}
    scroll horizontal y toda la información es visible apilada verticalmente (el cuerpo del
    widget ya tiene overflow:auto para el scroll vertical) */
 .arrecife-widget-body .calc-body{grid-template-columns:1fr}
+/* el número "dato real de hoy" (ej. Dominancia BTC) lleva un font-size:32px fijo por inline
+   style (ver renderDomLiveStat) - a propósito más grande que sus dos tarjetas vecinas, que usan
+   clamp(13px,2.4vw,17px) y sí se achican con el ancho. Fuera del dashboard ese salto de tamaño
+   se nota poco porque la tarjeta tiene mucho más aire alrededor; adentro de un widget angosto
+   queda enorme al lado de sus vecinas (Juan, captura real con círculo: "se ve muchísimo más
+   grande ese número"). Se unifica a un clamp propio (haciendo falta !important para ganarle al
+   inline style) consistente con el de sus vecinas, solo dentro del dashboard - fuera de Mi
+   Arrecife el 32px fijo original se queda igual que siempre */
+.arrecife-widget-body .res-card .r-val{font-size:clamp(14px,2.4vw,18px)!important}
 .arrecife-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);gap:10px}
 .arrecife-empty-state-icon{font-size:32px}
 .arrecife-empty-state-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
