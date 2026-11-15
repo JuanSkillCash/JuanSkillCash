@@ -54,7 +54,6 @@ const CACHE_SECONDS_DEFAULT = 900;
 const CACHE_SECONDS_NEAR_EVENT = 60;
 const NEAR_EVENT_WINDOW_MS = 30 * 60 * 1000; // [hora del evento, hora del evento + 30 min]
 const MAX_RANGE_DAYS = 31;
-const BOGOTA_OFFSET_MS = 5 * 60 * 60 * 1000; // America/Bogota = UTC-5, sin horario de verano
 const FETCH_TIMEOUT_MS = 8000;
 const FF_KV_KEY = 'ff_cache_semana';
 const FF_STALE_AFTER_MS = 70 * 60 * 1000; // el cron corre cada 30 min - más de 70 min sin refrescar = algo falló
@@ -186,20 +185,6 @@ function hashCorto(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
   return (h >>> 0).toString(36);
-}
-
-function semanaActualBogotaUtc(ahora) {
-  const bogotaAhora = new Date(ahora.getTime() - BOGOTA_OFFSET_MS);
-  const diaSemana = bogotaAhora.getUTCDay();
-  const diasDesdeLunes = (diaSemana + 6) % 7;
-  const lunesBogota = Date.UTC(
-    bogotaAhora.getUTCFullYear(), bogotaAhora.getUTCMonth(), bogotaAhora.getUTCDate() - diasDesdeLunes, 0, 0, 0
-  );
-  const domingoBogota = lunesBogota + 7 * 24 * 60 * 60 * 1000 - 1;
-  return {
-    desdeUtc: new Date(lunesBogota + BOGOTA_OFFSET_MS),
-    hastaUtc: new Date(domingoBogota + BOGOTA_OFFSET_MS),
-  };
 }
 
 function fetchConTimeout(url, opts, ms) {
@@ -482,7 +467,16 @@ export default {
     if (cached) return cached;
 
     const ahora = new Date();
-    let desdeUtc, hastaUtc;
+    // sin "desde"/"hasta" (filtro "Esta semana" del frontend) NO se calcula una semana propia
+    // (lunes-domingo en Bogotá) para filtrar - se descubrió en vivo (15-nov-2026, domingo, Juan:
+    // "el calendario ya no sirve") que ff_calendar_thisweek.json de Forex Factory YA "rueda" a la
+    // semana siguiente desde el fin de semana (su propio corte de "semana actual" no es
+    // lunes-domingo Bogotá), así que nuestra semana calculada (9-15 nov) no coincidía con la
+    // semana real que traía el feed (16-22 nov) y el filtro dejaba CERO eventos pasando, todos
+    // los fines de semana, sin que Forex Factory ni el cron fallaran en lo absoluto. Mejor
+    // confiar en el corte de semana que YA trae el propio feed (para eso existe
+    // "thisweek.json") en vez de recalcularlo nosotros con una definición distinta.
+    let desdeUtc = null, hastaUtc = null;
     const desdeParam = url.searchParams.get('desde');
     const hastaParam = url.searchParams.get('hasta');
     if (desdeParam && hastaParam) {
@@ -499,10 +493,6 @@ export default {
           status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
         });
       }
-    } else {
-      const semana = semanaActualBogotaUtc(ahora);
-      desdeUtc = semana.desdeUtc;
-      hastaUtc = semana.hastaUtc;
     }
 
     const paisesParam = url.searchParams.get('paises');
@@ -539,10 +529,14 @@ export default {
     }
     if (debugInfo) debugInfo.ff = { actualizado: ffCache.actualizado, eventos: ffCache.eventos.length, desactualizado: ffDesactualizado };
 
-    // 2) filtra por rango de fechas y países pedidos
+    // 2) filtra por rango de fechas (si se pidió uno explícito) y países pedidos - sin
+    // "desde"/"hasta" (desdeUtc/hastaUtc quedan null) no se filtra por fecha en absoluto, se
+    // confía en el corte de semana que ya trae el propio ff_calendar_thisweek.json
     const filtrados = ffCache.eventos.filter((e) => {
       const t = Date.parse(e.fechaUTC);
-      if (Number.isNaN(t) || t < desdeUtc.getTime() || t > hastaUtc.getTime()) return false;
+      if (Number.isNaN(t)) return false;
+      if (desdeUtc && t < desdeUtc.getTime()) return false;
+      if (hastaUtc && t > hastaUtc.getTime()) return false;
       return divisasPermitidas.has(e.divisa);
     });
 
