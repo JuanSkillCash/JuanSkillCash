@@ -31394,6 +31394,11 @@ async function awardColmillos(eventType, periodKey, amount){
         arrecifeGrid = GridStack.init({
           column: 12, cellHeight: 80, margin: 8, float: false,
           handle: '.arrecife-widget-head', alwaysShowResizeHandle: true,
+          // por defecto gridstack SOLO crea el tirador "se" (resizable.handles:"se" es su
+          // default real) - el CSS de abajo (.ui-resizable-nw/ne/se/sw) pinta 4 esquinas, pero
+          // sin esto nw/ne/sw nunca existen en el DOM para pintarse: solo se veía uno (Juan,
+          // con capturas reales: "sigue sin verse las flechas para agrandar las cosas")
+          resizable: { handles: 'nw, ne, sw, se' },
           columnOpts: { breakpoints: [{ w: 768, c: 1 }] },
         }, host);
         arrecifeGrid.on('added removed change', arrecifeScheduleSave);
