@@ -4546,6 +4546,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="cal-filter-group" role="group" aria-label="Rango de fechas">
               <button type="button" class="cal-filter-btn active" data-cal-range="semana">Esta semana</button>
               <button type="button" class="cal-filter-btn" data-cal-range="hoy">Hoy</button>
+              <button type="button" class="cal-filter-btn" data-cal-range="siguiente">Siguiente semana</button>
             </div>
           </div>
           <div class="cal-banner" id="calBanner" style="display:none"></div>
@@ -5196,6 +5197,23 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         var y = b.getUTCFullYear(), m = String(b.getUTCMonth() + 1).padStart(2, '0'), d = String(b.getUTCDate()).padStart(2, '0');
         return y + '-' + m + '-' + d;
       }
+      // Juan: "el jueves, el viernes, yo no podía ver cuáles eran los eventos de la siguiente
+      // semana" - el filtro "Esta semana" depende de lo que trae Forex Factory, que NO siempre
+      // tiene ya la semana que viene (según el día, puede no haber rodado todavía) - este botón
+      // pide explícitamente lunes-domingo de la semana que viene (Bogotá), para no depender de
+      // adivinar qué semana decidió mostrar Forex Factory por su cuenta. Si para esos días
+      // Forex Factory en verdad todavía no publicó nada (antes de que su propio feed ruede),
+      // el calendario simplemente queda vacío para ese rango - no hay manera de inventar datos
+      // que la fuente real todavía no tiene.
+      function rangoSiguienteSemanaBogota(){
+        var b = new Date(Date.now() - 5 * 3600 * 1000);
+        var diaSemana = b.getUTCDay(); // 0=domingo...6=sábado
+        var diasHastaProximoLunes = ((8 - diaSemana) % 7) || 7;
+        var lunes = new Date(Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate() + diasHastaProximoLunes));
+        var domingo = new Date(Date.UTC(lunes.getUTCFullYear(), lunes.getUTCMonth(), lunes.getUTCDate() + 6));
+        function fmt(d){ return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
+        return { desde: fmt(lunes), hasta: fmt(domingo) };
+      }
       function horaBogota(fechaUTC){
         try { return new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(fechaUTC)); }
         catch(e){ return '--:--'; }
@@ -5328,6 +5346,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           var hoy = fechaBogotaHoyStr();
           params.set('desde', hoy);
           params.set('hasta', hoy);
+        } else if(filtros.rango === 'siguiente'){
+          var siguiente = rangoSiguienteSemanaBogota();
+          params.set('desde', siguiente.desde);
+          params.set('hasta', siguiente.hasta);
         }
         params.set('paises', 'US,EU');
         var qs = params.toString();
