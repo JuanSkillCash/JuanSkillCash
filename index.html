@@ -1524,6 +1524,36 @@ button{font-family:inherit;color:inherit}
    este reseteo el gráfico se salía por fuera del propio cuerpo del widget (overflow:auto lo
    mostraba como una barra de scroll horizontal, y la parte visible se veía "a la mitad") */
 .arrecife-widget-body .chart-breakout{margin:0;padding:0}
+/* Para que un gráfico (familia "chart") use la altura REAL que le sobra dentro del widget
+   después del filtro de rango/leyenda/stats/disclaimer, en vez de un alto fijo que o se
+   corta (scroll vertical dentro del gráfico) o deja un hueco vacío: .indic-panel (el nodo que
+   se reparenta completo) y su interior se vuelven una columna flex del alto exacto del
+   widget, y el propio wrap del gráfico (.chart-breakout dentro de .indic-chart-body) es el
+   que crece (flex:1) para absorber lo que sobra - el resto de hermanos (filtro de rango,
+   leyenda, stats, disclaimer) conservan su alto natural. renderDomChart lee ese alto real
+   (wrap.clientHeight) para calcular totalH en la misma proporción. Fuera del dashboard esto
+   no aplica (no hay .arrecife-widget-body ancestro), cero cambio ahí. */
+.arrecife-widget-body .indic-panel{display:flex;flex-direction:column;height:100%}
+.arrecife-widget-body .indic-chart-card{display:flex;flex-direction:column;flex:1;min-height:0}
+.arrecife-widget-body .indic-chart-card .calc{display:flex;flex-direction:column;flex:1;min-height:0}
+/* OJO: a propósito SIN min-height:0 aquí (a diferencia de .indic-chart-card/.calc arriba) -
+   .indic-chart-body necesita conservar su tamaño mínimo automático (que toma del min-height de
+   su propio hijo wrap, ver abajo) para que el algoritmo de flex de .calc reserve ese espacio
+   correctamente ANTES de repartir lo que sobra entre el resto de hermanos (filtro de rango,
+   leyenda, stats, disclaimer). Con min-height:0 aquí, .calc podía colapsar este contenedor a 0px
+   exactos y de todos modos "pintar" su contenido desbordado (overflow:visible) MÁS ABAJO de
+   donde deberían estar los hermanos siguientes, en vez de empujarlos - el gráfico terminaba
+   superpuesto encima de la leyenda/stats/disclaimer en vez de simplemente quedar arriba de ellos */
+.arrecife-widget-body .indic-chart-body{flex:1;display:flex;flex-direction:column}
+/* min-height de respaldo: sin esto, cuando el filtro de rango + leyenda + stats + disclaimer
+   de un indicador ya ocupan por sí solos más alto del que tiene el widget (común en el tamaño
+   por defecto, 5 filas/400px, con indicadores que traen disclaimer largo), el gráfico podía
+   quedar reducido a casi nada. Este piso garantiza un gráfico siempre completo y legible; lo
+   que no alcance a verse debajo (leyenda/stats/disclaimer) queda dentro del scroll vertical
+   normal de .arrecife-widget-body, nunca el gráfico mismo cortado ni superpuesto con lo demás. */
+.arrecife-widget-body .indic-chart-body .chart-breakout{flex:1;min-height:200px}
+.arrecife-widget-body .indic-chart-body .indic-chart-soon{flex-shrink:0}
+.arrecife-widget-body .indic-chart-body .date-range-slider{flex-shrink:0}
 /* .calc-body (inputs a la izquierda, resultados a la derecha) solo cambia a una sola
    columna por @media(max-width:860px), que mide el ANCHO DE LA VENTANA, no el del widget -
    en un monitor ancho con un widget angosto esa columna de 300px fijos nunca cede y el
@@ -1548,6 +1578,34 @@ button{font-family:inherit;color:inherit}
 .arrecife-catalog-empty{color:var(--muted2);font-size:13px;text-align:center;padding:20px 0}
 @media(max-width:480px){
   .arrecife-grid-host .grid-stack-item-content{border-radius:12px}
+}
+/* gridstack.js dibuja sus 4 tiradores de esquina con un ícono gris oscuro (#666) de 20px que
+   casi no se nota sobre el fondo oscuro de las tarjetas (queja de Juan: "no se alcanza a ver
+   donde esta la opcion de agrandar y achicar") - se reemplazan por el mismo estilo de ícono de
+   líneas de contorno que usa el resto del sitio (ver CLAUDE.md), más grandes, en azul de
+   acento y con su propio fondito redondeado para que se note incluso encima de un gráfico de
+   colores. !important porque gridstack.min.css se carga como hoja de estilos aparte (de forma
+   perezosa, solo al entrar a Mi Arrecife) y puede insertarse después de este <style>, ganando
+   el empate de especificidad por orden de aparición si no se fuerza aquí. */
+.arrecife-grid-host .ui-resizable-nw,
+.arrecife-grid-host .ui-resizable-ne,
+.arrecife-grid-host .ui-resizable-se,
+.arrecife-grid-host .ui-resizable-sw{
+  width:26px!important;height:26px!important;
+  background-color:rgba(91,141,239,.18)!important;
+  border-radius:8px!important;
+  background-size:14px 14px!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  transform:none!important;
+}
+.arrecife-grid-host .ui-resizable-nw,
+.arrecife-grid-host .ui-resizable-se{
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235b8def" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><polyline points="6,12 6,6 12,6"/><polyline points="18,12 18,18 12,18"/></svg>')!important;
+}
+.arrecife-grid-host .ui-resizable-ne,
+.arrecife-grid-host .ui-resizable-sw{
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235b8def" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><polyline points="12,6 18,6 18,12"/><polyline points="6,12 6,18 12,18"/></svg>')!important;
 }
 
 /* ---- pastillas de navegación dentro de una categoría — solo celular; el menú lateral ya cubre esto en escritorio ---- */
@@ -25447,7 +25505,33 @@ function renderDomChart(key){
   // (que a su vez sigue el ancho de la ventana), así que el comportamiento normal no cambia.
   const chartContainerWidth = (wrap && wrap.parentElement && wrap.parentElement.clientWidth) || window.innerWidth;
   const isMobileChart = chartContainerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const totalW = isMobileChart ? 420 : 1100;
+  // dentro de un widget de Mi Arrecife, .indic-panel/.indic-chart-card/.calc/.indic-chart-body
+  // son ahora una columna flex con la altura real del widget (ver CSS .arrecife-widget-body
+  // .indic-panel y siguientes) y wrap (.chart-breakout) es flex:1 ahí dentro, así que para
+  // cuando esta función corre wrap.clientHeight YA es el alto real que le sobra al gráfico
+  // después del filtro de rango/leyenda/stats/disclaimer. Usar esa altura real (en la MISMA
+  // proporción ancho:alto) para totalH es lo que hace que el viewBox + width:100%;height:auto
+  // del <svg> de abajo termine ocupando exactamente ese espacio sin cortarse ni dejar un hueco
+  // vacío - antes totalH era un valor fijo (380/420) sin relación alguna con el widget, así
+  // que el dibujo quedaba más alto de lo que cabía y se veía cortado con scroll vertical.
+  // Fuera del dashboard wrap no tiene una altura impuesta (crece con su propio contenido), así
+  // que ahí se mantiene el alto fijo de siempre (comportamiento sin cambios).
+  const arrecifeWidgetBodyEl = wrap.closest('.arrecife-widget-body');
+  const dashboardHeightBudget = arrecifeWidgetBodyEl ? wrap.clientHeight : 0;
+  // justo al montar un widget nuevo (catálogo o carga inicial del panel guardado), gridstack
+  // aplica el tamaño final en píxeles del item en su propio frame de animación (rAF) - si el
+  // fetch de datos del indicador falla/resuelve casi al instante (ej. sin conexión), este
+  // primer renderDomChart puede correr ANTES de ese frame, y wrap.clientHeight todavía lee ~0.
+  // En ese caso se dibuja ya mismo con el alto fijo de respaldo (para no dejar el gráfico en
+  // blanco) y se reintenta 2 frames después, cuando el tamaño real del widget ya está aplicado
+  // - de ahí en adelante (resize, cambio de rango) el alto real ya se lee bien a la primera.
+  if(arrecifeWidgetBodyEl && dashboardHeightBudget <= 40){
+    requestAnimationFrame(() => requestAnimationFrame(() => renderDomChart(key)));
+  }
+  const totalH = dashboardHeightBudget > 40
+    ? Math.max(140, Math.min(900, Math.round(totalW * (dashboardHeightBudget / chartContainerWidth))))
+    : (isMobileChart ? 380 : 420);
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -31260,13 +31344,12 @@ async function awardColmillos(eventType, periodKey, amount){
   arrecifeCatalogSearch.addEventListener('input', () => arrecifeRenderCatalog(arrecifeCatalogSearch.value));
 
   // ==================== redibujar gráficos al redimensionar su widget ====================
-  // Limitación real conocida (ver docs/arrecife-widget-inventario.md): renderDomChart calcula
-  // su ancho con window.innerWidth, no con el ancho real del widget - un dashboard angosto en
-  // escritorio no hace que el SVG se dibuje más angosto todavía (eso es trabajo de Fase 3). Lo
-  // que SÍ logra este listener: si la ventana cruza el umbral móvil (640px) mientras el widget
-  // existe, o cambian los datos/rango, el gráfico se vuelve a dibujar en vez de quedarse con el
-  // tamaño viejo - y el overflow:auto del cuerpo del widget evita que un SVG más ancho que la
-  // tarjeta rompa el layout (se puede hacer scroll horizontal dentro del widget).
+  // renderDomChart mide el ancho Y el alto reales del widget (ver chartContainerWidth /
+  // dashboardHeightBudget dentro de esa función), así que lo que falta es solo volver a
+  // llamarla cada vez que el usuario termina de arrastrar el tirador de redimensionar -
+  // mientras no se le avise, el SVG se queda dibujado con el tamaño de cuando se montó.
+  // Las otras ~20 gráficas que NO pasan por renderDomChart/DOM_CHART_DEFS siguen sin ser
+  // conscientes del contenedor (pendiente de Fase 3, ver docs/arrecife-widget-inventario.md).
   const ARRECIFE_CHART_RERENDER = {
     'w-dombtc': () => { if(typeof renderDomChart === 'function') renderDomChart('dombtc'); },
     'w-m2supply': () => { if(typeof renderDomChart === 'function') renderDomChart('m2supply'); },
@@ -31310,7 +31393,7 @@ async function awardColmillos(eventType, periodKey, amount){
         const host = document.getElementById('arrecifeGridHost');
         arrecifeGrid = GridStack.init({
           column: 12, cellHeight: 80, margin: 8, float: false,
-          handle: '.arrecife-widget-head', alwaysShowResizeHandle: 'mobile',
+          handle: '.arrecife-widget-head', alwaysShowResizeHandle: true,
           columnOpts: { breakpoints: [{ w: 768, c: 1 }] },
         }, host);
         arrecifeGrid.on('added removed change', arrecifeScheduleSave);
