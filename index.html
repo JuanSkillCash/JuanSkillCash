@@ -1485,6 +1485,57 @@ button{font-family:inherit;color:inherit}
 .modal-overlay.inline-mode .modal-panel{max-width:none;width:100%;margin:0;opacity:1;transform:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;box-shadow:none}
 .modal-overlay.inline-mode .modal-close{position:absolute;top:14px;right:14px}
 
+/* ===== Mi Arrecife: dashboard personalizable (Fase 1 MVP) =====
+   Reparenta nodos ya existentes del sitio dentro de una grilla gridstack.js - ver
+   docs/arrecife-widget-inventario.md. Los widgets reusan el mismo patrón "inline-mode" de
+   .modal-overlay (arriba) para las calculadoras; la marca SkillCash de los paneles de
+   indicador/calculadora (logo+eyebrow) se oculta DENTRO del widget para no competir con la
+   cabecera propia de cada tarjeta - en su ubicación original (fuera del dashboard) sigue
+   viéndose igual que siempre. */
+.arrecife-auth-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);gap:10px}
+.arrecife-auth-gate-icon{font-size:32px}
+.arrecife-auth-gate-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
+.arrecife-auth-gate-text{font-size:13px;color:var(--muted2);max-width:380px;line-height:1.55}
+.arrecife-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:16px}
+.arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
+.arrecife-add-btn:hover{filter:brightness(1.12)}
+.arrecife-add-btn svg{width:16px;height:16px}
+.arrecife-grid-host{min-height:120px}
+.arrecife-grid-host .grid-stack-item-content{
+  background:var(--grad-caja);border:1px solid rgba(91,141,239,.3);border-radius:14px;
+  display:flex;flex-direction:column;overflow:hidden
+}
+.arrecife-widget-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:move;border-bottom:1px solid rgba(91,141,239,.18);flex-shrink:0}
+.arrecife-widget-head-label{flex:1;font-family:'Poppins',sans-serif;font-weight:700;font-size:12.5px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arrecife-widget-remove{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1px solid var(--border2);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .15s,border-color .15s}
+.arrecife-widget-remove:hover{color:var(--red);border-color:var(--red)}
+.arrecife-widget-remove svg{width:13px;height:13px}
+.arrecife-widget-body{flex:1;overflow:auto;padding:12px;min-height:0}
+/* la marca/branding y el título grande de SkillCash dentro de un panel de indicador o
+   calculadora no tienen sentido repetidos en una tarjeta chica que ya tiene su propio título
+   en la cabecera del widget (.arrecife-widget-head) - se ocultan solo aca adentro, en su
+   ubicación original (fuera del dashboard) ese mismo título se sigue viendo igual que siempre */
+.arrecife-widget-body .calc-head{display:none}
+.arrecife-widget-body .modal-close{display:none}
+.arrecife-widget-body .indic-chart-card,.arrecife-widget-body .calc{padding:0;border:none;background:none;box-shadow:none}
+.arrecife-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);gap:10px}
+.arrecife-empty-state-icon{font-size:32px}
+.arrecife-empty-state-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
+.arrecife-empty-state-text{font-size:13px;color:var(--muted2);max-width:380px;line-height:1.55}
+/* ---- catalogo "Agregar widget" ---- */
+.arrecife-catalog-search{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--white);font-size:13.5px;margin-bottom:14px}
+.arrecife-catalog-group-label{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+.arrecife-catalog-group-label:first-of-type{margin-top:0}
+.arrecife-catalog-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--white);font-size:13.5px;cursor:pointer;transition:background .15s,border-color .15s}
+.arrecife-catalog-item:hover:not(:disabled){background:rgba(91,141,239,.08);border-color:rgba(91,141,239,.3)}
+.arrecife-catalog-item:disabled{opacity:.45;cursor:default}
+.arrecife-catalog-item-label{flex:1}
+.arrecife-catalog-item-added{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.arrecife-catalog-empty{color:var(--muted2);font-size:13px;text-align:center;padding:20px 0}
+@media(max-width:480px){
+  .arrecife-grid-host .grid-stack-item-content{border-radius:12px}
+}
+
 /* ---- pastillas de navegación dentro de una categoría — solo celular; el menú lateral ya cubre esto en escritorio ---- */
 .cat-pill-tabs-wrap{display:none}
 @media(max-width:860px){
@@ -8106,11 +8157,37 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="portafolio">
       <div class="tool-cat-label">🐠 Mi Arrecife</div>
       <div class="section-intro-title">Bienvenido a Mi Arrecife</div>
-      <p class="section-intro-text">Próximamente: tu propio dashboard personalizado — elige qué herramientas, gráficos o noticias de SkillCash quieres ver aquí, y acomódalas al tamaño que prefieras. Las herramientas de inversión que vivían en este espacio se mudaron a su propia categoría, <b>Inversión</b>, donde siguen funcionando igual.</p>
-      <div class="indic-placeholder">
-        <div class="indic-placeholder-icon">🛠️</div>
-        <div class="indic-placeholder-title">Tu dashboard personalizado, próximamente</div>
-        <div class="indic-placeholder-text">Aquí vas a poder armar tu propio panel con cualquier herramienta, gráfico o noticia de SkillCash, del tamaño que prefieras.</div>
+      <p class="section-intro-text">Arma tu propio panel: elige qué herramientas, gráficos o noticias de SkillCash quieres ver aquí, y acomódalas al tamaño que prefieras.</p>
+
+      <div id="arrecifeAuthGate" class="arrecife-auth-gate" style="display:none">
+        <div class="arrecife-auth-gate-icon">🔒</div>
+        <div class="arrecife-auth-gate-title">Inicia sesión para armar tu panel</div>
+        <div class="arrecife-auth-gate-text">Tu dashboard se guarda en tu cuenta, para que lo veas igual cada vez que entres.</div>
+        <button type="button" class="arrecife-add-btn" id="arrecifeLoginBtn" style="margin-top:6px">Iniciar sesión</button>
+      </div>
+
+      <div id="arrecifeDashboard" style="display:none">
+        <div class="arrecife-toolbar">
+          <button type="button" class="arrecife-add-btn" id="arrecifeAddBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar widget
+          </button>
+        </div>
+        <div id="arrecifeEmptyState" class="arrecife-empty-state">
+          <div class="arrecife-empty-state-icon">🧩</div>
+          <div class="arrecife-empty-state-title">Tu panel está vacío</div>
+          <div class="arrecife-empty-state-text">Dale clic a "Agregar widget" y elige cualquier herramienta, gráfico o noticia de SkillCash.</div>
+        </div>
+        <div id="arrecifeGridHost" class="arrecife-grid-host grid-stack" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="arrecifeCatalogModal">
+      <div class="modal-panel" style="max-width:480px">
+        <button type="button" class="modal-close" id="arrecifeCatalogClose" aria-label="Cerrar">✕</button>
+        <h2 class="calc-title" style="margin-bottom:14px">Agregar widget</h2>
+        <input type="text" id="arrecifeCatalogSearch" class="arrecife-catalog-search" placeholder="Buscar herramienta...">
+        <div id="arrecifeCatalogList" style="max-height:60vh;overflow:auto"></div>
       </div>
     </div>
 
@@ -11611,6 +11688,10 @@ function showCategoryDetail(cat){
   if(typeof closeJournalPage === 'function') closeJournalPage();
   if(typeof closeAdminPage === 'function') closeAdminPage();
   if(typeof closeLiveChartPage === 'function') closeLiveChartPage();
+  // Mi Arrecife (dashboard personalizable): si se estaba viendo esa categoría y se sale hacia
+  // cualquier otra, cada widget tiene que volver a su lugar ANTES de que la categoría nueva
+  // intente usar esa misma herramienta normalmente - ver unmountAllArrecifeWidgets más abajo
+  if(categoryDetailView.dataset.activeCategory === 'portafolio' && cat !== 'portafolio' && typeof window.unmountAllArrecifeWidgets === 'function') window.unmountAllArrecifeWidgets();
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   // "Conferencias en Vivo"/"Calendario Económico"/"Noticias" son 3 categorías hermanas que se
   // puede saltar de una a otra SIN pasar por el overview (los 3 botones del menú llaman
@@ -11658,12 +11739,16 @@ function showCategoryDetail(cat){
   // visibles (su ocultamiento real llega después, por el MutationObserver de community.js, que
   // es una microtarea) y la página aterriza mucho más abajo de lo debido
   if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
+  if(cat === 'portafolio' && typeof window.arrecifeEnterDashboard === 'function') window.arrecifeEnterDashboard();
   categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
   if(typeof closeJournalPage === 'function') closeJournalPage();
   if(typeof closeAdminPage === 'function') closeAdminPage();
   if(typeof closeLiveChartPage === 'function') closeLiveChartPage();
+  // mismo motivo que en showCategoryDetail: si se estaba en Mi Arrecife y se vuelve al menú
+  // principal, cada widget tiene que devolverse a su sitio primero
+  if(categoryDetailView.style.display === 'block' && categoryDetailView.dataset.activeCategory === 'portafolio' && typeof window.unmountAllArrecifeWidgets === 'function') window.unmountAllArrecifeWidgets();
   if(typeof colmillosPageView !== 'undefined' && colmillosPageView && colmillosPageView.style.display === 'block' && typeof hideColmillosPage === 'function'){
     hideColmillosPage();
   }
@@ -30712,6 +30797,477 @@ async function awardColmillos(eventType, periodKey, amount){
   }catch(e){
     document.querySelectorAll('.sc-hide').forEach(function(el){ el.classList.remove('sc-hide', 'sc-in'); });
   }
+})();
+</script>
+<script>
+/* ===== Mi Arrecife: dashboard personalizable (Fase 1 MVP) =====
+   Ver docs/arrecife-widget-inventario.md para el inventario completo y las citas de línea de
+   cada pieza que este motor mueve. Arquitectura: REPARENTAR nodos ya existentes del sitio
+   (nunca copias, nunca iframes nuevos salvo YouTube que ya era iframe) - cada widget "mount"
+   saca su nodo real de donde vive hoy, deja un comentario de marcador en su lugar, y lo mete
+   en la tarjeta del dashboard; "unmount" hace exactamente lo contrario. Así cada herramienta
+   sigue siendo la MISMA instancia con el MISMO estado (timers, banderas de "ya cargado") sin
+   importar si vive en su categoría normal o en el dashboard.
+   gridstack.js se carga perezoso (solo al entrar a "portafolio"), vendorizado en
+   assets/js/vendor/gridstack/ - ver ese README para la versión exacta. */
+(function(){
+  "use strict";
+
+  const ARRECIFE_SIZE_RULES = {
+    kpi:      { minW:2, maxW:4,  minH:2, maxH:3,  defW:3, defH:2 },
+    chart:    { minW:4, maxW:12, minH:4, maxH:8,  defW:6, defH:5 },
+    calc:     { minW:4, maxW:6,  minH:6, maxH:10, defW:4, defH:7 },
+    news:     { minW:3, maxW:6,  minH:4, maxH:10, defW:4, defH:6 },
+    calendar: { minW:6, maxW:12, minH:5, maxH:10, defW:8, defH:6 },
+    video:    { minW:4, maxW:12, minH:3, maxH:8,  defW:6, defH:4 },
+  };
+  const ARRECIFE_FAMILY_LABELS = { kpi:'Indicadores clave', chart:'Gráficos', calc:'Calculadoras', news:'Noticias', calendar:'Calendario', video:'Video' };
+
+  // ---- helpers genéricos de reparentar: dejan un <!--comentario--> en el lugar original y lo
+  // devuelven ahí tal cual al desmontar, sin importar qué tan profundo viva el nodo ----
+  function arrecifeDetachToPlaceholder(key, node){
+    if(!node || node.dataset.arrecifePlaceholderKey) return node; // ya está montado, no lo toques dos veces
+    const placeholder = document.createComment('arrecife:' + key);
+    node.parentNode.insertBefore(placeholder, node);
+    node.dataset.arrecifePlaceholderKey = key;
+    arrecifePlaceholders[key] = placeholder;
+    return node;
+  }
+  function arrecifeRestoreFromPlaceholder(key, node){
+    const placeholder = arrecifePlaceholders[key];
+    if(!placeholder || !placeholder.parentNode){
+      // el marcador ya no existe (p.ej. se recargó la página a medio camino) - no hay a dónde
+      // devolverlo con certeza, así que se deja donde está en vez de perderlo de la vista
+      return;
+    }
+    placeholder.parentNode.insertBefore(node, placeholder);
+    placeholder.remove();
+    delete arrecifePlaceholders[key];
+    delete node.dataset.arrecifePlaceholderKey;
+  }
+  const arrecifePlaceholders = {};
+
+  function arrecifeMountGenericNode(selectorFn, afterMountFn){
+    return function(el){
+      const node = selectorFn();
+      if(!node) return;
+      arrecifeDetachToPlaceholder(this.id, node);
+      node.style.display = '';
+      el.appendChild(node);
+      if(afterMountFn) afterMountFn(node);
+    };
+  }
+  function arrecifeUnmountGenericNode(selectorFn){
+    return function(){
+      const node = selectorFn();
+      if(!node) return;
+      arrecifeRestoreFromPlaceholder(this.id, node);
+    };
+  }
+
+  function arrecifeMountModalWidget(modalId, initFn){
+    return function(el){
+      const overlay = document.getElementById(modalId);
+      if(!overlay) return;
+      arrecifeDetachToPlaceholder(this.id, overlay);
+      overlay.classList.add('inline-mode');
+      el.appendChild(overlay);
+      if(initFn) initFn();
+    };
+  }
+  function arrecifeUnmountModalWidget(modalId){
+    return function(){
+      const overlay = document.getElementById(modalId);
+      if(!overlay) return;
+      overlay.classList.remove('inline-mode', 'open');
+      arrecifeRestoreFromPlaceholder(this.id, overlay);
+    };
+  }
+
+  // ---- catálogo de los 12 widgets del MVP ----
+  const WIDGET_REGISTRY = {
+    'w-fngsummary': {
+      id:'w-fngsummary', label:'Índice de Miedo y Codicia', family:'kpi',
+      mount: arrecifeMountGenericNode(() => document.getElementById('fngSectionBox')),
+      unmount: arrecifeUnmountGenericNode(() => document.getElementById('fngSectionBox')),
+    },
+    'w-halvingbar': {
+      id:'w-halvingbar', label:'Próximo Halving', family:'kpi',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.dom-card.halving')),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.dom-card.halving')),
+    },
+    'w-dombtc': {
+      id:'w-dombtc', label:'Dominancia BTC', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="dombtc"]'), () => { if(typeof ensureDomBtcLoaded === 'function') ensureDomBtcLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="dombtc"]')),
+    },
+    'w-m2supply': {
+      id:'w-m2supply', label:'M2 (Oferta Monetaria)', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="m2supply"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('m2supply'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="m2supply"]')),
+    },
+    'w-vixindex': {
+      id:'w-vixindex', label:'VIX', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="vixindex"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('vixindex'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="vixindex"]')),
+    },
+    'w-netliquidity': {
+      id:'w-netliquidity', label:'Liquidez Neta', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="netliquidity"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('netliquidity'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="netliquidity"]')),
+    },
+    'w-calc-futuros': {
+      id:'w-calc-futuros', label:'Calculadora de Futuros', family:'calc',
+      mount: arrecifeMountModalWidget('calcModal', () => { if(typeof setFuturesMode === 'function') setFuturesMode('usdtm'); }),
+      unmount: arrecifeUnmountModalWidget('calcModal'),
+    },
+    'w-calc-dca': {
+      id:'w-calc-dca', label:'Simulador de DCA', family:'calc',
+      mount: arrecifeMountModalWidget('dcaModal', () => {
+        if(typeof setDcaMode === 'function') setDcaMode('buy');
+        if(typeof initDcaDates === 'function') initDcaDates();
+        if(typeof updateDcaCountPreview === 'function') updateDcaCountPreview();
+      }),
+      unmount: arrecifeUnmountModalWidget('dcaModal'),
+    },
+    'w-calc-quiz': {
+      id:'w-calc-quiz', label:'Perfil de Riesgo', family:'calc',
+      mount: arrecifeMountModalWidget('quizModal', () => { if(typeof resetQuiz === 'function') resetQuiz(); }),
+      unmount: arrecifeUnmountModalWidget('quizModal'),
+    },
+    'w-news-cripto': {
+      id:'w-news-cripto', label:'Noticias — Mercado cripto', family:'news',
+      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsNewsCrypto'); return list ? list.closest('.events-card') : null; }),
+      unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsNewsCrypto') ? document.getElementById('eventsNewsCrypto').closest('.events-card') : null),
+    },
+    'w-calendario': {
+      id:'w-calendario', label:'Calendario Económico', family:'calendar',
+      mount: arrecifeMountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }),
+      unmount: arrecifeUnmountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }),
+    },
+    'w-youtube-live': {
+      id:'w-youtube-live', label:'Conferencias en Vivo', family:'video',
+      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsYtChannelList'); return list ? list.closest('.events-card') : null; }),
+      unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsYtChannelList') ? document.getElementById('eventsYtChannelList').closest('.events-card') : null),
+    },
+  };
+  // el "this.id" que usan los helpers de arriba viene de llamar mount/unmount con .call(def, el) -
+  // ver arrecifeAddWidgetToGrid/arrecifeRemoveWidget más abajo
+  Object.keys(WIDGET_REGISTRY).forEach(id => { WIDGET_REGISTRY[id].id = id; });
+
+  // ==================== estado del dashboard ====================
+  let arrecifeGrid = null;
+  let arrecifeAssetsLoaded = false;
+  let arrecifeAssetsLoadingPromise = null;
+  let arrecifeSaveTimer = null;
+  let arrecifeMountedIds = new Set();
+  let arrecifeSuppressSave = false; // true mientras se está CARGANDO un layout guardado, para no re-guardarlo de inmediato como si el usuario lo hubiera movido
+
+  function arrecifeLoadAssets(){
+    if(arrecifeAssetsLoaded) return Promise.resolve();
+    if(arrecifeAssetsLoadingPromise) return arrecifeAssetsLoadingPromise;
+    arrecifeAssetsLoadingPromise = new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/assets/js/vendor/gridstack/gridstack.min.css';
+      document.head.appendChild(link);
+      const script = document.createElement('script');
+      script.src = '/assets/js/vendor/gridstack/gridstack-all.js';
+      script.onload = () => { arrecifeAssetsLoaded = true; resolve(); };
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+    return arrecifeAssetsLoadingPromise;
+  }
+
+  function arrecifeCreateGridItemEl(widgetId){
+    const label = WIDGET_REGISTRY[widgetId] ? WIDGET_REGISTRY[widgetId].label : widgetId;
+    const el = document.createElement('div');
+    el.className = 'grid-stack-item';
+    el.dataset.arrecifeWidgetId = widgetId;
+    el.innerHTML =
+      '<div class="grid-stack-item-content">' +
+        '<div class="arrecife-widget-head">' +
+          '<span class="arrecife-widget-head-label"></span>' +
+          '<button type="button" class="arrecife-widget-remove" aria-label="Quitar widget">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="arrecife-widget-body"></div>' +
+      '</div>';
+    el.querySelector('.arrecife-widget-head-label').textContent = label;
+    el.querySelector('.arrecife-widget-remove').addEventListener('click', () => arrecifeRemoveWidget(widgetId));
+    return el;
+  }
+
+  function arrecifeUpdateEmptyState(){
+    const empty = document.getElementById('arrecifeEmptyState');
+    const host = document.getElementById('arrecifeGridHost');
+    const hasAny = arrecifeMountedIds.size > 0;
+    if(empty) empty.style.display = hasAny ? 'none' : 'flex';
+    if(host) host.style.display = hasAny ? 'block' : 'none';
+  }
+
+  function arrecifeAddWidgetToGrid(widgetId, pos){
+    const def = WIDGET_REGISTRY[widgetId];
+    if(!def || arrecifeMountedIds.has(widgetId) || !arrecifeGrid) return;
+    const rules = ARRECIFE_SIZE_RULES[def.family] || ARRECIFE_SIZE_RULES.chart;
+    const el = arrecifeCreateGridItemEl(widgetId);
+    const host = document.getElementById('arrecifeGridHost');
+    host.appendChild(el);
+    const opts = Object.assign({
+      id: widgetId,
+      w: rules.defW, h: rules.defH,
+      minW: rules.minW, maxW: rules.maxW, minH: rules.minH, maxH: rules.maxH,
+    }, pos || {});
+    arrecifeGrid.makeWidget(el, opts);
+    const body = el.querySelector('.arrecife-widget-body');
+    try{ def.mount.call(def, body); }
+    catch(err){ body.textContent = 'No se pudo cargar esta herramienta aquí.'; console.error('[Mi Arrecife] mount', widgetId, err); }
+    arrecifeMountedIds.add(widgetId);
+    arrecifeUpdateEmptyState();
+  }
+
+  function arrecifeRemoveWidget(widgetId){
+    const def = WIDGET_REGISTRY[widgetId];
+    if(!def || !arrecifeMountedIds.has(widgetId)) return;
+    try{ def.unmount.call(def); }
+    catch(err){ console.error('[Mi Arrecife] unmount', widgetId, err); }
+    const el = document.querySelector('#arrecifeGridHost .grid-stack-item[data-arrecife-widget-id="' + widgetId + '"]');
+    if(el && arrecifeGrid) arrecifeGrid.removeWidget(el, true);
+    arrecifeMountedIds.delete(widgetId);
+    arrecifeUpdateEmptyState();
+    arrecifeScheduleSave();
+  }
+
+  // se llama SIEMPRE antes de salir de Mi Arrecife (cambiar de categoría o volver al menú) -
+  // devuelve cada herramienta a su lugar original ANTES de que esa otra vista intente usarla
+  // normalmente. Se desarma la grilla entera (en vez de solo ocultarla) para nunca arriesgar
+  // una herramienta "atrapada" en un widget fantasma si algo sale mal al reconstruir después.
+  function unmountAllArrecifeWidgets(){
+    if(!arrecifeMountedIds.size) return;
+    Array.from(arrecifeMountedIds).forEach(widgetId => {
+      const def = WIDGET_REGISTRY[widgetId];
+      if(!def) return;
+      try{ def.unmount.call(def); }
+      catch(err){ console.error('[Mi Arrecife] unmountAll', widgetId, err); }
+    });
+    arrecifeMountedIds.clear();
+    if(arrecifeGrid){
+      try{ arrecifeGrid.removeAll(true); } catch(err){ /* ya pudo haber sido destruida */ }
+    }
+    arrecifeUpdateEmptyState();
+  }
+  window.unmountAllArrecifeWidgets = unmountAllArrecifeWidgets;
+
+  // ==================== guardar / cargar (Supabase + localStorage) ====================
+  const ARRECIFE_LS_KEY = 'skillcash-arrecife-layout';
+
+  function arrecifeBuildLayoutArray(){
+    if(!arrecifeGrid) return [];
+    return Array.from(arrecifeMountedIds).map(widgetId => {
+      const el = document.querySelector('#arrecifeGridHost .grid-stack-item[data-arrecife-widget-id="' + widgetId + '"]');
+      const node = el && el.gridstackNode;
+      return {
+        id: widgetId,
+        x: node ? node.x : 0, y: node ? node.y : 0,
+        w: node ? node.w : 1, h: node ? node.h : 1,
+        cfg: {},
+      };
+    });
+  }
+
+  function arrecifeScheduleSave(){
+    if(arrecifeSuppressSave) return;
+    clearTimeout(arrecifeSaveTimer);
+    arrecifeSaveTimer = setTimeout(arrecifeSaveLayoutNow, 800);
+  }
+
+  function arrecifeSaveLayoutNow(){
+    const layout = arrecifeBuildLayoutArray();
+    try{ localStorage.setItem(ARRECIFE_LS_KEY, JSON.stringify(layout)); } catch(err){ /* privado/lleno - no es critico */ }
+    if(!currentUser || typeof sbClient === 'undefined') return;
+    sbClient.from('user_dashboards').upsert({
+      user_id: currentUser.id,
+      layout: layout,
+      schema_version: 1,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' }).then(({ error }) => {
+      if(error) console.error('[Mi Arrecife] no se pudo guardar el layout', error);
+    });
+  }
+
+  // descarta ids que ya no existan y ajusta w/h a los limites vigentes - por si el catalogo
+  // cambia de un deploy a otro y el layout guardado quedo con datos viejos
+  function arrecifeSanitizeLayout(layout){
+    if(!Array.isArray(layout)) return [];
+    return layout.filter(item => item && WIDGET_REGISTRY[item.id]).map(item => {
+      const def = WIDGET_REGISTRY[item.id];
+      const rules = ARRECIFE_SIZE_RULES[def.family] || ARRECIFE_SIZE_RULES.chart;
+      return {
+        id: item.id,
+        x: Number.isFinite(item.x) ? item.x : 0,
+        y: Number.isFinite(item.y) ? item.y : 0,
+        w: Math.min(rules.maxW, Math.max(rules.minW, Number.isFinite(item.w) ? item.w : rules.defW)),
+        h: Math.min(rules.maxH, Math.max(rules.minH, Number.isFinite(item.h) ? item.h : rules.defH)),
+        cfg: item.cfg || {},
+      };
+    });
+  }
+
+  function arrecifeApplyLayout(layout){
+    arrecifeSuppressSave = true;
+    arrecifeSanitizeLayout(layout).forEach(item => {
+      arrecifeAddWidgetToGrid(item.id, { x:item.x, y:item.y, w:item.w, h:item.h });
+    });
+    // deja que gridstack termine de acomodar antes de volver a permitir guardar - si no, el
+    // propio montaje inicial (que dispara eventos 'added') se guardaría a sí mismo de inmediato
+    setTimeout(() => { arrecifeSuppressSave = false; }, 400);
+  }
+
+  async function arrecifeLoadLayout(){
+    let localLayout = [];
+    try{ localLayout = JSON.parse(localStorage.getItem(ARRECIFE_LS_KEY) || '[]'); } catch(err){ localLayout = []; }
+    if(localLayout.length) arrecifeApplyLayout(localLayout);
+    if(!currentUser || typeof sbClient === 'undefined') return;
+    try{
+      const { data, error } = await sbClient.from('user_dashboards').select('layout').eq('user_id', currentUser.id).maybeSingle();
+      if(error || !data) return;
+      const remoteLayout = arrecifeSanitizeLayout(data.layout);
+      const remoteIds = remoteLayout.map(i => i.id).sort().join(',');
+      const localIds = Array.from(arrecifeMountedIds).sort().join(',');
+      if(remoteIds !== localIds){
+        // lo guardado en Supabase es la fuente de verdad real - si no coincide con lo que ya se
+        // pintó desde localStorage (otro dispositivo, u otra pestaña cambió algo), se reconstruye
+        unmountAllArrecifeWidgets();
+        arrecifeApplyLayout(data.layout);
+      }
+    }catch(err){ console.error('[Mi Arrecife] no se pudo leer el layout de Supabase', err); }
+  }
+
+  // ==================== catálogo "Agregar widget" ====================
+  const arrecifeCatalogModal = document.getElementById('arrecifeCatalogModal');
+  const arrecifeCatalogList = document.getElementById('arrecifeCatalogList');
+  const arrecifeCatalogSearch = document.getElementById('arrecifeCatalogSearch');
+
+  function arrecifeRenderCatalog(filterText){
+    const q = (filterText || '').trim().toLowerCase();
+    const byFamily = {};
+    Object.values(WIDGET_REGISTRY).forEach(def => {
+      if(q && def.label.toLowerCase().indexOf(q) === -1) return;
+      (byFamily[def.family] = byFamily[def.family] || []).push(def);
+    });
+    const families = Object.keys(ARRECIFE_FAMILY_LABELS).filter(f => byFamily[f] && byFamily[f].length);
+    if(!families.length){
+      arrecifeCatalogList.innerHTML = '<div class="arrecife-catalog-empty">Nada coincide con esa búsqueda.</div>';
+      return;
+    }
+    arrecifeCatalogList.innerHTML = families.map(family => {
+      const items = byFamily[family].map(def => {
+        const added = arrecifeMountedIds.has(def.id);
+        return '<button type="button" class="arrecife-catalog-item" data-widget-id="' + def.id + '"' + (added ? ' disabled' : '') + '>' +
+          '<span class="arrecife-catalog-item-label">' + def.label + '</span>' +
+          (added ? '<span class="arrecife-catalog-item-added">Ya agregado</span>' : '') +
+        '</button>';
+      }).join('');
+      return '<div class="arrecife-catalog-group-label">' + ARRECIFE_FAMILY_LABELS[family] + '</div>' + items;
+    }).join('');
+    arrecifeCatalogList.querySelectorAll('.arrecife-catalog-item:not(:disabled)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        arrecifeAddWidgetToGrid(btn.dataset.widgetId);
+        arrecifeScheduleSave();
+        arrecifeCloseCatalog();
+      });
+    });
+  }
+  function arrecifeOpenCatalog(){
+    arrecifeCatalogSearch.value = '';
+    arrecifeRenderCatalog('');
+    arrecifeCatalogModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => arrecifeCatalogSearch.focus(), 60);
+  }
+  function arrecifeCloseCatalog(){
+    arrecifeCatalogModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('arrecifeAddBtn').addEventListener('click', arrecifeOpenCatalog);
+  document.getElementById('arrecifeCatalogClose').addEventListener('click', arrecifeCloseCatalog);
+  arrecifeCatalogModal.addEventListener('click', (e) => { if(e.target === arrecifeCatalogModal) arrecifeCloseCatalog(); });
+  arrecifeCatalogSearch.addEventListener('input', () => arrecifeRenderCatalog(arrecifeCatalogSearch.value));
+
+  // ==================== redibujar gráficos al redimensionar su widget ====================
+  // Limitación real conocida (ver docs/arrecife-widget-inventario.md): renderDomChart calcula
+  // su ancho con window.innerWidth, no con el ancho real del widget - un dashboard angosto en
+  // escritorio no hace que el SVG se dibuje más angosto todavía (eso es trabajo de Fase 3). Lo
+  // que SÍ logra este listener: si la ventana cruza el umbral móvil (640px) mientras el widget
+  // existe, o cambian los datos/rango, el gráfico se vuelve a dibujar en vez de quedarse con el
+  // tamaño viejo - y el overflow:auto del cuerpo del widget evita que un SVG más ancho que la
+  // tarjeta rompa el layout (se puede hacer scroll horizontal dentro del widget).
+  const ARRECIFE_CHART_RERENDER = {
+    'w-dombtc': () => { if(typeof renderDomChart === 'function') renderDomChart('dombtc'); },
+    'w-m2supply': () => { if(typeof renderDomChart === 'function') renderDomChart('m2supply'); },
+    'w-vixindex': () => { if(typeof renderDomChart === 'function') renderDomChart('vixindex'); },
+    'w-netliquidity': () => { if(typeof renderDomChart === 'function') renderDomChart('netliquidity'); },
+  };
+  let arrecifeResizeTimer = null;
+  function arrecifeOnWidgetResizeStop(el){
+    const widgetId = el && el.dataset ? el.dataset.arrecifeWidgetId : null;
+    const fn = widgetId && ARRECIFE_CHART_RERENDER[widgetId];
+    if(!fn) return;
+    clearTimeout(arrecifeResizeTimer);
+    arrecifeResizeTimer = setTimeout(fn, 150);
+  }
+
+  // ==================== entrar / salir de la vista ====================
+  function arrecifeRenderGate(){
+    const gate = document.getElementById('arrecifeAuthGate');
+    const dash = document.getElementById('arrecifeDashboard');
+    if(!gate || !dash) return;
+    if(currentUser){
+      gate.style.display = 'none';
+      dash.style.display = 'block';
+    } else {
+      gate.style.display = 'flex';
+      dash.style.display = 'none';
+      // sin sesion no hay nada que desmontar (nunca se llego a inicializar la grilla), pero si
+      // el usuario cierra sesion CON el dashboard ya abierto, hay que devolver todo a su sitio
+      unmountAllArrecifeWidgets();
+    }
+  }
+  const arrecifeLoginBtn = document.getElementById('arrecifeLoginBtn');
+  if(arrecifeLoginBtn) arrecifeLoginBtn.addEventListener('click', () => { if(typeof openAuthModal === 'function') openAuthModal(); });
+
+  let arrecifeInitStarted = false;
+  function arrecifeEnterDashboard(){
+    arrecifeRenderGate();
+    if(!currentUser) return;
+    arrecifeLoadAssets().then(() => {
+      if(!arrecifeGrid){
+        const host = document.getElementById('arrecifeGridHost');
+        arrecifeGrid = GridStack.init({
+          column: 12, cellHeight: 80, margin: 8, float: false,
+          handle: '.arrecife-widget-head', alwaysShowResizeHandle: 'mobile',
+          columnOpts: { breakpoints: [{ w: 768, c: 1 }] },
+        }, host);
+        arrecifeGrid.on('added removed change', arrecifeScheduleSave);
+        arrecifeGrid.on('resizestop', (event, el) => arrecifeOnWidgetResizeStop(el));
+      }
+      if(!arrecifeInitStarted){
+        arrecifeInitStarted = true;
+        arrecifeLoadLayout();
+      }
+      arrecifeUpdateEmptyState();
+    }).catch(err => console.error('[Mi Arrecife] no se pudo cargar gridstack', err));
+  }
+
+  if(typeof sbClient !== 'undefined'){
+    sbClient.auth.onAuthStateChange(() => {
+      if(document.getElementById('categoryDetailView') && document.getElementById('categoryDetailView').dataset.activeCategory === 'portafolio') arrecifeRenderGate();
+    });
+  }
+
+  window.arrecifeEnterDashboard = arrecifeEnterDashboard;
 })();
 </script>
 <script>
