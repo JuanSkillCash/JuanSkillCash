@@ -1664,13 +1664,23 @@ button{font-family:inherit;color:inherit}
    de pantalla. La línea (border-bottom) se deja: separa el bloque de marca (logo+título) del
    cuerpo del gráfico, igual que un encabezado de tarjeta normal - no es un error, solo quedaba
    con demasiado aire alrededor. */
-.calc-head{text-align:center;margin:-32px -32px 14px -32px;padding:20px 32px 14px;position:relative;border-bottom:1px solid rgba(91,141,239,.3);border-radius:20px 20px 0 0}
-.calc-eyebrow{display:flex;align-items:center;justify-content:flex-start;gap:10px;font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;letter-spacing:-.01em;position:relative}
+/* Juan: "todos los indicadores tienen el logo [el bloque de marca SkillCash] en otro renglón...
+   deberían estar en el mismo renglón para ocupar menos espacio, por lo menos en PC" - por
+   defecto (escritorio/tablet) el bloque de marca comparte fila con el título (marca a la
+   izquierda, título a la derecha); en celular (≤860px, ver MOBILE más abajo) se apilan como
+   antes, porque ahí sí hace falta el ancho completo para que el título no se vea apretado.
+   Grid (no flex) a propósito: algunas calculadoras (29 de 74) agregan un .calc-sub (subtítulo)
+   como TERCER hijo de .calc-head - con flex y 3 items en fila el título quedaba exprimido en el
+   medio peleando espacio con el subtítulo, cortándose en varias líneas. Con grid, .calc-eyebrow
+   ocupa la columna izquierda (dos filas), y título+subtítulo comparten la columna derecha, uno
+   debajo del otro, como siempre - .calc-sub ni se nota cuando no existe (fila vacía, alto 0) */
+.calc-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:20px;row-gap:2px;text-align:left;margin:-32px -32px 14px -32px;padding:20px 32px 14px;position:relative;border-bottom:1px solid rgba(91,141,239,.3);border-radius:20px 20px 0 0}
+.calc-eyebrow{grid-column:1;grid-row:1/3;display:flex;align-items:center;justify-content:flex-start;gap:10px;font-family:'Poppins',sans-serif;font-weight:900;font-size:18px;letter-spacing:-.01em;position:relative}
 .calc-eyebrow img{width:40px;height:40px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 0 transparent)}
 .calc-eyebrow-word{white-space:nowrap;color:var(--white)}
 .calc-eyebrow-word span{color:var(--accent)}
-.calc-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.5vw,32px);text-transform:uppercase;margin:4px 0;letter-spacing:-.01em;background:linear-gradient(90deg,var(--white) 30%,var(--muted2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;position:relative}
-.calc-sub{font-family:'Space Mono',monospace;font-size:12px;color:var(--white);letter-spacing:.05em;text-transform:uppercase;line-height:1.6;position:relative}
+.calc-title{grid-column:2;grid-row:1;font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,4.5vw,32px);text-transform:uppercase;margin:0;letter-spacing:-.01em;background:linear-gradient(90deg,var(--white) 30%,var(--muted2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;position:relative;text-align:right;min-width:0}
+.calc-sub{grid-column:2;grid-row:2;font-family:'Space Mono',monospace;font-size:12px;color:var(--white);letter-spacing:.05em;text-transform:uppercase;line-height:1.6;position:relative;text-align:right;margin:0}
 
 .estimate-banner{margin-top:16px;padding:13px 16px;border-radius:12px;background:linear-gradient(155deg,rgba(240,178,61,.14),rgba(240,178,61,.03));border:1px solid rgba(240,178,61,.4);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:12.5px;line-height:1.6;text-transform:none;letter-spacing:normal;position:relative;overflow:hidden}
 .estimate-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold);animation:pulse 1.6s infinite}
@@ -2671,6 +2681,10 @@ img[src=""]{display:none}
   .sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;display:none}
   .sb-backdrop.show{display:block}
   .calc{padding:22px 18px 24px}
+  .calc-head{display:block;text-align:center}
+  .calc-eyebrow{justify-content:center}
+  .calc-title{text-align:center;margin:4px 0}
+  .calc-sub{text-align:center}
   .calc-body{grid-template-columns:1fr;gap:22px}
   .calc-grid{grid-template-columns:1fr}
   .res-grid{grid-template-columns:1fr 1fr}
