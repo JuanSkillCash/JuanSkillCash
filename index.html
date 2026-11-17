@@ -1614,16 +1614,17 @@ button{font-family:inherit;color:inherit}
 @media(max-width:480px){
   .arrecife-grid-host .grid-stack-item-content{border-radius:12px}
 }
-/* gridstack.js dibuja sus 4 tiradores de esquina con un ícono gris oscuro (#666) de 20px que
-   casi no se nota sobre el fondo oscuro de las tarjetas (queja de Juan: "no se alcanza a ver
-   donde esta la opcion de agrandar y achicar") - se reemplazan por el mismo estilo de ícono de
-   líneas de contorno que usa el resto del sitio (ver CLAUDE.md), más grandes, en azul de
-   acento y con su propio fondito redondeado para que se note incluso encima de un gráfico de
-   colores. !important porque gridstack.min.css se carga como hoja de estilos aparte (de forma
-   perezosa, solo al entrar a Mi Arrecife) y puede insertarse después de este <style>, ganando
-   el empate de especificidad por orden de aparición si no se fuerza aquí. */
-.arrecife-grid-host .ui-resizable-nw,
-.arrecife-grid-host .ui-resizable-ne,
+/* gridstack.js dibuja sus tiradores de esquina con un ícono gris oscuro (#666) de 20px que casi
+   no se nota sobre el fondo oscuro de las tarjetas (queja de Juan: "no se alcanza a ver donde
+   esta la opcion de agrandar y achicar") - se reemplazan por el mismo estilo de ícono de líneas
+   de contorno que usa el resto del sitio (ver CLAUDE.md), más grandes, en azul de acento y con
+   su propio fondito redondeado para que se note incluso encima de un gráfico de colores.
+   Solo esquinas de ABAJO (se/sw) - arriba (nw/ne) quedaban exactamente donde ya está la ✕ de
+   quitar el widget, en la cabecera: se superponían y eran difíciles de diferenciar entre sí,
+   sobre todo en una tarjeta angosta de celular (Juan, captura real). !important porque
+   gridstack.min.css se carga como hoja de estilos aparte (de forma perezosa, solo al entrar a
+   Mi Arrecife) y puede insertarse después de este <style>, ganando el empate de especificidad
+   por orden de aparición si no se fuerza aquí. */
 .arrecife-grid-host .ui-resizable-se,
 .arrecife-grid-host .ui-resizable-sw{
   width:26px!important;height:26px!important;
@@ -1634,11 +1635,9 @@ button{font-family:inherit;color:inherit}
   background-position:center!important;
   transform:none!important;
 }
-.arrecife-grid-host .ui-resizable-nw,
 .arrecife-grid-host .ui-resizable-se{
   background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235b8def" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><polyline points="6,12 6,6 12,6"/><polyline points="18,12 18,18 12,18"/></svg>')!important;
 }
-.arrecife-grid-host .ui-resizable-ne,
 .arrecife-grid-host .ui-resizable-sw{
   background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235b8def" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><polyline points="12,6 18,6 18,12"/><polyline points="6,12 6,18 12,18"/></svg>')!important;
 }
@@ -31998,10 +31997,14 @@ async function awardColmillos(eventType, periodKey, amount){
           column: 12, cellHeight: 80, margin: 8, float: false,
           handle: '.arrecife-widget-head', alwaysShowResizeHandle: true,
           // por defecto gridstack SOLO crea el tirador "se" (resizable.handles:"se" es su
-          // default real) - el CSS de abajo (.ui-resizable-nw/ne/se/sw) pinta 4 esquinas, pero
-          // sin esto nw/ne/sw nunca existen en el DOM para pintarse: solo se veía uno (Juan,
-          // con capturas reales: "sigue sin verse las flechas para agrandar las cosas")
-          resizable: { handles: 'nw, ne, sw, se' },
+          // default real) - el CSS de abajo (.ui-resizable-se/sw) pinta esquinas, pero sin esto
+          // ni siquiera "sw" existía en el DOM para pintarse (Juan, con capturas reales: "sigue
+          // sin verse las flechas para agrandar las cosas"). Solo esquinas de ABAJO (se/sw), no
+          // arriba (nw/ne) - las de arriba quedaban exactamente donde ya está la ✕ de quitar el
+          // widget (en la cabecera), superpuestas y confundibles entre sí, sobre todo en
+          // celular con la tarjeta angosta (Juan, captura real: "el botón de cerrar... quedó
+          // sobrepuesto como debajo de las flechas... no está bien diferenciado").
+          resizable: { handles: 'sw, se' },
           columnOpts: { breakpoints: [{ w: 768, c: 1 }] },
         }, host);
         arrecifeGrid.on('added removed change', arrecifeScheduleSave);
