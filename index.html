@@ -84,6 +84,9 @@
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
   --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
+  --ticker-h:34px; /* alto de la cinta de precios en vivo fija arriba de todo (#priceTicker) -
+                      usado tambien para empujar .app hacia abajo y para el offset del sidebar
+                      (sticky en escritorio, fixed en movil) para que nunca quede tapado */
   /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo") - una sola variable
      para poder reusarlo en todas las cajas del sitio (categorías, panorama del mercado,
      sesiones, eventos y noticias, quién está detrás) y que un ajuste futuro de tono se
@@ -155,13 +158,13 @@ button{font-family:inherit;color:inherit}
 }
 
 /* ===== LAYOUT ===== */
-.app{display:flex;min-height:100vh;position:relative;z-index:1}
+.app{display:flex;min-height:100vh;position:relative;z-index:1;padding-top:var(--ticker-h)}
 
 /* SIDEBAR */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;background:var(--bg);
   border-right:0;display:flex;flex-direction:column;
-  position:sticky;top:0;height:100vh;transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
+  position:sticky;top:var(--ticker-h);height:calc(100vh - var(--ticker-h));transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
   /* antes el scroll quedaba completamente invisible (scrollbar-width:none + el webkit de abajo
      en 0px) - sin ninguna pista de que había más opciones debajo, nadie bajaba a verlas. Ahora
      se deja una barrita bien delgada y sutil (ver .sidebar::-webkit-scrollbar más abajo) */
@@ -190,6 +193,25 @@ button{font-family:inherit;color:inherit}
 .sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0;width:100%}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 0 transparent)}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
+/* ---- cinta de precios en vivo (BTC/ETH/SOL/HYPE via Binance websocket, NASDAQ/S&P 500/
+   Russell 2000 via proxy de Twelve Data) - fija arriba de TODO (incluso del sidebar), pedido
+   de Juan con una captura marcando toda la franja superior. position:fixed e independiente de
+   .app a propósito: así nunca se ve tapada por el sidebar (sticky en escritorio, drawer fijo en
+   móvil) ni por nada del contenido normal - solo los modales (z-index 300+) y el drawer del
+   sidebar en móvil (z-index 250) se pintan por encima si hace falta, lo cual es lo esperable. */
+.price-ticker{position:fixed;top:0;left:0;right:0;height:var(--ticker-h);z-index:200;background:var(--bg2);border-bottom:1px solid rgba(91,141,239,.25);overflow:hidden;display:flex;align-items:center}
+.price-ticker-track{display:flex;align-items:center;animation:priceTickerScroll 38s linear infinite;will-change:transform}
+.price-ticker:hover .price-ticker-track{animation-play-state:paused}
+.price-ticker-item{display:inline-flex;align-items:center;gap:7px;padding:0 18px;height:var(--ticker-h);font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap;border-right:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.price-ticker-sym{color:var(--muted2);font-weight:700}
+.price-ticker-price{color:var(--white)}
+.price-ticker-chg{font-size:11.5px}
+.price-ticker-chg.up{color:var(--green)}
+.price-ticker-chg.down{color:var(--red)}
+.price-ticker-chg.flat{color:var(--muted2)}
+@keyframes priceTickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.price-ticker-track{animation:none;overflow-x:auto;max-width:100vw}}
+@media(max-width:768px){.price-ticker-item{padding:0 13px;font-size:11.5px;gap:5px}.price-ticker-chg{font-size:10.5px}}
 .mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
@@ -2704,7 +2726,7 @@ img[src=""]{display:none}
 
 /* MOBILE */
 @media(max-width:860px){
-  .sidebar{position:fixed;left:0;top:0;z-index:250;width:var(--sidebar-w);transform:translateX(-100%);box-shadow:20px 0 60px rgba(0,0,0,.5)}
+  .sidebar{position:fixed;left:0;top:var(--ticker-h);z-index:250;width:var(--sidebar-w);transform:translateX(-100%);box-shadow:20px 0 60px rgba(0,0,0,.5)}
   .sidebar.mobile-open{transform:translateX(0)}
   .sidebar.collapsed{width:var(--sidebar-w)}
   .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-logo-text,.sidebar.collapsed .sb-back span,.sidebar.collapsed .sb-item-badge{display:block}
@@ -3535,6 +3557,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   <b>Agregar SkillCash a tu inicio:</b>
   <div class="pwa-ios-step"><span class="pwa-ios-num">1</span><span>Toca el ícono de <b>Compartir</b> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 2v13"/><path d="m8 6 4-4 4 4"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg> en la barra de Safari</span></div>
   <div class="pwa-ios-step"><span class="pwa-ios-num">2</span><span>Elige <b>"Agregar a pantalla de inicio"</b></span></div>
+</div>
+
+<div class="price-ticker" id="priceTicker" aria-label="Precios en vivo: BTC, ETH, SOL, HYPE, Nasdaq, S&amp;P 500 y Russell 2000">
+  <div class="price-ticker-track" id="priceTickerTrack"></div>
 </div>
 
 <div class="app">
@@ -32441,6 +32467,110 @@ async function awardColmillos(eventType, periodKey, amount){
     else flushRun();
   });
   flushRun();
+})();
+</script>
+<script>
+/* ---- cinta de precios en vivo (#priceTicker, arriba de todo) - Juan pidio BTC/ETH/SOL/HYPE
+   + NASDAQ/S&P 500/Russell 2000, con una captura marcando toda la franja superior de la
+   pagina, y pidio explicitamente que sea EN VIVO (no un numero fijo) y usar Binance.
+   - Cripto: un solo websocket combinado a Binance (stream publico, sin llave, sin limite de
+     peticiones) - "en vivo" de verdad, cada operacion que pasa en Binance actualiza el precio.
+   - Los 3 indices NO existen en Binance (no son cripto) - se reusa el mismo mecanismo de proxy
+     de ETFs + Twelve Data que ya usa el resto del sitio (QQQ/SPY/IWM × su "scale" para
+     aproximar el valor real del indice, ver ASSET_CATEGORIES mas arriba) y se refresca cada
+     45s en una sola peticion con los 3 simbolos juntos, para no gastar de mas la cuota de la
+     API key compartida con el resto de la pagina. */
+(function(){
+  var PRICE_TICKER_ITEMS = [
+    { key:'btc', label:'BTC', kind:'crypto', binance:'btcusdt' },
+    { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt' },
+    { key:'sol', label:'SOL', kind:'crypto', binance:'solusdt' },
+    { key:'hype', label:'HYPE', kind:'crypto', binance:'hypeusdt' },
+    { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40 },
+    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10 },
+    { key:'rut', label:'RUSSELL 2000', kind:'index', proxy:'IWM', scale:10 }
+  ];
+
+  var track = document.getElementById('priceTickerTrack');
+  if(!track) return;
+
+  function buildItemHtml(item){
+    return '<span class="price-ticker-item" data-pt-key="' + item.key + '">' +
+      '<span class="price-ticker-sym">' + item.label + '</span>' +
+      '<span class="price-ticker-price" data-pt-price>—</span>' +
+      '<span class="price-ticker-chg flat" data-pt-chg>—</span>' +
+    '</span>';
+  }
+  // se duplica la tanda completa (no solo un item) para que la animacion de -50% en CSS quede
+  // perfecta (la segunda copia entra exactamente donde termino la primera, sin salto visible)
+  var oneRound = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
+  track.innerHTML = oneRound + oneRound;
+
+  function setItem(key, priceText, pct){
+    track.querySelectorAll('[data-pt-key="' + key + '"]').forEach(function(node){
+      var priceEl = node.querySelector('[data-pt-price]');
+      var chgEl = node.querySelector('[data-pt-chg]');
+      if(priceEl) priceEl.textContent = priceText;
+      if(chgEl && typeof pct === 'number' && isFinite(pct)){
+        chgEl.textContent = formatPct(pct);
+        chgEl.className = 'price-ticker-chg ' + (pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat');
+      }
+    });
+  }
+
+  // ---- cripto: un websocket INDEPENDIENTE por simbolo (no uno combinado para los 4) - si
+  // Binance llegara a renombrar/deslistar un simbolo nuevo como HYPEUSDT, ese socket se queda
+  // reintentando solo el suyo, sin tumbar BTC/ETH/SOL con el. Cada uno con reconexion
+  // automatica (Binance cierra sockets inactivos de vez en cuando, y en movil se pierde la
+  // conexion al cambiar de red o de pantalla) y backoff simple para no martillar el servidor
+  // si esta realmente caido.
+  var cryptoItems = PRICE_TICKER_ITEMS.filter(function(i){ return i.kind === 'crypto'; });
+  function connectBinanceSymbol(item){
+    var retryMs = 2000, ws = null, reconnectTimer = null;
+    function scheduleReconnect(){
+      if(reconnectTimer) return;
+      reconnectTimer = setTimeout(function(){
+        reconnectTimer = null;
+        retryMs = Math.min(retryMs * 1.5, 30000);
+        connect();
+      }, retryMs);
+    }
+    function connect(){
+      try{ ws = new WebSocket('wss://stream.binance.com:9443/ws/' + item.binance + '@ticker'); }
+      catch(err){ scheduleReconnect(); return; }
+      ws.onopen = function(){ retryMs = 2000; };
+      ws.onmessage = function(ev){
+        try{
+          var d = JSON.parse(ev.data);
+          var price = parseFloat(d.c), pct = parseFloat(d.P);
+          if(isFinite(price)) setItem(item.key, '$' + formatPrice(price), isFinite(pct) ? pct : undefined);
+        }catch(err){ /* mensaje raro - llega el siguiente en menos de un segundo, se ignora */ }
+      };
+      ws.onerror = function(){ if(ws) ws.close(); };
+      ws.onclose = scheduleReconnect;
+    }
+    connect();
+  }
+  cryptoItems.forEach(connectBinanceSymbol);
+
+  // ---- indices: ver comentario de arriba - refresca cada 45s, una sola peticion con los 3 ----
+  var indexItems = PRICE_TICKER_ITEMS.filter(function(i){ return i.kind === 'index'; });
+  function refreshIndices(){
+    var symbols = indexItems.map(function(i){ return i.proxy; }).join(',');
+    fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(symbols)))
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        indexItems.forEach(function(item){
+          var row = data && data[item.proxy];
+          if(!row || row.status === 'error') return;
+          var close = parseFloat(row.close), pct = parseFloat(row.percent_change);
+          if(isFinite(close)) setItem(item.key, formatPrice(close * item.scale), isFinite(pct) ? pct : undefined);
+        });
+      })
+      .catch(function(){ /* se reintenta solo en el proximo ciclo de 45s */ });
+  }
+  refreshIndices();
+  setInterval(refreshIndices, 45000);
 })();
 </script>
 <!-- ?v= es cache-busting manual - SUBIR este numero cada vez que se edite colmillos.js, si no
