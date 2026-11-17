@@ -31868,7 +31868,7 @@ async function awardColmillos(eventType, periodKey, amount){
       updated_at: new Date().toISOString(),
     }, { onConflict: 'id' }).then(({ error }) => {
       if(error) console.error('[Mi Arrecife] no se pudo guardar el panel', error);
-    });
+    }).catch(err => console.error('[Mi Arrecife] no se pudo guardar el panel', err));
   }
 
   // descarta ids que ya no existan y ajusta w/h a los limites vigentes - por si el catalogo
@@ -31979,7 +31979,7 @@ async function awardColmillos(eventType, periodKey, amount){
     if(currentUser && typeof sbClient !== 'undefined'){
       sbClient.from('user_arrecife_boards').update({ name: newName, updated_at: new Date().toISOString() }).eq('id', boardId).then(({ error }) => {
         if(error) console.error('[Mi Arrecife] no se pudo renombrar el panel', error);
-      });
+      }).catch(err => console.error('[Mi Arrecife] no se pudo renombrar el panel', err));
     }
   }
 
@@ -32020,7 +32020,7 @@ async function awardColmillos(eventType, periodKey, amount){
         id, user_id: currentUser.id, name: board.name, layout: [], schema_version: 1, position: board.position,
       }).then(({ error }) => {
         if(error) console.error('[Mi Arrecife] no se pudo crear el panel', error);
-      });
+      }).catch(err => console.error('[Mi Arrecife] no se pudo crear el panel', err));
     }
     const tpl = ARRECIFE_TEMPLATES.find(t => t.id === templateId);
     if(tpl){
@@ -32047,7 +32047,7 @@ async function awardColmillos(eventType, periodKey, amount){
     if(currentUser && typeof sbClient !== 'undefined'){
       sbClient.from('user_arrecife_boards').delete().eq('id', boardId).then(({ error }) => {
         if(error) console.error('[Mi Arrecife] no se pudo borrar el panel', error);
-      });
+      }).catch(err => console.error('[Mi Arrecife] no se pudo borrar el panel', err));
     }
   }
 
@@ -32116,7 +32116,15 @@ async function awardColmillos(eventType, periodKey, amount){
     if(!currentUser || typeof sbClient === 'undefined') return;
     try{
       const { data, error } = await sbClient.from('user_arrecife_boards').select('id,name,layout,position').eq('user_id', currentUser.id).order('position', { ascending: true });
-      if(error) return;
+      if(error){
+        // si Supabase falla (RLS, tabla recién creada, red, lo que sea) no se puede dejar al
+        // usuario mirando un panel vacío para siempre sin ninguna pestaña - al menos se le crea
+        // un panel local con la plantilla Básico para que pueda seguir usando Mi Arrecife ya
+        // mismo (se reintentará guardarlo en Supabase la próxima vez que toque algo)
+        console.error('[Mi Arrecife] no se pudo leer los paneles de Supabase', error);
+        if(!arrecifeBoards.length) arrecifeCreateBoard('Mi panel', 'basico');
+        return;
+      }
       if(!data || !data.length){
         // usuario de verdad sin ningún panel todavía (ni siquiera la migración de user_dashboards
         // encontró algo que copiarle) - se le crea uno por defecto con la plantilla Básico
@@ -32140,7 +32148,10 @@ async function awardColmillos(eventType, periodKey, amount){
         const activeBoard = arrecifeFindBoard(arrecifeActiveBoardId);
         if(activeBoard) arrecifeApplyLayout(activeBoard.layout);
       }
-    }catch(err){ console.error('[Mi Arrecife] no se pudo leer los paneles de Supabase', err); }
+    }catch(err){
+      console.error('[Mi Arrecife] no se pudo leer los paneles de Supabase', err);
+      if(!arrecifeBoards.length) arrecifeCreateBoard('Mi panel', 'basico');
+    }
   }
 
   // ==================== catálogo "Agregar widget" ====================
