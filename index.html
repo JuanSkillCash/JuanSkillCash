@@ -2762,6 +2762,10 @@ img[src=""]{display:none}
   .price-ticker-item{font-size:11.5px;gap:4px}
   .price-ticker-price{min-width:54px}
   .price-ticker-chg{font-size:10.5px;min-width:42px}
+  /* Juan: "en la version de celu solo pon a BTC... asi resolvemos el problema, sin que se
+     sobreponga algo" - en vez de 7 precios en varias filas, en celular se deja SOLO BTC (una
+     sola linea cortita, nunca se superpone con nada) */
+  .price-ticker-item:not([data-pt-key="btc"]){display:none}
   .exchange-pill{padding:6px 8px;gap:4px;font-size:0}
   .exchange-pill .pill-dot{font-size:0}
   .exchange-pill-label{display:none}
