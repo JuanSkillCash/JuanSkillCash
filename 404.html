@@ -84,9 +84,12 @@
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
   --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
-  --ticker-h:34px; /* alto de la cinta de precios en vivo fija arriba de todo (#priceTicker) -
-                      usado tambien para empujar .app hacia abajo y para el offset del sidebar
-                      (sticky en escritorio, fixed en movil) para que nunca quede tapado */
+  --ticker-h:34px; /* alto aproximado de 1 sola fila de los precios en vivo (#priceTicker) -
+                      usado SOLO para que el botoncito flotante de hamburguesa en escritorio
+                      (.topbar-brand cuando el sidebar esta colapsado, ver @media(min-width:861px)
+                      mas abajo) no quede tapado/cruzado por los precios - el resto de la pagina
+                      (sidebar, .app) NO usa esta variable a proposito, pedido de Juan de que el
+                      menu de hamburguesa no se corra de donde estaba antes de los precios */
   /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo") - una sola variable
      para poder reusarlo en todas las cajas del sitio (categorías, panorama del mercado,
      sesiones, eventos y noticias, quién está detrás) y que un ajuste futuro de tono se
@@ -158,13 +161,13 @@ button{font-family:inherit;color:inherit}
 }
 
 /* ===== LAYOUT ===== */
-.app{display:flex;min-height:100vh;position:relative;z-index:1;padding-top:var(--ticker-h)}
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
 
 /* SIDEBAR */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;background:var(--bg);
   border-right:0;display:flex;flex-direction:column;
-  position:sticky;top:var(--ticker-h);height:calc(100vh - var(--ticker-h));transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
+  position:sticky;top:0;height:100vh;transition:width .28s cubic-bezier(.16,1,.3,1);overflow-y:auto;overflow-x:hidden;
   /* antes el scroll quedaba completamente invisible (scrollbar-width:none + el webkit de abajo
      en 0px) - sin ninguna pista de que había más opciones debajo, nadie bajaba a verlas. Ahora
      se deja una barrita bien delgada y sutil (ver .sidebar::-webkit-scrollbar más abajo) */
@@ -193,25 +196,20 @@ button{font-family:inherit;color:inherit}
 .sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0;width:100%}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 0 transparent)}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
-/* ---- cinta de precios en vivo (BTC/ETH/SOL/HYPE via Binance websocket, NASDAQ/S&P 500/
-   Russell 2000 via proxy de Twelve Data) - fija arriba de TODO (incluso del sidebar), pedido
-   de Juan con una captura marcando toda la franja superior. position:fixed e independiente de
-   .app a propósito: así nunca se ve tapada por el sidebar (sticky en escritorio, drawer fijo en
-   móvil) ni por nada del contenido normal - solo los modales (z-index 300+) y el drawer del
-   sidebar en móvil (z-index 250) se pintan por encima si hace falta, lo cual es lo esperable. */
-.price-ticker{position:fixed;top:0;left:0;right:0;height:var(--ticker-h);z-index:200;background:var(--bg2);border-bottom:1px solid rgba(91,141,239,.25);overflow:hidden;display:flex;align-items:center}
-.price-ticker-track{display:flex;align-items:center;animation:priceTickerScroll 38s linear infinite;will-change:transform}
-.price-ticker:hover .price-ticker-track{animation-play-state:paused}
-.price-ticker-item{display:inline-flex;align-items:center;gap:7px;padding:0 18px;height:var(--ticker-h);font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap;border-right:1px solid rgba(255,255,255,.07);flex-shrink:0}
+/* ---- precios en vivo (BTC/ETH/SOL/HYPE via Binance websocket, NASDAQ/S&P 500/Russell 2000
+   via proxy de Twelve Data) - Juan pidio explicitamente que NO fuera una "cinta" animada
+   ("que no se mueva la sinta... sin cinta"): sin scroll, sin animacion, solo los 7 precios
+   puestos ahi arriba, en flujo normal de la pagina (no fixed), que se acomodan en varias
+   filas si no caben en una sola linea (celular). */
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 0;padding:6px 10px}
+.price-ticker-item{display:inline-flex;align-items:center;gap:7px;padding:3px 14px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
 .price-ticker-price{color:var(--white)}
 .price-ticker-chg{font-size:11.5px}
 .price-ticker-chg.up{color:var(--green)}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
-@keyframes priceTickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){.price-ticker-track{animation:none;overflow-x:auto;max-width:100vw}}
-@media(max-width:768px){.price-ticker-item{padding:0 13px;font-size:11.5px;gap:5px}.price-ticker-chg{font-size:10.5px}}
+@media(max-width:768px){.price-ticker-item{padding:2px 9px;font-size:11.5px;gap:5px}.price-ticker-chg{font-size:10.5px}}
 .mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
@@ -2726,7 +2724,7 @@ img[src=""]{display:none}
 
 /* MOBILE */
 @media(max-width:860px){
-  .sidebar{position:fixed;left:0;top:var(--ticker-h);z-index:250;width:var(--sidebar-w);transform:translateX(-100%);box-shadow:20px 0 60px rgba(0,0,0,.5)}
+  .sidebar{position:fixed;left:0;top:0;z-index:250;width:var(--sidebar-w);transform:translateX(-100%);box-shadow:20px 0 60px rgba(0,0,0,.5)}
   .sidebar.mobile-open{transform:translateX(0)}
   .sidebar.collapsed{width:var(--sidebar-w)}
   .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-logo-text,.sidebar.collapsed .sb-back span,.sidebar.collapsed .sb-item-badge{display:block}
@@ -2767,7 +2765,7 @@ img[src=""]{display:none}
      el sidebar y hacer scroll hacia abajo, el botoncito se quede flotando visible en vez de
      desaparecer hacia arriba junto con el resto de la topbar (pedido explícito de Juan) */
   .topbar-brand{display:none}
-  .sidebar.collapsed ~ .main .topbar-brand{display:flex;position:fixed;top:18px;left:18px;z-index:260}
+  .sidebar.collapsed ~ .main .topbar-brand{display:flex;position:fixed;top:calc(var(--ticker-h) + 18px);left:18px;z-index:260}
   .mobile-topbar{position:relative;min-height:58px}
 }
 
@@ -32501,13 +32499,11 @@ async function awardColmillos(eventType, periodKey, amount){
       '<span class="price-ticker-chg flat" data-pt-chg>—</span>' +
     '</span>';
   }
-  // se duplica la tanda completa (no solo un item) para que la animacion de -50% en CSS quede
-  // perfecta (la segunda copia entra exactamente donde termino la primera, sin salto visible)
-  var oneRound = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
-  track.innerHTML = oneRound + oneRound;
+  track.innerHTML = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
 
   function setItem(key, priceText, pct){
-    track.querySelectorAll('[data-pt-key="' + key + '"]').forEach(function(node){
+    var node = track.querySelector('[data-pt-key="' + key + '"]');
+    if(node){
       var priceEl = node.querySelector('[data-pt-price]');
       var chgEl = node.querySelector('[data-pt-chg]');
       if(priceEl) priceEl.textContent = priceText;
@@ -32515,7 +32511,7 @@ async function awardColmillos(eventType, periodKey, amount){
         chgEl.textContent = formatPct(pct);
         chgEl.className = 'price-ticker-chg ' + (pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat');
       }
-    });
+    }
   }
 
   // ---- cripto: un websocket INDEPENDIENTE por simbolo (no uno combinado para los 4) - si
