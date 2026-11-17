@@ -1586,6 +1586,17 @@ button{font-family:inherit;color:inherit}
    inline style) consistente con el de sus vecinas, solo dentro del dashboard - fuera de Mi
    Arrecife el 32px fijo original se queda igual que siempre */
 .arrecife-widget-body .res-card .r-val{font-size:clamp(14px,2.4vw,18px)!important}
+/* Fase 2 (lote 2) - widget "Ciclos de halving": cuando se muestra el ciclo completo ("all") y
+   estamos dentro de Mi Arrecife, el countdown del próximo halving se saca FUERA del gráfico
+   (ver showCountdownOutside en renderHalvingChart/renderHalvingAllTimeChart) para no robarle
+   espacio al propio dibujo - ese countdown reusa #halvingMobileCountdown (.dom-card), que tiene
+   min-height:100% a propósito en su uso normal (una tarjeta en un grid de KPIs donde todas deben
+   quedar parejas). Dentro de la columna flex alta de .arrecife-widget-body ese 100% se estira
+   contra un alto mucho más grande del que necesita (confirmado con Playwright: 311px solo para
+   un ícono+etiqueta+número+barra, dejando casi sin espacio al gráfico de abajo). Se le quita ese
+   estiramiento SOLO aquí - w-halvingbar (el widget KPI que SÍ usa .dom-card como su contenido
+   completo) usa un id/selector distinto, sin afectarlo. */
+.arrecife-widget-body #halvingMobileCountdown{min-height:0;flex-shrink:0}
 .arrecife-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:56px 24px;border-radius:16px;border:1px dashed var(--border2);background:rgba(255,255,255,.02);gap:10px}
 .arrecife-empty-state-icon{font-size:32px}
 .arrecife-empty-state-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
@@ -20703,6 +20714,25 @@ function halvingSwitchTab(cycle){
   });
 }
 
+// ancho/alto real del contenedor para cualquier gráfico SVG "a mano" de esta sección (no pasa
+// por renderDomChart/DOM_CHART_DEFS) - mismo criterio ya aplicado ahí (ver commits recientes de
+// Mi Arrecife): mide el <div class="calc"> real en vez de toda la ventana, así el gráfico se ve
+// completo dentro de un widget angosto/bajo del dashboard sin cambiar nada fuera de él (wrap no
+// tiene una altura impuesta fuera del dashboard, se mantiene el alto fijo de siempre).
+// needsRetry=true solo pasa al MONTAR un widget nuevo antes de que gridstack le aplique su
+// tamaño final (rAF) - el propio llamador reintenta 2 frames después, llamándose a sí mismo.
+function arrecifeChartBox(wrap, totalWDesktop, totalHDesktop, totalWMobile, totalHMobile){
+  const chartContainerWidth = (wrap && wrap.parentElement && wrap.parentElement.clientWidth) || window.innerWidth;
+  const isMobileChart = chartContainerWidth <= 640;
+  const totalW = isMobileChart ? totalWMobile : totalWDesktop;
+  const arrecifeWidgetBodyEl = wrap && wrap.closest ? wrap.closest('.arrecife-widget-body') : null;
+  const dashboardHeightBudget = arrecifeWidgetBodyEl ? wrap.clientHeight : 0;
+  const totalH = dashboardHeightBudget > 40
+    ? Math.max(140, Math.min(900, Math.round(totalW * (dashboardHeightBudget / chartContainerWidth))))
+    : (isMobileChart ? totalHMobile : totalHDesktop);
+  return { chartContainerWidth, isMobileChart, totalW, totalH, needsRetry: !!arrecifeWidgetBodyEl && dashboardHeightBudget <= 40 };
+}
+
 function renderHalvingChart(cycleIndex){
   halvingActiveCycle = cycleIndex;
   const loadingEl = document.getElementById('halvingLoading');
@@ -20758,15 +20788,19 @@ function renderHalvingChart(cycleIndex){
   const maxPrice = Math.max(...prices);
   const maxDay = days[days.length - 1] || 1;
 
-  const isMobileChart = window.innerWidth <= 640;
+  const arrecifeChartBoxHalving = arrecifeChartBox(wrap, 1100, 400, 420, 380);
+  const isMobileChart = arrecifeChartBoxHalving.isMobileChart;
   // en el ciclo en curso se reserva una franja extra arriba para el countdown del próximo
   // halving, integrado directo en el gráfico (no tiene sentido en un ciclo ya cerrado) —
-  // en celular el gráfico ya es chico, así que el countdown se saca aparte, arriba del todo,
-  // en vez de robarle espacio a la línea de precio
-  const showCountdownInChart = isOngoing && !isMobileChart;
-  const showCountdownOutside = isOngoing && isMobileChart;
+  // en celular (o dentro de un widget angosto/bajo de Mi Arrecife) el gráfico ya es chico, así
+  // que el countdown se saca aparte, arriba del todo, en vez de robarle espacio a la línea de
+  // precio
+  const insideArrecifeHalving = !!wrap.closest('.arrecife-widget-body');
+  const showCountdownInChart = isOngoing && !isMobileChart && !insideArrecifeHalving;
+  const showCountdownOutside = isOngoing && (isMobileChart || insideArrecifeHalving);
   const extraTop = showCountdownInChart ? 80 : 0;
-  const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
+  const totalW = arrecifeChartBoxHalving.totalW, totalH = arrecifeChartBoxHalving.totalH + extraTop;
+  if(arrecifeChartBoxHalving.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderHalvingChart(cycleIndex)));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 12 : 13;
   const marginLeft = isMobileChart ? 52 : 58;
@@ -20959,13 +20993,17 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const maxPrice = Math.max(...prices);
   const spanMs = (axisEndMs - startMs) || 1;
 
-  const isMobileChart = window.innerWidth <= 640;
-  // en escritorio se reserva una franja extra arriba para el countdown, integrado directo en
-  // el gráfico; en celular se muestra aparte (ver más abajo) para no robarle espacio a la línea
-  const showCountdownInChart = !isMobileChart;
-  const showCountdownOutside = isMobileChart;
+  const arrecifeChartBoxHalvingAll = arrecifeChartBox(wrap, 1100, 400, 420, 380);
+  const isMobileChart = arrecifeChartBoxHalvingAll.isMobileChart;
+  // en escritorio (fuera de Mi Arrecife) se reserva una franja extra arriba para el countdown,
+  // integrado directo en el gráfico; en celular, o dentro de un widget angosto/bajo del
+  // dashboard, se muestra aparte (ver más abajo) para no robarle espacio a la línea
+  const insideArrecifeHalvingAll = !!wrap.closest('.arrecife-widget-body');
+  const showCountdownInChart = !isMobileChart && !insideArrecifeHalvingAll;
+  const showCountdownOutside = isMobileChart || insideArrecifeHalvingAll;
   const extraTop = showCountdownInChart ? 80 : 0;
-  const totalW = isMobileChart ? 420 : 1100, totalH = (isMobileChart ? 380 : 400) + extraTop;
+  const totalW = arrecifeChartBoxHalvingAll.totalW, totalH = arrecifeChartBoxHalvingAll.totalH + extraTop;
+  if(arrecifeChartBoxHalvingAll.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderHalvingChart('all')));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58;
@@ -21489,8 +21527,10 @@ function renderRainbowChart(){
   const minPrice = dataMinPrice / Math.pow(10, 0.55);
   const maxPrice = dataMaxPrice * Math.pow(10, 0.9);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxRainbow = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxRainbow.isMobileChart;
+  const totalW = arrecifeChartBoxRainbow.totalW, totalH = arrecifeChartBoxRainbow.totalH;
+  if(arrecifeChartBoxRainbow.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderRainbowChart()));
   const yFontSize = isMobileChart ? 9 : 11;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -21757,8 +21797,10 @@ function renderEthLogRegChart(){
   const minPrice = dataMinPrice / Math.pow(10, 0.12);
   const maxPrice = dataMaxPrice * Math.pow(10, 0.12);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxEthLogReg = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxEthLogReg.isMobileChart;
+  const totalW = arrecifeChartBoxEthLogReg.totalW, totalH = arrecifeChartBoxEthLogReg.totalH;
+  if(arrecifeChartBoxEthLogReg.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderEthLogRegChart()));
   const yFontSize = isMobileChart ? 9 : 11;
   const xFontSize = isMobileChart ? 11 : 12;
   // más ancho que el resto de los gráficos (46/58): en "Todo el historial" la banda inferior de la regresión en los primeros días de ETH (2015) da valores muy chicos (ej. "$0.000200"), encontrado con Playwright/getBBox - un label así de largo no cabía con el margen normal
@@ -22035,8 +22077,10 @@ function renderEthVwapChart(){
   const minPrice = 0;
   const maxPrice = dataMaxPrice * 1.08;
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 420 : 440;
+  const arrecifeChartBoxEthVwap = arrecifeChartBox(wrap, 1100, 440, 420, 420);
+  const isMobileChart = arrecifeChartBoxEthVwap.isMobileChart;
+  const totalW = arrecifeChartBoxEthVwap.totalW, totalH = arrecifeChartBoxEthVwap.totalH;
+  if(arrecifeChartBoxEthVwap.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderEthVwapChart()));
   const yFontSize = isMobileChart ? 9 : 11;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -22258,8 +22302,10 @@ function renderPiCycleChart(){
   const allVals = points.map(p => p.c).concat(sma111).concat(sma350x2);
   const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxPiCycle = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxPiCycle.isMobileChart;
+  const totalW = arrecifeChartBoxPiCycle.totalW, totalH = arrecifeChartBoxPiCycle.totalH;
+  if(arrecifeChartBoxPiCycle.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderPiCycleChart()));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58; // 52 (antes 46): ajuste de overflow en mobile, igual que Halving/BTC Macro
@@ -22901,8 +22947,10 @@ function renderMarketFloorChart(){
   const prices = points.map(p => p.price).filter(v => v > 0);
   const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxMfloor = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxMfloor.isMobileChart;
+  const totalW = arrecifeChartBoxMfloor.totalW, totalH = arrecifeChartBoxMfloor.totalH;
+  if(arrecifeChartBoxMfloor.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderMarketFloorChart()));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58; // 52 (antes 46): "$100K" quedaba 1px fuera en mobile
@@ -23112,8 +23160,10 @@ function renderEma200Chart(){
   const allVals = points.map(p => p.c).concat(ema200).concat(sma200);
   const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxEma200 = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxEma200.isMobileChart;
+  const totalW = arrecifeChartBoxEma200.totalW, totalH = arrecifeChartBoxEma200.totalH;
+  if(arrecifeChartBoxEma200.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderEma200Chart()));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58; // 52 (antes 46): ajuste de overflow en mobile, igual que Halving/BTC Macro
@@ -23331,8 +23381,10 @@ function renderCicloSoporteChart(){
   const minPrice = Math.min(...prices, ...onscreenPeaks.map(pk => pk.peakPrice));
   const maxPrice = Math.max(...prices, ...onscreenPeaks.map(pk => pk.peakPrice));
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxCicloSoporte = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxCicloSoporte.isMobileChart;
+  const totalW = arrecifeChartBoxCicloSoporte.totalW, totalH = arrecifeChartBoxCicloSoporte.totalH;
+  if(arrecifeChartBoxCicloSoporte.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderCicloSoporteChart()));
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58; // 52 (antes 46): ajuste de overflow en mobile, igual que Halving/BTC Macro
@@ -23568,12 +23620,16 @@ function renderRsiChart(){
   const prices = points.map(p => p.c);
   const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
-  const isMobileChart = window.innerWidth <= 640;
   // totalH bajado de 480/540 a 400/450 (Juan: con los 2 paneles apilados y estirados a lo ancho
   // de .chart-breakout, el alto renderizado en escritorio se iba por encima de 700px y ni
   // tomando pantallazo cabía el título + los 2 paneles + el pie - ver el mismo ajuste en
-  // STH-MVRV/Epoch P&L/BTC-AAPL, los otros 3 gráficos de "panel superior + panel inferior")
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
+  // STH-MVRV/Epoch P&L/BTC-AAPL, los otros 3 gráficos de "panel superior + panel inferior").
+  // Dentro de Mi Arrecife el alto real del widget manda igual que en cualquier otro gráfico -
+  // los 2 paneles (precio+RSI) se siguen repartiendo ese alto en la misma proporción 63%/37%.
+  const arrecifeChartBoxRsi = arrecifeChartBox(wrap, 1100, 450, 420, 400);
+  const isMobileChart = arrecifeChartBoxRsi.isMobileChart;
+  const totalW = arrecifeChartBoxRsi.totalW, totalH = arrecifeChartBoxRsi.totalH;
+  if(arrecifeChartBoxRsi.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderRsiChart()));
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58, marginRight = isMobileChart ? 8 : 14; // 52 (antes 46): ajuste de overflow en mobile
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -23849,11 +23905,12 @@ function renderSthMvrvChart(){
   const mvrvVals = points.map(p => p.mvrv).filter(v => v != null && isFinite(v));
   const minMvrv = Math.min(0.4, ...mvrvVals), maxMvrv = Math.max(1.6, ...mvrvVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/Epoch P&L/BTC-AAPL - Juan:
-  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
-  // no cabía en un solo pantallazo junto con el título y el pie)
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
+  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/Epoch P&L/BTC-AAPL). Dentro
+  // de Mi Arrecife el alto real del widget manda igual que en cualquier otro gráfico.
+  const arrecifeChartBoxSthMvrv = arrecifeChartBox(wrap, 1100, 450, 420, 400);
+  const isMobileChart = arrecifeChartBoxSthMvrv.isMobileChart;
+  const totalW = arrecifeChartBoxSthMvrv.totalW, totalH = arrecifeChartBoxSthMvrv.totalH;
+  if(arrecifeChartBoxSthMvrv.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderSthMvrvChart()));
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -24111,11 +24168,12 @@ function renderEpochPlChart(){
   const prices = points.map(p => p.btc).filter(v => v > 0);
   const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
 
-  const isMobileChart = window.innerWidth <= 640;
-  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/STH-MVRV/BTC-AAPL - Juan:
-  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
-  // no cabía en un solo pantallazo junto con el título y el pie)
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 450;
+  // totalH bajado de 480/540 a 400/450 (mismo ajuste que RSI Mensual/STH-MVRV/BTC-AAPL). Dentro
+  // de Mi Arrecife el alto real del widget manda igual que en cualquier otro gráfico.
+  const arrecifeChartBoxEpochPl = arrecifeChartBox(wrap, 1100, 450, 420, 400);
+  const isMobileChart = arrecifeChartBoxEpochPl.isMobileChart;
+  const totalW = arrecifeChartBoxEpochPl.totalW, totalH = arrecifeChartBoxEpochPl.totalH;
+  if(arrecifeChartBoxEpochPl.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderEpochPlChart()));
   const yFontSize = isMobileChart ? 11 : 13, xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 30, marginBottom = isMobileChart ? 30 : 34;
@@ -24352,8 +24410,10 @@ function renderMa4yChart(){
   const allVals = points.map(p => p.c).concat(sma4y);
   const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxMa4y = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxMa4y.isMobileChart;
+  const totalW = arrecifeChartBoxMa4y.totalW, totalH = arrecifeChartBoxMa4y.totalH;
+  if(arrecifeChartBoxMa4y.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderMa4yChart()));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 52 : 58; // 52 (antes 46): ajuste de overflow en mobile, igual que Halving/BTC Macro
@@ -26440,8 +26500,10 @@ function renderBtcMacroChart(){
   const btcVals = points.map(p => p.btc).filter(v => v != null && v > 0);
   const minPrice = Math.min(...btcVals), maxPrice = Math.max(...btcVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxBtcMacro = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxBtcMacro.isMobileChart;
+  const totalW = arrecifeChartBoxBtcMacro.totalW, totalH = arrecifeChartBoxBtcMacro.totalH;
+  if(arrecifeChartBoxBtcMacro.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderBtcMacroChart()));
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -26723,8 +26785,10 @@ function renderBtcTrendsChart(){
   const btcVals = points.map(p => p.btc).filter(v => v != null && v > 0);
   const minPrice = Math.min(...btcVals), maxPrice = Math.max(...btcVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxBtcTrends = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxBtcTrends.isMobileChart;
+  const totalW = arrecifeChartBoxBtcTrends.totalW, totalH = arrecifeChartBoxBtcTrends.totalH;
+  if(arrecifeChartBoxBtcTrends.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderBtcTrendsChart()));
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -27023,8 +27087,10 @@ function renderMcapEmaChart(key){
   weeks.forEach(t => { const e = map.get(t); allVals.push(e.c, e.ema); });
   const minPrice = Math.min(...allVals), maxPrice = Math.max(...allVals);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxMcapEma = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxMcapEma.isMobileChart;
+  const totalW = arrecifeChartBoxMcapEma.totalW, totalH = arrecifeChartBoxMcapEma.totalH;
+  if(arrecifeChartBoxMcapEma.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderMcapEmaChart(key)));
   const yFontSize = isMobileChart ? 12 : 14;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -27296,8 +27362,10 @@ function renderBtcXauChart(){
   const ratios = points.map(p => p.ratio);
   const minR = Math.min(...ratios), maxR = Math.max(...ratios);
 
-  const isMobileChart = window.innerWidth <= 640;
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 380 : 420;
+  const arrecifeChartBoxBtcXau = arrecifeChartBox(wrap, 1100, 420, 420, 380);
+  const isMobileChart = arrecifeChartBoxBtcXau.isMobileChart;
+  const totalW = arrecifeChartBoxBtcXau.totalW, totalH = arrecifeChartBoxBtcXau.totalH;
+  if(arrecifeChartBoxBtcXau.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderBtcXauChart()));
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -27551,13 +27619,14 @@ function renderBtcAaplChart(){
   const btcPrices = points.map(p => p.btcPrice);
   const minP = Math.min(...btcPrices), maxP = Math.max(...btcPrices);
 
-  const isMobileChart = window.innerWidth <= 640;
-  // totalH bajado de 460/520 a 400/440 (mismo ajuste que RSI Mensual/STH-MVRV/Epoch P&L - Juan:
-  // con los 2 paneles estirados a lo ancho de .chart-breakout, el alto renderizado en escritorio
-  // no cabía en un solo pantallazo junto con el título y el pie). Las líneas de tendencia NO se
-  // tocan aquí - se calculan en precio/fecha y pasan por yForRatio más abajo, así que se
-  // reacomodan solas con el nuevo alto, sin cambiar a qué precio/fecha apuntan.
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 400 : 440;
+  // totalH bajado de 460/520 a 400/440 (mismo ajuste que RSI Mensual/STH-MVRV/Epoch P&L). Las
+  // líneas de tendencia NO se tocan aquí - se calculan en precio/fecha y pasan por yForRatio más
+  // abajo, así que se reacomodan solas con el nuevo alto, sin cambiar a qué precio/fecha apuntan.
+  // Dentro de Mi Arrecife el alto real del widget manda igual que en cualquier otro gráfico.
+  const arrecifeChartBoxBtcAapl = arrecifeChartBox(wrap, 1100, 440, 420, 400);
+  const isMobileChart = arrecifeChartBoxBtcAapl.isMobileChart;
+  const totalW = arrecifeChartBoxBtcAapl.totalW, totalH = arrecifeChartBoxBtcAapl.totalH;
+  if(arrecifeChartBoxBtcAapl.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderBtcAaplChart()));
   const yFontSize = isMobileChart ? 10 : 12;
   const xFontSize = isMobileChart ? 11 : 12;
   const marginLeft = isMobileChart ? 46 : 58;
@@ -27787,14 +27856,20 @@ async function loadCbpChartData(tfKey){
   });
   return merged;
 }
+// último "data" dibujado - para poder redibujar desde fuera (ej. al redimensionar el widget en
+// Mi Arrecife) sin tener que volver a pedirle los datos a loadCbpChartData()
+let arrecifeCbpLastData = null;
 function renderCbpChart(data){
+  arrecifeCbpLastData = data;
   const wrap = document.getElementById('cbpChartWrap');
   const statsEl = document.getElementById('cbpStats');
-  const isMobileChart = window.innerWidth <= 640;
   // totalH bajado de 420/480 a 360/420 (mismo ajuste que RSI Mensual/STH-MVRV/Epoch P&L/
-  // BTC-AAPL - Juan: con los 2 paneles estirados a lo ancho de .chart-breakout, el alto
-  // renderizado en escritorio no cabía en un solo pantallazo junto con el título y el pie)
-  const totalW = isMobileChart ? 420 : 1100, totalH = isMobileChart ? 360 : 420;
+  // BTC-AAPL). Dentro de Mi Arrecife el alto real del widget manda igual que en cualquier otro
+  // gráfico; el retry reutiliza el mismo "data" ya recibido, sin pedirlo de nuevo.
+  const arrecifeChartBoxCbp = arrecifeChartBox(wrap, 1100, 420, 420, 360);
+  const isMobileChart = arrecifeChartBoxCbp.isMobileChart;
+  const totalW = arrecifeChartBoxCbp.totalW, totalH = arrecifeChartBoxCbp.totalH;
+  if(arrecifeChartBoxCbp.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderCbpChart(data)));
   const yFontSize = isMobileChart ? 9 : 11, xFontSize = isMobileChart ? 10 : 12;
   const marginLeft = isMobileChart ? 46 : 58, marginRight = isMobileChart ? 8 : 14;
   const marginTop = 14, marginBottom = isMobileChart ? 26 : 30;
@@ -28097,7 +28172,6 @@ function renderOptionsOiChart(){
   legendEl.style.display = 'flex';
   statsEl.style.display = '';
 
-  const isMobileChart = window.innerWidth <= 640;
   const n = strikes.length;
   // el SVG escala siempre al ancho de la tarjeta (igual que el resto de los gráficos del sitio,
   // y que la propia app de Deribit en celular) - con muchos strikes las barras y el espaciado de
@@ -28105,12 +28179,15 @@ function renderOptionsOiChart(){
   // marginRight un poco más ancho que antes (36/58 → 48/66): con interés abierto notional grande
   // (ej. "$120.00M") la etiqueta del eje de Máximo Dolor se salía por el borde derecho, encontrado
   // con Playwright/getBBox
+  const arrecifeChartBoxOptionsOi = arrecifeChartBox(wrap, 1100, 340 + 26 + 76, 420, 220 + 26 + 56);
+  const isMobileChart = arrecifeChartBoxOptionsOi.isMobileChart;
+  if(arrecifeChartBoxOptionsOi.needsRetry) requestAnimationFrame(() => requestAnimationFrame(() => renderOptionsOiChart()));
   const marginLeft = isMobileChart ? 40 : 58, marginRight = isMobileChart ? 58 : 66, marginTop = 26, marginBottom = isMobileChart ? 56 : 76;
-  const totalW = isMobileChart ? 420 : 1100;
+  const totalW = arrecifeChartBoxOptionsOi.totalW;
   const drawW = totalW - marginLeft - marginRight;
   const barGroupW = drawW / n;
-  const drawH = isMobileChart ? 220 : 340;
-  const totalH = drawH + marginTop + marginBottom;
+  const totalH = arrecifeChartBoxOptionsOi.totalH;
+  const drawH = totalH - marginTop - marginBottom;
 
   const maxOi = Math.max(...strikes.map(s => {
     const d = byStrike.get(s);
@@ -31212,6 +31289,136 @@ async function awardColmillos(eventType, periodKey, amount){
       mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedbalance"]'), () => { if(typeof ensureMacroChartLoaded === 'function') ensureMacroChartLoaded('fedbalance'); }),
       unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="fedbalance"]')),
     },
+    // ---- Fase 2 (lote 2): los ~25 gráficos "a mano" que NO pasan por renderDomChart/
+    // DOM_CHART_DEFS (cada uno con su propia función de render y su propio ensureXLoaded, ver
+    // docs/arrecife-widget-inventario.md sección 3) - mismo mount/unmount genérico de siempre.
+    // Excluido a propósito: "treascb" (Costo Base Institucional) - su .indic-panel es solo texto
+    // explicativo (.calc-disclaimer), no tiene gráfico ni fetch propio que montar.
+    'w-btcaapl': {
+      id:'w-btcaapl', label:'BTC/AAPL', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcaapl"]'), () => { if(typeof ensureBtcAaplLoaded === 'function') ensureBtcAaplLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcaapl"]')),
+    },
+    'w-btcmacro': {
+      id:'w-btcmacro', label:'BTC + datos macroeconómicos', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcmacro"]'), () => { if(typeof ensureBtcMacroLoaded === 'function') ensureBtcMacroLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcmacro"]')),
+    },
+    'w-btcreturns': {
+      id:'w-btcreturns', label:'Retornos de Bitcoin', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcreturns"]'), () => { if(typeof ensureBtcReturnsLoaded === 'function') ensureBtcReturnsLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcreturns"]')),
+    },
+    'w-btctrends': {
+      id:'w-btctrends', label:'BTC + Google Trends', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="btctrends"]'), () => { if(typeof ensureBtcTrendsLoaded === 'function') ensureBtcTrendsLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="btctrends"]')),
+    },
+    'w-btcxau': {
+      id:'w-btcxau', label:'BTC/XAU', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcxau"]'), () => { if(typeof ensureBtcXauLoaded === 'function') ensureBtcXauLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="btcxau"]')),
+    },
+    'w-cbpremium': {
+      id:'w-cbpremium', label:'Coinbase Premium', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="cbpremium"]'), () => { if(typeof ensureCbpLoaded === 'function') ensureCbpLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="cbpremium"]')),
+    },
+    'w-ciclosoporte': {
+      id:'w-ciclosoporte', label:'Techo anterior', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ciclosoporte"]'), () => { if(typeof ensureCicloSoporteLoaded === 'function') ensureCicloSoporteLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ciclosoporte"]')),
+    },
+    'w-ema200': {
+      id:'w-ema200', label:'Medias móviles 200', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ema200"]'), () => { if(typeof ensureEma200Loaded === 'function') ensureEma200Loaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ema200"]')),
+    },
+    'w-epochpl': {
+      id:'w-epochpl', label:'% Supply en pérdida por época', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="epochpl"]'), () => { if(typeof ensureEpochPlLoaded === 'function') ensureEpochPlLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="epochpl"]')),
+    },
+    'w-ethlogreg': {
+      id:'w-ethlogreg', label:'Bandas log de ETH', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethlogreg"]'), () => { if(typeof ensureEthLogRegLoaded === 'function') ensureEthLogRegLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethlogreg"]')),
+    },
+    'w-ethreturns': {
+      id:'w-ethreturns', label:'Retornos de Ethereum', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethreturns"]'), () => { if(typeof ensureEthReturnsLoaded === 'function') ensureEthReturnsLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethreturns"]')),
+    },
+    'w-ethvwap': {
+      id:'w-ethvwap', label:'VWAP anclado de ETH', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethvwap"]'), () => { if(typeof ensureEthVwapLoaded === 'function') ensureEthVwapLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ethvwap"]')),
+    },
+    'w-govtreasuries': {
+      id:'w-govtreasuries', label:'Reservas gubernamentales', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="govtreasuries"]'), () => { if(typeof ensureGovTreasuriesLoaded === 'function') ensureGovTreasuriesLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="govtreasuries"]')),
+    },
+    'w-halving': {
+      id:'w-halving', label:'Ciclos de halving', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="halving"]'), () => { if(typeof ensureHalvingLoaded === 'function') ensureHalvingLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="halving"]')),
+    },
+    'w-longshort': {
+      id:'w-longshort', label:'Ratio largo/corto', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="longshort"]'), () => { if(typeof ensureLongShortLoaded === 'function') ensureLongShortLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="longshort"]')),
+    },
+    'w-ma4y': {
+      id:'w-ma4y', label:'Media móvil de 4 años', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="ma4y"]'), () => { if(typeof ensureMa4yLoaded === 'function') ensureMa4yLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="ma4y"]')),
+    },
+    'w-optionsoi': {
+      id:'w-optionsoi', label:'Interés abierto en opciones', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="optionsoi"]'), () => { if(typeof ensureOptionsOiLoaded === 'function') ensureOptionsOiLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="optionsoi"]')),
+    },
+    'w-others': {
+      id:'w-others', label:'OTHERS EMA200', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="others"]'), () => { if(typeof ensureOthersLoaded === 'function') ensureOthersLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="others"]')),
+    },
+    'w-picycle': {
+      id:'w-picycle', label:'Techo Pi Cycle', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="picycle"]'), () => { if(typeof ensurePicycleLoaded === 'function') ensurePicycleLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="picycle"]')),
+    },
+    'w-pisomercado': {
+      id:'w-pisomercado', label:'Pulso de fondo', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="pisomercado"]'), () => { if(typeof ensureMfloorLoaded === 'function') ensureMfloorLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="pisomercado"]')),
+    },
+    'w-rainbow': {
+      id:'w-rainbow', label:'Rainbow Chart', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="rainbow"]'), () => { if(typeof ensureRainbowLoaded === 'function') ensureRainbowLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="rainbow"]')),
+    },
+    'w-rsimensual': {
+      id:'w-rsimensual', label:'RSI mensual', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="rsimensual"]'), () => { if(typeof ensureRsiLoaded === 'function') ensureRsiLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="rsimensual"]')),
+    },
+    'w-sthmvrv': {
+      id:'w-sthmvrv', label:'STH-MVRV', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="sthmvrv"]'), () => { if(typeof ensureSthMvrvLoaded === 'function') ensureSthMvrvLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="sthmvrv"]')),
+    },
+    'w-total2': {
+      id:'w-total2', label:'TOTAL2 EMA200', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="total2"]'), () => { if(typeof ensureTotal2Loaded === 'function') ensureTotal2Loaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="total2"]')),
+    },
+    'w-treasuries': {
+      id:'w-treasuries', label:'Balances corporativos', family:'chart',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="treasuries"]'), () => { if(typeof ensureTreasuriesLoaded === 'function') ensureTreasuriesLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="treasuries"]')),
+    },
     'w-calc-futuros': {
       id:'w-calc-futuros', label:'Calculadora de Futuros', family:'calc',
       mount: arrecifeMountModalWidget('calcModal', () => { if(typeof setFuturesMode === 'function') setFuturesMode('usdtm'); }),
@@ -31553,6 +31760,30 @@ async function awardColmillos(eventType, periodKey, amount){
     'w-fedfundsrate': () => { if(typeof renderDomChart === 'function') renderDomChart('fedfundsrate'); },
     'w-gdpgrowth': () => { if(typeof renderDomChart === 'function') renderDomChart('gdpgrowth'); },
     'w-fedbalance': () => { if(typeof renderDomChart === 'function') renderDomChart('fedbalance'); },
+    // ---- Fase 2 (lote 2): gráficos "a mano", cada uno llama a SU PROPIA función de render (no
+    // renderDomChart, que es solo para los del lote 1). w-btcreturns/w-ethreturns (tablas HTML,
+    // no SVG), w-govtreasuries/w-longshort/w-treasuries (listas con barras de ancho en %, no
+    // SVG) no necesitan redibujado al redimensionar - ya son responsivos por CSS. ----
+    'w-btcaapl': () => { if(typeof renderBtcAaplChart === 'function') renderBtcAaplChart(); },
+    'w-btcmacro': () => { if(typeof renderBtcMacroChart === 'function') renderBtcMacroChart(); },
+    'w-btctrends': () => { if(typeof renderBtcTrendsChart === 'function') renderBtcTrendsChart(); },
+    'w-btcxau': () => { if(typeof renderBtcXauChart === 'function') renderBtcXauChart(); },
+    'w-cbpremium': () => { if(typeof renderCbpChart === 'function' && arrecifeCbpLastData) renderCbpChart(arrecifeCbpLastData); },
+    'w-ciclosoporte': () => { if(typeof renderCicloSoporteChart === 'function') renderCicloSoporteChart(); },
+    'w-ema200': () => { if(typeof renderEma200Chart === 'function') renderEma200Chart(); },
+    'w-epochpl': () => { if(typeof renderEpochPlChart === 'function') renderEpochPlChart(); },
+    'w-ethlogreg': () => { if(typeof renderEthLogRegChart === 'function') renderEthLogRegChart(); },
+    'w-ethvwap': () => { if(typeof renderEthVwapChart === 'function') renderEthVwapChart(); },
+    'w-halving': () => { if(typeof renderHalvingChart === 'function') renderHalvingChart(halvingActiveCycle); },
+    'w-ma4y': () => { if(typeof renderMa4yChart === 'function') renderMa4yChart(); },
+    'w-optionsoi': () => { if(typeof renderOptionsOiChart === 'function') renderOptionsOiChart(); },
+    'w-others': () => { if(typeof renderMcapEmaChart === 'function') renderMcapEmaChart('others'); },
+    'w-picycle': () => { if(typeof renderPiCycleChart === 'function') renderPiCycleChart(); },
+    'w-pisomercado': () => { if(typeof renderMarketFloorChart === 'function') renderMarketFloorChart(); },
+    'w-rainbow': () => { if(typeof renderRainbowChart === 'function') renderRainbowChart(); },
+    'w-rsimensual': () => { if(typeof renderRsiChart === 'function') renderRsiChart(); },
+    'w-sthmvrv': () => { if(typeof renderSthMvrvChart === 'function') renderSthMvrvChart(); },
+    'w-total2': () => { if(typeof renderMcapEmaChart === 'function') renderMcapEmaChart('total2'); },
   };
   let arrecifeResizeTimer = null;
   function arrecifeOnWidgetResizeStop(el){
