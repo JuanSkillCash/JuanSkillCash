@@ -31089,8 +31089,12 @@ async function awardColmillos(eventType, periodKey, amount){
     news:     { minW:3, maxW:6,  minH:4, maxH:10, defW:4, defH:6 },
     calendar: { minW:6, maxW:12, minH:5, maxH:10, defW:8, defH:6 },
     video:    { minW:4, maxW:12, minH:3, maxH:8,  defW:6, defH:4 },
+    // Glosario/Biblioteca de Errores/Manual (listas de referencia para leer) y los 2 radares
+    // (tabs+filtro+buscador+favoritos+grilla+lista+paginación, el contenido más denso de todo
+    // el catálogo) - más alto que una calculadora típica por defecto, pero se puede achicar
+    table:    { minW:4, maxW:12, minH:5, maxH:10, defW:6, defH:7 },
   };
-  const ARRECIFE_FAMILY_LABELS = { kpi:'Indicadores clave', chart:'Gráficos', calc:'Calculadoras', news:'Noticias', calendar:'Calendario', video:'Video' };
+  const ARRECIFE_FAMILY_LABELS = { kpi:'Indicadores clave', chart:'Gráficos', calc:'Calculadoras', news:'Noticias', calendar:'Calendario', video:'Video', table:'Tablas y listas' };
 
   // ---- helpers genéricos de reparentar: dejan un <!--comentario--> en el lugar original y lo
   // devuelven ahí tal cual al desmontar, sin importar qué tan profundo viva el nodo ----
@@ -31458,6 +31462,176 @@ async function awardColmillos(eventType, periodKey, amount){
       id:'w-youtube-live', label:'Conferencias en Vivo', family:'video',
       mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsYtChannelList'); return list ? list.closest('.events-card') : null; }),
       unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsYtChannelList') ? document.getElementById('eventsYtChannelList').closest('.events-card') : null),
+    },
+    // ---- Fase 2 (lote 3): las 18 calculadoras/referencias que faltaban (ver
+    // docs/arrecife-widget-inventario.md sección 4) - mismo arrecifeMountModalWidget/
+    // arrecifeUnmountModalWidget ya probado con calcModal/dcaModal/quizModal. El initFn de cada
+    // una replica SOLO la parte de "refrescar contenido" que su propio open*Modal() normal hace
+    // (nunca se llama openXModal()/closeXModal() directo - esas funciones también navegan de
+    // categoría, empujan ruta/historial, etc., que no tiene sentido dentro del dashboard) ----
+    'w-calc-rentabilidad': {
+      id:'w-calc-rentabilidad', label:'Calculadora de Rentabilidad', family:'calc',
+      mount: arrecifeMountModalWidget('profitModal'),
+      unmount: arrecifeUnmountModalWidget('profitModal'),
+    },
+    'w-calc-breakeven': {
+      id:'w-calc-breakeven', label:'Calculadora de Break-even', family:'calc',
+      mount: arrecifeMountModalWidget('breakevenModal', () => {
+        if(typeof computeBreakeven === 'function') computeBreakeven();
+        if(typeof setRandomPromoText === 'function') setRandomPromoText('promoTextBreakeven');
+      }),
+      unmount: arrecifeUnmountModalWidget('breakevenModal'),
+    },
+    'w-calc-mcap': {
+      id:'w-calc-mcap', label:'Comparador de Market Cap', family:'calc',
+      mount: arrecifeMountModalWidget('mcapCompareModal', () => {
+        if(typeof mcapMySelected !== 'undefined' && (!mcapMySelected.marketCap || !mcapTargetSelected.marketCap)){
+          if(typeof refreshMcapBothAssets === 'function') refreshMcapBothAssets();
+        } else if(typeof computeMcapActive === 'function') computeMcapActive();
+        if(typeof setRandomPromoText === 'function') setRandomPromoText('promoTextMcap');
+      }),
+      unmount: arrecifeUnmountModalWidget('mcapCompareModal'),
+    },
+    'w-calc-fifreedom': {
+      id:'w-calc-fifreedom', label:'Tiempo hasta la Libertad Financiera', family:'calc',
+      mount: arrecifeMountModalWidget('fiFreedomModal', () => {
+        if(typeof computeFiFreedom === 'function') computeFiFreedom();
+        if(typeof setRandomPromoText === 'function') setRandomPromoText('promoTextFi');
+      }),
+      unmount: arrecifeUnmountModalWidget('fiFreedomModal'),
+    },
+    'w-calc-unitconv': {
+      id:'w-calc-unitconv', label:'Conversor de Unidades', family:'calc',
+      mount: arrecifeMountModalWidget('unitConverterModal', () => { if(typeof refreshUnitConverterPrices === 'function') refreshUnitConverterPrices(); }),
+      unmount: arrecifeUnmountModalWidget('unitConverterModal'),
+    },
+    'w-calc-pct': {
+      id:'w-calc-pct', label:'Calculadora de Porcentajes', family:'calc',
+      mount: arrecifeMountModalWidget('pctCalcModal', () => { if(typeof computeAllPct === 'function') computeAllPct(); }),
+      unmount: arrecifeUnmountModalWidget('pctCalcModal'),
+    },
+    'w-calc-tzclock': {
+      id:'w-calc-tzclock', label:'Reloj de Zona Horaria', family:'calc',
+      // único de este lote con un timer propio: openTzClockModal()/closeTzClockModal() arrancan/
+      // paran un setInterval(updateTzClock,1000) mientras el modal está "abierto" normalmente -
+      // arrecifeMountModalWidget solo mueve el DOM, así que aquí se replica a mano ese arranque/
+      // parada (nunca se llama a esas funciones directo: openModalGeneric navega de categoría/
+      // empuja ruta, sin sentido dentro del dashboard)
+      mount: arrecifeMountModalWidget('tzClockModal', () => {
+        if(typeof updateTzClock === 'function') updateTzClock();
+        if(typeof tzClockInterval !== 'undefined'){
+          if(tzClockInterval) clearInterval(tzClockInterval);
+          tzClockInterval = setInterval(updateTzClock, 1000);
+        }
+      }),
+      unmount: function(){
+        if(typeof tzClockInterval !== 'undefined' && tzClockInterval){ clearInterval(tzClockInterval); tzClockInterval = null; }
+        arrecifeUnmountModalWidget('tzClockModal').call(this);
+      },
+    },
+    'w-calc-fees': {
+      id:'w-calc-fees', label:'Calculadora de Comisiones', family:'calc',
+      mount: arrecifeMountModalWidget('feesModal', () => {
+        if(typeof computeFees === 'function') computeFees();
+        if(typeof setRandomPromoText === 'function') setRandomPromoText('promoTextFees');
+      }),
+      unmount: arrecifeUnmountModalWidget('feesModal'),
+    },
+    'w-calc-correlacion': {
+      id:'w-calc-correlacion', label:'Monitor de Correlación', family:'calc',
+      mount: arrecifeMountModalWidget('correlationModal'),
+      unmount: arrecifeUnmountModalWidget('correlationModal'),
+    },
+    'w-calc-walletcompare': {
+      id:'w-calc-walletcompare', label:'Comparador de Wallets', family:'calc',
+      mount: arrecifeMountModalWidget('walletCompareModal', () => {
+        if(typeof computeWalletCompare === 'function') computeWalletCompare();
+        if(typeof renderWcCompareTable === 'function') renderWcCompareTable();
+      }),
+      unmount: arrecifeUnmountModalWidget('walletCompareModal'),
+    },
+    'w-calc-approvals': {
+      id:'w-calc-approvals', label:'Verificar Aprobaciones', family:'calc',
+      mount: arrecifeMountModalWidget('approvalsModal', () => { if(typeof renderApprovals === 'function') renderApprovals(); }),
+      unmount: arrecifeUnmountModalWidget('approvalsModal'),
+    },
+    'w-calc-inheritance': {
+      id:'w-calc-inheritance', label:'Herencia Digital', family:'calc',
+      mount: arrecifeMountModalWidget('inheritanceModal', () => { if(typeof renderInheritance === 'function') renderInheritance(); }),
+      unmount: arrecifeUnmountModalWidget('inheritanceModal'),
+    },
+    'w-calc-tokenscanner': {
+      id:'w-calc-tokenscanner', label:'Analizador de Token', family:'calc',
+      mount: arrecifeMountModalWidget('tokenScannerModal'),
+      unmount: arrecifeUnmountModalWidget('tokenScannerModal'),
+    },
+    'w-calc-checklist': {
+      id:'w-calc-checklist', label:'Checklist de Seguridad', family:'calc',
+      mount: arrecifeMountModalWidget('checklistModal', () => { if(typeof renderChecklist === 'function') renderChecklist(); }),
+      unmount: arrecifeUnmountModalWidget('checklistModal'),
+    },
+    'w-calc-portafolio': {
+      id:'w-calc-portafolio', label:'Simulador de Portafolio', family:'calc',
+      mount: arrecifeMountModalWidget('portfolioModal'),
+      unmount: arrecifeUnmountModalWidget('portfolioModal'),
+    },
+    'w-glosario': {
+      id:'w-glosario', label:'Glosario Cripto', family:'table',
+      mount: arrecifeMountModalWidget('glossaryModal', () => {
+        if(typeof renderWordOfDay === 'function') renderWordOfDay();
+        if(typeof renderGlossAzRow === 'function') renderGlossAzRow();
+        if(typeof renderGlossFilterRow === 'function') renderGlossFilterRow();
+        if(typeof renderGlossaryList === 'function') renderGlossaryList();
+      }),
+      unmount: arrecifeUnmountModalWidget('glossaryModal'),
+    },
+    'w-mistakes': {
+      id:'w-mistakes', label:'Biblioteca de Errores Comunes', family:'table',
+      mount: arrecifeMountModalWidget('mistakesModal', () => {
+        if(typeof renderMistakesFilterRow === 'function') renderMistakesFilterRow();
+        if(typeof renderMistakesList === 'function') renderMistakesList();
+      }),
+      unmount: arrecifeUnmountModalWidget('mistakesModal'),
+    },
+    'w-manual': {
+      id:'w-manual', label:'Manual del Depredador', family:'table',
+      mount: arrecifeMountModalWidget('manualModal', () => {
+        if(typeof renderManualFilterRow === 'function') renderManualFilterRow();
+        if(typeof renderManualList === 'function') renderManualList();
+      }),
+      unmount: arrecifeUnmountModalWidget('manualModal'),
+    },
+    // ---- Fase 2 (lote 3): segundo widget de noticias, mismo patrón exacto de w-news-cripto -
+    // #eventsNewsCrypto y #eventsNewsMacro son dos .events-card HERMANOS independientes dentro
+    // de #eventsNewsBlock (confirmado en el HTML), no uno anidado en el otro ----
+    'w-news-macro': {
+      id:'w-news-macro', label:'Noticias — Contexto financiero global', family:'news',
+      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsNewsMacro'); return list ? list.closest('.events-card') : null; }, () => { if(typeof window.ensureEventsNewsLoaded === 'function') window.ensureEventsNewsLoaded('macro'); }),
+      unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsNewsMacro') ? document.getElementById('eventsNewsMacro').closest('.events-card') : null),
+    },
+    // ---- Fase 2 (lote 3): los 2 radares (ver docs/arrecife-widget-inventario.md sección 7) -
+    // el contenedor correcto a reparentar es el .indic-panel COMPLETO (data-indic="delistradar"/
+    // "newlistradar"), NO el #delistRadarWrap/#newListRadarWrap interno que proponía el doc: ese
+    // wrap vive display:none hasta que cargan los datos, con el loading/error como HERMANOS
+    // fuera de él dentro de indic-chart-body - mover solo el wrap habría dejado el loading/error
+    // atrás en su ubicación original, mostrando un hueco vacío durante la primera carga. El
+    // .indic-panel completo sí incluye loading+error+wrap+disclaimer juntos, igual que todos los
+    // demás widgets de gráfico. Tabs, filtro de activo, buscador, Mi Lista (favoritos),
+    // paginación y la grilla de exchanges YA viven todos dentro de ese mismo wrap (confirmado
+    // leyendo el HTML) - se reparentan de un solo golpe, nada queda suelto afuera. El countdown
+    // en vivo de cada aviso (tickDelistCountdowns, cada 1s) es un setInterval GLOBAL que ya
+    // corría desde que carga la página entera, independiente de este widget - vuelve a buscar
+    // sus elementos [data-countdown] por selector en cada tick, así que sigue funcionando sin
+    // cambios sin importar en qué parte del DOM estén en ese momento. ----
+    'w-radar-delist': {
+      id:'w-radar-delist', label:'Radar de Deslistados', family:'table',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="delistradar"]'), () => { if(typeof ensureDelistRadarLoaded === 'function') ensureDelistRadarLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="delistradar"]')),
+    },
+    'w-radar-newlist': {
+      id:'w-radar-newlist', label:'Radar de Nuevos Listados', family:'table',
+      mount: arrecifeMountGenericNode(() => document.querySelector('.indic-panel[data-indic="newlistradar"]'), () => { if(typeof ensureNewListRadarLoaded === 'function') ensureNewListRadarLoaded(); }),
+      unmount: arrecifeUnmountGenericNode(() => document.querySelector('.indic-panel[data-indic="newlistradar"]')),
     },
   };
   // el "this.id" que usan los helpers de arriba viene de llamar mount/unmount con .call(def, el) -
