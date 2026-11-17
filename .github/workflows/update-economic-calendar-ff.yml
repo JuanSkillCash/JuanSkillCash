@@ -4,7 +4,15 @@ name: Actualizar calendario economico (Forex Factory)
 # refrescar la copia de Forex Factory - esas peticiones empezaron a recibir 429 (demasiadas
 # peticiones) de forma sostenida desde las IPs compartidas de Cloudflare Workers el 17-nov-2026.
 # Los runners de GitHub Actions salen por un rango de IPs distinto, asi que corriendo esto desde
-# aca se esquiva ese limite especifico. Cada 30 min, igual que el cron que reemplaza.
+# aca se esquiva ese limite especifico.
+#
+# OJO: el "schedule" de GitHub Actions en este repo llega atrasado VARIAS HORAS, sin importar el
+# minuto (mismo problema confirmado con el historial real de otros robots de este repo, ver
+# post-crypto-bulletin-telegram-daily.yml) - entre cada 30 min "programados" aqui puede no correr
+# NADA por horas. Por eso la corrida real y confiable cada 30 min la dispara Claude manualmente
+# via workflow_dispatch (scheduled trigger propio, no un cron de este archivo). Este "schedule" es
+# SOLO un respaldo por si ese disparo manual fallara - no hace dano correr de mas (siempre
+# sobreescribe la misma fila, fila id=1).
 on:
   schedule:
     - cron: "*/30 * * * *"
