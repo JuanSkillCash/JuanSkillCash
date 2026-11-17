@@ -527,6 +527,20 @@ export default {
     } else if (Date.now() - Date.parse(ffCache.actualizado) > FF_STALE_AFTER_MS) {
       ffDesactualizado = true;
     }
+    // ?debug=1&forzar=1 - fuerza un refresco real de Forex Factory ahora mismo (sin esperar al
+    // cron) y reporta el error EXACTO si falla - para diagnosticar en el momento por que la
+    // copia en KV quedo vieja (ej. Forex Factory devolviendo 429/403 a las IPs de Cloudflare)
+    // en vez de tener que esperar hasta 30 min al siguiente tick del cron para verlo.
+    if (debugWanted && url.searchParams.get('forzar') === '1') {
+      try {
+        const eventosFrescos = await refrescaCacheFF(env);
+        ffCache = { eventos: eventosFrescos, actualizado: new Date().toISOString() };
+        ffDesactualizado = false;
+        if (debugInfo) debugInfo.forzado = { ok: true };
+      } catch (err) {
+        if (debugInfo) debugInfo.forzado = { ok: false, error: String(err) };
+      }
+    }
     if (debugInfo) debugInfo.ff = { actualizado: ffCache.actualizado, eventos: ffCache.eventos.length, desactualizado: ffDesactualizado };
 
     // 2) filtra por rango de fechas (si se pidió uno explícito) y países pedidos - sin
