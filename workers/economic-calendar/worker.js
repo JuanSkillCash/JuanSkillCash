@@ -15,10 +15,18 @@
  * A) Forex Factory (horario/importancia/previsión/anterior) - GET
  *    https://nfs.faireconomy.media/ff_calendar_thisweek.json . Solo trae la semana en curso y
  *    NUNCA trae el dato "actual". Responde 429 seguido si se le pide en cada visita (límite por
- *    las IPs compartidas de Cloudflare) - por eso NO se pide por petición: un Cron Trigger
- *    (`scheduled()` abajo) la refresca cada 30 min y la guarda en KV; el handler normal SOLO lee
- *    de KV. Si el KV está vacío (primera vez, antes de que corra el primer cron), se hace un
- *    fetch directo una sola vez como arranque.
+ *    las IPs compartidas de Cloudflare).
+ *
+ *    CAMBIO 17-nov-2026: Forex Factory empezó a devolver 429 de forma SOSTENIDA a las IPs de
+ *    Cloudflare Workers (confirmado en vivo con Juan - "el calendario no sirve" + diagnóstico con
+ *    ?debug=1&forzar=1 más abajo) - no por tráfico nuestro (una petición cada 30 min, nunca había
+ *    sido el problema), sino porque ese rango de IPs se comparte entre miles de clientes de
+ *    Cloudflare. El refresco se movió a GitHub Actions (scripts/update_economic_calendar_ff.py,
+ *    corre cada 30 min desde un rango de IPs totalmente distinto) que deja el resultado en
+ *    Supabase (tabla economic_calendar_ff_cache, lectura pública, ver
+ *    scripts/sql/create_economic_calendar_ff_cache.sql). Este Worker ahora lee PRIMERO de ahí
+ *    (leerFFDesdeSupabase) y solo si eso falla cae al camino viejo: KV (que el Cron Trigger de
+ *    abajo sigue refrescando como respaldo) o, si el KV también está vacío, un fetch directo.
  *
  * B) Nasdaq (dato "actual" + consenso, de TODOS los países) - GET
  *    https://api.nasdaq.com/api/calendar/economicevents?date=YYYY-MM-DD . Sin llave, sin
@@ -63,6 +71,12 @@ const COUNTRY_WHITELIST = ['US', 'EU'];
 const PAIS_A_DIVISA_FF = { US: 'USD', EU: 'EUR' };
 
 const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+// llave publica (anon/publishable) de Supabase - la misma que ya viaja a cada navegador dentro
+// de index.html (SUPABASE_KEY ahi), segura de tener aca: la tabla solo permite lectura publica,
+// nunca escritura, via RLS (ver scripts/sql/create_economic_calendar_ff_cache.sql)
+const SUPABASE_URL = 'https://nbvgyouzjscwtfukzxok.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_uxAz2gqnTnMQup_lonppvw_0_EdXlRz';
+const FF_SUPABASE_TABLE = 'economic_calendar_ff_cache';
 const NASDAQ_URL = 'https://api.nasdaq.com/api/calendar/economicevents';
 const FRED_URL = 'https://api.stlouisfed.org/fred/series/observations';
 
@@ -205,9 +219,30 @@ function sumaDias(fechaStr, dias) {
   return dt.toISOString().slice(0, 10);
 }
 
+// ===== Forex Factory vía Supabase (ver comentario grande al inicio del archivo) =====
+// Lee la fila unica (id=1) que scripts/update_economic_calendar_ff.py mantiene al dia desde
+// GitHub Actions. Devuelve null si la tabla todavia no existe (Juan no ha corrido el SQL) o si
+// Supabase no responde - el llamador cae al camino viejo (KV) en ese caso, nunca lanza.
+async function leerFFDesdeSupabase(env) {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${FF_SUPABASE_TABLE}?id=eq.1&select=eventos,actualizado`;
+    const resp = await fetchConTimeout(url, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    }, FETCH_TIMEOUT_MS);
+    if (!resp.ok) return null;
+    const filas = await resp.json();
+    const fila = Array.isArray(filas) ? filas[0] : null;
+    if (!fila || !Array.isArray(fila.eventos)) return null;
+    return { eventos: fila.eventos, actualizado: fila.actualizado };
+  } catch (err) {
+    return null;
+  }
+}
+
 // ===== Forex Factory (horario/importancia/previsión/anterior - la base de cada evento) =====
 // Forma real de un item (verificada): { title, country:"USD", date:"2026-11-10T08:30:00-05:00",
 // impact:"High", forecast:"0.2%", previous:"0.3%" }. country YA es el código de divisa, no el país.
+// Respaldo directo (ver leerFFDesdeSupabase, que es ahora la fuente principal).
 async function obtenerDeForexFactory() {
   const resp = await fetchConTimeout(FF_URL, { headers: { 'User-Agent': UA } }, FETCH_TIMEOUT_MS);
   if (!resp.ok) throw new Error('Forex Factory respondió ' + resp.status);
@@ -509,23 +544,43 @@ export default {
     const debugWanted = url.searchParams.get('debug') === '1';
     const debugInfo = debugWanted ? { nasdaq: {}, fred: {} } : null;
 
-    // 1) Forex Factory desde KV (actualizado por el cron) - si el KV está vacío (primera vez),
-    // se hace un fetch directo de arranque una sola vez.
-    let ffCache = env.CALENDARIO_KV ? await env.CALENDARIO_KV.get(FF_KV_KEY, 'json') : null;
+    // 1) Forex Factory - PRIMERO Supabase (GitHub Actions la mantiene al día, ver comentario
+    // grande al inicio del archivo); si no está disponible todavía (Juan no ha corrido el SQL,
+    // o Supabase no respondió) o también está vieja, cae al camino viejo: KV (que el Cron
+    // Trigger de abajo sigue refrescando como respaldo) y, si el KV también está vacío, un
+    // fetch directo de arranque.
+    let ffCache = null;
     let ffDesactualizado = false;
-    if (!ffCache) {
-      try {
-        const eventos = await refrescaCacheFF(env);
-        ffCache = { eventos, actualizado: new Date().toISOString() };
-      } catch (err) {
-        if (debugInfo) debugInfo.ffError = String(err);
-        return new Response(JSON.stringify({
-          error: 'No se pudo obtener el calendario (Forex Factory falló y todavía no hay copia guardada en KV)',
-          ...(debugWanted ? { debug: debugInfo } : {}),
-        }), { status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    let ffFuente = null;
+
+    const ffSupabase = await leerFFDesdeSupabase(env);
+    if (ffSupabase) {
+      ffCache = ffSupabase;
+      ffFuente = 'supabase';
+      ffDesactualizado = Date.now() - Date.parse(ffCache.actualizado) > FF_STALE_AFTER_MS;
+    }
+
+    if (!ffCache || ffDesactualizado) {
+      const ffKv = env.CALENDARIO_KV ? await env.CALENDARIO_KV.get(FF_KV_KEY, 'json') : null;
+      if (ffKv && (!ffCache || Date.parse(ffKv.actualizado) > Date.parse(ffCache.actualizado))) {
+        ffCache = ffKv;
+        ffFuente = 'kv';
+        ffDesactualizado = Date.now() - Date.parse(ffCache.actualizado) > FF_STALE_AFTER_MS;
       }
-    } else if (Date.now() - Date.parse(ffCache.actualizado) > FF_STALE_AFTER_MS) {
-      ffDesactualizado = true;
+      if (!ffCache) {
+        try {
+          const eventos = await refrescaCacheFF(env);
+          ffCache = { eventos, actualizado: new Date().toISOString() };
+          ffFuente = 'directo';
+          ffDesactualizado = false;
+        } catch (err) {
+          if (debugInfo) debugInfo.ffError = String(err);
+          return new Response(JSON.stringify({
+            error: 'No se pudo obtener el calendario (Forex Factory, Supabase y KV fallaron - no hay ninguna copia guardada)',
+            ...(debugWanted ? { debug: debugInfo } : {}),
+          }), { status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+        }
+      }
     }
     // ?debug=1&forzar=1 - fuerza un refresco real de Forex Factory ahora mismo (sin esperar al
     // cron) y reporta el error EXACTO si falla - para diagnosticar en el momento por que la
@@ -541,7 +596,7 @@ export default {
         if (debugInfo) debugInfo.forzado = { ok: false, error: String(err) };
       }
     }
-    if (debugInfo) debugInfo.ff = { actualizado: ffCache.actualizado, eventos: ffCache.eventos.length, desactualizado: ffDesactualizado };
+    if (debugInfo) debugInfo.ff = { fuente: ffFuente, actualizado: ffCache.actualizado, eventos: ffCache.eventos.length, desactualizado: ffDesactualizado };
 
     // 2) filtra por rango de fechas (si se pidió uno explícito) y países pedidos - sin
     // "desde"/"hasta" (desdeUtc/hastaUtc quedan null) no se filtra por fecha en absoluto, se

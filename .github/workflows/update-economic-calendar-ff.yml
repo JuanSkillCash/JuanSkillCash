@@ -1,0 +1,30 @@
+name: Actualizar calendario economico (Forex Factory)
+
+# Reemplaza al Cron Trigger del Worker de Cloudflare (workers/economic-calendar/worker.js) para
+# refrescar la copia de Forex Factory - esas peticiones empezaron a recibir 429 (demasiadas
+# peticiones) de forma sostenida desde las IPs compartidas de Cloudflare Workers el 17-nov-2026.
+# Los runners de GitHub Actions salen por un rango de IPs distinto, asi que corriendo esto desde
+# aca se esquiva ese limite especifico. Cada 30 min, igual que el cron que reemplaza.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Descargar Forex Factory y guardar en Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_economic_calendar_ff.py
