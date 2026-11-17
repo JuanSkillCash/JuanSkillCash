@@ -84,12 +84,6 @@
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
   --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
-  --ticker-h:34px; /* alto aproximado de 1 sola fila de los precios en vivo (#priceTicker) -
-                      usado SOLO para que el botoncito flotante de hamburguesa en escritorio
-                      (.topbar-brand cuando el sidebar esta colapsado, ver @media(min-width:861px)
-                      mas abajo) no quede tapado/cruzado por los precios - el resto de la pagina
-                      (sidebar, .app) NO usa esta variable a proposito, pedido de Juan de que el
-                      menu de hamburguesa no se corra de donde estaba antes de los precios */
   /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo") - una sola variable
      para poder reusarlo en todas las cajas del sitio (categorías, panorama del mercado,
      sesiones, eventos y noticias, quién está detrás) y que un ajuste futuro de tono se
@@ -197,20 +191,29 @@ button{font-family:inherit;color:inherit}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 0 transparent)}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
 /* ---- precios en vivo (BTC/ETH/SOL/HYPE via Binance websocket, NASDAQ/S&P 500/Russell 2000
-   via proxy de Twelve Data) - Juan pidio explicitamente que NO fuera una "cinta" animada
-   ("que no se mueva la sinta... sin cinta"): sin scroll, sin animacion, solo los 7 precios
-   puestos ahi arriba, en flujo normal de la pagina (no fixed), que se acomodan en varias
-   filas si no caben en una sola linea (celular). */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 0;padding:6px 10px}
-.price-ticker-item{display:inline-flex;align-items:center;gap:7px;padding:3px 14px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
+   via proxy de Twelve Data) - Juan pidio varias cosas sobre esto, en orden:
+   1) "que no se mueva la sinta... sin cinta" - sin scroll, sin animacion.
+   2) "el menu de hamburguesa quede hasta arriba como estaba antes" + con captura real:
+      "yo veo que a la derecha tienes espacio... correlo a la derecha y sube el menu de
+      hamburguesa" - NO va en una fila propia (eso empuja todo lo de abajo, sidebar incluido,
+      aunque sea sin position:fixed) - va METIDO en la misma fila de .mobile-topbar, justo
+      despues del botoncito de hamburguesa, con flex:1 para que ocupe el espacio libre que ya
+      existia ahi (antes de #topbarInicio, que en escritorio tiene margin-left:auto y empuja
+      Bitunix/Telegram/campana/etc a la derecha - con esto el ticker ahora ocupa ese hueco del
+      medio en vez de quedar vacio) - asi el sidebar/boton de hamburguesa no se mueve ni un
+      pixel, solo se usa espacio que ya estaba libre en esa misma fila.
+   3) "deja el espacio suficiente y fijo en cada precio por si varia no afecte a los demas" -
+      min-width fijo + tabular-nums en precio/variacion para que un digito de mas/menos al
+      actualizarse en vivo no corra a los demas precios de la fila. */
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:1;min-width:0}
+.price-ticker-item{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
-.price-ticker-price{color:var(--white)}
-.price-ticker-chg{font-size:11.5px}
+.price-ticker-price{color:var(--white);min-width:62px;font-variant-numeric:tabular-nums}
+.price-ticker-chg{font-size:11.5px;min-width:48px;font-variant-numeric:tabular-nums}
 .price-ticker-chg.up{color:var(--green)}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
-@media(max-width:768px){.price-ticker-item{padding:2px 9px;font-size:11.5px;gap:5px}.price-ticker-chg{font-size:10.5px}}
-.mobile-topbar{display:flex;align-items:center;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
+.mobile-topbar{display:flex;align-items:flex-start;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
 .brand-glow-bar{position:relative;height:3.5px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
@@ -2746,6 +2749,19 @@ img[src=""]{display:none}
      completo junto a la hamburguesa en celular - se quita la etiqueta de texto y se
      comprime todo para que quede en una sola fila sin encimarse */
   .mobile-topbar{gap:6px}
+  /* en celular no hay espacio real junto al logo/los iconos para meter 7 precios (se probo y
+     el texto se desbordaba encima del icono de Bitunix) - acá la cinta pasa a ocupar su PROPIA
+     fila completa, debajo de la fila de iconos (order:5 + flex-basis:100% la manda al final y
+     a ancho completo), sin mover el botoncito de hamburguesa ni los demas iconos de su fila.
+     IMPORTANTE: esta regla tiene que ir DESPUES de la regla base ".mobile-topbar{...
+     flex-wrap:nowrap}" (la de mas arriba, sin @media) - puesta antes no servia de nada porque
+     esa regla sin condicion la pisaba siempre, sin importar el ancho de pantalla (mismo nivel
+     de especificidad, la que viene despues en el archivo gana) */
+  .mobile-topbar{flex-wrap:wrap}
+  .price-ticker{flex:none;flex-basis:100%;order:5;justify-content:flex-start;min-width:0}
+  .price-ticker-item{font-size:11.5px;gap:4px}
+  .price-ticker-price{min-width:54px}
+  .price-ticker-chg{font-size:10.5px;min-width:42px}
   .exchange-pill{padding:6px 8px;gap:4px;font-size:0}
   .exchange-pill .pill-dot{font-size:0}
   .exchange-pill-label{display:none}
@@ -2763,7 +2779,7 @@ img[src=""]{display:none}
      el sidebar y hacer scroll hacia abajo, el botoncito se quede flotando visible en vez de
      desaparecer hacia arriba junto con el resto de la topbar (pedido explícito de Juan) */
   .topbar-brand{display:none}
-  .sidebar.collapsed ~ .main .topbar-brand{display:flex;position:fixed;top:calc(var(--ticker-h) + 18px);left:18px;z-index:260}
+  .sidebar.collapsed ~ .main .topbar-brand{display:flex;position:fixed;top:18px;left:18px;z-index:260}
   .mobile-topbar{position:relative;min-height:58px}
 }
 
@@ -3555,10 +3571,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   <div class="pwa-ios-step"><span class="pwa-ios-num">2</span><span>Elige <b>"Agregar a pantalla de inicio"</b></span></div>
 </div>
 
-<div class="price-ticker" id="priceTicker" aria-label="Precios en vivo: BTC, ETH, SOL, HYPE, Nasdaq, S&amp;P 500 y Russell 2000">
-  <div class="price-ticker-track" id="priceTickerTrack"></div>
-</div>
-
 <div class="app">
 
   <div class="sb-backdrop" id="sbBackdrop"></div>
@@ -4142,6 +4154,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
+      </div>
+
+      <div class="price-ticker" id="priceTicker" aria-label="Precios en vivo: BTC, ETH, SOL, HYPE, Nasdaq, S&amp;P 500 y Russell 2000">
+        <div class="price-ticker-track" id="priceTickerTrack"></div>
       </div>
 
       <nav class="topbar-links">
@@ -8392,7 +8408,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="modal-overlay" id="arrecifeCatalogModal">
       <div class="modal-panel" style="max-width:480px">
         <button type="button" class="modal-close" id="arrecifeCatalogClose" aria-label="Cerrar">✕</button>
-        <h2 class="calc-title" style="margin-bottom:14px">Agregar widget</h2>
+        <h2 class="calc-title" style="margin-bottom:14px;padding-right:48px">Agregar widget</h2>
         <input type="text" id="arrecifeCatalogSearch" class="arrecife-catalog-search" placeholder="Buscar herramienta...">
         <div id="arrecifeCatalogList" style="max-height:60vh;overflow:auto"></div>
       </div>
@@ -31919,6 +31935,12 @@ async function awardColmillos(eventType, periodKey, amount){
   function arrecifeRenderBoardTabs(){
     const wrap = document.getElementById('arrecifeBoardsTabs');
     if(!wrap) return;
+    // red de seguridad: si por lo que sea (una falla de red a mitad de la carga, un error no
+    // previsto) arrecifeBoards llega aqui vacio, no se puede dejar a Juan mirando un panel sin
+    // NINGUNA pestaña y sin forma de agregar nada (asi se reporto una vez: "no deja poner nada,
+    // quedo bugueado") - se autorepara creando el panel por defecto ahi mismo, cada vez que se
+    // intenta pintar la tira de pestañas, sin importar por que quedo en cero
+    if(!arrecifeBoards.length){ arrecifeCreateBoard('Mi panel', 'basico'); return; }
     const delSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
     const addSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
     const editSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
