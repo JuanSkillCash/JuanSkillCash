@@ -1507,10 +1507,32 @@ button{font-family:inherit;color:inherit}
 .arrecife-auth-gate-icon{font-size:32px}
 .arrecife-auth-gate-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
 .arrecife-auth-gate-text{font-size:13px;color:var(--muted2);max-width:380px;line-height:1.55}
-.arrecife-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:16px}
+.arrecife-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-shrink:0}
 .arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
 .arrecife-add-btn:hover{filter:brightness(1.12)}
 .arrecife-add-btn svg{width:16px;height:16px}
+/* Fase 3: varias pestañas/paneles por usuario - fila con las pestañas a la izquierda (con
+   scroll horizontal propio si no caben, nunca desbordando toda la página) y "Agregar widget" a
+   la derecha, mismo estilo .tf-pill ya usado en los filtros de rango de fecha del sitio */
+.arrecife-boards-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.arrecife-boards-tabs-wrap{overflow-x:auto;flex:1;min-width:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.arrecife-boards-tabs-wrap::-webkit-scrollbar{display:none}
+.arrecife-boards-tabs{display:flex;gap:8px;min-width:min-content}
+.arrecife-board-tab{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid rgba(91,141,239,.3);border-radius:99px;padding:7px 8px 7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease;white-space:nowrap;flex-shrink:0}
+.arrecife-board-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.arrecife-board-tab-name{max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.arrecife-board-tab-name[contenteditable="true"]{cursor:text;outline:none;background:rgba(255,255,255,.08);border-radius:4px;padding:0 3px}
+.arrecife-board-tab-del{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;flex-shrink:0;color:inherit;opacity:.7}
+.arrecife-board-tab-del:hover{opacity:1;background:rgba(255,255,255,.18)}
+.arrecife-board-tab-del svg{width:11px;height:11px}
+.arrecife-board-tab-add{background:transparent;border:1px dashed rgba(91,141,239,.4);color:var(--muted2);padding:7px 14px}
+.arrecife-board-tab-add:hover{border-color:var(--accent);color:var(--white)}
+.arrecife-board-tab-add svg{width:13px;height:13px}
+.arrecife-template-list{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}
+.arrecife-template-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--white);cursor:pointer;transition:background .15s,border-color .15s}
+.arrecife-template-item:hover{background:rgba(91,141,239,.08);border-color:rgba(91,141,239,.3)}
+.arrecife-template-item-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:13.5px}
+.arrecife-template-item-desc{font-size:12px;color:var(--muted2)}
 .arrecife-grid-host{min-height:120px}
 .arrecife-grid-host .grid-stack-item-content{
   background:var(--grad-caja);border:1px solid rgba(91,141,239,.3);border-radius:14px;
@@ -8323,11 +8345,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div id="arrecifeDashboard" style="display:none">
-        <div class="arrecife-toolbar">
-          <button type="button" class="arrecife-add-btn" id="arrecifeAddBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Agregar widget
-          </button>
+        <div class="arrecife-boards-row">
+          <div class="arrecife-boards-tabs-wrap">
+            <div class="arrecife-boards-tabs" id="arrecifeBoardsTabs"></div>
+          </div>
+          <div class="arrecife-toolbar">
+            <button type="button" class="arrecife-add-btn" id="arrecifeAddBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Agregar widget
+            </button>
+          </div>
         </div>
         <div id="arrecifeEmptyState" class="arrecife-empty-state">
           <div class="arrecife-empty-state-icon">🧩</div>
@@ -8344,6 +8371,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <h2 class="calc-title" style="margin-bottom:14px">Agregar widget</h2>
         <input type="text" id="arrecifeCatalogSearch" class="arrecife-catalog-search" placeholder="Buscar herramienta...">
         <div id="arrecifeCatalogList" style="max-height:60vh;overflow:auto"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="arrecifeNewBoardModal">
+      <div class="modal-panel" style="max-width:520px">
+        <button type="button" class="modal-close" id="arrecifeNewBoardClose" aria-label="Cerrar">✕</button>
+        <h2 class="calc-title" style="margin-bottom:14px;text-align:left;padding-right:48px">Nuevo panel</h2>
+        <input type="text" id="arrecifeNewBoardName" class="arrecife-catalog-search" placeholder="Nombre del panel" maxlength="40" style="margin-bottom:16px">
+        <div id="arrecifeTemplateList" class="arrecife-template-list"></div>
       </div>
     </div>
 
@@ -31095,6 +31131,23 @@ async function awardColmillos(eventType, periodKey, amount){
   };
   const ARRECIFE_FAMILY_LABELS = { kpi:'Indicadores clave', chart:'Gráficos', calc:'Calculadoras', news:'Noticias', calendar:'Calendario', video:'Video', table:'Tablas y listas' };
 
+  // Fase 3: plantillas predefinidas por SkillCash para arrancar un panel nuevo sin empezar en
+  // blanco - cada widgetId tiene que existir en WIDGET_REGISTRY (se aplican en orden, uno por
+  // uno via arrecifeAddWidgetToGrid sin x/y explícito, gridstack con float:false los auto-
+  // acomoda solo, igual que ya hace el catálogo "Agregar widget" hoy)
+  const ARRECIFE_TEMPLATES = [
+    { id:'basico', label:'Básico', desc:'Para empezar: lo esencial de un vistazo.',
+      widgetIds:['w-fngsummary','w-halvingbar','w-dombtc','w-news-cripto','w-calendario'] },
+    { id:'trader', label:'Panel Trader', desc:'Lo que mira alguien operando día a día.',
+      widgetIds:['w-calc-futuros','w-dombtc','w-vixindex','w-netliquidity','w-longshort','w-calendario','w-news-cripto'] },
+    { id:'macro', label:'Panel Macro', desc:'El contexto macroeconómico que mueve el mercado.',
+      widgetIds:['w-m2supply','w-netliquidity','w-vixindex','w-dxy','w-cpi','w-fedfundsrate','w-gdpgrowth','w-pmius'] },
+    { id:'seguridad', label:'Panel Seguridad', desc:'Cuida tus activos antes que crezcan.',
+      widgetIds:['w-calc-checklist','w-calc-approvals','w-calc-walletcompare','w-calc-inheritance','w-calc-tokenscanner'] },
+    { id:'largoplazo', label:'Panel Largo Plazo', desc:'Para quien piensa en ciclos, no en velas de 5 minutos.',
+      widgetIds:['w-rainbow','w-halving','w-ma4y','w-ema200','w-calc-portafolio','w-calc-fifreedom','w-calc-dca'] },
+  ];
+
   // ---- helpers genéricos de reparentar: dejan un <!--comentario--> en el lugar original y lo
   // devuelven ahí tal cual al desmontar, sin importar qué tan profundo viva el nodo ----
   function arrecifeDetachToPlaceholder(key, node){
@@ -31644,11 +31697,12 @@ async function awardColmillos(eventType, periodKey, amount){
   let arrecifeSaveTimer = null;
   let arrecifeMountedIds = new Set();
   let arrecifeSuppressSave = false; // true mientras se está CARGANDO un layout guardado, para no re-guardarlo de inmediato como si el usuario lo hubiera movido
-  // última versión conocida del layout (ya sanitizada) - se actualiza al cargar y al guardar.
-  // Sirve para reconstruir el panel al RE-entrar a Mi Arrecife en la misma sesión sin volver a
-  // pedirle nada a Supabase: salir de la categoría desarma la grilla entera
-  // (unmountAllArrecifeWidgets), así que sin esto el panel se quedaba vacío la segunda vez.
-  let arrecifeLastKnownLayout = [];
+  // Fase 3: varios paneles por usuario, no un solo layout global. arrecifeBoards = [{ id, name,
+  // layout, position }, ...] (layout es la última versión conocida, ya sanitizada, de CADA
+  // panel - no solo el activo, así cambiar de pestaña no depende de volver a pedirle nada a
+  // Supabase). arrecifeActiveBoardId decide cuál se está mostrando/editando ahora mismo.
+  let arrecifeBoards = [];
+  let arrecifeActiveBoardId = null;
 
   function arrecifeLoadAssets(){
     if(arrecifeAssetsLoaded) return Promise.resolve();
@@ -31762,8 +31816,10 @@ async function awardColmillos(eventType, periodKey, amount){
   }
   window.unmountAllArrecifeWidgets = unmountAllArrecifeWidgets;
 
-  // ==================== guardar / cargar (Supabase + localStorage) ====================
-  const ARRECIFE_LS_KEY = 'skillcash-arrecife-layout';
+  // ==================== guardar / cargar (Supabase + localStorage) - Fase 3: por panel ========
+  // Fase 1/2 usaban 'skillcash-arrecife-layout' (un solo layout). Formato distinto (varios
+  // paneles) = clave nueva a propósito, para no leer por error un formato viejo incompatible.
+  const ARRECIFE_LS_KEY = 'skillcash-arrecife-boards-v1';
 
   function arrecifeBuildLayoutArray(){
     if(!arrecifeGrid) return [];
@@ -31779,24 +31835,37 @@ async function awardColmillos(eventType, periodKey, amount){
     });
   }
 
+  function arrecifePersistBoardsLocal(){
+    try{
+      localStorage.setItem(ARRECIFE_LS_KEY, JSON.stringify({ boards: arrecifeBoards, activeBoardId: arrecifeActiveBoardId }));
+    }catch(err){ /* privado/lleno - no es critico */ }
+  }
+
   function arrecifeScheduleSave(){
     if(arrecifeSuppressSave) return;
     clearTimeout(arrecifeSaveTimer);
     arrecifeSaveTimer = setTimeout(arrecifeSaveLayoutNow, 800);
   }
 
+  // guarda SOLO el panel activo (el que está montado en la grilla ahora mismo) - cambiar de
+  // pestaña nunca debe reescribir los otros paneles con lo que había en la grilla en ese momento
   function arrecifeSaveLayoutNow(){
+    const board = arrecifeBoards.find(b => b.id === arrecifeActiveBoardId);
+    if(!board) return;
     const layout = arrecifeBuildLayoutArray();
-    arrecifeLastKnownLayout = layout;
-    try{ localStorage.setItem(ARRECIFE_LS_KEY, JSON.stringify(layout)); } catch(err){ /* privado/lleno - no es critico */ }
+    board.layout = layout;
+    arrecifePersistBoardsLocal();
     if(!currentUser || typeof sbClient === 'undefined') return;
-    sbClient.from('user_dashboards').upsert({
+    sbClient.from('user_arrecife_boards').upsert({
+      id: board.id,
       user_id: currentUser.id,
+      name: board.name,
       layout: layout,
       schema_version: 1,
+      position: board.position,
       updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id' }).then(({ error }) => {
-      if(error) console.error('[Mi Arrecife] no se pudo guardar el layout', error);
+    }, { onConflict: 'id' }).then(({ error }) => {
+      if(error) console.error('[Mi Arrecife] no se pudo guardar el panel', error);
     });
   }
 
@@ -31821,7 +31890,6 @@ async function awardColmillos(eventType, periodKey, amount){
   function arrecifeApplyLayout(layout){
     arrecifeSuppressSave = true;
     const sanitized = arrecifeSanitizeLayout(layout);
-    arrecifeLastKnownLayout = sanitized;
     sanitized.forEach(item => {
       arrecifeAddWidgetToGrid(item.id, { x:item.x, y:item.y, w:item.w, h:item.h });
     });
@@ -31830,24 +31898,247 @@ async function awardColmillos(eventType, periodKey, amount){
     setTimeout(() => { arrecifeSuppressSave = false; }, 400);
   }
 
-  async function arrecifeLoadLayout(){
-    let localLayout = [];
-    try{ localLayout = JSON.parse(localStorage.getItem(ARRECIFE_LS_KEY) || '[]'); } catch(err){ localLayout = []; }
-    if(localLayout.length) arrecifeApplyLayout(localLayout);
+  // ---- Fase 3: varios paneles (pestañas) ----
+
+  function arrecifeFindBoard(id){ return arrecifeBoards.find(b => b.id === id) || null; }
+
+  function arrecifeRenderBoardTabs(){
+    const wrap = document.getElementById('arrecifeBoardsTabs');
+    if(!wrap) return;
+    const delSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
+    const addSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    const tabsHtml = arrecifeBoards.map(b => {
+      const active = b.id === arrecifeActiveBoardId;
+      return '<button type="button" class="arrecife-board-tab' + (active ? ' active' : '') + '" data-board-id="' + b.id + '">' +
+        '<span class="arrecife-board-tab-name">' + escapeHtml(b.name) + '</span>' +
+        (arrecifeBoards.length > 1 ? '<span class="arrecife-board-tab-del" data-del-board-id="' + b.id + '" title="Borrar panel">' + delSvg + '</span>' : '') +
+      '</button>';
+    }).join('') + '<button type="button" class="arrecife-board-tab arrecife-board-tab-add" id="arrecifeBoardAddTab" title="Nuevo panel">' + addSvg + '</button>';
+    wrap.innerHTML = tabsHtml;
+    wrap.querySelectorAll('.arrecife-board-tab[data-board-id]').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        if(e.target.closest('[data-del-board-id]')) return;
+        arrecifeSwitchBoard(tab.dataset.boardId);
+      });
+      const nameEl = tab.querySelector('.arrecife-board-tab-name');
+      if(tab.classList.contains('active') && nameEl){
+        nameEl.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          arrecifeStartRenameBoard(tab.dataset.boardId, nameEl);
+        });
+      }
+    });
+    wrap.querySelectorAll('[data-del-board-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        arrecifeDeleteBoard(btn.dataset.delBoardId);
+      });
+    });
+    const addTab = document.getElementById('arrecifeBoardAddTab');
+    if(addTab) addTab.addEventListener('click', arrecifeOpenNewBoardModal);
+    // en celular la tira de pestañas tiene scroll propio - sin esto, al crear o cambiar de
+    // panel la pestaña activa podía quedar casi oculta (solo una rebanada visible en el borde)
+    // en vez de verse completa, que fue justo lo que mostró la verificación con Playwright
+    const activeTab = wrap.querySelector('.arrecife-board-tab.active');
+    if(activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  function arrecifeStartRenameBoard(boardId, nameEl){
+    nameEl.setAttribute('contenteditable', 'true');
+    nameEl.focus();
+    document.execCommand && window.getSelection && (() => {
+      const range = document.createRange();
+      range.selectNodeContents(nameEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    })();
+    const finish = () => {
+      nameEl.removeAttribute('contenteditable');
+      const newName = nameEl.textContent.trim().slice(0, 40) || 'Panel sin nombre';
+      arrecifeRenameBoard(boardId, newName);
+      nameEl.removeEventListener('blur', finish);
+      nameEl.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e) => {
+      if(e.key === 'Enter'){ e.preventDefault(); nameEl.blur(); }
+      if(e.key === 'Escape'){ e.preventDefault(); nameEl.textContent = arrecifeFindBoard(boardId).name; nameEl.blur(); }
+    };
+    nameEl.addEventListener('blur', finish);
+    nameEl.addEventListener('keydown', onKey);
+  }
+
+  function arrecifeRenameBoard(boardId, newName){
+    const board = arrecifeFindBoard(boardId);
+    if(!board || board.name === newName){ arrecifeRenderBoardTabs(); return; }
+    board.name = newName;
+    arrecifePersistBoardsLocal();
+    arrecifeRenderBoardTabs();
+    if(currentUser && typeof sbClient !== 'undefined'){
+      sbClient.from('user_arrecife_boards').update({ name: newName, updated_at: new Date().toISOString() }).eq('id', boardId).then(({ error }) => {
+        if(error) console.error('[Mi Arrecife] no se pudo renombrar el panel', error);
+      });
+    }
+  }
+
+  // cambia de pestaña: guarda YA (sin esperar los 800ms del debounce) lo que haya pendiente del
+  // panel que se está dejando, desarma la grilla, y pinta el panel nuevo - mismo criterio que ya
+  // usaba unmountAllArrecifeWidgets para no perder cambios al salir de Mi Arrecife del todo
+  function arrecifeSwitchBoard(boardId){
+    if(boardId === arrecifeActiveBoardId) return;
+    const board = arrecifeFindBoard(boardId);
+    if(!board) return;
+    unmountAllArrecifeWidgets();
+    arrecifeActiveBoardId = boardId;
+    arrecifePersistBoardsLocal();
+    arrecifeRenderBoardTabs();
+    arrecifeApplyLayout(board.layout);
+    arrecifeUpdateEmptyState();
+  }
+
+  function arrecifeNextBoardPosition(){
+    return arrecifeBoards.length ? Math.max(...arrecifeBoards.map(b => b.position)) + 1 : 0;
+  }
+
+  // crea un panel (en blanco o desde una plantilla de ARRECIFE_TEMPLATES) y lo deja activo.
+  // Para aplicar la plantilla se reutiliza arrecifeAddWidgetToGrid uno por uno, SIN x/y - el
+  // mismo camino que ya usa el catálogo "Agregar widget" hoy, así gridstack (float:false) los
+  // auto-acomoda solo, sin tener que calcular posiciones a mano aquí.
+  function arrecifeCreateBoard(name, templateId){
+    const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'board-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+    const board = { id, name: name || 'Panel sin nombre', layout: [], position: arrecifeNextBoardPosition() };
+    arrecifeBoards.push(board);
+    unmountAllArrecifeWidgets();
+    arrecifeActiveBoardId = id;
+    arrecifePersistBoardsLocal();
+    arrecifeRenderBoardTabs();
+    arrecifeUpdateEmptyState();
+    if(currentUser && typeof sbClient !== 'undefined'){
+      sbClient.from('user_arrecife_boards').insert({
+        id, user_id: currentUser.id, name: board.name, layout: [], schema_version: 1, position: board.position,
+      }).then(({ error }) => {
+        if(error) console.error('[Mi Arrecife] no se pudo crear el panel', error);
+      });
+    }
+    const tpl = ARRECIFE_TEMPLATES.find(t => t.id === templateId);
+    if(tpl){
+      arrecifeSuppressSave = true;
+      tpl.widgetIds.forEach(widgetId => { if(WIDGET_REGISTRY[widgetId]) arrecifeAddWidgetToGrid(widgetId); });
+      setTimeout(() => { arrecifeSuppressSave = false; arrecifeScheduleSave(); }, 400);
+    }
+  }
+
+  // nunca deja al usuario sin ningun panel - si borra el unico que tiene, no hace nada
+  function arrecifeDeleteBoard(boardId){
+    if(arrecifeBoards.length <= 1) return;
+    const board = arrecifeFindBoard(boardId);
+    if(!board) return;
+    if(!confirm('¿Borrar el panel "' + board.name + '" y todos sus widgets? Esta acción no se puede deshacer.')) return;
+    const wasActive = boardId === arrecifeActiveBoardId;
+    if(wasActive){
+      const next = arrecifeBoards.find(b => b.id !== boardId);
+      arrecifeSwitchBoard(next.id);
+    }
+    arrecifeBoards = arrecifeBoards.filter(b => b.id !== boardId);
+    arrecifePersistBoardsLocal();
+    arrecifeRenderBoardTabs();
+    if(currentUser && typeof sbClient !== 'undefined'){
+      sbClient.from('user_arrecife_boards').delete().eq('id', boardId).then(({ error }) => {
+        if(error) console.error('[Mi Arrecife] no se pudo borrar el panel', error);
+      });
+    }
+  }
+
+  // ---- modal "Nuevo panel": nombre + plantilla ----
+  const arrecifeNewBoardModal = document.getElementById('arrecifeNewBoardModal');
+  const arrecifeNewBoardName = document.getElementById('arrecifeNewBoardName');
+  const arrecifeTemplateList = document.getElementById('arrecifeTemplateList');
+
+  function arrecifeRenderTemplateList(){
+    if(!arrecifeTemplateList) return;
+    const blank = '<button type="button" class="arrecife-template-item" data-template-id="">' +
+      '<span class="arrecife-template-item-label">Panel en blanco</span>' +
+      '<span class="arrecife-template-item-desc">Empieza vacío y agrega lo que quieras.</span>' +
+    '</button>';
+    const templates = ARRECIFE_TEMPLATES.map(t =>
+      '<button type="button" class="arrecife-template-item" data-template-id="' + t.id + '">' +
+        '<span class="arrecife-template-item-label">' + escapeHtml(t.label) + '</span>' +
+        '<span class="arrecife-template-item-desc">' + escapeHtml(t.desc) + '</span>' +
+      '</button>'
+    ).join('');
+    arrecifeTemplateList.innerHTML = blank + templates;
+    arrecifeTemplateList.querySelectorAll('.arrecife-template-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const templateId = btn.dataset.templateId;
+        const tpl = ARRECIFE_TEMPLATES.find(t => t.id === templateId);
+        const typedName = arrecifeNewBoardName.value.trim();
+        const name = typedName || (tpl ? tpl.label : 'Panel en blanco');
+        arrecifeCreateBoard(name, templateId || null);
+        arrecifeCloseNewBoardModal();
+      });
+    });
+  }
+
+  function arrecifeOpenNewBoardModal(){
+    if(!arrecifeNewBoardModal) return;
+    arrecifeNewBoardName.value = '';
+    arrecifeRenderTemplateList();
+    arrecifeNewBoardModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => arrecifeNewBoardName.focus(), 60);
+  }
+  function arrecifeCloseNewBoardModal(){
+    if(!arrecifeNewBoardModal) return;
+    arrecifeNewBoardModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if(arrecifeNewBoardModal){
+    document.getElementById('arrecifeNewBoardClose').addEventListener('click', arrecifeCloseNewBoardModal);
+    arrecifeNewBoardModal.addEventListener('click', (e) => { if(e.target === arrecifeNewBoardModal) arrecifeCloseNewBoardModal(); });
+  }
+
+  // carga TODOS los paneles del usuario (localStorage pinta rápido, luego se reconcilia con
+  // Supabase, fuente de verdad real) - se llama una sola vez por sesión, igual que antes hacía
+  // arrecifeLoadLayout con un solo layout
+  async function arrecifeLoadBoards(){
+    let localState = null;
+    try{ localState = JSON.parse(localStorage.getItem(ARRECIFE_LS_KEY) || 'null'); } catch(err){ localState = null; }
+    if(localState && Array.isArray(localState.boards) && localState.boards.length){
+      arrecifeBoards = localState.boards;
+      arrecifeActiveBoardId = localState.activeBoardId && arrecifeFindBoard(localState.activeBoardId)
+        ? localState.activeBoardId : arrecifeBoards[0].id;
+      arrecifeRenderBoardTabs();
+      const activeBoard = arrecifeFindBoard(arrecifeActiveBoardId);
+      if(activeBoard) arrecifeApplyLayout(activeBoard.layout);
+    }
     if(!currentUser || typeof sbClient === 'undefined') return;
     try{
-      const { data, error } = await sbClient.from('user_dashboards').select('layout').eq('user_id', currentUser.id).maybeSingle();
-      if(error || !data) return;
-      const remoteLayout = arrecifeSanitizeLayout(data.layout);
-      const remoteIds = remoteLayout.map(i => i.id).sort().join(',');
-      const localIds = Array.from(arrecifeMountedIds).sort().join(',');
-      if(remoteIds !== localIds){
-        // lo guardado en Supabase es la fuente de verdad real - si no coincide con lo que ya se
-        // pintó desde localStorage (otro dispositivo, u otra pestaña cambió algo), se reconstruye
-        unmountAllArrecifeWidgets();
-        arrecifeApplyLayout(data.layout);
+      const { data, error } = await sbClient.from('user_arrecife_boards').select('id,name,layout,position').eq('user_id', currentUser.id).order('position', { ascending: true });
+      if(error) return;
+      if(!data || !data.length){
+        // usuario de verdad sin ningún panel todavía (ni siquiera la migración de user_dashboards
+        // encontró algo que copiarle) - se le crea uno por defecto con la plantilla Básico
+        if(!arrecifeBoards.length) arrecifeCreateBoard('Mi panel', 'basico');
+        return;
       }
-    }catch(err){ console.error('[Mi Arrecife] no se pudo leer el layout de Supabase', err); }
+      const remoteBoards = data.map(row => ({
+        id: row.id, name: row.name, layout: arrecifeSanitizeLayout(row.layout), position: row.position,
+      })).sort((a, b) => a.position - b.position);
+      const remoteSignature = remoteBoards.map(b => b.id + ':' + b.layout.map(i => i.id).sort().join(',')).join('|');
+      const localSignature = arrecifeBoards.map(b => b.id + ':' + b.layout.map(i => i.id).sort().join(',')).join('|');
+      if(remoteSignature !== localSignature){
+        // Supabase es la fuente de verdad real - si no coincide con lo que ya se pintó desde
+        // localStorage (otro dispositivo, u otra pestaña cambió algo), se reconstruye
+        unmountAllArrecifeWidgets();
+        arrecifeBoards = remoteBoards;
+        arrecifeActiveBoardId = (arrecifeActiveBoardId && arrecifeFindBoard(arrecifeActiveBoardId))
+          ? arrecifeActiveBoardId : remoteBoards[0].id;
+        arrecifePersistBoardsLocal();
+        arrecifeRenderBoardTabs();
+        const activeBoard = arrecifeFindBoard(arrecifeActiveBoardId);
+        if(activeBoard) arrecifeApplyLayout(activeBoard.layout);
+      }
+    }catch(err){ console.error('[Mi Arrecife] no se pudo leer los paneles de Supabase', err); }
   }
 
   // ==================== catálogo "Agregar widget" ====================
@@ -32012,13 +32303,14 @@ async function awardColmillos(eventType, periodKey, amount){
       }
       if(!arrecifeInitStarted){
         arrecifeInitStarted = true;
-        arrecifeLoadLayout();
-      } else if(!arrecifeMountedIds.size && arrecifeLastKnownLayout.length){
-        // segunda vez (o más) que se entra a Mi Arrecife EN ESTA MISMA SESIÓN: ya se cargó el
-        // layout una vez, pero salir de la categoría desarma la grilla entera
-        // (unmountAllArrecifeWidgets) - hay que reconstruirla con lo último que se sabe, sin
-        // volver a pedirle nada a Supabase (eso sí sería ineficiente, no un bug, pero innecesario)
-        arrecifeApplyLayout(arrecifeLastKnownLayout);
+        arrecifeLoadBoards();
+      } else if(!arrecifeMountedIds.size && arrecifeActiveBoardId){
+        // segunda vez (o más) que se entra a Mi Arrecife EN ESTA MISMA SESIÓN: ya se cargaron los
+        // paneles una vez, pero salir de la categoría desarma la grilla entera
+        // (unmountAllArrecifeWidgets) - hay que reconstruir el panel activo con lo último que se
+        // sabe, sin volver a pedirle nada a Supabase (eso sí sería ineficiente, no un bug)
+        const board = arrecifeFindBoard(arrecifeActiveBoardId);
+        if(board) arrecifeApplyLayout(board.layout);
       }
       arrecifeUpdateEmptyState();
     }).catch(err => console.error('[Mi Arrecife] no se pudo cargar gridstack', err));
