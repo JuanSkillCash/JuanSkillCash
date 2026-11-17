@@ -1545,14 +1545,12 @@ button{font-family:inherit;color:inherit}
 .arrecife-board-tab-del{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;flex-shrink:0;color:inherit;opacity:.7}
 .arrecife-board-tab-del:hover{opacity:1;background:rgba(255,255,255,.18)}
 .arrecife-board-tab-del svg{width:11px;height:11px}
+.arrecife-board-tab-edit{display:flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;flex-shrink:0;color:inherit;opacity:.75}
+.arrecife-board-tab-edit:hover{opacity:1;background:rgba(255,255,255,.18)}
+.arrecife-board-tab-edit svg{width:10px;height:10px}
 .arrecife-board-tab-add{background:transparent;border:1px dashed rgba(91,141,239,.4);color:var(--muted2);padding:7px 14px}
 .arrecife-board-tab-add:hover{border-color:var(--accent);color:var(--white)}
 .arrecife-board-tab-add svg{width:13px;height:13px}
-.arrecife-template-list{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}
-.arrecife-template-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--white);cursor:pointer;transition:background .15s,border-color .15s}
-.arrecife-template-item:hover{background:rgba(91,141,239,.08);border-color:rgba(91,141,239,.3)}
-.arrecife-template-item-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:13.5px}
-.arrecife-template-item-desc{font-size:12px;color:var(--muted2)}
 .arrecife-grid-host{min-height:120px}
 .arrecife-grid-host .grid-stack-item-content{
   background:var(--grad-caja);border:1px solid rgba(91,141,239,.3);border-radius:14px;
@@ -8400,14 +8398,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
     </div>
 
-    <div class="modal-overlay" id="arrecifeNewBoardModal">
-      <div class="modal-panel" style="max-width:520px">
-        <button type="button" class="modal-close" id="arrecifeNewBoardClose" aria-label="Cerrar">✕</button>
-        <h2 class="calc-title" style="margin-bottom:14px;text-align:left;padding-right:48px">Nuevo panel</h2>
-        <input type="text" id="arrecifeNewBoardName" class="arrecife-catalog-search" placeholder="Nombre del panel" maxlength="40" style="margin-bottom:16px">
-        <div id="arrecifeTemplateList" class="arrecife-template-list"></div>
-      </div>
-    </div>
 
     <div class="tool-section" data-category="seguridad">
       <div class="tool-cat-label">🛡️ Blindaje</div>
@@ -31161,17 +31151,15 @@ async function awardColmillos(eventType, periodKey, amount){
   // blanco - cada widgetId tiene que existir en WIDGET_REGISTRY (se aplican en orden, uno por
   // uno via arrecifeAddWidgetToGrid sin x/y explícito, gridstack con float:false los auto-
   // acomoda solo, igual que ya hace el catálogo "Agregar widget" hoy)
+  // Juan ya no quiere elegir plantilla al crear un panel nuevo ("no me gusto esos
+  // predefinidos... mejor si le picas al + te sale uno blanco nuevo") - se quitaron las otras 4
+  // plantillas (trader/macro/seguridad/largoplazo) que quedaron sin ninguna forma de llegar a
+  // ellas desde la interfaz. "basico" se deja: sigue siendo el panel con el que arranca
+  // automaticamente un usuario nuevo que todavia no tiene ningun panel guardado (ver
+  // arrecifeLoadBoards), para que no abra Mi Arrecife por primera vez con la pantalla vacía.
   const ARRECIFE_TEMPLATES = [
     { id:'basico', label:'Básico', desc:'Para empezar: lo esencial de un vistazo.',
       widgetIds:['w-fngsummary','w-halvingbar','w-dombtc','w-news-cripto','w-calendario'] },
-    { id:'trader', label:'Panel Trader', desc:'Lo que mira alguien operando día a día.',
-      widgetIds:['w-calc-futuros','w-dombtc','w-vixindex','w-netliquidity','w-longshort','w-calendario','w-news-cripto'] },
-    { id:'macro', label:'Panel Macro', desc:'El contexto macroeconómico que mueve el mercado.',
-      widgetIds:['w-m2supply','w-netliquidity','w-vixindex','w-dxy','w-cpi','w-fedfundsrate','w-gdpgrowth','w-pmius'] },
-    { id:'seguridad', label:'Panel Seguridad', desc:'Cuida tus activos antes que crezcan.',
-      widgetIds:['w-calc-checklist','w-calc-approvals','w-calc-walletcompare','w-calc-inheritance','w-calc-tokenscanner'] },
-    { id:'largoplazo', label:'Panel Largo Plazo', desc:'Para quien piensa en ciclos, no en velas de 5 minutos.',
-      widgetIds:['w-rainbow','w-halving','w-ma4y','w-ema200','w-calc-portafolio','w-calc-fifreedom','w-calc-dca'] },
   ];
 
   // ---- helpers genéricos de reparentar: dejan un <!--comentario--> en el lugar original y lo
@@ -31933,20 +31921,31 @@ async function awardColmillos(eventType, periodKey, amount){
     if(!wrap) return;
     const delSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
     const addSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    const editSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     const tabsHtml = arrecifeBoards.map(b => {
       const active = b.id === arrecifeActiveBoardId;
       return '<button type="button" class="arrecife-board-tab' + (active ? ' active' : '') + '" data-board-id="' + b.id + '">' +
         '<span class="arrecife-board-tab-name">' + escapeHtml(b.name) + '</span>' +
+        // el lapiz solo va en la pestaña activa (renombrar otro panel primero requiere
+        // cambiarse a el) - pedido de Juan de que renombrar sea obvio con solo un clic, no
+        // escondido detras de un doble clic que nadie adivina solo
+        (active ? '<span class="arrecife-board-tab-edit" data-edit-board-id="' + b.id + '" title="Renombrar panel">' + editSvg + '</span>' : '') +
         (arrecifeBoards.length > 1 ? '<span class="arrecife-board-tab-del" data-del-board-id="' + b.id + '" title="Borrar panel">' + delSvg + '</span>' : '') +
       '</button>';
-    }).join('') + '<button type="button" class="arrecife-board-tab arrecife-board-tab-add" id="arrecifeBoardAddTab" title="Nuevo panel">' + addSvg + '</button>';
+    }).join('') + '<button type="button" class="arrecife-board-tab arrecife-board-tab-add" id="arrecifeBoardAddTab" title="Nuevo panel en blanco">' + addSvg + '</button>';
     wrap.innerHTML = tabsHtml;
     wrap.querySelectorAll('.arrecife-board-tab[data-board-id]').forEach(tab => {
+      const nameEl = tab.querySelector('.arrecife-board-tab-name');
       tab.addEventListener('click', (e) => {
-        if(e.target.closest('[data-del-board-id]')) return;
+        if(e.target.closest('[data-del-board-id],[data-edit-board-id]')) return;
+        // si ya es la pestaña activa, picarle al nombre no hace nada (cambiar de panel a si
+        // mismo es un no-op) - mejor usarlo para renombrar, asi no hace falta doble clic
+        if(tab.classList.contains('active') && nameEl && e.target.closest('.arrecife-board-tab-name')){
+          arrecifeStartRenameBoard(tab.dataset.boardId, nameEl);
+          return;
+        }
         arrecifeSwitchBoard(tab.dataset.boardId);
       });
-      const nameEl = tab.querySelector('.arrecife-board-tab-name');
       if(tab.classList.contains('active') && nameEl){
         nameEl.addEventListener('dblclick', (e) => {
           e.stopPropagation();
@@ -31960,8 +31959,18 @@ async function awardColmillos(eventType, periodKey, amount){
         arrecifeDeleteBoard(btn.dataset.delBoardId);
       });
     });
+    wrap.querySelectorAll('[data-edit-board-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tab = btn.closest('.arrecife-board-tab');
+        const nameEl = tab && tab.querySelector('.arrecife-board-tab-name');
+        if(nameEl) arrecifeStartRenameBoard(btn.dataset.editBoardId, nameEl);
+      });
+    });
     const addTab = document.getElementById('arrecifeBoardAddTab');
-    if(addTab) addTab.addEventListener('click', arrecifeOpenNewBoardModal);
+    // Juan: "no me gusto esos predefinidos... mejor si le picas al + te sale uno blanco nuevo" -
+    // se quito el modal de elegir plantilla, el + crea un panel en blanco de una vez
+    if(addTab) addTab.addEventListener('click', () => arrecifeCreateBoard('Panel en blanco', null));
     // en celular la tira de pestañas tiene scroll propio - sin esto, al crear o cambiar de
     // panel la pestaña activa podía quedar casi oculta (solo una rebanada visible en el borde)
     // en vez de verse completa, que fue justo lo que mostró la verificación con Playwright
@@ -32073,54 +32082,6 @@ async function awardColmillos(eventType, periodKey, amount){
         if(error) console.error('[Mi Arrecife] no se pudo borrar el panel', error);
       }).catch(err => console.error('[Mi Arrecife] no se pudo borrar el panel', err));
     }
-  }
-
-  // ---- modal "Nuevo panel": nombre + plantilla ----
-  const arrecifeNewBoardModal = document.getElementById('arrecifeNewBoardModal');
-  const arrecifeNewBoardName = document.getElementById('arrecifeNewBoardName');
-  const arrecifeTemplateList = document.getElementById('arrecifeTemplateList');
-
-  function arrecifeRenderTemplateList(){
-    if(!arrecifeTemplateList) return;
-    const blank = '<button type="button" class="arrecife-template-item" data-template-id="">' +
-      '<span class="arrecife-template-item-label">Panel en blanco</span>' +
-      '<span class="arrecife-template-item-desc">Empieza vacío y agrega lo que quieras.</span>' +
-    '</button>';
-    const templates = ARRECIFE_TEMPLATES.map(t =>
-      '<button type="button" class="arrecife-template-item" data-template-id="' + t.id + '">' +
-        '<span class="arrecife-template-item-label">' + escapeHtml(t.label) + '</span>' +
-        '<span class="arrecife-template-item-desc">' + escapeHtml(t.desc) + '</span>' +
-      '</button>'
-    ).join('');
-    arrecifeTemplateList.innerHTML = blank + templates;
-    arrecifeTemplateList.querySelectorAll('.arrecife-template-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const templateId = btn.dataset.templateId;
-        const tpl = ARRECIFE_TEMPLATES.find(t => t.id === templateId);
-        const typedName = arrecifeNewBoardName.value.trim();
-        const name = typedName || (tpl ? tpl.label : 'Panel en blanco');
-        arrecifeCreateBoard(name, templateId || null);
-        arrecifeCloseNewBoardModal();
-      });
-    });
-  }
-
-  function arrecifeOpenNewBoardModal(){
-    if(!arrecifeNewBoardModal) return;
-    arrecifeNewBoardName.value = '';
-    arrecifeRenderTemplateList();
-    arrecifeNewBoardModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => arrecifeNewBoardName.focus(), 60);
-  }
-  function arrecifeCloseNewBoardModal(){
-    if(!arrecifeNewBoardModal) return;
-    arrecifeNewBoardModal.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  if(arrecifeNewBoardModal){
-    document.getElementById('arrecifeNewBoardClose').addEventListener('click', arrecifeCloseNewBoardModal);
-    arrecifeNewBoardModal.addEventListener('click', (e) => { if(e.target === arrecifeNewBoardModal) arrecifeCloseNewBoardModal(); });
   }
 
   // carga TODOS los paneles del usuario (localStorage pinta rápido, luego se reconcilia con
