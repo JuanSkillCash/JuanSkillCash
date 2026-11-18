@@ -221,19 +221,21 @@ button{font-family:inherit;color:inherit}
 /* ---- precios en vivo (BTC/ETH/SOL/HYPE via Binance websocket, NASDAQ/S&P 500/Russell 2000
    via proxy de Twelve Data) - Juan pidio varias cosas sobre esto, en orden:
    1) "que no se mueva la sinta... sin cinta" - sin scroll, sin animacion.
-   2) "el menu de hamburguesa quede hasta arriba como estaba antes" + con captura real:
-      "yo veo que a la derecha tienes espacio... correlo a la derecha y sube el menu de
-      hamburguesa" - NO va en una fila propia (eso empuja todo lo de abajo, sidebar incluido,
-      aunque sea sin position:fixed) - va METIDO en la misma fila de .mobile-topbar, justo
-      despues del botoncito de hamburguesa, con flex:1 para que ocupe el espacio libre que ya
-      existia ahi (antes de #topbarInicio, que en escritorio tiene margin-left:auto y empuja
-      Bitunix/Telegram/campana/etc a la derecha - con esto el ticker ahora ocupa ese hueco del
-      medio en vez de quedar vacio) - asi el sidebar/boton de hamburguesa no se mueve ni un
-      pixel, solo se usa espacio que ya estaba libre en esa misma fila.
+   2) (version vieja, YA NO aplica, ver punto 4) "el menu de hamburguesa quede hasta arriba
+      como estaba antes" - en ese momento ponerlo en su propia fila "empujaba todo lo de abajo,
+      sidebar incluido", asi que el ticker se puso METIDO en la misma fila que los botones.
    3) "deja el espacio suficiente y fijo en cada precio por si varia no afecte a los demas" -
       min-width fijo + tabular-nums en precio/variacion para que un digito de mas/menos al
-      actualizarse en vivo no corra a los demas precios de la fila. */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:1;min-width:0}
+      actualizarse en vivo no corra a los demas precios de la fila.
+   4) (18-nov-2026) Juan: "los precios deberian estar en una fila diferente donde estan los
+      botones... debajo deberian estar los precios... sin incluir el espacio de la hamburguesa,
+      que se queda igual, no me vayas a bajar el menu" - vuelve a pedir fila propia para los
+      precios, pero esta vez SI es seguro: el .sidebar ya es position:sticky;top:0;height:100vh
+      (no como cuando se escribio el punto 2), asi que estirar .mobile-topbar a 2 filas no mueve
+      el sidebar ni el boton de hamburguesa ni un pixel - son independientes. order:5 +
+      flex-basis:100% manda el ticker a su propia fila, DESPUES de Bitunix/Telegram/campana/
+      tema/ayuda/cuenta (que se quedan todos juntos arriba, orden 0 por defecto). */
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:5;justify-content:flex-start;min-width:0}
 .price-ticker-item{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
 .price-ticker-price{color:var(--white);min-width:62px;font-variant-numeric:tabular-nums}
@@ -241,7 +243,7 @@ button{font-family:inherit;color:inherit}
 .price-ticker-chg.up{color:var(--green)}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
-.mobile-topbar{display:flex;align-items:flex-start;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:nowrap}
+.mobile-topbar{display:flex;align-items:flex-start;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:wrap;row-gap:10px}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
 .brand-glow-bar{position:relative;height:3.5px;border-radius:3px;background:color-mix(in srgb, var(--white) 6%, transparent);overflow:hidden}
@@ -2780,16 +2782,9 @@ img[src=""]{display:none}
      completo junto a la hamburguesa en celular - se quita la etiqueta de texto y se
      comprime todo para que quede en una sola fila sin encimarse */
   .mobile-topbar{gap:6px}
-  /* en celular no hay espacio real junto al logo/los iconos para meter 7 precios (se probo y
-     el texto se desbordaba encima del icono de Bitunix) - acá la cinta pasa a ocupar su PROPIA
-     fila completa, debajo de la fila de iconos (order:5 + flex-basis:100% la manda al final y
-     a ancho completo), sin mover el botoncito de hamburguesa ni los demas iconos de su fila.
-     IMPORTANTE: esta regla tiene que ir DESPUES de la regla base ".mobile-topbar{...
-     flex-wrap:nowrap}" (la de mas arriba, sin @media) - puesta antes no servia de nada porque
-     esa regla sin condicion la pisaba siempre, sin importar el ancho de pantalla (mismo nivel
-     de especificidad, la que viene despues en el archivo gana) */
-  .mobile-topbar{flex-wrap:wrap}
-  .price-ticker{flex:none;flex-basis:100%;order:5;justify-content:flex-start;min-width:0}
+  /* la fila propia del ticker (order:5 + flex-basis:100%) ya es la regla base de arriba (sin
+     @media), vale para todos los anchos desde 18-nov-2026. Aqui solo quedan los ajustes que
+     SI son nada mas de celular: texto mas chico y, mas abajo, dejar solo BTC visible. */
   .price-ticker-item{font-size:11.5px;gap:4px}
   .price-ticker-price{min-width:54px}
   .price-ticker-chg{font-size:10.5px;min-width:42px}
