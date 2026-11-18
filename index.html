@@ -238,7 +238,7 @@ button{font-family:inherit;color:inherit}
       arriba, precios abajo). order:-1 + flex-basis:100% manda el ticker a SU PROPIA fila de
       primero, antes de Bitunix/Telegram/campana/tema/ayuda/cuenta (que se quedan todos juntos
       despues, orden 0 por defecto). */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:-1;justify-content:flex-start;min-width:0}
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:-1;justify-content:center;min-width:0}
 .price-ticker-item{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
 .price-ticker-price{color:var(--white);min-width:62px;font-variant-numeric:tabular-nums}
@@ -510,7 +510,7 @@ button{font-family:inherit;color:inherit}
    inicio y del menú lateral; mismo patrón visual/de dropdown que .account-mini, reusa
    .account-dropdown-item para los 3 botones). Separación de 8px (antes 14px, Juan la vio muy
    abierta) entre los 3 círculos (notificaciones/ayuda/cuenta). */
-.help-mini{position:relative;margin-left:8px;flex-shrink:0}
+.help-mini{position:relative;margin-left:6px;flex-shrink:0}
 /* faltaba esta regla desde que se agrego el selector de tema - sin position:relative aqui, el
    .help-mini-dropdown (position:absolute) de adentro se posicionaba contra el ancestro
    posicionado mas cercano, que en escritorio da la casualidad de ser .mobile-topbar (tiene
@@ -519,12 +519,12 @@ button{font-family:inherit;color:inherit}
    DOM, y el menu aparecia miles de pixeles mas abajo de la pagina, invisible. Juan: "en celular
    el boton de cambiar color no sirve" - confirmado con Playwright (boundingBox del dropdown
    en y=5087 en vez de justo debajo del boton). */
-.theme-mini{position:relative;flex-shrink:0}
+.theme-mini{position:relative;margin-left:6px;flex-shrink:0}
 .help-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--muted2);font-size:15px;font-weight:800;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
 .help-mini-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--white)}
 .help-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
 .help-mini-dropdown.open{display:block}
-.account-mini{position:relative;margin-left:8px;flex-shrink:0}
+.account-mini{position:relative;margin-left:6px;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .profile-avatar-row{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 20px}
 .profile-avatar-circle{width:228px;height:228px;max-width:100%;border-radius:50%;background-color:var(--bg);border:3px solid color-mix(in srgb, var(--accent) 30%, transparent);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
@@ -1468,7 +1468,7 @@ button{font-family:inherit;color:inherit}
 @keyframes sparkTwinkle{0%,82%,100%{opacity:0;transform:scale(.3)}91%{opacity:var(--peak,1);transform:scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
-.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--c);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--c);margin-top:auto;align-self:flex-start;transition:filter .15s}
 .cat-overview-card:hover .cat-overview-btn{filter:brightness(1.12)}
 
 .cat-overview-featured{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
@@ -1520,7 +1520,7 @@ button{font-family:inherit;color:inherit}
 .tool-card .tool-card-head h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;line-height:1.25;color:var(--white);margin:0;text-align:left;min-height:3.75em;display:flex;align-items:center}
 .tool-card-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;color:#4ade80;border:1px solid rgba(46,204,113,.35);background:rgba(46,204,113,.16);padding:3px 10px;border-radius:20px;flex-shrink:0;white-space:nowrap}
 .tool-card-sub{font-size:11px;color:var(--accent);font-family:'Space Mono',monospace;letter-spacing:.03em;margin:3px 0 14px;padding-left:36px;font-weight:600}
-.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);margin-top:auto;align-self:flex-start;transition:filter .15s}
 .tool-card:hover .tool-card-btn{filter:brightness(1.12)}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
@@ -1576,7 +1576,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-auth-gate-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
 .arrecife-auth-gate-text{font-size:13px;color:var(--muted2);max-width:380px;line-height:1.55}
 .arrecife-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-shrink:0}
-.arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
+.arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
 .arrecife-add-btn:hover{filter:brightness(1.12)}
 .arrecife-add-btn svg{width:16px;height:16px}
 /* Fase 3: varias pestañas/paneles por usuario - fila con las pestañas a la izquierda (con
@@ -1587,7 +1587,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-boards-tabs-wrap::-webkit-scrollbar{display:none}
 .arrecife-boards-tabs{display:flex;gap:8px;min-width:min-content}
 .arrecife-board-tab{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:99px;padding:7px 8px 7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease;white-space:nowrap;flex-shrink:0}
-.arrecife-board-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.arrecife-board-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
 .arrecife-board-tab-name{max-width:140px;overflow:hidden;text-overflow:ellipsis}
 .arrecife-board-tab-name[contenteditable="true"]{cursor:text;outline:none;background:color-mix(in srgb, var(--white) 8%, transparent);border-radius:4px;padding:0 3px}
 .arrecife-board-tab-del{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;flex-shrink:0;color:inherit;opacity:.7}
@@ -2618,7 +2618,7 @@ img[src=""]{display:none}
 .tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
 .tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
 .tf-pill:hover{border-color:var(--red);color:var(--white)}
-.tf-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tf-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
 .ls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .ls-exchange-card{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:16px 18px}
 .ls-exchange-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:14.5px;color:var(--white);margin-bottom:12px}
@@ -2794,9 +2794,12 @@ img[src=""]{display:none}
      completo junto a la hamburguesa en celular - se quita la etiqueta de texto y se
      comprime todo para que quede en una sola fila sin encimarse */
   .mobile-topbar{gap:6px}
-  /* la fila propia del ticker (order:5 + flex-basis:100%) ya es la regla base de arriba (sin
+  /* la fila propia del ticker (order:-1 + flex-basis:100%) ya es la regla base de arriba (sin
      @media), vale para todos los anchos desde 18-nov-2026. Aqui solo quedan los ajustes que
-     SI son nada mas de celular: texto mas chico y, mas abajo, dejar solo BTC visible. */
+     SI son nada mas de celular: texto mas chico, sin centrar (Juan: "en la version de celular
+     quitalo" - el centrado de escritorio no se ve bien en celular, solo queda BTC de todas
+     formas asi que centrar no aporta nada) y, mas abajo, dejar solo BTC visible. */
+  .price-ticker{justify-content:flex-start}
   .price-ticker-item{font-size:11.5px;gap:4px}
   .price-ticker-price{min-width:54px}
   .price-ticker-chg{font-size:10.5px;min-width:42px}
@@ -2900,7 +2903,7 @@ img[src=""]{display:none}
   }
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
-.hero-mascot-imgwrap img{
+.hero-mascot-imgwrap img,.hero-mascot-tint{
   -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
   mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
 }
@@ -2914,27 +2917,20 @@ img[src=""]{display:none}
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(to bottom, transparent 38%, var(--bg) 80%);
 }
-/* (mismo dia, Juan de nuevo: "se sigue viendo el cuadrado") la capa de arriba no alcanzaba
-   porque .hero-mascot-glow (la copia borrosa de la MISMA foto, usada como resplandor detras
-   del personaje) tambien arrastra el fondo oscuro horneado de la imagen - al tener blur(24px)
-   y scale(1.05) ese fondo oscuro se desparramaba MAS ALLA de los bordes del wrap (230px), donde
-   la capa de arriba (inset:0, del tamano exacto del wrap) no llegaba a taparlo - se veia como un
-   smudge ovalado/rectangular gris flotando alrededor del personaje. overflow:hidden en el wrap
-   recorta ese desborde.
-   (mismo dia, tercera vuelta: "se sigue viendo un recuadro") el overflow:hidden de arriba SI
-   tapaba el desborde, pero dejaba un corte duro justo en el borde del wrap - un blur(24px)
-   recortado en seco a medio desvanecer se ve como una orilla recta, aunque mas sutil que antes.
-   Se le dio mask-image radial propia (desvanecido a transparente por los 4 lados, sin
-   scale(1.05)) - mejoro pero seguia dejando un contorno tenue (confirmado otra vez por Juan
-   despues de quitar .hero-mascot-tint: "si ya eliminamos el resplandor porque se sigue viendo
-   el recuadro").
-   (mismo dia, quinta vuelta) en vez de seguir afinando mascaras de un blur que insiste en dejar
-   algun rastro de contorno, se elimino .hero-mascot-glow del todo (HTML + CSS), igual que se
-   hizo con .hero-mascot-tint. Solo queda .hero-mascot-img (la foto nitida, con su propio fade
-   SOLO abajo via mask-image + el overlay var(--bg) de arriba) - sin ninguna capa borrosa de
-   fondo que pueda desparramarse o dejar orilla en ningun tema. */
+/* HISTORIAL del "cuadro" en temas claros (resumen - el detalle completo esta en el historial
+   de git si hace falta): el culpable real era .hero-mascot-glow (una copia borrosa de la MISMA
+   foto puesta detras como "aura" ambiental) - traia el fondo oscuro horneado de la imagen y,
+   por mas que se le ajusto mascara/blur/overflow en varias vueltas, seguia dejando algun rastro
+   de contorno en claro. Se elimino del todo (HTML + CSS). .hero-mascot-tint (el resplandor ROJO,
+   un gradiente de color puro, no una copia de la foto) NUNCA fue el problema - se habia quitado
+   por error pensando que si lo era, y se repuso aqui abajo una vez confirmado que el "cuadro"
+   ya no aparece sin .hero-mascot-glow. */
 .hero-mascot-imgwrap{overflow:hidden}
 .hero-mascot-imgwrap img{width:100%;height:auto;display:block}
+.hero-mascot-tint{
+  position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
+  background:radial-gradient(ellipse 55% 60% at 50% 45%,rgba(255,47,79,.5),transparent 70%);
+}
 .hero-mascot-img{position:relative;z-index:1;animation:hero-mascot-float 4.6s ease-in-out infinite}
 @keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
@@ -3023,7 +3019,7 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 #pwaIosHint b{color:var(--red)}
 #pwaIosHint .pwa-ios-step{display:flex;align-items:center;gap:10px;margin-top:8px}
 #pwaIosHint .pwa-ios-step:first-of-type{margin-top:10px}
-#pwaIosHint .pwa-ios-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+#pwaIosHint .pwa-ios-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
 #pwaIosHint .pwa-ios-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted2);font-size:18px;line-height:1;cursor:pointer;padding:4px}
 @media(min-width:641px){ #pwaIosHint{ display:none !important; } }
 /* ===== Rediseño paso 2: sin neon, mas sobrio =====
@@ -3345,7 +3341,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    ofrece el link directo a YouTube en vez de dejar un reproductor roto */
 .events-video-blocked{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--muted2);font-size:13px;background:linear-gradient(160deg,var(--bg2),#000)}
 .events-video-blocked a{color:var(--accent);font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:20px;padding:7px 16px;font-size:12.5px}
-.events-video-blocked a:hover{background:var(--accent);color:#fff}
+.events-video-blocked a:hover{background:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
 /* contenedor del reproductor real - se llena/vacía por JS (mountPlayer/unmountPlayer) con un
    <iframe> NUEVO cada vez, nunca el mismo reutilizado (YT.Player.destroy() lo elimina del DOM,
    reusar la misma referencia después de eso deja la pantalla en negro) */
@@ -3654,6 +3650,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 (function(){
   const SKC_THEMES = {
     dorado:   {name:'Medianoche + Dorado',   bg:'#0a0e1a', card:'#161c33', gradA:'#2a2560', gradB:'#0b0f24', accent:'#e8a317', white:'#f7f6ee', muted:'#b7b4a8', muted2:'#d9d6ca'},
+    original: {name:'Original (Azul clásico)', bg:'#090b16', card:'#1b2140', gradA:'#211f78', gradB:'#0c1034', accent:'#5b8def', white:'#f7f6fb', muted:'#b8bac2', muted2:'#dcdee2'},
     negro:    {name:'Todo negro',            bg:'#0a0a0a', card:'#1a1a1a', gradA:'#2a2a2a', gradB:'#0f0f0f', accent:'#e5e5e5', white:'#f5f5f5', muted:'#9a9a9a', muted2:'#bcbcbc'},
     bosque:   {name:'Bosque + Verde',        bg:'#07140f', card:'#102a1f', gradA:'#154a3c', gradB:'#061410', accent:'#a8e6c4', white:'#eef9f1', muted:'#a0bdac', muted2:'#c2dfce'},
     pizarra:  {name:'Pizarra + Lavanda',     bg:'#0d1117', card:'#19202c', gradA:'#2a3a52', gradB:'#0a0e16', accent:'#b8a6f0', white:'#f3f1fa', muted:'#b2aec2', muted2:'#d4d0e4'},
@@ -4338,6 +4335,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
         <div class="help-mini-dropdown" id="themeMiniDropdown">
           <button type="button" class="account-dropdown-item theme-option-btn" data-theme="dorado"><span class="theme-option-dot" style="background:#e8a317"></span>Medianoche + Dorado</button>
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="original"><span class="theme-option-dot" style="background:#5b8def"></span>Original (Azul clásico)</button>
           <button type="button" class="account-dropdown-item theme-option-btn" data-theme="negro"><span class="theme-option-dot" style="background:#e5e5e5"></span>Todo negro</button>
           <button type="button" class="account-dropdown-item theme-option-btn" data-theme="bosque"><span class="theme-option-dot" style="background:#a8e6c4"></span>Bosque + Verde</button>
           <button type="button" class="account-dropdown-item theme-option-btn" data-theme="pizarra"><span class="theme-option-dot" style="background:#b8a6f0"></span>Pizarra + Lavanda</button>
@@ -6111,8 +6109,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                               <stop offset="100%" stop-color="#2ecc71"/>
                             </linearGradient>
                           </defs>
-                          <line id="fngDetailNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
-                          <circle cx="100" cy="100" r="5" fill="#fff"/>
+                          <line id="fngDetailNeedle" x1="100" y1="100" x2="100" y2="30" stroke="var(--white)" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                          <circle cx="100" cy="100" r="5" fill="var(--white)"/>
                         </svg>
                       </div>
                       <div class="fng-big-value" id="fngDetailValue">—</div>
@@ -7691,8 +7689,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                           <stop offset="100%" stop-color="#2ecc71"/>
                         </linearGradient>
                       </defs>
-                      <line id="domallGaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
-                      <circle cx="100" cy="100" r="5" fill="#fff"/>
+                      <line id="domallGaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="var(--white)" stroke-width="3" stroke-linecap="round" style="transform-origin:100px 100px"/>
+                      <circle cx="100" cy="100" r="5" fill="var(--white)"/>
                     </svg>
                   </div>
                   <div class="fng-big-value" id="domallGaugeValue">—</div>
@@ -8803,7 +8801,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               <g transform="translate(140,158) rotate(14)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardB)" opacity=".62"/></g>
               <g transform="translate(140,158) rotate(21)"><rect x="-10" y="-90" width="20" height="34" rx="5" fill="url(#mnCardA)" opacity=".5"/></g>
               <g transform="translate(140,158)">
-                <rect x="-11" y="-92" width="22" height="36" rx="5" fill="#fff"/>
+                <rect x="-11" y="-92" width="22" height="36" rx="5" fill="var(--white)"/>
                 <path d="M-3,-80 L-3,-64 L7,-72 Z" fill="#ff2f4f"/>
               </g>
               <text x="140" y="152" text-anchor="middle" font-family="Space Mono,monospace" font-size="9.5" font-weight="700" letter-spacing="2.5" fill="#ff8a9c">8 MÓDULOS</text>
@@ -9329,7 +9327,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner">
         <div class="telegram-banner-left">
           <div class="telegram-banner-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--white)"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
           </div>
           <div>
             <div class="telegram-banner-title">Entrá al grupo de Telegram</div>
@@ -11424,7 +11422,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner" style="max-width:100%;flex-wrap:wrap;margin:0 0 16px">
         <div class="telegram-banner-left">
           <div class="telegram-banner-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--white)"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
           </div>
           <div>
             <div class="telegram-banner-title">Únete a la comunidad de Telegram de Juan SkillCash</div>
@@ -14760,11 +14758,30 @@ document.getElementById('accountBarLogout').addEventListener('click', async () =
   accountMiniDropdown.classList.remove('open');
 });
 
+/* ---- cierra los OTROS menucitos circulares de la topbar (cuenta/tema/ayuda/notificaciones)
+   al abrir uno nuevo - Juan: "si abro un botoncito de arriba y luego abro otro, el otro se
+   queda como abierto detras... deberia cerrarse y solo quedar abierto uno". function (no
+   const) para que quede hoisteada y la pueda llamar el bloque de notifMiniBtn mas abajo en el
+   archivo sin problema, aunque se declare mucho despues textualmente. */
+function closeOtherMiniDropdowns(exceptDropdownId){
+  ['accountMiniDropdown', 'themeMiniDropdown', 'helpMiniDropdown', 'notifMiniDropdown'].forEach((ddId) => {
+    if (ddId === exceptDropdownId) return;
+    const dd = document.getElementById(ddId);
+    if (dd && dd.classList.contains('open')) {
+      dd.classList.remove('open');
+      const btnId = ddId.replace('Dropdown', 'Btn');
+      const btn = document.getElementById(btnId);
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 /* ---- menú desplegable del botón circular de cuenta ---- */
 const accountMiniBtn = document.getElementById('accountMiniBtn');
 const accountMiniDropdown = document.getElementById('accountMiniDropdown');
 accountMiniBtn.addEventListener('click', (e) => {
   e.stopPropagation();
+  closeOtherMiniDropdowns('accountMiniDropdown');
   const isOpen = accountMiniDropdown.classList.toggle('open');
   accountMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
@@ -14786,6 +14803,7 @@ const themeMiniBtn = document.getElementById('themeMiniBtn');
 const themeMiniDropdown = document.getElementById('themeMiniDropdown');
 themeMiniBtn.addEventListener('click', (e) => {
   e.stopPropagation();
+  closeOtherMiniDropdowns('themeMiniDropdown');
   const isOpen = themeMiniDropdown.classList.toggle('open');
   themeMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
@@ -14821,6 +14839,7 @@ const helpMiniBtn = document.getElementById('helpMiniBtn');
 const helpMiniDropdown = document.getElementById('helpMiniDropdown');
 helpMiniBtn.addEventListener('click', (e) => {
   e.stopPropagation();
+  closeOtherMiniDropdowns('helpMiniDropdown');
   const isOpen = helpMiniDropdown.classList.toggle('open');
   helpMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
@@ -20422,7 +20441,7 @@ function renderFngChart(fromMs, toMs){
         ${segmentsHtml}
         ${xLabelsHtml}
         <line id="fngHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 35%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="fngHoverDot" r="7" fill="#fff" style="display:none"/>
+        <circle id="fngHoverDot" r="7" fill="var(--white)" style="display:none"/>
         <rect id="fngHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
       <div id="fngTooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
@@ -21101,8 +21120,8 @@ function renderHalvingChart(cycleIndex){
     const line2Y = roomRight ? py + 8 : Math.max(py - 12, marginTop + 12);
     todayMarkerHtml = `
       <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="none" stroke="#090b16" stroke-width="2"/>
-      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="#fff"/>
-      ${halvingReduceMotion ? '' : `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
+      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="var(--white)"/>
+      ${halvingReduceMotion ? '' : `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="none" stroke="var(--white)" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
       <text class="halving-today-label" x="${labelX.toFixed(1)}" y="${line1Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">Hoy</text>
       <text class="halving-today-price" x="${labelX.toFixed(1)}" y="${line2Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">${lastPriceLabel}</text>
       <text id="halvingTodayDateLabel" class="halving-axis-text" x="${Math.min(px, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${px > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}">${todayDateLabel}</text>
@@ -21329,8 +21348,8 @@ function renderHalvingAllTimeChart(loadingEl, errorEl, wrap, statsEl){
   const line2Y = roomRight ? lastPy + 8 : Math.max(lastPy - 12, marginTop + 12);
   const todayMarkerHtml = `
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="7" fill="none" stroke="#090b16" stroke-width="2"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    ${halvingReduceMotion ? '' : `<circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    ${halvingReduceMotion ? '' : `<circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="var(--white)" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
     <text class="halving-today-label" x="${labelX.toFixed(1)}" y="${line1Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">Hoy</text>
     <text class="halving-today-price" x="${labelX.toFixed(1)}" y="${line2Y.toFixed(1)}" text-anchor="${labelAnchor}" font-size="${xFontSize}">${lastPriceLabel}</text>
     <text id="halvingTodayDateLabel" class="halving-axis-text" x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}">${todayDateLabel}</text>
@@ -21845,14 +21864,14 @@ function renderRainbowChart(){
   // le faltaba (halvingReduceMotion es un flag genérico ya calculado una vez, no algo propio de
   // Ciclos de Halving) y se quita la línea punteada vertical (ruido visual)
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    ${halvingReduceMotion ? '' : `<circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    ${halvingReduceMotion ? '' : `<circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="6" fill="none" stroke="var(--white)" stroke-width="1.5" opacity=".6"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2s" repeatCount="indefinite"/></circle>`}
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica sobre las bandas Rainbow, precio actual ${fmtHalvingPrice(lastPoint.c)}, zona ${currentBand.label}`;
 
@@ -21862,11 +21881,11 @@ function renderRainbowChart(){
         ${chartWatermarkHtml(totalW, totalH)}
         ${bandsHtml}
         ${yGridHtml}
-        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${pathD.trim()}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="rainbowHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="rainbowHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="rainbowHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="rainbowHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="rainbowHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="rainbowHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -22101,12 +22120,12 @@ function renderEthLogRegChart(){
   const lastPx = xFor(endMs), lastPy = yFor(lastPoint.c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Ethereum en escala logarítmica con bandas de regresión, precio actual ${fmtEthExactPrice(lastPoint.c)}`;
 
@@ -22119,11 +22138,11 @@ function renderEthLogRegChart(){
         <path d="${pathFor(upperAt)}" fill="none" stroke="#ff2f4f" stroke-width="1.6" stroke-linecap="round"/>
         <path d="${pathFor(mainAt)}" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round"/>
         <path d="${pathFor(lowerAt)}" fill="none" stroke="#2ecc71" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${pathD.trim()}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ethlogregHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="ethlogregHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="ethlogregHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="ethlogregHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="ethlogregHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="ethlogregHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -22388,12 +22407,12 @@ function renderEthVwapChart(){
   const lastPx = xFor(endMs), lastPy = yFor(lastPoint.c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Ethereum con VWAP anclado, precio actual ${fmtEthExactPrice(lastPoint.c)}`;
 
@@ -22402,13 +22421,13 @@ function renderEthVwapChart(){
       <svg class="fng-chart-svg dv-chart-svg" id="ethvwapChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
         ${vwapPathsHtml}
-        <path d="${pathD.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${pathD.trim()}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.3 : 1.6}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ethvwapHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="ethvwapHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="ethvwapHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="ethvwapHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="ethvwapHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="ethvwapHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -22606,13 +22625,13 @@ function renderPiCycleChart(){
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica con el indicador Pi Cycle Top, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}`;
 
@@ -22622,14 +22641,14 @@ function renderPiCycleChart(){
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${crossHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${sma350Line}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 0.8 : 1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${sma111Line}" fill="none" stroke="#a855f7" stroke-width="${isMobileChart ? 0.8 : 1}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="picycleHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="picycleHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="picycleHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="picycleHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="picycleHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="picycleHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -23256,13 +23275,13 @@ function renderMarketFloorChart(){
   // timestamp de medianoche UTC se muestra un día antes para cualquier usuario al oeste de UTC)
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'UTC' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica con el piso de Keltner y el costo de producción, precio actual ${fmtHalvingPrice(points[points.length - 1].price)}`;
 
@@ -23272,14 +23291,14 @@ function renderMarketFloorChart(){
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         ${crossHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${costLine}" fill="none" stroke="#a855f7" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${keltnerLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="mfloorHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="mfloorHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="mfloorHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="mfloorHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="mfloorHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="mfloorHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -23449,13 +23468,13 @@ function renderEma200Chart(){
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica con EMA 200 y SMA 200, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}`;
 
@@ -23464,14 +23483,14 @@ function renderEma200Chart(){
       <svg class="fng-chart-svg dv-chart-svg" id="ema200ChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
         <path d="${smaLine}" fill="none" stroke="#f97316" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${emaLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 0.9 : 1.1}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ema200HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="ema200HoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="ema200HoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="ema200HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="ema200HoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="ema200HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -23688,13 +23707,13 @@ function renderCicloSoporteChart(){
 
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica con los techos de ciclo anteriores marcados como soporte, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}`;
 
@@ -23703,13 +23722,13 @@ function renderCicloSoporteChart(){
       <svg class="fng-chart-svg dv-chart-svg" id="ciclosoporteChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine.trim()}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         ${peakLinesHtml}
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ciclosoporteHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="ciclosoporteHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="ciclosoporteHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="ciclosoporteHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="ciclosoporteHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="ciclosoporteHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -23938,13 +23957,13 @@ function renderRsiChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${rsiBottom}" stroke="color-mix(in srgb, var(--white) 18%, transparent)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin y RSI mensual, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}, RSI ${rsi[rsi.length - 1].toFixed(1)}`;
 
@@ -23956,13 +23975,13 @@ function renderRsiChart(){
         ${rsiGridHtml}
         <line class="dv-grid-line" x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}"/>
         ${crossHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${rsiLine}" fill="none" stroke="#60a5fa" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="rsiHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${rsiBottom}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="rsiHoverDotUpper" r="5" fill="#fff" style="display:none"/>
+        <circle id="rsiHoverDotUpper" r="5" fill="var(--white)" style="display:none"/>
         <circle id="rsiHoverDotLower" r="5" fill="#60a5fa" style="display:none"/>
         <rect id="rsiHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="rsiHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
@@ -24223,13 +24242,13 @@ function renderSthMvrvChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${oscBottom}" stroke="color-mix(in srgb, var(--white) 18%, transparent)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin y MVRV de holders de corto plazo, precio actual ${fmtHalvingPrice(points[points.length - 1].btc)}, STH-MVRV ${points[points.length - 1].mvrv.toFixed(2)}`;
 
@@ -24242,14 +24261,14 @@ function renderSthMvrvChart(){
         <line class="dv-grid-line" x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}"/>
         <path d="${upperLine}" fill="none" stroke="rgba(240,178,61,.55)" stroke-width="1" stroke-dasharray="5,3"/>
         <path d="${lowerLine}" fill="none" stroke="rgba(240,178,61,.55)" stroke-width="1" stroke-dasharray="5,3"/>
-        <path d="${btcAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
+        <path d="${btcAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
         <path d="${costBasisLine}" fill="none" stroke="#f0b23d" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         ${oscHtml}
         <line id="sthmvrvHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${oscBottom}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="sthmvrvHoverDotUpper" r="5" fill="#fff" style="display:none"/>
+        <circle id="sthmvrvHoverDotUpper" r="5" fill="var(--white)" style="display:none"/>
         <circle id="sthmvrvHoverDotLower" r="5" fill="#22c55e" style="display:none"/>
         <rect id="sthmvrvHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="sthmvrvHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
@@ -24496,13 +24515,13 @@ function renderEpochPlChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${priceTop}" x2="${lastPx.toFixed(1)}" y2="${pctBottom}" stroke="color-mix(in srgb, var(--white) 18%, transparent)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, priceTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin y porcentaje de supply en pérdida por época de halving, precio actual ${fmtHalvingPrice(points[points.length - 1].btc)}`;
 
@@ -24514,13 +24533,13 @@ function renderEpochPlChart(){
         ${pctGridHtml}
         <line class="dv-grid-line" x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}"/>
         ${crossing95Html}
-        <path d="${btcAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${btcLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${btcLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         ${epochLines.map(e => `<path d="${e.d}" fill="none" stroke="${e.color}" stroke-width="${isMobileChart ? 1 : 1.3}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="epochplHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${pctBottom}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="epochplHoverDotUpper" r="5" fill="#fff" style="display:none"/>
+        <circle id="epochplHoverDotUpper" r="5" fill="var(--white)" style="display:none"/>
         <circle id="epochplHoverDotLower" r="5" fill="#a855f7" style="display:none"/>
         <rect id="epochplHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="epochplHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
@@ -24698,13 +24717,13 @@ function renderMa4yChart(){
   const lastPx = xFor(endMs), lastPy = yFor(points[points.length - 1].c);
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 16).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin en escala logarítmica con la media móvil de 4 años, precio actual ${fmtHalvingPrice(points[points.length - 1].c)}`;
 
@@ -24713,13 +24732,13 @@ function renderMa4yChart(){
       <svg class="fng-chart-svg dv-chart-svg" id="ma4yChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
         <path d="${smaLine}" fill="none" stroke="#22d3ee" stroke-width="${isMobileChart ? 1.1 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="ma4yHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="ma4yHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="ma4yHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="ma4yHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="ma4yHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="ma4yHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -26070,7 +26089,7 @@ function renderDomChart(key){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `${def.series.map(s => s.label).join(' y ')}, valor actual ${fmtDomVal(lastP[def.series[0].key])}`;
 
@@ -26087,7 +26106,7 @@ function renderDomChart(key){
         ${endMarkersHtml}
         ${xLabelsHtml}
         <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="${key}HoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="${key}HoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="${key}HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="${key}HoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="${key}HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -26815,7 +26834,7 @@ function renderBtcMacroChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
     <text class="btcmacro-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   // relleno de área bajo la línea de precio (~6% de opacidad, cerrado contra el fondo del área
   // de dibujo - ver btcMacroAreaPathD) - el naranja de BTC se mantiene exacto, solo se le agrega
@@ -27094,7 +27113,7 @@ function renderBtcTrendsChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Precio de Bitcoin con interés de búsqueda de Google Trends superpuesto, precio actual ${fmtHalvingPrice(points[points.length - 1].btc)}`;
 
@@ -27109,7 +27128,7 @@ function renderBtcTrendsChart(){
         ${overlayPathsHtml}
         ${xLabelsHtml}
         <line id="btctrendsHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="btctrendsHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="btctrendsHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="btctrendsHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="btctrendsHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="btctrendsHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -27375,12 +27394,12 @@ function renderMcapEmaChart(key){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <line x1="${lastPx.toFixed(1)}" y1="${lastPy.toFixed(1)}" x2="${lastPx.toFixed(1)}" y2="${(marginTop + drawH).toFixed(1)}" stroke="color-mix(in srgb, var(--white) 40%, transparent)" stroke-width="1" stroke-dasharray="3,3"/>
-    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fff"/>
+    <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="var(--white)"/>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}" fill="#c8cde0" font-family="'Space Mono',monospace">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
 
   wrap.innerHTML = `
@@ -27389,13 +27408,13 @@ function renderMcapEmaChart(key){
         ${chartWatermarkHtml(totalW, totalH)}
         ${yGridHtml}
         <path d="${emaLine}" fill="none" stroke="#22c55e" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${priceLine}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceLine}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.1 : 1.4}" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="${key}HoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 50%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="${key}HoverDot" r="6" fill="#fff" style="display:none"/>
+        <circle id="${key}HoverDot" r="6" fill="var(--white)" style="display:none"/>
         <rect id="${key}HoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
-        <text id="${key}HoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace" style="display:none"></text>
+        <text id="${key}HoverDateLabel" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" font-weight="700" fill="var(--white)" font-family="'Space Mono',monospace" style="display:none"></text>
         <rect id="${key}HoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair"/>
       </svg>
       <div id="${key}Tooltip" style="display:none;position:absolute;pointer-events:none;background:#08080b;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;transform:translate(-50%,-115%);z-index:5"></div>
@@ -27701,12 +27720,12 @@ function renderBtcXauChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayMarkerHtml = `
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPy.toFixed(1)}" r="5" fill="#fbbf24"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPy - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
   const ariaLabel = `Cuántas onzas de oro equivale 1 Bitcoin en escala logarítmica, valor actual ${fmtOz(points[points.length - 1].ratio)}`;
 
@@ -27723,7 +27742,7 @@ function renderBtcXauChart(){
         ${todayMarkerHtml}
         ${cycleLabelHtml}
         <line id="btcxauHoverLine" x1="0" y1="${marginTop}" x2="0" y2="${marginTop + drawH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="btcxauHoverDot" r="5" fill="#fff" style="display:none"/>
+        <circle id="btcxauHoverDot" r="5" fill="var(--white)" style="display:none"/>
         <rect id="btcxauHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="btcxauHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="btcxauHoverCatcher" x="${marginLeft}" y="${marginTop}" width="${drawW}" height="${drawH}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -27957,12 +27976,12 @@ function renderBtcAaplChart(){
   const todayDateLabel = new Date(endMs).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const todayMarkerHtml = `
     <circle cx="${lastPx.toFixed(1)}" cy="${lastPyUpper.toFixed(1)}" r="5" fill="#9ca3af"/>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPyUpper - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="#fff" font-family="'Space Mono',monospace">HOY</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${Math.max(lastPyUpper - 14, marginTop - 4).toFixed(1)}" text-anchor="${lastPx > totalW - marginRight - 20 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="700" fill="var(--white)" font-family="'Space Mono',monospace">HOY</text>
   `;
   const startLabel = new Date(startMs).toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'UTC' });
   const xLabelsHtml = `
     <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 10}" text-anchor="start" font-size="${xFontSize}">${startLabel}</text>
-    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${todayDateLabel}</text>
+    <text x="${Math.min(lastPx, totalW - marginRight - 2).toFixed(1)}" y="${totalH - 10}" text-anchor="${lastPx > totalW - marginRight - 30 ? 'end' : 'middle'}" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${todayDateLabel}</text>
   `;
 
   wrap.innerHTML = `
@@ -27975,12 +27994,12 @@ function renderBtcAaplChart(){
         <path d="${ratioLine.trim()}" fill="none" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         ${trendLineUpperHtml}
         ${trendLineLowerHtml}
-        <path d="${btcPriceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${btcPriceLine.trim()}" fill="none" stroke="var(--white)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
         ${xLabelsHtml}
         ${todayMarkerHtml}
         <line id="btcaaplHoverLine" x1="0" y1="${upperTop}" x2="0" y2="${lowerTop + lowerH}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
-        <circle id="btcaaplHoverDotUpper" r="5" fill="#fff" style="display:none"/>
-        <circle id="btcaaplHoverDotLower" r="5" fill="#fff" style="display:none"/>
+        <circle id="btcaaplHoverDotUpper" r="5" fill="var(--white)" style="display:none"/>
+        <circle id="btcaaplHoverDotLower" r="5" fill="var(--white)" style="display:none"/>
         <rect id="btcaaplHoverDateBg" y="${totalH - 22}" height="16" rx="3" fill="#090b16" style="display:none"/>
         <text id="btcaaplHoverDateLabel" class="dv-axis-text" x="0" y="${totalH - 10}" text-anchor="middle" font-size="${xFontSize}" style="display:none"></text>
         <rect id="btcaaplHoverCatcher" x="${marginLeft}" y="${upperTop}" width="${drawW}" height="${lowerTop + lowerH - upperTop}" fill="transparent" style="cursor:crosshair;touch-action:none"/>
@@ -28204,13 +28223,13 @@ function renderCbpChart(data){
       <svg class="dv-chart-svg" id="cbpChartSvg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" style="width:100%;height:auto;display:block" tabindex="0" role="img" aria-label="${ariaLabel}">
         ${chartWatermarkHtml(totalW, totalH)}
         ${priceGridHtml}
-        <path d="${priceAreaD}" fill="#ffffff" fill-opacity=".04" stroke="none"/>
-        <path d="${priceLine.trim()}" fill="none" stroke="#ffffff" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${priceAreaD}" fill="var(--white)" fill-opacity=".04" stroke="none"/>
+        <path d="${priceLine.trim()}" fill="none" stroke="var(--white)" stroke-width="${isMobileChart ? 1.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
         <line class="dv-grid-line" x1="${marginLeft}" y1="${dividerY.toFixed(1)}" x2="${totalW - marginRight}" y2="${dividerY.toFixed(1)}"/>
         ${yGridHtml}
         ${barsHtml}
         <text class="dv-axis-text" x="${marginLeft}" y="${totalH - 8}" text-anchor="start" font-size="${xFontSize}">${dateFmt(data[0].t)}</text>
-        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="500" fill="#fff" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
+        <text x="${totalW - marginRight}" y="${totalH - 8}" text-anchor="end" font-size="${xFontSize}" font-weight="500" fill="var(--white)" font-family="'Space Mono',monospace">${dateFmt(data[n - 1].t)}</text>
         <rect id="cbpHoverCatcher" x="${marginLeft}" y="0" width="${drawW}" height="${totalH}" fill="transparent" style="touch-action:none"/>
         <line id="cbpHoverLine" x1="0" y1="${priceTop}" x2="0" y2="${premiumBottom}" stroke="color-mix(in srgb, var(--white) 30%, transparent)" stroke-width="1" style="display:none"/>
       </svg>
@@ -30092,6 +30111,7 @@ async function markAllNotificationsRead(){
 }
 notifMiniBtn.addEventListener('click', (e) => {
   e.stopPropagation();
+  closeOtherMiniDropdowns('notifMiniDropdown');
   const isOpen = notifMiniDropdown.classList.toggle('open');
   notifMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   // con solo abrir la campanita ya se marcan como leidas - antes habia que entrar Y darle a
