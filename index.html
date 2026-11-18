@@ -2897,6 +2897,16 @@ img[src=""]{display:none}
   -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
   mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
 }
+/* la imagen del tiburon (logo-skillcash-1050) trae su propio fondo oscuro "horneado" en el
+   archivo (no es transparente ahi) - pensado para mezclarse con el fondo oscuro de siempre.
+   El mask-image de arriba solo le baja la opacidad a esos pixeles oscuros, asi que en temas
+   claros se alcanzaba a ver un "cuadro" oscuro traslucido en vez de desaparecer. Esta capa pinta
+   encima el --bg real del tema activo (mismo truco que .tool-card-banner::after mas abajo, que
+   si se ve bien en claro) para tapar ese borde sin importar que color tenga la imagen por dentro. */
+.hero-mascot-imgwrap::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to bottom, transparent 38%, var(--bg) 80%);
+}
 .hero-mascot-imgwrap img{width:100%;height:auto;display:block}
 .hero-mascot-tint{
   position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
