@@ -2924,18 +2924,17 @@ img[src=""]{display:none}
    (mismo dia, tercera vuelta: "se sigue viendo un recuadro") el overflow:hidden de arriba SI
    tapaba el desborde, pero dejaba un corte duro justo en el borde del wrap - un blur(24px)
    recortado en seco a medio desvanecer se ve como una orilla recta, aunque mas sutil que antes.
-   .hero-mascot-glow tiene SU PROPIA mask-image radial (se desvanece a transparente desde
-   bastante antes de llegar al borde, por los 4 lados) y sin scale(1.05).
-   (mismo dia, cuarta vuelta) Juan pidio directamente quitar .hero-mascot-tint (el resplandor
-   ROJO de fondo, aparte de .hero-mascot-glow) "asi quitamos el cuadro que no podemos quitar" -
-   eliminado del todo (HTML + CSS) en vez de seguir ajustandolo. */
+   Se le dio mask-image radial propia (desvanecido a transparente por los 4 lados, sin
+   scale(1.05)) - mejoro pero seguia dejando un contorno tenue (confirmado otra vez por Juan
+   despues de quitar .hero-mascot-tint: "si ya eliminamos el resplandor porque se sigue viendo
+   el recuadro").
+   (mismo dia, quinta vuelta) en vez de seguir afinando mascaras de un blur que insiste en dejar
+   algun rastro de contorno, se elimino .hero-mascot-glow del todo (HTML + CSS), igual que se
+   hizo con .hero-mascot-tint. Solo queda .hero-mascot-img (la foto nitida, con su propio fade
+   SOLO abajo via mask-image + el overlay var(--bg) de arriba) - sin ninguna capa borrosa de
+   fondo que pueda desparramarse o dejar orilla en ningun tema. */
 .hero-mascot-imgwrap{overflow:hidden}
 .hero-mascot-imgwrap img{width:100%;height:auto;display:block}
-.hero-mascot-glow{
-  position:absolute;inset:0;z-index:0;filter:blur(24px);opacity:.6;pointer-events:none;
-  -webkit-mask-image:radial-gradient(ellipse 62% 62% at 50% 45%,#000 35%,transparent 78%);
-  mask-image:radial-gradient(ellipse 62% 62% at 50% 45%,#000 35%,transparent 78%);
-}
 .hero-mascot-img{position:relative;z-index:1;animation:hero-mascot-float 4.6s ease-in-out infinite}
 @keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero-mascot-text{min-width:0;padding:0 0 22px}
@@ -4386,8 +4385,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="hero-orbe3" aria-hidden="true"></div>
       <div class="hero-orbe4" aria-hidden="true"></div>
       <div class="hero-mascot-imgwrap">
-        <img class="hero-mascot-glow" src="/logo-skillcash-1050.webp" alt="" aria-hidden="true" width="700" height="700" fetchpriority="high">
-        <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash" width="700" height="700" loading="lazy" decoding="async">
+        <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash" width="700" height="700" fetchpriority="high" decoding="async">
       </div>
       <div class="hero-mascot-text">
         <div class="hero-mascot-eyebrow">Bienvenido a</div>
