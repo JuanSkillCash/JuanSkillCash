@@ -517,6 +517,9 @@ button{font-family:inherit;color:inherit}
 .account-mini-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent)}
 .account-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
 .account-mini-dropdown.open{display:block}
+.theme-option-btn{display:flex;align-items:center}
+.theme-option-btn.active{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, transparent)}
+.theme-option-dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:9px;flex-shrink:0;border:1px solid rgba(255,255,255,.3)}
 .account-dropdown-item{display:block;width:100%;text-align:left;background:none;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--white);border-radius:8px;padding:10px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s;margin-top:6px}
 .account-dropdown-item:first-child{margin-top:0}
 .account-dropdown-item:hover{border-color:var(--red);color:var(--red)}
@@ -2795,8 +2798,8 @@ img[src=""]{display:none}
   .exchange-pill img,.exchange-pill svg{width:16px;height:16px}
   .colmillos-pill{font-size:11.5px}
   .colmillos-pill span#colmillosWalletBalance{font-size:11.5px}
-  .notif-mini-btn,.account-mini-btn,.help-mini-btn{width:34px;height:34px;font-size:14px}
-  .account-mini,.help-mini{margin-left:4px}
+  .notif-mini-btn,.account-mini-btn,.help-mini-btn,.theme-mini-btn{width:34px;height:34px;font-size:14px}
+  .account-mini,.help-mini,.theme-mini{margin-left:4px}
 }
 @media(min-width:861px){
   /* el botoncito de hamburguesa en escritorio solo se ve cuando el menu esta cerrado
@@ -3584,6 +3587,48 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 @media(max-width:560px){ .jr-form-grid{grid-template-columns:1fr} }
 
 </style>
+<script>
+/* Selector de tema (18-nov-2026): Juan pidió poder elegir la paleta de colores desde la
+   pagina en vivo, no solo en una maqueta aparte. Primera entrega SOLO con temas OSCUROS (5,
+   elegidos por Juan de la maqueta de 34 paquetes) - los temas CLAROS quedaron pendientes a
+   proposito: requieren revisar ~160 sitios con "blanco a baja opacidad" (bordes/fondos
+   sutiles) pensados solo para fondo oscuro, uno por uno, para no romper nada.
+   Este bloque va ANTES de <body> y se ejecuta de inmediato (sin esperar DOMContentLoaded)
+   para aplicar el tema guardado ANTES de que se pinte la pagina - si esperaramos a que
+   cargue todo el HTML se alcanzaria a ver un parpadeo del tema dorado (el que ya traen las
+   variables de :root) antes de cambiar al elegido. SKC_THEMES y applySkcTheme quedan en
+   window para que el resto de la logica (el menu desplegable, mas abajo en el archivo) los
+   reuse sin duplicar los valores de cada paleta. */
+(function(){
+  const SKC_THEMES = {
+    dorado:   {name:'Medianoche + Dorado',   bg:'#0a0e1a', card:'#161c33', gradA:'#2a2560', gradB:'#0b0f24', accent:'#e8a317', white:'#f7f6ee', muted:'#b7b4a8', muted2:'#d9d6ca'},
+    negro:    {name:'Todo negro',            bg:'#0a0a0a', card:'#1a1a1a', gradA:'#2a2a2a', gradB:'#0f0f0f', accent:'#e5e5e5', white:'#f5f5f5', muted:'#9a9a9a', muted2:'#bcbcbc'},
+    bosque:   {name:'Bosque + Verde',        bg:'#07140f', card:'#102a1f', gradA:'#154a3c', gradB:'#061410', accent:'#a8e6c4', white:'#eef9f1', muted:'#a0bdac', muted2:'#c2dfce'},
+    pizarra:  {name:'Pizarra + Lavanda',     bg:'#0d1117', card:'#19202c', gradA:'#2a3a52', gradB:'#0a0e16', accent:'#b8a6f0', white:'#f3f1fa', muted:'#b2aec2', muted2:'#d4d0e4'},
+    petroleo: {name:'Petróleo + Turquesa',   bg:'#061b1f', card:'#0e2e33', gradA:'#154a52', gradB:'#05161a', accent:'#2dd4bf', white:'#eefaf8', muted:'#9fc2bd', muted2:'#c1e4df'},
+  };
+  const DEFAULT_THEME = 'dorado';
+  function applySkcTheme(id){
+    const t = SKC_THEMES[id];
+    if(!t) return;
+    const s = document.documentElement.style;
+    s.setProperty('--bg', t.bg);
+    s.setProperty('--card', t.card);
+    s.setProperty('--grad-caja', 'radial-gradient(100% 70% at 100% 0%, ' + t.gradA + ' 0%, ' + t.gradB + ' 80%)');
+    s.setProperty('--accent', t.accent);
+    s.setProperty('--white', t.white);
+    s.setProperty('--muted', t.muted);
+    s.setProperty('--muted2', t.muted2);
+  }
+  window.SKC_THEMES = SKC_THEMES;
+  window.SKC_THEME_DEFAULT = DEFAULT_THEME;
+  window.applySkcTheme = applySkcTheme;
+  try {
+    const saved = localStorage.getItem('skc-theme');
+    if (saved && saved !== DEFAULT_THEME && SKC_THEMES[saved]) applySkcTheme(saved);
+  } catch(e) {}
+})();
+</script>
 </head>
 <body data-skillcash-adn="skillcash-forge" data-origen="Charly19">
 <span aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">skillcash-huella · origen-skillcash-tools</span>
@@ -4225,6 +4270,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <div class="notif-list" id="notifList"></div>
             <div class="portfolio-empty" id="notifEmptyMsg" style="display:none">No tienes notificaciones todavía. Agrega monedas a seguir desde el Radar de Deslistados o de Nuevos Listados.</div>
           </div>
+        </div>
+      </div>
+
+      <div class="theme-mini" id="themeMini">
+        <button class="help-mini-btn theme-mini-btn" id="themeMiniBtn" type="button" aria-label="Color del sitio" aria-haspopup="true" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-5 0-9 3.5-9 8 0 3 2 5 4.5 5 .8 0 1.5-.6 1.5-1.4 0-.4-.2-.7-.4-1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H14c3 0 5.5-2.2 5.5-5C19.5 5 16.2 3 12 3Z"/><circle cx="8" cy="9" r="1" fill="currentColor"/><circle cx="12" cy="7" r="1" fill="currentColor"/><circle cx="16" cy="9" r="1" fill="currentColor"/></svg>
+        </button>
+        <div class="help-mini-dropdown" id="themeMiniDropdown">
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="dorado"><span class="theme-option-dot" style="background:#e8a317"></span>Medianoche + Dorado</button>
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="negro"><span class="theme-option-dot" style="background:#e5e5e5"></span>Todo negro</button>
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="bosque"><span class="theme-option-dot" style="background:#a8e6c4"></span>Bosque + Verde</button>
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="pizarra"><span class="theme-option-dot" style="background:#b8a6f0"></span>Pizarra + Lavanda</button>
+          <button type="button" class="account-dropdown-item theme-option-btn" data-theme="petroleo"><span class="theme-option-dot" style="background:#2dd4bf"></span>Petróleo + Turquesa</button>
         </div>
       </div>
 
@@ -14657,6 +14715,41 @@ document.addEventListener('click', (e) => {
 document.getElementById('accountBarProfileBtn').addEventListener('click', () => {
   accountMiniDropdown.classList.remove('open');
 });
+
+/* ---- menú desplegable del selector de tema (paleta 🎨) - mismo patrón que cuenta/ayuda.
+   SKC_THEMES y applySkcTheme vienen del <script> de arriba de <head> (ver comentario ahí) -
+   ese ya aplicó el tema guardado antes de pintar la página; aquí solo se construye el menú y
+   se marca cuál quedó activo */
+const themeMiniBtn = document.getElementById('themeMiniBtn');
+const themeMiniDropdown = document.getElementById('themeMiniDropdown');
+themeMiniBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = themeMiniDropdown.classList.toggle('open');
+  themeMiniBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+document.addEventListener('click', (e) => {
+  if(themeMiniDropdown.classList.contains('open') && !themeMiniDropdown.contains(e.target) && e.target !== themeMiniBtn && !themeMiniBtn.contains(e.target)){
+    themeMiniDropdown.classList.remove('open');
+    themeMiniBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+(function(){
+  let savedTheme = window.SKC_THEME_DEFAULT;
+  try { savedTheme = localStorage.getItem('skc-theme') || window.SKC_THEME_DEFAULT; } catch(e) {}
+  const themeBtns = document.querySelectorAll('.theme-option-btn');
+  themeBtns.forEach((btn) => {
+    if (btn.dataset.theme === savedTheme) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.theme;
+      window.applySkcTheme(id);
+      try { localStorage.setItem('skc-theme', id); } catch(e) {}
+      themeBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      themeMiniDropdown.classList.remove('open');
+      themeMiniBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
 
 /* ---- menú desplegable del botón circular de ayuda ("?") - mismo patrón que el de cuenta de
    arriba. Las 3 herramientas que abre (openGlossaryModal/openMistakesModal/openManualModal)
