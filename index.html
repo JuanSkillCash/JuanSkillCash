@@ -2905,6 +2905,15 @@ img[src=""]{display:none}
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(to bottom, transparent 38%, var(--bg) 80%);
 }
+/* (mismo dia, Juan de nuevo: "se sigue viendo el cuadrado") la capa de arriba no alcanzaba
+   porque .hero-mascot-glow (la copia borrosa de la MISMA foto, usada como resplandor detras
+   del personaje) tambien arrastra el fondo oscuro horneado de la imagen - al tener blur(24px)
+   y scale(1.05) ese fondo oscuro se desparramaba MAS ALLA de los bordes del wrap (230px), donde
+   la capa de arriba (inset:0, del tamano exacto del wrap) no llegaba a taparlo - se veia como un
+   smudge ovalado/rectangular gris flotando alrededor del personaje. overflow:hidden en el wrap
+   recorta ese desborde (tambien recorta un poco el resplandor rojo de .hero-mascot-tint, que
+   sigue viendose, solo que mas contenido). */
+.hero-mascot-imgwrap{overflow:hidden}
 .hero-mascot-imgwrap img{width:100%;height:auto;display:block}
 .hero-mascot-tint{
   position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
