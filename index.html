@@ -511,6 +511,15 @@ button{font-family:inherit;color:inherit}
    .account-dropdown-item para los 3 botones). Separación de 8px (antes 14px, Juan la vio muy
    abierta) entre los 3 círculos (notificaciones/ayuda/cuenta). */
 .help-mini{position:relative;margin-left:8px;flex-shrink:0}
+/* faltaba esta regla desde que se agrego el selector de tema - sin position:relative aqui, el
+   .help-mini-dropdown (position:absolute) de adentro se posicionaba contra el ancestro
+   posicionado mas cercano, que en escritorio da la casualidad de ser .mobile-topbar (tiene
+   position:relative solo en @media(min-width:861px)) y por eso ahi SI se veia bien - pero en
+   celular (sin esa regla) el ancestro mas cercano terminaba siendo .app, mucho mas arriba en el
+   DOM, y el menu aparecia miles de pixeles mas abajo de la pagina, invisible. Juan: "en celular
+   el boton de cambiar color no sirve" - confirmado con Playwright (boundingBox del dropdown
+   en y=5087 en vez de justo debajo del boton). */
+.theme-mini{position:relative;flex-shrink:0}
 .help-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--muted2);font-size:15px;font-weight:800;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
 .help-mini-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--white)}
 .help-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
