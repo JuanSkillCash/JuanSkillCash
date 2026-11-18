@@ -111,8 +111,19 @@
   --cat-cyan:#22d3ee;
   --cat-indigo:#7c7ff5;
   --cat-pink:#ec4899;
-  --cat-teal:#5d7ad1; /* pese al nombre, ahora es el acento "azul medianoche" que eligio Juan
-                          para las cajas de inicio (antes era un teal/aguamarina que no le gusto) */
+  --cat-teal:var(--accent); /* pese al nombre, es el acento de las cajas de inicio (tarjetas
+                                "Tus herramientas" / cat-overview-card) - antes era un azul fijo
+                                independiente del --accent general (#5d7ad1, "azul medianoche"
+                                que eligio Juan en su momento). Cambiado a seguir siempre a
+                                --accent el 18-nov-2026: con el cambio de --accent a dorado
+                                (combinación "Medianoche + dorado"), Juan reportó que el menu
+                                lateral si cambio mas las cajas de "Tus herramientas" seguian en
+                                azul - la causa era esta variable separada mas la regla
+                                ".cat-overview-card, .cat-flip-back{ --c:var(--cat-teal)
+                                !important; }" que la fuerza por encima del --c:var(--accent) que
+                                ya traia cada tarjeta en su style inline. Enlazarla a --accent
+                                evita que se vuelva a desincronizar la proxima vez que cambie el
+                                acento del sitio. */
   --white:#f7f6ee;
   --muted:#b7b4a8; /* tono calido (en vez de frio/azulado) para acompañar el acento dorado,
                        cambiado 18-nov-2026 junto con --accent (ver comentario ahi) - sin llegar
