@@ -228,14 +228,17 @@ button{font-family:inherit;color:inherit}
       min-width fijo + tabular-nums en precio/variacion para que un digito de mas/menos al
       actualizarse en vivo no corra a los demas precios de la fila.
    4) (18-nov-2026) Juan: "los precios deberian estar en una fila diferente donde estan los
-      botones... debajo deberian estar los precios... sin incluir el espacio de la hamburguesa,
-      que se queda igual, no me vayas a bajar el menu" - vuelve a pedir fila propia para los
-      precios, pero esta vez SI es seguro: el .sidebar ya es position:sticky;top:0;height:100vh
-      (no como cuando se escribio el punto 2), asi que estirar .mobile-topbar a 2 filas no mueve
-      el sidebar ni el boton de hamburguesa ni un pixel - son independientes. order:5 +
-      flex-basis:100% manda el ticker a su propia fila, DESPUES de Bitunix/Telegram/campana/
-      tema/ayuda/cuenta (que se quedan todos juntos arriba, orden 0 por defecto). */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:5;justify-content:flex-start;min-width:0}
+      botones... sin incluir el espacio de la hamburguesa, que se queda igual, no me vayas a
+      bajar el menu" - vuelve a pedir fila propia para los precios, pero esta vez SI es seguro:
+      el .sidebar ya es position:sticky;top:0;height:100vh (no como cuando se escribio el punto
+      2), asi que estirar .mobile-topbar a 2 filas no mueve el sidebar ni el boton de hamburguesa
+      ni un pixel - son independientes.
+   5) (mismo dia, un mensaje despues, viendo el resultado) "era al reves, primero los precios,
+      luego lo otro de bitunix y la campanita" - el punto 4 los habia puesto AL REVES (botones
+      arriba, precios abajo). order:-1 + flex-basis:100% manda el ticker a SU PROPIA fila de
+      primero, antes de Bitunix/Telegram/campana/tema/ayuda/cuenta (que se quedan todos juntos
+      despues, orden 0 por defecto). */
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:-1;justify-content:flex-start;min-width:0}
 .price-ticker-item{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
 .price-ticker-price{color:var(--white);min-width:62px;font-variant-numeric:tabular-nums}
