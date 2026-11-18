@@ -74,27 +74,32 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#090b16;
+  --bg:#0a0e1a;
   --bg2:#0e1321;
   --surface:#141824;
-  --card:#1b2140; /* relleno de las cajas de la pagina principal (cat-overview-card) - un
+  --card:#161c33; /* relleno de las cajas de la pagina principal (cat-overview-card) - un
                      poco mas claro que --bg pero mas oscuro que --bg2, para dar profundidad
-                     sin que se vea "grisaceo". Subido de luminosidad 17-nov-2026 (Juan: "mi
-                     pagina es muy oscura... las tarjetas muy oscuras") - eligió la variante
-                     "C - fuerte" de 3 opciones comparadas con captura real */
+                     sin que se vea "grisaceo" */
   --border:rgba(255,255,255,.07);
   --border2:rgba(255,255,255,.12);
   --red:#ff2f4f;
-  --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca y para pérdidas/alertas */
-  /* degradado "caja" elegido por Juan (propuesta 14, "Contraste extremo") - una sola variable
-     para poder reusarlo en todas las cajas del sitio (categorías, panorama del mercado,
-     sesiones, eventos y noticias, quién está detrás) y que un ajuste futuro de tono se
-     aplique en todos lados a la vez. Misma forma radial de siempre (Juan: "esos colores ya
-     estaban bien"), solo el extremo claro bajado de luminosidad para que no se lea lavado/
-     blanco - sigue siendo oscuro de punta a punta, solo un poco menos oscuro en la esquina.
-     Subido de luminosidad 17-nov-2026 junto con --card (ver comentario ahi) - MISMA forma/
-     direccion del degradado, solo mas claro en los dos extremos, variante "C - fuerte". */
-  --grad-caja:radial-gradient(100% 70% at 100% 0%, #211f78 0%, #0c1034 80%);
+  --accent:#e8a317; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca
+                        y para pérdidas/alertas. Cambiado de azul a dorado 18-nov-2026: Juan pidió
+                        "cambiar radicalmente la web en cuanto a colores" - se armó una maqueta
+                        interactiva (artefacto aparte, no en este repo) con 20 colores de acento
+                        (pasteles + fuertes + gama de azules) y 16 combinaciones completas de
+                        fondo/cajas/acento/texto para que las probara en vivo; eligió la
+                        combinación "Medianoche + dorado" - el dorado conecta con el nombre
+                        "SkillCash" (valor/dinero) en vez del azul genérico que ya tenía. OJO:
+                        queda cerca del tono de --gold (#f0b23d, usado en insignias PRO/premium
+                        en 93 sitios) - si en el futuro Juan quiere diferenciarlos más, ese es el
+                        punto a ajustar */
+  /* degradado "caja" elegido por Juan - una sola variable para poder reusarlo en todas las cajas
+     del sitio (categorías, panorama del mercado, sesiones, eventos y noticias, quién está detrás)
+     y que un ajuste futuro de tono se aplique en todos lados a la vez. Misma forma radial de
+     siempre, actualizado a tono violeta/índigo oscuro 18-nov-2026 junto con el cambio de --accent
+     a dorado (combinación "Medianoche + dorado" de la maqueta, ver comentario en --accent) */
+  --grad-caja:radial-gradient(100% 70% at 100% 0%, #2a2560 0%, #0b0f24 80%);
   --red-dim:#c91f3b;
   --red-glow:rgba(255,47,79,.35);
   --gold:#f0b23d;
@@ -108,12 +113,12 @@
   --cat-pink:#ec4899;
   --cat-teal:#5d7ad1; /* pese al nombre, ahora es el acento "azul medianoche" que eligio Juan
                           para las cajas de inicio (antes era un teal/aguamarina que no le gusto) */
-  --white:#f7f6fb;
-  --muted:#b8bac2; /* subido de luminosidad 17-nov-2026 (Juan: "mucho texto color gris...
-                       deberia ser blanco") - sin llegar a blanco puro para no perder la
-                       jerarquia entre texto principal y secundario, que es para lo que
-                       sirve este tono */
-  --muted2:#dcdee2;
+  --white:#f7f6ee;
+  --muted:#b7b4a8; /* tono calido (en vez de frio/azulado) para acompañar el acento dorado,
+                       cambiado 18-nov-2026 junto con --accent (ver comentario ahi) - sin llegar
+                       a blanco puro para no perder la jerarquia entre texto principal y
+                       secundario, que es para lo que sirve este tono */
+  --muted2:#d9d6ca;
   --r:16px;
   --sidebar-w:258px;
   --sidebar-w-collapsed:74px;
