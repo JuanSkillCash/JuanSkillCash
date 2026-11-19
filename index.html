@@ -3460,6 +3460,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .cal-retry-btn{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid var(--border2);color:var(--white);background:var(--bg2);cursor:pointer}
 .cal-retry-btn:hover{border-color:var(--accent)}
 .cal-empty{color:var(--muted);font-size:13px;padding:30px 10px;text-align:center}
+.cal-empty-btn{margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#000;background:var(--accent);border:none;padding:9px 16px;border-radius:20px;cursor:pointer;font-family:inherit}
 /* tabla (escritorio) - fondo de cada fila con los tokens del sitio (--surface/--bg2), nunca el
    blanco fijo del widget anterior; separador de día pintado con --accent como el resto del menú */
 .cal-table{width:100%;border-collapse:collapse;font-size:13px}
@@ -4844,7 +4845,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               <div class="cal-error-text">No se pudo cargar el calendario. Revisa tu conexión e intenta de nuevo.</div>
               <button type="button" class="cal-retry-btn" id="calRetryBtn">Reintentar</button>
             </div>
-            <div class="cal-empty" id="calEmpty" style="display:none">No hay eventos para este filtro en este rango de fechas.</div>
+            <div class="cal-empty" id="calEmpty" style="display:none">
+              <div id="calEmptyText">No hay eventos para este filtro en este rango de fechas.</div>
+              <button type="button" class="cal-empty-btn" id="calEmptyAddBtn" style="display:none">Agregar impacto Media y Baja →</button>
+            </div>
             <table class="cal-table" id="calTable" style="display:none">
               <thead>
                 <tr><th>Hora</th><th>Div.</th><th>Imp.</th><th>Evento</th><th>Actual</th><th>Previsión</th><th>Anterior</th></tr>
@@ -5467,6 +5471,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var errorEl = document.getElementById('calError');
       var retryBtn = document.getElementById('calRetryBtn');
       var emptyEl = document.getElementById('calEmpty');
+      var emptyTextEl = document.getElementById('calEmptyText');
+      var emptyAddBtn = document.getElementById('calEmptyAddBtn');
       var tableEl = document.getElementById('calTable');
       var tbodyEl = document.getElementById('calTbody');
       var cardsEl = document.getElementById('calCards');
@@ -5563,6 +5569,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         skelEl.style.display = 'none';
         errorEl.style.display = 'none';
         if(!filtrados.length){
+          // Juan: "hoy no se ve nada" - resultó ser que SÍ hay eventos ese día, solo que
+          // ninguno es de impacto "Alta" (el filtro por defecto) - el mensaje genérico de
+          // "no hay eventos" no distinguía eso de que de verdad no haya datos (ej. Forex
+          // Factory todavía no publicó la semana que viene), así que se sentía como que algo
+          // estaba roto. Ahora el mensaje y el botón cambian según cuál de los dos casos es.
+          if(eventosCache.length > 0){
+            emptyTextEl.textContent = 'Hay ' + eventosCache.length + ' evento' + (eventosCache.length === 1 ? '' : 's') + ' en este rango, pero ninguno es de impacto Alta (tu filtro actual).';
+            emptyAddBtn.style.display = '';
+          } else {
+            emptyTextEl.textContent = 'Todavía no hay eventos publicados para este rango de fechas — vuelve a intentar más tarde.';
+            emptyAddBtn.style.display = 'none';
+          }
           emptyEl.style.display = 'block';
           tableEl.style.display = 'none';
           cardsEl.style.display = 'none';
@@ -5701,6 +5719,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       });
 
       if(retryBtn) retryBtn.addEventListener('click', function(){ cargado = false; cargar(); });
+      if(emptyAddBtn) emptyAddBtn.addEventListener('click', function(){
+        filtros.importancias.add(1).add(2);
+        filtersEl.querySelectorAll('[data-cal-filter="importancia"]').forEach(function(b){ b.classList.add('active'); });
+        render();
+      });
 
       // Mi Arrecife (dashboard) mueve .events-card a otra parte del DOM, pero el
       // IntersectionObserver de abajo sigue vigilando ESTA sección en su ubicación original -
