@@ -3354,6 +3354,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-yt-channels::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px}
 .events-yt-channels{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .events-yt-channels-head{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 6px 4px}
+/* leyenda de qué significa cada color de punto - Juan preguntó "qué significa cada punto",
+   la respuesta ya existía en el código (ver comentario de .events-yt-channel-dot más abajo) pero
+   nunca se le mostraba a él en el sitio */
+.events-yt-channels-legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:0 6px 10px;font-size:10px;color:var(--muted)}
+.events-yt-legend-item{display:inline-flex;align-items:center;gap:5px}
 .events-yt-channel-list{display:flex;flex-direction:column;gap:3px}
 .events-yt-channel-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:none;color:var(--muted2);font-size:13px;font-weight:600;text-align:left;cursor:pointer;transition:background .2s,border-color .2s,color .2s;width:100%}
 .events-yt-channel-item:hover{background:color-mix(in srgb, var(--white) 5%, transparent);color:var(--white)}
@@ -4798,6 +4803,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             </div>
             <aside class="events-yt-channels" aria-label="Lista de canales">
               <div class="events-yt-channels-head">Canales</div>
+              <div class="events-yt-channels-legend">
+                <span class="events-yt-legend-item"><i class="events-yt-channel-dot" data-state="live"></i>En vivo</span>
+                <span class="events-yt-legend-item"><i class="events-yt-channel-dot" data-state="upcoming"></i>Programado</span>
+                <span class="events-yt-legend-item"><i class="events-yt-channel-dot" data-state="offline"></i>Sin directo ahora</span>
+              </div>
               <div class="events-yt-channel-list" id="eventsYtChannelList"></div>
             </aside>
           </div>
@@ -5028,6 +5038,28 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         if(!u || !u.titulo) return null;
         return 'Último: ' + u.titulo + (u.hace ? ' · ' + u.hace : '');
       }
+      // "¿cuánto falta para el live?" (pedido de Juan, el punto dorado por sí solo no lo decía) -
+      // el Worker manda scheduledStartTime (ms) cuando YouTube lo publicó; si no vino (campo
+      // interno de YouTube que puede faltar), se deja sin cuenta regresiva en vez de inventar algo
+      function textoCuentaRegresiva(scheduledStartTime){
+        if(!scheduledStartTime) return null;
+        var diffMin = Math.round((scheduledStartTime - Date.now()) / 60000);
+        if(diffMin <= 0) return 'debería estar por comenzar';
+        var dias = Math.floor(diffMin / 1440);
+        var horas = Math.floor((diffMin % 1440) / 60);
+        var min = diffMin % 60;
+        if(dias > 0) return 'faltan ' + dias + 'd ' + horas + 'h';
+        if(horas > 0) return 'faltan ' + horas + 'h ' + min + 'min';
+        return 'faltan ' + min + ' min';
+      }
+      // texto compartido para los 3 lugares que muestran "Programado: ..." (fachada del video,
+      // pie de página y la 2ª línea de cada canal en la lista) - así la cuenta regresiva sale
+      // igual en los 3 sin repetir la lógica
+      function textoProgramado(data){
+        var cuenta = textoCuentaRegresiva(data && data.scheduledStartTime);
+        var base = (data && data.title) ? ('Programado: ' + data.title) : 'Hay un directo programado, todavía no empieza';
+        return cuenta ? (base + ' (' + cuenta + ')') : base;
+      }
       function setDotState(i, state){
         var dot = itemEls[i] && itemEls[i].querySelector('.events-yt-channel-dot');
         if(!dot) return;
@@ -5156,7 +5188,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
         } else if(known && known.upcoming){
           pendingSrc = null;
-          setFacade(null, known.title ? 'Programado: ' + known.title : 'Hay un directo programado, todavía no empieza');
+          setFacade(null, textoProgramado(known));
           if(foot) foot.textContent = 'Este canal tiene un directo programado que todavía no comenzó.';
         } else {
           pendingSrc = uploadsEmbedUrl(ch.id);
@@ -5190,10 +5222,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             lastResults[idx] = {
               live: live, videoId: data && data.videoId, title: data && data.title,
               upcoming: upcoming, playability: data && data.playability, embeddable: data && data.embeddable,
-              recientes: recientes,
+              scheduledStartTime: data && data.scheduledStartTime, recientes: recientes,
             };
             setDotState(idx, live ? 'live' : (upcoming ? 'upcoming' : 'offline'));
-            setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : (upcoming ? ('Programado' + (data.title ? ': ' + data.title : '')) : null));
+            setChannelSummary(idx, live ? (data.title || 'En vivo ahora') : (upcoming ? textoProgramado(lastResults[idx]) : null));
             setChannelReciente(idx, textoUltimoReciente(recientes));
             if(idx !== currentIdx) return;
             renderRecientesPanel(idx);
@@ -5215,7 +5247,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             } else if(upcoming){
               if(livePill) livePill.style.display = 'none';
               pendingSrc = null;
-              setFacade(null, data.title ? 'Programado: ' + data.title : 'Hay un directo programado, todavía no empieza');
+              setFacade(null, textoProgramado(lastResults[idx]));
               if(manual && foot) foot.textContent = 'Este canal tiene un directo programado que todavía no comenzó.';
             } else {
               if(livePill) livePill.style.display = 'none';
@@ -5406,20 +5438,21 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 idx: x.idx, live: live, videoId: data && data.videoId, title: data && data.title,
                 upcoming: !live && !!(data && data.upcoming),
                 playability: data && data.playability, embeddable: data && data.embeddable,
+                scheduledStartTime: data && data.scheduledStartTime,
                 recientes: (data && Array.isArray(data.recientes)) ? data.recientes : [],
               };
             })
-            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null, recientes: [] }; });
+            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null, scheduledStartTime: null, recientes: [] }; });
         })).then(function(results){
           var yaEstabaReproduciendo = played;
           results.forEach(function(r){
             lastResults[r.idx] = {
               live: r.live, videoId: r.videoId, title: r.title,
               upcoming: r.upcoming, playability: r.playability, embeddable: r.embeddable,
-              recientes: r.recientes,
+              scheduledStartTime: r.scheduledStartTime, recientes: r.recientes,
             };
             setDotState(r.idx, r.live ? 'live' : (r.upcoming ? 'upcoming' : 'offline'));
-            setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : (r.upcoming ? ('Programado' + (r.title ? ': ' + r.title : '')) : null));
+            setChannelSummary(r.idx, r.live ? (r.title || 'En vivo ahora') : (r.upcoming ? textoProgramado(lastResults[r.idx]) : null));
             setChannelReciente(r.idx, textoUltimoReciente(r.recientes));
           });
           reorderChannelList();
