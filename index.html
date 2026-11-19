@@ -33448,6 +33448,33 @@ async function awardColmillos(eventType, periodKey, amount){
   cryptoItems.forEach(connectBinanceSymbol);
 
   // ---- indices: ver comentario de arriba - refresca cada 45s, una sola peticion con los 3 ----
+  // Juan reporto NASDAQ/S&P en "—" (captura 19-nov-2026): la clave de Twelve Data es UNA sola,
+  // compartida por TODOS los visitantes del sitio (cada navegador le pega directo, sin cache de
+  // servidor) - el mismo patron que ya dejo los 4 graficos de Dominancia en blanco a la vez una
+  // vez que CoinGecko se quedo sin cuota (ver commit "Fix Dominancia charts all failing at once").
+  // Como Twelve Data gratis tiene un limite bastante mas chico que CoinGecko, es facil que un
+  // refresco puntual falle (401/429/timeout) sin que haya nada roto de verdad. Antes, cuando eso
+  // pasaba, setItem() simplemente nunca se llamaba y el item se quedaba en "—" para siempre (el
+  // valor con el que arranca buildItemHtml). Ahora se guarda el ultimo valor bueno en
+  // localStorage y se pinta de entrada al cargar la pagina - si el refresco en vivo falla, se
+  // queda viendo ese ultimo dato real (un poco viejo) en vez de un guion vacio.
+  var IDX_CACHE_KEY = 'skc-ticker-idx-cache-v1';
+  function loadCachedIndices(){
+    try{
+      var cache = JSON.parse(localStorage.getItem(IDX_CACHE_KEY) || '{}');
+      indexItems.forEach(function(item){
+        var c = cache[item.key];
+        if(c && typeof c.price === 'string') setItem(item.key, c.price, c.pct);
+      });
+    }catch(err){ /* localStorage bloqueado (privado/cookies desactivadas) - sin cache, sin drama */ }
+  }
+  function saveIndexCache(key, price, pct){
+    try{
+      var cache = JSON.parse(localStorage.getItem(IDX_CACHE_KEY) || '{}');
+      cache[key] = { price: price, pct: pct };
+      localStorage.setItem(IDX_CACHE_KEY, JSON.stringify(cache));
+    }catch(err){ /* idem */ }
+  }
   var indexItems = PRICE_TICKER_ITEMS.filter(function(i){ return i.kind === 'index'; });
   function refreshIndices(){
     var symbols = indexItems.map(function(i){ return i.proxy; }).join(',');
@@ -33458,11 +33485,17 @@ async function awardColmillos(eventType, periodKey, amount){
           var row = data && data[item.proxy];
           if(!row || row.status === 'error') return;
           var close = parseFloat(row.close), pct = parseFloat(row.percent_change);
-          if(isFinite(close)) setItem(item.key, formatPrice(close * item.scale), isFinite(pct) ? pct : undefined);
+          if(isFinite(close)){
+            var priceText = formatPrice(close * item.scale);
+            var pctVal = isFinite(pct) ? pct : undefined;
+            setItem(item.key, priceText, pctVal);
+            saveIndexCache(item.key, priceText, pctVal);
+          }
         });
       })
       .catch(function(){ /* se reintenta solo en el proximo ciclo de 45s */ });
   }
+  loadCachedIndices();
   refreshIndices();
   setInterval(refreshIndices, 45000);
 })();
