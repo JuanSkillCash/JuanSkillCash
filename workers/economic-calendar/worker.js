@@ -299,7 +299,14 @@ async function obtenerDeNasdaq(fechaObjetivoStr, debug) {
     if (!resp.ok) return [];
     const data = await resp.json();
     const filas = (data && data.data && Array.isArray(data.data.rows)) ? data.data.rows : [];
-    if (debug) debug[fechaObjetivoStr].filas = filas.length;
+    if (debug) {
+      debug[fechaObjetivoStr].filas = filas.length;
+      // volcado de nombres+país tal cual los manda Nasdaq (solo con ?debug=1) - para poder ver
+      // de un vistazo qué string exacto hay que meter en ALIAS_FF_A_NASDAQ sin tener que
+      // adivinarlo (ej. "Philly Fed Manufacturing Index" de Forex Factory vs. como sea que
+      // Nasdaq lo llame de verdad)
+      debug[fechaObjetivoStr].nombres = filas.map((f) => (f.eventName || '') + ' | ' + (f.country || ''));
+    }
     return filas;
   } catch (err) {
     if (debug) debug[fechaObjetivoStr] = { error: String(err) };
@@ -542,7 +549,10 @@ export default {
     const divisasPermitidas = new Set(paises.map((p) => PAIS_A_DIVISA_FF[p]).filter(Boolean));
 
     const debugWanted = url.searchParams.get('debug') === '1';
-    const debugInfo = debugWanted ? { nasdaq: {}, fred: {} } : null;
+    // fredApiKeyConfigurado: solo dice SI/NO hay secreto puesto (nunca el valor) - para poder
+    // diagnosticar desde afuera por qué el respaldo FRED nunca entra en acción, sin tener que
+    // adivinar entre "no hay alias de Nasdaq" y "falta el secreto FRED_API_KEY"
+    const debugInfo = debugWanted ? { nasdaq: {}, fred: {}, fredApiKeyConfigurado: !!env.FRED_API_KEY } : null;
 
     // 1) Forex Factory - PRIMERO Supabase (GitHub Actions la mantiene al día, ver comentario
     // grande al inicio del archivo); si no está disponible todavía (Juan no ha corrido el SQL,
