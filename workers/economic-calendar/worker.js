@@ -121,6 +121,33 @@ const ALIAS_FF_A_NASDAQ = {
   'core retail sales m/m': 'core retail sales',
   'non-farm employment change': 'nonfarm payrolls',
   'unemployment rate': 'unemployment rate',
+  // agregados 19-nov-2026: encontrados con ?debug=1 (debug.nasdaq.<fecha>.nombres), comparando
+  // los nombres REALES que manda Nasdaq esa semana contra los títulos de Forex Factory que se
+  // quedaban en "Pendiente..." para siempre pese a ya tener prevision/anterior reales (el
+  // síntoma que reportó Juan con "Philly Fed Manufacturing Index") - no son adivinados, se
+  // verificaron contra datos reales de producción antes de agregarlos.
+  'philly fed manufacturing index': 'philadelphia fed manufacturing index',
+  'empire state manufacturing index': 'ny empire state manufacturing index',
+  'building permits': 'building permits',
+  'housing starts': 'housing starts',
+  'capacity utilization rate': 'capacity utilization rate',
+  'nahb housing market index': 'nahb housing market index',
+  'industrial production m/m': 'industrial production',
+  'business inventories m/m': 'business inventories',
+  'import prices m/m': 'import price index',
+  'german zew economic sentiment': 'german zew economic sentiment',
+  'zew economic sentiment': 'zew economic sentiment',
+  'adp weekly employment change': 'adp employment change weekly',
+  'final core cpi y/y': 'core cpi',
+  // NO agregados a propósito (mismo chequeo del 19-nov-2026) - Nasdaq trae MÁS DE UNA fila con
+  // un nombre parecido para estos y no hay forma de saber cuál es la correcta sin adivinar (ej.
+  // "Pending Home Sales" vs "Pending Home Sales Index" - ¿cuál es el % de cambio que manda FF?):
+  // si alguno de estos sigue en "Pendiente..." después de este cambio, es resultado de NO haber
+  // adivinado mal a propósito, no un descuido - "pending home sales m/m" (Pending Home Sales /
+  // Pending Home Sales Index), "current account" EUR (Current Account / Current Account n.s.a.),
+  // "tic long-term purchases" (TIC Net Long-Term Transactions / ...including Swaps), "final cpi
+  // y/y" EUR (CPI / CPI, n.s.a). "Cleveland Fed Inflation Expectations" ni siquiera aparece en
+  // los nombres de Nasdaq esa semana - no es un alias faltante, Nasdaq simplemente no lo cubre.
 };
 
 // --- respaldo FRED: título FF (minúsculas) -> serie + cómo calcular el "actual" ---
