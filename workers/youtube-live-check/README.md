@@ -4,7 +4,28 @@ Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso
 videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Ya desplegado (19-nov-2026, confirmado por Juan)** - el campo `scheduledStartTime`
+> **Juan: vuelve a pegar el código actualizado (19-nov-2026, 2º cambio del día)** - reportaste
+> que un canal que SÍ está en vivo (confirmado por ti mismo en YouTube) a veces el sitio lo
+> marcaba en vivo y a veces no, sin patrón claro, incluso entre celular y computador al mismo
+> tiempo. Dos causas posibles, ambas reales en este tipo de Worker:
+>
+> 1. **Lectura rara de YouTube** (la que sí se puede arreglar en código): la página de YouTube a
+>    veces responde bien pero con datos incompletos - un `ytInitialPlayerResponse` sin
+>    `videoDetails`, o con el video de OTRO contenido (no el directo). Antes esto se leía
+>    exactamente igual que "de verdad no está en vivo" y se guardaba así 60 segundos. Ahora se
+>    detecta ese caso (`debug.hasVideoDetails`/`debug.channelIdMatch` en `?channel=...&debug=1`
+>    más abajo) y se reintenta en 15s en vez de quedarse 60s con una lectura posiblemente mala.
+> 2. **El caché de Cloudflare es "por sede"** (no se puede arreglar sin rediseñar esto, por ahora
+>    no lo toqué): este Worker corre en decenas de centros de datos de Cloudflare alrededor del
+>    mundo, y cada uno guarda SU PROPIA copia en caché por 60 segundos - no hay un solo caché
+>    compartido. Si tu celular y tu computador salen a internet por rutas distintas (muy común),
+>    pueden terminar pegándole a sedes distintas de Cloudflare, cada una con su propia copia
+>    guardada en un momento ligeramente distinto - eso solo, sin que nada esté roto, ya explica
+>    ver resultados distintos por unos segundos entre dispositivos. Si después de este cambio
+>    sigue pasando seguido (no solo por unos segundos), avísame y lo rediseñamos con un caché
+>    compartido de verdad (como el que ya usa el calendario económico con Supabase).
+>
+> Cambio anterior (mismo día): el campo `scheduledStartTime`
 > (cuándo arranca un directo programado, para la cuenta regresiva "faltan Xh Ymin") ya está en
 > producción. Sigue el mismo truco de raspar la página de YouTube, así que si en algún momento
 > deja de verse la cuenta regresiva (pero el punto amarillo "programado" sigue apareciendo bien),

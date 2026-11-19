@@ -37,7 +37,12 @@
  *    y YouTube lo publicó - si no, queda null y el frontend no muestra cuenta regresiva),
  *    "recientes":[{"videoId":"xyz","titulo":"...","hace":"hace 4 h"}, ...] (máx 3, últimas 24h),
  *    "debug":{"httpStatus":200,"finalUrl":"https://www.youtube.com/watch?v=abc123","htmlLength":123456,
- *             "hasPlayerResponse":true,"consentPage":false,"botCheck":false}}
+ *             "hasPlayerResponse":true,"hasVideoDetails":true,"channelIdMatch":true,
+ *             "consentPage":false,"botCheck":false}}
+ * "hasVideoDetails":false o "channelIdMatch":false con "hasPlayerResponse":true = YouTube
+ * respondió una página usable pero sin los datos del directo esperados (o con el video de otro
+ * contenido) - se trata como lectura no confiable (caché de 15s en vez de 60s), NO como "de
+ * verdad no está en vivo" (antes de 19-nov-2026 ambos casos se veían exactamente igual).
  *
  * Caché en 2 capas, cada una con su propio tiempo: la detección de "en vivo" se cachea 60 s
  * (normal) o 15 s (si hubo un error o página rara) - compartido entre TODAS las visitas, así
@@ -132,6 +137,14 @@ async function revisaCanal(channelId) {
     hasPlayerResponse: false,
     consentPage: false,
     botCheck: false,
+    // los 2 de abajo son para diagnosticar el caso reportado por Juan (19-nov-2026): "a veces
+    // sale en vivo, a veces no, para el MISMO canal que sí está en vivo de verdad en YouTube" -
+    // hasVideoDetails=false o channelIdMatch=false con hasPlayerResponse=true quiere decir que
+    // YouTube SÍ respondió una página usable, pero no con el video del directo esperado (le pasó
+    // el video equivocado, o una respuesta "vacía" sin detalles) - antes esto se leía igual que
+    // "de verdad no está en vivo" (live=false, sin avisar que la lectura fue rara)
+    hasVideoDetails: false,
+    channelIdMatch: null,
   };
 
   try {
@@ -148,9 +161,11 @@ async function revisaCanal(channelId) {
     const player = extraeJsonTrasVar(html, 'ytInitialPlayerResponse');
     debug.hasPlayerResponse = !!player;
 
+    debug.hasVideoDetails = !!(player && player.videoDetails);
     if (player && player.videoDetails) {
       const vd = player.videoDetails;
       const ps = player.playabilityStatus || {};
+      debug.channelIdMatch = vd.channelId === channelId;
       // solo se confía en el resultado si el video que YouTube devolvió es realmente del canal
       // que se pidió (evita reportar en vivo el video equivocado si algo viene raro)
       if (vd.channelId === channelId) {
@@ -318,7 +333,12 @@ export default {
       !!resultado.debug.error ||
       resultado.debug.consentPage ||
       resultado.debug.botCheck ||
-      (resultado.debug.httpStatus === 200 && !resultado.debug.hasPlayerResponse);
+      (resultado.debug.httpStatus === 200 && !resultado.debug.hasPlayerResponse) ||
+      // lectura "rara" (19-nov-2026): la página cargó bien y traía un ytInitialPlayerResponse,
+      // pero sin videoDetails o con el video de OTRO canal - no es un error de red, pero tampoco
+      // es un resultado en el que se pueda confiar para dejarlo cacheado 60s (ver el comentario
+      // de "hasVideoDetails"/"channelIdMatch" más arriba)
+      (resultado.debug.hasPlayerResponse && (!resultado.debug.hasVideoDetails || resultado.debug.channelIdMatch === false));
     const ttl = huboProblema ? CACHE_SECONDS_ERROR : CACHE_SECONDS_OK;
 
     const response = new Response(JSON.stringify(resultado), {
