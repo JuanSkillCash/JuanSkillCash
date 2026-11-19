@@ -5338,6 +5338,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             var live = !!(data && data.live && data.videoId);
             var upcoming = !live && !!(data && data.upcoming);
             var recientes = (data && Array.isArray(data.recientes)) ? data.recientes : [];
+            // si este canal es el que se está reproduciendo AHORA MISMO y esta lectura no trae
+            // evidencia de un video EN VIVO distinto al que ya se está viendo, se descarta por
+            // completo (ni el punto, ni el resumen, ni lastResults se tocan) - una lectura
+            // aislada de "ya no está en vivo" suele ser una lectura rara de YouTube (ver
+            // worker.js, debug.hasVideoDetails/channelIdMatch), no un corte real. Bug reportado
+            // por Juan: el punto se ponía en rojo mientras él seguía viendo el directo con sus
+            // propios ojos, sin que nada se hubiera cortado de verdad.
+            var sigueReproduciendoseAqui = idx === currentIdx && played && !!currentVideoId;
+            var hayVideoNuevoEnVivo = live && data.videoId !== currentVideoId;
+            if(sigueReproduciendoseAqui && !hayVideoNuevoEnVivo) return;
             lastResults[idx] = {
               live: live, videoId: data && data.videoId, title: data && data.title,
               upcoming: upcoming, playability: data && data.playability, embeddable: data && data.embeddable,
@@ -5581,6 +5591,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         })).then(function(results){
           var yaEstabaReproduciendo = played;
           results.forEach(function(r){
+            // mismo motivo que en checkLiveAndMaybeSwitch: si es el canal que se está
+            // reproduciendo ahora mismo y esta lectura no trae un video EN VIVO distinto al que
+            // ya se está viendo, se descarta (no se mueve el punto a rojo por una lectura rara)
+            var sigueReproduciendoseAqui = r.idx === currentIdx && yaEstabaReproduciendo && !!currentVideoId;
+            var hayVideoNuevoEnVivo = r.live && r.videoId !== currentVideoId;
+            if(sigueReproduciendoseAqui && !hayVideoNuevoEnVivo) return;
             lastResults[r.idx] = {
               live: r.live, videoId: r.videoId, title: r.title,
               upcoming: r.upcoming, playability: r.playability, embeddable: r.embeddable,
