@@ -4,10 +4,16 @@ Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso
 videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Juan: vuelve a pegar el código actualizado (14-nov-2026)** - se agregó el campo `recientes`
-> (últimos videos subidos del canal, máximo 3, de las últimas 24h) usando el mismo truco de
-> siempre pero sobre la página `/videos` del canal en vez de `/live`. La detección de "en vivo"
-> en sí no cambió en este paso (ya se había arreglado y confirmado en producción antes).
+> **Juan: vuelve a pegar el código actualizado (19-nov-2026)** - se agregó el campo
+> `scheduledStartTime` (cuándo arranca un directo programado, para mostrar la cuenta regresiva
+> que pediste - "pero no dice cuánto falta para el live"). Sigue el mismo truco de raspar la
+> página de YouTube, así que si en algún momento deja de verse la cuenta regresiva (pero el punto
+> amarillo "programado" sigue apareciendo bien), probablemente YouTube cambió el formato interno
+> de ese campo - no es grave, el sitio sigue funcionando igual, solo sin la cuenta regresiva.
+>
+> Cambio anterior (14-nov-2026): se agregó el campo `recientes` (últimos videos subidos del
+> canal, máximo 3, de las últimas 24h) usando el mismo truco de siempre pero sobre la página
+> `/videos` del canal en vez de `/live`. La detección de "en vivo" en sí no cambió en ese paso.
 
 ## Cómo desplegarlo
 
@@ -19,6 +25,7 @@ completa en los comentarios de `worker.js`).
 ```json
 {"live":true,"videoId":"Qr61waJ6AZg","title":"CNN en Español en vivo","channelId":"UC_lEiu6917IJz03TnntWUaQ",
  "checkedAt":1762500000000,"upcoming":false,"playability":"OK","embeddable":true,
+ "scheduledStartTime":null,
  "recientes":[{"videoId":"zWfV3LJDnno","titulo":"La FAA levanta la suspensión de vuelos...","hace":"hace 4 h"},
               {"videoId":"9xNy2G3dSxQ","titulo":"FAA ordena la suspensión de todos los vuelos...","hace":"hace 8 h"}],
  "debug":{"httpStatus":200,"finalUrl":"https://www.youtube.com/watch?v=Qr61waJ6AZg","htmlLength":612345,
@@ -26,6 +33,9 @@ completa en los comentarios de `worker.js`).
 ```
 
 - `upcoming`: hay un directo anunciado pero todavía no arrancó (no intentar reproducir).
+- `scheduledStartTime`: timestamp en milisegundos de cuándo arranca el directo programado (solo
+  cuando `upcoming` es `true` y YouTube publicó esa fecha) - `null` si no aplica o no se pudo leer.
+  El sitio lo usa para mostrar "Empieza en X h Y min" junto al punto amarillo.
 - `playability`/`embeddable`: si `playability` no es `"OK"` o `embeddable` es `false`, el video
   no se debe intentar embeber aunque `live` sea `true` - el sitio ya maneja esto mostrando un
   link directo a YouTube.

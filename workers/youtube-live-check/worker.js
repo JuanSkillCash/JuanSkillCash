@@ -33,6 +33,8 @@
  * Responde (siempre con el bloque "debug" para poder diagnosticar sin adivinar):
  *   {"live":true,"videoId":"abc123","title":"De qué trata el directo","channelId":"UCxxxxxxxx",
  *    "checkedAt":169...,"upcoming":false,"playability":"OK","embeddable":true,
+ *    "scheduledStartTime":169...|null (timestamp en MS de cuándo arranca, solo si upcoming=true
+ *    y YouTube lo publicó - si no, queda null y el frontend no muestra cuenta regresiva),
  *    "recientes":[{"videoId":"xyz","titulo":"...","hace":"hace 4 h"}, ...] (máx 3, últimas 24h),
  *    "debug":{"httpStatus":200,"finalUrl":"https://www.youtube.com/watch?v=abc123","htmlLength":123456,
  *             "hasPlayerResponse":true,"consentPage":false,"botCheck":false}}
@@ -121,6 +123,7 @@ async function revisaCanal(channelId) {
     upcoming: false,
     playability: null,
     embeddable: null,
+    scheduledStartTime: null,
   };
   const debug = {
     httpStatus: null,
@@ -157,6 +160,19 @@ async function revisaCanal(channelId) {
         resultado.title = vd.title || null;
         resultado.playability = ps.status || null;
         resultado.embeddable = ps.playableInEmbed !== false;
+        // cuándo empieza un directo programado (vd.isUpcoming=true): YouTube lo manda dentro de
+        // playabilityStatus.liveStreamability...offlineSlate.liveStreamOfflineSlateRenderer.
+        // scheduledStartTime, timestamp unix EN SEGUNDOS como string - mismo campo que usan
+        // yt-dlp/Invidious para esto mismo. Si la ruta no existe (YouTube cambió el formato o no
+        // es un directo programado), simplemente queda null - no revienta nada, el frontend ya
+        // sabe mostrar el texto sin cuenta regresiva en ese caso.
+        try {
+          var offlineSlate = ps.liveStreamability && ps.liveStreamability.liveStreamabilityRenderer &&
+            ps.liveStreamability.liveStreamabilityRenderer.offlineSlate &&
+            ps.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer;
+          var sst = offlineSlate && offlineSlate.scheduledStartTime;
+          if (sst) resultado.scheduledStartTime = Number(sst) * 1000;
+        } catch (e) { /* queda null, no es crítico */ }
       }
     }
   } catch (err) {
