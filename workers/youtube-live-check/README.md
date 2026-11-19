@@ -4,7 +4,7 @@ Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso
 videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Juan: vuelve a pegar el código actualizado (19-nov-2026, 2º cambio del día)** - reportaste
+> **Ya desplegado (19-nov-2026, 2º cambio del día, confirmado por Juan)** - reportaste
 > que un canal que SÍ está en vivo (confirmado por ti mismo en YouTube) a veces el sitio lo
 > marcaba en vivo y a veces no, sin patrón claro, incluso entre celular y computador al mismo
 > tiempo. Dos causas posibles, ambas reales en este tipo de Worker:
