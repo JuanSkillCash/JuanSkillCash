@@ -81,13 +81,13 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0e1a;
+  --bg:#090b16;
   --bg2:color-mix(in srgb, var(--bg) 94%, var(--white) 6%); /* derivado de --bg (en vez de un hex
     fijo) 18-nov-2026, al agregar temas CLAROS al selector de color - asi no hace falta guardar un
     valor de --bg2 por cada tema nuevo, siempre se ve como una version un poco mas clara/oscura
     (segun el tema) de --bg automaticamente */
   --surface:#141824;
-  --card:#161c33; /* relleno de las cajas de la pagina principal (cat-overview-card) - un
+  --card:#1b2140; /* relleno de las cajas de la pagina principal (cat-overview-card) - un
                      poco mas claro que --bg pero mas oscuro que --bg2, para dar profundidad
                      sin que se vea "grisaceo" */
   --border:color-mix(in srgb, var(--white) 7%, transparent); /* derivado de --white (antes
@@ -95,23 +95,29 @@
     asi este borde se ve oscuro sobre fondo claro en vez de blanco invisible */
   --border2:color-mix(in srgb, var(--white) 12%, transparent);
   --red:#ff2f4f;
-  --accent:#e8a317; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca
-                        y para pérdidas/alertas. Cambiado de azul a dorado 18-nov-2026: Juan pidió
+  --accent:#5b8def; /* acento de interfaz (pestañas, botones, chips) - el rojo queda para la marca
+                        y para pérdidas/alertas. Este bloque :root es el tema "Original (Azul
+                        clásico)" (ver SKC_THEMES más abajo) - vuelto a ser el tema por DEFECTO
+                        19-nov-2026 (antes había sido "Medianoche + dorado", ver nota vieja más
+                        abajo): Juan pidió que quien entra sin haber elegido un tema antes (nunca
+                        guardó nada en localStorage) vea el azul original de toda la vida, no el
+                        dorado - dorado sigue existiendo como opción en el selector de temas, solo
+                        dejó de ser el que se ve por defecto. DEFAULT_THEME (más abajo, en el
+                        <script> de SKC_THEMES) también se cambió a 'original' para que coincida -
+                        los dos tienen que ir siempre de la mano, si uno cambia el otro también.
+                        Nota vieja (18-nov-2026, cuando SÍ era dorado el de por defecto): Juan pidió
                         "cambiar radicalmente la web en cuanto a colores" - se armó una maqueta
                         interactiva (artefacto aparte, no en este repo) con 20 colores de acento
                         (pasteles + fuertes + gama de azules) y 16 combinaciones completas de
                         fondo/cajas/acento/texto para que las probara en vivo; eligió la
                         combinación "Medianoche + dorado" - el dorado conecta con el nombre
-                        "SkillCash" (valor/dinero) en vez del azul genérico que ya tenía. OJO:
-                        queda cerca del tono de --gold (#f0b23d, usado en insignias PRO/premium
-                        en 93 sitios) - si en el futuro Juan quiere diferenciarlos más, ese es el
-                        punto a ajustar */
-  /* degradado "caja" elegido por Juan - una sola variable para poder reusarlo en todas las cajas
-     del sitio (categorías, panorama del mercado, sesiones, eventos y noticias, quién está detrás)
-     y que un ajuste futuro de tono se aplique en todos lados a la vez. Misma forma radial de
-     siempre, actualizado a tono violeta/índigo oscuro 18-nov-2026 junto con el cambio de --accent
-     a dorado (combinación "Medianoche + dorado" de la maqueta, ver comentario en --accent) */
-  --grad-caja:radial-gradient(100% 70% at 100% 0%, #2a2560 0%, #0b0f24 80%);
+                        "SkillCash" (valor/dinero) en vez del azul genérico que ya tenía. */
+  /* degradado "caja" - una sola variable para poder reusarlo en todas las cajas del sitio
+     (categorías, panorama del mercado, sesiones, eventos y noticias, quién está detrás) y que un
+     ajuste futuro de tono se aplique en todos lados a la vez. Misma forma radial de siempre,
+     valores del tema "Original (Azul clásico)", vuelto a ser el de por defecto 19-nov-2026 (ver
+     comentario de --accent arriba) */
+  --grad-caja:radial-gradient(100% 70% at 100% 0%, #211f78 0%, #0c1034 80%);
   --red-dim:#c91f3b;
   --red-glow:rgba(255,47,79,.35);
   --gold:#f0b23d;
@@ -127,21 +133,20 @@
                                 "Tus herramientas" / cat-overview-card) - antes era un azul fijo
                                 independiente del --accent general (#5d7ad1, "azul medianoche"
                                 que eligio Juan en su momento). Cambiado a seguir siempre a
-                                --accent el 18-nov-2026: con el cambio de --accent a dorado
-                                (combinación "Medianoche + dorado"), Juan reportó que el menu
-                                lateral si cambio mas las cajas de "Tus herramientas" seguian en
-                                azul - la causa era esta variable separada mas la regla
+                                --accent el 18-nov-2026: con el cambio de --accent a dorado en ese
+                                momento (combinación "Medianoche + dorado"), Juan reportó que el
+                                menu lateral si cambio mas las cajas de "Tus herramientas" seguian
+                                en azul - la causa era esta variable separada mas la regla
                                 ".cat-overview-card, .cat-flip-back{ --c:var(--cat-teal)
                                 !important; }" que la fuerza por encima del --c:var(--accent) que
                                 ya traia cada tarjeta en su style inline. Enlazarla a --accent
                                 evita que se vuelva a desincronizar la proxima vez que cambie el
-                                acento del sitio. */
-  --white:#f7f6ee;
-  --muted:#b7b4a8; /* tono calido (en vez de frio/azulado) para acompañar el acento dorado,
-                       cambiado 18-nov-2026 junto con --accent (ver comentario ahi) - sin llegar
-                       a blanco puro para no perder la jerarquia entre texto principal y
-                       secundario, que es para lo que sirve este tono */
-  --muted2:#d9d6ca;
+                                acento del sitio (como volvió a pasar, en sentido contrario, al
+                                devolver el acento a azul el 19-nov-2026). */
+  --white:#f7f6fb;
+  --muted:#b8bac2; /* tono del tema "Original (Azul clásico)" - vuelto a ser el de por defecto
+                       19-nov-2026 junto con --accent (ver comentario ahi) */
+  --muted2:#dcdee2;
   --r:16px;
   --sidebar-w:258px;
   --sidebar-w-collapsed:74px;
@@ -3786,7 +3791,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     bebe:     {name:'Blanco + Azul bebé',    bg:'#f6f8fc', card:'#ffffff', gradA:'#dceaff', gradB:'#ffffff', accent:'#6fa8e8', white:'#1e2733', muted:'#637183', muted2:'#414f61', light:true},
     magenta:  {name:'Gris + Magenta',        bg:'#f6f5f7', card:'#ffffff', gradA:'#f5dcee', gradB:'#ffffff', accent:'#c2185b', white:'#241a20', muted:'#6e5d65', muted2:'#4c3b43', light:true},
   };
-  const DEFAULT_THEME = 'dorado';
+  const DEFAULT_THEME = 'original';
   function applySkcTheme(id){
     const t = SKC_THEMES[id];
     if(!t) return;
