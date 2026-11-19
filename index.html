@@ -201,16 +201,19 @@ button{font-family:inherit;color:inherit}
 .sidebar::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--accent) 35%, transparent);border-radius:4px}
 .sidebar::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb, var(--accent) 55%, transparent)}
 /* en escritorio "colapsado" significa oculto del todo (ancho 0), no la barrita angosta de solo
-   iconos que habia antes. El sidebar de escritorio ahora viene SIN esta clase por defecto (el
-   <aside id="sidebar"> no trae "collapsed" en el HTML) - se abre ya desplegado, y si el usuario
-   lo colapsa con #sbToggle queda colapsado solo durante esa visita (no se guarda en
-   localStorage); al picarle al botoncito flotante de hamburguesa (abajo, en .topbar-brand,
-   visible y fijo en pantalla solo mientras el sidebar esta colapsado) se vuelve a abrir el menu
-   completo, empujando el contenido (el ancho del sidebar es un item mas de .app{display:flex},
-   asi que .main se reacomoda solo, sea cual sea la pagina que este abierta adentro). En celular
-   esto no afecta nada: el sidebar sigue oculto con transform fuera de pantalla sin importar esta
-   clase, y si "collapsed" llegara a estar presente ahi la pisa la regla de abajo (dentro de
-   @media(max-width:860px)), mostrando el menu completo con texto como siempre */
+   iconos que habia antes. (19-nov-2026) Juan: "cada vez que recargo la pagina, el menu
+   hamburguesa esta expandido... que no quede expandido desde el inicio, que quede contraido" -
+   el <aside id="sidebar"> ahora SI trae la clase "collapsed" de entrada en el HTML, asi que
+   siempre empieza contraido en cada carga/F5 (antes venia sin la clase a proposito, abierto por
+   defecto - ver commits previos si hace falta el porque de esa decision vieja, ya no aplica).
+   Si el usuario lo abre con el botoncito flotante de hamburguesa (.topbar-brand, visible y fijo
+   en pantalla solo mientras el sidebar esta colapsado) queda abierto solo durante esa visita (no
+   se guarda en localStorage - vuelve a empezar contraido en la siguiente carga, que es
+   justamente lo que Juan pidio). El ancho del sidebar es un item mas de .app{display:flex}, asi
+   que .main se reacomoda solo, sea cual sea la pagina que este abierta adentro. En celular esto
+   no afecta nada: el sidebar sigue oculto con transform fuera de pantalla sin importar esta
+   clase, y la regla de abajo (dentro de @media(max-width:860px)) la pisa, mostrando el menu
+   completo con texto como siempre cuando SI se abre (hamburguesa de arriba, no la flotante) */
 .sidebar.collapsed{width:0;border-right:0}
 .sidebar.collapsed .sb-top{gap:10px;padding:16px 8px}
 .sb-top{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 14px 8px}
@@ -248,9 +251,16 @@ button{font-family:inherit;color:inherit}
       un periodo distinto al de cripto, por eso dice diferente) y se subio un poco el tamano de
       letra. Para que nunca se parta a una segunda fila en anchos intermedios (no tan angosto
       como para activar el modo celular de mas abajo, pero no tan ancho como 1400px), un par de
-      @media mas abajo van ocultando RUSSELL 2000 y despues tambien S&P 500 (Juan: "dejas de
-      mostrar el ultimo precio... o el que le sigue, para que se ajuste y no tengamos 2 o 3
-      renglones de precios"). */
+      @media mas abajo van ocultando S&P 500 y despues NASDAQ/HYPE (Juan: "dejas de mostrar el
+      ultimo precio... o el que le sigue, para que se ajuste y no tengamos 2 o 3 renglones de
+      precios").
+   7) (mismo dia, un rato despues) Juan: "quita el precio de Russell 2000 porque veo que no cabe
+      y va a estorbar" - RUSSELL 2000 se quita del todo de PRICE_TICKER_ITEMS (mas abajo en este
+      archivo), ya no es parte de la cinta. El @media que lo ocultaba a partir de 1599px tambien
+      se quito (ya no hace falta, ahora el grupo completo son 6 precios: BTC/ETH/SOL/HYPE/
+      NASDAQ/S&P 500). El catalogo CURATED_INDICES (idx_rut, usado en Mi Arrecife/Sonar para
+      graficos de indices) es una cosa totalmente aparte y no se toco - Russell 2000 sigue
+      disponible ahi como grafico, solo se quito de la cintita de precios de arriba. */
 .price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;flex:none;flex-basis:100%;order:-1;justify-content:center;min-width:0}
 .price-ticker-item{display:inline-flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;padding:0 9px}
 .price-ticker-item:first-child{padding-left:0}
@@ -263,7 +273,6 @@ button{font-family:inherit;color:inherit}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
 .price-ticker-period{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.02em}
-@media(max-width:1599px){ .price-ticker-item[data-pt-key="rut"]{display:none} }
 @media(max-width:1389px){ .price-ticker-item[data-pt-key="spx"]{display:none} }
 @media(max-width:1219px){ .price-ticker-item[data-pt-key="ndx"]{display:none} }
 @media(max-width:1059px){ .price-ticker-item[data-pt-key="hype"]{display:none} }
@@ -2817,10 +2826,12 @@ img[src=""]{display:none}
   .mobile-topbar{gap:6px}
   /* la fila propia del ticker (order:-1 + flex-basis:100%) ya es la regla base de arriba (sin
      @media), vale para todos los anchos desde 18-nov-2026. Aqui solo quedan los ajustes que
-     SI son nada mas de celular: texto mas chico, sin centrar (Juan: "en la version de celular
-     quitalo" - el centrado de escritorio no se ve bien en celular, solo queda BTC de todas
-     formas asi que centrar no aporta nada) y, mas abajo, dejar solo BTC visible. */
-  .price-ticker{justify-content:flex-start}
+     SI son nada mas de celular: texto mas chico y, mas abajo, dejar solo BTC visible.
+     (19-nov-2026) Juan primero pidio sin centrar en celular ("quitalo, no se ve tan bien"), pero
+     despues, viendo el resultado en escritorio, pidio "TODO, como todo el banner de precios,
+     centradito" - sin excepcion de celular esta vez, asi que se quito el justify-content:
+     flex-start que habia aqui; ahora el centrado base (ver regla sin @media, mas arriba) aplica
+     tambien en celular. */
   .price-ticker-item{font-size:11.5px;gap:4px}
   .price-ticker-price{min-width:54px}
   .price-ticker-chg{font-size:10.5px;min-width:42px}
@@ -3724,7 +3735,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
   <div class="sb-backdrop" id="sbBackdrop"></div>
 
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar collapsed" id="sidebar">
     <div class="sb-sticky-head">
       <div class="sb-top">
         <a href="#" class="sb-logo" id="sbLogo">
@@ -4305,7 +4316,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </button>
       </div>
 
-      <div class="price-ticker" id="priceTicker" aria-label="Precios en vivo: BTC, ETH, SOL, HYPE, Nasdaq, S&amp;P 500 y Russell 2000">
+      <div class="price-ticker" id="priceTicker" aria-label="Precios en vivo: BTC, ETH, SOL, HYPE, Nasdaq y S&amp;P 500">
         <div class="price-ticker-track" id="priceTickerTrack"></div>
       </div>
 
@@ -12130,7 +12141,7 @@ function showCategoryDetail(cat){
   // es una microtarea) y la página aterriza mucho más abajo de lo debido
   if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   if(cat === 'portafolio' && typeof window.arrecifeEnterDashboard === 'function') window.arrecifeEnterDashboard();
-  categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if(!suppressInitialScroll) categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
   if(typeof closeJournalPage === 'function') closeJournalPage();
@@ -12553,7 +12564,7 @@ function jumpToIndicator(id){
   // Guía (que es una página larga) o desde Favoritos hereda el scroll que traía esa página y
   // puede aterrizar a mitad del panel nuevo (más corto), mostrando solo las tarjetas/disclaimer
   // del final en vez del título y el gráfico
-  categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if(!suppressInitialScroll) categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const standalone = id === 'guia' || id === 'predicciones';
   const group = standalone ? id : (INDIC_ID_TO_GROUP[id] || 'guia');
   if(indicGroupTabs){
@@ -12839,7 +12850,7 @@ function openModalGeneric(overlay, panel, focusTarget){
       pushRoute({ skillcashModal: true }, toolPath);
     }
     setPageTitle(TOOL_LABELS[overlay.dataset.tool]);
-    toolDetailSlot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if(!suppressInitialScroll) toolDetailSlot.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => { (focusTarget || panel.querySelector('.modal-close')).focus({ preventScroll: true }); }, 60);
   } else {
     overlay.classList.add('open');
@@ -12887,6 +12898,17 @@ function goBackOneStep(){
 // navegador, o el ruteo inicial), donde la URL ya está donde tiene que estar y no hay que
 // apilar/reemplazar nada más
 let suppressRouteWrites = false;
+// (19-nov-2026) Juan: "algunas herramientas, cuando le doy F5, como que se van para abajo y me
+// toca subir" - al recargar una URL profunda (ej. /herramientas/trading/calculadora o
+// /indicadores/rsi), applyInitialRoute() arma esa vista haciendo lo mismo que un click normal
+// del usuario (incluye un card.click() sintetico) - y ese mismo camino hace scrollIntoView hacia
+// la herramienta/indicador, que tiene sentido cuando el usuario SI hace click (viene viendo la
+// cuadricula de arriba, hay que bajarlo a lo que abrio) pero NO cuando es apenas la carga de la
+// pagina (ya arranca en la herramienta correcta, no hace falta un scroll animado de por medio -
+// eso era el salto que Juan reportaba). Esta bandera se prende solo durante
+// applyInitialRoute() para que openModalGeneric()/jumpToIndicator() se salten su propio
+// scrollIntoView ese momento puntual, sin tocar el comportamiento normal de click.
+let suppressInitialScroll = false;
 // arma la vista correspondiente a una ruta cualquiera — la usan tanto el arranque de la página
 // (link directo/recarga) como el botón atrás/adelante del navegador, así ninguno de los dos
 // tiene su propia copia de esta lógica
@@ -30107,7 +30129,9 @@ document.addEventListener('visibilitychange', () => {
   const path = (window.__initialRoutePath || location.pathname).replace(/\/+$/, '') || '/';
   replaceRoute(null, '/');
   if(path === '/') return;
+  suppressInitialScroll = true;
   applyRoute(path);
+  suppressInitialScroll = false;
 })();
 
 /* ===================================================================================
@@ -32691,8 +32715,7 @@ async function awardColmillos(eventType, periodKey, amount){
     { key:'sol', label:'SOL', kind:'crypto', binance:'solusdt', period:'24h' },
     { key:'hype', label:'HYPE', kind:'crypto', binance:'hypeusdt', period:'24h' },
     { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40, period:'día' },
-    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día' },
-    { key:'rut', label:'RUSSELL 2000', kind:'index', proxy:'IWM', scale:10, period:'día' }
+    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día' }
   ];
 
   var track = document.getElementById('priceTickerTrack');
