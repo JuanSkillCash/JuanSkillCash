@@ -2829,6 +2829,12 @@ img[src=""]{display:none}
   .sidebar.collapsed{width:var(--sidebar-w)}
   .sidebar.collapsed .sb-item-label,.sidebar.collapsed .sb-logo-text,.sidebar.collapsed .sb-back span,.sidebar.collapsed .sb-item-badge{display:block}
   .sidebar.collapsed .sb-item{justify-content:flex-start}
+  /* respaldo del fix en JS (mobileMenuBtn ya quita "collapsed" al abrir) - si por cualquier
+     otra vía la clase queda puesta mientras el menú está abierto en celular, que al menos no
+     desaparezcan el buscador, los botones de inicio/expandir-todo ni el texto de las categorías */
+  .sidebar.collapsed .sb-search-wrap{display:flex}
+  .sidebar.collapsed .sb-cat-label{opacity:1}
+  .sidebar.collapsed .sb-home-btn,.sidebar.collapsed .sb-cat-toggle-all{display:flex}
   .main{padding:20px 18px 50px}
   .sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;display:none}
   .sb-backdrop.show{display:block}
@@ -12809,6 +12815,15 @@ const sbToggle = document.getElementById('sbToggle');
 const sbBackdrop = document.getElementById('sbBackdrop');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
+// al cargar la página se arranca en el home (sin categoría activa), pero nadie llama
+// showCategoryOverview() para "entrar" ahí - ya se está ahí de entrada - así que filterSidebarNav
+// nunca corría en el arranque y cada .sb-cat-label se quedaba en su estado por defecto del HTML
+// (expandido, sin la clase "collapsed"). Resultado: la primera vez que se abría el menú
+// (sobre todo en celular, donde hasta ahora era la única forma de verlo) aparecían TODAS las
+// herramientas desplegadas de una - justo lo que Juan pidió que nunca pasara ("las herramientas
+// y todo tienen que estar contraído" al abrir la página)
+filterSidebarNav(null);
+
 sbToggle.addEventListener('click', () => {
   if(window.innerWidth <= 860){
     sidebar.classList.remove('mobile-open');
@@ -12819,6 +12834,13 @@ sbToggle.addEventListener('click', () => {
 });
 mobileMenuBtn.addEventListener('click', () => {
   if(window.innerWidth <= 860){
+    // sin esto el sidebar se abre con la clase "collapsed" todavía puesta (es la clase por
+    // defecto del <aside> en el HTML, pensada para el modo ícono-only de escritorio) y, como el
+    // bloque @media(max-width:860px) no neutraliza TODos sus selectores, el buscador
+    // (.sb-search-wrap), el botón de inicio, el de "expandir/contraer todo" y el texto de cada
+    // categoría (.sb-cat-label, opacity:0) se quedaban invisibles aunque el menú sí se abriera -
+    // bug reportado por Juan ("no aparece el botón de inicio, ni el de expandir...")
+    sidebar.classList.remove('collapsed');
     sidebar.classList.add('mobile-open');
     sbBackdrop.classList.add('show');
   } else {
