@@ -5349,20 +5349,29 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
             } else if(live){
-              // si YA se está viendo este mismo directo (mismo videoId), NO se vuelve a montar el
-              // reproductor - antes se recreaba el iframe cada 90s (este chequeo automático corre
-              // en un setInterval) aunque el directo siguiera siendo el mismo, y como mountPlayer
-              // SIEMPRE crea un iframe nuevo desde cero, se sentía como que el video "se recargaba
-              // solo" y volvía a quedar muteado cada vez (bug real reportado por Juan: "estoy
-              // viendo el vivo y... se recarga y me queda en mute")
+              // si YA se está viendo este mismo directo (mismo videoId), NO se toca nada - antes
+              // se recreaba el iframe cada 90s (este chequeo automático corre en un setInterval)
+              // aunque el directo siguiera siendo el mismo, y como mountPlayer SIEMPRE crea un
+              // iframe nuevo desde cero, se sentía como que el video "se recargaba solo" y volvía
+              // a quedar muteado cada vez (bug reportado por Juan: "estoy viendo el vivo y... se
+              // recarga y me queda en mute"). Al arreglar SOLO el mountPlayer (commit anterior)
+              // quedó al descubierto un 2º bug ya existente: setFacade() se seguía llamando cada
+              // 90s sin condición, y pone la fachada (la miniatura) en display:flex de nuevo SIN
+              // que nada vuelva a ocultarla (eso antes lo hacía el propio mountPlayer al remontar,
+              // por eso no se notaba) - la miniatura quedaba tapando el video real, que seguía
+              // reproduciéndose de fondo sin que se viera (bug reportado por Juan: "se congela la
+              // imagen, pero sigo escuchando"). Por eso ahora TODO este bloque (no solo el
+              // mountPlayer) se salta por completo si ya se está reproduciendo este mismo directo.
               var esVideoNuevo = data.videoId !== currentVideoId;
               currentVideoId = data.videoId;
-              pendingSrc = liveEmbedUrl(data.videoId);
-              setFacade(data.videoId, '');
-              // cambio automático a directo SIN que la persona haya clicado nada (el Worker lo
-              // detectó solo) - el navegador no deja autoplay con sonido sin gesto del usuario,
-              // así que arranca muteado y el botón de silencio queda marcado como tal
-              if(played && esVideoNuevo) mountPlayer(pendingSrc, true);
+              if(!played || esVideoNuevo){
+                pendingSrc = liveEmbedUrl(data.videoId);
+                setFacade(data.videoId, '');
+                // cambio automático a directo SIN que la persona haya clicado nada (el Worker lo
+                // detectó solo) - el navegador no deja autoplay con sonido sin gesto del usuario,
+                // así que arranca muteado y el botón de silencio queda marcado como tal
+                if(played) mountPlayer(pendingSrc, true);
+              }
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
             } else if(upcoming){
@@ -5588,15 +5597,19 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
           } else if(current && current.live && current.videoId){
             // mismo motivo que en checkLiveAndMaybeSwitch: si ya se está viendo este directo, no
-            // se vuelve a montar el reproductor solo porque "Buscar directo" lo volvió a confirmar
+            // se toca nada solo porque "Buscar directo" lo volvió a confirmar - ni el reproductor
+            // (mountPlayer) ni la fachada (setFacade, que si no también tapaba el video real con
+            // la miniatura mientras el audio seguía sonando de fondo)
             var esVideoNuevo = current.videoId !== currentVideoId;
             currentVideoId = current.videoId;
-            pendingSrc = liveEmbedUrl(current.videoId);
-            setFacade(current.videoId, '');
-            // cambio automático SIN clic de la persona (venía reproduciendo otra cosa y este
-            // canal resultó en vivo al revisar todos) - arranca muteado, igual que en
-            // checkLiveAndMaybeSwitch
-            if(yaEstabaReproduciendo && esVideoNuevo) mountPlayer(pendingSrc, true);
+            if(!yaEstabaReproduciendo || esVideoNuevo){
+              pendingSrc = liveEmbedUrl(current.videoId);
+              setFacade(current.videoId, '');
+              // cambio automático SIN clic de la persona (venía reproduciendo otra cosa y este
+              // canal resultó en vivo al revisar todos) - arranca muteado, igual que en
+              // checkLiveAndMaybeSwitch
+              if(yaEstabaReproduciendo) mountPlayer(pendingSrc, true);
+            }
             if(livePill) livePill.style.display = 'inline-flex';
             if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
           }
