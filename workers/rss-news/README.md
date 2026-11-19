@@ -4,13 +4,18 @@ Junta titulares de varios medios (RSS público) y los devuelve ya ordenados en J
 tarjetas "Noticias Cripto" y "Macro y Economía" de Eventos y Noticias (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Ya desplegado (confirmado por Juan el 19-nov-2026)** - se le agregó la bajada/entradilla de
-> la noticia (cuando el feed la trae) como contexto extra para el modelo que arma el "resumen",
-> porque antes solo tenía el título y terminaba parafraseándolo casi igual (lo que reportó Juan:
-> "a veces dice como lo mismo que dice el título"). No se pudo probar contra los feeds reales
-> desde este entorno de trabajo (sin salida a internet hacia esos medios) - Juan: revisa unos
-> cuantos resúmenes nuevos cuando puedas, a ver si ya aportan algo que el título no decía; si
-> siguen igual de parecidos al título, avísame.
+> **Juan: vuelve a pegar el código actualizado (19-nov-2026)** - se agregaron los campos
+> `resumenLargo` (un párrafo más largo, 3-4 frases) e `imagen` (si el feed la trae), para la
+> "vista detallada" de Noticias que pediste (una noticia grande a la vez, con foto y resumen
+> más largo, con flechas para pasar a la siguiente). `resumenLargo` sale de la MISMA llamada a
+> Workers AI que ya armaba `resumen`/`sentimiento` (no es una llamada nueva, no gasta más cupo).
+> `imagen` sale del RSS del medio cuando lo trae (`<enclosure>`, `<media:content>` o un `<img>`
+> suelto en la bajada) - no todos la traen, por eso el sitio tiene que poder mostrarse bien
+> cuando sale `null` (muestra un cartel genérico en vez de romperse).
+>
+> Cambio anterior (confirmado por Juan): se le agregó la bajada/entradilla de la noticia (cuando
+> el feed la trae) como contexto extra para el modelo que arma el "resumen", porque antes solo
+> tenía el título y terminaba parafraseándolo casi igual.
 
 ## Cómo desplegarlo (igual que hiciste con el de YouTube en vivo)
 
@@ -47,10 +52,16 @@ https://<tu-worker>.workers.dev/?category=crypto
 Debería responder algo como:
 
 ```json
-{"items":[{"title":"...","link":"https://...","source":"CoinDesk","publishedAt":1762500000000}, ...],"checkedAt":1762500000000}
+{"items":[{"title":"...","link":"https://...","source":"CoinDesk","publishedAt":1762500000000,
+           "resumen":"...","resumenLargo":"...","imagen":"https://.../foto.jpg","sentimiento":"alcista"}, ...],
+ "checkedAt":1762500000000}
 ```
 
 Y con `?category=macro` lo mismo pero con titulares de MarketWatch/Investing.com.
 
 Si alguno de los dos sale con `"items":[]` (vacío) no es necesariamente un error — puede ser
 que ese medio esté lento o haya cambiado algo en su RSS. Avísame si pasa seguido con el mismo.
+
+`"imagen":null` tampoco es un error - ese medio en particular no trajo ninguna imagen en el RSS
+para esa noticia puntual (pasa seguido, sobre todo con MarketWatch/Investing.com). El sitio ya
+está preparado para mostrar un cartel genérico ahí en vez de un espacio roto.

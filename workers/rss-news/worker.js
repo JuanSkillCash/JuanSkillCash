@@ -17,8 +17,18 @@
  *   POST https://<tu-worker>.workers.dev/?action=moderate   cuerpo JSON: {"text":"..."}
  * Las de noticias responden:
  *   {"items":[{"title":"...","link":"...","source":"CoinDesk","publishedAt":169...,
- *              "resumen":"...","sentimiento":"alcista|bajista|neutral"}, ...],"checkedAt":169...}
+ *              "resumen":"...","resumenLargo":"...","imagen":"https://..."|null,
+ *              "sentimiento":"alcista|bajista|neutral"}, ...],"checkedAt":169...}
  * La de moderación responde: {"flagged":true|false}
+ *
+ * "resumenLargo" e "imagen" (19-nov-2026): para la "vista detallada" de Noticias (una noticia
+ * grande a la vez, con imagen y un resumen más largo que el renglón de la lista compacta) que
+ * pidió Juan. "resumenLargo" lo arma la misma llamada a Workers AI que ya hacía "resumen" y
+ * "sentimiento" (se le agregó una 3ª línea al formato de respuesta, no es una llamada nueva -
+ * sigue gastando lo mismo del cupo gratis). "imagen" sale del propio RSS si el feed la trae
+ * (<enclosure>, <media:content>/<media:thumbnail>, o un <img> suelto dentro de la descripción) -
+ * no todos los medios la traen, por eso puede salir `null` y el sitio debe poder mostrarse bien
+ * sin ella (un cartel genérico en vez de romperse).
  *
  * Cacheado 30 minutos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
  * visitante) - las noticias no cambian segundo a segundo, no tiene sentido pedirle a cada
@@ -83,6 +93,24 @@ function stripTags(s) {
   return s.replace(/<[^>]*>/g, '').trim();
 }
 
+// saca una URL de imagen de un <item> de RSS, probando en orden lo más común primero:
+// 1) <enclosure url="..." type="image/..."> (CoinDesk la trae así)
+// 2) <media:content url="..."> o <media:thumbnail url="..."> (varios feeds de WordPress)
+// 3) un <img src="..."> suelto dentro de <description>/<content:encoded> (Cointelegraph mete la
+//    imagen de portada como el primer <img> del cuerpo del resumen)
+// No todos los feeds traen nada de esto - en ese caso se devuelve null y el sitio muestra un
+// cartel genérico en vez de romperse (confirmado: ninguna de las 4 fuentes actuales lo trae
+// SIEMPRE, por eso hace falta cubrir varias formas distintas antes de rendirse).
+function extraeImagen(block) {
+  const enclosure = block.match(/<enclosure\b[^>]*url=["']([^"']+)["'][^>]*>/i);
+  if (enclosure && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(enclosure[1])) return enclosure[1];
+  const media = block.match(/<media:(?:content|thumbnail)\b[^>]*url=["']([^"']+)["'][^>]*>/i);
+  if (media) return media[1];
+  const img = block.match(/<img\b[^>]*src=["']([^"']+)["'][^>]*>/i);
+  if (img) return img[1];
+  return null;
+}
+
 // Parser casero a propósito (sin librería de XML): Cloudflare Workers no trae un DOMParser de
 // verdad en su runtime, y para solo sacar título/link/fecha de cada <item> de un RSS, unas
 // expresiones regulares bastan - es la misma idea que ya se usó en el Worker de YouTube para
@@ -115,12 +143,16 @@ function parseRssItems(xml, source) {
     // recortada a 500 caracteres - de sobra para darle contexto al modelo sin gastar tokens de
     // más (algunos feeds, sobre todo content:encoded, traen el articulo casi completo)
     const description = descMatch ? decodeEntities(stripTags(stripCdata(descMatch[1]))).slice(0, 500) : '';
+    // la imagen se busca en TODO el <item> (no solo en description/content:encoded) porque el
+    // <enclosure> y el <media:content> suelen ser hermanos de <description>, no estar dentro
+    const imagen = extraeImagen(block);
     if (!title || !link) continue;
     items.push({
       title,
       link,
       source,
       description,
+      imagen,
       publishedAt: isNaN(publishedAt) ? null : publishedAt,
     });
   }
@@ -188,28 +220,36 @@ async function traduceTitulo(texto, env, debug) {
 // fácil de leer con una expresión regular sin que un modelo de lenguaje "invente" un JSON mal
 // formado y rompa el parseo.
 async function analizaTitulo(tituloOriginalIngles, descripcionOriginalIngles, env, debug) {
-  const vacio = { resumen: null, sentimiento: null };
+  const vacio = { resumen: null, resumenLargo: null, sentimiento: null };
   try {
     // la bajada/entradilla real de la noticia (cuando el feed la trae) se le pasa aparte del
     // título, como contexto - sin esto el modelo solo tenía el título para trabajar y el
     // "resumen" terminaba siendo casi el mismo título parafraseado, sin aportar nada nuevo
     const contexto = descripcionOriginalIngles ? '\nBajada de la noticia (más contexto, en inglés): "' + descripcionOriginalIngles + '"\n' : '';
+    // DETALLE (19-nov-2026, para la "vista detallada" que pidió Juan) va en la MISMA llamada que
+    // SENTIMIENTO/RESUMEN - no es una petición nueva a Workers AI, solo una 3ª línea en el mismo
+    // formato de respuesta, para no duplicar el gasto del cupo gratis diario.
     const prompt = 'Eres un analista que explica noticias de cripto y economía a principiantes, en español.\n' +
       'Para la siguiente noticia (viene en inglés), responde EXACTAMENTE en este formato, sin nada antes ni después:\n' +
       'SENTIMIENTO: alcista, bajista o neutral\n' +
-      'RESUMEN: una frase corta en español (máximo 20 palabras) que agregue contexto o explique por qué le podría importar a alguien que invierte en cripto - NUNCA repitas ni parafrasees el título, di algo que el título no dice (el motivo, el dato detrás, la consecuencia)\n\n' +
+      'RESUMEN: una frase corta en español (máximo 20 palabras) que agregue contexto o explique por qué le podría importar a alguien que invierte en cripto - NUNCA repitas ni parafrasees el título, di algo que el título no dice (el motivo, el dato detrás, la consecuencia)\n' +
+      'DETALLE: un párrafo más largo en español (entre 50 y 90 palabras, 3-4 frases) que explique la noticia con más contexto que RESUMEN - de qué se trata, por qué pasó y qué podría significar para alguien que invierte en cripto o sigue la economía. Igual que en RESUMEN, no repitas el título tal cual.\n\n' +
       'Título: "' + tituloOriginalIngles + '"' + contexto;
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 120,
+      max_tokens: 280,
     });
     if (debug) debug.respuestaCrudaAnalisis = result;
     const texto = (result && result.response) || '';
     const sentMatch = texto.match(/SENTIMIENTO:\s*(alcista|bajista|neutral)/i);
     const resMatch = texto.match(/RESUMEN:\s*(.+)/i);
+    // DETALLE puede traer varias frases (con saltos de línea) - se corta en el siguiente
+    // encabezado en mayúsculas si el modelo agrega algo más después, o al final del texto
+    const detMatch = texto.match(/DETALLE:\s*([\s\S]+?)(?:\n[A-ZÁÉÍÓÚÑ]+:|$)/i);
     return {
       sentimiento: sentMatch ? sentMatch[1].toLowerCase() : null,
-      resumen: resMatch ? decodeEntities(resMatch[1].trim()) : null,
+      resumen: resMatch ? decodeEntities(resMatch[1].split('\n')[0].trim()) : null,
+      resumenLargo: detMatch ? decodeEntities(detMatch[1].trim()) : null,
     };
   } catch (err) {
     if (debug) debug.motivoAnalisis = 'Excepción al pedir resumen/sentimiento: ' + String(err);
@@ -324,7 +364,7 @@ export default {
       // description solo era insumo para analizaTitulo (el "resumen" que sí se manda ya la
       // reemplaza) - no hace falta mandarla también cruda al sitio
       const { description, ...rest } = it;
-      return { ...rest, title: titulo, resumen: analisis.resumen, sentimiento: analisis.sentimiento };
+      return { ...rest, title: titulo, resumen: analisis.resumen, resumenLargo: analisis.resumenLargo, sentimiento: analisis.sentimiento };
     }));
 
     const body = JSON.stringify({ items, checkedAt: Date.now(), ...(debugWanted ? { debug: debugInfo } : {}) });
