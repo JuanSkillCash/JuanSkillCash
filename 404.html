@@ -3515,6 +3515,30 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
   .news-detail-nav-btn span{display:none}
 }
 .events-news-empty{font-size:12.5px;color:var(--muted);padding:10px 4px}
+
+/* "Buscar histórico" de Noticias (pedido de Juan, 19-nov-2026) - busca en news_archive
+   (Supabase), tabla aparte alimentada por scripts/update_news_archive.py, independiente del
+   Worker de noticias (que solo trae lo último, cacheado 30 min) */
+.news-archive-search-row{margin-bottom:16px}
+.news-archive-search-wrap{position:relative;display:flex;align-items:center;max-width:480px}
+.news-archive-search-wrap svg{position:absolute;left:13px;color:var(--muted);pointer-events:none}
+.news-archive-search-wrap input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:11px 14px 11px 38px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13.5px;outline:none;transition:border-color .2s}
+.news-archive-search-wrap input:focus{border-color:var(--accent)}
+.news-archive-list{display:flex;flex-direction:column;gap:2px}
+.news-archive-item{display:flex;align-items:flex-start;gap:10px;padding:12px 4px 12px 14px;border-left:2px solid var(--border2);text-decoration:none;border-radius:0 8px 8px 0;transition:background var(--dur-fast) var(--ease-out)}
+.news-archive-item:hover{background:color-mix(in srgb, var(--white) 4%, transparent)}
+.news-archive-item[data-sent="alcista"]{border-left-color:var(--green)}
+.news-archive-item[data-sent="bajista"]{border-left-color:var(--red)}
+.news-archive-item-body{flex:1;min-width:0}
+.news-archive-item-title{font-size:13.5px;font-weight:600;color:var(--white);line-height:1.4}
+.news-archive-item-why{font-size:11.5px;color:var(--muted2);line-height:1.4;margin-top:3px}
+.news-archive-item-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.news-archive-item-ext{flex-shrink:0;color:var(--muted);margin-top:3px}
+.news-archive-status{font-size:12.5px;color:var(--muted);padding:14px 4px;text-align:center}
+.news-archive-more-btn{display:block;margin:4px auto 0;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);padding:10px 20px;border-radius:20px;cursor:pointer;transition:background .2s}
+.news-archive-more-btn:hover{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+.news-archive-skel{height:52px;border-radius:0 8px 8px 0;margin-bottom:2px;background:linear-gradient(90deg,color-mix(in srgb, var(--white) 4%, transparent),color-mix(in srgb, var(--white) 9%, transparent),color-mix(in srgb, var(--white) 4%, transparent));background-size:200% 100%;animation:newsSkelShine 1.4s infinite}
+@media(prefers-reduced-motion:reduce){ .news-archive-skel{animation:none} }
 /* ===== Calendario Económico propio (reemplaza el iframe de Investing.com - ver
    workers/economic-calendar/worker.js para el backend y el porqué: sus filas de datos quedaban
    fijas en blanco sin importar los parámetros de color, y su ancho no se estiraba) ===== */
@@ -4949,6 +4973,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="news-view-toggle">
         <button type="button" id="newsViewQuickBtn" class="active">Vista rápida</button>
         <button type="button" id="newsViewDetailBtn">Vista detallada</button>
+        <button type="button" id="newsViewArchiveBtn">Buscar histórico</button>
       </div>
 
       <div class="news-detail-controls" id="newsDetailControls">
@@ -5038,6 +5063,43 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </div>
           <div class="events-card-foot">Titulares recientes de medios financieros, los más nuevos primero.</div>
         </div>
+      </div>
+
+      <!-- "Buscar histórico" (pedido de Juan, 19-nov-2026): busca en news_archive (Supabase),
+           alimentada aparte por scripts/update_news_archive.py - independiente del Worker de
+           noticias (que solo trae lo último, cacheado 30 min) -->
+      <div class="news-archive-view" id="newsArchiveView" style="display:none">
+        <div class="news-archive-search-row">
+          <div class="news-archive-search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="newsArchiveSearchInput" placeholder="Buscar por palabra clave (ej. bitcoin, inflación, SEC)...">
+          </div>
+        </div>
+        <div class="news-detail-controls" id="newsArchiveControls" style="display:flex">
+          <div class="news-detail-filter-group">
+            <span class="news-detail-filter-label">Categoría</span>
+            <button type="button" class="news-pill-btn news-archive-cat-pill" data-cat="crypto">Cripto</button>
+            <button type="button" class="news-pill-btn news-archive-cat-pill" data-cat="macro">Económicas</button>
+            <button type="button" class="news-pill-btn news-archive-cat-pill active" data-cat="ambas">Ambas</button>
+          </div>
+          <div class="news-detail-filter-group">
+            <span class="news-detail-filter-label">Rango</span>
+            <button type="button" class="news-pill-btn news-archive-range-pill active" data-range="1">Últimas 24h</button>
+            <button type="button" class="news-pill-btn news-archive-range-pill" data-range="7">Últimos 7 días</button>
+            <button type="button" class="news-pill-btn news-archive-range-pill" data-range="30">Últimos 30 días</button>
+            <button type="button" class="news-pill-btn news-archive-range-pill" data-range="0">Todo el historial</button>
+          </div>
+          <div class="news-detail-filter-group">
+            <span class="news-detail-filter-label">Sentimiento</span>
+            <button type="button" class="news-pill-btn news-archive-sent-pill active" data-sent="todas">Todas</button>
+            <button type="button" class="news-pill-btn news-archive-sent-pill" data-sent="alcista">Alcistas</button>
+            <button type="button" class="news-pill-btn news-archive-sent-pill" data-sent="neutral">Neutrales</button>
+            <button type="button" class="news-pill-btn news-archive-sent-pill" data-sent="bajista">Bajistas</button>
+          </div>
+        </div>
+        <div class="news-archive-list" id="newsArchiveList"></div>
+        <div class="news-archive-status" id="newsArchiveStatus"></div>
+        <button type="button" class="news-archive-more-btn" id="newsArchiveMoreBtn" style="display:none">Ver más noticias</button>
       </div>
     </section>
     </div>
@@ -6211,22 +6273,143 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         });
       });
 
+      var archiveViewEl = document.getElementById('newsArchiveView');
       var quickBtn = document.getElementById('newsViewQuickBtn');
       var detailBtn = document.getElementById('newsViewDetailBtn');
+      var archiveBtn = document.getElementById('newsViewArchiveBtn');
+      function ocultarTodasLasVistas(){
+        quickViewEl.style.display = 'none'; detailControlsEl.style.display = 'none';
+        detailViewEl.style.display = 'none'; detailEmptyEl.style.display = 'none';
+        archiveViewEl.style.display = 'none';
+        [quickBtn, detailBtn, archiveBtn].forEach(function(b){ b.classList.remove('active'); });
+      }
       quickBtn.addEventListener('click', function(){
         currentView = 'quick';
-        quickBtn.classList.add('active'); detailBtn.classList.remove('active');
-        quickViewEl.style.display = ''; detailControlsEl.style.display = 'none';
-        detailViewEl.style.display = 'none'; detailEmptyEl.style.display = 'none';
+        ocultarTodasLasVistas();
+        quickBtn.classList.add('active');
+        quickViewEl.style.display = '';
       });
       detailBtn.addEventListener('click', function(){
         currentView = 'detail';
-        detailBtn.classList.add('active'); quickBtn.classList.remove('active');
-        quickViewEl.style.display = 'none'; detailControlsEl.style.display = 'flex';
+        ocultarTodasLasVistas();
+        detailBtn.classList.add('active');
+        detailControlsEl.style.display = 'flex';
         detailViewEl.style.display = 'block';
         loadCategory('crypto'); loadCategory('macro'); // por si el IntersectionObserver no había disparado todavía
         renderDetailView();
       });
+      archiveBtn.addEventListener('click', function(){
+        currentView = 'archive';
+        ocultarTodasLasVistas();
+        archiveBtn.classList.add('active');
+        archiveViewEl.style.display = 'block';
+        if(!archiveYaBuscoUnaVez){ archiveYaBuscoUnaVez = true; runArchiveSearch(true); }
+      });
+
+      /* ===== "Buscar histórico" (pedido de Juan, 19-nov-2026) =====
+         Busca en news_archive (tabla de Supabase, lectura pública vía RLS) - alimentada aparte
+         por scripts/update_news_archive.py cada ~30 min (GitHub Actions). Independiente del
+         Worker de noticias de arriba (ese solo trae lo último, cacheado 30 min, sin historial). */
+      var archiveListEl = document.getElementById('newsArchiveList');
+      var archiveStatusEl = document.getElementById('newsArchiveStatus');
+      var archiveMoreBtn = document.getElementById('newsArchiveMoreBtn');
+      var archiveSearchInput = document.getElementById('newsArchiveSearchInput');
+      var ARCHIVE_PAGE_SIZE = 20;
+      var archiveCat = 'ambas';
+      var archiveRange = '1'; // días hacia atrás; '0' = todo el historial
+      var archiveSent = 'todas';
+      var archiveOffset = 0;
+      var archiveSearchTimer = null;
+      var archiveReqId = 0; // para ignorar una respuesta vieja si el usuario ya cambió el filtro
+      var archiveYaBuscoUnaVez = false;
+
+      function archiveSkelHtml(n){
+        var out = '';
+        for(var i = 0; i < n; i++) out += '<div class="news-archive-skel"></div>';
+        return out;
+      }
+
+      function archiveItemHtml(it){
+        var sent = (it.sentimiento && SENTIMIENTO_LABEL[it.sentimiento]) ? it.sentimiento : '';
+        var metaTxt = [timeAgo(it.published_at ? Date.parse(it.published_at) : null), it.source].filter(Boolean).join(' · ');
+        return '<a class="news-archive-item" data-sent="' + escapeHtml(sent) + '" href="' + escapeHtml(it.link) + '" target="_blank" rel="noopener">' +
+          '<div class="news-archive-item-body">' +
+            '<div class="news-archive-item-title">' + escapeHtml(it.title) + '</div>' +
+            (it.resumen ? '<div class="news-archive-item-why">' + escapeHtml(it.resumen) + '</div>' : '') +
+            '<div class="news-archive-item-meta">' + sentimientoChipHtml(it.sentimiento) + escapeHtml(metaTxt) + '</div>' +
+          '</div>' +
+          '<svg class="news-archive-item-ext" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>' +
+        '</a>';
+      }
+
+      function runArchiveSearch(reset){
+        if(reset){ archiveOffset = 0; archiveListEl.innerHTML = archiveSkelHtml(5); archiveMoreBtn.style.display = 'none'; }
+        var myReqId = ++archiveReqId;
+        archiveStatusEl.textContent = 'Buscando...';
+
+        var q = sbClient.from('news_archive').select('*').order('published_at', { ascending: false })
+          .range(archiveOffset, archiveOffset + ARCHIVE_PAGE_SIZE - 1);
+        if(archiveCat !== 'ambas') q = q.eq('category', archiveCat);
+        if(archiveSent !== 'todas') q = q.eq('sentimiento', archiveSent);
+        if(archiveRange !== '0'){
+          var desde = new Date(Date.now() - Number(archiveRange) * 86400000).toISOString();
+          q = q.gte('published_at', desde);
+        }
+        var term = archiveSearchInput.value.trim();
+        if(term) q = q.ilike('title', '%' + term + '%');
+
+        q.then(function(res){
+          if(myReqId !== archiveReqId) return; // el usuario ya cambió el filtro, esta respuesta llegó tarde
+          if(reset) archiveListEl.innerHTML = '';
+          if(res.error){
+            archiveStatusEl.textContent = 'No se pudo buscar en el historial. Intenta de nuevo en un momento.';
+            archiveMoreBtn.style.display = 'none';
+            return;
+          }
+          var items = res.data || [];
+          if(reset && !items.length){
+            archiveStatusEl.textContent = term
+              ? 'No hay noticias guardadas que coincidan con "' + term + '" en este rango/filtro.'
+              : 'Todavía no hay noticias guardadas en este rango - el historial se va llenando solo cada cierto tiempo, vuelve a revisar más tarde.';
+            archiveMoreBtn.style.display = 'none';
+            return;
+          }
+          archiveListEl.insertAdjacentHTML('beforeend', items.map(archiveItemHtml).join(''));
+          archiveOffset += items.length;
+          archiveStatusEl.textContent = archiveListEl.children.length + ' noticia' + (archiveListEl.children.length === 1 ? '' : 's') + ' encontrada' + (archiveListEl.children.length === 1 ? '' : 's') + (term ? ' para "' + term + '"' : '') + '.';
+          archiveMoreBtn.style.display = items.length === ARCHIVE_PAGE_SIZE ? '' : 'none';
+        });
+      }
+
+      document.querySelectorAll('.news-archive-cat-pill').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          document.querySelectorAll('.news-archive-cat-pill').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          archiveCat = btn.dataset.cat;
+          runArchiveSearch(true);
+        });
+      });
+      document.querySelectorAll('.news-archive-range-pill').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          document.querySelectorAll('.news-archive-range-pill').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          archiveRange = btn.dataset.range;
+          runArchiveSearch(true);
+        });
+      });
+      document.querySelectorAll('.news-archive-sent-pill').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          document.querySelectorAll('.news-archive-sent-pill').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          archiveSent = btn.dataset.sent;
+          runArchiveSearch(true);
+        });
+      });
+      archiveSearchInput.addEventListener('input', function(){
+        if(archiveSearchTimer) clearTimeout(archiveSearchTimer);
+        archiveSearchTimer = setTimeout(function(){ runArchiveSearch(true); }, 400);
+      });
+      archiveMoreBtn.addEventListener('click', function(){ runArchiveSearch(false); });
     })();
     </script>
       <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
