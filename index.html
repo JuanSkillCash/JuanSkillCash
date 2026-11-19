@@ -5351,13 +5351,20 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
             } else if(live){
+              // si YA se está viendo este mismo directo (mismo videoId), NO se vuelve a montar el
+              // reproductor - antes se recreaba el iframe cada 90s (este chequeo automático corre
+              // en un setInterval) aunque el directo siguiera siendo el mismo, y como mountPlayer
+              // SIEMPRE crea un iframe nuevo desde cero, se sentía como que el video "se recargaba
+              // solo" y volvía a quedar muteado cada vez (bug real reportado por Juan: "estoy
+              // viendo el vivo y... se recarga y me queda en mute")
+              var esVideoNuevo = data.videoId !== currentVideoId;
               currentVideoId = data.videoId;
               pendingSrc = liveEmbedUrl(data.videoId);
               setFacade(data.videoId, '');
               // cambio automático a directo SIN que la persona haya clicado nada (el Worker lo
               // detectó solo) - el navegador no deja autoplay con sonido sin gesto del usuario,
               // así que arranca muteado y el botón de silencio queda marcado como tal
-              if(played) mountPlayer(pendingSrc, true);
+              if(played && esVideoNuevo) mountPlayer(pendingSrc, true);
               if(livePill) livePill.style.display = 'inline-flex';
               if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
             } else if(upcoming){
@@ -5582,13 +5589,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             if(livePill) livePill.style.display = 'inline-flex';
             if(foot) foot.textContent = '🔴 En vivo, pero no se puede reproducir en este sitio.';
           } else if(current && current.live && current.videoId){
+            // mismo motivo que en checkLiveAndMaybeSwitch: si ya se está viendo este directo, no
+            // se vuelve a montar el reproductor solo porque "Buscar directo" lo volvió a confirmar
+            var esVideoNuevo = current.videoId !== currentVideoId;
             currentVideoId = current.videoId;
             pendingSrc = liveEmbedUrl(current.videoId);
             setFacade(current.videoId, '');
             // cambio automático SIN clic de la persona (venía reproduciendo otra cosa y este
             // canal resultó en vivo al revisar todos) - arranca muteado, igual que en
             // checkLiveAndMaybeSwitch
-            if(yaEstabaReproduciendo) mountPlayer(pendingSrc, true);
+            if(yaEstabaReproduciendo && esVideoNuevo) mountPlayer(pendingSrc, true);
             if(livePill) livePill.style.display = 'inline-flex';
             if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
           }
