@@ -1550,6 +1550,15 @@ button{font-family:inherit;color:inherit}
 .tool-card-banner img{width:100%;height:100%;object-fit:cover;display:block}
 .tool-card-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
 .tool-card-banner.icon-bleed{background:color-mix(in srgb, var(--white) 4%, var(--bg))}
+/* pedido de Juan tras ver la maqueta "8 formas de tarjetas internas": toma el estilo 4
+   (mini-banner, a la mitad de alto) + el borde de acento del estilo 7 - pero el borde SIEMPRE
+   en var(--accent) (el color único del tema elegido), nunca un color por categoría, para que
+   las 18 tarjetas (Zona de Caza/Inversión/Blindaje) se vean parejas sin importar cuál sea. Por
+   ahora Sonar de Mercado no entra (su Índice de Indicadores es otro componente, no usa
+   .tool-card-banner, así que ya queda afuera por su cuenta). */
+.tool-card:has(.tool-card-banner.icon-bleed){border-top:3px solid var(--accent)}
+.tool-card-banner.icon-bleed{height:90px}
+.tool-card-banner.icon-bleed .ibb-icon{width:118px;max-width:118px;top:-22px;right:-18px}
 .tool-card-head{display:flex;align-items:center;gap:10px;margin-bottom:2px;padding-right:38px}
 .tool-card-num{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:800;flex-shrink:0}
 .tool-card-head .tool-icon{width:18px;height:18px;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;margin:0;flex-shrink:0;color:var(--accent)}
