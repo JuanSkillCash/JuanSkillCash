@@ -4,12 +4,12 @@ Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso
 videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Juan: vuelve a pegar el código actualizado (19-nov-2026)** - se agregó el campo
-> `scheduledStartTime` (cuándo arranca un directo programado, para mostrar la cuenta regresiva
-> que pediste - "pero no dice cuánto falta para el live"). Sigue el mismo truco de raspar la
-> página de YouTube, así que si en algún momento deja de verse la cuenta regresiva (pero el punto
-> amarillo "programado" sigue apareciendo bien), probablemente YouTube cambió el formato interno
-> de ese campo - no es grave, el sitio sigue funcionando igual, solo sin la cuenta regresiva.
+> **Ya desplegado (19-nov-2026, confirmado por Juan)** - el campo `scheduledStartTime`
+> (cuándo arranca un directo programado, para la cuenta regresiva "faltan Xh Ymin") ya está en
+> producción. Sigue el mismo truco de raspar la página de YouTube, así que si en algún momento
+> deja de verse la cuenta regresiva (pero el punto amarillo "programado" sigue apareciendo bien),
+> probablemente YouTube cambió el formato interno de ese campo - no es grave, el sitio sigue
+> funcionando igual, solo sin la cuenta regresiva.
 >
 > Cambio anterior (14-nov-2026): se agregó el campo `recientes` (últimos videos subidos del
 > canal, máximo 3, de las últimas 24h) usando el mismo truco de siempre pero sobre la página
