@@ -237,15 +237,36 @@ button{font-family:inherit;color:inherit}
       luego lo otro de bitunix y la campanita" - el punto 4 los habia puesto AL REVES (botones
       arriba, precios abajo). order:-1 + flex-basis:100% manda el ticker a SU PROPIA fila de
       primero, antes de Bitunix/Telegram/campana/tema/ayuda/cuenta (que se quedan todos juntos
-      despues, orden 0 por defecto). */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:none;flex-basis:100%;order:-1;justify-content:center;min-width:0}
-.price-ticker-item{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;white-space:nowrap}
+      despues, orden 0 por defecto).
+   6) (19-nov-2026) Juan, viendo una captura real: "no se entiende que es de SP500 esa perdida...
+      separado por una linecita sutil, la perdida un poquito mas pegada, que diga si es en 24
+      horas o en cuanto, los numeros un poco mas grandes, sin que se vea doble renglon" - cada
+      item ahora lleva una rayita vertical ANTES de el (menos el primero, BTC) como separador, el
+      texto del cambio% se achico el gap interno para que se lea mas pegado a su propio precio,
+      se agrego un periodo chiquito en la MISMA linea (24h para cripto - dato real del ticker de
+      Binance -, "dia" para los indices - dato real de Twelve Data vs el cierre anterior, SI es
+      un periodo distinto al de cripto, por eso dice diferente) y se subio un poco el tamano de
+      letra. Para que nunca se parta a una segunda fila en anchos intermedios (no tan angosto
+      como para activar el modo celular de mas abajo, pero no tan ancho como 1400px), un par de
+      @media mas abajo van ocultando RUSSELL 2000 y despues tambien S&P 500 (Juan: "dejas de
+      mostrar el ultimo precio... o el que le sigue, para que se ajuste y no tengamos 2 o 3
+      renglones de precios"). */
+.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;flex:none;flex-basis:100%;order:-1;justify-content:center;min-width:0}
+.price-ticker-item{display:inline-flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;padding:0 9px}
+.price-ticker-item:first-child{padding-left:0}
+.price-ticker-item:not(:first-child){border-left:1px solid var(--border2)}
 .price-ticker-sym{color:var(--muted2);font-weight:700}
-.price-ticker-price{color:var(--white);min-width:62px;font-variant-numeric:tabular-nums}
-.price-ticker-chg{font-size:11.5px;min-width:48px;font-variant-numeric:tabular-nums}
+.price-ticker-price{color:var(--white);min-width:58px;font-variant-numeric:tabular-nums}
+.price-ticker-chg-wrap{display:inline-flex;align-items:baseline;gap:3px}
+.price-ticker-chg{font-size:12px;font-variant-numeric:tabular-nums}
 .price-ticker-chg.up{color:var(--green)}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
+.price-ticker-period{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+@media(max-width:1599px){ .price-ticker-item[data-pt-key="rut"]{display:none} }
+@media(max-width:1389px){ .price-ticker-item[data-pt-key="spx"]{display:none} }
+@media(max-width:1219px){ .price-ticker-item[data-pt-key="ndx"]{display:none} }
+@media(max-width:1059px){ .price-ticker-item[data-pt-key="hype"]{display:none} }
 .mobile-topbar{display:flex;align-items:flex-start;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:wrap;row-gap:10px}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
@@ -510,7 +531,7 @@ button{font-family:inherit;color:inherit}
    inicio y del menú lateral; mismo patrón visual/de dropdown que .account-mini, reusa
    .account-dropdown-item para los 3 botones). Separación de 8px (antes 14px, Juan la vio muy
    abierta) entre los 3 círculos (notificaciones/ayuda/cuenta). */
-.help-mini{position:relative;margin-left:6px;flex-shrink:0}
+.help-mini{position:relative;flex-shrink:0}
 /* faltaba esta regla desde que se agrego el selector de tema - sin position:relative aqui, el
    .help-mini-dropdown (position:absolute) de adentro se posicionaba contra el ancestro
    posicionado mas cercano, que en escritorio da la casualidad de ser .mobile-topbar (tiene
@@ -519,12 +540,12 @@ button{font-family:inherit;color:inherit}
    DOM, y el menu aparecia miles de pixeles mas abajo de la pagina, invisible. Juan: "en celular
    el boton de cambiar color no sirve" - confirmado con Playwright (boundingBox del dropdown
    en y=5087 en vez de justo debajo del boton). */
-.theme-mini{position:relative;margin-left:6px;flex-shrink:0}
+.theme-mini{position:relative;flex-shrink:0}
 .help-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--muted2);font-size:15px;font-weight:800;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
 .help-mini-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--white)}
 .help-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:60;display:none}
 .help-mini-dropdown.open{display:block}
-.account-mini{position:relative;margin-left:6px;flex-shrink:0}
+.account-mini{position:relative;flex-shrink:0}
 .account-mini-btn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s;line-height:1}
 .profile-avatar-row{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 20px}
 .profile-avatar-circle{width:228px;height:228px;max-width:100%;border-radius:50%;background-color:var(--bg);border:3px solid color-mix(in srgb, var(--accent) 30%, transparent);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
@@ -1468,7 +1489,7 @@ button{font-family:inherit;color:inherit}
 @keyframes sparkTwinkle{0%,82%,100%{opacity:0;transform:scale(.3)}91%{opacity:var(--peak,1);transform:scale(1.15)}}
 @media(prefers-reduced-motion:reduce){.spark{animation:none;opacity:.4}}
 .cat-overview-desc{font-size:13px;color:var(--muted2);line-height:1.55;margin-bottom:16px}
-.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--c);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.cat-overview-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#000;padding:8px 15px;border-radius:20px;border:1.5px solid var(--c);background:var(--c);margin-top:auto;align-self:flex-start;transition:filter .15s}
 .cat-overview-card:hover .cat-overview-btn{filter:brightness(1.12)}
 
 .cat-overview-featured{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
@@ -1520,7 +1541,7 @@ button{font-family:inherit;color:inherit}
 .tool-card .tool-card-head h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;line-height:1.25;color:var(--white);margin:0;text-align:left;min-height:3.75em;display:flex;align-items:center}
 .tool-card-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;color:#4ade80;border:1px solid rgba(46,204,113,.35);background:rgba(46,204,113,.16);padding:3px 10px;border-radius:20px;flex-shrink:0;white-space:nowrap}
 .tool-card-sub{font-size:11px;color:var(--accent);font-family:'Space Mono',monospace;letter-spacing:.03em;margin:3px 0 14px;padding-left:36px;font-weight:600}
-.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);margin-top:auto;align-self:flex-start;transition:filter .15s}
+.tool-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#000;padding:8px 15px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);margin-top:auto;align-self:flex-start;transition:filter .15s}
 .tool-card:hover .tool-card-btn{filter:brightness(1.12)}
 .tool-icon{font-size:24px;height:28px;margin-bottom:8px;line-height:1;color:inherit;display:flex;align-items:center;justify-content:center;width:100%}
 .tool-card h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;line-height:1.35;color:var(--white);margin:0 0 6px;text-align:center;min-height:2.7em}
@@ -1576,7 +1597,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-auth-gate-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
 .arrecife-auth-gate-text{font-size:13px;color:var(--muted2);max-width:380px;line-height:1.55}
 .arrecife-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-shrink:0}
-.arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
+.arrecife-add-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#000;background:var(--accent);border:1.5px solid var(--accent);border-radius:20px;padding:9px 16px;cursor:pointer;transition:filter .15s}
 .arrecife-add-btn:hover{filter:brightness(1.12)}
 .arrecife-add-btn svg{width:16px;height:16px}
 /* Fase 3: varias pestañas/paneles por usuario - fila con las pestañas a la izquierda (con
@@ -1587,7 +1608,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-boards-tabs-wrap::-webkit-scrollbar{display:none}
 .arrecife-boards-tabs{display:flex;gap:8px;min-width:min-content}
 .arrecife-board-tab{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:99px;padding:7px 8px 7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease;white-space:nowrap;flex-shrink:0}
-.arrecife-board-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+.arrecife-board-tab.active{background:var(--accent);border-color:var(--accent);color:#000}
 .arrecife-board-tab-name{max-width:140px;overflow:hidden;text-overflow:ellipsis}
 .arrecife-board-tab-name[contenteditable="true"]{cursor:text;outline:none;background:color-mix(in srgb, var(--white) 8%, transparent);border-radius:4px;padding:0 3px}
 .arrecife-board-tab-del{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;flex-shrink:0;color:inherit;opacity:.7}
@@ -2618,7 +2639,7 @@ img[src=""]{display:none}
 .tf-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
 .tf-pill{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--muted2);background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:99px;padding:7px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease}
 .tf-pill:hover{border-color:var(--red);color:var(--white)}
-.tf-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+.tf-pill.active{background:var(--accent);border-color:var(--accent);color:#000}
 .ls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .ls-exchange-card{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:16px 18px}
 .ls-exchange-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:14.5px;color:var(--white);margin-bottom:12px}
@@ -3019,7 +3040,7 @@ body :where(h1, h1 *, h2, h2 *, h3, h3 *, button, .btn, [class*="title"], [class
 #pwaIosHint b{color:var(--red)}
 #pwaIosHint .pwa-ios-step{display:flex;align-items:center;gap:10px;margin-top:8px}
 #pwaIosHint .pwa-ios-step:first-of-type{margin-top:10px}
-#pwaIosHint .pwa-ios-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+#pwaIosHint .pwa-ios-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
 #pwaIosHint .pwa-ios-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted2);font-size:18px;line-height:1;cursor:pointer;padding:4px}
 @media(min-width:641px){ #pwaIosHint{ display:none !important; } }
 /* ===== Rediseño paso 2: sin neon, mas sobrio =====
@@ -3341,7 +3362,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    ofrece el link directo a YouTube en vez de dejar un reproductor roto */
 .events-video-blocked{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--muted2);font-size:13px;background:linear-gradient(160deg,var(--bg2),#000)}
 .events-video-blocked a{color:var(--accent);font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:20px;padding:7px 16px;font-size:12.5px}
-.events-video-blocked a:hover{background:var(--accent);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+.events-video-blocked a:hover{background:var(--accent);color:#000}
 /* contenedor del reproductor real - se llena/vacía por JS (mountPlayer/unmountPlayer) con un
    <iframe> NUEVO cada vez, nunca el mismo reutilizado (YT.Player.destroy() lo elimina del DOM,
    reusar la misma referencia después de eso deja la pantalla en negro) */
@@ -32665,23 +32686,33 @@ async function awardColmillos(eventType, periodKey, amount){
      API key compartida con el resto de la pagina. */
 (function(){
   var PRICE_TICKER_ITEMS = [
-    { key:'btc', label:'BTC', kind:'crypto', binance:'btcusdt' },
-    { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt' },
-    { key:'sol', label:'SOL', kind:'crypto', binance:'solusdt' },
-    { key:'hype', label:'HYPE', kind:'crypto', binance:'hypeusdt' },
-    { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40 },
-    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10 },
-    { key:'rut', label:'RUSSELL 2000', kind:'index', proxy:'IWM', scale:10 }
+    { key:'btc', label:'BTC', kind:'crypto', binance:'btcusdt', period:'24h' },
+    { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt', period:'24h' },
+    { key:'sol', label:'SOL', kind:'crypto', binance:'solusdt', period:'24h' },
+    { key:'hype', label:'HYPE', kind:'crypto', binance:'hypeusdt', period:'24h' },
+    { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40, period:'día' },
+    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día' },
+    { key:'rut', label:'RUSSELL 2000', kind:'index', proxy:'IWM', scale:10, period:'día' }
   ];
 
   var track = document.getElementById('priceTickerTrack');
   if(!track) return;
 
+  /* Juan: "no se entiende que es de SP500 esa perdida... separado por una linecita sutil, la
+     perdida un poquito mas pegada, que diga si es en 24 horas o en cuanto" - cada item ahora
+     trae: simbolo + precio (juntos, mas separados del cambio) | cambio% + periodo chiquito
+     (24h para cripto que es dato real de Binance - el 24hr ticker -, "dia" para los indices
+     que es vs el cierre anterior, dato real de Twelve Data - no es el mismo periodo para los
+     dos grupos, por eso el texto varia). La rayita vertical entre items (.price-ticker-item,
+     ver CSS) es la "linecita sutil" que separa un symbolo+precio+cambio del siguiente. */
   function buildItemHtml(item){
     return '<span class="price-ticker-item" data-pt-key="' + item.key + '">' +
       '<span class="price-ticker-sym">' + item.label + '</span>' +
       '<span class="price-ticker-price" data-pt-price>—</span>' +
-      '<span class="price-ticker-chg flat" data-pt-chg>—</span>' +
+      '<span class="price-ticker-chg-wrap">' +
+        '<span class="price-ticker-chg flat" data-pt-chg>—</span>' +
+        '<span class="price-ticker-period">' + item.period + '</span>' +
+      '</span>' +
     '</span>';
   }
   track.innerHTML = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
