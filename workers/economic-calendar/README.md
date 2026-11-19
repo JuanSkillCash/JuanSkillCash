@@ -4,6 +4,20 @@ Trae los eventos económicos (CPI, nóminas, tasas de interés, etc.), ya traduc
 coloreados en JSON, para la tabla propia de "Calendario Económico" del sitio (ver la explicación
 completa en los comentarios de `worker.js`).
 
+> **Ya desplegado (19-nov-2026, confirmado por Juan)** - se agregaron 13 alias nuevos a
+> `ALIAS_FF_A_NASDAQ` (Philly Fed Manufacturing Index, Empire State Manufacturing Index, Building
+> Permits, Housing Starts, y otros) que se quedaban en "Pendiente..." para siempre aunque ya
+> tuvieran el dato real publicado - el diccionario que traduce el nombre del evento a como lo
+> llama Nasdaq simplemente no los tenía. Verificados contra los nombres reales de Nasdaq con
+> `?debug=1` (ver abajo), no adivinados. Quedaron ~5 eventos sin alias a propósito (Nasdaq trae
+> más de una fila parecida para esos y no hay forma de saber cuál es la correcta sin verlo con
+> datos reales - ver el comentario junto a `ALIAS_FF_A_NASDAQ` en `worker.js`) y uno
+> (`Cleveland Fed Inflation Expectations`) que Nasdaq no cubre en absoluto.
+>
+> De paso quedó confirmado que el respaldo FRED está inactivo en producción (falta el secreto
+> `FRED_API_KEY`, opcional) - no afectó este arreglo, pero si en el futuro hace falta cubrir algo
+> que Nasdaq no tenga, ese sería el camino.
+
 ## Rediseño de fuentes (14-nov-2026)
 
 **TradingView se descartó por completo.** Causa confirmada del error 403: su endpoint
@@ -45,9 +59,13 @@ https://<tu-worker>.workers.dev/?debug=1
 ```
 
 Con `?debug=1` la respuesta trae `debug.ff` (si la copia de Forex Factory en KV está fresca o
-desactualizada), `debug.nasdaq` (qué días se consultaron y cuántas filas trajo cada uno) y
-`debug.fred` (si se intentó FRED para algún evento). Revisa semana del 9 al 13 de noviembre: debe
-salir CPI 0,4% / Core CPI 0,3% / PPI 0,3% / Unemployment Claims 200K / Existing Home Sales 3,75M.
+desactualizada), `debug.nasdaq` (qué días se consultaron, cuántas filas trajo cada uno y, en
+`debug.nasdaq.<fecha>.nombres`, la lista real de "nombre del evento | país" tal cual los manda
+Nasdaq ese día - sirve para encontrar el alias correcto cuando algo se queda en "Pendiente..." sin
+necesidad de adivinar), `debug.fred` (si se intentó FRED para algún evento) y
+`debug.fredApiKeyConfigurado` (true/false - si el secreto `FRED_API_KEY` está puesto en este
+Worker, sin mostrar el valor). Revisa semana del 9 al 13 de noviembre: debe salir CPI 0,4% /
+Core CPI 0,3% / PPI 0,3% / Unemployment Claims 200K / Existing Home Sales 3,75M.
 
 **Si `?debug=1` da un error 503 con `"Forex Factory respondió 429"`**: no es un error del código,
 es que Forex Factory está rechazando temporalmente por el límite de peticiones compartido entre
