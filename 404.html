@@ -5531,7 +5531,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         if(direccion === 'abajo') return ' ▼';
         return '';
       }
+      // Juan: "el lunes y el miércoles ya pasaron y sigue diciendo Pendiente... ¿por qué?" -
+      // esos dos eran "Fed Chairman Warsh Speaks" y "FOMC Meeting Minutes": discursos/actas, no
+      // publicaciones de un dato numérico - Forex Factory nunca les manda anterior/previsión
+      // porque no existe un "Actual" que reportar, así que iban a decir "Pendiente..." para
+      // siempre (no es que el dato se esté demorando, es que ese evento no tiene dato). Un
+      // evento SÍ es de este tipo cuando no trae NI anterior NI previsión - los indicadores
+      // reales (CPI, Retail Sales, etc.) siempre traen al menos el valor anterior.
+      function esEventoSinDato(ev){
+        return ev.anterior == null && ev.prevision == null;
+      }
       function celdaActualHtml(ev, ahoraMs){
+        if(ev.actual == null && esEventoSinDato(ev)) return '—';
         var pasoLaHora = Date.parse(ev.fechaUTC) <= ahoraMs;
         if(ev.actual == null){
           if(pasoLaHora) return '<span class="cal-pendiente">Pendiente…</span>';
