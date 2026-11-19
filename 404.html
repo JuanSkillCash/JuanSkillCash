@@ -1182,13 +1182,12 @@ button{font-family:inherit;color:inherit}
    nunca dorado (dorado queda reservado para "curado por Juan") */
 .indic-index-banner{position:relative;height:260px;margin:0 0 12px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
 .indic-index-banner img{width:100%;height:100%;object-fit:cover;object-position:center 75%;display:block}
-.indic-index-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
 .indic-index-banner-text{position:absolute;left:24px;right:24px;bottom:20px;z-index:1;display:flex;flex-direction:column;gap:6px}
 /* el titulo ocupa casi todo el banner (pedido de Juan) - antes era chiquito (18px) y se veia
    repetido con el .indic-guide-title que habia arriba (ya se quito, era literal el mismo
    texto dos veces); !important porque si no, la regla global de Inter lo pisa */
-.indic-index-banner-title{font-family:'Poppins',sans-serif !important;font-weight:800;letter-spacing:-.02em;font-size:clamp(28px,6vw,46px);color:var(--white);line-height:1.05}
-.indic-index-banner-sub{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.04em}
+.indic-index-banner-title{font-family:'Poppins',sans-serif !important;font-weight:800;letter-spacing:-.02em;font-size:clamp(28px,6vw,46px);color:var(--white);line-height:1.05;text-shadow:0 2px 10px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.8)}
+.indic-index-banner-sub{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.04em;text-shadow:0 1px 4px rgba(0,0,0,.75)}
 .indic-index-caption{font-size:13.5px;color:var(--muted2);line-height:1.6;max-width:640px;margin:0 0 20px}
 /* banner grande al abrir cada una de las 6 categorías principales (pedido de Juan: "cuando
    abres Sonar de Mercado tiene un banner arriba... quiero eso en las 6 cajas, un banner distinto
@@ -1196,9 +1195,8 @@ button{font-family:inherit;color:inherit}
    .indic-index-banner (que ya tenía Sonar) para que las 6 se vean parejas. */
 .tool-section-banner{position:relative;height:200px;margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
 .tool-section-banner img{width:100%;height:100%;object-fit:cover;display:block}
-.tool-section-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,rgba(9,11,22,0) 60%)}
 .tool-section-banner-text{position:absolute;left:22px;right:22px;bottom:18px;z-index:1}
-.tool-section-banner-title{font-family:'Poppins',sans-serif !important;font-weight:800;letter-spacing:-.02em;font-size:clamp(24px,4.4vw,38px);color:var(--white);line-height:1.05}
+.tool-section-banner-title{font-family:'Poppins',sans-serif !important;font-weight:800;letter-spacing:-.02em;font-size:clamp(24px,4.4vw,38px);color:var(--white);line-height:1.05;text-shadow:0 2px 10px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.8)}
 .indic-index-standalone{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(124,127,245,.08);border:1px solid rgba(124,127,245,.25);color:#fff;font-family:inherit;font-weight:700;font-size:14px;margin-bottom:22px;width:100%;text-align:left;cursor:pointer;transition:background var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
 .indic-index-standalone:hover{background:rgba(124,127,245,.14);border-color:rgba(124,127,245,.4)}
 .indic-index-depth-wrap{display:flex;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:4px}
