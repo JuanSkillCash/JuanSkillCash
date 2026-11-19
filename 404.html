@@ -4426,7 +4426,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash" width="700" height="700" fetchpriority="high" decoding="async">
       </div>
       <div class="hero-mascot-text">
-        <div class="hero-mascot-eyebrow">Bienvenido a</div>
+        <div class="hero-mascot-eyebrow" id="heroWelcomeEyebrow">Bienvenido a</div>
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
         <script>
         /* la version anterior de este script escondia el titulo (opacity:0 via .pre-split) y
@@ -14768,8 +14768,10 @@ function renderAuthState(){
   const accountLoginBtn = document.getElementById('accountLoginBtn');
   const accountBarSession = document.getElementById('accountBarSession');
   const accountBarEmail = document.getElementById('accountBarEmail');
+  const heroWelcomeEyebrow = document.getElementById('heroWelcomeEyebrow');
 
   if(currentUser){
+    if(heroWelcomeEyebrow) heroWelcomeEyebrow.textContent = 'Bienvenido, ' + getDisplayName(currentUser) + ' a';
     authGate.style.display = 'none';
     portfolioApp.style.display = 'block';
     document.getElementById('portfolioUserEmail').textContent = getDisplayName(currentUser);
@@ -14787,6 +14789,7 @@ function renderAuthState(){
     if(typeof loadAccountMiniAvatar === 'function') loadAccountMiniAvatar();
     if(authModal.classList.contains('open')) closeAuthModal();
   } else {
+    if(heroWelcomeEyebrow) heroWelcomeEyebrow.textContent = 'Bienvenido a';
     authGate.style.display = 'block';
     portfolioApp.style.display = 'none';
     selectedPortfolio = null;
