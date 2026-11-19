@@ -1,0 +1,36 @@
+name: Guardar historial de noticias
+
+# Guarda en Supabase (news_archive) los titulares que ya trae el Worker de noticias
+# (workers/rss-news/) - sin esto, una noticia desaparece para siempre en cuanto sale del RSS del
+# medio (normalmente solo trae los ultimos 20-50). Ver scripts/update_news_archive.py y
+# scripts/sql/create_news_archive.sql para el detalle completo.
+#
+# OJO: el "schedule" de GitHub Actions en este repo llega atrasado VARIAS HORAS, sin importar el
+# minuto (mismo problema ya documentado en update-economic-calendar-ff.yml) - a diferencia del
+# calendario economico, ESTE dato no necesita estar al minuto (es un archivo historico, no un
+# valor que alguien este mirando en vivo), asi que por ahora se deja solo con el "schedule" nativo
+# sin que Claude lo dispare a mano cada 30 min - si Juan nota que el historial no se esta llenando
+# seguido, se puede agregar al mismo disparo manual que ya existe para el calendario.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir requests
+
+      - name: Pedir titulares al Worker de noticias y guardar en Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_news_archive.py
