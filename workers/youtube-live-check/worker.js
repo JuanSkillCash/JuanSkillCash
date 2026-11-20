@@ -131,7 +131,95 @@ function fetchYoutube(url) {
   });
 }
 
-async function revisaCanal(channelId) {
+const YOUTUBE_API_VIDEOS_URL = 'https://www.googleapis.com/youtube/v3/videos';
+// 6h: un canal 24/7 (Telemundo, CNN, RTVE...) suele quedarse en el MISMO video de transmisión por
+// días/semanas - no hace falta revalidar el ID conocido más seguido que esto.
+const KNOWN_ID_CACHE_SECONDS = 6 * 3600;
+
+function cacheKeyIdConocido(channelId) {
+  return new Request('https://cache-interno.invalid/known-live-id/' + channelId);
+}
+
+async function obtieneIdConocido(channelId, cache) {
+  const cached = await cache.match(cacheKeyIdConocido(channelId));
+  if (!cached) return null;
+  try {
+    const data = await cached.json();
+    return data.videoId || null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function guardaIdConocido(channelId, videoId, cache) {
+  await cache.put(cacheKeyIdConocido(channelId), new Response(JSON.stringify({ videoId }), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${KNOWN_ID_CACHE_SECONDS}` },
+  }));
+}
+
+// "Plan B" del README (20-nov-2026, agregado tras el bloqueo sostenido de YouTube reportado por
+// Juan en su conexión): le pregunta a la API OFICIAL de YouTube (videos.list, 1 de las 10.000
+// unidades gratis al día) si un video YA CONOCIDO sigue en vivo - a diferencia de raspar la
+// página pública, esto es una llamada autenticada de verdad, YouTube NUNCA la trata como "tráfico
+// inusual" ni la bloquea. El límite es que necesita saber DE ANTEMANO el ID del video (esta API
+// no tiene forma barata de decir "¿cuál es el directo de este canal ahora mismo?" sin esa pista -
+// buscarlo con search.list cuesta 100 unidades, inviable revisando 9+ canales seguido). Por eso
+// solo se usa como atajo cuando ya hay un ID guardado de un raspado anterior - ver revisaCanal().
+// Devuelve null si la API misma falló (llave inválida, cuota agotada, etc.) - el llamador cae de
+// vuelta al raspado de siempre en ese caso, como si este atajo no existiera.
+async function consultaApiOficial(videoId, apiKey) {
+  try {
+    const url = YOUTUBE_API_VIDEOS_URL + '?id=' + encodeURIComponent(videoId) +
+      '&part=snippet,liveStreamingDetails&key=' + apiKey;
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const item = data.items && data.items[0];
+    if (!item) return { existe: false };
+    const lsd = item.liveStreamingDetails || {};
+    const terminado = !!lsd.actualEndTime;
+    const enVivo = !!(item.snippet && item.snippet.liveBroadcastContent === 'live') && !terminado;
+    return { existe: true, live: enVivo, title: item.snippet && item.snippet.title };
+  } catch (err) {
+    return null;
+  }
+}
+
+// Punto de entrada real (antes era revisaCanalRaspando() directo) - intenta primero el atajo de
+// la API oficial sobre un ID ya conocido (barato, nunca bloqueado); si no hay ID conocido, o ese
+// video ya terminó, o la API falló, cae al raspado de siempre. Cuando el raspado SÍ encuentra un
+// directo, guarda su ID para que la próxima revisión de este canal pueda usar el atajo.
+async function revisaCanal(channelId, env, cache) {
+  const apiKey = env && env.YOUTUBE_API_KEY;
+  if (apiKey && cache) {
+    const idConocido = await obtieneIdConocido(channelId, cache);
+    if (idConocido) {
+      const oficial = await consultaApiOficial(idConocido, apiKey);
+      if (oficial && oficial.existe && oficial.live) {
+        return {
+          live: true, videoId: idConocido, title: oficial.title || null, channelId,
+          checkedAt: Date.now(), upcoming: false, playability: 'OK', embeddable: true,
+          scheduledStartTime: null, bloqueado: false,
+          debug: {
+            fuente: 'api-oficial', httpStatus: null, finalUrl: null, htmlLength: 0,
+            hasPlayerResponse: false, consentPage: false, botCheck: false,
+            hasVideoDetails: false, channelIdMatch: null,
+          },
+        };
+      }
+      // oficial.existe===false (el video ya no existe) o oficial.live===false (terminó) o
+      // oficial===null (la API falló) - en los 3 casos se sigue de largo al raspado: puede que
+      // haya un directo NUEVO con otro ID que todavía no se conoce.
+    }
+  }
+  const resultado = await revisaCanalRaspando(channelId);
+  if (apiKey && cache && resultado.live && resultado.videoId) {
+    await guardaIdConocido(channelId, resultado.videoId, cache);
+  }
+  return resultado;
+}
+
+async function revisaCanalRaspando(channelId) {
   const resultado = {
     live: false,
     videoId: null,
@@ -315,7 +403,7 @@ async function obtieneRecientesCacheado(channelId, cache) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
@@ -341,12 +429,15 @@ export default {
     if (cached) return cached;
 
     const [resultado, recientes] = await Promise.all([
-      revisaCanal(channelId),
+      revisaCanal(channelId, env, cache),
       obtieneRecientesCacheado(channelId, cache),
     ]);
     resultado.recientes = recientes;
 
-    const huboProblema =
+    // una respuesta que vino del atajo de la API oficial (ver revisaCanal) es confiable de por sí
+    // - nunca la trae "rara" ni bloqueada, así que se salta por completo esta revisión (que es
+    // para detectar problemas del RASPADO, no aplica aquí)
+    const huboProblema = resultado.debug.fuente === 'api-oficial' ? false : (
       !!resultado.debug.error ||
       resultado.debug.consentPage ||
       resultado.debug.botCheck ||
@@ -355,7 +446,8 @@ export default {
       // pero sin videoDetails o con el video de OTRO canal - no es un error de red, pero tampoco
       // es un resultado en el que se pueda confiar para dejarlo cacheado 60s (ver el comentario
       // de "hasVideoDetails"/"channelIdMatch" más arriba)
-      (resultado.debug.hasPlayerResponse && (!resultado.debug.hasVideoDetails || resultado.debug.channelIdMatch === false));
+      (resultado.debug.hasPlayerResponse && (!resultado.debug.hasVideoDetails || resultado.debug.channelIdMatch === false))
+    );
     const ttl = huboProblema ? CACHE_SECONDS_ERROR : CACHE_SECONDS_OK;
 
     const response = new Response(JSON.stringify(resultado), {
