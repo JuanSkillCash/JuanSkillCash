@@ -5345,6 +5345,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       }
       var liveCheckAbort = null;
       var autoCheckTimer = null;
+      var allChannelsCheckTimer = null;
       function showChannel(i){
         if(liveCheckAbort){ liveCheckAbort(); liveCheckAbort = null; }
         if(autoCheckTimer){ clearInterval(autoCheckTimer); autoCheckTimer = null; }
@@ -5750,9 +5751,25 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           // un canal que se ponía en vivo mientras tanto se quedaba gris/rojo para siempre hasta
           // que alguien lo refrescara a mano. Ahora la lista completa también se revisa sola cada
           // 90s, igual que el canal activo - nadie tiene que estar pendiente ni dando clic.
-          setInterval(function(){ checkAllChannels(false); }, 90000);
+          allChannelsCheckTimer = setInterval(function(){ checkAllChannels(false); }, 90000);
         }
       }
+      // Juan: "si estoy viendo el video de YouTube y le doy atrás y me voy para otra
+      // herramienta, de fondo sigo escuchando" - al salir de Conferencias en Vivo hacia
+      // cualquier otra categoría, nada destruía el reproductor: el <iframe> seguía existiendo
+      // (solo oculto detrás de la nueva vista), así que el audio seguía sonando. Mismo patrón
+      // que ya existe para Mi Arrecife (ver unmountAllArrecifeWidgets/window.unmountAllArrecifeWidgets
+      // en showCategoryDetail/showCategoryOverview) - se expone esta función global para que esas
+      // mismas dos funciones puedan llamarla al salir de 'eventos-youtube'. También detiene los 2
+      // timers de revisión automática (el del canal activo y el de la lista completa) - no tiene
+      // sentido seguirle preguntando al Worker cada 90s mientras la persona ni está viendo esto.
+      window.teardownEventsYtPlayer = function(){
+        if(liveCheckAbort){ liveCheckAbort(); liveCheckAbort = null; }
+        if(autoCheckTimer){ clearInterval(autoCheckTimer); autoCheckTimer = null; }
+        if(allChannelsCheckTimer){ clearInterval(allChannelsCheckTimer); allChannelsCheckTimer = null; }
+        if(blockedRetryTimer){ clearTimeout(blockedRetryTimer); blockedRetryTimer = null; }
+        unmountPlayer();
+      };
     })();
     // Calendario Económico propio (reemplaza el iframe de Investing.com) - ver
     // workers/economic-calendar/worker.js para el backend. Rediseño de fuentes 14-nov-2026:
@@ -12772,6 +12789,12 @@ function showCategoryDetail(cat){
   // cualquier otra, cada widget tiene que volver a su lugar ANTES de que la categoría nueva
   // intente usar esa misma herramienta normalmente - ver unmountAllArrecifeWidgets más abajo
   if(categoryDetailView.dataset.activeCategory === 'portafolio' && cat !== 'portafolio' && typeof window.unmountAllArrecifeWidgets === 'function') window.unmountAllArrecifeWidgets();
+  // Conferencias en Vivo (Eventos y Noticias): mismo motivo que Mi Arrecife arriba - si se estaba
+  // viendo un directo de YouTube y se sale hacia cualquier otra categoría, el reproductor tiene
+  // que destruirse (no solo ocultarse) o el audio se sigue escuchando de fondo. Ver
+  // window.teardownEventsYtPlayer más arriba en el archivo (bug reportado por Juan: "le doy
+  // atrás... de fondo sigo escuchando").
+  if(categoryDetailView.dataset.activeCategory === 'eventos-youtube' && cat !== 'eventos-youtube' && typeof window.teardownEventsYtPlayer === 'function') window.teardownEventsYtPlayer();
   const enteringFromOverview = categoryDetailView.style.display !== 'block';
   // "Conferencias en Vivo"/"Calendario Económico"/"Noticias" son 3 categorías hermanas que se
   // puede saltar de una a otra SIN pasar por el overview (los 3 botones del menú llaman
@@ -12829,6 +12852,9 @@ function showCategoryOverview(){
   // mismo motivo que en showCategoryDetail: si se estaba en Mi Arrecife y se vuelve al menú
   // principal, cada widget tiene que devolverse a su sitio primero
   if(categoryDetailView.style.display === 'block' && categoryDetailView.dataset.activeCategory === 'portafolio' && typeof window.unmountAllArrecifeWidgets === 'function') window.unmountAllArrecifeWidgets();
+  // mismo motivo que en showCategoryDetail: si se estaba en Conferencias en Vivo y se vuelve al
+  // menú principal (no a otra categoría puntual), el reproductor también tiene que destruirse
+  if(categoryDetailView.style.display === 'block' && categoryDetailView.dataset.activeCategory === 'eventos-youtube' && typeof window.teardownEventsYtPlayer === 'function') window.teardownEventsYtPlayer();
   if(typeof colmillosPageView !== 'undefined' && colmillosPageView && colmillosPageView.style.display === 'block' && typeof hideColmillosPage === 'function'){
     hideColmillosPage();
   }
