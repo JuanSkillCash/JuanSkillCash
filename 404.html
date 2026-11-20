@@ -4187,7 +4187,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <button class="sb-item sb-item-section sb-item-noicon" type="button">
         <span class="sb-item-label">Skins del Tiburón</span>
       </button>
-      <button class="sb-item sb-item-section sb-item-noicon" data-sb-open-category="partners">
+      <button class="sb-item sb-item-section sb-item-noicon" data-sb-open-category="partners" data-cat-home="partners">
         <span class="sb-item-label">Aliados</span>
       </button>
       <div class="sb-cat-label sb-cat-label-static" data-category="eventos">Noticias</div>
@@ -12609,6 +12609,12 @@ function expandContainingGroups(item){
   }
 }
 /* ---- el menú lateral muestra solo las herramientas de la categoría activa (o todas, colapsadas, en el resumen) ---- */
+// Las 6 categorías agrupadas bajo el encabezado "Herramientas" en el menú lateral - Juan pidió
+// (20-nov-2026) que, igual que Comunidad/Noticias, se sigan viendo en el menú aunque se esté
+// navegando otra cosa (ej. Aliados, Noticias): antes el bloque entero de "Herramientas"
+// desaparecía del todo al entrar a cualquier categoría que no fuera una de estas 6, dejando el
+// menú con solo Comunidad/Noticias visibles ("no veo la sección de herramientas").
+const HERRAMIENTAS_CATEGORIES = ['portafolio', 'indicadores', 'rangos', 'inversion', 'trading', 'seguridad'];
 function filterSidebarNav(cat){
   document.querySelectorAll('.sb-cat-label').forEach(label => {
     const items = [];
@@ -12622,6 +12628,25 @@ function filterSidebarNav(cat){
       // mientras se ve otra distinta)
       label.style.display = '';
       setGroupItemsVisibility(items, true);
+      return;
+    }
+    if(label.dataset.category === '__herramientas'){
+      // el encabezado "Herramientas" en sí (sin items propios - sus items son las 6 categorías
+      // de abajo, cada una con su propio .sb-cat-label) - siempre visible, igual que arriba
+      label.style.display = '';
+      return;
+    }
+    if(HERRAMIENTAS_CATEGORIES.includes(label.dataset.category)){
+      // siempre visibles (nunca display:none) - pero sí se pliegan/despliegan según cuál esté
+      // activa, igual que antes
+      label.style.display = '';
+      if(cat === label.dataset.category){
+        label.classList.remove('collapsed');
+        setGroupItemsVisibility(items, true);
+      } else {
+        label.classList.add('collapsed');
+        setGroupItemsVisibility(items, false);
+      }
       return;
     }
     if(cat === null){
