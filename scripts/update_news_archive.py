@@ -17,6 +17,13 @@ hasta que el medio las empuja fuera) y, como el modelo de IA no da el mismo text
 veces, el resumen guardado iría cambiando solo con el tiempo sin razón - además de gastar cupo de
 Workers AI de más cada vez que el caché de 30 min del Worker expira entre corridas.
 
+Desde el 20-nov-2026 también guarda "importancia" (alta/baja, la clasificación que ahora hace
+esa misma llamada a Workers AI) - la usa scripts/post_important_news_telegram.py para decidir
+qué noticia manda como alerta a Telegram. Una fila guardada ANTES de este cambio se queda con
+importancia=null para siempre (ignore-duplicates no la vuelve a tocar) - eso está bien, null
+nunca hace match con el filtro "alta" del script de Telegram, así que no manda de golpe todo el
+historial viejo como si fuera nuevo.
+
 Variables de entorno requeridas:
     SUPABASE_URL
     SUPABASE_SERVICE_ROLE_KEY
@@ -65,6 +72,7 @@ def fetch_category(category):
             "resumen_largo": it.get("resumenLargo"),
             "imagen": it.get("imagen"),
             "sentimiento": it.get("sentimiento"),
+            "importancia": it.get("importancia"),
         })
     return filas
 

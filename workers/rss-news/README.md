@@ -4,14 +4,21 @@ Junta titulares de varios medios (RSS público) y los devuelve ya ordenados en J
 tarjetas "Noticias Cripto" y "Macro y Economía" de Eventos y Noticias (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Juan: vuelve a pegar el código actualizado (19-nov-2026)** - se agregaron los campos
-> `resumenLargo` (un párrafo más largo, 3-4 frases) e `imagen` (si el feed la trae), para la
-> "vista detallada" de Noticias que pediste (una noticia grande a la vez, con foto y resumen
-> más largo, con flechas para pasar a la siguiente). `resumenLargo` sale de la MISMA llamada a
-> Workers AI que ya armaba `resumen`/`sentimiento` (no es una llamada nueva, no gasta más cupo).
-> `imagen` sale del RSS del medio cuando lo trae (`<enclosure>`, `<media:content>` o un `<img>`
-> suelto en la bajada) - no todos la traen, por eso el sitio tiene que poder mostrarse bien
-> cuando sale `null` (muestra un cartel genérico en vez de romperse).
+> **Juan: vuelve a pegar el código actualizado (20-nov-2026)** - se agregó el campo
+> `importancia` (`"alta"` o `"baja"`), para las alertas de Telegram de noticias cripto clave que
+> pediste (ver `scripts/post_important_news_telegram.py`). Sale "alta" solo si la noticia entra
+> en una de las 12 categorías que elegiste una por una (ETF, SEC/regulación, Fed, hackeo grande,
+> quiebra/fraude grande, movimiento de precio fuerte, adopción institucional, país adoptando
+> cripto, upgrade de red grande, empresa grande no-cripto con producto cripto, ballena grande,
+> figura política) - igual que `resumenLargo`, sale de la MISMA llamada a Workers AI que ya
+> armaba `resumen`/`sentimiento`/`resumenLargo`, no es una llamada nueva, no gasta más cupo.
+>
+> Cambio anterior (confirmado por Juan, 19-nov-2026): se agregaron los campos `resumenLargo` (un
+> párrafo más largo, 3-4 frases) e `imagen` (si el feed la trae), para la "vista detallada" de
+> Noticias (una noticia grande a la vez, con foto y resumen más largo, con flechas para pasar a
+> la siguiente). `imagen` sale del RSS del medio cuando lo trae (`<enclosure>`, `<media:content>`
+> o un `<img>` suelto en la bajada) - no todos la traen, por eso el sitio tiene que poder
+> mostrarse bien cuando sale `null` (muestra un cartel genérico en vez de romperse).
 >
 > Cambio anterior (confirmado por Juan): se le agregó la bajada/entradilla de la noticia (cuando
 > el feed la trae) como contexto extra para el modelo que arma el "resumen", porque antes solo
