@@ -38,14 +38,9 @@ jobs:
       # Alertas de Telegram de noticias cripto clave (pedido de Juan, 20-nov-2026) - va DESPUES
       # del paso de arriba a proposito, en el mismo job: necesita que las noticias nuevas de esta
       # misma corrida ya esten guardadas en news_archive (con su "importancia") antes de revisar
-      # que mandar. Ver scripts/post_important_news_telegram.py para el filtro completo.
-      # continue-on-error=true SOLO mientras falta que Juan pase el link del tema de Telegram
-      # (ver TODO en post_important_news_telegram.py) - el script se niega a correr sin eso, y sin
-      # este continue-on-error ESTE job completo (incluido el guardado del historial de arriba,
-      # que si funciona) se marcaria como "fallido" cada 30 min en GitHub Actions por algo que
-      # todavia no esta configurado. Quitar continue-on-error en cuanto se complete el TODO.
+      # que mandar. Ver scripts/post_important_news_telegram.py para el filtro completo (12
+      # categorias + exclusion de XRP/XLM/HBAR/FLR, todo elegido por Juan a mano).
       - name: Mandar a Telegram las noticias cripto de importancia alta
-        continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -42,14 +42,11 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TABLE = "news_archive"
 
-# Mismo chat que ya usa el boletín diario (post_crypto_bulletin_telegram.py) - sacado del link
-# que compartió Juan ese día. El tema/hilo de "noticias" es OTRO, todavía no lo tenemos: Juan dijo
-# "al canal que ya tenemos de noticias" pero ese thread_id nunca se guardó en el código (solo
-# existe el de "Análisis Crypto", usado para el boletín). Falta que Juan pase el link del tema de
-# noticias (t.me/juanskll/<numero>) para completar TELEGRAM_THREAD_ID - hasta entonces este script
-# se niega a correr, a propósito, para no arriesgarse a mandar en el tema equivocado.
+# Mismo chat que ya usa el boletín diario (post_crypto_bulletin_telegram.py). El tema/hilo es OTRO
+# (el de "Análisis Crypto" es 8549, usado por el boletín) - Juan pasó el link de este, el de
+# noticias: https://t.me/juanskll/8540
 TELEGRAM_CHAT = "@juanskll"
-TELEGRAM_THREAD_ID = None  # TODO Juan: reemplazar con el ID real del tema "noticias"
+TELEGRAM_THREAD_ID = 8540
 
 # Palabras que descartan una noticia aunque la IA la haya marcado "alta" (pedido explícito de
 # Juan, 20-nov-2026: "excluir todo lo relacionado con xrp, xlm, hbar, Flare... cryptos ISO").
