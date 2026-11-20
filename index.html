@@ -5300,6 +5300,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       // directo en vez de mostrarse primero la lista de subidas y cambiar un instante después
       var lastResults = {};
       var currentVideoId = null;
+      // reintento automático cuando YouTube bloqueó la verificación (ver "bloqueado" más abajo) -
+      // sin esto, Juan reportó "no pasa nada" dando clic en "Buscar directo" seguido: el caché de
+      // 15s de Cloudflare le devolvía la MISMA respuesta bloqueada una y otra vez, dar clic de
+      // nuevo antes de que pase ese tiempo no sirve de nada. Un solo timer compartido (se cancela
+      // y se vuelve a armar si hay otro bloqueo antes de que dispare) reintenta solo, sin que haya
+      // que seguir dando clic - si sigue bloqueado, se vuelve a programar otro reintento.
+      var blockedRetryTimer = null;
       function setFacade(videoIdForThumb, label){
         if(blockedEl) blockedEl.style.display = 'none';
         facade.style.display = 'flex';
@@ -5712,6 +5719,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
           } else if(manual && algunBloqueado){
             if(foot) foot.textContent = 'YouTube bloqueó momentáneamente la verificación de algunos canales (demasiadas peticiones) - vuelve a intentar en unos segundos.';
+          }
+          if(algunBloqueado){
+            // 20s: un poco más que los 15s que cachea el Worker un resultado bloqueado, para no
+            // pegarle otra vez al mismo caché todavía vigente - si para entonces YouTube sigue
+            // bloqueando, este mismo bloque vuelve a programar el siguiente reintento solo
+            if(blockedRetryTimer) clearTimeout(blockedRetryTimer);
+            blockedRetryTimer = setTimeout(function(){ blockedRetryTimer = null; checkAllChannels(false); }, 20000);
           }
         }).finally(function(){
           if(manual){
