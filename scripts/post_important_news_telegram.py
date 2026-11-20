@@ -72,7 +72,7 @@ def fetch_pendientes() -> list[dict]:
             "category": "eq.crypto",
             "importancia": "eq.alta",
             "telegram_enviado": "eq.false",
-            "select": "id,title,resumen,link,imagen",
+            "select": "id,title,resumen,resumen_largo,source,imagen",
             "order": "published_at.asc",
             "limit": str(MAX_PER_RUN),
         },
@@ -96,15 +96,25 @@ def marca_resuelta(row_id: int) -> None:
 
 
 def build_caption(row: dict) -> str:
-    # corto a propósito (pedido de Juan: "que el texto no sea tan largo") - título + una frase +
-    # link, nada de resumen_largo aquí
+    # Juan, 20-nov-2026, segundo pedido (el primero fue "que el texto no sea tan largo", por eso
+    # antes se usaba "resumen" corto + el link al final): ahora pidió lo contrario - "que no
+    # traigan el link y tuviera un poco más de detalles claves el texto, está muy simple" y luego
+    # "quizás un poquito más largo" todavía. Se quita el link del todo y se usan LOS DOS campos que
+    # ya arma la misma llamada a Workers AI (no son llamadas nuevas): "resumen" (la frase corta de
+    # contexto) seguido de "resumen_largo" (el párrafo de 50-90 palabras que también alimenta la
+    # "vista detallada" del sitio) - juntos dan más cuerpo al mensaje sin tocar esa llamada a la
+    # IA. "Fuente" al final da de dónde salió la noticia sin que sea un link clickeable.
     titulo = (row.get("title") or "").strip()
     resumen = (row.get("resumen") or "").strip()
-    link = row.get("link") or ""
+    detalle = (row.get("resumen_largo") or "").strip()
+    fuente = (row.get("source") or "").strip()
     partes = [f"🚨 {titulo}"]
     if resumen:
         partes.append(resumen)
-    partes.append(link)
+    if detalle and detalle != resumen:
+        partes.append(detalle)
+    if fuente:
+        partes.append(f"Fuente: {fuente}")
     return "\n\n".join(partes)
 
 
