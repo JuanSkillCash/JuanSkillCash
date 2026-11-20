@@ -4,7 +4,34 @@ Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso
 videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
 completa en los comentarios de `worker.js`).
 
-> **Ya desplegado (19-nov-2026, 2º cambio del día, confirmado por Juan)** - reportaste
+> **Juan: vuelve a pegar el código actualizado (20-nov-2026)** - reportaste "varios canales en
+> vivo a esta hora y no me está mostrando que está en vivo", con TODOS los canales en rojo a la
+> vez (no solo uno). Lo confirmamos pidiéndote que abrieras el link directo del Worker
+> (`?channel=...`) desde tu propio navegador: YouTube te estaba respondiendo con HTTP 429 y una
+> redirección a `google.com/sorry/...` (la pantalla de "verificar que no eres un robot") - el
+> borde de Cloudflare que te atiende a ti se quedó sin cupo de peticiones sin clave ante YouTube,
+> algo por IP/región, no por canal (por eso afectaba a TODOS los canales de tu visita a la vez,
+> mientras a mí, desde otra IP, me seguía respondiendo bien).
+>
+> Esa página de bloqueo es muy cortita y casi nunca trae ninguna de las frases que ya buscaba
+> `esPaginaDeBotCheck()` ("unusual traffic", "no eres un robot"...), así que se colaba como
+> `live:false` normal - el sitio no tenía forma de distinguir "de verdad no está en vivo" de "no
+> se pudo revisar, YouTube bloqueó la petición". Dos arreglos:
+>
+> 1. **Backend**: nueva función `esBloqueoDeGoogle()` que detecta este caso específico (HTTP 429 o
+>    redirección a `google.com/sorry/`) y lo marca igual que un `botCheck` (acorta el caché a 15s
+>    para reintentar pronto) + un campo nuevo en la respuesta, `"bloqueado":true`.
+> 2. **Frontend** (`index.html`): cuando `bloqueado` sale `true`, el sitio YA NO pinta el punto en
+>    rojo (eso afirmaría "confirmado que no está en vivo", que es falso) - deja el canal tal cual
+>    estaba (el último dato confiable que sí se tenía, o gris si nunca se supo) y, si fue un
+>    "Buscar directo" manual, avisa en texto que YouTube bloqueó la verificación momentáneamente.
+>
+> Esto no evita que YouTube bloquee esa IP de Cloudflare de nuevo - solo evita que el sitio lo
+> MUESTRE como una mentira ("sin directo ahora" cuando en realidad no se pudo ni preguntar). Si
+> esto te sigue pasando SEGUIDO (no solo una vez cada tanto), ya toca el "Plan B" de la API
+> oficial de YouTube (ver más abajo).
+>
+> Cambio anterior (19-nov-2026, 2º cambio del día, confirmado por Juan) - reportaste
 > que un canal que SÍ está en vivo (confirmado por ti mismo en YouTube) a veces el sitio lo
 > marcaba en vivo y a veces no, sin patrón claro, incluso entre celular y computador al mismo
 > tiempo. Dos causas posibles, ambas reales en este tipo de Worker:
@@ -46,12 +73,16 @@ completa en los comentarios de `worker.js`).
 ```json
 {"live":true,"videoId":"Qr61waJ6AZg","title":"CNN en Español en vivo","channelId":"UC_lEiu6917IJz03TnntWUaQ",
  "checkedAt":1762500000000,"upcoming":false,"playability":"OK","embeddable":true,
- "scheduledStartTime":null,
+ "scheduledStartTime":null,"bloqueado":false,
  "recientes":[{"videoId":"zWfV3LJDnno","titulo":"La FAA levanta la suspensión de vuelos...","hace":"hace 4 h"},
               {"videoId":"9xNy2G3dSxQ","titulo":"FAA ordena la suspensión de todos los vuelos...","hace":"hace 8 h"}],
  "debug":{"httpStatus":200,"finalUrl":"https://www.youtube.com/watch?v=Qr61waJ6AZg","htmlLength":612345,
           "hasPlayerResponse":true,"consentPage":false,"botCheck":false}}
 ```
+
+- `bloqueado`: `true` cuando YouTube bloqueó/rate-limitó la petición (HTTP 429 o redirección a
+  `google.com/sorry/`) - el sitio NO debe leer esto como "confirmado que no está en vivo", sino
+  como "no se pudo revisar ahora mismo" (ver el cambio del 20-nov-2026 arriba).
 
 - `upcoming`: hay un directo anunciado pero todavía no arrancó (no intentar reproducir).
 - `scheduledStartTime`: timestamp en milisegundos de cuándo arranca el directo programado (solo

@@ -104,6 +104,19 @@ function esPaginaDeBotCheck(html) {
   return /unusual traffic|detectamos tr[aá]fico inusual|not a robot|no eres un robot/i.test(html);
 }
 
+// Bloqueo real visto el 20-nov-2026 (reportado por Juan: "todos los canales en rojo", confirmado
+// pidiéndole que abriera el link directo del Worker desde SU conexión): YouTube redirige a
+// google.com/sorry/... con HTTP 429 cuando el borde de Cloudflare que le atiende a esa visita ya
+// gastó su cupo de peticiones sin clave - la página de /sorry/ es muy corta (unos pocos KB, un
+// captcha) y casi nunca trae ninguna de las frases que busca esPaginaDeBotCheck(), así que ese
+// bloqueo se colaba como "live:false" normal (el canal se veía "sin directo" en vez de "no se
+// pudo revisar ahora"). Esto es por IP/borde, no por canal: un bloqueo afecta TODOS los canales
+// de esa visita a la vez, coincide exactamente con lo que reportó Juan.
+function esBloqueoDeGoogle(httpStatus, finalUrl) {
+  if (httpStatus === 429) return true;
+  return !!(finalUrl && /google\.com\/sorry\//i.test(finalUrl));
+}
+
 function fetchYoutube(url) {
   return fetch(url, {
     headers: {
@@ -129,6 +142,9 @@ async function revisaCanal(channelId) {
     playability: null,
     embeddable: null,
     scheduledStartTime: null,
+    // true = YouTube bloqueó/rate-limiteó esta petición (ver esBloqueoDeGoogle) - el frontend NO
+    // debe leer esto como "de verdad no está en vivo", sino como "no se pudo revisar ahora mismo"
+    bloqueado: false,
   };
   const debug = {
     httpStatus: null,
@@ -156,7 +172,8 @@ async function revisaCanal(channelId) {
     const html = await ytResp.text();
     debug.htmlLength = html.length;
     debug.consentPage = esPaginaDeConsentimiento(html, ytResp.url);
-    debug.botCheck = esPaginaDeBotCheck(html);
+    debug.botCheck = esPaginaDeBotCheck(html) || esBloqueoDeGoogle(ytResp.status, ytResp.url);
+    resultado.bloqueado = debug.botCheck;
 
     const player = extraeJsonTrasVar(html, 'ytInitialPlayerResponse');
     debug.hasPlayerResponse = !!player;
