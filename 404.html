@@ -5743,6 +5743,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         } else {
           btn.addEventListener('click', function(){ checkAllChannels(true); });
           checkAllChannels(false);
+          // Juan: "voy a yo a estar pendiente de ese canal" - antes SOLO el canal activo (el que
+          // se está viendo) se revisaba solo cada 90s (autoCheckTimer, más abajo); la lista
+          // completa de canales del panel derecho solo se revisaba al cargar la página o al dar
+          // clic en "Buscar directo" a mano - si alguien dejaba la página abierta sin tocar nada,
+          // un canal que se ponía en vivo mientras tanto se quedaba gris/rojo para siempre hasta
+          // que alguien lo refrescara a mano. Ahora la lista completa también se revisa sola cada
+          // 90s, igual que el canal activo - nadie tiene que estar pendiente ni dando clic.
+          setInterval(function(){ checkAllChannels(false); }, 90000);
         }
       }
     })();
