@@ -212,21 +212,22 @@ button{font-family:inherit;color:inherit}
 .sidebar::-webkit-scrollbar-track{background:transparent}
 .sidebar::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--accent) 35%, transparent);border-radius:4px}
 .sidebar::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb, var(--accent) 55%, transparent)}
-/* en escritorio "colapsado" (clase .collapsed en el <aside>) es el modo MANUAL que deja el
-   botoncito #sbToggle: una barrita angosta de solo iconos (ancho var(--sidebar-w-collapsed),
-   74px) en vez de ocultar el sidebar del todo. (19-nov-2026, varias rondas) Ojo: esto NO es el
-   estado de entrada - Juan aclaró explícitamente que el menú debe cargar ABIERTO (con texto,
-   ancho completo, SIN esta clase) y que lo "contraído" que pedía era otra cosa: los grupos de
-   categorías adentro (.sb-cat-label) cerrados por defecto, que ya se maneja aparte con
-   filterSidebarNav(null) al arrancar (ver más abajo donde se llama) y no tiene nada que ver con
-   esta clase. Esta clase .collapsed solo se aplica si el usuario mismo le da clic a #sbToggle
-   para angostar el menú a modo ícono (no se guarda en localStorage - vuelve a abrir normal en la
-   siguiente carga). El ancho del sidebar es un item mas de .app{display:flex}, asi que .main se
-   reacomoda solo, sea cual sea la pagina que este abierta adentro. En celular esto no afecta
-   nada: el sidebar sigue oculto con transform fuera de pantalla sin importar esta clase, y la
-   regla de abajo (dentro de @media(max-width:860px)) la pisa, mostrando el menu completo con
-   texto como siempre cuando SI se abre (hamburguesa de arriba) */
-.sidebar.collapsed{width:var(--sidebar-w-collapsed);border-right:1px solid color-mix(in srgb, var(--accent) 14%, transparent)}
+/* en escritorio "colapsado" (clase .collapsed en el <aside>) significa OCULTO DEL TODO
+   (ancho:0), no una barrita angosta de iconos - eso se probó (19-nov-2026) y Juan lo rechazó
+   explícitamente: "no chiquitico en una línea al lado izquierdo, así angosto, no". Lo que sí
+   quiere al colapsar: el sidebar desaparece por completo y solo queda un cuadradito arriba a la
+   izquierda con las 3 rayitas de hamburguesa (.topbar-brand/#mobileMenuBtn, ver más abajo en
+   @media(min-width:861px)) - sin logo ni nada más adentro - que al darle clic vuelve a abrir el
+   menú completo. El ESTADO DE ENTRADA sigue siendo sin esta clase (sidebar abierto de una vez,
+   con texto) - lo "contraído" que Juan pedía originalmente son los grupos de categorías de
+   adentro (.sb-cat-label) cerrados por defecto, que ya se maneja aparte con
+   filterSidebarNav(null) al arrancar y no tiene nada que ver con esta clase. El ancho del sidebar
+   es un item mas de .app{display:flex}, asi que .main se reacomoda solo, sea cual sea la pagina
+   que este abierta adentro. En celular esto no afecta nada: el sidebar sigue oculto con
+   transform fuera de pantalla sin importar esta clase, y la regla de abajo (dentro de
+   @media(max-width:860px)) la pisa, mostrando el menu completo con texto como siempre cuando SI
+   se abre (hamburguesa de arriba) */
+.sidebar.collapsed{width:0;border-right:0}
 .sidebar.collapsed .sb-top{gap:10px;padding:16px 8px}
 .sb-top{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 14px 8px}
 .sb-top-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}
@@ -2891,12 +2892,15 @@ img[src=""]{display:none}
   .account-mini,.help-mini,.theme-mini{margin-left:4px}
 }
 @media(min-width:861px){
-  /* el botoncito de hamburguesa flotante (.topbar-brand) era para cuando el sidebar colapsado
-     quedaba oculto del todo (ancho 0) - ya no aplica: ahora "colapsado" siempre deja visible el
-     rail de iconos, con su propia flechita de adentro (#sbToggle) para expandir, así que este
-     botón flotante sobraría encima del rail en escritorio. Se deja oculto siempre en escritorio;
-     en celular (@media max-width:860px más abajo) sigue siendo la única forma de abrir el menú */
+  /* el botoncito de hamburguesa flotante (.topbar-brand, solo el ícono de 3 rayitas, sin logo ni
+     nada más) en escritorio solo se ve cuando el menu esta cerrado del todo (.sidebar.collapsed,
+     ancho:0 - ver esa clase más arriba) - con el menu abierto para cerrarlo se usa la flechita de
+     adentro (#sbToggle), no hace falta mostrar los dos a la vez. position:fixed (en vez de quedar
+     en el flujo normal de .mobile-topbar) para que, al colapsar el sidebar y hacer scroll hacia
+     abajo, el botoncito se quede flotando visible en vez de desaparecer hacia arriba junto con el
+     resto de la topbar (pedido explícito de Juan) */
   .topbar-brand{display:none}
+  .sidebar.collapsed ~ .main .topbar-brand{display:flex;position:fixed;top:18px;left:18px;z-index:260}
   .mobile-topbar{position:relative;min-height:58px}
 }
 
