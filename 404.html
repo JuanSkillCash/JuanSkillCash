@@ -5400,6 +5400,16 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             var live = !!(data && data.live && data.videoId);
             var upcoming = !live && !!(data && data.upcoming);
             var recientes = (data && Array.isArray(data.recientes)) ? data.recientes : [];
+            // bloqueo de YouTube (20-nov-2026, reportado por Juan: "varios canales en vivo y no me
+            // muestra que están en vivo", TODOS los canales en rojo a la vez): el Worker respondió
+            // con "bloqueado:true" - YouTube le dio captcha/429 al borde de Cloudflare que atendió
+            // esta visita, no es que el canal de verdad no esté en vivo. Se deja tal cual estaba
+            // (gris si nunca se supo, o lo último confiable que sí se supo) en vez de ponerlo en
+            // rojo, que afirmaría algo que el Worker no pudo confirmar de verdad.
+            if(data && data.bloqueado){
+              if(manual && foot) foot.textContent = 'YouTube bloqueó momentáneamente la verificación (demasiadas peticiones) - vuelve a intentar en unos segundos.';
+              return;
+            }
             // si este canal es el que se está reproduciendo AHORA MISMO y esta lectura no trae
             // evidencia de un video EN VIVO distinto al que ya se está viendo, se descarta por
             // completo (ni el punto, ni el resumen, ni lastResults se tocan) - una lectura
@@ -5647,12 +5657,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                 playability: data && data.playability, embeddable: data && data.embeddable,
                 scheduledStartTime: data && data.scheduledStartTime,
                 recientes: (data && Array.isArray(data.recientes)) ? data.recientes : [],
+                bloqueado: !!(data && data.bloqueado),
               };
             })
-            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null, scheduledStartTime: null, recientes: [] }; });
+            .catch(function(){ return { idx: x.idx, live: false, videoId: null, title: null, upcoming: false, playability: null, embeddable: null, scheduledStartTime: null, recientes: [], bloqueado: false }; });
         })).then(function(results){
           var yaEstabaReproduciendo = played;
+          var algunBloqueado = false;
           results.forEach(function(r){
+            // bloqueo de YouTube (ver comentario igual en checkLiveAndMaybeSwitch) - se deja ese
+            // canal tal cual estaba, no se afirma "sin directo" sobre algo que no se pudo revisar
+            if(r.bloqueado){ algunBloqueado = true; return; }
             // mismo motivo que en checkLiveAndMaybeSwitch: si es el canal que se está
             // reproduciendo ahora mismo y esta lectura no trae un video EN VIVO distinto al que
             // ya se está viendo, se descarta (no se mueve el punto a rojo por una lectura rara)
@@ -5695,6 +5710,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             }
             if(livePill) livePill.style.display = 'inline-flex';
             if(foot) foot.textContent = '🔴 Transmitiendo en vivo ahora mismo.';
+          } else if(manual && algunBloqueado){
+            if(foot) foot.textContent = 'YouTube bloqueó momentáneamente la verificación de algunos canales (demasiadas peticiones) - vuelve a intentar en unos segundos.';
           }
         }).finally(function(){
           if(manual){
