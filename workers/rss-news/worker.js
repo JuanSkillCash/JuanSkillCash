@@ -18,7 +18,8 @@
  * Las de noticias responden:
  *   {"items":[{"title":"...","link":"...","source":"CoinDesk","publishedAt":169...,
  *              "resumen":"...","resumenLargo":"...","imagen":"https://..."|null,
- *              "sentimiento":"alcista|bajista|neutral"}, ...],"checkedAt":169...}
+ *              "sentimiento":"alcista|bajista|neutral","importancia":"alta|baja"}, ...],
+ *    "checkedAt":169...}
  * La de moderación responde: {"flagged":true|false}
  *
  * "resumenLargo" e "imagen" (19-nov-2026): para la "vista detallada" de Noticias (una noticia
@@ -29,6 +30,14 @@
  * (<enclosure>, <media:content>/<media:thumbnail>, o un <img> suelto dentro de la descripción) -
  * no todos los medios la traen, por eso puede salir `null` y el sitio debe poder mostrarse bien
  * sin ella (un cartel genérico en vez de romperse).
+ *
+ * "importancia" (20-nov-2026): para las alertas de Telegram de noticias cripto clave que pidió
+ * Juan (ver scripts/post_important_news_telegram.py) - "alta" solo si la noticia entra en una de
+ * 12 categorías exactas que Juan eligió a mano (ETF, SEC/regulación, Fed, hackeo grande,
+ * quiebra/fraude grande, movimiento de precio fuerte, adopción institucional, país adoptando
+ * cripto, upgrade de red grande, empresa grande no-cripto lanzando producto cripto, ballena
+ * grande, figura política). Mismo truco que resumenLargo: una línea más en la MISMA llamada a
+ * Workers AI, no una petición nueva.
  *
  * Cacheado 30 minutos en el borde de Cloudflare (compartido entre TODAS las visitas, no por
  * visitante) - las noticias no cambian segundo a segundo, no tiene sentido pedirle a cada
@@ -220,24 +229,42 @@ async function traduceTitulo(texto, env, debug) {
 // fácil de leer con una expresión regular sin que un modelo de lenguaje "invente" un JSON mal
 // formado y rompa el parseo.
 async function analizaTitulo(tituloOriginalIngles, descripcionOriginalIngles, env, debug) {
-  const vacio = { resumen: null, resumenLargo: null, sentimiento: null };
+  const vacio = { resumen: null, resumenLargo: null, sentimiento: null, importancia: null };
   try {
     // la bajada/entradilla real de la noticia (cuando el feed la trae) se le pasa aparte del
     // título, como contexto - sin esto el modelo solo tenía el título para trabajar y el
     // "resumen" terminaba siendo casi el mismo título parafraseado, sin aportar nada nuevo
     const contexto = descripcionOriginalIngles ? '\nBajada de la noticia (más contexto, en inglés): "' + descripcionOriginalIngles + '"\n' : '';
-    // DETALLE (19-nov-2026, para la "vista detallada" que pidió Juan) va en la MISMA llamada que
-    // SENTIMIENTO/RESUMEN - no es una petición nueva a Workers AI, solo una 3ª línea en el mismo
+    // DETALLE (19-nov-2026, para la "vista detallada" que pidió Juan) e IMPORTANCIA (20-nov-2026,
+    // para las alertas de Telegram de noticias clave que pidió Juan) van en la MISMA llamada que
+    // SENTIMIENTO/RESUMEN - no son peticiones nuevas a Workers AI, solo más líneas en el mismo
     // formato de respuesta, para no duplicar el gasto del cupo gratis diario.
+    // Los 12 temas de IMPORTANCIA son EXACTAMENTE los que Juan eligió uno por uno (de una lista
+    // más amplia que se le mostró) para las alertas de Telegram - no inventar ni agregar otros
+    // sin que él los pida explícitamente.
     const prompt = 'Eres un analista que explica noticias de cripto y economía a principiantes, en español.\n' +
       'Para la siguiente noticia (viene en inglés), responde EXACTAMENTE en este formato, sin nada antes ni después:\n' +
       'SENTIMIENTO: alcista, bajista o neutral\n' +
       'RESUMEN: una frase corta en español (máximo 20 palabras) que agregue contexto o explique por qué le podría importar a alguien que invierte en cripto - NUNCA repitas ni parafrasees el título, di algo que el título no dice (el motivo, el dato detrás, la consecuencia)\n' +
-      'DETALLE: un párrafo más largo en español (entre 50 y 90 palabras, 3-4 frases) que explique la noticia con más contexto que RESUMEN - de qué se trata, por qué pasó y qué podría significar para alguien que invierte en cripto o sigue la economía. Igual que en RESUMEN, no repitas el título tal cual.\n\n' +
+      'DETALLE: un párrafo más largo en español (entre 50 y 90 palabras, 3-4 frases) que explique la noticia con más contexto que RESUMEN - de qué se trata, por qué pasó y qué podría significar para alguien que invierte en cripto o sigue la economía. Igual que en RESUMEN, no repitas el título tal cual.\n' +
+      'IMPORTANCIA: alta o baja - responde "alta" SOLO si la noticia trata sobre uno de estos temas:\n' +
+      '(1) aprobación/rechazo de un ETF cripto o un flujo grande de dinero hacia/desde un ETF\n' +
+      '(2) una medida o decisión regulatoria de la SEC u otro gobierno\n' +
+      '(3) una decisión de la Reserva Federal (Fed) u otro banco central que afecte al mercado cripto\n' +
+      '(4) un hackeo o exploit grande (robo de fondos)\n' +
+      '(5) la quiebra o un fraude grande de una empresa, exchange o fondo cripto\n' +
+      '(6) un movimiento de precio muy fuerte (más de ~5% en el día) de una cripto grande como BTC o ETH\n' +
+      '(7) una empresa grande comprando o agregando cripto a su balance (adopción institucional)\n' +
+      '(8) un país adoptando cripto oficialmente (moneda de curso legal, reserva estatal, etc.)\n' +
+      '(9) una actualización o desarrollo grande de una red importante (upgrade mayor, hard fork grande)\n' +
+      '(10) una empresa grande NO cripto (ej. Visa, PayPal, un banco) lanzando un producto cripto\n' +
+      '(11) una "ballena" moviendo una cantidad enorme de fondos\n' +
+      '(12) una figura política importante (ej. un presidente) haciendo una declaración o medida sobre cripto\n' +
+      'Para cualquier otro tema (opiniones, análisis técnico, actualizaciones menores, partnerships chicos, noticias de proyectos pequeños) responde "baja".\n\n' +
       'Título: "' + tituloOriginalIngles + '"' + contexto;
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 280,
+      max_tokens: 300,
     });
     if (debug) debug.respuestaCrudaAnalisis = result;
     const texto = (result && result.response) || '';
@@ -246,10 +273,12 @@ async function analizaTitulo(tituloOriginalIngles, descripcionOriginalIngles, en
     // DETALLE puede traer varias frases (con saltos de línea) - se corta en el siguiente
     // encabezado en mayúsculas si el modelo agrega algo más después, o al final del texto
     const detMatch = texto.match(/DETALLE:\s*([\s\S]+?)(?:\n[A-ZÁÉÍÓÚÑ]+:|$)/i);
+    const impMatch = texto.match(/IMPORTANCIA:\s*(alta|baja)/i);
     return {
       sentimiento: sentMatch ? sentMatch[1].toLowerCase() : null,
       resumen: resMatch ? decodeEntities(resMatch[1].split('\n')[0].trim()) : null,
       resumenLargo: detMatch ? decodeEntities(detMatch[1].trim()) : null,
+      importancia: impMatch ? impMatch[1].toLowerCase() : null,
     };
   } catch (err) {
     if (debug) debug.motivoAnalisis = 'Excepción al pedir resumen/sentimiento: ' + String(err);
@@ -364,7 +393,7 @@ export default {
       // description solo era insumo para analizaTitulo (el "resumen" que sí se manda ya la
       // reemplaza) - no hace falta mandarla también cruda al sitio
       const { description, ...rest } = it;
-      return { ...rest, title: titulo, resumen: analisis.resumen, resumenLargo: analisis.resumenLargo, sentimiento: analisis.sentimiento };
+      return { ...rest, title: titulo, resumen: analisis.resumen, resumenLargo: analisis.resumenLargo, sentimiento: analisis.sentimiento, importancia: analisis.importancia };
     }));
 
     const body = JSON.stringify({ items, checkedAt: Date.now(), ...(debugWanted ? { debug: debugInfo } : {}) });

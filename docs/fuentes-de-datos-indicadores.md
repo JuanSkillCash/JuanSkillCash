@@ -93,3 +93,10 @@ Los 3 workflows de Telegram (`post-crypto-bulletin-telegram-daily.yml`, `post-fn
 `post-dominance-telegram-daily.yml`) dependen de un disparo manual (`workflow_dispatch`) porque el
 `schedule` nativo de GitHub Actions en este repo llega atrasado 3-6 horas — se disparan a mano cada
 mañana a la hora correcta. No afectan ningún dato del sitio, solo el mensaje que se envía al canal.
+
+**Alertas de noticias cripto clave** (`update-news-archive.yml`, agregada 20-nov-2026): va como un
+2º paso dentro del mismo workflow que guarda el historial de noticias (`scripts/post_important_news_telegram.py`,
+con `continue-on-error: true` mientras falta configurar `TELEGRAM_THREAD_ID` — ver TODO en ese
+archivo). Lee de `news_archive`, no pide nada nuevo a ninguna fuente — usa el campo `importancia`
+(alta/baja) que ya viene de la misma llamada a Workers AI que arma `resumen`/`sentimiento` en
+`workers/rss-news/worker.js`.
