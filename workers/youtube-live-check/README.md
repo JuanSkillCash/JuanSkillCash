@@ -1,10 +1,33 @@
 # Worker: ¿está este canal de YouTube en vivo? + temas recientes
 
 Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso trae sus últimos
-videos subidos ("temas recientes"), sin necesitar una API key de YouTube (ver la explicación
-completa en los comentarios de `worker.js`).
+videos subidos ("temas recientes") - ver la explicación completa en los comentarios de `worker.js`.
 
-> **Juan: vuelve a pegar el código actualizado (20-nov-2026)** - reportaste "varios canales en
+> **Juan: vuelve a pegar el código actualizado (20-nov-2026, 2º cambio del día - "Plan B")** -
+> después del bloqueo sostenido de YouTube hacia tu conexión (ver el cambio de abajo), armamos el
+> "Plan B" que ya estaba documentado al final de este README: ahora el Worker usa la **llave de la
+> API oficial de YouTube** (`YOUTUBE_API_KEY`, el secreto que ya guardaste en Cloudflare) como
+> atajo para los canales 24/7 que casi nunca cambian de video (Telemundo, CNN, RTVE, France24,
+> euronews, MILENIO, Infobae, Negocios TV, DW Español...).
+>
+> Cómo funciona: la primera vez que el raspado de siempre encuentra un canal en vivo, el Worker
+> guarda ese ID de video 6 horas. En la SIGUIENTE revisión de ese mismo canal, en vez de volver a
+> raspar la página (el método que YouTube puede bloquear), le pregunta a la API oficial "¿este
+> video específico sigue en vivo?" - una llamada autenticada de verdad (`videos.list`, 1 de las
+> 10.000 unidades gratis al día) que YouTube NUNCA trata como "tráfico inusual". Si confirma que
+> sigue en vivo, ni siquiera se raspa esta vez. Si el video ya terminó (o la API falla por algún
+> motivo), cae de vuelta al raspado normal - puede que haya un directo NUEVO con otro ID.
+>
+> Lo que esto NO resuelve: canales que arrancan un directo nuevo con un ID que todavía no
+> conocemos (Casa Blanca, ruedas de prensa sueltas, etc.) siguen necesitando el raspado para
+> DESCUBRIR ese primer ID - ahí el riesgo de bloqueo sigue igual que antes. Pero para los canales
+> 24/7 (la mayoría de los 15), una vez que se conoce su ID, prácticamente deja de raspar - y por
+> lo tanto deja de poder ser bloqueado para ese canal.
+>
+> Si `YOUTUBE_API_KEY` no está configurado (o la llave falla por lo que sea), el Worker se
+> comporta exactamente igual que antes de este cambio - no rompe nada, solo no tiene el atajo.
+>
+> Cambio anterior (mismo día) - reportaste "varios canales en
 > vivo a esta hora y no me está mostrando que está en vivo", con TODOS los canales en rojo a la
 > vez (no solo uno). Lo confirmamos pidiéndote que abrieras el link directo del Worker
 > (`?channel=...`) desde tu propio navegador: YouTube te estaba respondiendo con HTTP 429 y una
@@ -101,27 +124,34 @@ completa en los comentarios de `worker.js`).
 
 ## Si `live` sale mal, revisa el `debug`
 
+- `"debug":{"fuente":"api-oficial",...}` → esta respuesta NO vino de raspar la página, vino del
+  atajo de la API oficial (ver "Plan B" abajo) - los demás campos de `debug` (httpStatus,
+  finalUrl, etc.) quedan vacíos a propósito, no aplican a este camino.
 - `"consentPage":true` → YouTube sigue mandando la pantalla de "antes de continuar", pese a la
   cabecera `Cookie` que ya intenta evitarla. Avísame.
-- `"botCheck":true` → YouTube detectó la IP de Cloudflare como tráfico de robot. Avísame (este
-  es el caso donde haría falta el "Plan B" de abajo).
+- `"botCheck":true` → YouTube detectó la IP de Cloudflare como tráfico de robot (incluye el
+  bloqueo con HTTP 429 / redirección a `google.com/sorry/` - ver "bloqueado" más abajo). El
+  "Plan B" ya implementado reduce cuánto pasa esto para los canales 24/7, pero sigue pudiendo
+  pasar en canales que arrancan un directo con un ID nuevo que todavía no se conoce.
 - `"hasPlayerResponse":false` con `"httpStatus":200` y sin `consentPage`/`botCheck` → YouTube
   cambió otra vez el formato de la página. Mándame el `"htmlLength"` que salió y lo reviso.
 
-## Plan B (solo si `botCheck` sale en `true` seguido, es decir YouTube bloquea Cloudflare)
+## Plan B - IMPLEMENTADO (20-nov-2026)
 
-No implementado todavía - documentado aquí como lo que seguiría si hace falta:
+Ya no es un plan pendiente - ver el cambio de arriba. Resumen de cómo quedó, para referencia:
 
-1. Una sola llamada a la API oficial de YouTube: `videos.list` con `part=snippet,liveStreamingDetails`
-   y hasta 50 IDs de video a la vez (cuesta solo **1 unidad** por llamada, de las 10.000
-   unidades/día gratis) - **nunca** `search.list` (cuesta 100 unidades por llamada, se acabaría
-   la cuota del día enseguida entre varios canales). `snippet.liveBroadcastContent=="live"` = en
-   vivo.
-2. El problema es conseguir el ID del video candidato sin la API oficial (que es lo que este
-   Worker hace hoy raspando la página) - el feed RSS que se había pensado para esto
-   (`youtube.com/feeds/videos.xml?channel_id=...`) **quedó confirmado muerto, da 404** (probado
-   el 14-nov-2026 con 3 canales distintos) - **no usarlo**. Si se llega a necesitar el Plan B,
-   hay que investigar de cero una forma de conseguir el ID del video candidato.
-
-Si llegas a necesitarlo, dímelo con el `debug` completo de un caso con `botCheck:true` y lo
-armamos con calma (necesita una API key de YouTube Data API v3 nueva, como secreto del Worker).
+1. `videos.list` con `part=snippet,liveStreamingDetails` (cuesta solo **1 unidad** por llamada, de
+   las 10.000 unidades/día gratis) - **nunca** `search.list` (100 unidades por llamada, inviable
+   revisando varios canales seguido). `snippet.liveBroadcastContent=="live"` y sin
+   `liveStreamingDetails.actualEndTime` = sigue en vivo.
+2. El problema seguía siendo conseguir el ID del video candidato sin la API oficial (el feed RSS
+   que se había pensado para esto, `youtube.com/feeds/videos.xml?channel_id=...`, sigue muerto, da
+   404 - no usarlo). Solución real: no se necesita descubrir el ID por adelantado - se usa el ID
+   que el raspado de siempre YA encontró la primera vez, guardado 6 horas (ver
+   `obtieneIdConocido`/`guardaIdConocido` en `worker.js`), y la API oficial solo CONFIRMA que ese
+   mismo video sigue en vivo en revisiones futuras. Cuando ese video termina, se cae de vuelta al
+   raspado para descubrir el siguiente - el raspado nunca desaparece del todo, solo se usa mucho
+   menos seguido para los canales que mantienen el mismo video por horas/días/semanas.
+3. Requiere el secreto `YOUTUBE_API_KEY` en el Worker (Settings → Variables and Secrets). Si no
+   está configurado, o la llave falla, el Worker funciona exactamente igual que antes de este
+   cambio (sin el atajo) - nunca rompe nada por faltar o fallar la llave.
