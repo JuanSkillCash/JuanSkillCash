@@ -140,7 +140,26 @@ function cacheKeyIdConocido(channelId) {
   return new Request('https://cache-interno.invalid/known-live-id/' + channelId);
 }
 
-async function obtieneIdConocido(channelId, cache) {
+// Guardado del "ID conocido" (20-nov-2026, 2ª vuelta): la primera versión de esto usaba SOLO
+// caches.default, que es un caché POR BORDE de Cloudflare (cada centro de datos tiene el suyo,
+// no comparten entre sí) - Juan reportó "sigue sin funcionar" después de confirmar que el borde
+// que le atiende A ÉL sigue bloqueado por YouTube: ese borde nunca iba a tener oportunidad de
+// "aprender" el ID por sí solo, sin importar cuántas veces otros visitantes (en otros bordes) sí
+// lo descubrieran. Arreglo real: si hay un namespace de KV (env.YT_KNOWN_IDS, compartido de
+// verdad entre TODOS los bordes de Cloudflare) se usa ese primero - así, en cuanto CUALQUIER
+// visitante en CUALQUIER borde descubre el video en vivo de un canal, el borde de Juan puede
+// usar ese mismo dato sin tener que raspar (ni bloquearse) él mismo. Sin ese namespace
+// configurado, se sigue usando el caché por borde de antes (mejor que nada, pero no resuelve el
+// caso de un borde bloqueado todo el tiempo).
+async function obtieneIdConocido(channelId, env, cache) {
+  if (env && env.YT_KNOWN_IDS) {
+    try {
+      const v = await env.YT_KNOWN_IDS.get(channelId);
+      return v || null;
+    } catch (err) {
+      return null;
+    }
+  }
   const cached = await cache.match(cacheKeyIdConocido(channelId));
   if (!cached) return null;
   try {
@@ -151,7 +170,13 @@ async function obtieneIdConocido(channelId, cache) {
   }
 }
 
-async function guardaIdConocido(channelId, videoId, cache) {
+async function guardaIdConocido(channelId, videoId, env, cache) {
+  if (env && env.YT_KNOWN_IDS) {
+    try {
+      await env.YT_KNOWN_IDS.put(channelId, videoId, { expirationTtl: KNOWN_ID_CACHE_SECONDS });
+      return;
+    } catch (err) { /* sigue al respaldo de abajo */ }
+  }
   await cache.put(cacheKeyIdConocido(channelId), new Response(JSON.stringify({ videoId }), {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${KNOWN_ID_CACHE_SECONDS}` },
   }));
@@ -191,8 +216,8 @@ async function consultaApiOficial(videoId, apiKey) {
 // directo, guarda su ID para que la próxima revisión de este canal pueda usar el atajo.
 async function revisaCanal(channelId, env, cache) {
   const apiKey = env && env.YOUTUBE_API_KEY;
-  if (apiKey && cache) {
-    const idConocido = await obtieneIdConocido(channelId, cache);
+  if (apiKey) {
+    const idConocido = await obtieneIdConocido(channelId, env, cache);
     if (idConocido) {
       const oficial = await consultaApiOficial(idConocido, apiKey);
       if (oficial && oficial.existe && oficial.live) {
@@ -213,8 +238,8 @@ async function revisaCanal(channelId, env, cache) {
     }
   }
   const resultado = await revisaCanalRaspando(channelId);
-  if (apiKey && cache && resultado.live && resultado.videoId) {
-    await guardaIdConocido(channelId, resultado.videoId, cache);
+  if (apiKey && resultado.live && resultado.videoId) {
+    await guardaIdConocido(channelId, resultado.videoId, env, cache);
   }
   return resultado;
 }

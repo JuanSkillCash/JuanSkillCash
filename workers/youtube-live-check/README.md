@@ -3,29 +3,45 @@
 Revisa si un canal de YouTube está transmitiendo en vivo ahora mismo, y de paso trae sus últimos
 videos subidos ("temas recientes") - ver la explicación completa en los comentarios de `worker.js`.
 
-> **Juan: vuelve a pegar el código actualizado (20-nov-2026, 2º cambio del día - "Plan B")** -
-> después del bloqueo sostenido de YouTube hacia tu conexión (ver el cambio de abajo), armamos el
-> "Plan B" que ya estaba documentado al final de este README: ahora el Worker usa la **llave de la
-> API oficial de YouTube** (`YOUTUBE_API_KEY`, el secreto que ya guardaste en Cloudflare) como
-> atajo para los canales 24/7 que casi nunca cambian de video (Telemundo, CNN, RTVE, France24,
-> euronews, MILENIO, Infobae, Negocios TV, DW Español...).
+> **Juan: vuelve a pegar el código actualizado (20-nov-2026, 3er cambio del día - "Plan B",
+> 2ª vuelta) Y crea el namespace de KV de abajo** - la 1ª versión del "Plan B" (atajo con la API
+> oficial) guardaba el "ID de video conocido" en el caché normal de Cloudflare, que es **por
+> borde** (cada centro de datos de Cloudflare tiene el suyo, no se comparten entre sí). Probaste y
+> seguía sin funcionar - tiene sentido: el borde que te atiende A TI sigue bloqueado por YouTube,
+> así que NUNCA iba a tener la oportunidad de "aprender" el ID por sí solo, sin importar cuántas
+> veces el resto de visitantes (en otros bordes, sin bloqueo) sí lo descubrieran.
 >
-> Cómo funciona: la primera vez que el raspado de siempre encuentra un canal en vivo, el Worker
-> guarda ese ID de video 6 horas. En la SIGUIENTE revisión de ese mismo canal, en vez de volver a
-> raspar la página (el método que YouTube puede bloquear), le pregunta a la API oficial "¿este
-> video específico sigue en vivo?" - una llamada autenticada de verdad (`videos.list`, 1 de las
-> 10.000 unidades gratis al día) que YouTube NUNCA trata como "tráfico inusual". Si confirma que
-> sigue en vivo, ni siquiera se raspa esta vez. Si el video ya terminó (o la API falla por algún
-> motivo), cae de vuelta al raspado normal - puede que haya un directo NUEVO con otro ID.
+> Arreglo real: el ID conocido ahora se guarda en un **namespace de KV** de Cloudflare - a
+> diferencia del caché normal, esto SÍ es compartido de verdad entre TODOS los bordes. En cuanto
+> CUALQUIER visitante (en cualquier parte del mundo, en un borde sin bloqueo) descubre el video en
+> vivo de un canal, tu borde ya puede leer ese mismo dato y confirmarlo con la API oficial sin
+> tener que raspar (ni bloquearse) él mismo.
 >
-> Lo que esto NO resuelve: canales que arrancan un directo nuevo con un ID que todavía no
-> conocemos (Casa Blanca, ruedas de prensa sueltas, etc.) siguen necesitando el raspado para
-> DESCUBRIR ese primer ID - ahí el riesgo de bloqueo sigue igual que antes. Pero para los canales
-> 24/7 (la mayoría de los 15), una vez que se conoce su ID, prácticamente deja de raspar - y por
-> lo tanto deja de poder ser bloqueado para ese canal.
+> **Paso nuevo que falta (una sola vez)**: crear el namespace de KV y conectarlo al Worker:
+> 1. En Cloudflare, menú izquierdo → **Almacenamiento y bases de datos** → **KV** → **Crear
+>    namespace** → nómbralo `skillcash-youtube-known-ids` → Crear.
+> 2. Entra de nuevo al Worker **`skillcash-youtube-live`** → **Settings** → baja hasta
+>    **"Bindings"** (o "Vinculaciones") → **"Add"** → elige **"KV Namespace"**.
+> 3. En **"Variable name"** escribe exactamente: `YT_KNOWN_IDS`
+> 4. En **"KV namespace"** elige el que acabas de crear (`skillcash-youtube-known-ids`).
+> 5. Guarda/Deploy.
 >
-> Si `YOUTUBE_API_KEY` no está configurado (o la llave falla por lo que sea), el Worker se
-> comporta exactamente igual que antes de este cambio - no rompe nada, solo no tiene el atajo.
+> Sin ese namespace conectado (o si algo falla), el Worker sigue funcionando igual que la 1ª
+> versión del Plan B (caché por borde, el atajo solo sirve si tu PROPIO borde logró aprender el
+> ID) - no se rompe nada, solo no resuelve el caso de un borde bloqueado todo el tiempo como el
+> tuyo.
+>
+> Cómo queda funcionando (resto del Plan B, igual que antes): la primera vez que el raspado de
+> siempre encuentra un canal en vivo, se guarda ese ID de video 6 horas en el KV compartido. En la
+> SIGUIENTE revisión de ese mismo canal (en CUALQUIER borde), en vez de raspar, se le pregunta a
+> la API oficial "¿este video específico sigue en vivo?" (`videos.list`, 1 de las 10.000 unidades
+> gratis al día, nunca tratada como "tráfico inusual"). Si el video ya terminó (o la API falla),
+> se cae de vuelta al raspado normal - puede que haya un directo NUEVO con otro ID.
+>
+> Lo que esto sigue sin resolver: el PRIMER descubrimiento de un canal que arranca un directo
+> nuevo con un ID todavía desconocido (Casa Blanca, ruedas de prensa sueltas) necesita que ALGÚN
+> borde (no necesariamente el tuyo) logre raspar sin ser bloqueado - una vez que CUALQUIERA lo
+> logra, todos los demás bordes (incluido el tuyo) se benefician al instante via KV.
 >
 > Cambio anterior (mismo día) - reportaste "varios canales en
 > vivo a esta hora y no me está mostrando que está en vivo", con TODOS los canales en rojo a la
@@ -155,3 +171,12 @@ Ya no es un plan pendiente - ver el cambio de arriba. Resumen de cómo quedó, p
 3. Requiere el secreto `YOUTUBE_API_KEY` en el Worker (Settings → Variables and Secrets). Si no
    está configurado, o la llave falla, el Worker funciona exactamente igual que antes de este
    cambio (sin el atajo) - nunca rompe nada por faltar o fallar la llave.
+4. El ID conocido se guarda en un **namespace de KV** (`YT_KNOWN_IDS`, ver instrucciones de
+   creación arriba) - compartido de verdad entre TODOS los bordes de Cloudflare, a diferencia del
+   caché normal (`caches.default`), que es por borde. Esto importa porque un bloqueo de YouTube
+   puede ser por borde/región: si el borde que atiende a un visitante en particular está
+   bloqueado de forma sostenida, con el caché por borde ese visitante NUNCA se beneficiaría del
+   atajo (su propio borde nunca lograría aprender el ID); con KV, en cuanto CUALQUIER borde
+   descubre el ID, todos los demás (bloqueados o no) pueden usarlo de inmediato. Sin ese namespace
+   conectado, cae de vuelta al caché por borde (sigue funcionando, solo que sin ese beneficio
+   cruzado entre bordes).
