@@ -32850,7 +32850,16 @@ async function awardColmillos(eventType, periodKey, amount){
     const low = text.toLowerCase();
     const hit = ARRECIFE_QUOTE_SYMBOLS.find(it => it.label.toLowerCase() === low || it.q.split(' ').indexOf(low) !== -1);
     if(hit) return hit.symbol;
-    return text.toUpperCase().replace(/\s+/g, '');
+    const clean = text.toUpperCase().replace(/\s+/g, '');
+    // si ya viene con bolsa explícita (ej. "NASDAQ:NFLX", para una acción que no está en la
+    // lista de arriba) se respeta tal cual, sin tocarla
+    if(clean.indexOf(':') !== -1) return clean;
+    // pedido explícito de Juan: "el precio sí o sí tiene que venir de Binance porque debe ser en
+    // vivo" - cualquier cripto que no esté en la lista de arriba (todas esas YA apuntan a
+    // BINANCE:...) cae aquí, así que se arma el símbolo de Binance a mano en vez de mandar el
+    // texto suelto (que TradingView podría resolver con datos de otra fuente, no
+    // necesariamente en vivo). Si ya termina en USDT se usa tal cual, si no, se le agrega.
+    return 'BINANCE:' + (clean.endsWith('USDT') ? clean : clean + 'USDT');
   }
   // crea (o, al restaurar un panel guardado, recrea) la definición de UNA instancia de "Precio
   // Rápido" - instanceId es único por instancia (ver arrecifeAddWidgetToGrid), nunca se comparte.
