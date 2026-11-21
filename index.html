@@ -12791,6 +12791,10 @@ function showCategoryDetail(cat){
   document.querySelectorAll('.tool-section[data-category]').forEach(section => {
     section.style.display = section.dataset.category === cat ? 'block' : 'none';
   });
+  // las cajas de herramienta de esta categoría recién se vuelven visibles ahora mismo - sus
+  // íconos fantasma (ver más abajo en el archivo) solo se pueden medir/colocar con la caja ya
+  // visible, por eso se escanean de nuevo cada vez que se entra a una categoría
+  if(typeof window.scanForGhostIcons === 'function') window.scanForGhostIcons();
   setIndicMobileMode(cat === 'indicadores');
   filterSidebarNav(cat);
   if(enteringFromOverview) logToolUsage(cat);
@@ -32032,6 +32036,89 @@ async function awardColmillos(eventType, periodKey, amount){
   } else {
     init();
   }
+})();
+</script>
+<script>
+/* "ícono fantasma" (pedido de Juan, 21-nov-2026): además del ícono grande que ya sangra en la
+   esquina de cada caja con banner .icon-bleed (las 6 tarjetas de categoría de la portada Y las
+   tarjetas de cada herramienta adentro de cada categoría - Sonar de Mercado por dentro no usa
+   este tipo de tarjeta así que queda afuera solo), se agregan unas copias chiquitas del MISMO
+   ícono (70% más chicas, 50% más tenues) regadas por el resto de la caja, sin que se encimen
+   entre ellas ni con el ícono grande.
+   El tamaño real del ícono grande depende del ancho de cada tarjeta (es un % en CSS, no un px
+   fijo), así que no se puede calcular a mano - se mide con getBoundingClientRect() una vez la
+   caja ya es visible. Esto es clave para las tarjetas de herramienta: viven dentro de
+   .tool-section[data-category], ocultas (display:none) hasta que esa categoría se abre, así que
+   medirlas en el momento de cargar la página daría 0x0. Por eso scanForGhostIcons() se expone en
+   window y se vuelve a llamar cada vez que se abre una categoría (ver showCategoryDetail) -
+   dataset.ghostsDone evita duplicar el trabajo en una caja ya procesada. */
+(function(){
+  function addGhostIcons(banner){
+    if(banner.dataset.ghostsDone) return;
+    var main = banner.querySelector(':scope > .ibb-icon');
+    if(!main) return;
+    var bRect = banner.getBoundingClientRect();
+    if(bRect.width < 20 || bRect.height < 20) return; // todavía oculta (categoría sin abrir) - se reintenta después
+    banner.dataset.ghostsDone = '1';
+    var svgHTML = main.innerHTML;
+    var mRect = main.getBoundingClientRect();
+    var ghostSize = Math.max(8, mRect.width * 0.3); // 70% más chico que el ícono grande
+    var pad = ghostSize * 0.3;
+    var mainBox = {
+      left: mRect.left - bRect.left - pad,
+      top: mRect.top - bRect.top - pad,
+      right: mRect.right - bRect.left + pad,
+      bottom: mRect.bottom - bRect.top + pad,
+    };
+    var maxX = bRect.width - ghostSize;
+    var maxY = bRect.height - ghostSize;
+    if(maxX < 10 || maxY < 10) return;
+    var placed = [];
+    var count = 4;
+    for(var i=0;i<count;i++){
+      var tries = 0, x, y, ok;
+      do{
+        x = Math.random()*maxX;
+        y = Math.random()*maxY;
+        ok = !(x+ghostSize > mainBox.left && x < mainBox.right && y+ghostSize > mainBox.top && y < mainBox.bottom);
+        if(ok){
+          // choque real entre cuadrados (NO alcanza con la distancia entre esquinas: dos
+          // cuadrados pueden estar a esa distancia en diagonal y aun así encimarse) - un
+          // cuadrado no choca con otro solo si está separado en X o en Y por al menos su lado
+          // (+ un respiro chiquito para que no queden pegados)
+          var gap = ghostSize * 0.2;
+          for(var j=0;j<placed.length;j++){
+            var p = placed[j];
+            var choca = !(x+ghostSize+gap <= p.x || x >= p.x+ghostSize+gap || y+ghostSize+gap <= p.y || y >= p.y+ghostSize+gap);
+            if(choca){ ok = false; break; }
+          }
+        }
+        tries++;
+      } while(!ok && tries < 60);
+      if(!ok) continue; // no se encontró hueco libre tras varios intentos - mejor ninguno que uno encimado
+      placed.push({ x: x, y: y });
+      var ghost = document.createElement('span');
+      ghost.className = 'ibb-icon';
+      ghost.setAttribute('aria-hidden', 'true');
+      // sin rotación random: una rotación agranda la silueta VISIBLE del cuadrado más allá de su
+      // caja lógica (hasta ~41% más en diagonal a 45°), así que dos fantasmas sin choque en la
+      // caja lógica (que es lo único que se midió arriba) podían terminar encimados de verdad en
+      // pantalla una vez rotados - se detectó con Playwright, no a simple vista. transform:none
+      // deja la caja lógica y la silueta visible exactamente iguales, que es lo que garantiza
+      // que el cálculo de "no se encimen" de arriba sea cierto de verdad.
+      ghost.style.cssText = 'left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;right:auto;bottom:auto;' +
+        'width:' + ghostSize.toFixed(1) + 'px;height:' + ghostSize.toFixed(1) + 'px;max-width:none;' +
+        'opacity:.5;transform:none;';
+      ghost.innerHTML = svgHTML;
+      banner.appendChild(ghost);
+    }
+  }
+  function scanForGhostIcons(root){
+    (root || document).querySelectorAll('.icon-bleed').forEach(addGhostIcons);
+  }
+  window.scanForGhostIcons = scanForGhostIcons;
+  scanForGhostIcons();
+  window.addEventListener('load', function(){ scanForGhostIcons(); });
 })();
 </script>
 <script>
