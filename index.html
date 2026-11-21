@@ -1713,7 +1713,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-quote-search-row svg{flex-shrink:0;color:var(--muted)}
 .arrecife-quote-search-row input{flex:1;min-width:0;background:none;border:none;color:var(--white);font-size:13px;outline:none}
 .arrecife-quote-search-hint{font-size:10.5px;color:var(--muted)}
-.arrecife-quote-widget{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:12px;background:var(--grad-caja);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent)}
+.arrecife-quote-widget{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:12px;background:var(--grad-caja);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);overflow:hidden}
 .arrecife-quote-change{position:absolute;top:0;right:0;z-index:2;width:22px;height:22px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,color .15s}
 .arrecife-quote-change:hover{background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--white)}
 .arrecife-quote-head{display:flex;align-items:center;gap:6px}
@@ -1727,6 +1727,15 @@ button{font-family:inherit;color:inherit}
 .arrecife-quote-chg.flat{color:var(--muted)}
 .arrecife-quote-live{display:flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.04em;color:var(--muted)}
 .arrecife-quote-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:pillDotPulse 1.6s ease-in-out infinite}
+/* mini-gráfico real (cierres por hora, últimas 24h, directo de la misma API de Binance que ya
+   usa el resto del widget) pedido por Juan tras ver el sparkline de CoinMarketCap - línea sola,
+   sin ejes ni grilla (no hay espacio ni falta hace en una tarjeta tan chica), el color sigue la
+   misma convención sube/baja que el resto del sitio en vez de un tono fijo */
+.arrecife-quote-spark-wrap{display:flex;align-items:center;justify-content:center;width:100%;min-height:26px}
+.arrecife-quote-spark{width:100%;max-width:150px;height:26px;flex-shrink:0}
+.arrecife-quote-spark polyline{fill:none;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.arrecife-quote-spark.up polyline{stroke:var(--green)}
+.arrecife-quote-spark.down polyline{stroke:var(--red)}
 .arrecife-widget-body .indic-chart-card,.arrecife-widget-body .calc{padding:0;border:none;background:none;box-shadow:none}
 /* .chart-breakout (todos los gráficos) usa margin negativo para "salirse" del padding de
    .calc/.indic-chart-card y pegar contra el borde de la tarjeta grande normal - aquí arriba
@@ -32253,6 +32262,12 @@ async function awardColmillos(eventType, periodKey, amount){
     // (tabs+filtro+buscador+favoritos+grilla+lista+paginación, el contenido más denso de todo
     // el catálogo) - más alto que una calculadora típica por defecto, pero se puede achicar
     table:    { minW:4, maxW:12, minH:5, maxH:10, defW:6, defH:7 },
+    // "Precio Rápido": Juan reportó la tarjeta de Ethereum cortada contra el margen inferior al
+    // mínimo tamaño que permitía la familia 'kpi' compartida (minH:2) - en vez de tocar esa regla
+    // (la usan muchos otros indicadores de una sola cifra que sí caben bien en 2 filas), esta
+    // familia aparte solo la usan las INSTANCIAS reales de Precio Rápido (la entrada de catálogo
+    // 'w-quote-template' se queda en 'kpi' para seguir listada bajo "Indicadores clave")
+    quote:    { minW:2, maxW:4,  minH:3, maxH:5,  defW:3, defH:3 },
   };
   const ARRECIFE_FAMILY_LABELS = { kpi:'Indicadores clave', chart:'Gráficos', calc:'Calculadoras', news:'Noticias', calendar:'Calendario', video:'Video', table:'Tablas y listas' };
 
@@ -32904,6 +32919,25 @@ async function awardColmillos(eventType, periodKey, amount){
       })
       .catch(() => cb(null));
   }
+  // mini-gráfico real (pedido por Juan viendo el sparkline de CoinMarketCap): cierres por hora de
+  // las últimas 24h, directo de la misma API pública de klines de Binance que ya usa el sitio en
+  // otros gráficos (ver fetchBinanceKlines más arriba) - sin proxy, sin llave, CORS ya permitido
+  function arrecifeFetchQuoteSparkline(sym, cb){
+    fetch('https://api.binance.com/api/v3/klines?symbol=' + sym + '&interval=1h&limit=24')
+      .then(r => { if(!r.ok) throw new Error('binance klines failed'); return r.json(); })
+      .then(rows => cb((rows || []).map(r => parseFloat(r[4])).filter(isFinite)))
+      .catch(() => cb(null));
+  }
+  function arrecifeQuoteSparklineSvg(closes){
+    if(!closes || closes.length < 2) return '';
+    const w = 100, h = 26;
+    const min = Math.min.apply(null, closes), max = Math.max.apply(null, closes);
+    const span = (max - min) || 1;
+    const stepX = w / (closes.length - 1);
+    const pts = closes.map((c, i) => (i * stepX).toFixed(1) + ',' + (h - ((c - min) / span) * h).toFixed(1)).join(' ');
+    const up = closes[closes.length - 1] >= closes[0];
+    return '<svg class="arrecife-quote-spark ' + (up ? 'up' : 'down') + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><polyline points="' + pts + '"/></svg>';
+  }
   // crea (o, al restaurar un panel guardado, recrea) la definición de UNA instancia de "Precio
   // Rápido" - instanceId es único por instancia (ver arrecifeAddWidgetToGrid), nunca se comparte.
   function arrecifeRegisterQuoteInstance(instanceId, initialSymbolRaw){
@@ -32914,10 +32948,12 @@ async function awardColmillos(eventType, periodKey, amount){
     // connectBinanceSymbol() en el ticker principal del sitio - cada tarjeta se reconecta sola
     // sin afectar a las demás
     let ws = null, reconnectTimer = null, retryMs = 2000, wsSymbol = null;
+    let sparkTimer = null; // refresca el mini-gráfico cada 5min - no hace falta por cada tick del websocket
     function closeSocket(){
       if(reconnectTimer){ clearTimeout(reconnectTimer); reconnectTimer = null; }
       wsSymbol = null;
       if(ws){ try{ ws.onclose = null; ws.onerror = null; ws.close(); }catch(e){} ws = null; }
+      if(sparkTimer){ clearInterval(sparkTimer); sparkTimer = null; }
     }
     function connectQuoteSocket(sym){
       closeSocket();
@@ -32965,16 +33001,26 @@ async function awardColmillos(eventType, periodKey, amount){
             '<input type="text" placeholder="Bitcoin, ETH, PEPE..." list="arrecifeQuoteList" autocomplete="off">' +
           '</form>' +
           '<datalist id="arrecifeQuoteList">' + ARRECIFE_QUOTE_SYMBOLS.map(it => '<option value="' + it.label.replace(/"/g,'&quot;') + '">').join('') + '</datalist>' +
-          '<div class="arrecife-quote-search-hint">Elige de la lista o escribe el ticker exacto</div>' +
+          '<div class="arrecife-quote-search-hint">Elige una opción de la lista, o escribe el ticker y dale Enter</div>' +
         '</div>';
-      bodyEl.querySelector('form').addEventListener('submit', e => {
-        e.preventDefault();
-        const input = bodyEl.querySelector('input');
-        const picked = arrecifeResolveQuoteSymbol(input.value);
+      function pick(text){
+        const picked = arrecifeResolveQuoteSymbol(text);
         if(!picked) return;
         currentSymbol = picked;
         renderQuote();
         arrecifeScheduleSave();
+      }
+      bodyEl.querySelector('form').addEventListener('submit', e => {
+        e.preventDefault();
+        pick(bodyEl.querySelector('input').value);
+      });
+      // Juan: "yo puse Litecoin... toca darle enter para que funcione" - al elegir una opción del
+      // <datalist> el navegador SÍ dispara 'input' (aunque no haya submit), así que si el valor
+      // actual calza EXACTO con una de las etiquetas de la lista (no con texto libre a medio
+      // escribir) se abre sola, sin esperar el Enter
+      const labelSet = new Set(ARRECIFE_QUOTE_SYMBOLS.map(it => it.label.toLowerCase()));
+      bodyEl.querySelector('input').addEventListener('input', e => {
+        if(labelSet.has(e.target.value.trim().toLowerCase())) pick(e.target.value);
       });
     }
     function renderQuote(){
@@ -32991,6 +33037,7 @@ async function awardColmillos(eventType, periodKey, amount){
             '<span class="arrecife-quote-sym">' + displaySym + '</span>' +
           '</div>' +
           '<div class="arrecife-quote-price">—</div>' +
+          '<div class="arrecife-quote-spark-wrap"></div>' +
           '<div class="arrecife-quote-chg-row">' +
             '<span class="arrecife-quote-chg flat">—</span>' +
             '<span class="arrecife-quote-live"><span class="arrecife-quote-live-dot"></span>EN VIVO</span>' +
@@ -33003,9 +33050,19 @@ async function awardColmillos(eventType, periodKey, amount){
         if(img){ img.src = url; img.hidden = false; }
       });
       connectQuoteSocket(sym);
+      function loadSparkline(){
+        arrecifeFetchQuoteSparkline(sym, closes => {
+          if(!bodyEl || wsSymbol !== sym) return; // la tarjeta cambió de símbolo (o se cerró) mientras pedía
+          const wrap = bodyEl.querySelector('.arrecife-quote-spark-wrap');
+          if(wrap && closes) wrap.innerHTML = arrecifeQuoteSparklineSvg(closes);
+        });
+      }
+      loadSparkline();
+      if(sparkTimer) clearInterval(sparkTimer);
+      sparkTimer = setInterval(loadSparkline, 5 * 60 * 1000);
     }
     WIDGET_REGISTRY[instanceId] = {
-      id: instanceId, label:'Precio Rápido', family:'kpi',
+      id: instanceId, label:'Precio Rápido', family:'quote',
       mount: function(body){ bodyEl = body; if(currentSymbol) renderQuote(); else renderSearch(); },
       // a diferencia de los demás widgets, este no reparenta nada de otra parte del sitio (todo
       // su contenido es propio, creado aquí) - al desmontar solo hay que cerrar su websocket y
