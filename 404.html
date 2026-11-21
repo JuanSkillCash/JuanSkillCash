@@ -1451,7 +1451,17 @@ button{font-family:inherit;color:inherit}
 .cat-flip-outer{perspective:1600px;height:100%;position:relative}
 .cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
 .cat-flip-outer.flipped .cat-flip-inner{transform:rotateY(180deg)}
-.cat-flip-toggle{position:absolute;top:58px;right:26px;z-index:5;width:24px;height:24px;border-radius:50%;background:var(--card);border:1.5px solid var(--cat-teal);color:var(--cat-teal);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:top .15s var(--ease-out),transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
+/* Juan, 21-nov-2026: "el boton que le da el reverso a la tarjeta deberia estar en la parte de
+   abajo... en el mismo renglon donde esta el boton de explorar" - antes vivia pegado justo
+   debajo de la pildora GRATIS/PROXIMAMENTE (arriba de la imagen), reposicionado en vivo por JS
+   (ver positionCatFlipToggles, ya quitado) porque esa pildora no siempre estaba a la misma
+   altura. Ahora se ancla por abajo (bottom, no top) en la misma esquina donde ya vive el boton
+   "Explorar ->" (align-self:flex-start lo deja pegado a la izquierda, así que no se pisan) - un
+   bottom fijo SI es confiable aca porque no depende de cuantas lineas ocupe el titulo. También un
+   poco más grande (24px -> 30px/32px) a pedido suyo. */
+.cat-flip-toggle{position:absolute;bottom:20px;right:20px;z-index:5;width:30px;height:30px;border-radius:50%;background:var(--card);border:1.5px solid var(--cat-teal);color:var(--cat-teal);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),background .2s;padding:0}
+.cat-flip-toggle svg{width:16px;height:16px}
+.cat-flip-outer.big .cat-flip-toggle{bottom:26px;right:26px;width:32px;height:32px}
 .cat-flip-toggle:hover{background:color-mix(in srgb, var(--accent) 14%, transparent)}
 .cat-flip-outer.flipped .cat-flip-toggle{transform:rotate(180deg)}
 /* el empuje en Z que arregla el hit-test del tilt (ver tarjetas-magicas.js, funcion
@@ -1488,7 +1498,7 @@ button{font-family:inherit;color:inherit}
 .cat-overview-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .cat-overview-num{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;color:var(--c);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .cat-overview-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;flex:1;color:var(--white);display:flex;align-items:center;gap:8px}
-.cat-overview-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:20px;background:#2ecc71;color:#06220f;border:1px solid #27ae60;box-shadow:0 2px 8px rgba(46,204,113,.35)}
+.cat-overview-tag{font-family:'Space Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.04em;padding:4px 11px;border-radius:20px;background:#2ecc71;color:#06220f;border:1px solid #27ae60;box-shadow:0 2px 8px rgba(46,204,113,.35)}
 .cat-overview-tag.soon{background:color-mix(in srgb, var(--white) 6%, transparent);color:var(--muted2);border-color:color-mix(in srgb, var(--accent) 30%, transparent)}
 .cat-overview-sub{font-size:11px;color:var(--c);font-family:'Space Mono',monospace;letter-spacing:.03em;margin:3px 0 14px;padding-left:36px;font-weight:600}
 .cat-overview-preview{
@@ -1535,7 +1545,7 @@ button{font-family:inherit;color:inherit}
 .cat-overview-card.big .cat-overview-num{width:28px;height:28px;font-size:12.5px}
 .cat-overview-card.big .cat-overview-title{font-size:18px;gap:9px}
 .cat-overview-card.big .cat-overview-title svg{width:19px;height:19px}
-.cat-overview-card.big .cat-overview-tag{font-size:9px;padding:3px 10px}
+.cat-overview-card.big .cat-overview-tag{font-size:10.5px;padding:4.5px 12px}
 .cat-overview-card.big .cat-overview-sub{font-size:11.5px;padding-left:37px;margin:3px 0 15px}
 .cat-overview-card.big .cat-overview-preview{height:104px;margin-bottom:15px}
 .cat-overview-card.big .cat-overview-desc{font-size:13.5px;margin-bottom:17px}
@@ -12874,23 +12884,10 @@ document.querySelectorAll('.cat-flip-toggle').forEach(btn => {
     btn.closest('.cat-flip-outer').classList.toggle('flipped');
   });
 });
-/* el botoncito de girar va pegado justo debajo de la píldora (GRATIS/ALIANZAS/etc) de cada
-   tarjeta, nunca fuera de la caja - como el título a veces ocupa 1 o 2 líneas, esa píldora no
-   siempre está a la misma altura, así que se calcula en JS en vez de un top fijo en CSS */
-function positionCatFlipToggles(){
-  document.querySelectorAll('.cat-flip-outer').forEach(outer => {
-    const tag = outer.querySelector('.cat-overview-tag');
-    const toggle = outer.querySelector('.cat-flip-toggle');
-    if(!tag || !toggle) return;
-    const outerTop = outer.getBoundingClientRect().top;
-    const tagBottom = tag.getBoundingClientRect().bottom;
-    toggle.style.top = Math.round(tagBottom - outerTop + 8) + 'px';
-  });
-}
-positionCatFlipToggles();
-window.addEventListener('load', positionCatFlipToggles);
-let catFlipToggleResizeT;
-window.addEventListener('resize', () => { clearTimeout(catFlipToggleResizeT); catFlipToggleResizeT = setTimeout(positionCatFlipToggles, 150); });
+// el botoncito de girar ya no necesita reposicionarse por JS (antes seguía a la píldora
+// GRATIS/PRÓXIMAMENTE porque esa píldora no siempre estaba a la misma altura) - ahora vive
+// anclado abajo con bottom fijo en CSS (.cat-flip-toggle), en la misma esquina que el botón
+// "Explorar →", que es una posición siempre confiable sin importar cuántas líneas ocupe el título.
 /* "N HERRAMIENTAS" (caja de categoría y su reverso al voltear) se cuenta SIEMPRE de las
    tool-card reales de esa categoría, nunca a mano - así no vuelve a pasar que el numero quede
    desactualizado cuando se agrega o quita una herramienta (bug reportado por Juan: Manual del
