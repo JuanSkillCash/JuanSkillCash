@@ -1559,7 +1559,12 @@ button{font-family:inherit;color:inherit}
 .cat-back-btn:hover{border-color:var(--red);color:var(--white)}
 .tool-cat-label::after{content:'';flex:1;height:1px;background:color-mix(in srgb, var(--accent) 30%, transparent)}
 .section-intro-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
-.section-intro-text{font-size:13.5px;color:var(--muted2);line-height:1.65;max-width:640px;margin-bottom:20px}
+/* sin max-width a propósito: Juan - "el texto queda comprimido, como de dos columnas, con
+   espacio vacío al lado... debería ocupar de lado a lado" (pasaba en TODAS las categorías,
+   porque todas comparten esta clase) - antes tenía max-width:640px pensado para que las líneas
+   no quedaran demasiado largas de leer, pero en una pantalla ancha eso dejaba un bloque angosto
+   con un hueco grande a la derecha, que es justo lo que no quería */
+.section-intro-text{font-size:13.5px;color:var(--muted2);line-height:1.65;margin-bottom:20px}
 .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:900px){ .tool-grid{grid-template-columns:1fr 1fr} }
 @media(max-width:560px){ .tool-grid{grid-template-columns:1fr} }
@@ -3364,6 +3369,17 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .events-card-head svg{flex-shrink:0;color:var(--accent)}
 .events-yt-controls{display:flex;gap:8px}
 .events-yt-refresh{flex-shrink:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+/* Juan, 21-nov-2026: "cuando estoy en el dashboard y pongo las conferencias, el video se ve muy
+   pequeño... porque están los canales al lado derecho" - pidió un botón para minimizar/agrandar
+   esa lista, tanto en Mi Arrecife como en la página normal de Conferencias en Vivo. Como el
+   widget del dashboard REUSA este mismo markup (se reparenta, no se duplica - ver
+   arrecifeDetachToPlaceholder), un solo botón cubre los dos lugares a la vez, sin nada aparte
+   para el dashboard. margin-left:auto lo manda al extremo derecho de .events-yt-controls, cerca
+   de donde está la propia lista de canales. */
+.events-yt-channels-toggle{flex-shrink:0;margin-left:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:8px 11px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.events-yt-channels-toggle:hover{background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--white)}
+@media(max-width:860px){ .events-yt-channels-toggle{display:none} } /* en celular la lista ya se apila DEBAJO del video (ver .events-yt-layout más abajo), nunca le quita ancho - no hay nada que colapsar */
+.events-yt-layout.channels-collapsed .events-yt-channels{display:none}
 .events-yt-refresh:hover{border-color:var(--accent)}
 .events-yt-refresh:disabled{opacity:.6;cursor:default}
 /* layout de "Conferencias en Vivo" en 2 columnas, como una lista de reproducción de YouTube -
@@ -3898,7 +3914,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="sb-cat-label" data-category="__herramientas">Herramientas</div>
       <div class="sb-cat-label" data-category="portafolio">Mi Arrecife</div>
       <button class="sb-item" data-cat-home="portafolio">
-        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Panorama</span>
+        <span class="sb-item-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="sb-item-label">Dashboard</span>
       </button>
 
       <div class="sb-cat-label" data-category="indicadores">Sonar de Mercado</div>
@@ -4852,6 +4868,10 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
                abajo. -->
           <div class="events-yt-controls">
             <button type="button" id="eventsYtRefresh" class="events-yt-refresh">🔄 Buscar directo</button>
+            <button type="button" id="eventsYtChannelsToggle" class="events-yt-channels-toggle" aria-pressed="false" title="Minimizar/agrandar la lista de canales">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><line x1="14.5" y1="4.5" x2="14.5" y2="19.5"/></svg>
+              <span id="eventsYtChannelsToggleLabel">Ocultar canales</span>
+            </button>
           </div>
           <div class="events-yt-layout">
             <div class="events-yt-main">
@@ -5183,6 +5203,20 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       var recientesWrapEl = document.getElementById('eventsYtRecientes');
       var recientesListEl = document.getElementById('eventsYtRecientesList');
       if(!listEl || !playerHost) return;
+      // botón para minimizar/agrandar la lista de canales (pedido de Juan: "el video se ve muy
+      // pequeño... porque están los canales al lado derecho") - funciona igual en la página
+      // normal y dentro del widget de Mi Arrecife, porque ambos reusan este mismo DOM
+      // (reparentado, no duplicado - ver arrecifeDetachToPlaceholder)
+      var channelsToggleBtn = document.getElementById('eventsYtChannelsToggle');
+      var channelsToggleLabel = document.getElementById('eventsYtChannelsToggleLabel');
+      var ytLayoutEl = document.querySelector('#eventsYoutubeBlock .events-yt-layout');
+      if(channelsToggleBtn && ytLayoutEl){
+        channelsToggleBtn.addEventListener('click', function(){
+          var collapsed = ytLayoutEl.classList.toggle('channels-collapsed');
+          channelsToggleBtn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+          if(channelsToggleLabel) channelsToggleLabel.textContent = collapsed ? 'Mostrar canales' : 'Ocultar canales';
+        });
+      }
       function escapeHtml(s){
         return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
           return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
