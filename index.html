@@ -32657,11 +32657,27 @@ async function awardColmillos(eventType, periodKey, amount){
       mount: arrecifeMountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }, () => { if(typeof window.ensureEventsCalendarLoaded === 'function') window.ensureEventsCalendarLoaded(); }),
       unmount: arrecifeUnmountGenericNode(() => { const block = document.getElementById('eventsCalendarBlock'); return block ? block.querySelector('.events-card') : null; }),
     },
-    'w-youtube-live': {
-      id:'w-youtube-live', label:'Conferencias en Vivo', family:'video',
-      mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsYtChannelList'); return list ? list.closest('.events-card') : null; }),
-      unmount: arrecifeUnmountGenericNode(() => document.getElementById('eventsYtChannelList') ? document.getElementById('eventsYtChannelList').closest('.events-card') : null),
-    },
+    'w-youtube-live': (function(){
+      const baseUnmount = arrecifeUnmountGenericNode(() => document.getElementById('eventsYtChannelList') ? document.getElementById('eventsYtChannelList').closest('.events-card') : null);
+      return {
+        id:'w-youtube-live', label:'Conferencias en Vivo', family:'video',
+        mount: arrecifeMountGenericNode(() => { const list = document.getElementById('eventsYtChannelList'); return list ? list.closest('.events-card') : null; }),
+        // Juan ya había reportado antes (ver window.teardownEventsYtPlayer más arriba) que salir
+        // de la página normal de Conferencias en Vivo dejaba el audio sonando de fondo - eso se
+        // arregló ahí, pero este widget del dashboard es un camino DISTINTO para llegar al mismo
+        // <iframe> y se quedó sin el mismo arreglo: reparentar el nodo de vuelta a su lugar
+        // original (lo que hace arrecifeUnmountGenericNode/baseUnmount) mueve el <iframe> en el
+        // DOM, y YouTube lo recarga al moverlo - como su src ya trae "&autoplay=1" integrado
+        // desde que se montó, la recarga lo vuelve a reproducir solo, ignorando que la persona ya
+        // le había dado pausa/mute (bug reportado: "me salgo al menú principal... y se empieza a
+        // reproducir otra vez"). Por eso hay que destruir el reproductor PRIMERO (como ya hace
+        // teardownEventsYtPlayer al salir de la página normal) y solo DESPUÉS mover el nodo.
+        unmount: function(){
+          if(typeof window.teardownEventsYtPlayer === 'function') window.teardownEventsYtPlayer();
+          baseUnmount.apply(this, arguments);
+        },
+      };
+    })(),
     // ---- Fase 2 (lote 3): las 18 calculadoras/referencias que faltaban (ver
     // docs/arrecife-widget-inventario.md sección 4) - mismo arrecifeMountModalWidget/
     // arrecifeUnmountModalWidget ya probado con calcModal/dcaModal/quizModal. El initFn de cada
