@@ -12827,8 +12827,10 @@ function showCategoryDetail(cat){
   });
   // las cajas de herramienta de esta categoría recién se vuelven visibles ahora mismo - sus
   // íconos fantasma (ver más abajo en el archivo) solo se pueden medir/colocar con la caja ya
-  // visible, por eso se escanean de nuevo cada vez que se entra a una categoría
-  if(typeof window.scanForGhostIcons === 'function') window.scanForGhostIcons();
+  // visible, por eso se escanean de nuevo cada vez que se entra a una categoría. Doble
+  // protección a propósito (acá Y adentro de scanForGhostIcons): es puramente decorativo y NUNCA
+  // debe frenar lo que sigue en esta función (arrecifeEnterDashboard, filterSidebarNav, etc.)
+  try{ if(typeof window.scanForGhostIcons === 'function') window.scanForGhostIcons(); }catch(e){}
   setIndicMobileMode(cat === 'indicadores');
   filterSidebarNav(cat);
   if(enteringFromOverview) logToolUsage(cat);
@@ -32148,7 +32150,12 @@ async function awardColmillos(eventType, periodKey, amount){
     }
   }
   function scanForGhostIcons(root){
-    (root || document).querySelectorAll('.icon-bleed').forEach(addGhostIcons);
+    // puramente decorativo - un error en una caja nunca debe tumbar el resto (ni, peor, lo que
+    // sea que llame a esta función: showCategoryDetail sigue con cosas bastante más importantes
+    // justo después, como abrir el dashboard de Mi Arrecife)
+    (root || document).querySelectorAll('.icon-bleed').forEach(function(banner){
+      try{ addGhostIcons(banner); }catch(e){}
+    });
   }
   window.scanForGhostIcons = scanForGhostIcons;
   scanForGhostIcons();
