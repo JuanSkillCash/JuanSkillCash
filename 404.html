@@ -1718,6 +1718,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-quote-change:hover{background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--white)}
 .arrecife-quote-head{display:flex;align-items:center;gap:6px}
 .arrecife-quote-logo{width:22px;height:22px;border-radius:50%;flex-shrink:0}
+.arrecife-quote-logo.arrecife-quote-generic-icon{display:flex;align-items:center;justify-content:center;color:var(--accent)}
 .arrecife-quote-sym{font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;color:var(--white);letter-spacing:.02em}
 .arrecife-quote-price{font-size:23px;font-weight:800;color:var(--white);line-height:1.1;font-variant-numeric:tabular-nums}
 .arrecife-quote-chg-row{display:flex;align-items:center;gap:9px}
@@ -32849,55 +32850,71 @@ async function awardColmillos(eventType, periodKey, amount){
   // TradingView ("este símbolo solo está disponible en TradingView") y de una vez rechazó TODO el
   // enfoque de embeber un widget de terceros: "la idea es que fuera de la API de Binance, una
   // construcción propia, no una integración... fondo azul, precio blanco, variación roja, el logo
-  // de Bitcoin". Como Binance (a diferencia de TradingView) solo cubre criptomonedas, este widget
-  // se reenfoca 100% a cripto - ya no acepta acciones/índices, que necesitarían otra fuente de
-  // datos en vivo para construirse "propio" igual que esto. Lista corta y a mano (mismo criterio
-  // que EVENTS_YT_CHANNELS/EXCLUDED_KEYWORDS en otras partes del sitio) de las criptos que Juan
-  // cree que la gente va a buscar más seguido: cada una con su ticker real de Binance (para el
-  // websocket en vivo) y su id de CoinGecko (para traer el logo, mismo catálogo que ya usa el
-  // resto del sitio). Si lo que se escribe no está en esta lista, se asume que es un ticker de
-  // Binance tal cual (sin logo, porque no hay forma confiable de adivinar su id de CoinGecko).
+  // de Bitcoin". Las criptos (kind:'crypto') salen de Binance en vivo vía websocket, igual que el
+  // ticker principal del sitio. Segundo ajuste el mismo día: Juan pidió de vuelta índices/materias
+  // primas ("pongo SP pero no sale nada, Nasdaq y no sale nada") - como Binance NO los tiene (es un
+  // exchange de cripto), esos (kind:'index'/'commodity') usan el MISMO mecanismo de ETF-proxy +
+  // escala que ya corre en producción en el ticker principal y en la herramienta de Inversión (ver
+  // CURATED_INDICES/CURATED_COMMODITIES más arriba) - Twelve Data, no Binance, pero sigue siendo
+  // construcción propia (cero iframes). Por eso estos dos NO admiten texto libre como la cripto: el
+  // proxy ETF hay que mapearlo a mano, no se puede adivinar - solo se eligen de la lista curada.
   const ARRECIFE_QUOTE_SYMBOLS = [
-    { q:'bitcoin btc', label:'Bitcoin (BTC)', binance:'btcusdt', cgid:'bitcoin' },
-    { q:'ethereum eth', label:'Ethereum (ETH)', binance:'ethusdt', cgid:'ethereum' },
-    { q:'solana sol', label:'Solana (SOL)', binance:'solusdt', cgid:'solana' },
-    { q:'hyperliquid hype', label:'Hyperliquid (HYPE)', binance:'hypeusdt', cgid:'hyperliquid' },
-    { q:'xrp ripple', label:'XRP', binance:'xrpusdt', cgid:'ripple' },
-    { q:'bnb binance coin', label:'BNB', binance:'bnbusdt', cgid:'binancecoin' },
-    { q:'dogecoin doge', label:'Dogecoin (DOGE)', binance:'dogeusdt', cgid:'dogecoin' },
-    { q:'cardano ada', label:'Cardano (ADA)', binance:'adausdt', cgid:'cardano' },
-    { q:'toncoin ton', label:'Toncoin (TON)', binance:'tonusdt', cgid:'the-open-network' },
-    { q:'avalanche avax', label:'Avalanche (AVAX)', binance:'avaxusdt', cgid:'avalanche-2' },
-    { q:'chainlink link', label:'Chainlink (LINK)', binance:'linkusdt', cgid:'chainlink' },
-    { q:'polkadot dot', label:'Polkadot (DOT)', binance:'dotusdt', cgid:'polkadot' },
-    { q:'litecoin ltc', label:'Litecoin (LTC)', binance:'ltcusdt', cgid:'litecoin' },
+    { kind:'crypto', q:'bitcoin btc', label:'Bitcoin (BTC)', binance:'btcusdt', cgid:'bitcoin' },
+    { kind:'crypto', q:'ethereum eth', label:'Ethereum (ETH)', binance:'ethusdt', cgid:'ethereum' },
+    { kind:'crypto', q:'solana sol', label:'Solana (SOL)', binance:'solusdt', cgid:'solana' },
+    { kind:'crypto', q:'hyperliquid hype', label:'Hyperliquid (HYPE)', binance:'hypeusdt', cgid:'hyperliquid' },
+    { kind:'crypto', q:'xrp ripple', label:'XRP', binance:'xrpusdt', cgid:'ripple' },
+    { kind:'crypto', q:'bnb binance coin', label:'BNB', binance:'bnbusdt', cgid:'binancecoin' },
+    { kind:'crypto', q:'dogecoin doge', label:'Dogecoin (DOGE)', binance:'dogeusdt', cgid:'dogecoin' },
+    { kind:'crypto', q:'cardano ada', label:'Cardano (ADA)', binance:'adausdt', cgid:'cardano' },
+    { kind:'crypto', q:'toncoin ton', label:'Toncoin (TON)', binance:'tonusdt', cgid:'the-open-network' },
+    { kind:'crypto', q:'avalanche avax', label:'Avalanche (AVAX)', binance:'avaxusdt', cgid:'avalanche-2' },
+    { kind:'crypto', q:'chainlink link', label:'Chainlink (LINK)', binance:'linkusdt', cgid:'chainlink' },
+    { kind:'crypto', q:'polkadot dot', label:'Polkadot (DOT)', binance:'dotusdt', cgid:'polkadot' },
+    { kind:'crypto', q:'litecoin ltc', label:'Litecoin (LTC)', binance:'ltcusdt', cgid:'litecoin' },
+    { kind:'index', q:'sp500 s&p500 spx', label:'S&P 500', symbol:'SPX', proxy:'SPY', scale:10.0 },
+    { kind:'index', q:'dow jones dji', label:'Dow Jones', symbol:'DJI', proxy:'DIA', scale:100.0 },
+    { kind:'index', q:'nasdaq nasdaq100 ndx', label:'Nasdaq 100', symbol:'NDX', proxy:'QQQ', scale:40.0 },
+    { kind:'index', q:'russell 2000 rut', label:'Russell 2000', symbol:'RUT', proxy:'IWM', scale:10.0 },
+    { kind:'commodity', q:'oro gold xau', label:'Oro (XAU/USD)', symbol:'XAU/USD', proxy:'GLD', scale:10.95 },
+    { kind:'commodity', q:'plata silver xag', label:'Plata (XAG/USD)', symbol:'XAG/USD', proxy:'SLV', scale:1.09 },
+    { kind:'commodity', q:'petroleo oil wti', label:'Petróleo WTI', symbol:'WTI/USD', proxy:'USO', scale:0.60 },
+    { kind:'commodity', q:'petroleo brent', label:'Petróleo Brent', symbol:'BRENT/USD', proxy:'BNO', scale:1.66 },
   ];
   const ARRECIFE_QUOTE_CGID = {};
-  ARRECIFE_QUOTE_SYMBOLS.forEach(it => { ARRECIFE_QUOTE_CGID[it.binance.toUpperCase()] = it.cgid; });
+  ARRECIFE_QUOTE_SYMBOLS.forEach(it => { if(it.binance) ARRECIFE_QUOTE_CGID[it.binance.toUpperCase()] = it.cgid; });
+  // devuelve un descriptor completo (no un simple string) porque, a diferencia de la cripto, un
+  // índice/materia prima necesita cargar con su proxy+escala para poder pedirle el precio a
+  // Twelve Data más adelante (ver renderQuote)
   function arrecifeResolveQuoteSymbol(raw){
     const text = (raw || '').trim();
     if(!text) return null;
     const low = text.toLowerCase();
     const hit = ARRECIFE_QUOTE_SYMBOLS.find(it => it.label.toLowerCase() === low || it.q.split(' ').indexOf(low) !== -1);
-    if(hit) return hit.binance.toUpperCase();
-    // no está en la lista curada: se asume que ya es (o casi es) un ticker de Binance tal cual -
-    // si no termina en USDT se le agrega, que es el par que cubre casi todo lo que cotiza ahí
+    if(hit){
+      if(hit.kind === 'crypto') return { kind:'crypto', binance: hit.binance.toUpperCase(), symbol: hit.binance.toUpperCase() };
+      return { kind: hit.kind, label: hit.label, symbol: hit.symbol, proxy: hit.proxy, scale: hit.scale };
+    }
+    // no está en la lista curada: índices/materias primas necesitan un proxy de ETF ya mapeado a
+    // mano (no se pueden adivinar), así que el texto libre SOLO se interpreta como cripto - se
+    // asume que ya es (o casi es) un ticker de Binance tal cual, agregándole USDT si hace falta
     const clean = text.toUpperCase().replace(/\s+/g, '').replace(/^BINANCE:/, '');
     if(!clean) return null;
-    return clean.endsWith('USDT') ? clean : clean + 'USDT';
+    const ticker = clean.endsWith('USDT') ? clean : clean + 'USDT';
+    return { kind:'crypto', binance: ticker, symbol: ticker };
   }
-  // los paneles guardados ANTES del rediseño traían el formato viejo "BINANCE:BTCUSDT" (o, para
-  // acciones/índices que ya no se soportan, "NASDAQ:AAPL" y similares) - se migra el primer caso
-  // al ticker plano nuevo, y el segundo se descarta (vuelve a mostrar el buscador) en vez de
-  // tronar con un símbolo que Binance no puede resolver.
+  // los paneles guardados ANTES de este rediseño traían un string plano (ej. "BTCUSDT", o aún más
+  // viejo "BINANCE:BTCUSDT"/"NASDAQ:AAPL") en vez del descriptor nuevo - se migran al vuelo; el
+  // formato ya nuevo (objeto) simplemente se reutiliza tal cual.
   function arrecifeNormalizeLegacySymbol(raw){
     if(!raw) return null;
+    if(typeof raw === 'object') return raw;
     const s = String(raw).trim();
     if(!s) return null;
     const up = s.toUpperCase();
-    if(up.indexOf('BINANCE:') === 0) return up.slice('BINANCE:'.length);
-    if(up.indexOf(':') !== -1) return null;
-    return up;
+    const ticker = up.indexOf('BINANCE:') === 0 ? up.slice('BINANCE:'.length) : (up.indexOf(':') !== -1 ? null : up);
+    if(!ticker) return null; // formato viejo con otra bolsa (ya no soportado tal cual) - vuelve al buscador
+    return { kind:'crypto', binance: ticker, symbol: ticker };
   }
   // el logo del activo se trae de CoinGecko (mismo mecanismo/cache que ya usa el ticker superior
   // del sitio, ver CACHE_KEY 'skc_ticker_icons_v3' más abajo) pero por-símbolo y a demanda, ya que
@@ -32928,6 +32945,53 @@ async function awardColmillos(eventType, periodKey, amount){
       .then(rows => cb((rows || []).map(r => parseFloat(r[4])).filter(isFinite)))
       .catch(() => cb(null));
   }
+  // precio+variación de un índice/materia prima: mismo mecanismo de ETF-proxy que ya corre en
+  // producción en el ticker principal (ver refreshIndices más abajo) - el % de variación del ETF
+  // proxy es igual al del índice real (un factor de escala no cambia un % relativo), solo el
+  // PRECIO mostrado necesita el "* scale" para aproximar el nivel real
+  function arrecifeFetchIndexQuote(proxy, scale, cb){
+    fetch(tdUrl('https://api.twelvedata.com/quote?symbol=' + encodeURIComponent(proxy)))
+      .then(r => r.json())
+      .then(data => {
+        const close = parseFloat(data && data.close), pct = parseFloat(data && data.percent_change);
+        if(!isFinite(close)){ cb(null); return; }
+        cb({ priceText: '$' + formatPrice(close * scale), pct: isFinite(pct) ? pct : undefined });
+      })
+      .catch(() => cb(null));
+  }
+  // Twelve Data gratis es una llave compartida por TODO el sitio (ver comentario junto a
+  // refreshIndices) - igual que ahí, se cachea el último valor bueno para no quedar en "—" si un
+  // refresco puntual falla por cupo
+  const ARRECIFE_QUOTE_IDX_CACHE_KEY = 'skc_quote_idx_cache_v1';
+  function arrecifeQuoteIdxCacheGet(proxy){
+    try{ return (JSON.parse(localStorage.getItem(ARRECIFE_QUOTE_IDX_CACHE_KEY) || '{}'))[proxy] || null; }catch(e){ return null; }
+  }
+  function arrecifeQuoteIdxCacheSet(proxy, priceText, pct){
+    try{
+      const c = JSON.parse(localStorage.getItem(ARRECIFE_QUOTE_IDX_CACHE_KEY) || '{}');
+      c[proxy] = { price: priceText, pct: pct };
+      localStorage.setItem(ARRECIFE_QUOTE_IDX_CACHE_KEY, JSON.stringify(c));
+    }catch(e){}
+  }
+  // mini-gráfico de un índice/materia prima: time_series del mismo proxy ETF (misma API, mismo
+  // endpoint que ya usan los gráficos históricos de Oro/AAPL de otras herramientas) - sin escalar,
+  // porque para la FORMA de la línea el factor de escala no importa (solo cambiaría el tamaño del
+  // eje, no la tendencia)
+  function arrecifeFetchIndexSparkline(proxy, cb){
+    fetch(tdUrl('https://api.twelvedata.com/time_series?symbol=' + encodeURIComponent(proxy) + '&interval=1h&outputsize=24'))
+      .then(r => r.json())
+      .then(data => {
+        const values = (data && data.values) || [];
+        // Twelve Data manda del más reciente al más viejo - se invierte para dibujar en orden
+        const closes = values.map(v => parseFloat(v.close)).filter(isFinite).reverse();
+        cb(closes.length >= 2 ? closes : null);
+      })
+      .catch(() => cb(null));
+  }
+  // ícono genérico (índices/materias primas no tienen un logo curado como la cripto vía CoinGecko)
+  // - contorno simple con currentColor, mismo criterio del resto del sitio para íconos chiquitos
+  // (ver CLAUDE.md, sección de íconos de tool-card): nunca un emoji con color forzado
+  const ARRECIFE_QUOTE_GENERIC_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V3"/></svg>';
   function arrecifeQuoteSparklineSvg(closes){
     if(!closes || closes.length < 2) return '';
     const w = 100, h = 26;
@@ -32949,14 +33013,17 @@ async function awardColmillos(eventType, periodKey, amount){
     // sin afectar a las demás
     let ws = null, reconnectTimer = null, retryMs = 2000, wsSymbol = null;
     let sparkTimer = null; // refresca el mini-gráfico cada 5min - no hace falta por cada tick del websocket
-    function closeSocket(){
+    let pollTimer = null, pollToken = null; // índice/materia prima: Twelve Data no tiene websocket público, se sondea cada 45s
+    function stopFeeds(){
       if(reconnectTimer){ clearTimeout(reconnectTimer); reconnectTimer = null; }
       wsSymbol = null;
       if(ws){ try{ ws.onclose = null; ws.onerror = null; ws.close(); }catch(e){} ws = null; }
       if(sparkTimer){ clearInterval(sparkTimer); sparkTimer = null; }
+      if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+      pollToken = null;
     }
     function connectQuoteSocket(sym){
-      closeSocket();
+      stopFeeds();
       wsSymbol = sym;
       retryMs = 2000;
       function scheduleReconnect(){
@@ -32993,15 +33060,15 @@ async function awardColmillos(eventType, periodKey, amount){
     }
     function renderSearch(){
       if(!bodyEl) return;
-      closeSocket();
+      stopFeeds();
       bodyEl.innerHTML =
         '<div class="arrecife-quote-search">' +
           '<form class="arrecife-quote-search-row">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>' +
-            '<input type="text" placeholder="Bitcoin, ETH, PEPE..." list="arrecifeQuoteList" autocomplete="off">' +
+            '<input type="text" placeholder="Bitcoin, S&amp;P 500, Oro..." list="arrecifeQuoteList" autocomplete="off">' +
           '</form>' +
           '<datalist id="arrecifeQuoteList">' + ARRECIFE_QUOTE_SYMBOLS.map(it => '<option value="' + it.label.replace(/"/g,'&quot;') + '">').join('') + '</datalist>' +
-          '<div class="arrecife-quote-search-hint">Elige una opción de la lista, o escribe el ticker y dale Enter</div>' +
+          '<div class="arrecife-quote-search-hint">Elige de la lista (cripto, índices y materias primas), o escribe el ticker de una cripto y dale Enter</div>' +
         '</div>';
       function pick(text){
         const picked = arrecifeResolveQuoteSymbol(text);
@@ -33025,15 +33092,18 @@ async function awardColmillos(eventType, periodKey, amount){
     }
     function renderQuote(){
       if(!bodyEl) return;
-      const sym = currentSymbol;
-      const displaySym = sym.endsWith('USDT') ? sym.slice(0, -4) + '/USDT' : sym;
+      const cur = currentSymbol;
+      const isCrypto = cur.kind === 'crypto';
+      const displaySym = isCrypto
+        ? (cur.binance.endsWith('USDT') ? cur.binance.slice(0, -4) + '/USDT' : cur.binance)
+        : cur.symbol;
       bodyEl.innerHTML =
         '<div class="arrecife-quote-widget">' +
           '<button type="button" class="arrecife-quote-change" title="Cambiar símbolo" aria-label="Cambiar símbolo">' +
             '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>' +
           '</button>' +
           '<div class="arrecife-quote-head">' +
-            '<img class="arrecife-quote-logo" alt="" hidden>' +
+            (isCrypto ? '<img class="arrecife-quote-logo" alt="" hidden>' : '<span class="arrecife-quote-logo arrecife-quote-generic-icon">' + ARRECIFE_QUOTE_GENERIC_ICON + '</span>') +
             '<span class="arrecife-quote-sym">' + displaySym + '</span>' +
           '</div>' +
           '<div class="arrecife-quote-price">—</div>' +
@@ -33044,30 +33114,75 @@ async function awardColmillos(eventType, periodKey, amount){
           '</div>' +
         '</div>';
       bodyEl.querySelector('.arrecife-quote-change').addEventListener('click', renderSearch);
-      arrecifeQuoteLogoUrl(ARRECIFE_QUOTE_CGID[sym] || null, url => {
-        if(!url || !bodyEl) return;
-        const img = bodyEl.querySelector('.arrecife-quote-logo');
-        if(img){ img.src = url; img.hidden = false; }
-      });
-      connectQuoteSocket(sym);
-      function loadSparkline(){
-        arrecifeFetchQuoteSparkline(sym, closes => {
-          if(!bodyEl || wsSymbol !== sym) return; // la tarjeta cambió de símbolo (o se cerró) mientras pedía
-          const wrap = bodyEl.querySelector('.arrecife-quote-spark-wrap');
-          if(wrap && closes) wrap.innerHTML = arrecifeQuoteSparklineSvg(closes);
+
+      if(isCrypto){
+        const sym = cur.binance;
+        arrecifeQuoteLogoUrl(ARRECIFE_QUOTE_CGID[sym] || null, url => {
+          if(!url || !bodyEl) return;
+          const img = bodyEl.querySelector('.arrecife-quote-logo');
+          if(img){ img.src = url; img.hidden = false; }
         });
+        connectQuoteSocket(sym);
+        function loadSparkline(){
+          arrecifeFetchQuoteSparkline(sym, closes => {
+            if(!bodyEl || wsSymbol !== sym) return; // la tarjeta cambió de símbolo (o se cerró) mientras pedía
+            const wrap = bodyEl.querySelector('.arrecife-quote-spark-wrap');
+            if(wrap && closes) wrap.innerHTML = arrecifeQuoteSparklineSvg(closes);
+          });
+        }
+        loadSparkline();
+        if(sparkTimer) clearInterval(sparkTimer);
+        sparkTimer = setInterval(loadSparkline, 5 * 60 * 1000);
+      } else {
+        stopFeeds(); // por si venía de una cripto (cierra ese websocket) - no borra el HTML recién pintado
+        const proxy = cur.proxy, scale = cur.scale;
+        const myToken = proxy + ':' + Date.now();
+        pollToken = myToken;
+        const cached = arrecifeQuoteIdxCacheGet(proxy);
+        if(cached){
+          const priceEl = bodyEl.querySelector('.arrecife-quote-price');
+          const chgEl = bodyEl.querySelector('.arrecife-quote-chg');
+          if(priceEl) priceEl.textContent = cached.price;
+          if(chgEl && typeof cached.pct === 'number'){
+            chgEl.textContent = formatPct(cached.pct);
+            chgEl.className = 'arrecife-quote-chg ' + (cached.pct > 0 ? 'up' : cached.pct < 0 ? 'down' : 'flat');
+          }
+        }
+        function pollPrice(){
+          arrecifeFetchIndexQuote(proxy, scale, res => {
+            if(!bodyEl || pollToken !== myToken || !res) return;
+            const priceEl = bodyEl.querySelector('.arrecife-quote-price');
+            const chgEl = bodyEl.querySelector('.arrecife-quote-chg');
+            if(priceEl) priceEl.textContent = res.priceText;
+            if(chgEl && typeof res.pct === 'number'){
+              chgEl.textContent = formatPct(res.pct);
+              chgEl.className = 'arrecife-quote-chg ' + (res.pct > 0 ? 'up' : res.pct < 0 ? 'down' : 'flat');
+            }
+            arrecifeQuoteIdxCacheSet(proxy, res.priceText, res.pct);
+          });
+        }
+        pollPrice();
+        if(pollTimer) clearInterval(pollTimer);
+        pollTimer = setInterval(pollPrice, 45000);
+        function loadSparkline(){
+          arrecifeFetchIndexSparkline(proxy, closes => {
+            if(!bodyEl || pollToken !== myToken) return;
+            const wrap = bodyEl.querySelector('.arrecife-quote-spark-wrap');
+            if(wrap && closes) wrap.innerHTML = arrecifeQuoteSparklineSvg(closes);
+          });
+        }
+        loadSparkline();
+        if(sparkTimer) clearInterval(sparkTimer);
+        sparkTimer = setInterval(loadSparkline, 5 * 60 * 1000);
       }
-      loadSparkline();
-      if(sparkTimer) clearInterval(sparkTimer);
-      sparkTimer = setInterval(loadSparkline, 5 * 60 * 1000);
     }
     WIDGET_REGISTRY[instanceId] = {
       id: instanceId, label:'Precio Rápido', family:'quote',
       mount: function(body){ bodyEl = body; if(currentSymbol) renderQuote(); else renderSearch(); },
       // a diferencia de los demás widgets, este no reparenta nada de otra parte del sitio (todo
-      // su contenido es propio, creado aquí) - al desmontar solo hay que cerrar su websocket y
-      // limpiar la entrada del registro para no dejar instancias fantasma acumulándose
-      unmount: function(){ closeSocket(); delete WIDGET_REGISTRY[instanceId]; },
+      // su contenido es propio, creado aquí) - al desmontar solo hay que cerrar su websocket/
+      // sondeo y limpiar la entrada del registro para no dejar instancias fantasma acumulándose
+      unmount: function(){ stopFeeds(); delete WIDGET_REGISTRY[instanceId]; },
       getCfg: function(){ return { symbol: currentSymbol }; },
     };
   }
