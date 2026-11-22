@@ -4420,15 +4420,22 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
            archivo) - Glosario/Errores comunes/Manual abren el mismo modal de siempre
            (reusan exactamente las mismas funciones openGlossaryModal/openMistakesModal/
            openManualModal con onclick directo, no data-cat-home, porque no son una
-           categoría real que mostrar/ocultar - solo "Guías" sí lo es). -->
+           categoría real que mostrar/ocultar - solo "Guías" sí lo es).
+           data-tool="glosario"/"mistakes"/"manual" (22-nov-2026, bug que reportó Juan con
+           captura): SÍ hace falta, aunque no abran una categoría - es lo que engancha el
+           listener genérico de la línea ~15744 que resalta en azul el ítem del sidebar que
+           coincide con el data-tool del modal abierto (y le quita el resaltado a "Guías").
+           Sin este atributo, showCategoryDetail('guias') (que sí corre por dentro de
+           openModalGeneric) dejaba el resaltado pegado en "Guías" en vez de moverse al
+           ítem de Glosario/Errores/Manual que de verdad se abrió. -->
       <div class="sb-cat-label sb-cat-label-static" data-category="__ayuda">Ayuda</div>
-      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openGlossaryModal()">
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" data-tool="glosario" onclick="openGlossaryModal()">
         <span class="sb-item-label">Glosario</span>
       </button>
-      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openMistakesModal()">
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" data-tool="mistakes" onclick="openMistakesModal()">
         <span class="sb-item-label">Errores comunes</span>
       </button>
-      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openManualModal()">
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" data-tool="manual" onclick="openManualModal()">
         <span class="sb-item-label">Manual</span>
       </button>
       <button class="sb-item sb-item-section sb-item-noicon" data-sb-open-category="guias" data-cat-home="guias">
@@ -15741,19 +15748,24 @@ renderIndicIndexList();
    ojo: el selector debe ser específico (no '[data-tool]' a secas) porque el .modal-overlay de cada
    herramienta también trae data-tool, y un click en su botón de cerrar burbujea hasta el overlay y
    volvería a marcar esa herramienta como activa justo después de cerrarla */
-document.querySelectorAll('.sb-item[data-tool], .tool-card[data-tool]').forEach(el => {
-  el.addEventListener('click', () => {
-    const tool = el.dataset.tool;
-    document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
-      item.classList.toggle('active', item.dataset.tool === tool);
-    });
-    document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => {
-      const active = pill.dataset.tool === tool;
-      pill.classList.toggle('active', active);
-      if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    });
-    document.querySelectorAll('[data-cat-home]').forEach(item => item.classList.remove('active'));
+// extraída a función (22-nov-2026) para poder reusarla también desde el desplegable del botón
+// "?" de la topbar (helpOpenGlossaryBtn y hermanos) - ese menú no tiene un elemento [data-tool]
+// que el usuario "clickee" de verdad (son botones propios con onclick directo a
+// openGlossaryModal/etc.), así que sin esto el resaltado del sidebar se quedaba pegado en
+// "Guías" cuando Glosario/Errores/Manual se abrían desde ahí en vez de desde el sidebar.
+function markSidebarToolActive(tool){
+  document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
+    item.classList.toggle('active', item.dataset.tool === tool);
   });
+  document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => {
+    const active = pill.dataset.tool === tool;
+    pill.classList.toggle('active', active);
+    if(active) pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
+  document.querySelectorAll('[data-cat-home]').forEach(item => item.classList.remove('active'));
+}
+document.querySelectorAll('.sb-item[data-tool], .tool-card[data-tool]').forEach(el => {
+  el.addEventListener('click', () => { markSidebarToolActive(el.dataset.tool); });
 });
 
 // "Panorama": vuelve a la portada de la categoría (grilla + intro) sin salir de ella —
@@ -16792,14 +16804,17 @@ document.addEventListener('click', (e) => {
 document.getElementById('helpOpenGlossaryBtn').addEventListener('click', () => {
   helpMiniDropdown.classList.remove('open');
   openGlossaryModal();
+  markSidebarToolActive('glosario');
 });
 document.getElementById('helpOpenMistakesBtn').addEventListener('click', () => {
   helpMiniDropdown.classList.remove('open');
   openMistakesModal();
+  markSidebarToolActive('mistakes');
 });
 document.getElementById('helpOpenManualBtn').addEventListener('click', () => {
   helpMiniDropdown.classList.remove('open');
   openManualModal();
+  markSidebarToolActive('manual');
 });
 document.getElementById('helpOpenGuiasBtn').addEventListener('click', () => {
   helpMiniDropdown.classList.remove('open');
