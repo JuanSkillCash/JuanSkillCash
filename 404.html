@@ -533,16 +533,16 @@ button{font-family:inherit;color:inherit}
 .session-status.open{color:var(--green)}
 .session-status.closed{color:var(--red)}
 .session-countdown{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);white-space:nowrap}
-@media(max-width:620px){
-  /* antes esto apilaba TODO en una sola columna angosta (bandera+nombre, luego hora local,
-     luego horario, luego estado, luego cuenta regresiva) - 4-5 renglones de alto dejando medio
-     celular vacio a la derecha de cada uno. Juan: "acomoda la informacion para que quede un
-     poco repartida entre horizontalmente y no vertical". Ahora Hora Local y Horario se quedan
-     lado a lado (como en escritorio, hay ancho de sobra para eso en un celular normal) y solo
-     el estado Abierto/Cerrado + cuenta regresiva bajan a su propio renglon completo. */
-  .session-main{flex-wrap:wrap;row-gap:8px}
-  .session-status-row{align-items:flex-start;text-align:left;flex:1 1 100%}
-}
+/* antes, en celular (max-width:620px) esto se apilaba en una sola columna angosta (bandera+
+   nombre, hora local, horario, estado, cuenta regresiva - 4-5 renglones) dejando medio celular
+   vacio a la derecha de cada renglon. Juan: "distribuye mejor la info, no tan vertical".
+   Resulta que el layout de escritorio (.session-main de una sola fila: stats a la izquierda,
+   estado a la derecha) YA cabe perfecto en el ancho real de un celular normal - las 3 tarjetas
+   de escritorio miden mas o menos lo mismo de ancho que una tarjeta de celular a lo largo (la
+   grilla de escritorio las pone en 3 columnas de ~360px cada una). Por eso ya no hace falta
+   ningun @media aqui: se deja el MISMO layout de una sola fila en todos los anchos - bandera+
+   nombre arriba, y Hora Local + Horario + Estado los 3 lado a lado abajo, 2 renglones en vez
+   de 4-5, usando todo el ancho de la tarjeta. */
 .market-sessions-footer{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);margin-top:6px;margin-bottom:14px}
 .market-sessions-footer b{color:var(--white)}
 .dom-card-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.02em}
