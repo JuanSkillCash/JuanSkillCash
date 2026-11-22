@@ -3004,34 +3004,42 @@ img[src=""]{display:none}
      pagina cada ~33ms, sin parar, mientras la animacion corria (confirmado con
      PerformanceObserver de layout-shift en vivo). transform/opacity nunca disparan layout, solo
      composicion en GPU - mismo efecto visual (deriva lenta e irregular), sin ese costo. */
+  /* pedido de Juan: ya no es solo una deriva chiquita alrededor de su punto de partida - cada
+     mosca ahora recorre de un lado a otro buena parte del ancho de toda la franja (S de "Skill"
+     al borde derecho), con el movimiento vertical a propósito irregular/asimétrico (sin curva
+     suave tipo seno) para que se sienta más aleatorio, no como las 4 sincronizadas */
   .hero-orbe{ animation:hero-orbita 20s ease-in-out infinite; }
   @keyframes hero-orbita{
     0%{ transform:translate(0,0); }
-    14%{ transform:translate(40px,18px); }
-    28%{ transform:translate(75px,-12px); }
-    42%{ transform:translate(110px,22px); }
-    57%{ transform:translate(70px,2px); }
-    71%{ transform:translate(30px,28px); }
-    85%{ transform:translate(8px,10px); }
+    10%{ transform:translate(130px,-35px); }
+    22%{ transform:translate(300px,20px); }
+    35%{ transform:translate(480px,-45px); }
+    48%{ transform:translate(640px,15px); }
+    60%{ transform:translate(520px,-25px); }
+    72%{ transform:translate(360px,35px); }
+    85%{ transform:translate(150px,-15px); }
     100%{ transform:translate(0,0); }
   }
   .hero-orbe2{ animation:hero-orbita2 16s ease-in-out infinite; }
   @keyframes hero-orbita2{
     0%{ transform:translate(0,0); }
-    20%{ transform:translate(-35px,16px); }
-    40%{ transform:translate(-60px,-4px); }
-    60%{ transform:translate(-45px,30px); }
-    80%{ transform:translate(-10px,24px); }
+    15%{ transform:translate(-170px,30px); }
+    30%{ transform:translate(-330px,-25px); }
+    45%{ transform:translate(-120px,45px); }
+    60%{ transform:translate(180px,-15px); }
+    75%{ transform:translate(380px,30px); }
+    90%{ transform:translate(110px,-20px); }
     100%{ transform:translate(0,0); }
   }
   .hero-orbe3{ animation:hero-orbita3 24s ease-in-out infinite; }
   @keyframes hero-orbita3{
     0%{ transform:translate(0,0); }
-    16%{ transform:translate(35px,-22px); }
-    33%{ transform:translate(65px,-12px); }
-    50%{ transform:translate(45px,-30px); }
-    66%{ transform:translate(22px,-6px); }
-    83%{ transform:translate(-12px,-18px); }
+    12%{ transform:translate(-200px,-30px); }
+    25%{ transform:translate(-380px,40px); }
+    40%{ transform:translate(-230px,-45px); }
+    55%{ transform:translate(60px,25px); }
+    70%{ transform:translate(280px,-35px); }
+    85%{ transform:translate(110px,20px); }
     100%{ transform:translate(0,0); }
   }
   /* la cuarta mosca, agregada despues - mismo espiritu (ruta irregular propia, solo
@@ -3039,11 +3047,11 @@ img[src=""]{display:none}
   .hero-orbe4{ animation:hero-orbita4 11s ease-in-out infinite; }
   @keyframes hero-orbita4{
     0%{ transform:translate(0,0); }
-    18%{ transform:translate(-28px,14px); }
-    36%{ transform:translate(-18px,-20px); }
-    54%{ transform:translate(20px,-10px); }
-    72%{ transform:translate(32px,16px); }
-    88%{ transform:translate(6px,24px); }
+    18%{ transform:translate(-280px,40px); }
+    36%{ transform:translate(-540px,-30px); }
+    54%{ transform:translate(-380px,50px); }
+    72%{ transform:translate(-160px,-25px); }
+    88%{ transform:translate(-60px,20px); }
     100%{ transform:translate(0,0); }
   }
 }
