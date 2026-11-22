@@ -1557,6 +1557,11 @@ button{font-family:inherit;color:inherit}
   transition:border-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out);
 }
 .cat-back-btn:hover{border-color:var(--red);color:var(--white)}
+.cat-header-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.cat-header-row .cat-back-btn{margin-bottom:0}
+.cat-header-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-width:0}
+.cat-header-title-main{font-family:'Poppins',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:clamp(19px,2.6vw,26px);color:var(--white);line-height:1.1}
+.cat-header-title-sub{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.04em;white-space:nowrap}
 .tool-cat-label::after{content:'';flex:1;height:1px;background:color-mix(in srgb, var(--accent) 30%, transparent)}
 .section-intro-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--white);margin-bottom:8px}
 /* sin max-width a propósito: Juan - "el texto queda comprimido, como de dos columnas, con
@@ -6556,7 +6561,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       archiveMoreBtn.addEventListener('click', function(){ runArchiveSearch(false); });
     })();
     </script>
-      <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
+      <div class="cat-header-row" id="catHeaderRow">
+        <button type="button" class="cat-back-btn" id="catBackBtn">← Volver a categorías</button>
+        <div class="cat-header-title" id="catHeaderTitle">
+          <span class="cat-header-title-main" id="catHeaderTitleMain"></span>
+          <span class="cat-header-title-sub" id="catHeaderTitleSub"></span>
+        </div>
+      </div>
 
       <div class="cat-pill-tabs-wrap" id="catPillTabsWrap" style="display:none">
         <div class="cat-pill-tabs" id="catPillTabs"></div>
@@ -9144,8 +9155,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="trading">
       <div class="tool-section-banner">
         <img src="/assets/menu-principal/zonacaza.webp" alt="" loading="lazy" width="1248" height="334" decoding="async">
-        <div class="tool-section-banner-text"><div class="tool-section-banner-title">Zona de Caza</div></div>
-      </div>
+              </div>
       <div class="section-intro-title">Bienvenido a Zona de Caza</div>
       <p class="section-intro-text">Todas las calculadoras para cazar oportunidades: liquidación, break-even, comisiones y ganancia real en futuros, DCA de compra/venta, y las utilidades rápidas (conversor, porcentajes, zona horaria) que antes andaban sueltas.</p>
       <div class="tool-grid">
@@ -9250,8 +9260,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="inversion">
       <div class="tool-section-banner">
         <img src="/assets/menu-principal/aliados.webp" alt="" loading="lazy" width="1248" height="334" decoding="async">
-        <div class="tool-section-banner-text"><div class="tool-section-banner-title">El Banco</div></div>
-      </div>
+              </div>
       <div class="section-intro-title">Bienvenido a Inversión</div>
       <p class="section-intro-text">Perfila tu riesgo, diseña cómo repartir tu dinero o registra lo que ya tienes comprado, con valor actualizado en vivo y tu ganancia o pérdida real — compara capitalizaciones de mercado y descubre cuándo podrías vivir de tus inversiones.</p>
       <div class="tool-grid">
@@ -9320,8 +9329,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="portafolio">
       <div class="tool-section-banner">
         <img src="/assets/menu-principal/portafolio.webp" alt="" loading="lazy" width="1248" height="334" decoding="async">
-        <div class="tool-section-banner-text"><div class="tool-section-banner-title">Mi Arrecife</div></div>
-      </div>
+              </div>
       <div class="section-intro-title">Bienvenido a Mi Arrecife</div>
       <p class="section-intro-text">Arma tu propio panel: elige qué herramientas, gráficos o noticias de SkillCash quieres ver aquí, y acomódalas al tamaño que prefieras.</p>
 
@@ -9366,8 +9374,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="seguridad">
       <div class="tool-section-banner">
         <img src="/assets/menu-principal/seguridad.webp" alt="" loading="lazy" width="1248" height="334" decoding="async">
-        <div class="tool-section-banner-text"><div class="tool-section-banner-title">La Coraza</div></div>
-      </div>
+              </div>
       <div class="section-intro-title">Bienvenido a Blindaje</div>
       <p class="section-intro-text">Revisa qué tan protegida está tu wallet, compara opciones de custodia, verifica qué apps tienen acceso a tus fondos, y deja todo listo para que tu familia herede sin problemas.</p>
       <div class="tool-grid">
@@ -9436,8 +9443,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="rangos">
       <div class="tool-section-banner">
         <img src="/assets/menu-principal/rango.webp" alt="" loading="lazy" width="1248" height="334" decoding="async">
-        <div class="tool-section-banner-text"><div class="tool-section-banner-title">La Guarida</div></div>
-      </div>
+              </div>
       <div class="section-intro-title">Bienvenido a Rango de Manada</div>
       <p class="section-intro-text">Tu volumen de trading real a través de mi link de afiliado te va subiendo de rango — cada rango desbloquea herramientas reales para operar mejor, no puntos para gastar en cosméticos. El rango se calcula sobre lo que operas <b>cada mes</b> (se reinicia el día 1): si dejas de operar, no te quedas con el rango para siempre. Todavía estamos construyendo esta parte: por ahora puedes conectar tu cuenta y ver cómo va quedando la escala.</p>
 
@@ -12860,6 +12866,17 @@ function showCategoryDetail(cat){
   document.querySelectorAll('.tool-section[data-category]').forEach(section => {
     section.style.display = section.dataset.category === cat ? 'block' : 'none';
   });
+  // el título/subtítulo que antes vivía superpuesto encima de la foto del banner (ilegible en
+  // varias imágenes con fondos claros/recargados) ahora vive junto al botón "Volver a
+  // categorías", así que se actualiza acá mismo cada vez que se entra a una categoría
+  const catHeaderTitleMain = document.getElementById('catHeaderTitleMain');
+  const catHeaderTitleSub = document.getElementById('catHeaderTitleSub');
+  if(catHeaderTitleMain) catHeaderTitleMain.textContent = CATEGORY_LABELS[cat] || '';
+  if(catHeaderTitleSub){
+    catHeaderTitleSub.textContent = cat === 'indicadores'
+      ? `${Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length} INDICADORES · ORGANIZADOS POR PROFUNDIDAD`
+      : '';
+  }
   // las cajas de herramienta de esta categoría recién se vuelven visibles ahora mismo - sus
   // íconos fantasma (ver más abajo en el archivo) solo se pueden medir/colocar con la caja ya
   // visible, por eso se escanean de nuevo cada vez que se entra a una categoría. Doble
@@ -14562,17 +14579,12 @@ function renderIndicIndexList(){
   if(!grid) return;
   const visibleGroups = INDIC_INDEX_CATEGORY_ORDER.filter(cat => (INDIC_GROUPS[cat.group] || []).length);
   const totalRows = 1 + visibleGroups.reduce((sum, cat) => sum + INDIC_GROUPS[cat.group].length, 0);
-  const realCount = Object.values(INDIC_GROUPS).flat().filter(it => !it.id.endsWith('guia')).length;
   let rowIndex = 0;
   const nextColor = () => indicDepthColor(totalRows > 1 ? rowIndex++ / (totalRows - 1) : (rowIndex++, 0));
 
   let html = `
     <div class="indic-index-banner">
       <img src="/assets/sonar/profundidad-banner.webp" alt="" loading="lazy" width="1248" height="300" decoding="async">
-      <div class="indic-index-banner-text">
-        <div class="indic-index-banner-title">Sonar de Mercado</div>
-        <div class="indic-index-banner-sub">${realCount} INDICADORES · ORGANIZADOS POR PROFUNDIDAD</div>
-      </div>
     </div>
     <p class="indic-index-caption">Haz clic en cualquiera de la lista para abrir su gráfico en vivo. Están agrupadas por categoría.</p>
     <button type="button" class="indic-index-standalone" data-jump="predicciones">
