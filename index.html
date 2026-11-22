@@ -9736,6 +9736,80 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <div class="tool-section" data-category="guias">
       <div class="tool-cat-label">📘 Guías</div>
 
+      <div class="section-intro-title">Guías paso a paso</div>
+      <div class="section-intro-text">Explicaciones claras y sin tecnicismos de los temas que más preguntas generan: desde abrir tu primera cuenta hasta entender futuros, apalancamiento y comisiones. Elige un tema para empezar.</div>
+
+      <!-- índice de guías (grid de tarjetas, mismo patrón .indic-guide-grid/.indic-guide-card
+           que ya usa "¿Cómo leer los indicadores?" dentro de Sonar de Mercado) - al hacer clic en
+           una tarjeta, showGuia(id) oculta este grid y muestra solo el .guia-panel de ese id;
+           data-guia-back adentro de cada panel hace el camino inverso. Iconos: SVG de líneas a
+           mano (nunca emoji "de objeto" - ver CLAUDE.md, el mismo motivo por el que .tool-icon
+           tampoco usa emoji). */ -->
+      <div class="indic-guide-grid" id="guiasIndexGrid">
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="bitunix">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M8.5 14l2.5-2.5-2.5-2.5M11 14h4.5"/></svg></div>
+          <div class="indic-guide-card-title">Cómo abrir una cuenta en Bitunix</div>
+          <div class="indic-guide-card-text">Registro paso a paso, niveles de verificación (KYC) y lo primero que conviene activar en seguridad.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="spotFuturos">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v16M6 8h12M6 8l-2.5 6h5L6 8M18 8l-2.5 6h5L18 8"/></svg></div>
+          <div class="indic-guide-card-title">Spot o futuros: en qué se diferencian</div>
+          <div class="indic-guide-card-text">Propiedad de la moneda, apalancamiento, liquidación, comisiones y financiación, en una tabla clara.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="apalancamiento">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg></div>
+          <div class="indic-guide-card-title">Qué es el apalancamiento en cripto</div>
+          <div class="indic-guide-card-text">Cómo funciona de verdad el multiplicador que más cuentas vacía, con números.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="liquidacion">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 18l3.5-5"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg></div>
+          <div class="indic-guide-card-title">Cómo se calcula el precio de liquidación</div>
+          <div class="indic-guide-card-text">La fórmula para posiciones largas y cortas, con ejemplos a x10 y x20.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="primeraOperacion">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M9.5 8v8"/><rect x="4.5" y="8" width="3" height="7" rx=".6"/><path d="M15 3v18M18.5 6v12"/><rect x="13.5" y="6" width="3" height="8" rx=".6"/></svg></div>
+          <div class="indic-guide-card-title">Tu primera operación en futuros</div>
+          <div class="indic-guide-card-text">Qué preparar, la pantalla de la orden campo a campo, y un ejemplo completo con números.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="stopLoss">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.6v5.4c0 4.8-3 8-7 9.2-4-1.2-7-4.4-7-9.2V5.6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <div class="indic-guide-card-title">Stop loss y take profit</div>
+          <div class="indic-guide-card-text">Qué son, stop de mercado o límite, dónde ponerlos y el ratio riesgo/beneficio.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="funding">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 6.9 12L12 12z"/></svg></div>
+          <div class="indic-guide-card-title">Funding rate en futuros perpetuos</div>
+          <div class="indic-guide-card-text">Quién le paga a quién, cada cuánto, y cuánto cuesta mantener una posición abierta.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="makerTaker">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="15" rx="6" ry="2.6"/><path d="M3 15v3.5c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6V15"/><ellipse cx="15" cy="7" rx="5" ry="2.2"/></svg></div>
+          <div class="indic-guide-card-title">Comisiones maker y taker</div>
+          <div class="indic-guide-card-text">Qué diferencia una orden maker de una taker y cuánto pagas de verdad.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="dca">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5c3.5 4.5 7 8.5 7 12.5a7 7 0 0 1-14 0c0-4 3.5-8 7-12.5z"/></svg></div>
+          <div class="indic-guide-card-title">DCA: qué es y cómo calcular tu precio medio</div>
+          <div class="indic-guide-card-text">Comprar poco a poco en vez de todo de una vez, con la fórmula del precio medio.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+        <div class="indic-guide-card indic-guide-card-link" data-guia-jump="referido">
+          <div class="indic-guide-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5a3.5 3.5 0 0 1 0-5l2.2-2.2a3.5 3.5 0 0 1 5 5"/><path d="M14.5 9.5a3.5 3.5 0 0 1 0 5l-2.2 2.2a3.5 3.5 0 0 1-5-5"/></svg></div>
+          <div class="indic-guide-card-title">Qué es un código de referido</div>
+          <div class="indic-guide-card-text">Quién gana qué, cómo se usa y qué datos nunca debes compartir con nadie.</div>
+          <div class="indic-guide-card-link-hint">Leer →</div>
+        </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelBitunix" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
       <div class="section-intro-title">Cómo abrir una cuenta en Bitunix paso a paso</div>
       <div class="section-intro-text">Bitunix es el exchange aliado de SkillCash: puedes entrar y mover lo básico sin verificarte, pero para retirar dinero te va a pedir el nivel 1. Esta guía va paso a paso por el registro, los niveles de verificación y lo primero que conviene activar en seguridad.</div>
 
@@ -9875,6 +9949,694 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión (sobre todo en futuros y apalancamiento) es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas. Los enlaces a Bitunix de esta página son de afiliado: si abres una cuenta con ellos, Bitunix le paga a SkillCash una parte de las comisiones que te cobre al operar. Solo para mayores de 18 años.
         </div>
       </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelSpotFuturos" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Spot o futuros: en qué se diferencian</div>
+      <div class="section-intro-text">Antes de abrir tu primera posición conviene tener clara la diferencia entre comprar la moneda de verdad y operar un contrato sobre su precio — son dos juegos distintos, con riesgos distintos.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~3 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5c3.5 4.5 7 8.5 7 12.5a7 7 0 0 1-14 0c0-4 3.5-8 7-12.5z"/></svg></span><span class="guia-highlight-text">En spot compras la moneda de verdad: es tuya, no hay apalancamiento ni liquidación posible.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8"/></svg></span><span class="guia-highlight-text">En futuros operas un contrato sobre el precio: puedes usar apalancamiento, ganar si baja (en corto) y te pueden liquidar.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 6.9 12L12 12z"/></svg></span><span class="guia-highlight-text">Solo los futuros perpetuos tienen funding rate — un pago periódico entre quienes están en largo y en corto.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Las diferencias, en una tabla</h3>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th></th><th>Spot</th><th>Futuros</th></tr></thead>
+              <tbody>
+                <tr><td>¿Es tuya la moneda?</td><td>Sí</td><td>No — es un contrato sobre el precio</td></tr>
+                <tr><td>Apalancamiento</td><td>No</td><td>Sí, hasta x100 o más según el exchange</td></tr>
+                <tr><td>¿Puede bajar a cero y listo?</td><td>Pierdes lo invertido, nada más</td><td>Te pueden liquidar antes de perder el 100%</td></tr>
+                <tr><td>¿Ganas si el precio baja?</td><td>No</td><td>Sí, abriendo en corto</td></tr>
+                <tr><td>Funding rate</td><td>No existe</td><td>Sí, en los perpetuos</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:16px">La comisión también cambia: en spot se cobra una sola vez sobre lo que compras; en futuros se cobra sobre el tamaño de la posición, que con apalancamiento es mucho mayor que tu margen — más detalle en <span data-guia-link="makerTaker" style="color:var(--accent);cursor:pointer;text-decoration:underline">comisiones maker y taker</span>.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Por qué conviene entender spot primero</h3>
+          <p>En spot, lo peor que puede pasar es que la moneda baje y pierdas lo que invertiste — nunca más que eso, y nunca te cierran la posición por ti. En futuros, con apalancamiento, un movimiento normal del precio puede liquidarte en minutos si no mides el tamaño de la posición. Equivocarse en spot cuesta menos mientras aprendes cómo se mueve el mercado.</p>
+          <div class="guia-callout">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">No es obligatorio pasar por spot antes de futuros, pero entender los dos antes de usar apalancamiento ahorra sustos — spot no tiene liquidación ni funding rate.</span>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Puedo perder más de lo que invierto en spot?</summary><div class="guia-faq-answer">No. En spot compras la moneda con tu propio dinero — si baja a cero, pierdes lo que pusiste, nunca más que eso.</div></details>
+            <details><summary>¿Los futuros siempre usan apalancamiento?</summary><div class="guia-faq-answer">Puedes operar futuros a x1 (sin apalancamiento real), pero la mayoría de la gente los usa justamente para apalancarse — si no quieres apalancamiento, spot es más simple.</div></details>
+            <details><summary>¿Qué son los futuros perpetuos?</summary><div class="guia-faq-answer">Contratos de futuros que no vencen nunca, a diferencia de los futuros clásicos con fecha de vencimiento. Son los más usados en cripto y los que tienen funding rate.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelApalancamiento" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Qué es el apalancamiento en cripto y cómo funciona de verdad</div>
+      <div class="section-intro-text">El apalancamiento es lo primero que ves al abrir futuros, y lo que más cuentas vacía. No es dinero gratis: es un multiplicador, y multiplica igual lo que ganas y lo que pierdes.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~5 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="10" rx="1.5"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg></span><span class="guia-highlight-text">Con apalancamiento abres una posición más grande que el dinero que pones. Ese dinero se llama margen.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8"/></svg></span><span class="guia-highlight-text">Con x10, un movimiento del 1% en el precio es un 10% de tu margen — para bien o para mal.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 18l3.5-5"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg></span><span class="guia-highlight-text">Cuanto más alto el apalancamiento, más cerca está la liquidación: con x10 basta algo menos de un 10% en contra.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.6v5.4c0 4.8-3 8-7 9.2-4-1.2-7-4.4-7-9.2V5.6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="guia-highlight-text">El apalancamiento no cambia cuánto arriesgas si usas stop loss: lo decide el tamaño de la posición.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> El apalancamiento, en una frase</h3>
+          <p>Apalancarte es operar con una posición más grande que el dinero que pones de garantía. Si pones 100 USDT y eliges x10, abres una posición de 1.000 USDT. Esos 100 USDT son el <strong>margen</strong>: lo que el exchange retiene como garantía y lo único que puedes perder. Los otros 900 no te los prestan para llevártelos — solo existen mientras la posición está abierta, y por eso el apalancamiento se usa en futuros, no al comprar en spot.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Lo que ganas y lo que pierdes, con números</h3>
+          <p>Con 100 USDT de margen a x10 (posición de 1.000 USDT), así se mueve tu margen según el precio:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Movimiento del precio</th><th>Resultado</th><th>Sobre tu margen de 100 USDT</th></tr></thead>
+              <tbody>
+                <tr><td>+5%</td><td>+50 USDT</td><td>+50%</td></tr>
+                <tr><td>+1%</td><td>+10 USDT</td><td>+10%</td></tr>
+                <tr><td>−1%</td><td>−10 USDT</td><td>−10%</td></tr>
+                <tr><td>−5%</td><td>−50 USDT</td><td>−50%</td></tr>
+                <tr><td>−9,5% aprox.</td><td>Liquidación</td><td>Pierdes el margen</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:16px">La cuenta siempre es la misma: resultado = tamaño de la posición × movimiento del precio. El apalancamiento solo decide cuánto margen pones para ese tamaño.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Por qué te liquidan antes de perder el 100%</h3>
+          <p>Cuando las pérdidas se comen casi todo tu margen, el exchange cierra la posición por ti — es la liquidación. Necesita un colchón para cerrar sin perder él mismo: el margen de mantenimiento. Una regla aproximada (margen aislado, sin comisiones): la distancia hasta la liquidación es algo menos de 100 dividido entre el apalancamiento.</p>
+          <div class="guia-stats">
+            <div class="guia-stat"><div class="guia-stat-num">x5</div><div class="guia-stat-label">menos del 20% en contra te liquida</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">x10</div><div class="guia-stat-label">menos del 10% en contra te liquida</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">x20</div><div class="guia-stat-label">menos del 5% en contra te liquida</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">x100</div><div class="guia-stat-label">menos del 1% en contra te liquida</div></div>
+          </div>
+          <div class="wp-note">Con x100, un movimiento de menos del 1% cierra tu posición — en cripto eso pasa varias veces al día. El cálculo exacto está en <span data-guia-link="liquidacion" style="color:var(--accent);cursor:pointer;text-decoration:underline">cómo se calcula el precio de liquidación</span>.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Margen aislado o cruzado</h3>
+          <ul>
+            <li><strong>Aislado:</strong> cada posición tiene su propio margen. Si te liquidan, pierdes ese margen y nada más.</li>
+            <li><strong>Cruzado:</strong> todas las posiciones comparten el saldo de tu cuenta de futuros. La liquidación queda más lejos, pero si llega te puedes quedar sin la cuenta entera.</li>
+          </ul>
+          <div class="wp-note">Si estás empezando, el aislado es más fácil de entender: sabes en todo momento cuánto puedes perder en cada operación.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> El error más común: creer que el apalancamiento es el riesgo</h3>
+          <p>El apalancamiento no decide cuánto pierdes — lo decide el tamaño de la posición y dónde pones el stop loss. Una posición de 1.000 USDT con stop a un 2% de distancia pierde 20 USDT si salta, la abras con x2 (500 USDT de margen) o con x20 (50 USDT de margen).</p>
+          <div class="guia-callout warn">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">Si abres una posición sin saber dónde la vas a cerrar si sale mal, el apalancamiento decide por ti — y lo hace con la liquidación. El peligro real es un apalancamiento alto sin stop loss, no el número en sí.</span>
+          </div>
+          <p>Las comisiones también se multiplican: se cobran sobre el tamaño de la posición, no sobre tu margen. Con 100 USDT a x50 abres 5.000 USDT, y cada comisión se calcula sobre esos 5.000 — más en <span data-guia-link="makerTaker" style="color:var(--accent);cursor:pointer;text-decoration:underline">comisiones maker y taker</span>.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Qué significa x10 en trading?</summary><div class="guia-faq-answer">Que tu posición es 10 veces el margen que pusiste — con 100 USDT de margen a x10, controlas 1.000 USDT.</div></details>
+            <details><summary>¿Puedo perder más dinero del que pongo con apalancamiento?</summary><div class="guia-faq-answer">En margen aislado, no — como máximo pierdes el margen de esa posición, porque el exchange te liquida antes. En margen cruzado puedes perder todo el saldo de tu cuenta de futuros.</div></details>
+            <details><summary>¿Qué apalancamiento es seguro?</summary><div class="guia-faq-answer">No hay un número universal — lo que importa es el tamaño de la posición y el stop loss. Un apalancamiento bajo (x2-x5) deja más margen de error mientras aprendes.</div></details>
+            <details><summary>¿El apalancamiento se paga?</summary><div class="guia-faq-answer">No tiene un costo propio, pero las comisiones se cobran sobre el tamaño total de la posición (no sobre tu margen), así que con apalancamiento alto pesan más.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelLiquidacion" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Cómo se calcula el precio de liquidación en futuros</div>
+      <div class="section-intro-text">El precio de liquidación es el precio al que el exchange cierra tu posición porque ya no queda margen para sostenerla. Saberlo antes de abrir marca la diferencia entre una operación que sale mal y una cuenta que desaparece.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~5 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span><span class="guia-highlight-text">En una posición larga, la liquidación queda por debajo del precio de entrada; en una corta, por encima.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8"/></svg></span><span class="guia-highlight-text">Con x10 y entrada en 60.000 USDT, un largo se liquida hacia los 54.300 USDT (margen aislado).</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="guia-highlight-text">El exchange calcula el suyo con sus propios datos — el que ves en la pantalla de la orden es el que manda.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Qué es exactamente</h3>
+          <p>Cuando abres una posición con <span data-guia-link="apalancamiento" style="color:var(--accent);cursor:pointer;text-decoration:underline">apalancamiento</span>, pones un margen. Si el precio va en tu contra, las pérdidas se restan de ese margen. Cuando lo que queda llega al <strong>margen de mantenimiento</strong> (el mínimo que exige el exchange para que la posición siga abierta), el sistema la cierra por ti. El precio al que pasa eso es el precio de liquidación — y se calcula con el <strong>precio de marca</strong> (una media de varios mercados), no con el último precio negociado, así una mecha puntual en un solo exchange no liquida a todo el mundo.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> La fórmula, para largos y cortos</h3>
+          <p>En margen aislado, y dejando fuera comisiones, el cálculo cabe en una línea:</p>
+          <div class="wp-formula">Largo: liquidación = entrada × (1 − 1/apalancamiento + mantenimiento)</div><br>
+          <div class="wp-formula">Corto: liquidación = entrada × (1 + 1/apalancamiento − mantenimiento)</div>
+          <p style="margin-top:16px">El margen de mantenimiento va en tanto por uno (0,5% es 0,005) y suele estar entre 0,4% y 1% para posiciones pequeñas en pares grandes, subiendo con el tamaño de la posición.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Ejemplos con números</h3>
+          <p>Con entrada en 60.000 USDT y mantenimiento del 0,5%:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Posición</th><th>Apalancamiento</th><th>Liquidación</th><th>Distancia</th></tr></thead>
+              <tbody>
+                <tr><td>Largo</td><td>x10</td><td>54.300 USDT</td><td>−9,5%</td></tr>
+                <tr><td>Corto</td><td>x10</td><td>65.700 USDT</td><td>+9,5%</td></tr>
+                <tr><td>Largo</td><td>x20</td><td>57.300 USDT</td><td>−4,5%</td></tr>
+                <tr><td>Corto</td><td>x20</td><td>62.700 USDT</td><td>+4,5%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">Doblar el apalancamiento no acerca la liquidación un poco: la deja a menos de la mitad de distancia.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Y en margen cruzado</h3>
+          <p>En margen cruzado la posición usa todo el saldo libre de tu cuenta de futuros como colchón. La liquidación queda más lejos, y se mueve: si abres otra posición o retiras saldo, cambia. Que quede más lejos no quiere decir que arriesgues menos — si llega, te puede llevar el saldo entero de la cuenta de futuros, no solo el de esa posición.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Por qué tu exchange da una cifra un poco distinta</h3>
+          <ul>
+            <li>Descuenta la comisión de cierre que cobraría al liquidarte, acercando un poco la liquidación.</li>
+            <li>El margen de mantenimiento sube por tramos según el tamaño de la posición.</li>
+            <li>Si añades margen o te cobran funding rate, el margen cambia y la liquidación se mueve.</li>
+          </ul>
+          <div class="wp-note">Usa la fórmula para entender el orden de magnitud antes de abrir, y la cifra del exchange para decidir.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Cómo alejar la liquidación</h3>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text"><strong>Baja el apalancamiento</strong> — es lo que más la aleja: de x20 a x5, la distancia pasa de menos del 5% a menos del 20%.</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Añade margen a la posición abierta (en aislado, casi todos los exchanges lo permiten).</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Pon un <span data-guia-link="stopLoss" style="color:var(--accent);cursor:pointer;text-decoration:underline">stop loss</span> bastante antes de la liquidación — si salta, cierras con una pérdida que elegiste tú.</span></div>
+            <div class="guia-step"><span class="guia-step-num">4</span><span class="guia-step-text">Reduce el tamaño de la posición: con el mismo margen y menos tamaño, el apalancamiento efectivo baja.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">7</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Qué pasa cuando te liquidan?</summary><div class="guia-faq-answer">El exchange cierra tu posición y pierdes el margen que tenía retenido — en aislado, solo el de esa posición; en cruzado, puede ser el saldo de futuros entero.</div></details>
+            <details><summary>¿El precio de liquidación cambia con la posición abierta?</summary><div class="guia-faq-answer">Sí, sobre todo en margen cruzado: cambia si abres otra posición, añades o retiras saldo, o te cobran funding rate.</div></details>
+            <details><summary>¿Un stop loss evita la liquidación?</summary><div class="guia-faq-answer">Si queda antes del precio de liquidación y se ejecuta, sí — cierras tú la posición con una pérdida elegida antes de llegar a ese punto.</div></details>
+            <details><summary>¿Por qué hay liquidaciones si el gráfico no llega a ese precio?</summary><div class="guia-faq-answer">Porque la liquidación se calcula con el precio de marca (una media de varios mercados), no con el precio de un solo exchange o gráfico.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelPrimeraOperacion" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Cómo empezar con los futuros cripto: tu primera operación, paso a paso</div>
+      <div class="section-intro-text">La primera vez que abres la pestaña de futuros hay demasiadas cosas a la vez. Antes de pulsar el botón de abrir una posición hay tres cuentas que hacer y media docena de campos que entender — esta guía va de la cuenta vacía a la primera operación cerrada, con números.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~8 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 18l3.5-5"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg></span><span class="guia-highlight-text">Antes de abrir nada, decide cuánto puedes perder y dónde va el stop. El tamaño de la posición sale de ahí, no del apalancamiento.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="10" rx="1.5"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg></span><span class="guia-highlight-text">Para empezar: margen aislado y apalancamiento bajo — sabes en todo momento qué puedes perder.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.6v5.4c0 4.8-3 8-7 9.2-4-1.2-7-4.4-7-9.2V5.6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="guia-highlight-text">Pon el stop loss al abrir, no después, y comprueba que queda antes del precio de liquidación.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5l1.6-3 1.6 3 1.6-3 1.6 3 1.6-3 1.6 3"/><path d="M3 13c2.3-2.2 5-2.2 7 0s4.7 2.2 7 0"/></svg></span><span class="guia-highlight-text">Las primeras semanas, opera con importes pequeños: lo que se aprende es el proceso, no el resultado.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Qué necesitas antes de la primera operación</h3>
+          <p>Necesitas una cuenta verificada, saldo en USDT en la cuenta de futuros, y tres números decididos antes de entrar: cuánto puedes perder, dónde va el stop y de qué tamaño será la posición. Sin esos tres, el apalancamiento decide por ti.</p>
+          <ul>
+            <li><strong>La cuenta:</strong> casi todos los exchanges piden verificar tu identidad antes de depositar, operar o retirar.</li>
+            <li><strong>El saldo:</strong> los perpetuos más comunes se liquidan en USDT (futuros USDT-M) — si tu saldo está en spot, tienes que transferirlo.</li>
+            <li><strong>La idea de la operación:</strong> por qué entras, dónde sales si te equivocas y dónde recoges si aciertas. Si no puedes decirlo en una frase, todavía no hay operación.</li>
+          </ul>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> La pantalla de la orden, campo por campo</h3>
+          <ul>
+            <li><strong>Par:</strong> el contrato que operas (ej. BTCUSDT perpetuo). Uno con mucho volumen se mueve menos a saltos que una moneda pequeña.</li>
+            <li><strong>Modo de margen:</strong> aislado o cruzado — ver <span data-guia-link="apalancamiento" style="color:var(--accent);cursor:pointer;text-decoration:underline">qué es el apalancamiento</span>.</li>
+            <li><strong>Apalancamiento:</strong> decide cuánto margen pones, no lo que pierdes si salta el stop.</li>
+            <li><strong>Tipo de orden:</strong> a mercado entra al momento; límite entra solo a tu precio o uno mejor, y suele pagar menos comisión.</li>
+            <li><strong>Cantidad:</strong> el tamaño de la posición — en moneda, en USDT o como margen según el exchange. Mira cuál antes de escribir el número.</li>
+            <li><strong>Stop loss y take profit:</strong> las órdenes que cierran la posición en tu pérdida máxima o tu objetivo.</li>
+          </ul>
+          <div class="guia-callout warn">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">Antes de confirmar, la pantalla enseña el precio de liquidación estimado. Si queda más cerca que tu stop, la operación está mal planteada: baja el apalancamiento o reduce el tamaño.</span>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Una primera operación, con números</h3>
+          <p>Con 500 USDT en futuros y un riesgo del 1%, puedes perder 5 USDT. Si el stop queda a un 2% de la entrada, la posición es de 250 USDT, y a x5 solo retiene 50 USDT de margen:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Pieza</th><th>Cuenta</th><th>Resultado</th></tr></thead>
+              <tbody>
+                <tr><td>Riesgo (1% de 500 USDT)</td><td>500 × 0,01</td><td>5 USDT</td></tr>
+                <tr><td>Entrada, largo en BTC</td><td>Precio del momento</td><td>60.000 USDT</td></tr>
+                <tr><td>Stop loss, a un 2%</td><td>60.000 × 0,98</td><td>58.800 USDT</td></tr>
+                <tr><td>Tamaño de la posición</td><td>5 ÷ 0,02</td><td>250 USDT</td></tr>
+                <tr><td>Margen retenido a x5</td><td>250 ÷ 5</td><td>50 USDT</td></tr>
+                <tr><td>Take profit, a un 4%</td><td>60.000 × 1,04</td><td>62.400 USDT: +10 USDT</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">Si salta el stop, pierdes 5 USDT más comisiones. Si llega el take profit, ganas 10 USDT menos esas mismas comisiones. La liquidación queda casi un 20% por debajo de la entrada: el stop salta mucho antes.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Cómo abrir la operación, paso a paso</h3>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">Transfiere el saldo de spot a la cuenta de futuros USDT-M.</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Elige el par (ej. BTCUSDT perpetuo) y cambia el modo de margen a aislado.</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Pon el apalancamiento decidido — en el ejemplo, x5.</span></div>
+            <div class="guia-step"><span class="guia-step-num">4</span><span class="guia-step-text">Elige orden límite y escribe el precio de entrada y la cantidad.</span></div>
+            <div class="guia-step"><span class="guia-step-num">5</span><span class="guia-step-text">Activa el stop loss y el take profit en la misma orden.</span></div>
+            <div class="guia-step"><span class="guia-step-num">6</span><span class="guia-step-text">Revisa el precio de liquidación estimado y el margen que se va a retener. Si cuadra, confirma.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Mientras está abierta, y al cerrarla</h3>
+          <p>Con la posición abierta verás un resultado que cambia cada segundo: es el beneficio o la pérdida no realizados, y solo pasa a tu saldo cuando cierras. Tres cosas a vigilar: la <span data-guia-link="funding" style="color:var(--accent);cursor:pointer;text-decoration:underline">tasa de financiación</span> (se cobra cada pocas horas), el stop (no lo alejes porque el precio se acerque) y el precio de marca (el exchange liquida con él, no con el último precio negociado).</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Los errores más comunes al empezar</h3>
+          <ul>
+            <li>Elegir el apalancamiento primero y el tamaño después — es al revés.</li>
+            <li>Abrir sin stop pensando en ponerlo luego.</li>
+            <li>Confundir la cantidad: escribir el número pensando en USDT cuando el campo pedía el margen.</li>
+            <li>Usar margen cruzado sin saberlo — una sola posición puede llevarse todo el saldo.</li>
+            <li>Operar para recuperar justo después de una pérdida, con más tamaño.</li>
+          </ul>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">7</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Con cuánto dinero se puede empezar en futuros?</summary><div class="guia-faq-answer">Muchos exchanges dejan abrir posiciones de unos pocos USDT. Más que la cantidad, importa que lo que arriesgas en cada operación sea una parte pequeña de lo que tienes en futuros.</div></details>
+            <details><summary>¿Qué apalancamiento usar en la primera operación?</summary><div class="guia-faq-answer">No hay un número correcto. Con x2 o x5 la liquidación queda lejos y hay más margen de error.</div></details>
+            <details><summary>¿Hay que operar en spot antes de pasar a futuros?</summary><div class="guia-faq-answer">No es obligatorio, pero en spot no hay liquidación ni funding rate, y equivocarse cuesta menos.</div></details>
+            <details><summary>¿Qué pasa si me liquidan?</summary><div class="guia-faq-answer">El exchange cierra la posición y pierdes el margen retenido — en aislado, solo el de esa posición.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelStopLoss" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Stop loss y take profit: qué son y cómo ponerlos con criterio</div>
+      <div class="section-intro-text">El stop loss cierra tu operación cuando sale mal, y el take profit cuando sale bien. Ponerlos antes de entrar te obliga a decidir con la cabeza fría cuánto estás dispuesto a perder y qué esperas ganar.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~4 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.6v5.4c0 4.8-3 8-7 9.2-4-1.2-7-4.4-7-9.2V5.6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="guia-highlight-text">El stop loss limita la pérdida; el take profit asegura la ganancia.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M8 12h8M12 8v8"/></svg></span><span class="guia-highlight-text">Un stop de mercado se ejecuta siempre, aunque sea a peor precio; un stop límite puede no ejecutarse.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 18l3.5-5"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg></span><span class="guia-highlight-text">El stop va donde tu idea deja de tener sentido, no a un porcentaje cualquiera.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l6-5 6 5"/><path d="M4 10.5l6-5 6 5"/></svg></span><span class="guia-highlight-text">Con un ratio de 1:3, te basta con acertar algo más de una de cada cuatro para no perder.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Qué hace cada uno</h3>
+          <ul>
+            <li><strong>Stop loss:</strong> cierra la posición si el precio llega a un nivel en tu contra. En largo, va por debajo de la entrada; en corto, por encima.</li>
+            <li><strong>Take profit:</strong> cierra la posición si el precio llega a tu objetivo. En largo, por encima; en corto, por debajo.</li>
+          </ul>
+          <p>Los dos esperan en el exchange y se ejecutan aunque no estés mirando — el mercado cripto no cierra nunca, y tú tienes que dormir.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Stop de mercado o stop límite</h3>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th></th><th>Stop de mercado</th><th>Stop límite</th></tr></thead>
+              <tbody>
+                <tr><td>Qué lanza</td><td>Una orden a mercado</td><td>Una orden límite a un precio</td></tr>
+                <tr><td>¿Se ejecuta seguro?</td><td>Sí</td><td>No — si el precio salta tu límite, se queda sin ejecutar</td></tr>
+                <tr><td>Precio de salida</td><td>Puede ser peor (deslizamiento)</td><td>Nunca peor que tu límite</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">Para cortar pérdidas, lo que importa es salir. Un stop límite que no se ejecuta en una caída brusca te deja dentro justo cuando más daño hace.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Dónde poner el stop</h3>
+          <p>El error más común es ponerlo a un porcentaje fijo o donde duele menos. El stop va en el precio que demuestra que te equivocaste: por debajo del último mínimo relevante si entras en largo, por encima del último máximo si entras en corto. Una vez sabes dónde va, calculas el tamaño de la posición para que, si salta, pierdas lo que decidiste arriesgar — y con apalancamiento, el stop tiene que quedar siempre antes del <span data-guia-link="liquidacion" style="color:var(--accent);cursor:pointer;text-decoration:underline">precio de liquidación</span>.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> El ratio riesgo/beneficio</h3>
+          <p>Compara lo que arriesgas hasta el stop con lo que buscas hasta el take profit. Entrada en 60.000, stop en 58.800 (−2%) y take profit en 63.600 (+6%): arriesgas 2 para ganar 6, un ratio de 1:3.</p>
+          <div class="guia-stats">
+            <div class="guia-stat"><div class="guia-stat-num">1:1</div><div class="guia-stat-label">necesitas 50% de aciertos</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">1:2</div><div class="guia-stat-label">necesitas 33% de aciertos</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">1:3</div><div class="guia-stat-label">necesitas 25% de aciertos</div></div>
+            <div class="guia-stat"><div class="guia-stat-num">1:4</div><div class="guia-stat-label">necesitas 20% de aciertos</div></div>
+          </div>
+          <div class="wp-note">Sin contar comisiones — con ellas, necesitas un poco más. Un ratio alto no hace buena una operación por sí solo: un take profit muy lejano se alcanza menos veces.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Errores que cuestan dinero</h3>
+          <ul>
+            <li><strong>Alejar el stop</strong> cuando el precio se acerca — conviertes una pérdida pequeña en una grande.</li>
+            <li><strong>Poner el stop en un número redondo</strong> o justo en el mínimo, donde está todo el mundo.</li>
+            <li><strong>No ponerlo</strong> porque "lo vigilo yo" — un movimiento de segundos no te espera.</li>
+            <li><strong>Mover el take profit por codicia</strong> y ver cómo el precio se da la vuelta.</li>
+          </ul>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Qué es un stop loss?</summary><div class="guia-faq-answer">Una orden que cierra tu posición automáticamente si el precio llega a un nivel en tu contra, limitando la pérdida.</div></details>
+            <details><summary>¿Qué es un take profit?</summary><div class="guia-faq-answer">Una orden que cierra tu posición cuando el precio llega a tu objetivo, asegurando la ganancia.</div></details>
+            <details><summary>¿Dónde se pone el stop loss?</summary><div class="guia-faq-answer">En el precio que demuestra que la idea de la operación estaba equivocada — no a un porcentaje arbitrario.</div></details>
+            <details><summary>¿Por qué salta el stop y luego el precio sigue a favor?</summary><div class="guia-faq-answer">Pasa, y es parte del juego — un stop bien puesto (en el nivel que invalida la idea) sigue siendo correcto aunque esa vez el precio se diera la vuelta después.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelFunding" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Funding rate: qué es la tasa de financiación en futuros perpetuos</div>
+      <div class="section-intro-text">Si alguna vez viste que tu saldo de futuros bajaba un poco sin haber cerrado nada, probablemente fue el funding rate — el mecanismo que mantiene el precio de los futuros perpetuos pegado al del spot.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~3 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5a3.5 3.5 0 0 1 0-5l2.2-2.2a3.5 3.5 0 0 1 5 5"/><path d="M14.5 9.5a3.5 3.5 0 0 1 0 5l-2.2 2.2a3.5 3.5 0 0 1-5-5"/></svg></span><span class="guia-highlight-text">El funding es un pago entre traders, no una comisión del exchange.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l6-5 6 5"/><path d="M4 10.5l6-5 6 5"/></svg></span><span class="guia-highlight-text">Si la tasa es positiva, los largos pagan a los cortos; si es negativa, los cortos pagan a los largos.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3.5 2"/></svg></span><span class="guia-highlight-text">Se cobra cada pocas horas (en muchos contratos, cada 8) y solo si tienes la posición abierta justo entonces.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="10" rx="1.5"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg></span><span class="guia-highlight-text">Se calcula sobre el tamaño de la posición: con apalancamiento, pesa más sobre tu margen.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Para qué existe</h3>
+          <p>Un perpetuo no vence nunca, así que necesita algo que lo mantenga pegado al precio real: ese algo es el funding. Cuando el perpetuo cotiza por encima del spot, los largos pagan a los cortos — así abrir un largo sale más caro y abrir un corto, más atractivo, y el precio vuelve a acercarse.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Quién paga a quién</h3>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Tasa</th><th>Qué suele indicar</th><th>Largos</th><th>Cortos</th></tr></thead>
+              <tbody>
+                <tr><td>Positiva</td><td>Más presión compradora</td><td>Pagan</td><td>Cobran</td></tr>
+                <tr><td>Negativa</td><td>Más presión vendedora</td><td>Cobran</td><td>Pagan</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">El exchange no se queda con ese dinero: pasa de unos traders a otros.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Cuánto te cuesta, con números</h3>
+          <p>La cuenta es tamaño de la posición × tasa. En mercados tranquilos, la tasa ronda el 0,01% por periodo. Con una posición larga de 10.000 USDT:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Tasa por periodo</th><th>Cada periodo</th><th>Al día (3 de 8h)</th><th>En 30 días</th></tr></thead>
+              <tbody>
+                <tr><td>0,01%</td><td>1 USDT</td><td>3 USDT</td><td>90 USDT</td></tr>
+                <tr><td>0,05%</td><td>5 USDT</td><td>15 USDT</td><td>450 USDT</td></tr>
+                <tr><td>0,10%</td><td>10 USDT</td><td>30 USDT</td><td>900 USDT</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="guia-callout warn">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">Si esa posición de 10.000 USDT la abriste con 1.000 de margen a x10, con una tasa del 0,05% pierdes casi la mitad del margen en un mes solo de financiación, aunque el precio no se mueva.</span>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Cuándo se cobra</h3>
+          <p>Cada contrato tiene sus horas fijas de liquidación de la financiación, y el exchange enseña la tasa prevista y la cuenta atrás hasta el siguiente cobro. Solo pagas o cobras si tienes la posición abierta justo en ese momento. Algunos contratos liquidan cada 8 horas, otros cada 4 o cada hora: mira el tuyo.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Lo que dice del mercado</h3>
+          <p>Una tasa muy positiva durante días indica que mucha gente está en largo con apalancamiento. No dice hacia dónde irá el precio, pero sí que, si cae, habrá muchas posiciones largas cerca de su <span data-guia-link="liquidacion" style="color:var(--accent);cursor:pointer;text-decoration:underline">liquidación</span>, y las liquidaciones en cadena aceleran las caídas. Es un dato de contexto, no una señal para entrar.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿El funding rate lo cobra el exchange?</summary><div class="guia-faq-answer">No — es un pago entre traders (largos y cortos). El exchange solo lo hace pasar de unos a otros.</div></details>
+            <details><summary>¿Cada cuánto se paga el funding?</summary><div class="guia-faq-answer">Depende del contrato: muchos cada 8 horas, otros cada 4 o cada hora. Se muestra en la pantalla del contrato.</div></details>
+            <details><summary>¿Cómo evito pagar funding?</summary><div class="guia-faq-answer">Cerrando la posición antes de la hora de cobro, u operando en spot, donde el funding no existe.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelMakerTaker" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Comisiones maker y taker: qué son y cuánto pagas de verdad</div>
+      <div class="section-intro-text">Cada vez que abres o cierras una operación, el exchange cobra una comisión. Parece poca cosa, un 0,0algo por ciento, hasta que haces la cuenta sobre el volumen operado de un mes.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~4 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h13"/></svg></span><span class="guia-highlight-text"><strong>Maker:</strong> tu orden queda en el libro esperando y añade liquidez. Suele pagar menos.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L4 14h7l-1 7 9-11h-7z"/></svg></span><span class="guia-highlight-text"><strong>Taker:</strong> tu orden se ejecuta al momento contra otras y quita liquidez. Suele pagar más.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="10" rx="1.5"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg></span><span class="guia-highlight-text">La comisión se cobra sobre el tamaño de la posición, no sobre tu margen — con apalancamiento pesa mucho más.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Maker y taker, sin tecnicismos</h3>
+          <p>En el libro de órdenes hay gente esperando para comprar y vender a precios concretos. Cuando pones una orden límite que no se ejecuta al momento y se queda en el libro, eres <strong>maker</strong>: estás "haciendo" mercado, porque das a otros algo contra lo que operar. Cuando lanzas una orden a mercado, o una límite que se cruza enseguida con otra, eres <strong>taker</strong>: "tomas" una orden que ya estaba ahí. Los exchanges premian al maker con una comisión más baja porque la liquidez es lo que hace que su mercado funcione.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Cómo se calcula</h3>
+          <p>La cuenta es: comisión = tamaño de la orden × porcentaje, y se cobra al abrir y otra vez al cerrar. Con porcentajes de ejemplo de 0,02% maker y 0,06% taker (los de tu exchange pueden ser otros), sobre una posición de 10.000 USDT:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th></th><th>Al abrir</th><th>Al cerrar</th><th>Total</th></tr></thead>
+              <tbody>
+                <tr><td>Las dos como taker</td><td>6 USDT</td><td>6 USDT</td><td>12 USDT</td></tr>
+                <tr><td>Abres maker, cierras taker</td><td>2 USDT</td><td>6 USDT</td><td>8 USDT</td></tr>
+                <tr><td>Las dos como maker</td><td>2 USDT</td><td>2 USDT</td><td>4 USDT</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">La misma operación cuesta el triple según cómo pongas las órdenes. En futuros perpetuos, además, se cobra o se paga <span data-guia-link="funding" style="color:var(--accent);cursor:pointer;text-decoration:underline">funding rate</span> mientras la posición sigue abierta.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Con apalancamiento, la comisión se come el margen</h3>
+          <p>Abres 100 USDT de margen a x50: la posición es de 5.000 USDT. Si abres y cierras como taker al 0,06%, pagas 3 + 3 = 6 USDT — un 6% de tu margen en una sola operación, antes de que el precio se mueva.</p>
+          <div class="guia-callout warn">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">Diez operaciones así son 60 USDT, más de la mitad del margen, aunque aciertes la mitad de las veces. Con apalancamiento alto, el precio tiene que moverse a tu favor bastante más que la comisión solo para quedarte igual.</span>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> El volumen operado lo es todo</h3>
+          <p>Lo que pagas al mes no depende de cuánto dinero tienes, sino del volumen operado: la suma de todas las órdenes que abres y cierras. Con 1.000 USDT y x10, una sola operación de ida y vuelta mueve 20.000 USDT de volumen — diez al mes son 200.000 USDT, y al 0,06% son 120 USDT en comisiones. Por eso muchos exchanges bajan los porcentajes por niveles, según el volumen operado o el saldo que mantienes.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Cómo pagar menos comisiones</h3>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">Usa <strong>órdenes límite</strong> cuando no tengas prisa por entrar — si quedan en el libro, pagas como maker. Algunos exchanges tienen la opción "solo maker" (post-only).</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Opera menos veces: cada operación paga dos comisiones (abrir y cerrar).</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Cuidado con el apalancamiento alto, que multiplica el tamaño sobre el que se cobra.</span></div>
+            <div class="guia-step"><span class="guia-step-num">4</span><span class="guia-step-text">Mira si tu exchange tiene descuentos por su token propio o por nivel de volumen operado.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Qué es una comisión maker?</summary><div class="guia-faq-answer">La que pagas cuando tu orden queda esperando en el libro (una orden límite que no se ejecuta al momento) y añade liquidez al mercado. Suele ser más barata.</div></details>
+            <details><summary>¿Qué es una comisión taker?</summary><div class="guia-faq-answer">La que pagas cuando tu orden se ejecuta de inmediato contra otra ya puesta en el libro (una orden a mercado, por ejemplo), quitando liquidez. Suele ser más cara.</div></details>
+            <details><summary>¿Las comisiones se cobran sobre el margen o sobre la posición?</summary><div class="guia-faq-answer">Sobre el tamaño total de la posición, no sobre tu margen — con apalancamiento, la base sobre la que se cobra es mucho mayor.</div></details>
+            <details><summary>¿Una orden de stop loss paga maker o taker?</summary><div class="guia-faq-answer">Casi siempre taker, porque al activarse lanza una orden a mercado que se ejecuta de inmediato — revisa la documentación de tu exchange para el caso exacto.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelDca" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">DCA en cripto: qué es y cómo calcular tu precio medio de compra</div>
+      <div class="section-intro-text">DCA son las siglas de dollar cost averaging: comprar una cantidad fija cada cierto tiempo, pase lo que pase con el precio, en vez de jugárselo todo a un solo día.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~3 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3.5 2"/></svg></span><span class="guia-highlight-text">DCA es comprar la misma cantidad cada cierto tiempo, sin intentar adivinar el mejor momento.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8"/></svg></span><span class="guia-highlight-text">Tu precio medio es total invertido ÷ monedas compradas — no la media de los precios.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l6-5 6 5"/><path d="M4 10.5l6-5 6 5"/></svg></span><span class="guia-highlight-text">Como compras más monedas cuando el precio está bajo, tu precio medio queda por debajo de la media simple.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="guia-highlight-text">El DCA reparte el momento de entrada; no evita pérdidas si el precio cae y no se recupera.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Qué es el DCA</h3>
+          <p>En vez de invertir 1.200 USDT un día, inviertes 100 USDT cada mes durante un año, o 25 cada semana. Compras siempre la misma cantidad en USDT, así que cuando el precio está alto te llevas menos monedas, y cuando está bajo, más. La ventaja es psicológica y práctica: no tienes que acertar el momento, y reduces el peso de haber comprado todo justo en un máximo. Muchos exchanges permiten automatizarlo con compras periódicas en spot.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Cómo calcular tu precio medio</h3>
+          <p>Tu precio medio es lo que has invertido dividido entre las monedas que tienes, no la media de los precios a los que compraste. Cuatro compras de 100 USDT a precios distintos:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Compra</th><th>Precio</th><th>Inviertes</th><th>Monedas</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>50.000 USDT</td><td>100 USDT</td><td>0,002000</td></tr>
+                <tr><td>2</td><td>40.000 USDT</td><td>100 USDT</td><td>0,002500</td></tr>
+                <tr><td>3</td><td>60.000 USDT</td><td>100 USDT</td><td>0,001667</td></tr>
+                <tr><td>4</td><td>50.000 USDT</td><td>100 USDT</td><td>0,002000</td></tr>
+                <tr><td>Total</td><td></td><td>400 USDT</td><td>0,008167</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wp-note">Precio medio = 400 ÷ 0,008167 = unos 48.980 USDT. La media simple de los cuatro precios es 50.000, pero tu precio real es más bajo, porque en la compra a 40.000 te llevaste más monedas. Si compras cantidades distintas cada vez, la fórmula es la misma: suma lo invertido y divide entre la suma de las monedas.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> No te olvides de las comisiones</h3>
+          <p>Cada compra paga su comisión. Si haces muchas compras pequeñas, las comisiones pesan más sobre el total — para un precio medio exacto, suma también lo que pagaste de comisión a lo invertido. Cómo se calculan, en <span data-guia-link="makerTaker" style="color:var(--accent);cursor:pointer;text-decoration:underline">comisiones maker y taker</span>.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Lo que el DCA no hace</h3>
+          <ul>
+            <li><strong>No garantiza ganar:</strong> si el precio cae y no vuelve a subir, sigues perdiendo, solo que repartido.</li>
+            <li><strong>No es una estrategia para cualquier moneda:</strong> comprar cada mes algo que va a cero es ir a cero poco a poco.</li>
+            <li><strong>No tiene sentido con apalancamiento:</strong> promediar a la baja una posición apalancada acerca la <span data-guia-link="liquidacion" style="color:var(--accent);cursor:pointer;text-decoration:underline">liquidación</span> con cada compra.</li>
+          </ul>
+          <div class="wp-note">Qué comprar, cuánto y cada cuánto depende de tu situación, y es decisión tuya. Esta guía explica la mecánica, no qué hacer con tu dinero.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Qué significa DCA en cripto?</summary><div class="guia-faq-answer">Dollar cost averaging: comprar una cantidad fija de dinero cada cierto tiempo, sin importar el precio del momento.</div></details>
+            <details><summary>¿Cómo se calcula el precio medio de compra?</summary><div class="guia-faq-answer">Sumando todo lo invertido y dividiéndolo entre la suma total de monedas compradas — no promediando los precios directamente.</div></details>
+            <details><summary>¿El DCA elimina el riesgo?</summary><div class="guia-faq-answer">No. Reparte el momento de entrada en el tiempo, pero si el activo cae y no se recupera, sigues perdiendo dinero, solo que de forma más gradual.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
+      <div class="guia-panel" id="guiaPanelReferido" style="display:none">
+      <button type="button" class="cat-back-btn" data-guia-back>← Volver a Guías</button>
+      <div class="section-intro-title">Qué es un código de referido en un exchange y cómo funciona</div>
+      <div class="section-intro-text">Al abrir una cuenta en casi cualquier exchange aparece una casilla para un código de referido o de invitación. Esto es lo que pasa de verdad cuando usas uno.</div>
+      <div class="wp-article">
+        <div class="wp-meta"><div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~4 min</div></div>
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5a3.5 3.5 0 0 1 0-5l2.2-2.2a3.5 3.5 0 0 1 5 5"/><path d="M14.5 9.5a3.5 3.5 0 0 1 0 5l-2.2 2.2a3.5 3.5 0 0 1-5-5"/></svg></span><span class="guia-highlight-text">Un código de referido une tu cuenta a la de quien te lo dio, dentro del programa de afiliados del exchange.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="15" rx="6" ry="2.6"/><path d="M3 15v3.5c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6V15"/><ellipse cx="15" cy="7" rx="5" ry="2.2"/></svg></span><span class="guia-highlight-text">Quien te da el código suele recibir del exchange una parte de las comisiones que pagas al operar.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M6 16c.5-1.8 2-2.5 2.5-2.5s2 .7 2.5 2.5"/></svg></span><span class="guia-highlight-text">El código se pone al registrarte. Después, casi nunca se puede añadir ni cambiar.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><line x1="10" y1="10" x2="20" y2="20"/><line x1="14" y1="14" x2="16.3" y2="11.7"/><line x1="17" y1="17" x2="19.3" y2="14.7"/></svg></span><span class="guia-highlight-text">Nadie necesita tu contraseña ni tus claves para comprobar un código: como mucho, tu UID.</span></div>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Qué es un código de referido</h3>
+          <p>Los exchanges tienen programas de afiliados: personas o webs que les traen usuarios a cambio de una parte de lo que esos usuarios generan. Cada afiliado tiene un código y un enlace — si te registras con ellos, tu cuenta queda marcada como <strong>referida</strong> de ese afiliado. Es el modelo con el que se financian muchos canales y webs de cripto, SkillCash incluido con su alianza con Bitunix.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> Quién gana qué</h3>
+          <ul>
+            <li><strong>El exchange</strong> gana un usuario y sus comisiones de trading.</li>
+            <li><strong>El afiliado</strong> recibe del exchange una parte de las comisiones que pagas al operar. Si no operas, normalmente no recibe nada.</li>
+            <li><strong>Tú</strong> a veces recibes algo a cambio: un descuento en comisiones, un bono de bienvenida o acceso a una comunidad — depende del exchange y del afiliado.</li>
+          </ul>
+          <div class="wp-note">En los programas habituales, lo que recibe el afiliado sale de lo que el exchange ya te cobra al operar (ver <span data-guia-link="makerTaker" style="color:var(--accent);cursor:pointer;text-decoration:underline">comisiones maker y taker</span>): no es un cargo aparte.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Cómo se usa</h3>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">Entra en el exchange desde el enlace del afiliado, o abre su registro y busca la casilla "código de invitación" o "código de referido".</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Escribe el código antes de terminar el registro. Si entraste por el enlace, normalmente ya viene puesto — comprueba que está.</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Termina el registro y la verificación de identidad que pida el exchange.</span></div>
+          </div>
+          <div class="wp-note">Antes de registrarte, comprueba que el exchange puede darte servicio en tu país y con qué licencia opera allí.</div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Si ya tenías cuenta sin código</h3>
+          <p>Casi ningún exchange deja añadir un código a una cuenta que ya existe. Algunos lo permiten durante unos días tras el registro o a través de su soporte, y otros no lo permiten nunca — la forma más segura de saberlo es preguntar al soporte oficial del exchange desde su propia web o su app.</p>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> El UID y los datos que nunca debes dar</h3>
+          <p>El UID es el número que identifica tu cuenta en el exchange — lo encuentras en tu perfil, junto a tu nombre de usuario. Con él, un afiliado puede comprobar en su panel si tu cuenta es referida suya, sin acceder a nada más.</p>
+          <div class="guia-callout danger">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text">Tu contraseña y los códigos de verificación (SMS, correo o app) nunca se dan a nadie. Tus claves de API dan acceso a tu cuenta: no se comparten para "comprobar" nada. Nadie legítimo te pide que le envíes dinero para darte acceso a un grupo, un bono o una señal.</span>
+          </div>
+        </div>
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open><summary>¿Usar un código de referido me cuesta más?</summary><div class="guia-faq-answer">No. Lo que recibe el afiliado sale de la comisión que el exchange ya te cobraría de todas formas — no es un cargo adicional para ti.</div></details>
+            <details><summary>¿Puedo añadir un código de referido después de registrarme?</summary><div class="guia-faq-answer">Casi nunca. La mayoría de exchanges solo lo aceptan en el momento del registro — pregunta al soporte oficial si tu caso admite una excepción.</div></details>
+            <details><summary>¿Qué es el UID de un exchange?</summary><div class="guia-faq-answer">El número que identifica tu cuenta dentro de ese exchange, visible en tu perfil — es el único dato que un afiliado necesita para verificar que eres su referido.</div></details>
+            <details><summary>¿Es seguro usar un código de referido?</summary><div class="guia-faq-answer">Sí, siempre que venga de una fuente que conozcas y confíes — un código en sí mismo no da acceso a tu cuenta a nadie, solo la marca como referida dentro del programa de afiliados.</div></details>
+          </div>
+        </div>
+        <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+          <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta en Bitunix →</a>
+          <div class="partner-cta-sub">Usa el código <strong style="color:var(--white)">SKLL20</strong> al registrarte.</div>
+        </div>
+        <div class="calc-disclaimer" style="margin-top:14px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas; el apalancamiento y los futuros multiplican las pérdidas. Solo para mayores de 18 años.
+        </div>
+      </div>
+      </div>
+
     </div>
 
     </div>
@@ -13213,6 +13975,10 @@ function showCategoryDetail(cat){
   // es una microtarea) y la página aterriza mucho más abajo de lo debido
   if(typeof window.syncHomeMirror === 'function') window.syncHomeMirror();
   if(cat === 'portafolio' && typeof window.arrecifeEnterDashboard === 'function') window.arrecifeEnterDashboard();
+  // Guías: al entrar desde el overview (no al volver de abrir Glosario/Manual en línea, que ya
+  // maneja su propio ocultamiento) siempre se arranca mostrando el índice, nunca la última guía
+  // que se hubiera quedado abierta de una visita anterior
+  if(cat === 'guias' && enteringFromOverview && typeof window.showGuiasIndex === 'function') window.showGuiasIndex();
   if(!suppressInitialScroll) categoryDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showCategoryOverview(){
@@ -13495,6 +14261,9 @@ const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
 });
+TOOL_LABELS['glosario'] = 'Glosario Cripto';
+TOOL_LABELS['mistakes'] = 'Errores Comunes';
+TOOL_LABELS['manual'] = 'Manual del Depredador';
 const INDIC_LABELS = { guia: 'Guía', predicciones: 'Predicciones' };
 Object.values(INDIC_GROUPS).flat().forEach(it => { INDIC_LABELS[it.id] = it.label; });
 // nombre completo de cada ticker, para que el buscador entienda tanto "SOL" como "Solana" —
@@ -13863,6 +14632,15 @@ const TOOL_CATEGORY = {};
 document.querySelectorAll('.tool-section[data-category] .tool-card[data-tool]').forEach(card => {
   TOOL_CATEGORY[card.dataset.tool] = card.closest('.tool-section').dataset.category;
 });
+// Glosario/Errores comunes/Manual: Juan pidió (22-nov-2026) que dejen de abrir como "pantalla
+// emergente" encima de todo y abran "directo como las herramientas" - no tienen un .tool-card
+// real adentro de ningún .tool-section (por eso el escaneo de arriba no los agarra solo), así
+// que se registran a mano apuntando a 'guias' para que openModalGeneric los trate exactamente
+// igual que a cualquier otra herramienta (en línea, dentro de toolDetailSlot, con su propia
+// URL/botón atrás) en vez de caer en el otro else (overlay.classList.add('open')).
+TOOL_CATEGORY['glosario'] = 'guias';
+TOOL_CATEGORY['mistakes'] = 'guias';
+TOOL_CATEGORY['manual'] = 'guias';
 /* ---- cierra y repone en su sitio cualquier herramienta que haya quedado abierta en línea, sin importar de qué categoría era — se llama siempre antes de cambiar de vista para que nunca quede una "pegada" ---- */
 function closeAnyOpenToolInline(){
   const wrap = toolDetailSlot.querySelector('.tool-detail-card');
@@ -13880,8 +14658,12 @@ function closeAnyOpenToolInline(){
   toolDetailSlot.style.display = 'none';
   setCatLabelToolOpen(false);
   const prevSectionEl = document.querySelector('.tool-section[data-category="' + prevCategory + '"]');
-  const grid = prevSectionEl ? prevSectionEl.querySelector('.tool-grid') : null;
+  const grid = prevSectionEl ? prevSectionEl.querySelector('.tool-grid, .indic-guide-grid') : null;
   if(grid) grid.style.display = '';
+  // 'guias' no tiene .tool-grid - su "panorama" es el índice de tarjetas (.indic-guide-grid,
+  // ya cubierto arriba) + que cualquier guía que estuviera abierta (.guia-panel) se oculte, para
+  // volver siempre al índice al cerrar Glosario/Errores comunes/Manual (o cualquier guía) en línea.
+  if(prevSectionEl) prevSectionEl.querySelectorAll('.guia-panel').forEach(p => { p.style.display = 'none'; });
   const prevCatLabel = prevSectionEl ? prevSectionEl.querySelector('.tool-cat-label') : null;
   const prevIntroTitle = prevSectionEl ? prevSectionEl.querySelector('.section-intro-title') : null;
   const prevIntroText = prevSectionEl ? prevSectionEl.querySelector('.section-intro-text') : null;
@@ -13903,8 +14685,9 @@ function openModalGeneric(overlay, panel, focusTarget){
     const hadPreviousTool = !!toolDetailSlot.querySelector('.tool-detail-card');
     showCategoryDetail(category);
     const sectionEl = document.querySelector('.tool-section[data-category="' + category + '"]');
-    const grid = sectionEl ? sectionEl.querySelector('.tool-grid') : null;
+    const grid = sectionEl ? sectionEl.querySelector('.tool-grid, .indic-guide-grid') : null;
     if(grid) grid.style.display = 'none';
+    if(sectionEl) sectionEl.querySelectorAll('.guia-panel').forEach(p => { p.style.display = 'none'; });
     // la bienvenida de la categoria ("Bienvenido a...", su etiqueta y su descripcion) es solo
     // para cuando se esta viendo la cuadricula de tarjetas - con una herramienta puntual abierta
     // no deberia seguir nada de eso ahi debajo
@@ -14995,6 +15778,40 @@ document.querySelectorAll('[data-sb-open-card]').forEach(btn => {
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sbBackdrop').classList.remove('show');
   });
+});
+// ---- Guías: índice de tarjetas (#guiasIndexGrid) + un .guia-panel por artículo, ambos dentro
+// de .tool-section[data-category="guias"] - solo uno visible a la vez. data-guia-jump en cada
+// tarjeta del índice abre su guía; data-guia-back en cada guía vuelve al índice; data-guia-link
+// son los enlaces cruzados DENTRO del texto de una guía hacia otra (ej. "ver apalancamiento").
+// El primer caracter del id se pone en mayúscula para armar el id real del panel
+// (data-guia-jump="spotFuturos" -> #guiaPanelSpotFuturos).
+function showGuia(id){
+  const section = document.querySelector('.tool-section[data-category="guias"]');
+  if(!section) return;
+  const grid = document.getElementById('guiasIndexGrid');
+  if(grid) grid.style.display = 'none';
+  section.querySelectorAll('.guia-panel').forEach(p => { p.style.display = 'none'; });
+  const panel = document.getElementById('guiaPanel' + id.charAt(0).toUpperCase() + id.slice(1));
+  if(panel){
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+function showGuiasIndex(){
+  const section = document.querySelector('.tool-section[data-category="guias"]');
+  if(!section) return;
+  section.querySelectorAll('.guia-panel').forEach(p => { p.style.display = 'none'; });
+  const grid = document.getElementById('guiasIndexGrid');
+  if(grid) grid.style.display = '';
+}
+document.querySelectorAll('[data-guia-jump]').forEach(card => {
+  card.addEventListener('click', () => showGuia(card.dataset.guiaJump));
+});
+document.querySelectorAll('[data-guia-back]').forEach(btn => {
+  btn.addEventListener('click', showGuiasIndex);
+});
+document.querySelectorAll('[data-guia-link]').forEach(link => {
+  link.addEventListener('click', () => showGuia(link.dataset.guiaLink));
 });
 // "Aliados" en Comunidad: ya no tiene tarjeta propia en el inicio (esa tarjeta ahora es
 // "Inversión") - abre la categoria "partners" directo, sin depender de que exista una
