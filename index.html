@@ -2073,13 +2073,8 @@ button{font-family:inherit;color:inherit}
    hacia falta: listas numeradas de pasos, tabla ya existente .returns-table para los niveles,
    y un acordeon de preguntas frecuentes con <details> nativo (sin JS propio: el navegador ya
    sabe abrir/cerrar y es accesible por defecto) ---- */
-.wp-section ol{padding-left:22px;display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
-.wp-section ol li{font-size:15.5px;line-height:1.75;color:#d6d2e3}
-.wp-section ol li::marker{color:var(--gold);font-family:'Space Mono',monospace;font-weight:700}
 .wp-section ul{padding-left:20px;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
 .wp-section ul li{font-size:14.5px;line-height:1.6;color:var(--muted2)}
-.wp-abstract ul{padding-left:20px;display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.wp-abstract ul li{font-size:14.5px;line-height:1.6;color:var(--white)}
 .wp-section strong,.wp-abstract strong{color:var(--white)}
 .guia-faq{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
 .guia-faq details{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:10px;padding:14px 16px;background:transparent;transition:border-color var(--dur-base) var(--ease-out)}
@@ -2089,6 +2084,42 @@ button{font-family:inherit;color:inherit}
 .guia-faq summary::before{content:'▸';color:var(--accent);transition:transform .2s ease;flex-shrink:0;font-size:12px}
 .guia-faq details[open] summary::before{transform:rotate(90deg)}
 .guia-faq-answer{font-size:14px;color:var(--muted2);line-height:1.7;margin-top:12px;padding-left:20px}
+
+/* 22-nov-2026: Juan vio la guía de Bitunix publicada y dijo que se veía "súper plana, títulos
+   y texto muy planos" - pidió que las guías fueran "más dinámicas, fácil de entender". En vez
+   de listas <ol>/<ul> de puro texto gris, los pasos y los resúmenes ahora son tarjetas con
+   color/ícono - mismo lenguaje visual que ya usa el resto del sitio (perk-chip, indic-dir-row,
+   macro-guia-card), no un estilo nuevo inventado para esta sección sola. */
+.guia-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.guia-step{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:10px;background:color-mix(in srgb, var(--accent) 6%, transparent);border:1px solid color-mix(in srgb, var(--accent) 20%, transparent)}
+.guia-step-num{width:27px;height:27px;border-radius:50%;background:var(--accent);color:#06102a;font-family:'Space Mono',monospace;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guia-step-text{font-size:14.5px;line-height:1.65;color:#d6d2e3}
+.guia-step-text strong{color:var(--white)}
+.guia-step-text code{background:color-mix(in srgb, var(--white) 8%, transparent);color:var(--gold);padding:1px 6px;border-radius:5px;font-family:'Space Mono',monospace;font-size:.92em}
+
+.guia-highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:14px}
+.guia-highlight{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:10px;background:color-mix(in srgb, var(--white) 4%, transparent)}
+.guia-highlight-icon{width:30px;height:30px;border-radius:8px;background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.guia-highlight-icon svg{width:16px;height:16px}
+.guia-highlight-text{font-size:13px;line-height:1.55;color:var(--white)}
+
+/* tarjeta de aviso con color/ícono (más visible que .wp-note, para la info que de verdad
+   importa que no se salte: seguridad, riesgo, límites) */
+.guia-callout{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:10px;margin:14px 0 16px;background:color-mix(in srgb, var(--accent) 8%, transparent);border:1px solid color-mix(in srgb, var(--accent) 25%, transparent)}
+.guia-callout.warn{background:rgba(240,178,61,.09);border-color:rgba(240,178,61,.3)}
+.guia-callout.danger{background:rgba(255,47,79,.08);border-color:rgba(255,47,79,.3)}
+.guia-callout-icon{width:22px;height:22px;flex-shrink:0;color:var(--accent)}
+.guia-callout.warn .guia-callout-icon{color:var(--gold)}
+.guia-callout.danger .guia-callout-icon{color:var(--red)}
+.guia-callout-text{font-size:13.5px;line-height:1.7;color:var(--muted2)}
+.guia-callout-text strong{color:var(--white)}
+
+/* números grandes en fila, para una cifra clave que se debe leer de un vistazo (ej. "20%",
+   "x10", "cada 8 horas") en vez de enterrada en un párrafo */
+.guia-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0 16px}
+.guia-stat{text-align:center;padding:16px 10px;border-radius:10px;background:color-mix(in srgb, var(--white) 4%, transparent);border:1px solid color-mix(in srgb, var(--accent) 18%, transparent)}
+.guia-stat-num{font-family:'Poppins',sans-serif;font-weight:800;font-size:22px;color:var(--accent);line-height:1.1}
+.guia-stat-label{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}
 
 .macro-guia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:8px}
 .macro-guia-card{background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:8px;padding:13px 14px;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
@@ -9716,12 +9747,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
         <div class="wp-abstract">
           <span class="wp-label">Lo esencial</span>
-          <ul>
-            <li>Te registras con correo o teléfono, una contraseña y un código que te llega por SMS o correo. El código de invitación es opcional, pero si lo pones queda pegado a la cuenta para siempre.</li>
-            <li>Sin verificar ya puedes entrar y usar lo básico — para retirar necesitas el nivel 1 (documento + selfie), que normalmente se revisa en minutos.</li>
-            <li>El nivel 2 pide además un comprobante de domicilio y sube tu límite de retiro de 500.000 a 5.000.000 USDT al día.</li>
-            <li>Bitunix no está disponible en varios países (EE. UU., Francia y Malasia entre ellos) y, desde julio de 2026, tampoco puede operar legalmente con residentes del Espacio Económico Europeo sin licencia MiCA.</li>
-          </ul>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span class="guia-highlight-text">Te registras con correo o teléfono, una contraseña y un código que te llega por SMS o correo. El código de invitación es opcional, pero si lo pones queda pegado a la cuenta para siempre.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M6 16c.5-1.8 2-2.5 2.5-2.5s2 .7 2.5 2.5"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/></svg></span><span class="guia-highlight-text">Sin verificar ya puedes entrar y usar lo básico — para retirar necesitas el nivel 1 (documento + selfie), que normalmente se revisa en minutos.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg></span><span class="guia-highlight-text">El nivel 2 pide además un comprobante de domicilio y sube tu límite de retiro de 500.000 a 5.000.000 USDT al día.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg></span><span class="guia-highlight-text">Bitunix no está disponible en varios países (EE. UU., Francia y Malasia entre ellos) y, desde julio de 2026, tampoco puede operar legalmente con residentes del Espacio Económico Europeo sin licencia MiCA.</span></div>
+          </div>
         </div>
 
         <div class="wp-section">
@@ -9736,13 +9767,13 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <div class="wp-section">
           <h3><span class="wp-num">2</span> El registro, paso a paso</h3>
           <p>El registro en sí no pide ningún documento — solo tu correo o teléfono, una contraseña y confirmar con un código.</p>
-          <ol>
-            <li>Entra a <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">bitunix.com</a> y dale a <strong>Registrarse</strong>.</li>
-            <li>Elige correo o teléfono y escríbelo.</li>
-            <li>Crea tu contraseña.</li>
-            <li>Revisa el <strong>código de invitación</strong> — si entraste por un link de aliado ya debería estar puesto. Si te registras por tu cuenta, puedes escribir <code>SKLL20</code> a mano para activar los mismos beneficios.</li>
-            <li>Acepta los términos, dale a <strong>Registrarse</strong> y escribe el código que te llega al correo o por SMS.</li>
-          </ol>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">Entra a <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">bitunix.com</a> y dale a <strong>Registrarse</strong>.</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Elige correo o teléfono y escríbelo.</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Crea tu contraseña.</span></div>
+            <div class="guia-step"><span class="guia-step-num">4</span><span class="guia-step-text">Revisa el <strong>código de invitación</strong> — si entraste por un link de aliado ya debería estar puesto. Si te registras por tu cuenta, puedes escribir <code>SKLL20</code> a mano para activar los mismos beneficios.</span></div>
+            <div class="guia-step"><span class="guia-step-num">5</span><span class="guia-step-text">Acepta los términos, dale a <strong>Registrarse</strong> y escribe el código que te llega al correo o por SMS.</span></div>
+          </div>
           <div class="wp-note">En la app los pasos son iguales. Si un link de invitación no abre bien en el celular, regístrate directo desde la app y escribe el código de invitación a mano.</div>
         </div>
 
@@ -9760,34 +9791,37 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             </table>
           </div>
           <p style="margin-top:16px">Para subir de nivel:</p>
-          <ol>
-            <li>En tu perfil, entra a <strong>Verificación de identidad</strong>.</li>
-            <li>Elige tu país y el tipo de documento.</li>
-            <li>Sube las fotos del documento (JPG o PNG, hasta 5 MB) — completas, sin reflejos y con los 4 bordes visibles.</li>
-            <li>Haz el selfie siguiendo las indicaciones en pantalla.</li>
-          </ol>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">En tu perfil, entra a <strong>Verificación de identidad</strong>.</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Elige tu país y el tipo de documento.</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Sube las fotos del documento (JPG o PNG, hasta 5 MB) — completas, sin reflejos y con los 4 bordes visibles.</span></div>
+            <div class="guia-step"><span class="guia-step-num">4</span><span class="guia-step-text">Haz el selfie siguiendo las indicaciones en pantalla.</span></div>
+          </div>
           <div class="wp-note">El nivel 1 suele revisarse en minutos (hasta 24 horas); el nivel 2 es manual y normalmente tarda entre 1 y 3 horas. Los límites reales también dependen de tu país, el riesgo de la cuenta y cuántos métodos de seguridad tengas activos — y solo se permite una cuenta verificada por persona.</div>
         </div>
 
         <div class="wp-section">
           <h3><span class="wp-num">4</span> Lo primero después de abrir la cuenta: seguridad</h3>
           <p>Antes de mover dinero de verdad, conviene dejar la cuenta bien protegida. Bitunix recomienda tener activos al menos dos métodos de seguridad antes de retirar — entre más tengas, más alto es tu límite:</p>
-          <ul>
-            <li><strong>Google Authenticator:</strong> el código de 6 dígitos que te va a pedir tanto para iniciar sesión como para retirar.</li>
-            <li><strong>Passkey:</strong> entrar con la huella o la cara del celular, sin escribir contraseña.</li>
-            <li><strong>Código antiphishing:</strong> una frase corta tuya (8 a 20 caracteres) que Bitunix agrega a TODOS sus correos reales — si un correo "de Bitunix" no la trae, es falso.</li>
-          </ul>
-          <div class="wp-note">Ningún empleado de Bitunix te va a pedir tu contraseña ni tus códigos de verificación por ningún medio. Si alguien lo hace, es un intento de estafa.</div>
+          <div class="guia-highlights">
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span><span class="guia-highlight-text"><strong>Google Authenticator:</strong> el código de 6 dígitos que te va a pedir tanto para iniciar sesión como para retirar.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><line x1="10" y1="10" x2="20" y2="20"/><line x1="14" y1="14" x2="16.3" y2="11.7"/><line x1="17" y1="17" x2="19.3" y2="14.7"/></svg></span><span class="guia-highlight-text"><strong>Passkey:</strong> entrar con la huella o la cara del celular, sin escribir contraseña.</span></div>
+            <div class="guia-highlight"><span class="guia-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span class="guia-highlight-text"><strong>Código antiphishing:</strong> una frase corta tuya (8 a 20 caracteres) que Bitunix agrega a TODOS sus correos reales — si un correo "de Bitunix" no la trae, es falso.</span></div>
+          </div>
+          <div class="guia-callout danger">
+            <span class="guia-callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg></span>
+            <span class="guia-callout-text"><strong>Ningún empleado de Bitunix</strong> te va a pedir tu contraseña ni tus códigos de verificación por ningún medio. Si alguien lo hace, es un intento de estafa.</span>
+          </div>
         </div>
 
         <div class="wp-section">
           <h3><span class="wp-num">5</span> El primer depósito y el paso a futuros</h3>
           <p>Puedes meter dinero enviando cripto que ya tengas, comprando con tarjeta (pide verificación) o comprándola a otra persona por P2P.</p>
-          <ol>
-            <li>En <strong>Billetera → Depositar</strong>, elige la moneda (por ejemplo USDT) y la red, y copia la dirección — la red tiene que ser la misma en los dos lados, o el dinero se puede perder. Normalmente llega en 3 a 30 minutos.</li>
-            <li>Si compras por P2P, paga desde una cuenta a tu propio nombre: Bitunix no deja retirar lo comprado así hasta el día siguiente.</li>
-            <li>Si vas a operar futuros, pasa el saldo de Spot a Futuros en <strong>Activos → Transferir</strong>.</li>
-          </ol>
+          <div class="guia-steps">
+            <div class="guia-step"><span class="guia-step-num">1</span><span class="guia-step-text">En <strong>Billetera → Depositar</strong>, elige la moneda (por ejemplo USDT) y la red, y copia la dirección — la red tiene que ser la misma en los dos lados, o el dinero se puede perder. Normalmente llega en 3 a 30 minutos.</span></div>
+            <div class="guia-step"><span class="guia-step-num">2</span><span class="guia-step-text">Si compras por P2P, paga desde una cuenta a tu propio nombre: Bitunix no deja retirar lo comprado así hasta el día siguiente.</span></div>
+            <div class="guia-step"><span class="guia-step-num">3</span><span class="guia-step-text">Si vas a operar futuros, pasa el saldo de Spot a Futuros en <strong>Activos → Transferir</strong>.</span></div>
+          </div>
           <div class="wp-note">Bitunix tiene una demo de futuros con 50.000 USDT virtuales, sin pedir verificación, que puedes reiniciar cuando quieras — sirve para practicar antes de arriesgar dinero real.</div>
         </div>
 
