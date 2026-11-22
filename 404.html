@@ -171,14 +171,17 @@
 }
 html{
   scroll-behavior:smooth;
-  /* overflow-x:hidden tambien hacia falta ACA, no solo en body - Juan reporto en su celular real
-     que se podia desplazar hacia la derecha (bug que Playwright en desktop headless no detecto,
-     scrollWidth/clientWidth daban igual ahi). Causa: el transform:translate() grande de las
-     "moscas" del hero (hasta 640px) puede contar como scrollable overflow en algunos navegadores
-     aunque sea solo visual - sin este guard en <html> (no solo en <body>), ese overflow puede
-     quedar scrolleable a nivel de pagina en movil real aunque en desktop no se note. */
-  overflow-x:hidden;
-  /* la barra de desplazamiento de la página (cuando el contenido es más alto que la pantalla,
+  /* NUNCA pongas overflow-x:hidden (ni overflow a secas) aqui en <html> - se probo para tapar
+     el bug de scroll horizontal en movil (moscas del hero con transform grande) pero rompe
+     position:sticky en .sidebar: con overflow-x:hidden en <html>, el sidebar dejaba de
+     quedarse pegado al hacer scroll y se iba desplazando con el resto de la pagina (Juan: "el
+     menu de hamburguesa no llega hasta abajo, esta raro" - confirmado con Playwright,
+     getBoundingClientRect().top del sidebar daba -900 en vez de 0 al bajar el scroll). El
+     overflow-x:hidden que SI hace falta para el bug de movil ya estaba en <body> desde antes
+     (nunca rompio el sticky, solo <html> lo rompe) + el recorrido de las moscas ya se redujo en
+     movil (ver @media max-width:860px mas abajo) - con esas dos cosas solas ya alcanza, no hace
+     falta tocar <html>.
+     la barra de desplazamiento de la página (cuando el contenido es más alto que la pantalla,
      ej. Mi Arrecife con varios widgets) venía con el estilo blanco/brillante por defecto del
      navegador - Juan: "que sea más sutil, como tipo la del menú de hamburguesa". Mismo estilo
      ya usado en .sidebar (ver más abajo), aplicado aquí a la página completa */
