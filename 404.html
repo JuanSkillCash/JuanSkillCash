@@ -20,7 +20,7 @@
      tienda de Sharkoins, el monito, etc.) resolvia "assets/..." contra esa ruta y salia roto.
      Por eso ahora todas las referencias a assets van con "/" adelante ("/assets/..."), que
      no dependen de la URL actual -->
-<script>(function(){ window.__initialRoutePath = location.pathname; if(location.pathname !== '/'){ try{ history.replaceState(history.state, '', '/' + location.search + location.hash); }catch(e){} } })();</script>
+<script>(function(){ try{ if('scrollRestoration' in history) history.scrollRestoration = 'manual'; }catch(e){} window.__initialRoutePath = location.pathname; if(location.pathname !== '/'){ try{ history.replaceState(history.state, '', '/' + location.search + location.hash); }catch(e){} } })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP de defensa en profundidad: aunque el HTML se vea entero (es un sitio estatico), esto
      evita que un script inyectado (XSS o una libreria externa comprometida) pueda mandar datos
