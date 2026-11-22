@@ -8,6 +8,15 @@ mapeado, indicador por indicador, con qué fuente y mecanismo (en vivo desde
 el navegador vs. robot de GitHub Actions + qué script + qué frecuencia) se
 actualiza cada cosa del sitio.
 
+Antes de generar un prompt nuevo para las fotos de banner de las categorías
+("Tus Herramientas") o de tocar esos banners, lee
+docs/estilo-banners-atlantis-tiburones.md — ahí está guardado, palabra por
+palabra, el estilo exacto ("Semi-realistic painterly illustration...") que
+a Juan le gustó (tiburón con marcas teal+dorado, objeto central tallado en
+roca, barco hundido de fondo), qué variantes de prompt se probaron y NO
+funcionaron (y por qué), y en qué categorías ya está aplicado este estilo
+vs. cuáles siguen con el estilo "Atlantis" anterior.
+
 ## Íconos de las tool-card (tarjetas de herramientas con banner de foto)
 
 Los íconos chiquitos junto al número en `.tool-card-head .tool-icon` (Zona de
