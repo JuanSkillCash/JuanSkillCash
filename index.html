@@ -2069,6 +2069,27 @@ button{font-family:inherit;color:inherit}
 .wp-refs{font-size:13px;color:var(--muted);line-height:2;padding-left:18px}
 .wp-refs li{margin-bottom:5px}
 
+/* ---- Guías paso a paso (misma tipografia wp-* del Whitepaper de Bitcoin arriba, + lo que le
+   hacia falta: listas numeradas de pasos, tabla ya existente .returns-table para los niveles,
+   y un acordeon de preguntas frecuentes con <details> nativo (sin JS propio: el navegador ya
+   sabe abrir/cerrar y es accesible por defecto) ---- */
+.wp-section ol{padding-left:22px;display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+.wp-section ol li{font-size:15.5px;line-height:1.75;color:#d6d2e3}
+.wp-section ol li::marker{color:var(--gold);font-family:'Space Mono',monospace;font-weight:700}
+.wp-section ul{padding-left:20px;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.wp-section ul li{font-size:14.5px;line-height:1.6;color:var(--muted2)}
+.wp-abstract ul{padding-left:20px;display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.wp-abstract ul li{font-size:14.5px;line-height:1.6;color:var(--white)}
+.wp-section strong,.wp-abstract strong{color:var(--white)}
+.guia-faq{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+.guia-faq details{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:10px;padding:14px 16px;background:transparent;transition:border-color var(--dur-base) var(--ease-out)}
+.guia-faq details[open]{border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
+.guia-faq summary{cursor:pointer;font-family:'Poppins',sans-serif;font-weight:700;font-size:14.5px;color:var(--white);list-style:none;display:flex;align-items:center;gap:10px}
+.guia-faq summary::-webkit-details-marker{display:none}
+.guia-faq summary::before{content:'▸';color:var(--accent);transition:transform .2s ease;flex-shrink:0;font-size:12px}
+.guia-faq details[open] summary::before{transform:rotate(90deg)}
+.guia-faq-answer{font-size:14px;color:var(--muted2);line-height:1.7;margin-top:12px;padding-left:20px}
+
 .macro-guia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:8px}
 .macro-guia-card{background:transparent;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:8px;padding:13px 14px;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:border-color var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)}
 .macro-guia-card:hover{border-color:color-mix(in srgb, var(--accent) 30%, transparent);background:color-mix(in srgb, var(--white) 4%, transparent)}
@@ -4356,6 +4377,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </button>
       <button class="sb-item sb-item-section sb-item-noicon" id="sbEventosYoutubeLink" data-cat-home="eventos-youtube">
         <span class="sb-item-label">Conferencias en Vivo</span>
+      </button>
+
+      <!-- "Ayuda" - grupo nuevo (22-nov-2026) para contenido educativo/paso-a-paso, separado de
+           "Comunidad" (rango/skins/aliados) y de "Noticias". Primer item: la guia de Bitunix.
+           Pensado para sumar mas adelante (glosario, foro) bajo este mismo grupo si Juan lo pide -
+           mismo patron sb-cat-label-static + data-sb-open-category que ya usa "Aliados". -->
+      <div class="sb-cat-label sb-cat-label-static" data-category="__ayuda">Ayuda</div>
+      <button class="sb-item sb-item-section sb-item-noicon" data-sb-open-category="guias" data-cat-home="guias">
+        <span class="sb-item-label">Guías</span>
       </button>
 
     </nav>
@@ -9647,6 +9677,155 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
     </div>
 
+    <!-- Guías - primera guía (22-nov-2026, pedido de Juan): "Cómo abrir cuenta en Bitunix",
+         redactada desde cero por SkillCash (no es una copia de ninguna guía de terceros, solo se
+         usaron como referencia de HECHOS los datos públicos de la ayuda oficial de Bitunix,
+         confirmados por Juan con capturas de pantalla). Reusa la tipografía wp-* ya hecha para el
+         Whitepaper de Bitcoin (ver arriba) + la tabla .returns-table ya existente + un acordeon de
+         preguntas con <details> nativo (ver CSS .guia-faq). Sin tool-grid ni tool-card: por eso
+         'guias' esta excluido de renderCatPillTabs (igual que 'partners'/'rangos') y no necesita
+         .tool-cat-label con numero de categoria, solo el titulo del articulo. -->
+    <div class="tool-section" data-category="guias">
+      <div class="tool-cat-label">📘 Guías</div>
+
+      <div class="section-intro-title">Cómo abrir una cuenta en Bitunix paso a paso</div>
+      <div class="section-intro-text">Bitunix es el exchange aliado de SkillCash: puedes entrar y mover lo básico sin verificarte, pero para retirar dinero te va a pedir el nivel 1. Esta guía va paso a paso por el registro, los niveles de verificación y lo primero que conviene activar en seguridad.</div>
+
+      <div class="wp-article">
+        <div class="wp-meta">
+          <div>Guía de SkillCash · actualizada el 22 de noviembre de 2026 · lectura de ~6 min</div>
+          <div style="margin-top:4px">Basada en la ayuda oficial de Bitunix al momento de escribir esto — revisa siempre la fuente oficial, porque un exchange puede cambiar sus reglas sin avisar.</div>
+        </div>
+
+        <div class="wp-abstract">
+          <span class="wp-label">Lo esencial</span>
+          <ul>
+            <li>Te registras con correo o teléfono, una contraseña y un código que te llega por SMS o correo. El código de invitación es opcional, pero si lo pones queda pegado a la cuenta para siempre.</li>
+            <li>Sin verificar ya puedes entrar y usar lo básico — para retirar necesitas el nivel 1 (documento + selfie), que normalmente se revisa en minutos.</li>
+            <li>El nivel 2 pide además un comprobante de domicilio y sube tu límite de retiro de 500.000 a 5.000.000 USDT al día.</li>
+            <li>Bitunix no está disponible en varios países (EE. UU., Francia y Malasia entre ellos) y, desde julio de 2026, tampoco puede operar legalmente con residentes del Espacio Económico Europeo sin licencia MiCA.</li>
+          </ul>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">1</span> Antes de empezar</h3>
+          <p>No necesitas casi nada para abrir la cuenta: un correo o un número de celular, ser mayor de edad y vivir en un país que Bitunix acepte (más abajo está la lista). Para <strong>retirar</strong> sí vas a necesitar, más adelante, un documento de identidad vigente y la cámara del celular para el selfie.</p>
+          <ul>
+            <li><strong>Documento válido:</strong> pasaporte, cédula/DNI, cédula de extranjería o licencia de conducir. Un visado de estudiante, trabajo o turista no sirve.</li>
+            <li><strong>Código de invitación (opcional):</strong> si entraste por el link de un aliado como SkillCash, ya viene cargado — solo confírmalo antes de terminar el registro, porque después no se puede cambiar.</li>
+          </ul>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">2</span> El registro, paso a paso</h3>
+          <p>El registro en sí no pide ningún documento — solo tu correo o teléfono, una contraseña y confirmar con un código.</p>
+          <ol>
+            <li>Entra a <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener">bitunix.com</a> y dale a <strong>Registrarse</strong>.</li>
+            <li>Elige correo o teléfono y escríbelo.</li>
+            <li>Crea tu contraseña.</li>
+            <li>Revisa el <strong>código de invitación</strong> — si entraste por un link de aliado ya debería estar puesto. Si te registras por tu cuenta, puedes escribir <code>SKLL20</code> a mano para activar los mismos beneficios.</li>
+            <li>Acepta los términos, dale a <strong>Registrarse</strong> y escribe el código que te llega al correo o por SMS.</li>
+          </ol>
+          <div class="wp-note">En la app los pasos son iguales. Si un link de invitación no abre bien en el celular, regístrate directo desde la app y escribe el código de invitación a mano.</div>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">3</span> Los niveles de verificación (KYC)</h3>
+          <p>Bitunix usa tres niveles. Sin verificar ya puedes entrar y mirar, pero el trading, los retiros y el dinero fiat pueden estar limitados. Para desbloquear retiros hace falta subir al nivel 1, y el nivel 2 sube todavía más el límite:</p>
+          <div class="returns-table-wrap">
+            <table class="returns-table">
+              <thead><tr><th>Nivel</th><th>Qué pide</th><th>Qué permite</th></tr></thead>
+              <tbody>
+                <tr><td>Nivel 0</td><td>Nada</td><td>Funciones básicas; trading, retiros y fiat pueden estar limitados</td></tr>
+                <tr><td>Nivel 1</td><td>Documento + selfie</td><td>Retirar cripto, hasta 500.000 USDT cada 24 horas</td></tr>
+                <tr><td>Nivel 2</td><td>Comprobante de domicilio (&lt;3 meses)</td><td>Retirar hasta 5.000.000 USDT cada 24 horas</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:16px">Para subir de nivel:</p>
+          <ol>
+            <li>En tu perfil, entra a <strong>Verificación de identidad</strong>.</li>
+            <li>Elige tu país y el tipo de documento.</li>
+            <li>Sube las fotos del documento (JPG o PNG, hasta 5 MB) — completas, sin reflejos y con los 4 bordes visibles.</li>
+            <li>Haz el selfie siguiendo las indicaciones en pantalla.</li>
+          </ol>
+          <div class="wp-note">El nivel 1 suele revisarse en minutos (hasta 24 horas); el nivel 2 es manual y normalmente tarda entre 1 y 3 horas. Los límites reales también dependen de tu país, el riesgo de la cuenta y cuántos métodos de seguridad tengas activos — y solo se permite una cuenta verificada por persona.</div>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">4</span> Lo primero después de abrir la cuenta: seguridad</h3>
+          <p>Antes de mover dinero de verdad, conviene dejar la cuenta bien protegida. Bitunix recomienda tener activos al menos dos métodos de seguridad antes de retirar — entre más tengas, más alto es tu límite:</p>
+          <ul>
+            <li><strong>Google Authenticator:</strong> el código de 6 dígitos que te va a pedir tanto para iniciar sesión como para retirar.</li>
+            <li><strong>Passkey:</strong> entrar con la huella o la cara del celular, sin escribir contraseña.</li>
+            <li><strong>Código antiphishing:</strong> una frase corta tuya (8 a 20 caracteres) que Bitunix agrega a TODOS sus correos reales — si un correo "de Bitunix" no la trae, es falso.</li>
+          </ul>
+          <div class="wp-note">Ningún empleado de Bitunix te va a pedir tu contraseña ni tus códigos de verificación por ningún medio. Si alguien lo hace, es un intento de estafa.</div>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">5</span> El primer depósito y el paso a futuros</h3>
+          <p>Puedes meter dinero enviando cripto que ya tengas, comprando con tarjeta (pide verificación) o comprándola a otra persona por P2P.</p>
+          <ol>
+            <li>En <strong>Billetera → Depositar</strong>, elige la moneda (por ejemplo USDT) y la red, y copia la dirección — la red tiene que ser la misma en los dos lados, o el dinero se puede perder. Normalmente llega en 3 a 30 minutos.</li>
+            <li>Si compras por P2P, paga desde una cuenta a tu propio nombre: Bitunix no deja retirar lo comprado así hasta el día siguiente.</li>
+            <li>Si vas a operar futuros, pasa el saldo de Spot a Futuros en <strong>Activos → Transferir</strong>.</li>
+          </ol>
+          <div class="wp-note">Bitunix tiene una demo de futuros con 50.000 USDT virtuales, sin pedir verificación, que puedes reiniciar cuando quieras — sirve para practicar antes de arriesgar dinero real.</div>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">6</span> Desde qué países se puede usar</h3>
+          <p>Bitunix no acepta residentes de varios países, entre ellos EE. UU., Canadá, Francia, Malasia, Singapur, Hong Kong, China continental y los Emiratos Árabes Unidos — la lista completa (y más larga) está en el aviso oficial de regiones restringidas de Bitunix, y sus términos también prohíben usar una VPN para saltársela.</p>
+          <p>Si vives en el Espacio Económico Europeo hay un matiz aparte: Bitunix no figura en el registro de exchanges con licencia MiCA de ESMA, y desde el 1 de julio de 2026 un exchange sin esa licencia no puede dar servicio legalmente a residentes del EEE — aunque sus términos no excluyan tu país de forma explícita. Si tienes dudas, revisa el registro de ESMA y lo que diga la ley de tu país sobre exchanges extranjeros.</p>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">7</span> Por qué Bitunix es el aliado de SkillCash</h3>
+          <p>Bitunix es el exchange que uso a diario para operar — buena liquidez, ejecución rápida y soporte real en español (no un bot). Si te registras con el código de SkillCash activas beneficios que no vienen por defecto si te registras por tu cuenta:</p>
+          <div style="--pc:var(--bitunix-green);--pt:rgba(191,250,44,.12)">
+            <div class="partner-perks">
+              <span class="perk-chip"><span class="perk-chip-dot"></span>20% cashback en comisiones</span>
+              <span class="perk-chip"><span class="perk-chip-dot"></span>Soporte en español</span>
+              <span class="perk-chip"><span class="perk-chip-dot"></span>Spot y futuros</span>
+            </div>
+            <a href="https://www.bitunix.com/es-es/register?vipCode=SKLL20" target="_blank" rel="noopener" class="partner-cta">Abrir cuenta con mi código →</a>
+            <div class="partner-cta-sub">O usa el código <strong style="color:var(--white)">SKLL20</strong> si ya te registras por tu cuenta.</div>
+          </div>
+        </div>
+
+        <div class="wp-section">
+          <h3><span class="wp-num">8</span> Preguntas frecuentes</h3>
+          <div class="guia-faq">
+            <details open>
+              <summary>¿Se puede usar Bitunix sin KYC?</summary>
+              <div class="guia-faq-answer">Sí, para abrir la cuenta y usar las funciones básicas, que pueden estar limitadas. Para retirar hace falta el nivel 1 de verificación: un documento y un selfie.</div>
+            </details>
+            <details>
+              <summary>¿Cuánto tarda la verificación de Bitunix?</summary>
+              <div class="guia-faq-answer">Según su ayuda oficial, de unos minutos a 24 horas. La del nivel 2, con el comprobante de domicilio, es manual y suele tomar entre 1 y 3 horas.</div>
+            </details>
+            <details>
+              <summary>¿Cuánto se puede retirar de Bitunix al día?</summary>
+              <div class="guia-faq-answer">Con el nivel 1, hasta 500.000 USDT cada 24 horas. Con el nivel 2, hasta 5.000.000. Los límites reales también cambian según el país, el riesgo de la cuenta y los métodos de seguridad que tengas activos.</div>
+            </details>
+            <details>
+              <summary>¿Puedo cambiar el código de invitación después de registrarme?</summary>
+              <div class="guia-faq-answer">No. Según Bitunix, el código queda unido a la cuenta en el momento del registro y no se puede cambiar después — por eso conviene revisarlo bien antes de confirmar.</div>
+            </details>
+            <details>
+              <summary>¿Bitunix funciona en España?</summary>
+              <div class="guia-faq-answer">Sus términos no excluyen España por nombre, pero Bitunix no figura en el registro de ESMA de exchanges con licencia MiCA — y desde el 1 de julio de 2026, sin esa licencia no puede dar servicio legalmente a residentes del Espacio Económico Europeo.</div>
+            </details>
+          </div>
+        </div>
+
+        <div class="calc-disclaimer" style="margin-top:4px">
+          <strong>Antes de nada:</strong> esta guía es información general y educativa — no es asesoramiento financiero ni una recomendación personalizada, y cada decisión (sobre todo en futuros y apalancamiento) es tuya. Los criptoactivos son muy volátiles y puedes perder todo lo que inviertas. Los enlaces a Bitunix de esta página son de afiliado: si abres una cuenta con ellos, Bitunix le paga a SkillCash una parte de las comisiones que te cobre al operar. Solo para mayores de 18 años.
+        </div>
+      </div>
+    </div>
+
     </div>
 
     <!-- Bitacora de trading (assets/js/journal.js): todo el contenido lo arma el JS -->
@@ -10201,6 +10380,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <div class="site-footer-col-title">Aprende</div>
           <button type="button" class="site-footer-col-link" onclick="openGlossaryModal()">Glosario</button>
           <button type="button" class="site-footer-col-link" onclick="openManualModal()">Manual</button>
+          <button type="button" class="site-footer-col-link" onclick="showCategoryDetail('guias')">Guías</button>
           <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="site-footer-col-link">Comunidad de Telegram</a>
         </div>
         <div class="site-footer-col">
@@ -12843,7 +13023,7 @@ function renderCatPillTabs(cat){
       indicJump: btn.dataset.indicJump,
       onClick: () => jumpToIndicator(btn.dataset.indicJump),
     }));
-  } else if(cat && cat !== 'partners' && cat !== 'rangos'){
+  } else if(cat && cat !== 'partners' && cat !== 'rangos' && cat !== 'guias'){
     items = [{ label: 'Panorama', catHome: cat, onClick: () => showCategoryGrid(cat) }].concat(
       [...document.querySelectorAll('.tool-section[data-category="' + cat + '"] .tool-card[data-tool]')].map(card => ({
         label: card.querySelector('h3').textContent,
@@ -13259,6 +13439,7 @@ document.querySelectorAll('.cat-overview-card[data-category]').forEach(card => {
 CATEGORY_LABELS['eventos-youtube'] = 'Conferencias en Vivo';
 CATEGORY_LABELS['eventos-calendario'] = 'Calendario Económico';
 CATEGORY_LABELS['eventos-noticias'] = 'Noticias';
+CATEGORY_LABELS['guias'] = 'Guías';
 const TOOL_LABELS = {};
 document.querySelectorAll('.tool-card[data-tool] h3').forEach(h3 => {
   TOOL_LABELS[h3.closest('.tool-card').dataset.tool] = safeText(h3);
