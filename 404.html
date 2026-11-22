@@ -3041,8 +3041,8 @@ img[src=""]{display:none}
 }
 .hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
 .hero-mascot-imgwrap img,.hero-mascot-tint{
-  -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
-  mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);
+  -webkit-mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
 }
 /* la imagen del tiburon (logo-skillcash-1050) trae su propio fondo oscuro "horneado" en el
    archivo (no es transparente ahi) - pensado para mezclarse con el fondo oscuro de siempre.
@@ -3052,7 +3052,7 @@ img[src=""]{display:none}
    si se ve bien en claro) para tapar ese borde sin importar que color tenga la imagen por dentro. */
 .hero-mascot-imgwrap::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(to bottom, transparent 38%, var(--bg) 80%);
+  background:linear-gradient(to bottom, transparent 75%, var(--bg) 97%);
 }
 /* HISTORIAL del "cuadro" en temas claros (resumen - el detalle completo esta en el historial
    de git si hace falta): el culpable real era .hero-mascot-glow (una copia borrosa de la MISMA
