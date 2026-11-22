@@ -1193,7 +1193,13 @@ button{font-family:inherit;color:inherit}
    la lista completa - no por bloques de categoria - para que se sienta un solo recorrido de
    profundidad. Ver renderIndicIndexList() e indicDepthColor(). Los titulos van en azul/acento,
    nunca dorado (dorado queda reservado para "curado por Juan") */
-.indic-index-banner{position:relative;height:260px;margin:0 0 12px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
+/* antes tenía height:260px fijo - el ancho de esta caja crece con la pantalla (es fluido) pero
+   la altura se quedaba clavada, así que en monitores anchos el ratio real ancho/alto terminaba
+   siendo mucho mayor que el de la imagen (ej. a 2560px de viewport daba ratio ~7.7:1 en vez del
+   ~4.16:1 para el que se recortó la foto), y object-fit:cover recortaba de más arriba/abajo -
+   Juan reportó que el tiburón/la bóveda de El Banco quedaban cortados en su pantalla ancha.
+   aspect-ratio mantiene siempre la MISMA proporción que la imagen sin importar el ancho real. */
+.indic-index-banner{position:relative;aspect-ratio:1248/300;margin:0 0 12px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
 .indic-index-banner img{width:100%;height:100%;object-fit:cover;object-position:center 75%;display:block}
 .indic-index-banner-text{position:absolute;left:24px;right:24px;bottom:20px;z-index:1;display:flex;flex-direction:column;gap:6px}
 /* el titulo ocupa casi todo el banner (pedido de Juan) - antes era chiquito (18px) y se veia
@@ -1206,7 +1212,10 @@ button{font-family:inherit;color:inherit}
    abres Sonar de Mercado tiene un banner arriba... quiero eso en las 6 cajas, un banner distinto
    en cada una" - NO en las tarjetas chiquitas de adentro). Mismo recorte/degradado que
    .indic-index-banner (que ya tenía Sonar) para que las 6 se vean parejas. */
-.tool-section-banner{position:relative;height:290px;margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
+/* mismo motivo que .indic-index-banner arriba: aspect-ratio en vez de height fijo, para que la
+   proporción real de la caja siempre coincida con la de las fotos (1248x334) sin importar qué
+   tan ancha sea la pantalla - si no, en monitores anchos object-fit:cover recorta de más. */
+.tool-section-banner{position:relative;aspect-ratio:1248/334;margin:0 0 16px;border-radius:14px;overflow:hidden;border:1px solid var(--border2)}
 .tool-section-banner img{width:100%;height:100%;object-fit:cover;display:block}
 .tool-section-banner-text{position:absolute;left:22px;right:22px;bottom:18px;z-index:1}
 .tool-section-banner-title{font-family:'Poppins',sans-serif !important;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;font-size:clamp(28px,5.2vw,46px);color:var(--white);line-height:1.05;text-shadow:0 2px 10px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.8)}
@@ -2995,7 +3004,7 @@ img[src=""]{display:none}
      pagina cada ~33ms, sin parar, mientras la animacion corria (confirmado con
      PerformanceObserver de layout-shift en vivo). transform/opacity nunca disparan layout, solo
      composicion en GPU - mismo efecto visual (deriva lenta e irregular), sin ese costo. */
-  .hero-orbe{ animation:hero-orbita 38s ease-in-out infinite; }
+  .hero-orbe{ animation:hero-orbita 20s ease-in-out infinite; }
   @keyframes hero-orbita{
     0%{ transform:translate(0,0); }
     14%{ transform:translate(40px,18px); }
@@ -3006,7 +3015,7 @@ img[src=""]{display:none}
     85%{ transform:translate(8px,10px); }
     100%{ transform:translate(0,0); }
   }
-  .hero-orbe2{ animation:hero-orbita2 29s ease-in-out infinite; }
+  .hero-orbe2{ animation:hero-orbita2 16s ease-in-out infinite; }
   @keyframes hero-orbita2{
     0%{ transform:translate(0,0); }
     20%{ transform:translate(-35px,16px); }
@@ -3015,7 +3024,7 @@ img[src=""]{display:none}
     80%{ transform:translate(-10px,24px); }
     100%{ transform:translate(0,0); }
   }
-  .hero-orbe3{ animation:hero-orbita3 45s ease-in-out infinite; }
+  .hero-orbe3{ animation:hero-orbita3 24s ease-in-out infinite; }
   @keyframes hero-orbita3{
     0%{ transform:translate(0,0); }
     16%{ transform:translate(35px,-22px); }
@@ -3026,9 +3035,8 @@ img[src=""]{display:none}
     100%{ transform:translate(0,0); }
   }
   /* la cuarta mosca, agregada despues - mismo espiritu (ruta irregular propia, solo
-     transform/opacity) pero mas rapida que las otras 3 (20s en vez de 29-45s), pedido
-     explicito de Juan */
-  .hero-orbe4{ animation:hero-orbita4 20s ease-in-out infinite; }
+     transform/opacity) pero mas rapida que las otras 3, pedido explicito de Juan */
+  .hero-orbe4{ animation:hero-orbita4 11s ease-in-out infinite; }
   @keyframes hero-orbita4{
     0%{ transform:translate(0,0); }
     18%{ transform:translate(-28px,14px); }
