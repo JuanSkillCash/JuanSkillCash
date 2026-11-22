@@ -1549,13 +1549,6 @@ button{font-family:inherit;color:inherit}
    ícono de la tarjeta sangra en la esquina del banner (maqueta "20 formas...",
    estilo 16). Comparte .ibb-icon con .tool-card-banner (ver mas abajo). */
 .cat-overview-banner.icon-bleed{border:none;margin:0 -20px 14px;border-radius:0;background:color-mix(in srgb, var(--white) 4%, var(--bg))}
-/* EXPERIMENTO pedido por Juan, SOLO en Mi Arrecife por ahora (una prueba, "a ver como se ve,
-   si no me gusta lo quitamos"): el mismo tratamiento visual que las tarjetas internas
-   (.tool-card) - borde superior grueso y solido en var(--accent) en vez del borde parejo
-   delgado de las 4 esquinas que tienen las otras 5 cajas - mismo tamano de siempre, nada se
-   achica. Si decide mantenerlo, se repite esta misma clase en las otras 5 tarjetas y se les
-   cambia el banner de icon-bleed a la foto real, igual que aca. */
-.cat-overview-card.exp-tool-style{border-top:3px solid var(--accent) !important}
 .cat-overview-banner.icon-bleed::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--card) 0%,rgba(12,15,28,0) 60%)}
 .ibb-icon{position:absolute;top:-20%;right:-16%;width:64%;aspect-ratio:1/1;max-width:230px;transform:rotate(-12deg);color:color-mix(in srgb, var(--c, var(--accent)) 42%, transparent);pointer-events:none}
 .ibb-icon svg{width:100%;height:100%;display:block}
@@ -4803,14 +4796,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="cat-flip-outer big">
       <button type="button" class="cat-flip-toggle" aria-label="Girar tarjeta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <div class="cat-flip-inner">
-      <button type="button" class="cat-overview-card big cat-flip-front exp-tool-style" data-category="portafolio" style="--c:var(--accent);--bc:color-mix(in srgb, var(--white) 16%, transparent);--tint:color-mix(in srgb, var(--accent) 7%, transparent)">
+      <button type="button" class="cat-overview-card big cat-flip-front" data-category="portafolio" style="--c:var(--accent);--bc:color-mix(in srgb, var(--white) 16%, transparent);--tint:color-mix(in srgb, var(--accent) 7%, transparent)">
         <div class="cat-overview-head">
           <div class="cat-overview-num">1</div>
           <div class="cat-overview-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c);flex-shrink:0"><line x1="4.5" y1="4" x2="4.5" y2="16"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="12" y1="3" x2="12" y2="17"/><line x1="15.5" y1="4" x2="15.5" y2="16"/></svg><span>Mi Arrecife</span></div>
           <div class="cat-overview-tag">GRATIS</div>
         </div>
         <div class="cat-overview-sub">DASHBOARD PERSONALIZADO</div>
-        <div class="cat-overview-banner"><img src="/assets/menu-principal/portafolio.webp" alt="" loading="lazy" width="1248" height="334"></div>
+        <div class="cat-overview-banner icon-bleed"><span class="ibb-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4.5" y1="4" x2="4.5" y2="16"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="12" y1="3" x2="12" y2="17"/><line x1="15.5" y1="4" x2="15.5" y2="16"/></svg></span></div>
         <div class="cat-overview-desc">Arma tu propio panel: elige qué herramientas, gráficos y noticias de SkillCash quieres ver, y acomódalas al tamaño que prefieras.</div>
         <div class="cat-overview-btn">Explorar →</div>
             <svg class="bite-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M36,64 A28,28 0 0,1 64,36 L64,64 Z" fill="var(--bg)"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M36,64 A28,28 0 0,1 64,36" fill="none" stroke="var(--c)" stroke-opacity=".6" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/></svg>
