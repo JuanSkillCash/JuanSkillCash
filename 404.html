@@ -2978,12 +2978,16 @@ img[src=""]{display:none}
 .hero-orbe, .hero-orbe2, .hero-orbe3, .hero-orbe4{
   position:absolute;z-index:0;width:28px;height:28px;border-radius:50%;
   pointer-events:none;filter:blur(7px);
-  background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%);
 }
-.hero-orbe{ left:10%; top:15%; }
-.hero-orbe2{ left:60%; top:8%; width:20px; height:20px; }
-.hero-orbe3{ left:35%; top:30%; width:23px; height:23px; }
-.hero-orbe4{ left:48%; top:20%; width:18px; height:18px; }
+/* las 4 "moscas" ahora viven en la franja vacía que va desde la S de "Skill" hasta el borde
+   derecho (antes estaban pegadas a la imagen del tiburón) - un color distinto cada una: roja
+   (el acento de siempre), blanca, y las otras dos tomando el mismo amarillo/dorado y
+   azul-teal de las marcas bioluminiscentes del tiburón nuevo (var(--gold) y var(--cat-cyan),
+   ya usados en el resto del sitio) */
+.hero-orbe{ left:20%; top:12%; background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%); }
+.hero-orbe2{ left:40%; top:30%; width:20px; height:20px; background:radial-gradient(circle, color-mix(in srgb, var(--white) 70%, transparent) 0%, transparent 72%); }
+.hero-orbe3{ left:60%; top:10%; width:23px; height:23px; background:radial-gradient(circle, color-mix(in srgb, var(--gold) 70%, transparent) 0%, transparent 72%); }
+.hero-orbe4{ left:80%; top:24%; width:18px; height:18px; background:radial-gradient(circle, color-mix(in srgb, var(--cat-cyan) 70%, transparent) 0%, transparent 72%); }
 @media(prefers-reduced-motion:no-preference){
   /* animan transform (translate), nunca left/top - esas se quedan fijas en la regla de arriba
      como posicion base. Las 3 "moscas" ANTES movian left/top/margin en bucle infinito -
