@@ -3417,11 +3417,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    ámbar, ahora los 3 van iguales). */
 .sb-cat-label[data-category="__herramientas"],
 .sb-cat-label[data-category="__comunidad"],
-.sb-cat-label[data-category="eventos"]{ color:var(--accent) !important; }
+.sb-cat-label[data-category="eventos"],
+.sb-cat-label[data-category="__ayuda"]{ color:var(--accent) !important; }
 /* las categorías reales de "Tus Herramientas" (Sonar de Mercado, Zona de Caza, etc.) se
    indentan un poco para que se lean como contenidas DENTRO de "Herramientas", no como títulos
    de sección al mismo nivel */
-.sb-cat-label:not([data-category="__herramientas"]):not([data-category="__comunidad"]):not([data-category="eventos"]){
+.sb-cat-label:not([data-category="__herramientas"]):not([data-category="__comunidad"]):not([data-category="eventos"]):not([data-category="__ayuda"]){
   padding-left:20px;
 }
 /* "Comunidad" y "Noticias" no tienen nada que plegar (1-2 ítems nada más) - Juan pidió que
@@ -4383,7 +4384,22 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
            "Comunidad" (rango/skins/aliados) y de "Noticias". Primer item: la guia de Bitunix.
            Pensado para sumar mas adelante (glosario, foro) bajo este mismo grupo si Juan lo pide -
            mismo patron sb-cat-label-static + data-sb-open-category que ya usa "Aliados". -->
+      <!-- 22-nov-2026: Juan pidió que este grupo tenga las MISMAS 4 opciones que el
+           desplegable del botón "?" de la topbar (ver helpMiniDropdown más abajo en el
+           archivo) - Glosario/Errores comunes/Manual abren el mismo modal de siempre
+           (reusan exactamente las mismas funciones openGlossaryModal/openMistakesModal/
+           openManualModal con onclick directo, no data-cat-home, porque no son una
+           categoría real que mostrar/ocultar - solo "Guías" sí lo es). -->
       <div class="sb-cat-label sb-cat-label-static" data-category="__ayuda">Ayuda</div>
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openGlossaryModal()">
+        <span class="sb-item-label">Glosario</span>
+      </button>
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openMistakesModal()">
+        <span class="sb-item-label">Errores comunes</span>
+      </button>
+      <button class="sb-item sb-item-section sb-item-noicon" type="button" onclick="openManualModal()">
+        <span class="sb-item-label">Manual</span>
+      </button>
       <button class="sb-item sb-item-section sb-item-noicon" data-sb-open-category="guias" data-cat-home="guias">
         <span class="sb-item-label">Guías</span>
       </button>
@@ -4697,6 +4713,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <button type="button" class="account-dropdown-item" id="helpOpenGlossaryBtn">📖 Glosario Cripto</button>
           <button type="button" class="account-dropdown-item" id="helpOpenMistakesBtn">⚠️ Errores comunes</button>
           <button type="button" class="account-dropdown-item" id="helpOpenManualBtn">📘 Manual completo</button>
+          <button type="button" class="account-dropdown-item" id="helpOpenGuiasBtn">📚 Guías</button>
         </div>
       </div>
 
@@ -15932,6 +15949,10 @@ document.getElementById('helpOpenMistakesBtn').addEventListener('click', () => {
 document.getElementById('helpOpenManualBtn').addEventListener('click', () => {
   helpMiniDropdown.classList.remove('open');
   openManualModal();
+});
+document.getElementById('helpOpenGuiasBtn').addEventListener('click', () => {
+  helpMiniDropdown.classList.remove('open');
+  showCategoryDetail('guias');
 });
 
 /* ---- modal de login (general de la página) ---- */
