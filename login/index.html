@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SkillCash · Entra a tu arrecife</title>
+<meta name="description" content="Inicia sesión en SkillCash Tools. Sin contraseña: te enviamos un código al correo.">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:title" content="SkillCash · Entra a tu arrecife">
+<meta property="og:description" content="Tus herramientas de trading, siempre listas. Inicia sesión sin contraseña.">
+<meta property="og:image" content="assets/og-image.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SkillCash · Entra a tu arrecife">
+<meta name="twitter:description" content="Tus herramientas de trading, siempre listas. Inicia sesión sin contraseña.">
+<meta name="twitter:image" content="assets/og-image.jpg">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<link rel="preload" as="image" href="assets/scene.webp" fetchpriority="high">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================= ESCENA (submarino) ================= -->
+  <div class="stage-wrap" aria-hidden="true">
+    <div class="stage" id="stage">
+      <picture>
+        <source media="(max-width: 720px)" srcset="assets/scene-mobile.webp">
+        <img class="stage-bg" id="sceneImg" src="assets/scene.webp" alt="" draggable="false">
+      </picture>
+
+      <div class="glass-layers" id="glassLayers">
+        <svg class="caustics-svg" id="causticsSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <filter id="causticsFilter" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence id="causticsTurb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="noise"/>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <linearGradient id="causticsFade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#5fd8ff" stop-opacity="0"/>
+              <stop offset="40%" stop-color="#5fd8ff" stop-opacity="0"/>
+              <stop offset="70%" stop-color="#5fd8ff" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#5fd8ff" stop-opacity="1"/>
+            </linearGradient>
+          </defs>
+          <rect class="caustics-rect" x="0" y="0" width="100" height="100" fill="url(#causticsFade)" filter="url(#causticsFilter)"/>
+        </svg>
+
+        <div class="sunbeams" id="sunbeams">
+          <span class="beam b1"></span>
+          <span class="beam b2"></span>
+          <span class="beam b3"></span>
+          <span class="beam b4"></span>
+        </div>
+
+        <div class="specular"></div>
+      </div>
+
+      <div class="ring-glow" id="ringGlow"></div>
+      <div class="spill-light" id="spillLight"></div>
+      <div class="fog"></div>
+      <div class="stage-vignette" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <span class="header-logo" id="headerLogo"></span>
+    <span class="header-word">SKILLCASH</span>
+  </header>
+
+  <!-- ================= TARJETA ================= -->
+  <main class="auth-stage">
+    <div class="auth-card" id="authCard">
+      <span class="screw tl" aria-hidden="true"></span>
+      <span class="screw tr" aria-hidden="true"></span>
+      <span class="screw bl" aria-hidden="true"></span>
+      <span class="screw br" aria-hidden="true"></span>
+
+      <div class="card-brand">
+        <span class="card-logo" id="cardLogo"></span>
+        <span class="card-word">SKILLCASH</span>
+      </div>
+
+      <!-- Estado 1: correo -->
+      <section class="card-state" data-state="email" id="stateEmail">
+        <h1 class="card-title">Entra a tu arrecife</h1>
+        <p class="card-sub">Sin contraseña: te enviamos un código al correo.</p>
+
+        <button type="button" class="btn btn-google" id="btnGoogle">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.58-5.17 3.58-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.92l-3.88-3a7.15 7.15 0 0 1-10.6-3.76H1.5v3.1A11.98 11.98 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.46 14.32a7.2 7.2 0 0 1 0-4.62V6.6H1.5a11.97 11.97 0 0 0 0 10.82l3.96-3.1z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.78l3.44-3.44A11.9 11.9 0 0 0 12 0 11.98 11.98 0 0 0 1.5 6.6l3.96 3.1A7.16 7.16 0 0 1 12 4.75z"/></svg>
+          Seguir con Google
+        </button>
+
+        <div class="divider"><span>o con tu correo</span></div>
+
+        <form id="emailForm" novalidate>
+          <label for="emailInput" class="field-label">Correo electrónico</label>
+          <input type="email" id="emailInput" name="email" class="field-input" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
+          <p class="field-error" id="emailError" aria-live="polite"></p>
+
+          <button type="submit" class="btn btn-primary" id="btnSendCode">
+            <span class="btn-label">Sumergirme</span>
+            <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p class="legal">Al continuar aceptas los <a href="/terminos">Términos</a> y la <a href="/privacidad">Política de privacidad</a>.</p>
+      </section>
+
+      <!-- Estado 2: código -->
+      <section class="card-state" data-state="code" id="stateCode" hidden>
+        <h1 class="card-title">Revisa tu correo</h1>
+        <p class="card-sub">Enviamos un código de 6 dígitos a <strong id="codeEmailLabel"></strong>.</p>
+
+        <form id="codeForm" novalidate>
+          <div class="code-boxes" id="codeBoxes" role="group" aria-label="Código de 6 dígitos">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Dígito 1">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 2">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 3">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 4">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 5">
+            <input class="code-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 6">
+          </div>
+          <p class="field-error" id="codeError" aria-live="polite"></p>
+
+          <button type="submit" class="btn btn-primary" id="btnVerifyCode">
+            <span class="btn-label">Entrar</span>
+            <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <div class="code-actions">
+          <button type="button" class="link-btn" id="btnResend" disabled>Reenviar código (<span id="resendTimer">60</span>s)</button>
+          <button type="button" class="link-btn" id="btnChangeEmail">Cambiar correo</button>
+        </div>
+      </section>
+
+      <!-- Estado 3: éxito -->
+      <section class="card-state" data-state="success" id="stateSuccess" hidden>
+        <div class="success-check" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h1 class="card-title">Sumergiéndote…</h1>
+        <p class="card-sub">Bienvenido de vuelta a SkillCash.</p>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    /* Mismo proyecto/clave que usa el sitio real (index.html, SUPABASE_URL/KEY). */
+    var SKC_SUPABASE_URL = 'https://nbvgyouzjscwtfukzxok.supabase.co';
+    var SKC_SUPABASE_KEY = 'sb_publishable_uxAz2gqnTnMQup_lonppvw_0_EdXlRz';
+    var sbClient = (typeof supabase !== 'undefined')
+      ? supabase.createClient(SKC_SUPABASE_URL, SKC_SUPABASE_KEY)
+      : null;
+  </script>
+  <script src="scene.js"></script>
+  <script src="neon.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

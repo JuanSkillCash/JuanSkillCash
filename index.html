@@ -16878,11 +16878,19 @@ document.getElementById('helpOpenGuiasBtn').addEventListener('click', () => {
   showCategoryDetail('guias');
 });
 
-/* ---- modal de login (general de la página) ---- */
+/* ---- login: pantalla real "Portilla neón" (/login/) ----
+   Reemplaza el modal de correo/contraseña de toda la vida: openAuthModal()
+   es la función que casi todo el sitio llama para pedir inicio de sesión
+   (cuenta, reseñas, Mi Arrecife, Zona de Caza, etc.), así que redefinirla
+   aquí basta para mandar cualquier "Iniciar sesión" del sitio a /login/,
+   con ?next= para volver exactamente a donde estaba el usuario. */
 const authModal = document.getElementById('authModal');
 const authPanel = authModal.querySelector('.modal-panel');
 const closeAuth = document.getElementById('closeAuth');
-function openAuthModal(){ openModalGeneric(authModal, authPanel, closeAuth); }
+function openAuthModal(){
+  const next = window.location.pathname + window.location.search + window.location.hash;
+  window.location.href = '/login/?next=' + encodeURIComponent(next);
+}
 function closeAuthModal(){ closeModalGeneric(authModal); }
 closeAuth.addEventListener('click', closeAuthModal);
 authModal.addEventListener('click', (e) => { if(e.target === authModal) closeAuthModal(); });
@@ -16890,14 +16898,7 @@ document.getElementById('accountLoginBtn').addEventListener('click', () => {
   document.getElementById('accountMiniDropdown').classList.remove('open');
   openAuthModal();
 });
-document.getElementById('portfolioLoginPromptBtn').addEventListener('click', () => {
-  // Intercambio visual directo (ver nota en openAssetDetailModal) para evitar la misma
-  // condición de carrera entre history.back() y history.pushState().
-  portfolioModal.classList.remove('open');
-  authModal.classList.add('open');
-  activeModalPanel = authPanel;
-  setTimeout(() => { closeAuth.focus(); }, 60);
-});
+document.getElementById('portfolioLoginPromptBtn').addEventListener('click', openAuthModal);
 
 /* ---- modal de perfil (cambiar nombre de usuario) ---- */
 const profileModal = document.getElementById('profileModal');
