@@ -278,4 +278,11 @@
       }, 1900);
     }
   }
+
+  // Si llegamos aquí porque "Seguir con Google" falló en el sitio real
+  // (ver checkOAuthReturnError en index.html), mostramos el motivo.
+  (function showIncomingError() {
+    var err = new URLSearchParams(window.location.search).get('error');
+    if (err) setFieldError(emailInput, emailError, err);
+  })();
 })();
