@@ -270,6 +270,34 @@ button{font-family:inherit}
   color:var(--text);
 }
 
+.intent-tabs{
+  display:flex;
+  gap:4px;
+  background:rgba(5,8,13,.6);
+  border:1px solid rgba(0,229,255,.15);
+  border-radius:10px;
+  padding:4px;
+  margin-bottom:20px;
+}
+.intent-tab{
+  flex:1;
+  background:none;
+  border:none;
+  border-radius:7px;
+  padding:9px;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.intent-tab.active{
+  background:rgba(0,229,255,.14);
+  color:var(--text);
+}
+.intent-tab:not(.active):hover{ color:var(--text); }
+
 .card-title{
   margin:0 0 6px;
   font-size:24px;

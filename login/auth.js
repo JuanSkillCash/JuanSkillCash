@@ -19,7 +19,7 @@
     if (!msg) return 'Ocurrió un error. Intenta de nuevo.';
     if (/Token has expired or is invalid/i.test(msg)) return 'El código venció o es incorrecto. Pide uno nuevo.';
     if (/Email rate limit|For security purposes/i.test(msg)) return 'Espera un momento antes de pedir otro código.';
-    if (/Signups not allowed|Email signups are disabled/i.test(msg)) return 'El registro con correo está deshabilitado en este momento.';
+    if (/Signups not allowed|Email signups are disabled/i.test(msg)) return 'No encontramos una cuenta con ese correo. Prueba "Crear cuenta".';
     if (/invalid.*email/i.test(msg)) return 'Revisa que el correo esté bien escrito.';
     return msg;
   }
@@ -31,10 +31,15 @@
     return null;
   }
 
-  function sendCode(email) {
+  // intent: 'login' (shouldCreateUser:false, falla si el correo no tiene
+  // cuenta) o 'signup' (shouldCreateUser:true, la crea si hace falta).
+  function sendCode(email, intent) {
     var blocked = requireClient();
     if (blocked) return blocked;
-    return sbClient.auth.signInWithOtp({ email: email }).then(function (res) {
+    return sbClient.auth.signInWithOtp({
+      email: email,
+      options: { shouldCreateUser: intent === 'signup' }
+    }).then(function (res) {
       if (res.error) throw new Error(translateAuthError(res.error.message));
       return { ok: true };
     });
@@ -52,7 +57,10 @@
   function loginWithGoogle() {
     var blocked = requireClient();
     if (blocked) return blocked;
-    var redirectTo = window.location.origin + NEXT_PATH;
+    // Vuelve a /login/ (no directo al sitio) para poder mostrar la misma
+    // animación de inmersión antes de mandar al sitio real; ver el
+    // onAuthStateChange('SIGNED_IN') más abajo.
+    var redirectTo = window.location.origin + window.location.pathname + '?next=' + encodeURIComponent(NEXT_PATH);
     return sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: redirectTo, queryParams: { prompt: 'select_account' } }
@@ -77,6 +85,30 @@
   var emailError = document.getElementById('emailError');
   var btnSendCode = document.getElementById('btnSendCode');
   var btnGoogle = document.getElementById('btnGoogle');
+  var tabLogin = document.getElementById('tabLogin');
+  var tabSignup = document.getElementById('tabSignup');
+  var emailTitle = document.getElementById('emailTitle');
+  var emailSub = document.getElementById('emailSub');
+  var btnSendCodeLabel = btnSendCode.querySelector('.btn-label');
+
+  var INTENT_COPY = {
+    login: { title: 'Entra a tu arrecife', sub: 'Sin contraseña: te enviamos un código al correo.', btn: 'Sumergirme' },
+    signup: { title: 'Únete a SkillCash', sub: 'Crea tu cuenta sin contraseña, solo con un código.', btn: 'Crear mi cuenta' }
+  };
+  var intent = 'login';
+  function setIntent(next) {
+    intent = next;
+    tabLogin.classList.toggle('active', intent === 'login');
+    tabLogin.setAttribute('aria-selected', String(intent === 'login'));
+    tabSignup.classList.toggle('active', intent === 'signup');
+    tabSignup.setAttribute('aria-selected', String(intent === 'signup'));
+    var copy = INTENT_COPY[intent];
+    emailTitle.textContent = copy.title;
+    emailSub.textContent = copy.sub;
+    btnSendCodeLabel.textContent = copy.btn;
+  }
+  tabLogin.addEventListener('click', function () { setIntent('login'); });
+  tabSignup.addEventListener('click', function () { setIntent('signup'); });
 
   var codeForm = document.getElementById('codeForm');
   var codeBoxes = Array.prototype.slice.call(document.querySelectorAll('.code-box'));
@@ -126,7 +158,7 @@
     }
 
     setLoading(btnSendCode, true);
-    sendCode(email)
+    sendCode(email, intent)
       .then(function () {
         currentEmail = email;
         codeEmailLabel.textContent = email;
@@ -230,7 +262,7 @@
   btnResend.addEventListener('click', function () {
     if (btnResend.disabled) return;
     btnResend.disabled = true;
-    sendCode(currentEmail)
+    sendCode(currentEmail, intent)
       .then(function () {
         btnResend.innerHTML = 'Reenviar código (<span id="resendTimer">60</span>s)';
         resendTimerEl = document.getElementById('resendTimer');
@@ -249,7 +281,10 @@
   });
 
   // ---------- estado 3: éxito + inmersión ----------
+  var successTriggered = false;
   function goToSuccess() {
+    if (successTriggered) return;
+    successTriggered = true;
     showState('success');
     card.style.transition = 'opacity .5s ease';
     requestAnimationFrame(function () {
@@ -285,4 +320,14 @@
     var err = new URLSearchParams(window.location.search).get('error');
     if (err) setFieldError(emailInput, emailError, err);
   })();
+
+  // "Seguir con Google" manda de vuelta aquí mismo (no directo al sitio)
+  // para que se alcance a ver la inmersión: en cuanto Supabase confirma
+  // la sesión nueva (evento SIGNED_IN, no una sesión vieja ya guardada),
+  // disparamos el mismo éxito+zoom antes de mandar al sitio real.
+  if (sbClient) {
+    sbClient.auth.onAuthStateChange(function (event, session) {
+      if (event === 'SIGNED_IN' && session) goToSuccess();
+    });
+  }
 })();
