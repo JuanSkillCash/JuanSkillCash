@@ -1,22 +1,24 @@
 """
-Manda a Telegram las noticias cripto que la IA del Worker de noticias (workers/rss-news/worker.js)
-clasificó como "importancia: alta" - lo que Juan pidió: que SOLO las noticias cripto clave (ETF,
-SEC/regulación, Fed, hackeo grande, quiebra/fraude grande, movimiento de precio fuerte, adopción
-institucional, país adoptando cripto, upgrade de red grande, empresa grande no-cripto con producto
-cripto, ballena grande, figura política) lleguen al canal, no todo lo que sale en Noticias.
+Manda a Telegram TODAS las noticias cripto nuevas de news_archive (Juan, 23-nov-2026: "quiero que
+envíes todas las noticias crypto al telegram menos las que dice: Esto es lo que sucedió en Crypto
+hoy..." - antes este script solo mandaba las que la IA del Worker clasificaba "importancia: alta";
+ese filtro se quitó).
 
-Lee de news_archive (ya poblada cada 30 min por update_news_archive.py, que ahora también guarda
-"importancia") en vez de pedirle de nuevo al Worker - evita gastar cupo de Workers AI dos veces y
-reusa el mismo historial que ya alimenta el buscador del sitio.
+Lee de news_archive (ya poblada cada 30 min por update_news_archive.py) en vez de pedirle de nuevo
+al Worker - evita gastar cupo de Workers AI dos veces y reusa el mismo historial que ya alimenta
+el buscador del sitio.
 
-Filtro de monedas excluidas (pedido explícito de Juan): aunque una noticia salga "alta", si el
-TÍTULO menciona XRP, Stellar (XLM), Hedera (HBAR) o Flare/Songbird (FLR/SGB), se descarta. Esto es
-un filtro de palabras simple (no IA) a propósito - es una lista fija de nombres propios, mucho más
-confiable que pedirle a un modelo que lo adivine, y Juan la puede ampliar en cualquier momento
-solo pidiendo que se agregue un nombre a EXCLUDED_KEYWORDS.
+Dos filtros de TÍTULO (ninguno usa IA, a propósito - más confiable que pedirle a un modelo que lo
+adivine, y Juan los puede ampliar en cualquier momento):
+
+1. Monedas excluidas (pedido explícito de Juan, 20-nov-2026): si el título menciona XRP, Stellar
+   (XLM), Hedera (HBAR) o Flare/Songbird (FLR/SGB), se descarta - lista fija en EXCLUDED_KEYWORDS.
+2. Resumen diario "Esto es lo que sucedió en Crypto hoy..." (pedido explícito de Juan,
+   23-nov-2026): un titular recurrente de resumen del día (no es una noticia puntual) se descarta -
+   patrón en EXCLUDED_TITLE_PATTERN.
 
 "telegram_enviado" se marca en true tanto si la noticia se mandó de verdad como si se descartó por
-el filtro de monedas excluidas - en los dos casos ya se "resolvió" esa fila y no hace falta
+cualquiera de los dos filtros - en los dos casos ya se "resolvió" esa fila y no hace falta
 revisarla de nuevo en la próxima corrida.
 
 Variables de entorno requeridas:
@@ -54,6 +56,10 @@ TELEGRAM_THREAD_ID = 8540
 EXCLUDED_KEYWORDS = ["xrp", "ripple", "xlm", "stellar", "hbar", "hedera", "flr", "sgb", "flare", "songbird"]
 EXCLUDED_PATTERN = re.compile(r"\b(?:" + "|".join(EXCLUDED_KEYWORDS) + r")\b", re.IGNORECASE)
 
+# Resumen diario tipo "Esto es lo que sucedió en Crypto hoy..." (Juan, 23-nov-2026) - no es una
+# noticia puntual, es un recap. "sucedió|pasó" cubre variaciones del mismo titular día a día.
+EXCLUDED_TITLE_PATTERN = re.compile(r"esto es lo que (?:sucedi[oó]|pas[oó]) en crypto hoy", re.IGNORECASE)
+
 MAX_PER_RUN = 8  # tope de seguridad - si algo saliera mal y hubiera un montón pendiente, no inundar el canal de una
 
 
@@ -70,7 +76,6 @@ def fetch_pendientes() -> list[dict]:
         f"{SUPABASE_URL}/rest/v1/{TABLE}",
         params={
             "category": "eq.crypto",
-            "importancia": "eq.alta",
             "telegram_enviado": "eq.false",
             "select": "id,title,resumen,resumen_largo,source,imagen",
             "order": "published_at.asc",
@@ -164,16 +169,21 @@ def main() -> None:
 
     pendientes = fetch_pendientes()
     if not pendientes:
-        log.info("sin noticias nuevas de importancia alta - nada que mandar.")
+        log.info("sin noticias cripto nuevas - nada que mandar.")
         return
 
-    enviadas, excluidas = 0, 0
+    enviadas, excluidas_moneda, excluidas_recap = 0, 0, 0
     for row in pendientes:
         titulo = row.get("title") or ""
         if EXCLUDED_PATTERN.search(titulo):
             log.info(f"excluida por filtro de monedas (fila {row['id']}): {titulo[:80]}")
             marca_resuelta(row["id"])
-            excluidas += 1
+            excluidas_moneda += 1
+            continue
+        if EXCLUDED_TITLE_PATTERN.search(titulo):
+            log.info(f"excluida por ser el recap diario (fila {row['id']}): {titulo[:80]}")
+            marca_resuelta(row["id"])
+            excluidas_recap += 1
             continue
         try:
             send_to_telegram(build_caption(row), row.get("imagen"))
@@ -182,7 +192,10 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001 - un fallo puntual de Telegram no debe tumbar el resto del lote
             log.warning(f"no se pudo mandar la fila {row['id']} ({titulo[:80]}): {e}")
 
-    log.info(f"Listo. {enviadas} mandadas, {excluidas} excluidas por filtro de monedas, {len(pendientes)} revisadas.")
+    log.info(
+        f"Listo. {enviadas} mandadas, {excluidas_moneda} excluidas por filtro de monedas, "
+        f"{excluidas_recap} excluidas por ser el recap diario, {len(pendientes)} revisadas."
+    )
 
 
 if __name__ == "__main__":

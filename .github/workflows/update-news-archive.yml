@@ -35,12 +35,14 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/update_news_archive.py
 
-      # Alertas de Telegram de noticias cripto clave (pedido de Juan, 20-nov-2026) - va DESPUES
+      # Alertas de Telegram de TODAS las noticias cripto nuevas (pedido de Juan, 20-nov-2026,
+      # ampliado el 23-nov-2026 a "todas" en vez de solo las de importancia alta) - va DESPUES
       # del paso de arriba a proposito, en el mismo job: necesita que las noticias nuevas de esta
-      # misma corrida ya esten guardadas en news_archive (con su "importancia") antes de revisar
-      # que mandar. Ver scripts/post_important_news_telegram.py para el filtro completo (12
-      # categorias + exclusion de XRP/XLM/HBAR/FLR, todo elegido por Juan a mano).
-      - name: Mandar a Telegram las noticias cripto de importancia alta
+      # misma corrida ya esten guardadas en news_archive antes de revisar que mandar. Ver
+      # scripts/post_important_news_telegram.py para el filtro completo (exclusion de
+      # XRP/XLM/HBAR/FLR + del resumen diario "Esto es lo que sucedio en Crypto hoy...", todo
+      # elegido por Juan a mano).
+      - name: Mandar a Telegram las noticias cripto nuevas
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
