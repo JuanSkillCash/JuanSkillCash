@@ -227,7 +227,34 @@ function groupRows(list, keyFn){
 }
 
 /* ======================= graficas SVG ======================= */
-const C = { pos: '#4ade80', neg: '#f87171', line: '#5b8def', grid: 'rgba(255,255,255,.07)', txt: '#8b8f9a' };
+const C = { pos: '#4ade80', neg: '#f87171', line: '#5b8def', grid: 'rgba(255,255,255,.07)', txt: '#8b8f9a', orange: '#f0b23d', purple: '#b794f6', cyan: '#22d3ee' };
+/* sparkline minimalista para el hero de Resumen - a diferencia de lineChartSvg (ejes, grilla,
+   etiquetas) esto es solo la linea+area, estirada al 100% del ancho real por CSS/viewBox en vez
+   de redibujarse con drawCharts() - no necesita precision de pixel, es puro refuerzo visual. */
+function sparkline(points, opt = {}){
+  if(points.length < 2) return '';
+  const W = 600, H = 60;
+  const ys = points.map(p => p.y);
+  const yMin = Math.min(...ys, 0), yMax = Math.max(...ys, 0);
+  const X = i => W * (i / (points.length - 1));
+  const Y = v => H - 4 - (H - 8) * ((v - yMin) / ((yMax - yMin) || 1));
+  const path = points.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.y).toFixed(1)).join(' ');
+  const color = opt.color || C.line;
+  const base = Y(0);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${path} L${W} ${base} L0 ${base} Z" fill="${color}" opacity=".16"/>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`;
+}
+const JR_ICONS = {
+  target: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="3.6"/><circle cx="9" cy="9" r=".5" fill="currentColor" stroke="none"/></svg>',
+  scale: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5v13"/><path d="M4 5h10"/><path d="M4 5l-2.4 4.8a2.4 2.4 0 0 0 4.8 0z"/><path d="M14 5l-2.4 4.8a2.4 2.4 0 0 0 4.8 0z"/></svg>',
+  down: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l4.2 4.2 2.8-2.8L15.5 12"/><path d="M11 12h4.5V7.5"/></svg>',
+  bars: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="4" height="7" rx="1"/><rect x="11" y="3" width="4" height="12" rx="1"/></svg>',
+  coin: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><path d="M9 5.3v7.4"/><path d="M11.1 7.2c-.3-.8-1-1.2-2.1-1.2-1.3 0-2.1.6-2.1 1.5 0 2.1 4.2.9 4.2 3 0 .9-.8 1.5-2.1 1.5-1.1 0-1.8-.4-2.1-1.2"/></svg>',
+  flame: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.2c1.8 2.6-.8 3.6-.8 5.6a1.8 1.8 0 0 0 3.6 0c0-.8-.4-1.3-.4-1.3.9.9 1.8 2.3 1.8 4a4.2 4.2 0 1 1-8.4 0c0-3.3 2.8-4.6 4.2-8.3z"/></svg>',
+  pulse: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1.8-5 3 9 1.8-5h3l1.9 0"/></svg>',
+};
 function niceTicks(min, max, count = 4){
   if(min === max){ min -= 1; max += 1; }
   const span = max - min, step0 = span / count, mag = Math.pow(10, Math.floor(Math.log10(step0)));
@@ -332,6 +359,17 @@ function donut(parts){
 const root = () => $('journalRoot');
 function kpi(label, value, sub, cls){
   return `<div class="jr-kpi"><div class="jr-kpi-label">${label}${helpBtn(label)}</div><div class="jr-kpi-val ${cls || ''}">${value}</div>${sub ? `<div class="jr-kpi-sub">${sub}</div>` : ''}</div>`;
+}
+/* tarjeta "titular" grande (fila de 4 arriba del todo en Resumen) - mismo contenido que un kpi()
+   normal pero con icono+color propios, para que las 3-4 metricas que mas importan de un vistazo
+   no se pierdan entre las demas. */
+function headlineCard(icon, color, label, value, sub, cls){
+  return `<div class="jr-headline-card" style="--hc:${color}"><div class="jr-headline-icon">${JR_ICONS[icon] || ''}</div><div class="jr-headline-label">${label}${helpBtn(label)}</div><div class="jr-headline-val ${cls || ''}">${value}</div>${sub ? `<div class="jr-headline-sub">${sub}</div>` : ''}</div>`;
+}
+/* un grupo de kpi() normales bajo una misma etiqueta+color+icono, en vez de una sola grilla
+   plana de 16 cuadritos identicos sin ningun orden visual. */
+function kpiGroup(icon, color, label, itemsHtml){
+  return `<div class="jr-kpi-group" style="--gc:${color}"><div class="jr-kpi-group-label">${JR_ICONS[icon] || ''}${label}</div><div class="jr-kpis">${itemsHtml}</div></div>`;
 }
 function card(title, body, extra){
   return `<div class="jr-card ${extra || ''}"><div class="jr-card-title">${title}${helpBtn(title)}</div>${body}</div>`;
@@ -508,8 +546,9 @@ function paneResumen(){
   const opens = openTrades();
   return `
     <div class="jr-hero ${signCls(st.net)}">
-      <div><div class="jr-kpi-label">P&L neto del rango${helpBtn('P&L neto del rango')}</div><div class="jr-hero-val">${sUsd(st.net)}</div>
-      <div class="jr-hero-sub">${st.n} operaciones cerradas</div></div>
+      <div style="flex:1;min-width:220px"><div class="jr-kpi-label">P&L neto del rango${helpBtn('P&L neto del rango')}</div><div class="jr-hero-val">${sUsd(st.net)}</div>
+      <div class="jr-hero-sub">${st.n} operaciones cerradas</div>
+      <div class="jr-hero-spark">${sparkline(curve, { color: st.net >= 0 ? C.pos : C.neg })}</div></div>
       <div class="jr-hero-mini">
         <div><span>Ganado${helpBtn('Ganado')}</span><b class="jr-pos">${usd(st.gp)}</b></div>
         <div><span>Perdido${helpBtn('Perdido')}</span><b class="jr-neg">${usd(st.gl)}</b></div>
@@ -519,28 +558,37 @@ function paneResumen(){
       </div>
       <div class="jr-hero-sub" style="margin-top:6px">El 20% de descuento que te doy en comisiones no es un descuento en el momento — Bitunix te lo devuelve como cashback real a tu cuenta spot. Esto es lo que llevas recibido este mes.</div>
     </div>
-    <div class="jr-kpis">
-      ${kpi('Winrate', pct(st.winrate), st.wins + ' G · ' + st.losses + ' P · ' + st.be + ' BE')}
-      ${kpi('Profit factor', Number.isFinite(st.pf) ? st.pf.toFixed(2) : (st.pf === Infinity ? '∞' : '—'), 'Ganado ÷ perdido')}
-      ${kpi('Expectativa', sUsd(st.expectancy), 'Promedio por operación', signCls(st.expectancy))}
-      ${kpi('Ratio G/P', Number.isFinite(st.payoff) ? st.payoff.toFixed(2) : '—', 'Ganancia prom. ÷ pérdida prom.')}
-      ${kpi('Ganancia promedio', usd(st.avgWin), '', 'jr-pos')}
-      ${kpi('Pérdida promedio', usd(st.avgLoss), '', 'jr-neg')}
-      ${kpi('Max drawdown', usd(-st.maxDD), 'Pico a valle, en dólares', 'jr-neg')}
-      ${kpi('Factor de recuperación', Number.isFinite(st.recovery) ? st.recovery.toFixed(2) : '—', 'Neto ÷ max drawdown')}
-      ${kpi('Mejor operación', st.best ? sUsd(st.best.net) : '—', st.best ? esc(st.best.symbol) + ' · ' + fmtDate(st.best.closed) : '', 'jr-pos')}
-      ${kpi('Peor operación', st.worst ? sUsd(st.worst.net) : '—', st.worst ? esc(st.worst.symbol) + ' · ' + fmtDate(st.worst.closed) : '', 'jr-neg')}
-      ${kpi('Rachas', st.maxW + ' / ' + st.maxL, 'Máx. ganadoras / perdedoras · actual ' + (st.curW ? st.curW + ' G' : st.curL ? st.curL + ' P' : '—'))}
-      ${kpi('Días en verde', st.tradingDays ? st.greenDays + '/' + st.tradingDays : '—', st.tradingDays ? pct(st.greenDays / st.tradingDays * 100, 0) + ' de los días operados' : '')}
-      ${kpi('Apalancamiento prom.', Number.isFinite(st.avgLev) ? st.avgLev.toFixed(1) + 'x' : '—', '')}
-      ${kpi('Duración promedio', fmtDur(st.avgDur), '')}
-      ${kpi('Volumen operado', usd(st.volume, 0), 'Tamaño de posición total')}
-      ${kpi('Sharpe (diario, anual.)', Number.isFinite(st.sharpe) ? st.sharpe.toFixed(2) : '—', 'Rentabilidad ÷ variabilidad')}
+    <div class="jr-headline-row">
+      ${headlineCard('target', C.line, 'Winrate', pct(st.winrate), st.wins + ' G · ' + st.losses + ' P · ' + st.be + ' BE', Number.isFinite(st.winrate) ? (st.winrate >= 50 ? 'jr-pos' : 'jr-neg') : '')}
+      ${headlineCard('scale', C.pos, 'Profit factor', Number.isFinite(st.pf) ? st.pf.toFixed(2) : (st.pf === Infinity ? '∞' : '—'), 'Ganado ÷ perdido', st.pf === Infinity || (Number.isFinite(st.pf) && st.pf >= 1) ? 'jr-pos' : (Number.isFinite(st.pf) ? 'jr-neg' : ''))}
+      ${headlineCard('down', C.neg, 'Max drawdown', usd(-st.maxDD), 'Pico a valle, en dólares', 'jr-neg')}
+      ${headlineCard('bars', C.orange, 'Ratio G/P', Number.isFinite(st.payoff) ? st.payoff.toFixed(2) : '—', 'Ganancia prom. ÷ pérdida prom.', Number.isFinite(st.payoff) ? (st.payoff >= 1 ? 'jr-pos' : 'jr-neg') : '')}
     </div>
+    ${kpiGroup('coin', C.orange, 'Ganancias y pérdidas', [
+      kpi('Expectativa', sUsd(st.expectancy), 'Promedio por operación', signCls(st.expectancy)),
+      kpi('Ganancia promedio', usd(st.avgWin), '', 'jr-pos'),
+      kpi('Pérdida promedio', usd(st.avgLoss), '', 'jr-neg'),
+      kpi('Mejor operación', st.best ? sUsd(st.best.net) : '—', st.best ? esc(st.best.symbol) + ' · ' + fmtDate(st.best.closed) : '', 'jr-pos'),
+    ].join(''))}
+    ${kpiGroup('flame', C.purple, 'Riesgo y rachas', [
+      kpi('Peor operación', st.worst ? sUsd(st.worst.net) : '—', st.worst ? esc(st.worst.symbol) + ' · ' + fmtDate(st.worst.closed) : '', 'jr-neg'),
+      kpi('Factor de recuperación', Number.isFinite(st.recovery) ? st.recovery.toFixed(2) : '—', 'Neto ÷ max drawdown'),
+      kpi('Rachas', st.maxW + ' / ' + st.maxL, 'Máx. ganadoras / perdedoras · actual ' + (st.curW ? st.curW + ' G' : st.curL ? st.curL + ' P' : '—')),
+      kpi('Días en verde', st.tradingDays ? st.greenDays + '/' + st.tradingDays : '—', st.tradingDays ? pct(st.greenDays / st.tradingDays * 100, 0) + ' de los días operados' : ''),
+    ].join(''))}
+    ${kpiGroup('pulse', C.cyan, 'Actividad', [
+      kpi('Apalancamiento prom.', Number.isFinite(st.avgLev) ? st.avgLev.toFixed(1) + 'x' : '—', ''),
+      kpi('Duración promedio', fmtDur(st.avgDur), ''),
+      kpi('Volumen operado', usd(st.volume, 0), 'Tamaño de posición total'),
+      kpi('Sharpe (diario, anual.)', Number.isFinite(st.sharpe) ? st.sharpe.toFixed(2) : '—', 'Rentabilidad ÷ variabilidad'),
+    ].join(''))}
     <div class="jr-grid2">
       ${card('P&L acumulado', lineChart(curve, { area: true, color: C.line, h: 260, areaBase: 0, zero: true }), 'jr-span2')}
       ${card('Drawdown', lineChart(ddCurve, { area: true, color: C.neg, h: 160, areaBase: 0 }), 'jr-span2')}
       ${card('P&L por día', barChart(dayItems, { h: 220 }), 'jr-span2')}
+    </div>
+    <div class="jr-grid3">
+      ${card('Resultados', donut([{ label: 'Ganadoras', value: st.wins, color: C.pos }, { label: 'Perdedoras', value: st.losses, color: C.neg }, { label: 'Break-even', value: st.be, color: '#8b8f9a' }]))}
       ${card('Long vs Short', `<table class="jr-table jr-compact"><thead><tr><th></th><th>Long</th><th>Short</th></tr></thead><tbody>
         <tr><td>Operaciones</td><td>${sl.n}</td><td>${ss.n}</td></tr>
         <tr><td>Winrate</td><td>${pct(sl.winrate)}</td><td>${pct(ss.winrate)}</td></tr>
@@ -548,9 +596,10 @@ function paneResumen(){
         <tr><td>Profit factor</td><td>${Number.isFinite(sl.pf) ? sl.pf.toFixed(2) : '—'}</td><td>${Number.isFinite(ss.pf) ? ss.pf.toFixed(2) : '—'}</td></tr>
         <tr><td>Expectativa</td><td class="${signCls(sl.expectancy)}">${sUsd(sl.expectancy)}</td><td class="${signCls(ss.expectancy)}">${sUsd(ss.expectancy)}</td></tr>
       </tbody></table>`)}
-      ${card('Resultados', donut([{ label: 'Ganadoras', value: st.wins, color: C.pos }, { label: 'Perdedoras', value: st.losses, color: C.neg }, { label: 'Break-even', value: st.be, color: '#8b8f9a' }]))}
       ${card('Mejores y peores pares', hBars(top.map(r => ({ label: r.k, value: r.net, tip: r.n + ' operaciones · winrate ' + pct(r.wr) }))))}
-      ${card('Posiciones abiertas', opens.length ? `<table class="jr-table jr-compact"><thead><tr><th>Par</th><th>Lado</th><th>Entrada</th><th>Margen</th><th>Desde</th></tr></thead><tbody>${opens.map(t => `<tr class="jr-row" data-edit="${t.id}"><td>${esc(t.symbol)}</td><td><span class="jr-side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span> ${t.leverage ? t.leverage + 'x' : ''}</td><td>${t.entry ?? '—'}</td><td>${t.margin != null ? usd(t.margin) : '—'}</td><td>${fmtDateTime(t.opened)}</td></tr>`).join('')}</tbody></table>` : '<div class="jr-empty">No tienes posiciones abiertas.</div>')}
+    </div>
+    <div class="jr-grid2">
+      ${card('Posiciones abiertas', opens.length ? `<table class="jr-table jr-compact"><thead><tr><th>Par</th><th>Lado</th><th>Entrada</th><th>Margen</th><th>Desde</th></tr></thead><tbody>${opens.map(t => `<tr class="jr-row" data-edit="${t.id}"><td>${esc(t.symbol)}</td><td><span class="jr-side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span> ${t.leverage ? t.leverage + 'x' : ''}</td><td>${t.entry ?? '—'}</td><td>${t.margin != null ? usd(t.margin) : '—'}</td><td>${fmtDateTime(t.opened)}</td></tr>`).join('')}</tbody></table>` : '<div class="jr-empty">No tienes posiciones abiertas.</div>', 'jr-span2')}
     </div>`;
 }
 function emptyState(){
