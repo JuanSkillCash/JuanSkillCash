@@ -13184,62 +13184,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 </div>
 
 <!-- ===== MODAL: LOGIN (general de la página) ===== -->
-<div class="modal-overlay" id="authModal">
-  <button class="modal-close" id="closeAuth" aria-label="Cerrar">✕</button>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="authTitleEl" style="max-width:460px">
-
-    <div class="calc">
-      <div class="calc-head">
-        <div class="calc-eyebrow">
-          <img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async">
-          <div class="calc-eyebrow-word">SKILL<span>CASH</span><span class="sb-logo-tools" style="font-size:1.15em">Tools</span></div>
-        </div>
-        <h2 class="calc-title" id="authTitleEl" style="font-size:22px">🔐 Tu cuenta</h2>
-        <p class="calc-sub">Necesaria para herramientas que guardan tus datos</p>
-      </div>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="authTabLogin" data-auth="login">Iniciar sesión</button>
-        <button class="auth-tab" id="authTabSignup" data-auth="signup">Crear cuenta</button>
-      </div>
-
-      <div class="auth-form">
-        <div class="field" id="f-auth-username" style="display:none">
-          <label for="authUsername">Nombre de usuario</label>
-          <input type="text" id="authUsername" placeholder="Ej. JuanTrader" autocomplete="off">
-        </div>
-        <div class="field" id="f-auth-email">
-          <label for="authEmail">Correo</label>
-          <input type="email" id="authEmail" placeholder="tu@correo.com" autocomplete="email">
-        </div>
-        <div class="field" id="f-auth-password" style="margin-top:10px">
-          <label for="authPassword" id="authPasswordLabel">Contraseña</label>
-          <input type="password" id="authPassword" placeholder="Mínimo 6 caracteres" autocomplete="current-password">
-        </div>
-        <label class="auth-terms-check" id="f-auth-terms" style="display:none">
-          <input type="checkbox" id="authAcceptTerms">
-          <span>Acepto los <a href="#" class="legal-inline-link" data-legal="terminos">Términos y Condiciones</a> y la <a href="#" class="legal-inline-link" data-legal="privacidad">Política de Tratamiento de Datos</a>.</span>
-        </label>
-        <button type="button" id="forgotPasswordLink" class="auth-link-btn">¿Olvidaste tu contraseña?</button>
-        <button type="button" id="backToLoginLink" class="auth-link-btn" style="display:none">← Volver a iniciar sesión</button>
-
-        <div class="auth-error" id="authError" style="margin-top:12px"></div>
-        <div class="auth-success" id="authSuccess" style="margin-top:12px"></div>
-
-        <button class="btn-block btn-red-full" id="authSubmitBtn" style="margin-top:14px">Iniciar sesión</button>
-
-        <div class="auth-divider" id="authDivider">o</div>
-
-        <button class="btn-block btn-google" id="googleSignInBtn" type="button">
-          <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4c-7.6 0-14.1 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.5 35.4 26.9 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.6 5C9.8 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.6 5.4C40.9 36.5 44 30.9 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
-          Continuar con Google
-        </button>
-
-        <p class="auth-note" style="margin-top:6px">Tu cuenta guarda tus herramientas (como el portafolio) para que las encuentres desde cualquier dispositivo. Nunca compartimos tu correo.</p>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- El modal viejo de correo/contraseña (#authModal) se quitó: el login real
+     ahora vive en /login/ ("Portilla neón"), ver openAuthModal() más abajo. -->
 
 <!-- ===== MODAL: MI PERFIL ===== -->
 <div class="modal-overlay" id="profileModal">
@@ -13270,9 +13216,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <button class="btn-block btn-red-full" id="profileSaveBtn" style="margin-top:14px">Guardar cambios</button>
 
-      <button type="button" id="profileChangePasswordLink" class="auth-link-btn" style="margin-top:14px">Cambiar mi contraseña →</button>
-
-      <p class="auth-note profile-email-row" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b><button type="button" id="profileEmailToggleBtn" class="profile-email-eye" aria-label="Mostrar correo" title="Mostrar correo">👁️</button></p>
+<p class="auth-note profile-email-row" style="margin-top:14px">Correo asociado: <b id="profileEmailDisplay">—</b><button type="button" id="profileEmailToggleBtn" class="profile-email-eye" aria-label="Mostrar correo" title="Mostrar correo">👁️</button></p>
 
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid color-mix(in srgb, var(--accent) 30%, transparent)">
         <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Conexiones</p>
@@ -16539,76 +16483,10 @@ portfolioModal.addEventListener('click', (e) => { if(e.target === portfolioModal
 
 /* ---- autenticación ---- */
 let currentUser = null;
-let authMode = 'login';
 
 const authGate = document.getElementById('portfolioAuthGate');
 const portfolioApp = document.getElementById('portfolioApp');
-const authEmail = document.getElementById('authEmail');
-const authPassword = document.getElementById('authPassword');
-const authError = document.getElementById('authError');
-const authSuccess = document.getElementById('authSuccess');
-const authSubmitBtn = document.getElementById('authSubmitBtn');
 
-document.getElementById('authTabLogin').addEventListener('click', () => setAuthMode('login'));
-document.getElementById('authTabSignup').addEventListener('click', () => setAuthMode('signup'));
-document.getElementById('forgotPasswordLink').addEventListener('click', () => setAuthMode('forgot'));
-document.getElementById('backToLoginLink').addEventListener('click', () => setAuthMode('login'));
-
-function setAuthMode(mode){
-  authMode = mode;
-  const tabs = document.querySelector('.auth-tabs');
-  const usernameField = document.getElementById('f-auth-username');
-  const emailField = document.getElementById('f-auth-email');
-  const passwordField = document.getElementById('f-auth-password');
-  const passwordLabel = document.getElementById('authPasswordLabel');
-  const forgotLink = document.getElementById('forgotPasswordLink');
-  const backLink = document.getElementById('backToLoginLink');
-  const googleBtn = document.getElementById('googleSignInBtn');
-  const divider = document.getElementById('authDivider');
-  const termsField = document.getElementById('f-auth-terms');
-
-  document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
-  document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
-
-  tabs.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
-  usernameField.style.display = mode === 'signup' ? 'block' : 'none';
-  termsField.style.display = mode === 'signup' ? 'flex' : 'none';
-  googleBtn.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
-  divider.style.display = (mode === 'login' || mode === 'signup') ? 'flex' : 'none';
-  forgotLink.style.display = mode === 'login' ? 'block' : 'none';
-  backLink.style.display = (mode === 'forgot' || mode === 'reset') ? 'block' : 'none';
-
-  if(mode === 'forgot'){
-    emailField.style.display = 'block';
-    passwordField.style.display = 'none';
-    authSubmitBtn.textContent = 'Enviar enlace de recuperación';
-  } else if(mode === 'reset'){
-    emailField.style.display = 'none';
-    passwordField.style.display = 'block';
-    passwordLabel.textContent = 'Nueva contraseña';
-    authPassword.placeholder = 'Mínimo 6 caracteres';
-    authSubmitBtn.textContent = 'Guardar nueva contraseña';
-  } else {
-    emailField.style.display = 'block';
-    passwordField.style.display = 'block';
-    passwordLabel.textContent = 'Contraseña';
-    authPassword.placeholder = 'Mínimo 6 caracteres';
-    authSubmitBtn.textContent = mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
-  }
-  authError.classList.remove('show');
-  authSuccess.classList.remove('show');
-}
-
-function showAuthError(msg){
-  authError.textContent = msg;
-  authError.classList.add('show');
-  authSuccess.classList.remove('show');
-}
-function showAuthSuccess(msg){
-  authSuccess.textContent = msg;
-  authSuccess.classList.add('show');
-  authError.classList.remove('show');
-}
 function translateAuthError(msg){
   if(!msg) return 'Ocurrió un error. Intenta de nuevo.';
   if(msg.includes('Invalid login credentials')) return 'Correo o contraseña incorrectos.';
@@ -16629,89 +16507,6 @@ function getDisplayName(user){
   if(meta.name) return meta.name;
   return user.email ? user.email.split('@')[0] : 'Usuario';
 }
-
-authSubmitBtn.addEventListener('click', async () => {
-  const email = authEmail.value.trim();
-  const password = authPassword.value;
-  const username = document.getElementById('authUsername').value.trim();
-  authError.classList.remove('show');
-  authSuccess.classList.remove('show');
-
-  if(authMode === 'forgot'){
-    if(!email){ showAuthError('Escribe tu correo.'); return; }
-    authSubmitBtn.disabled = true;
-    const original = authSubmitBtn.textContent;
-    authSubmitBtn.textContent = 'Enviando...';
-    try{
-      const { error } = await sbClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
-      if(error) throw error;
-      showAuthSuccess('Listo — revisa tu correo y sigue el enlace para elegir una nueva contraseña.');
-    } catch(err){
-      showAuthError(translateAuthError(err.message));
-    } finally {
-      authSubmitBtn.disabled = false;
-      authSubmitBtn.textContent = original;
-    }
-    return;
-  }
-
-  if(authMode === 'reset'){
-    if(!password || password.length < 6){ showAuthError('La contraseña debe tener al menos 6 caracteres.'); return; }
-    authSubmitBtn.disabled = true;
-    const original = authSubmitBtn.textContent;
-    authSubmitBtn.textContent = 'Guardando...';
-    try{
-      const { error } = await sbClient.auth.updateUser({ password });
-      if(error) throw error;
-      showAuthSuccess('Contraseña actualizada. Ya quedaste con la sesión iniciada.');
-      renderAuthState();
-      setTimeout(() => { closeAuthModal(); setAuthMode('login'); }, 1800);
-    } catch(err){
-      showAuthError(translateAuthError(err.message));
-    } finally {
-      authSubmitBtn.disabled = false;
-      authSubmitBtn.textContent = original;
-    }
-    return;
-  }
-
-  if(!email || !password){ showAuthError('Completa correo y contraseña.'); return; }
-  if(authMode === 'signup' && !username){ showAuthError('Elige un nombre de usuario.'); return; }
-  if(authMode === 'signup' && !document.getElementById('authAcceptTerms').checked){ showAuthError('Debes aceptar los Términos y la Política de Tratamiento de Datos para crear tu cuenta.'); return; }
-  authSubmitBtn.disabled = true;
-  const original = authSubmitBtn.textContent;
-  authSubmitBtn.textContent = 'Un momento...';
-  try{
-    if(authMode === 'login'){
-      const { error } = await sbClient.auth.signInWithPassword({ email, password });
-      if(error) throw error;
-    } else {
-      const { data, error } = await sbClient.auth.signUp({ email, password, options: { data: { username } } });
-      if(error) throw error;
-      if(data.user && !data.session){
-        showAuthSuccess('Cuenta creada. Revisa tu correo para confirmar antes de iniciar sesión.');
-      }
-    }
-  } catch(err){
-    showAuthError(translateAuthError(err.message));
-  } finally {
-    authSubmitBtn.disabled = false;
-    authSubmitBtn.textContent = original;
-  }
-});
-
-document.getElementById('googleSignInBtn').addEventListener('click', async () => {
-  if(authMode === 'signup' && !document.getElementById('authAcceptTerms').checked){ showAuthError('Debes aceptar los Términos y la Política de Tratamiento de Datos para crear tu cuenta.'); return; }
-  const cleanUrl = window.location.origin + window.location.pathname;
-  const { error } = await sbClient.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: cleanUrl,
-      queryParams: { prompt: 'select_account' }
-    }
-  });
-  if(error) showAuthError('No se pudo iniciar con Google: ' + error.message);
-});
 
 document.getElementById('portfolioLogoutBtn').addEventListener('click', async () => {
   await sbClient.auth.signOut();
@@ -16742,7 +16537,6 @@ function renderAuthState(){
     if(typeof delistWatchlistWidget !== 'undefined') delistWatchlistWidget.onAuthChange();
     if(typeof newlistWatchlistWidget !== 'undefined') newlistWatchlistWidget.onAuthChange();
     if(typeof loadAccountMiniAvatar === 'function') loadAccountMiniAvatar();
-    if(authModal.classList.contains('open')) closeAuthModal();
   } else {
     if(heroWelcomeEyebrow) heroWelcomeEyebrow.textContent = 'Bienvenido a';
     authGate.style.display = 'block';
@@ -16884,16 +16678,10 @@ document.getElementById('helpOpenGuiasBtn').addEventListener('click', () => {
    (cuenta, reseñas, Mi Arrecife, Zona de Caza, etc.), así que redefinirla
    aquí basta para mandar cualquier "Iniciar sesión" del sitio a /login/,
    con ?next= para volver exactamente a donde estaba el usuario. */
-const authModal = document.getElementById('authModal');
-const authPanel = authModal.querySelector('.modal-panel');
-const closeAuth = document.getElementById('closeAuth');
 function openAuthModal(){
   const next = window.location.pathname + window.location.search + window.location.hash;
   window.location.href = '/login/?next=' + encodeURIComponent(next);
 }
-function closeAuthModal(){ closeModalGeneric(authModal); }
-closeAuth.addEventListener('click', closeAuthModal);
-authModal.addEventListener('click', (e) => { if(e.target === authModal) closeAuthModal(); });
 document.getElementById('accountLoginBtn').addEventListener('click', () => {
   document.getElementById('accountMiniDropdown').classList.remove('open');
   openAuthModal();
@@ -17026,13 +16814,6 @@ document.getElementById('profileSaveBtn').addEventListener('click', async () => 
   }
 });
 
-document.getElementById('profileChangePasswordLink').addEventListener('click', () => {
-  closeProfileModal();
-  setAuthMode('forgot');
-  authEmail.value = currentUser ? currentUser.email : '';
-  openAuthModal();
-});
-
 /* ---- eliminar cuenta: borra todos los datos del usuario (sus portafolios) de forma
    autoservida, ya mismo, con las mismas politicas de RLS que ya usa el simulador para
    que cada quien solo pueda tocar lo suyo. El registro de acceso (correo/contraseña en
@@ -17094,11 +16875,6 @@ sbClient.auth.onAuthStateChange((event, session) => {
   if(typeof loadColmillosBalance === 'function') loadColmillosBalance();
   if(typeof awardColmillos === 'function' && currentUser) awardColmillos('daily_visit', todayKeyUTC(), 20);
   if(typeof updateWipLockVisuals === 'function') updateWipLockVisuals();
-  if(event === 'PASSWORD_RECOVERY'){
-    setAuthMode('reset');
-    openAuthModal();
-    return; // no renderAuthState() aquí para que no se cierre el modal de golpe
-  }
   renderAuthState();
 });
 sbClient.auth.getSession().then(({ data }) => {
@@ -32128,15 +31904,18 @@ document.addEventListener('visibilitychange', () => {
   if(!document.hidden) updateMarketSessions();
 });
 
-/* si Google/Supabase regresan con un error en la URL, avisar en vez de quedar en silencio */
+/* si Google/Supabase regresan con un error en la URL (el intento de login con
+   Google se hizo desde /login/, con redirectTo de vuelta a esta misma página),
+   avisar en vez de quedar en silencio: se manda a /login/ con el motivo para
+   que lo muestre ahí mismo, en vez de abrir el modal viejo que ya no existe. */
 (function checkOAuthReturnError(){
   const raw = window.location.hash || window.location.search;
   if(!raw || raw.indexOf('error') === -1) return;
   const params = new URLSearchParams(raw.replace(/^[#?]/, ''));
   const errDesc = params.get('error_description') || params.get('error');
   if(errDesc){
-    openAuthModal();
-    showAuthError('Google: ' + decodeURIComponent(errDesc.replace(/\+/g, ' ')));
+    const next = window.location.pathname;
+    window.location.href = '/login/?next=' + encodeURIComponent(next) + '&error=' + encodeURIComponent('Google: ' + errDesc.replace(/\+/g, ' '));
   }
 })();
 
