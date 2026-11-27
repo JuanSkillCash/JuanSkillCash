@@ -572,22 +572,23 @@ button{font-family:inherit;color:inherit}
   /* el sitio tiene una regla global que apaga TODO text-shadow (ver "Rediseño paso 2: sin neón"
      más abajo en este archivo) - sin ese recurso, la única forma de que el texto se siga
      leyendo sobre la foto es un degradado bien sólido donde va el texto (nada de solo "oscurecer
-     un poco"). Juan, 27-nov-2026, segunda vuelta: el primer intento oscurecía básicamente toda
-     la mitad izquierda pareja - pidió que se concentre en el primer 35-45% nomás y que del
-     centro para adelante la foto recupere su luminosidad/colores cálidos (nada de gris: sigue
-     siendo var(--bg), un azul marino, nunca un gris neutro). El ::before va con z-index:1 y cada
+     un poco"). Juan, 27-nov-2026, varias vueltas de ajuste hasta llegar aquí: un solo degradado
+     horizontal (se quitó el ::after de arriba hacia abajo que había antes - se veía como una
+     franja aparte) con MUCHOS pasos intermedios para que la transición sea orgánica y no se note
+     ningún corte/línea (la versión con solo 2-3 pasos se veía como una franja negra recortada
+     encima de la foto). Empieza 92% opaco (no 100%, para que no arranque como un bloque sólido),
+     se mantiene fuerte hasta ~20%, y se apaga del todo hacia el 60% - de ahí al 100% la foto
+     queda intacta. var(--bg) se adapta solo al tema activo. El ::before va con z-index:1 y cada
      hijo directo de la tarjeta con z-index:2 (en vez del truco anterior de z-index:-1). */
   content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:1;
-  background:linear-gradient(90deg, color-mix(in srgb, var(--bg) 99%, transparent) 0%, color-mix(in srgb, var(--bg) 98%, transparent) 15%, color-mix(in srgb, var(--bg) 94%, transparent) 30%, color-mix(in srgb, var(--bg) 82%, transparent) 42%, color-mix(in srgb, var(--bg) 55%, transparent) 55%, color-mix(in srgb, var(--bg) 22%, transparent) 72%, transparent 90%);
-}
-.session-card.has-photo::after{
-  /* Segunda capa INDEPENDIENTE (Juan, 27-nov-2026): una franja oscura abajo, de arriba hacia
-     abajo, para que "Hora local"/"Horario" se integren con la foto en vez de depender solo del
-     degradado horizontal - se funde suave (varios pasos, no un corte recto) y no tapa la mitad
-     derecha de arriba (esa debe quedar nítida). Mismo z-index que ::before: las dos capas se
-     sobreponen entre sí sin pelear con el contenido (z-index:2). */
-  content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:1;
-  background:linear-gradient(180deg, transparent 0%, transparent 48%, color-mix(in srgb, var(--bg) 35%, transparent) 70%, color-mix(in srgb, var(--bg) 70%, transparent) 88%, color-mix(in srgb, var(--bg) 80%, transparent) 100%);
+  background:linear-gradient(90deg,
+    color-mix(in srgb, var(--bg) 92%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 88%, transparent) 20%,
+    color-mix(in srgb, var(--bg) 70%, transparent) 30%,
+    color-mix(in srgb, var(--bg) 48%, transparent) 38%,
+    color-mix(in srgb, var(--bg) 26%, transparent) 45%,
+    color-mix(in srgb, var(--bg) 10%, transparent) 52%,
+    transparent 60%);
 }
 /* OJO: .session-bell-btn ya es position:absolute (top:7px;right:7px) para ir en la esquina -
    un "> *{position:relative}" genérico se lo pisaba y lo sacaba de su esquina (quedaba una
