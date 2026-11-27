@@ -35644,7 +35644,7 @@ async function awardColmillos(eventType, periodKey, amount){
       '</span>' +
     '</span>';
   }
-  track.innerHTML = PT_BOLTS_HTML + PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
+  track.innerHTML = PRICE_TICKER_ITEMS.map(buildItemHtml).join('') + PT_BOLTS_HTML;
 
   // logos reales de BTC/ETH (una sola vez - mismo endpoint de CoinGecko que ya usa el resto
   // del sitio, ver loadDominanceLogos en Panorama del mercado). Si falla, se queda el ícono de
