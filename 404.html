@@ -35599,7 +35599,7 @@ async function awardColmillos(eventType, periodKey, amount){
     { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt', period:'24h', cgId:'ethereum' },
     { key:'xau', label:'Oro', kind:'crypto', binance:'paxgusdt', period:'24h', cgId:'pax-gold' },
     { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40, period:'día' },
-    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día' }
+    { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día', icon:'assets/ticker-icons/sp500.png' }
   ];
   var PT_ICON_FALLBACK = {
     btc: '<circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/>',
@@ -35629,9 +35629,10 @@ async function awardColmillos(eventType, periodKey, amount){
      ver CSS) es la "linecita sutil" que separa un symbolo+precio+cambio del siguiente. */
   function buildItemHtml(item){
     var fallback = PT_ICON_FALLBACK[item.key] || '';
-    var iconHtml = '<span class="price-ticker-icon-wrap">' +
+    var iconHtml = '<span class="price-ticker-icon-wrap' + (item.icon ? ' has-img' : '') + '">' +
       '<svg class="price-ticker-icon-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + fallback + '</svg>' +
       (item.cgId ? '<img class="price-ticker-icon-img" id="ptIcon-' + item.key + '" alt="" aria-hidden="true">' : '') +
+      (item.icon ? '<img class="price-ticker-icon-img loaded" src="' + item.icon + '" alt="" aria-hidden="true">' : '') +
     '</span>';
     return '<span class="price-ticker-item" data-pt-key="' + item.key + '">' +
       iconHtml +
