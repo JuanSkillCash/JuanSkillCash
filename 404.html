@@ -624,13 +624,15 @@ button{font-family:inherit;color:inherit}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:24px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:8px;background:color-mix(in srgb, var(--white) 8%, transparent);overflow:hidden}
 .dom-card-bar-fill{position:absolute;top:0;left:0;height:100%;border-radius:8px;transition:width .6s cubic-bezier(.16,1,.3,1)}
-/* Dominancia BTC/USDT (undécima vuelta): número+variación a la izquierda, minigráfico de 7 días
-   a la derecha (mismo patrón SVG-polyline-sin-ejes ya usado en las cotizaciones de Mi Arrecife -
-   ver .arrecife-quote-spark). El % de HOY sigue viniendo de CoinGecko (loadMarketDominance, sin
-   tocar); el histórico de 7 días y el % de variación vienen de la tabla cryptocap_history que ya
-   usan los paneles de detalle (ver renderDomSparkline) - cero APIs nuevas. */
-.dom-card-body-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:1px}
-.dom-card-figures{display:flex;flex-direction:column;gap:3px;min-width:0}
+/* Dominancia BTC/USDT (duodécima vuelta): Juan, viendo el resultado real, pidió juntar más el
+   número y la variación % justo debajo del título, quitar "del market cap total cripto" (ya se
+   sobreentiende) y usar TODO ese espacio liberado para un gráfico grande - antes el gráfico
+   era chiquito (82px) al lado de las cifras; ahora .dom-card-chart-wrap es flex:1, así que crece
+   y ocupa todo lo que sobra dentro de la tarjeta (la misma altura que ya se repartía con
+   justify-content:space-between en .dom-card). .dom-card-sub se queda en el HTML sin tocar
+   (loadMarketDominance sigue escribiéndole texto, por si se necesita de vuelta) pero oculto con
+   CSS - así no hay que tocar esa función para nada. */
+.dom-card-figures{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:1px}
 .dom-card-change{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;line-height:1}
 .dom-card-change::before{content:'▲';font-size:8px}
 .dom-card-change.down::before{content:'▼'}
@@ -638,19 +640,15 @@ button{font-family:inherit;color:inherit}
 .dom-card-change.up{color:var(--green)}
 .dom-card-change.down{color:var(--red)}
 .dom-card-change.flat{color:var(--muted)}
-.dom-card-spark{width:82px;height:42px;flex-shrink:0}
-/* En celular angosto (BTC/USDT ya van en 2 columnas desde los 900px), el ancho real de cada
-   tarjeta es poco - número+variación+gráfico de 82px lado a lado ya no caben y el texto se
-   desbordaba fuera de la tarjeta (confirmado con Playwright en 390px). Se apila el gráfico
-   DEBAJO de las cifras en vez de al lado, achicándolo un poco, en vez de encogerlo tanto que
-   deje de verse. */
-@media(max-width:480px){
-  .dom-card-body-row{flex-direction:column;align-items:flex-start;gap:6px}
-  .dom-card-spark{width:100%;max-width:150px;height:34px}
-}
-.dom-card-spark path{fill:none;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
-#btcDomSpark path{stroke:#f0b23d}
-#usdtDomSpark path{stroke:#2dd4bf}
+.dom-card.btc .dom-card-sub,.dom-card.usdt .dom-card-sub{display:none}
+.dom-card-chart-wrap{flex:1;display:flex;align-items:stretch;min-height:46px;margin-top:2px}
+.dom-card-spark{width:100%;height:100%;display:block}
+/* "Un poquito más neón" (Juan) - color más vivo (naranja real de Bitcoin en vez del dorado del
+   sitio, que se confundía con el ícono) + un resplandor sutil con drop-shadow (filter, no
+   box-shadow - mismo costo que animar nada, es estático, no hay problema de rendimiento). */
+.dom-card-spark path{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+#btcDomSpark path{stroke:#f7931a;filter:drop-shadow(0 0 4px rgba(247,147,26,.65))}
+#usdtDomSpark path{stroke:#2dd4bf;filter:drop-shadow(0 0 4px rgba(45,212,191,.65))}
 .dom-card.btc .dom-card-bar-fill{background:linear-gradient(90deg,#f0b23d,#ffcf6b);box-shadow:0 0 0 transparent}
 .dom-card.usdt .dom-card-bar-fill{background:linear-gradient(90deg,#2ecc71,#7bf5ab);box-shadow:0 0 0 transparent}
 .dom-card.halving .dom-card-bar-fill{background:linear-gradient(90deg,#a855f7,#e879f9);box-shadow:0 0 0 transparent}
@@ -5174,26 +5172,22 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
       <div class="dom-card btc" id="btcDomCard">
         <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg><img class="dom-card-logo-img" id="btcLogoImg" alt="" aria-hidden="true"></span>Dominancia BTC</div>
-        <div class="dom-card-body-row">
-          <div class="dom-card-figures">
-            <div class="dom-card-value skeleton" id="btcDomValue"></div>
-            <div class="dom-card-change" id="btcDomChange"></div>
-          </div>
-          <svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg>
+        <div class="dom-card-figures">
+          <div class="dom-card-value skeleton" id="btcDomValue"></div>
+          <div class="dom-card-change" id="btcDomChange"></div>
         </div>
+        <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="btcDomSub">Cargando…</div>
         <div class="dom-card-click-hint">Ver detalle →</div>
       </div>
 
       <div class="dom-card usdt" id="usdtDomCard">
         <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg><img class="dom-card-logo-img" id="usdtLogoImg" alt="" aria-hidden="true"></span>Dominancia USDT</div>
-        <div class="dom-card-body-row">
-          <div class="dom-card-figures">
-            <div class="dom-card-value skeleton" id="usdtDomValue"></div>
-            <div class="dom-card-change" id="usdtDomChange"></div>
-          </div>
-          <svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg>
+        <div class="dom-card-figures">
+          <div class="dom-card-value skeleton" id="usdtDomValue"></div>
+          <div class="dom-card-change" id="usdtDomChange"></div>
         </div>
+        <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
         <div class="dom-card-click-hint">Ver detalle →</div>
       </div>
