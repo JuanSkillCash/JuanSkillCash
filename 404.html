@@ -297,16 +297,14 @@ button{font-family:inherit;color:inherit}
   background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 45%, var(--white) 15%), color-mix(in srgb, var(--bg) 90%, transparent) 70%);
   box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 1px 1px rgba(255,255,255,.05);
 }
-.pt-bolt-tl{top:6px;left:16px}
-.pt-bolt-tr{top:6px;right:16px}
-.pt-bolt-bl{bottom:6px;left:16px}
-.pt-bolt-br{bottom:6px;right:16px}
+.pt-bolt-left{top:50%;left:12px;transform:translateY(-50%)}
+.pt-bolt-right{top:50%;right:12px;transform:translateY(-50%)}
 @media(max-width:620px){.pt-bolt{display:none}}
 .price-ticker-track{
   position:relative;
   display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;
   width:fit-content;max-width:100%;margin:0 auto;
-  padding:7px 20px;
+  padding:7px 28px;
   border-radius:999px;
   background:
     radial-gradient(70% 70% at 18% -10%, color-mix(in srgb, var(--accent) 13%, transparent) 0%, transparent 60%),
@@ -35611,14 +35609,15 @@ async function awardColmillos(eventType, periodKey, amount){
 
   var track = document.getElementById('priceTickerTrack');
   if(!track) return;
-  // Juan, 27-nov-2026: mismos "remaches" de las esquinas de Panorama del mercado, pero SOLO en
-  // esta pildora (explicito: nada en las pildoras de Bitunix/Telegram ni en los menus de
-  // notificaciones/cuenta). Se agregan aqui porque track.innerHTML se reescribe completo mas
-  // abajo - si se pusieran en el HTML estatico, se perderian en el primer render.
-  var PT_BOLTS_HTML = '<span class="pt-bolt pt-bolt-tl" aria-hidden="true"></span>' +
-    '<span class="pt-bolt pt-bolt-tr" aria-hidden="true"></span>' +
-    '<span class="pt-bolt pt-bolt-bl" aria-hidden="true"></span>' +
-    '<span class="pt-bolt pt-bolt-br" aria-hidden="true"></span>';
+  // Juan, 27-nov-2026: "remaches" SOLO en esta pildora (explicito: nada en las pildoras de
+  // Bitunix/Telegram ni en los menus de notificaciones/cuenta). A diferencia de Panorama del
+  // mercado (placa rectangular, 4 remaches en las 4 esquinas), aqui la pildora es angosta y
+  // redondeada en los dos extremos - 4 esquinas se veian como "dos remaches pegados" en cada
+  // lado (Juan lo reporto explicitamente). Por eso son solo 2, uno centrado verticalmente en
+  // cada extremo (izquierda/derecha). Se agregan aqui porque track.innerHTML se reescribe
+  // completo mas abajo - si se pusieran en el HTML estatico, se perderian en el primer render.
+  var PT_BOLTS_HTML = '<span class="pt-bolt pt-bolt-left" aria-hidden="true"></span>' +
+    '<span class="pt-bolt pt-bolt-right" aria-hidden="true"></span>';
 
   /* Juan: "no se entiende que es de SP500 esa perdida... separado por una linecita sutil, la
      perdida un poquito mas pegada, que diga si es en 24 horas o en cuanto" - cada item ahora
