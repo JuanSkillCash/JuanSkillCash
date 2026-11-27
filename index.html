@@ -31838,28 +31838,48 @@ setInterval(loadMarketDominance, 1800000); // se refresca solo cada 30 minutos
    hay ninguna API nueva ni dependencia nueva. Se pide una sola vez (el histórico diario no
    cambia dentro de la sesión) en vez de cada 30 min como el valor de hoy. Si falla, el
    minigráfico simplemente se queda vacío - nunca se dibuja con datos inventados. */
-// Catmull-Rom -> Bézier: con solo 7-8 puntos diarios (es todo lo que cryptocap_history tiene,
-// no hay dato por hora de dominancia), una polyline recta entre puntos se veía como un
-// zigzag anguloso ("el gráfico no está bien logrado" - Juan, con captura real). Esto traza una
-// curva suave que SÍ pasa por cada punto real (no es un suavizado que invente valores, solo
-// interpola la forma entre ellos) - mismo principio de "curva suave, pero fiel a los datos"
-// del pedido original.
-function catmullRomSvgPath(points){
-  if(points.length < 2) return '';
-  if(points.length === 2) return 'M' + points[0][0] + ',' + points[0][1] + ' L' + points[1][0] + ',' + points[1][1];
-  let d = 'M' + points[0][0].toFixed(1) + ',' + points[0][1].toFixed(1);
-  for(let i = 0; i < points.length - 1; i++){
-    const p0 = points[i - 1] || points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[i + 2] || p2;
-    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
-    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
-    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
-    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
-    d += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+// Monótona cúbica (Fritsch-Carlson, el mismo método que d3.curveMonotoneX) en vez de Catmull-Rom:
+// con solo 7-8 puntos diarios y un zigzag real (sube-baja-sube), Catmull-Rom puede "pasarse" más
+// allá del valor real entre dos puntos (overshoot) - como el SVG recorta lo que sale del
+// viewBox, eso se veía con la curva cortada/rara en los picos ("se sigue viendo feo" - Juan).
+// Monótona garantiza que la curva NUNCA se pase del valor real entre dos puntos consecutivos,
+// sigue pasando exactamente por cada dato real, y se ve igual de suave.
+function monotoneSvgPath(points){
+  const n = points.length;
+  if(n < 2) return '';
+  if(n === 2) return 'M' + points[0][0].toFixed(1) + ',' + points[0][1].toFixed(1) + ' L' + points[1][0].toFixed(1) + ',' + points[1][1].toFixed(1);
+  const dx = [], d = [];
+  for(let i = 0; i < n - 1; i++){
+    dx[i] = points[i + 1][0] - points[i][0];
+    d[i] = (points[i + 1][1] - points[i][1]) / dx[i];
   }
-  return d;
+  const m = new Array(n);
+  m[0] = d[0];
+  m[n - 1] = d[n - 2];
+  for(let i = 1; i < n - 1; i++){
+    m[i] = (d[i - 1] < 0) !== (d[i] < 0) ? 0 : (d[i - 1] + d[i]) / 2;
+  }
+  for(let i = 0; i < n - 1; i++){
+    if(d[i] === 0){ m[i] = 0; m[i + 1] = 0; continue; }
+    const a = m[i] / d[i], b = m[i + 1] / d[i];
+    if(a < 0) m[i] = 0;
+    if(b < 0) m[i + 1] = 0;
+    const s = a * a + b * b;
+    if(s > 9){
+      const tau = 3 / Math.sqrt(s);
+      m[i] = tau * a * d[i];
+      m[i + 1] = tau * b * d[i];
+    }
+  }
+  let path = 'M' + points[0][0].toFixed(1) + ',' + points[0][1].toFixed(1);
+  for(let i = 0; i < n - 1; i++){
+    const x0 = points[i][0], y0 = points[i][1];
+    const x1 = points[i + 1][0], y1 = points[i + 1][1];
+    const c1x = x0 + dx[i] / 3, c1y = y0 + m[i] * dx[i] / 3;
+    const c2x = x1 - dx[i] / 3, c2y = y1 - m[i + 1] * dx[i] / 3;
+    path += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' + x1.toFixed(1) + ',' + y1.toFixed(1);
+  }
+  return path;
 }
 async function renderDomSparkline(svgId, changeElId, symbolFull){
   const svgEl = document.getElementById(svgId);
@@ -31878,7 +31898,7 @@ async function renderDomSparkline(svgId, changeElId, symbolFull){
       pad + (1 - (v - minV) / range) * (h - pad * 2)
     ]);
     const pathEl = svgEl.querySelector('path');
-    if(pathEl) pathEl.setAttribute('d', catmullRomSvgPath(points));
+    if(pathEl) pathEl.setAttribute('d', monotoneSvgPath(points));
     const first = vals[0], last = vals[vals.length - 1];
     const changePct = first !== 0 ? ((last - first) / first) * 100 : 0;
     const sign = changePct > 0 ? '+' : '';
