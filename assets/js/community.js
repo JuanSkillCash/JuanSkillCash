@@ -107,7 +107,7 @@ function renderReviewsSummary(stats){
 }
 function reviewCard(r){
   const card = document.createElement('div');
-  card.className = 'review-card' + (r.hidden ? ' is-hidden' : '');
+  card.className = 'review-card glass-card' + (r.hidden ? ' is-hidden' : '');
   const head = document.createElement('div'); head.className = 'review-card-head';
   const name = document.createElement('span'); name.className = 'review-card-name'; name.textContent = r.display_name;
   const stars = document.createElement('span'); stars.className = 'review-card-stars'; stars.textContent = starsText(r.rating);
