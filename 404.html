@@ -571,7 +571,7 @@ button{font-family:inherit;color:inherit}
 .halving-chart-countdown-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#60a5fa;letter-spacing:.03em;margin-bottom:3px;white-space:nowrap}
 .halving-chart-countdown-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:15px;color:var(--white);letter-spacing:-.01em;white-space:nowrap}
 .halving-chart-countdown .dom-card-bar{margin-top:5px;width:120px}
-.dom-card-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:6px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
+.dom-card-click-hint{display:block;text-align:right;width:100%;padding-top:6px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .dom-card.halving:hover .dom-card-click-hint{color:#c084fc}
 .fng-section-head{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap;margin-bottom:4px}
 .fng-section-title{font-size:10.5px;font-weight:700;color:var(--white);margin-right:auto;flex:1 0 100%}
@@ -602,10 +602,25 @@ button{font-family:inherit;color:inherit}
 .fng-gauge-needle-tip{fill:var(--white);filter:drop-shadow(0 0 4px rgba(255,255,255,.7));transition:transform .6s cubic-bezier(.16,1,.3,1);transform-origin:60px 60px}
 .fng-gauge-pivot{fill:var(--white)}
 .fng-gauge-center{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;margin-top:4px}
+/* Juan, captura real con marcas a mano: "ese espacio que sobra" - como las 3 tarjetas btc/usdt/
+   halving tienen menos contenido que la de Miedo y Codicia (la más alta, por el velocímetro),
+   el grid (align-items:stretch) las estira a esa misma altura, y el margin-top:auto del
+   "VER DETALLE" absorbía TODO ese sobrante de golpe en un solo hueco feo justo encima de él.
+   justify-content:space-between reparte ese espacio entre los renglones en vez de dejarlo todo
+   amontonado en un solo lugar - por eso se quita el margin-top:auto de .dom-card-click-hint
+   (si se dejaran los dos a la vez, el auto se comería de nuevo todo el espacio él solo). */
 .dom-card{
-  border-radius:14px;padding:9px 13px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;min-height:100%
+  border-radius:14px;padding:9px 13px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;min-height:100%
 }
 .dom-card-label{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--muted2)}
+/* Logo real de BTC/USDT (Juan: "que sea grandecito... no gigante pero que se vea bien") - se
+   trae una vez de CoinGecko (loadDominanceLogos) y se superpone al ícono de contorno ya
+   existente, que se queda de respaldo visible si la petición falla (nunca queda vacío). */
+.dom-card-logo-wrap{position:relative;display:inline-flex;width:21px;height:21px;flex-shrink:0}
+.dom-card-logo-fallback{width:100%;height:100%}
+.dom-card-logo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:50%;opacity:0;transition:opacity .25s ease}
+.dom-card-logo-img.loaded{opacity:1}
+.dom-card-logo-wrap.has-img .dom-card-logo-fallback{display:none}
 .dom-card-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:24px;color:var(--white);letter-spacing:-.01em}
 .dom-card-bar{position:relative;height:5px;border-radius:8px;background:color-mix(in srgb, var(--white) 8%, transparent);overflow:hidden}
 .dom-card-bar-fill{position:absolute;top:0;left:0;height:100%;border-radius:8px;transition:width .6s cubic-bezier(.16,1,.3,1)}
@@ -623,10 +638,19 @@ button{font-family:inherit;color:inherit}
 .dom-card-change.up{color:var(--green)}
 .dom-card-change.down{color:var(--red)}
 .dom-card-change.flat{color:var(--muted)}
-.dom-card-spark{width:70px;height:30px;flex-shrink:0}
-.dom-card-spark polyline{fill:none;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
-#btcDomSpark polyline{stroke:#f0b23d}
-#usdtDomSpark polyline{stroke:#2dd4bf}
+.dom-card-spark{width:82px;height:42px;flex-shrink:0}
+/* En celular angosto (BTC/USDT ya van en 2 columnas desde los 900px), el ancho real de cada
+   tarjeta es poco - número+variación+gráfico de 82px lado a lado ya no caben y el texto se
+   desbordaba fuera de la tarjeta (confirmado con Playwright en 390px). Se apila el gráfico
+   DEBAJO de las cifras en vez de al lado, achicándolo un poco, en vez de encogerlo tanto que
+   deje de verse. */
+@media(max-width:480px){
+  .dom-card-body-row{flex-direction:column;align-items:flex-start;gap:6px}
+  .dom-card-spark{width:100%;max-width:150px;height:34px}
+}
+.dom-card-spark path{fill:none;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+#btcDomSpark path{stroke:#f0b23d}
+#usdtDomSpark path{stroke:#2dd4bf}
 .dom-card.btc .dom-card-bar-fill{background:linear-gradient(90deg,#f0b23d,#ffcf6b);box-shadow:0 0 0 transparent}
 .dom-card.usdt .dom-card-bar-fill{background:linear-gradient(90deg,#2ecc71,#7bf5ab);box-shadow:0 0 0 transparent}
 .dom-card.halving .dom-card-bar-fill{background:linear-gradient(90deg,#a855f7,#e879f9);box-shadow:0 0 0 transparent}
@@ -5149,26 +5173,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="dom-card btc" id="btcDomCard">
-        <div class="dom-card-label"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:var(--gold)"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg>Dominancia BTC</div>
+        <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg><img class="dom-card-logo-img" id="btcLogoImg" alt="" aria-hidden="true"></span>Dominancia BTC</div>
         <div class="dom-card-body-row">
           <div class="dom-card-figures">
             <div class="dom-card-value skeleton" id="btcDomValue"></div>
             <div class="dom-card-change" id="btcDomChange"></div>
           </div>
-          <svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><polyline points=""/></svg>
+          <svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg>
         </div>
         <div class="dom-card-sub" id="btcDomSub">Cargando…</div>
         <div class="dom-card-click-hint">Ver detalle →</div>
       </div>
 
       <div class="dom-card usdt" id="usdtDomCard">
-        <div class="dom-card-label"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:var(--green)"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg>Dominancia USDT</div>
+        <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg><img class="dom-card-logo-img" id="usdtLogoImg" alt="" aria-hidden="true"></span>Dominancia USDT</div>
         <div class="dom-card-body-row">
           <div class="dom-card-figures">
             <div class="dom-card-value skeleton" id="usdtDomValue"></div>
             <div class="dom-card-change" id="usdtDomChange"></div>
           </div>
-          <svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><polyline points=""/></svg>
+          <svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg>
         </div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
         <div class="dom-card-click-hint">Ver detalle →</div>
@@ -31814,6 +31838,29 @@ setInterval(loadMarketDominance, 1800000); // se refresca solo cada 30 minutos
    hay ninguna API nueva ni dependencia nueva. Se pide una sola vez (el histórico diario no
    cambia dentro de la sesión) en vez de cada 30 min como el valor de hoy. Si falla, el
    minigráfico simplemente se queda vacío - nunca se dibuja con datos inventados. */
+// Catmull-Rom -> Bézier: con solo 7-8 puntos diarios (es todo lo que cryptocap_history tiene,
+// no hay dato por hora de dominancia), una polyline recta entre puntos se veía como un
+// zigzag anguloso ("el gráfico no está bien logrado" - Juan, con captura real). Esto traza una
+// curva suave que SÍ pasa por cada punto real (no es un suavizado que invente valores, solo
+// interpola la forma entre ellos) - mismo principio de "curva suave, pero fiel a los datos"
+// del pedido original.
+function catmullRomSvgPath(points){
+  if(points.length < 2) return '';
+  if(points.length === 2) return 'M' + points[0][0] + ',' + points[0][1] + ' L' + points[1][0] + ',' + points[1][1];
+  let d = 'M' + points[0][0].toFixed(1) + ',' + points[0][1].toFixed(1);
+  for(let i = 0; i < points.length - 1; i++){
+    const p0 = points[i - 1] || points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+  }
+  return d;
+}
 async function renderDomSparkline(svgId, changeElId, symbolFull){
   const svgEl = document.getElementById(svgId);
   const changeEl = document.getElementById(changeElId);
@@ -31826,13 +31873,12 @@ async function renderDomSparkline(svgId, changeElId, symbolFull){
     const minV = Math.min(...vals), maxV = Math.max(...vals);
     const range = (maxV - minV) || 1;
     const w = 100, h = 34, pad = 3;
-    const points = vals.map((v, i) => {
-      const x = pad + (i / (vals.length - 1)) * (w - pad * 2);
-      const y = pad + (1 - (v - minV) / range) * (h - pad * 2);
-      return x.toFixed(1) + ',' + y.toFixed(1);
-    }).join(' ');
-    const poly = svgEl.querySelector('polyline');
-    if(poly) poly.setAttribute('points', points);
+    const points = vals.map((v, i) => [
+      pad + (i / (vals.length - 1)) * (w - pad * 2),
+      pad + (1 - (v - minV) / range) * (h - pad * 2)
+    ]);
+    const pathEl = svgEl.querySelector('path');
+    if(pathEl) pathEl.setAttribute('d', catmullRomSvgPath(points));
     const first = vals[0], last = vals[vals.length - 1];
     const changePct = first !== 0 ? ((last - first) / first) * 100 : 0;
     const sign = changePct > 0 ? '+' : '';
@@ -31848,6 +31894,33 @@ function loadDominanceSparklines(){
   renderDomSparkline('usdtDomSpark', 'usdtDomChange', 'CRYPTOCAP:USDT.D');
 }
 loadDominanceSparklines();
+
+/* ---- logos reales de BTC/USDT (una sola vez - no cambian, así que no hace falta refrescarlos) ----
+   Mismo endpoint de CoinGecko que ya usa el resto del sitio (coins/markets), pidiendo solo estos
+   2 ids puntuales - no es una API nueva, es la misma que loadMarketDominance/fetchCryptoPriceUSD. */
+async function loadDominanceLogos(){
+  try{
+    const res = await fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,tether'));
+    const rows = await res.json();
+    const byId = {};
+    (rows || []).forEach(r => { byId[r.id] = r; });
+    [['bitcoin', 'btcLogoImg'], ['tether', 'usdtLogoImg']].forEach(([coinId, imgId]) => {
+      const coin = byId[coinId];
+      const img = document.getElementById(imgId);
+      if(coin && coin.image && img){
+        img.addEventListener('load', () => {
+          img.classList.add('loaded');
+          const wrap = img.closest('.dom-card-logo-wrap');
+          if(wrap) wrap.classList.add('has-img');
+        }, { once: true });
+        img.src = coin.image;
+      }
+    });
+  } catch(err){
+    // sin logos reales disponibles ahora - se queda el ícono de contorno ya existente
+  }
+}
+loadDominanceLogos();
 
 /* ---- relojito "actualizado hace X min" — matemática pura, no vuelve a pedir el dato ---- */
 function updateDominanceTimestampLabel(){
