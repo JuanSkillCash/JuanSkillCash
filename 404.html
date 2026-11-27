@@ -553,21 +553,52 @@ button{font-family:inherit;color:inherit}
 .session-card.has-photo{
   background-size:cover;background-position:center;min-height:172px;
   padding:14px 16px 13px;justify-content:space-between;gap:10px;
+  position:relative;isolation:isolate;
+  /* Juan, 27-nov-2026: acabado "3D Glass / Neon Edge" - borde fino azul eléctrico, reflejo cian
+     arriba (como luz sobre vidrio), inset para dar grosor, y sombra en capas (azul suave +
+     oscura) para que la tarjeta se sienta elevada. OJO: esto necesita overflow VISIBLE (no
+     overflow:hidden como se había puesto antes para el degradado/z-index) porque las sombras
+     exteriores se pintan fuera del borde de la tarjeta - el degradado y la foto siguen
+     recortados igual gracias a border-radius:inherit en el ::before y al clipping normal del
+     background, no hacia falta overflow:hidden para eso. */
+  border:1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #8fd8ff 28%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent),
+    0 -1px 14px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 12px 26px rgba(2,4,12,.45);
 }
 .session-card.has-photo::before{
   /* el sitio tiene una regla global que apaga TODO text-shadow (ver "Rediseño paso 2: sin neón"
      más abajo en este archivo) - sin ese recurso, la única forma de que el texto se siga
      leyendo sobre la foto es un degradado bien sólido donde va el texto (nada de solo "oscurecer
-     un poco"). Juan, 27-nov-2026: la primera versión tenia un tramo 0-46% PLANO (mismo tono
-     parejo) y de ahi saltaba a la foto - se veia como un corte, no como un degradado. Con mas
-     pasos intermedios (32/46/58/72/90%) sigue opaco donde va el texto pero ahora se nota
-     progresivo de verdad. */
-  content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:-1;
-  background:linear-gradient(90deg, var(--bg) 0%, var(--bg) 32%, color-mix(in srgb, var(--bg) 88%, transparent) 46%, color-mix(in srgb, var(--bg) 65%, transparent) 58%, color-mix(in srgb, var(--bg) 32%, transparent) 72%, transparent 90%);
+     un poco"). Juan, 27-nov-2026, segunda vuelta: el primer intento oscurecía básicamente toda
+     la mitad izquierda pareja - pidió que se concentre en el primer 35-45% nomás y que del
+     centro para adelante la foto recupere su luminosidad/colores cálidos (nada de gris: sigue
+     siendo var(--bg), un azul marino, nunca un gris neutro). El ::before va con z-index:1 y cada
+     hijo directo de la tarjeta con z-index:2 (en vez del truco anterior de z-index:-1). */
+  content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:1;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--bg) 99%, transparent) 0%, color-mix(in srgb, var(--bg) 98%, transparent) 15%, color-mix(in srgb, var(--bg) 94%, transparent) 30%, color-mix(in srgb, var(--bg) 82%, transparent) 42%, color-mix(in srgb, var(--bg) 55%, transparent) 55%, color-mix(in srgb, var(--bg) 22%, transparent) 72%, transparent 90%);
 }
+.session-card.has-photo::after{
+  /* Segunda capa INDEPENDIENTE (Juan, 27-nov-2026): una franja oscura abajo, de arriba hacia
+     abajo, para que "Hora local"/"Horario" se integren con la foto en vez de depender solo del
+     degradado horizontal - se funde suave (varios pasos, no un corte recto) y no tapa la mitad
+     derecha de arriba (esa debe quedar nítida). Mismo z-index que ::before: las dos capas se
+     sobreponen entre sí sin pelear con el contenido (z-index:2). */
+  content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:1;
+  background:linear-gradient(180deg, transparent 0%, transparent 48%, color-mix(in srgb, var(--bg) 35%, transparent) 70%, color-mix(in srgb, var(--bg) 70%, transparent) 88%, color-mix(in srgb, var(--bg) 80%, transparent) 100%);
+}
+/* OJO: .session-bell-btn ya es position:absolute (top:7px;right:7px) para ir en la esquina -
+   un "> *{position:relative}" genérico se lo pisaba y lo sacaba de su esquina (quedaba una
+   elipse rara estirada en medio de la tarjeta). Por eso aquí van por separado: los dos hijos
+   que SÍ son estáticos reciben position:relative, el botón solo necesita el z-index. */
+.session-card.has-photo .session-card-label,
+.session-card.has-photo .session-main{position:relative;z-index:2}
+.session-card.has-photo .session-bell-btn{z-index:2}
 .session-card--tokyo{background-image:url('assets/sessions/tokyo.webp');background-position:62% 38%}
 .session-card--london{background-image:url('assets/sessions/london.webp');background-position:58% 42%}
-.session-card--ny{background-image:url('assets/sessions/ny.webp');background-position:64% 48%}
+.session-card--ny{background-image:url('assets/sessions/ny.webp');background-position:64% 8%}
 .session-card.has-photo .session-card-label,
 .session-card.has-photo .session-main{max-width:62%}
 .session-card.has-photo .session-card-label{color:var(--white)}
@@ -31650,10 +31681,13 @@ document.getElementById('usdtDomCard').addEventListener('click', () => {
 /* ---- reloj de sesiones de mercado (sin API, matemática de horarios) ---- */
 // Horarios de apertura/cierre en la hora LOCAL de cada plaza (con su propio horario de verano
 // resuelto automáticamente por Intl — nunca hay que actualizar esto a mano).
+// "name" (con continente, ej. "Asia (Tokio)") sigue usándose en aria-label/title del botón de
+// campana - ahí sí ayuda al lector de pantalla a ubicar la sesión. "city" (Juan, 27-nov-2026:
+// "uno ya sabe" el continente, quítalo) es SOLO para el texto visible de la tarjeta.
 const MARKET_SESSIONS = [
-  { id: 'tokyo', name: 'Asia (Tokio)', flagAlt: 'Bandera de Japón', tz: 'Asia/Tokyo', openSec: 9 * 3600, closeSec: 15 * 3600 },
-  { id: 'london', name: 'Europa (Londres)', flagAlt: 'Bandera del Reino Unido', tz: 'Europe/London', openSec: 8 * 3600, closeSec: 16.5 * 3600 },
-  { id: 'ny', name: 'EE. UU. (N. York)', flagAlt: 'Bandera de Estados Unidos', tz: 'America/New_York', openSec: 9.5 * 3600, closeSec: 16 * 3600 }
+  { id: 'tokyo', name: 'Asia (Tokio)', city: 'Tokio', flagAlt: 'Bandera de Japón', tz: 'Asia/Tokyo', openSec: 9 * 3600, closeSec: 15 * 3600 },
+  { id: 'london', name: 'Europa (Londres)', city: 'Londres', flagAlt: 'Bandera del Reino Unido', tz: 'Europe/London', openSec: 8 * 3600, closeSec: 16.5 * 3600 },
+  { id: 'ny', name: 'EE. UU. (N. York)', city: 'Nueva York', flagAlt: 'Bandera de Estados Unidos', tz: 'America/New_York', openSec: 9.5 * 3600, closeSec: 16 * 3600 }
 ];
 
 // Dibujadas a mano en SVG en vez de usar el emoji de bandera (🇯🇵🇬🇧🇺🇸): en Windows (y otros
@@ -31749,7 +31783,7 @@ function renderMarketSessions(){
         '<button type="button" class="session-bell-btn" id="bell-' + session.id + '" aria-label="Avisarme cuando ' + session.name + ' abra o cierre" title="Sonido solo cuando ' + session.name + ' abre o cierra">' +
           '<svg id="bellIcon-' + session.id + '" width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a5 5 0 0110 0c0 4 1.5 5 1.5 5h-13S5 12 5 8z"/><path d="M8.3 16a1.8 1.8 0 003.4 0"/></svg>' +
         '</button>' +
-        '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span><span class="session-flag" role="img" aria-label="' + session.flagAlt + '">' + MARKET_FLAG_SVG[session.id] + '</span>' + session.name + '</div>' +
+        '<div class="session-card-label"><span class="session-dot" id="dot-' + session.id + '"></span><span class="session-flag" role="img" aria-label="' + session.flagAlt + '">' + MARKET_FLAG_SVG[session.id] + '</span>' + session.city + '</div>' +
         '<div class="session-main">' +
           '<div class="session-stats">' +
             '<div class="session-stat">' +
