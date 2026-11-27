@@ -330,9 +330,14 @@ button{font-family:inherit;color:inherit}
 .price-ticker-chg.down{color:var(--red)}
 .price-ticker-chg.flat{color:var(--muted2)}
 .price-ticker-period{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.02em}
-@media(max-width:1550px){ .price-ticker-item[data-pt-key="spx"]{display:none} }
-@media(max-width:1380px){ .price-ticker-item[data-pt-key="ndx"]{display:none} }
-@media(max-width:1220px){ .price-ticker-item[data-pt-key="xau"]{display:none} }
+/* Ya no se oculta ningun item por ancho de pantalla en escritorio (spx/ndx/xau) - Juan reportó
+   que el S&P 500 "desaparecía" sin razón aparente. Causa: estos umbrales se calibraron contra
+   el ancho TOTAL del viewport, pero la píldora (.price-ticker-track) se ajusta a su propio
+   contenido y además tiene flex-wrap - si algún día no cupiera en una sola fila, simplemente
+   pasa a una segunda línea dentro de la misma píldora en vez de desbordarse, así que ocultar
+   items por breakpoint ya no hacía falta y solo causaba confusión. En celular sigue existiendo
+   la regla aparte (ver @media(max-width:860px) mas abajo) que deja solo BTC, esa sí la pidió
+   Juan explícitamente. */
 /* Ícono por precio (décimoquinta vuelta) - mismo patrón visual que .dom-card-logo-wrap en
    Panorama del mercado: contorno SVG de respaldo + logo real superpuesto cuando carga. */
 .price-ticker-icon-wrap{position:relative;display:inline-flex;width:15px;height:15px;flex-shrink:0}
