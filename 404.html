@@ -284,7 +284,28 @@ button{font-family:inherit;color:inherit}
       NASDAQ/S&P 500). El catalogo CURATED_INDICES (idx_rut, usado en Mi Arrecife/Sonar para
       graficos de indices) es una cosa totalmente aparte y no se toco - Russell 2000 sigue
       disponible ahi como grafico, solo se quito de la cintita de precios de arriba. */
-.price-ticker{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;flex:none;flex-basis:100%;order:-1;justify-content:center;min-width:0}
+/* Décimocuarta vuelta: Juan pidió llevar el lenguaje visual de Panorama del mercado (cristal
+   oscuro, bisel, resplandor sutil) a la cintita de precios, en forma de UNA SOLA píldora que
+   envuelve los 6 precios juntos (primer intento fue una píldora por cada precio - Juan corrigió:
+   "la píldora es grande para todos en una sola"). El degradado de capas vive en .price-ticker
+   (el contenedor), .price-ticker-item vuelve a ser texto plano adentro, con la rayita vertical
+   divisoria de siempre entre uno y otro. */
+.price-ticker{
+  display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;flex:none;flex-basis:100%;order:-1;min-width:0;
+  width:fit-content;max-width:100%;margin:0 auto;
+  padding:7px 20px;
+  border-radius:999px;
+  background:
+    radial-gradient(70% 70% at 18% -10%, color-mix(in srgb, var(--accent) 13%, transparent) 0%, transparent 60%),
+    linear-gradient(165deg, color-mix(in srgb, var(--bg) 52%, transparent) 0%, color-mix(in srgb, var(--bg) 76%, transparent) 100%);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--white) 7%, transparent),
+    0 10px 20px -12px rgba(2,4,12,.5),
+    0 0 16px -9px color-mix(in srgb, var(--accent) 22%, transparent);
+}
 .price-ticker-item{display:inline-flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;padding:0 9px}
 .price-ticker-item:first-child{padding-left:0}
 .price-ticker-item:not(:first-child){border-left:1px solid var(--border2)}
@@ -298,7 +319,13 @@ button{font-family:inherit;color:inherit}
 .price-ticker-period{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.02em}
 @media(max-width:1389px){ .price-ticker-item[data-pt-key="spx"]{display:none} }
 @media(max-width:1219px){ .price-ticker-item[data-pt-key="ndx"]{display:none} }
-@media(max-width:1059px){ .price-ticker-item[data-pt-key="hype"]{display:none} }
+/* Ícono por precio (décimoquinta vuelta) - mismo patrón visual que .dom-card-logo-wrap en
+   Panorama del mercado: contorno SVG de respaldo + logo real superpuesto cuando carga. */
+.price-ticker-icon-wrap{position:relative;display:inline-flex;width:15px;height:15px;flex-shrink:0}
+.price-ticker-icon-fallback{width:100%;height:100%;color:var(--accent)}
+.price-ticker-icon-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:50%;opacity:0;transition:opacity .25s ease}
+.price-ticker-icon-img.loaded{opacity:1}
+.price-ticker-icon-wrap.has-img .price-ticker-icon-fallback{display:none}
 .mobile-topbar{display:flex;align-items:flex-start;gap:14px;padding-bottom:6px;margin-bottom:4px;flex-wrap:wrap;row-gap:10px}
 
 /* ---- barra de resplandor "cometa": recorre de un lado al otro y reaparece del otro, en bucle ---- */
@@ -35431,14 +35458,24 @@ async function awardColmillos(eventType, periodKey, amount){
      45s en una sola peticion con los 3 simbolos juntos, para no gastar de mas la cuota de la
      API key compartida con el resto de la pagina. */
 (function(){
+  /* Décimoquinta vuelta: Juan pidió quitar SOL/HYPE (se quedan BTC/ETH/NASDAQ/S&P 500) y agregar
+     un ícono real a cada uno - BTC/ETH reusan el mismo mecanismo de loadDominanceLogos (logo
+     real de CoinGecko, una sola petición, con el ícono de contorno de respaldo si falla).
+     NASDAQ/S&P no tienen un "logo de moneda" que pedirle a CoinGecko, así que llevan un
+     monograma simple en círculo (mismo estilo de contorno currentColor del resto del sitio -
+     ver CLAUDE.md, nunca un emoji con color forzado), no un logo de marca inventado. */
   var PRICE_TICKER_ITEMS = [
-    { key:'btc', label:'BTC', kind:'crypto', binance:'btcusdt', period:'24h' },
-    { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt', period:'24h' },
-    { key:'sol', label:'SOL', kind:'crypto', binance:'solusdt', period:'24h' },
-    { key:'hype', label:'HYPE', kind:'crypto', binance:'hypeusdt', period:'24h' },
+    { key:'btc', label:'BTC', kind:'crypto', binance:'btcusdt', period:'24h', cgId:'bitcoin' },
+    { key:'eth', label:'ETH', kind:'crypto', binance:'ethusdt', period:'24h', cgId:'ethereum' },
     { key:'ndx', label:'NASDAQ', kind:'index', proxy:'QQQ', scale:40, period:'día' },
     { key:'spx', label:'S&P 500', kind:'index', proxy:'SPY', scale:10, period:'día' }
   ];
+  var PT_ICON_FALLBACK = {
+    btc: '<circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/>',
+    eth: '<path d="M10 3l5 7.2-5 2.9-5-2.9L10 3z"/><path d="M5 11.4L10 17l5-5.6-5 2.9-5-2.9z"/>',
+    ndx: '<path d="M4 15V9M8 15V6M12 15v-5M16 15V4"/>',
+    spx: '<path d="M4 13l4-5 3 3 5-6"/><path d="M12 5h4v4"/>'
+  };
 
   var track = document.getElementById('priceTickerTrack');
   if(!track) return;
@@ -35451,7 +35488,13 @@ async function awardColmillos(eventType, periodKey, amount){
      dos grupos, por eso el texto varia). La rayita vertical entre items (.price-ticker-item,
      ver CSS) es la "linecita sutil" que separa un symbolo+precio+cambio del siguiente. */
   function buildItemHtml(item){
+    var fallback = PT_ICON_FALLBACK[item.key] || '';
+    var iconHtml = '<span class="price-ticker-icon-wrap">' +
+      '<svg class="price-ticker-icon-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + fallback + '</svg>' +
+      (item.cgId ? '<img class="price-ticker-icon-img" id="ptIcon-' + item.key + '" alt="" aria-hidden="true">' : '') +
+    '</span>';
     return '<span class="price-ticker-item" data-pt-key="' + item.key + '">' +
+      iconHtml +
       '<span class="price-ticker-sym">' + item.label + '</span>' +
       '<span class="price-ticker-price" data-pt-price>—</span>' +
       '<span class="price-ticker-chg-wrap">' +
@@ -35461,6 +35504,34 @@ async function awardColmillos(eventType, periodKey, amount){
     '</span>';
   }
   track.innerHTML = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
+
+  // logos reales de BTC/ETH (una sola vez - mismo endpoint de CoinGecko que ya usa el resto
+  // del sitio, ver loadDominanceLogos en Panorama del mercado). Si falla, se queda el ícono de
+  // contorno que ya está dibujado como respaldo.
+  (function loadTickerCryptoIcons(){
+    var ids = PRICE_TICKER_ITEMS.filter(function(i){ return i.cgId; }).map(function(i){ return i.cgId; });
+    if(!ids.length) return;
+    fetch(cgUrl('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + ids.join(',')))
+      .then(function(res){ return res.json(); })
+      .then(function(rows){
+        var byId = {};
+        (rows || []).forEach(function(r){ byId[r.id] = r; });
+        PRICE_TICKER_ITEMS.forEach(function(item){
+          if(!item.cgId) return;
+          var coin = byId[item.cgId];
+          var img = document.getElementById('ptIcon-' + item.key);
+          if(coin && coin.image && img){
+            img.addEventListener('load', function(){
+              img.classList.add('loaded');
+              var wrap = img.closest('.price-ticker-icon-wrap');
+              if(wrap) wrap.classList.add('has-img');
+            }, { once:true });
+            img.src = coin.image;
+          }
+        });
+      })
+      .catch(function(){ /* sin logos reales ahora - se queda el ícono de contorno */ });
+  })();
 
   function setItem(key, priceText, pct){
     var node = track.querySelector('[data-pt-key="' + key + '"]');
