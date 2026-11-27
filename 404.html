@@ -293,7 +293,17 @@ button{font-family:inherit;color:inherit}
 .price-ticker{
   display:flex;flex-wrap:wrap;justify-content:center;flex:none;flex-basis:100%;order:-1;min-width:0;
 }
+.pt-bolt{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:3;
+  background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 45%, var(--white) 15%), color-mix(in srgb, var(--bg) 90%, transparent) 70%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 1px 1px rgba(255,255,255,.05);
+}
+.pt-bolt-tl{top:6px;left:16px}
+.pt-bolt-tr{top:6px;right:16px}
+.pt-bolt-bl{bottom:6px;left:16px}
+.pt-bolt-br{bottom:6px;right:16px}
+@media(max-width:620px){.pt-bolt{display:none}}
 .price-ticker-track{
+  position:relative;
   display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;
   width:fit-content;max-width:100%;margin:0 auto;
   padding:7px 20px;
@@ -499,7 +509,7 @@ button{font-family:inherit;color:inherit}
   -webkit-backdrop-filter:blur(16px);
   border:1px solid color-mix(in srgb, var(--accent) 10%, transparent);
   border-radius:22px;
-  padding:6px 14px 6px;
+  padding:6px 14px 16px;
   margin-top:9px;
   margin-bottom:7px;
   box-shadow:
@@ -510,14 +520,14 @@ button{font-family:inherit;color:inherit}
     0 40px 90px -30px rgba(2,4,12,.6),
     0 0 50px -14px color-mix(in srgb, var(--accent) 22%, transparent);
 }
-.mo-bolt{position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:2;
+.mo-bolt{position:absolute;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:2;
   background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 45%, var(--white) 15%), color-mix(in srgb, var(--bg) 90%, transparent) 70%);
   box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 1px 1px rgba(255,255,255,.05);
 }
-.mo-bolt-tl{top:11px;left:11px}
-.mo-bolt-tr{top:11px;right:11px}
-.mo-bolt-bl{bottom:11px;left:11px}
-.mo-bolt-br{bottom:11px;right:11px}
+.mo-bolt-tl{top:10px;left:10px}
+.mo-bolt-tr{top:10px;right:10px}
+.mo-bolt-bl{bottom:10px;left:10px}
+.mo-bolt-br{bottom:10px;right:10px}
 @media(max-width:540px){.mo-bolt{display:none}}
 .market-overview-wrap .market-overview{margin-bottom:0}
 .market-overview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px -2px 6px;padding:0 2px 4px;position:relative}
@@ -528,7 +538,7 @@ button{font-family:inherit;color:inherit}
   background:linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 26%, transparent) 20%, color-mix(in srgb, var(--accent) 26%, transparent) 80%, transparent);
   box-shadow:0 1px 0 rgba(0,0,0,.4);
 }
-.market-overview-head-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--white)}
+.market-overview-head-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--white);margin-left:7px}
 .market-overview-head-title svg{color:var(--accent);flex-shrink:0}
 .market-overview-more{background:none;border:none;padding:0;margin:0;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent);cursor:pointer;white-space:nowrap;transition:color var(--dur-fast) var(--ease-out)}
 .market-overview-more:hover{color:var(--white)}
@@ -589,8 +599,6 @@ button{font-family:inherit;color:inherit}
   .fng-section:hover,.dom-card:hover{transform:none;filter:none}
 }
 .fng-section{border-radius:14px;padding:5px 12px 4px;margin-bottom:0;display:flex;flex-direction:column}
-.fng-click-hint{display:block;text-align:right;width:100%;margin-top:auto;padding-top:5px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
-.fng-section:hover .fng-click-hint{color:var(--gold)}
 .dom-card.halving{cursor:pointer}
 .dom-card.btc{cursor:pointer}
 .dom-card.usdt{cursor:pointer}
@@ -603,10 +611,12 @@ button{font-family:inherit;color:inherit}
 .halving-chart-countdown-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#60a5fa;letter-spacing:.03em;margin-bottom:3px;white-space:nowrap}
 .halving-chart-countdown-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:15px;color:var(--white);letter-spacing:-.01em;white-space:nowrap}
 .halving-chart-countdown .dom-card-bar{margin-top:5px;width:120px}
-.dom-card-click-hint{display:block;text-align:right;width:100%;padding-top:3px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
+.dom-card-click-hint{display:block;text-align:right;width:100%;padding-top:3px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
 .dom-card.halving:hover .dom-card-click-hint{color:#c084fc}
+.dom-card-click-hint-top{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;flex-shrink:0;transition:color var(--dur-fast) var(--ease-out)}
+.fng-section:hover .dom-card-click-hint-top{color:var(--white)}
 .fng-section-head{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap;margin-bottom:1px}
-.fng-section-title{font-size:10.5px;font-weight:700;color:var(--white);margin-right:auto;flex:1 0 100%}
+.fng-section-title{font-size:10.5px;font-weight:700;color:var(--white);margin-right:auto}
 .fng-section-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:20px;color:var(--white);letter-spacing:-.01em;line-height:1}
 .skeleton{display:inline-block;width:52px;height:1em;border-radius:8px;vertical-align:-2px;background:linear-gradient(90deg,color-mix(in srgb, var(--white) 6%, transparent) 25%,color-mix(in srgb, var(--white) 14%, transparent) 50%,color-mix(in srgb, var(--white) 6%, transparent) 75%);background-size:200% 100%;animation:skeleton-shimmer 1.4s ease-in-out infinite}
 @keyframes skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -616,7 +626,7 @@ button{font-family:inherit;color:inherit}
 .fng-big-value.fng-red{color:var(--red)}
 .fng-big-value.fng-gold{color:var(--gold)}
 .fng-big-value.fng-green{color:var(--green)}
-.fng-section-class{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted2)}
+.fng-section-class{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted2)}
 
 /* Undécima vuelta (REDISEÑO INTEGRAL): Juan mandó una imagen de referencia pidiendo un
    velocímetro semicircular con aguja - antes (misma sesión) se había revertido un gauge así por
@@ -627,7 +637,7 @@ button{font-family:inherit;color:inherit}
    alrededor del pivote (60,60) con CSS transform:rotate(), de -90deg (val=0, apunta a la
    izquierda) a +90deg (val=100, apunta a la derecha) - ver loadFearGreedIndex. */
 .fng-gauge-wrap{position:relative;display:flex;flex-direction:column;align-items:center;margin:2px 0 0}
-.fng-gauge-svg{width:100%;max-width:58px;height:auto;overflow:visible;display:block;margin:0 auto -3px}
+.fng-gauge-svg{width:100%;max-width:86px;height:auto;overflow:visible;display:block;margin:0 auto -4px}
 .fng-gauge-track-arc{fill:none;stroke:color-mix(in srgb, var(--white) 10%, transparent);stroke-width:9;stroke-linecap:round}
 .fng-gauge-fill-arc{fill:none;stroke-width:9;stroke-linecap:round}
 .fng-gauge-needle{stroke:var(--white);stroke-width:2.6;stroke-linecap:round;transform-origin:60px 60px;transition:transform .6s cubic-bezier(.16,1,.3,1);filter:drop-shadow(0 0 3px rgba(255,255,255,.5))}
@@ -760,8 +770,8 @@ button{font-family:inherit;color:inherit}
    uso que ya tiene .session-card (el reloj mundial "Ciudad A/B" más abajo en este archivo, sin
    fotos) - ese sigue exactamente igual que antes. */
 .session-card.has-photo{
-  background-size:cover;background-position:center;min-height:172px;
-  padding:14px 16px 13px;justify-content:space-between;gap:10px;
+  background-size:cover;background-position:center;min-height:120px;
+  padding:10px 14px 9px;justify-content:space-between;gap:7px;
   position:relative;isolation:isolate;
   /* Juan, 27-nov-2026: acabado "3D Glass / Neon Edge" - borde fino azul eléctrico, reflejo cian
      arriba (como luz sobre vidrio), inset para dar grosor, y sombra en capas (azul suave +
@@ -5276,7 +5286,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     <span class="mo-bolt mo-bolt-br" aria-hidden="true"></span>
     <div class="market-overview-head">
       <div class="market-overview-head-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="3.2" height="6"/><rect x="8.4" y="7" width="3.2" height="10"/><rect x="13.8" y="3.5" width="3.2" height="13.5"/></svg>Panorama del mercado</div>
-      <button type="button" class="market-overview-more" onclick="if(typeof showCategoryDetail==='function') showCategoryDetail('indicadores')">Ver más →</button>
     </div>
     <div class="market-overview">
       <div class="fng-section" id="fngSectionBox" style="cursor:pointer;position:relative">
@@ -5285,7 +5294,8 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
              en el CSS. loadFearGreedIndex (JS) sigue siendo la misma fuente de datos, solo
              cambia CÓMO se dibuja el valor (aguja rotando en vez de marcador deslizante). -->
         <div class="fng-section-head">
-          <span class="fng-section-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Análisis de Miedo y Codicia</span>
+          <span class="fng-section-title"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:var(--gold)"><path d="M4 15a7 7 0 0113 0"/><line x1="10" y1="10" x2="13" y2="7"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg>Miedo y Codicia</span>
+          <span class="dom-card-click-hint-top">Ver</span>
         </div>
         <div class="fng-gauge-wrap">
           <svg class="fng-gauge-svg" viewBox="0 0 120 66" aria-hidden="true">
@@ -5310,7 +5320,6 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <span class="fng-section-class" id="fngClass">Cargando…</span>
           </div>
         </div>
-        <div class="fng-click-hint">Ver detalle →</div>
       </div>
 
       <div class="dom-card btc" id="btcDomCard">
@@ -5321,7 +5330,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </div>
         <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="btcDomSub">Cargando…</div>
-        <div class="dom-card-click-hint">Ver detalle →</div>
+        <div class="dom-card-click-hint">Ver</div>
       </div>
 
       <div class="dom-card usdt" id="usdtDomCard">
@@ -5332,7 +5341,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         </div>
         <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
-        <div class="dom-card-click-hint">Ver detalle →</div>
+        <div class="dom-card-click-hint">Ver</div>
       </div>
 
       <div class="dom-card halving" id="halvingSectionBox">
@@ -5343,7 +5352,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           <span class="halving-countdown-pct" id="halvingPct">—</span>
         </div>
         <div class="dom-card-sub halving-countdown-sub">Calculando…</div>
-        <div class="dom-card-click-hint">Ver detalle →</div>
+        <div class="dom-card-click-hint">Ver</div>
       </div>
     </div>
     </div>
@@ -35600,6 +35609,14 @@ async function awardColmillos(eventType, periodKey, amount){
 
   var track = document.getElementById('priceTickerTrack');
   if(!track) return;
+  // Juan, 27-nov-2026: mismos "remaches" de las esquinas de Panorama del mercado, pero SOLO en
+  // esta pildora (explicito: nada en las pildoras de Bitunix/Telegram ni en los menus de
+  // notificaciones/cuenta). Se agregan aqui porque track.innerHTML se reescribe completo mas
+  // abajo - si se pusieran en el HTML estatico, se perderian en el primer render.
+  var PT_BOLTS_HTML = '<span class="pt-bolt pt-bolt-tl" aria-hidden="true"></span>' +
+    '<span class="pt-bolt pt-bolt-tr" aria-hidden="true"></span>' +
+    '<span class="pt-bolt pt-bolt-bl" aria-hidden="true"></span>' +
+    '<span class="pt-bolt pt-bolt-br" aria-hidden="true"></span>';
 
   /* Juan: "no se entiende que es de SP500 esa perdida... separado por una linecita sutil, la
      perdida un poquito mas pegada, que diga si es en 24 horas o en cuanto" - cada item ahora
@@ -35624,7 +35641,7 @@ async function awardColmillos(eventType, periodKey, amount){
       '</span>' +
     '</span>';
   }
-  track.innerHTML = PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
+  track.innerHTML = PT_BOLTS_HTML + PRICE_TICKER_ITEMS.map(buildItemHtml).join('');
 
   // logos reales de BTC/ETH (una sola vez - mismo endpoint de CoinGecko que ya usa el resto
   // del sitio, ver loadDominanceLogos en Panorama del mercado). Si falla, se queda el ícono de
