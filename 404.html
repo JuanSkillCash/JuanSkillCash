@@ -498,7 +498,7 @@ button{font-family:inherit;color:inherit}
         se note de verdad.
    El borde baja de 25% a 10% de opacidad ("reduce la dependencia visual del borde") - el volumen
    ahora lo cargan las capas de arriba + los insets de abajo, no el borde. */
-.market-overview-wrap,.market-sessions-wrap{
+.market-overview-wrap,.market-sessions-wrap,.glass-plate{
   position:relative;
   background:
     radial-gradient(70% 60% at 16% -8%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 55%),
@@ -592,7 +592,7 @@ button{font-family:inherit;color:inherit}
    superficie - ahora es apenas el COLOR del reflejo localizado de la esquina (como si la luz
    ambiental rebotara en ese tono), ver los overrides de `background-image` más abajo junto a
    sus colores de barra. Border baja de 20% a 9% (mismo criterio que el panel grande). */
-.fng-section,.dom-card{
+.fng-section,.dom-card,.glass-card{
   position:relative;
   background:
     radial-gradient(75% 65% at 20% -10%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 55%),
@@ -614,7 +614,7 @@ button{font-family:inherit;color:inherit}
     0 0 26px -14px color-mix(in srgb, var(--accent) 18%, transparent);
   transition:transform .22s cubic-bezier(.23,1,.32,1), border-color .22s ease, box-shadow .22s ease, filter .22s ease;
 }
-.fng-section:hover,.dom-card:hover{
+.fng-section:hover,.dom-card:hover,.glass-card:hover{
   transform:translateY(-2px);
   border-color:color-mix(in srgb, var(--accent) 22%, transparent);
   filter:brightness(1.05);
@@ -627,10 +627,25 @@ button{font-family:inherit;color:inherit}
     0 0 34px -10px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 @media(prefers-reduced-motion: reduce){
-  .fng-section,.dom-card{transition:none}
-  .fng-section:hover,.dom-card:hover{transform:none;filter:none}
+  .fng-section,.dom-card,.glass-card{transition:none}
+  .fng-section:hover,.dom-card:hover,.glass-card:hover{transform:none;filter:none}
 }
 .fng-section{border-radius:14px;padding:5px 12px 4px;margin-bottom:0;display:flex;flex-direction:column}
+/* "Vidrio Doble" (el mismo nombre que le pusimos entre Juan y yo para este estilo): el mismo
+   material de vidrio esmerilado de Panorama del mercado / Sesiones de mercado, reutilizable en
+   cualquier parte del sitio - .glass-plate es la placa grande de fondo (comparte selector con
+   .market-overview-wrap/.market-sessions-wrap más arriba) y .glass-card es la cajita individual
+   que va montada encima (comparte selector con .fng-section/.dom-card más arriba). border-radius
+   y padding van aparte (no heredados de .dom-card) porque esos dos ya vienen muy ajustados
+   específicamente para Panorama. */
+.glass-card{border-radius:14px;padding:16px}
+/* Cuando .glass-plate se usa SIN un header propio adentro (Quién está detrás, Reseñas - a
+   diferencia de Panorama/Sesiones que sí traen título arriba y por eso les basta el padding
+   compartido de la línea 501), el contenido queda pegado al borde y los remaches de las 4
+   esquinas (10-18px desde el borde) terminan montados sobre la primera/última cajita. Este
+   padding extra despeja esa zona en los 4 lados para que el remache quede siempre sobre el
+   "vidrio" de la placa y nunca sobre una .glass-card, una línea o un texto. */
+.glass-plate{padding:28px 26px 26px}
 .fng-updated-label{display:flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted2);margin:6px 24px 0}
 .dom-card.halving{cursor:pointer}
 .dom-card.btc{cursor:pointer}
@@ -1506,7 +1521,7 @@ button{font-family:inherit;color:inherit}
 .lc-bottom-val{font-family:'Poppins',sans-serif;font-weight:800;font-size:17px;color:var(--white);letter-spacing:-.01em}
 
 /* NOTIFICACIONES (campanita) */
-.notif-mini-btn{position:relative;width:38px;height:38px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;line-height:1;
+.notif-mini-btn,.footer-social-round{position:relative;width:38px;height:38px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s,transform .2s;line-height:1;
   background:
     radial-gradient(70% 70% at 30% -10%, color-mix(in srgb, var(--accent) 13%, transparent) 0%, transparent 60%),
     linear-gradient(165deg, color-mix(in srgb, var(--bg) 52%, transparent) 0%, color-mix(in srgb, var(--bg) 76%, transparent) 100%);
@@ -1518,11 +1533,13 @@ button{font-family:inherit;color:inherit}
     0 10px 20px -12px rgba(2,4,12,.5),
     0 0 16px -9px color-mix(in srgb, var(--accent) 22%, transparent);
 }
-.notif-mini-btn:hover{box-shadow:
+.notif-mini-btn:hover,.footer-social-round:hover{box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--white) 7%, transparent),
     0 10px 20px -12px rgba(2,4,12,.5),
-    0 0 18px -8px color-mix(in srgb, var(--accent) 36%, transparent);}
+    0 0 18px -8px color-mix(in srgb, var(--accent) 36%, transparent);
+  transform:translateY(-2px);}
 .notif-mini-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent)}
+.footer-social-round:hover{border-color:var(--hover, var(--accent))}
 .notif-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--red);color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;box-shadow:0 0 0 2px var(--bg)}
 .notif-mini-dropdown{position:absolute;top:calc(100% + 10px);right:0;border-radius:12px;padding:14px;width:320px;max-width:calc(100vw - 32px);max-height:420px;overflow-y:auto;z-index:60;display:none;
   background:
@@ -3205,13 +3222,8 @@ img[src=""]{display:none}
 .site-footer-col-brand{flex:1 1 220px;min-width:200px;display:flex;flex-direction:column;gap:14px}
 .site-footer-col-email{font-size:12.5px;color:var(--muted2)}
 .site-footer-social-round{display:flex;flex-wrap:wrap;gap:10px}
-.footer-social-round{
-  width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:var(--card);border:1.5px solid color-mix(in srgb, var(--white) 25%, transparent);color:var(--white);
-  transition:border-color .2s,transform .2s;flex-shrink:0;
-}
+.footer-social-round{width:42px;height:42px;color:var(--white);flex-shrink:0}
 .footer-social-round svg{width:18px;height:18px}
-.footer-social-round:hover{border-color:color-mix(in srgb, var(--white) 55%, transparent);transform:translateY(-2px)}
 .site-footer-col{flex:1 1 150px;min-width:140px;display:flex;flex-direction:column;gap:11px}
 .site-footer-col-title{font-weight:700;font-size:13.5px;color:var(--white)}
 .site-footer-col-link{
@@ -3225,13 +3237,11 @@ img[src=""]{display:none}
 
 .telegram-banner{
   display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:nowrap;text-decoration:none;
-  background:linear-gradient(135deg,rgba(34,158,217,.15),rgba(34,158,217,.03));
-  border:1px solid rgba(34,158,217,.35);border-radius:12px;padding:12px 16px;margin:0 auto 28px;
-  transition:border-color var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);
+  padding:12px 16px;margin:0 auto 28px;
   max-width:60%;
 }
 @media(max-width:700px){ .telegram-banner{max-width:100%;flex-wrap:wrap} }
-.telegram-banner:hover{border-color:#229ed9;transform:translateY(-2px)}
+.telegram-banner:hover{border-color:#229ed9}
 .telegram-banner-left{display:flex;align-items:center;gap:11px;min-width:0}
 .telegram-banner-icon{width:32px;height:32px;border-radius:50%;background:#229ed9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .telegram-banner-icon svg{width:16px;height:16px}
@@ -4259,14 +4269,14 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 @media(min-width:641px){ .cal-cards{display:none !important} }
 @media(max-width:640px){ .cal-table{display:none !important} }
 .about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.about-stat{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:18px 14px;text-align:center;background:var(--grad-caja)}
+.about-stat{text-align:center;padding:18px 14px}
 .about-stat-num{font-size:30px;font-weight:700;line-height:1.1}
 .about-stat-label{color:var(--muted);font-size:13px;margin-top:6px}
 .reviews-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .reviews-summary{color:var(--muted2);font-size:14px}
 .reviews-summary b{color:var(--white);font-size:20px;margin-right:4px}
 .reviews-summary .rs-stars{color:#f0b23d;letter-spacing:2px;margin-right:6px}
-.review-form-box{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:16px;margin-bottom:16px}
+.review-form-box{padding:16px;margin-bottom:16px}
 .review-login-note{color:var(--muted2);font-size:14px}
 .review-link-btn{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;padding:0;font-size:14px}
 .review-form-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
@@ -4283,7 +4293,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .review-submit{border:none;background:var(--white);color:var(--bg);font-weight:700;border-radius:20px;padding:8px 18px;cursor:pointer}
 .review-submit:disabled{opacity:.5;cursor:default}
 .reviews-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.review-card{border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:12px;padding:14px 16px}
+.review-card{padding:14px 16px}
 .review-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .review-card-name{font-weight:600;font-size:14px}
 .review-card-stars{color:#f0b23d;font-size:13px;letter-spacing:1px}
@@ -5544,12 +5554,18 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       <div class="section-eyebrow">Quién está detrás</div>
       <h2 class="community-title">Juan SkillCash</h2>
       <p class="community-lead">Herramientas para aprender y operar cripto con criterio, hechas para la manada. Estos son los números reales, sin inflar.</p>
-      <div class="about-stats" id="aboutStats">
-        <div class="about-stat"><div class="about-stat-num">10.000+</div><div class="about-stat-label">Seguidores en TikTok</div></div>
-        <div class="about-stat"><div class="about-stat-num">43.000+</div><div class="about-stat-label">Líneas de código</div></div>
-        <div class="about-stat"><div class="about-stat-num" id="aboutStatTools">—</div><div class="about-stat-label">Herramientas</div></div>
-        <div class="about-stat"><div class="about-stat-num" id="aboutStatIndic">—</div><div class="about-stat-label">Indicadores</div></div>
-        <div class="about-stat"><div class="about-stat-num">200+</div><div class="about-stat-label">Miembros en Telegram</div></div>
+      <div class="glass-plate">
+        <span class="mo-bolt mo-bolt-tl" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-tr" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-bl" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-br" aria-hidden="true"></span>
+        <div class="about-stats" id="aboutStats">
+          <div class="about-stat glass-card"><div class="about-stat-num">10.000+</div><div class="about-stat-label">Seguidores en TikTok</div></div>
+          <div class="about-stat glass-card"><div class="about-stat-num">43.000+</div><div class="about-stat-label">Líneas de código</div></div>
+          <div class="about-stat glass-card"><div class="about-stat-num" id="aboutStatTools">—</div><div class="about-stat-label">Herramientas</div></div>
+          <div class="about-stat glass-card"><div class="about-stat-num" id="aboutStatIndic">—</div><div class="about-stat-label">Indicadores</div></div>
+          <div class="about-stat glass-card"><div class="about-stat-num">200+</div><div class="about-stat-label">Miembros en Telegram</div></div>
+        </div>
       </div>
     </section>
 
@@ -5559,26 +5575,32 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
         <h2 class="community-title">Reseñas</h2>
         <div class="reviews-summary" id="reviewsSummary"></div>
       </div>
-      <div class="review-form-box" id="reviewFormBox">
-        <div class="review-login-note" id="reviewLoginNote">Inicia sesión para dejar tu reseña. <button type="button" class="review-link-btn" id="reviewLoginBtn">Iniciar sesión</button></div>
-        <form class="review-form" id="reviewForm" style="display:none">
-          <div class="review-form-row">
-            <span class="review-form-label" id="reviewFormLabel">Tu calificación</span>
-            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Calificación">
-              <button type="button" data-v="1" aria-label="1 estrella">★</button><button type="button" data-v="2" aria-label="2 estrellas">★</button><button type="button" data-v="3" aria-label="3 estrellas">★</button><button type="button" data-v="4" aria-label="4 estrellas">★</button><button type="button" data-v="5" aria-label="5 estrellas">★</button>
+      <div class="glass-plate">
+        <span class="mo-bolt mo-bolt-tl" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-tr" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-bl" aria-hidden="true"></span>
+        <span class="mo-bolt mo-bolt-br" aria-hidden="true"></span>
+        <div class="review-form-box glass-card" id="reviewFormBox">
+          <div class="review-login-note" id="reviewLoginNote">Inicia sesión para dejar tu reseña. <button type="button" class="review-link-btn" id="reviewLoginBtn">Iniciar sesión</button></div>
+          <form class="review-form" id="reviewForm" style="display:none">
+            <div class="review-form-row">
+              <span class="review-form-label" id="reviewFormLabel">Tu calificación</span>
+              <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Calificación">
+                <button type="button" data-v="1" aria-label="1 estrella">★</button><button type="button" data-v="2" aria-label="2 estrellas">★</button><button type="button" data-v="3" aria-label="3 estrellas">★</button><button type="button" data-v="4" aria-label="4 estrellas">★</button><button type="button" data-v="5" aria-label="5 estrellas">★</button>
+              </div>
             </div>
-          </div>
-          <textarea id="reviewComment" maxlength="500" rows="3" placeholder="¿Qué te parece la plataforma? ¿Qué te sirve, qué mejorarías?"></textarea>
-          <div class="review-form-foot">
-            <span class="review-counter" id="reviewCounter">0/500</span>
-            <span class="review-msg" id="reviewMsg"></span>
-            <button type="button" class="review-link-btn" id="reviewDeleteBtn" style="display:none">Borrar mi reseña</button>
-            <button type="submit" class="review-submit" id="reviewSubmitBtn">Publicar reseña</button>
-          </div>
-        </form>
+            <textarea id="reviewComment" maxlength="500" rows="3" placeholder="¿Qué te parece la plataforma? ¿Qué te sirve, qué mejorarías?"></textarea>
+            <div class="review-form-foot">
+              <span class="review-counter" id="reviewCounter">0/500</span>
+              <span class="review-msg" id="reviewMsg"></span>
+              <button type="button" class="review-link-btn" id="reviewDeleteBtn" style="display:none">Borrar mi reseña</button>
+              <button type="submit" class="review-submit" id="reviewSubmitBtn">Publicar reseña</button>
+            </div>
+          </form>
+        </div>
+        <div class="reviews-list" id="reviewsList"></div>
+        <button type="button" class="review-more" id="reviewsMoreBtn" style="display:none">Ver más reseñas</button>
       </div>
-      <div class="reviews-list" id="reviewsList"></div>
-      <button type="button" class="review-more" id="reviewsMoreBtn" style="display:none">Ver más reseñas</button>
     </section>
 
     <div id="categoryDetailView" style="display:none">
@@ -11707,7 +11729,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 </div>
 
     <footer class="site-footer">
-      <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner">
+      <a href="https://t.me/juanskll" target="_blank" rel="noopener" class="telegram-banner glass-card">
         <div class="telegram-banner-left">
           <div class="telegram-banner-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--white)"><path d="M21.9 4.3c.3-1.1-.4-1.6-1.4-1.2L2.7 10.3c-1.1.4-1.1 1.1-.2 1.4l4.5 1.4 1.7 5.4c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.1-2 4.4 3.2c.8.5 1.4.2 1.6-.8l3.3-15zM8.2 13.3l9.6-6c.5-.3.9-.1.6.3l-8.2 7.4-.3 3.2-1.4-4.5z"/></svg>
