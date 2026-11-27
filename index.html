@@ -602,8 +602,8 @@ button{font-family:inherit;color:inherit}
 .dom-card.halving{cursor:pointer}
 .dom-card.btc{cursor:pointer}
 .dom-card.usdt{cursor:pointer}
-.dom-card.btc:hover .dom-card-click-hint{color:var(--gold)}
-.dom-card.usdt:hover .dom-card-click-hint{color:var(--green)}
+.dom-card.btc:hover .dom-card-click-hint-top{color:var(--gold)}
+.dom-card.usdt:hover .dom-card-click-hint-top{color:var(--green)}
 .halving-chart-countdown{
   position:absolute;background:rgba(9,11,22,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:8px 12px;
@@ -611,8 +611,7 @@ button{font-family:inherit;color:inherit}
 .halving-chart-countdown-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#60a5fa;letter-spacing:.03em;margin-bottom:3px;white-space:nowrap}
 .halving-chart-countdown-value{font-family:'Poppins',sans-serif;font-weight:900;font-size:15px;color:var(--white);letter-spacing:-.01em;white-space:nowrap}
 .halving-chart-countdown .dom-card-bar{margin-top:5px;width:120px}
-.dom-card-click-hint{display:block;text-align:right;width:100%;padding-top:3px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;transition:color var(--dur-fast) var(--ease-out)}
-.dom-card.halving:hover .dom-card-click-hint{color:#c084fc}
+.dom-card.halving:hover .dom-card-click-hint-top{color:#c084fc}
 .dom-card-click-hint-top{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;flex-shrink:0;transition:color var(--dur-fast) var(--ease-out)}
 .fng-section:hover .dom-card-click-hint-top{color:var(--white)}
 .fng-section-head{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap;margin-bottom:1px}
@@ -654,7 +653,8 @@ button{font-family:inherit;color:inherit}
 .dom-card{
   border-radius:14px;padding:4px 10px;display:flex;flex-direction:column;justify-content:space-between;gap:2px;min-height:100%
 }
-.dom-card-label{display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;color:var(--muted2)}
+.dom-card-label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:9.5px;font-weight:700;color:var(--muted2)}
+.dom-card-label-text{display:flex;align-items:center;gap:4px;min-width:0}
 /* Logo real de BTC/USDT (Juan: "que sea grandecito... no gigante pero que se vea bien") - se
    trae una vez de CoinGecko (loadDominanceLogos) y se superpone al ícono de contorno ya
    existente, que se queda de respaldo visible si la petición falla (nunca queda vacío). */
@@ -5323,36 +5323,33 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
 
       <div class="dom-card btc" id="btcDomCard">
-        <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg><img class="dom-card-logo-img" id="btcLogoImg" alt="" aria-hidden="true"></span>Dominancia BTC</div>
+        <div class="dom-card-label"><span class="dom-card-label-text"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M8.3 6.3v7.4M8.3 6.8h3.2a1.9 1.9 0 010 3.8H8.3m0 0h3.6a1.9 1.9 0 010 3.8H8.3"/></svg><img class="dom-card-logo-img" id="btcLogoImg" alt="" aria-hidden="true"></span>Dominancia BTC</span><span class="dom-card-click-hint-top">Ver</span></div>
         <div class="dom-card-figures">
           <div class="dom-card-value skeleton" id="btcDomValue"></div>
           <div class="dom-card-change" id="btcDomChange"></div>
         </div>
         <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="btcDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="btcDomSub">Cargando…</div>
-        <div class="dom-card-click-hint">Ver</div>
       </div>
 
       <div class="dom-card usdt" id="usdtDomCard">
-        <div class="dom-card-label"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg><img class="dom-card-logo-img" id="usdtLogoImg" alt="" aria-hidden="true"></span>Dominancia USDT</div>
+        <div class="dom-card-label"><span class="dom-card-label-text"><span class="dom-card-logo-wrap"><svg class="dom-card-logo-fallback" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 5.5v9M12.5 7.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2 5 .8 5 2.8 0 1-1 1.6-2.5 1.6s-2.5-.6-2.5-1.6"/></svg><img class="dom-card-logo-img" id="usdtLogoImg" alt="" aria-hidden="true"></span>Dominancia USDT</span><span class="dom-card-click-hint-top">Ver</span></div>
         <div class="dom-card-figures">
           <div class="dom-card-value skeleton" id="usdtDomValue"></div>
           <div class="dom-card-change" id="usdtDomChange"></div>
         </div>
         <div class="dom-card-chart-wrap"><svg class="dom-card-spark" id="usdtDomSpark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d=""/></svg></div>
         <div class="dom-card-sub" id="usdtDomSub">Cargando…</div>
-        <div class="dom-card-click-hint">Ver</div>
       </div>
 
       <div class="dom-card halving" id="halvingSectionBox">
-        <div class="dom-card-label"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:#c084fc"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo Halving</div>
+        <div class="dom-card-label"><span class="dom-card-label-text"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px;color:#c084fc"><path d="M5 3h10M5 17h10M5 3c0 4 2.5 5.5 5 7-2.5 1.5-5 3-5 7M15 3c0 4-2.5 5.5-5 7 2.5 1.5 5 3 5 7"/></svg>Próximo Halving</span><span class="dom-card-click-hint-top">Ver</span></div>
         <div class="dom-card-value halving-countdown-value" style="font-size:clamp(13px,1.6vw,16px)">—</div>
         <div class="halving-countdown-row">
           <div class="dom-card-bar"><div class="dom-card-bar-fill halving-countdown-bar" style="width:0%"></div></div>
           <span class="halving-countdown-pct" id="halvingPct">—</span>
         </div>
         <div class="dom-card-sub halving-countdown-sub">Calculando…</div>
-        <div class="dom-card-click-hint">Ver</div>
       </div>
     </div>
     </div>
