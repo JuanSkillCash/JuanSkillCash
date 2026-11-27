@@ -541,7 +541,20 @@ button{font-family:inherit;color:inherit}
    espacio de arriba, en vez de sumarse encima. */
 .market-overview-wrap .market-overview{margin-bottom:0}
 .market-overview-head,.market-sessions-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px -2px 6px;padding:0 2px 4px;position:relative}
-.market-sessions-head-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.market-sessions-head-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+/* El remache de la esquina superior derecha (.mo-bolt-tr) vive a solo 10px del borde de la
+   placa - la notita "Toca la campana..." empujada a la derecha con justify-content:space-between
+   quedaba encima de ese remache. Se le da aire extra solo por la derecha (el título a la
+   izquierda no lo necesita, ese lado no tiene remache tan cerca). */
+.market-sessions-head{padding-right:26px}
+@media(max-width:620px){
+  /* Debajo de 620px el título ya se envuelve en dos líneas y la notita pasa a su propia línea
+     abajo (ver regla de wrap más abajo) - ahí el remache ya está oculto (@media max-width:540px)
+     pero entre 540 y 620px el remache SIGUE visible mientras el texto ya se reparte distinto, así
+     que se mantiene el padding sin cambios en ese rango intermedio. */
+  .market-sessions-head{flex-wrap:wrap;row-gap:4px}
+  .market-sessions-head-note{flex-basis:100%;white-space:normal}
+}
 /* Línea grabada bajo el header - para que el título se sienta como una "placa" integrada en el
    propio panel (el panel "se interrumpe" para alojarla), no un encabezado suelto encima. */
 .market-overview-head::after,.market-sessions-head::after{
