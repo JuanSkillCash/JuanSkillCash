@@ -592,7 +592,9 @@ button{font-family:inherit;color:inherit}
    superficie - ahora es apenas el COLOR del reflejo localizado de la esquina (como si la luz
    ambiental rebotara en ese tono), ver los overrides de `background-image` más abajo junto a
    sus colores de barra. Border baja de 20% a 9% (mismo criterio que el panel grande). */
-.fng-section,.dom-card,.glass-card{
+.fng-section,.dom-card,.glass-card,
+.tool-card,.indic-guide-card,.indic-chart-card,.events-card,.news-detail-card,
+.partner-block,.arrecife-quote-widget,.arrecife-grid-host .grid-stack-item-content{
   position:relative;
   background:
     radial-gradient(75% 65% at 20% -10%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 55%),
@@ -614,7 +616,8 @@ button{font-family:inherit;color:inherit}
     0 0 26px -14px color-mix(in srgb, var(--accent) 18%, transparent);
   transition:transform .22s cubic-bezier(.23,1,.32,1), border-color .22s ease, box-shadow .22s ease, filter .22s ease;
 }
-.fng-section:hover,.dom-card:hover,.glass-card:hover{
+.fng-section:hover,.dom-card:hover,.glass-card:hover,
+.tool-card:hover,.indic-guide-card-link:hover{
   transform:translateY(-2px);
   border-color:color-mix(in srgb, var(--accent) 22%, transparent);
   filter:brightness(1.05);
@@ -627,8 +630,8 @@ button{font-family:inherit;color:inherit}
     0 0 34px -10px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 @media(prefers-reduced-motion: reduce){
-  .fng-section,.dom-card,.glass-card{transition:none}
-  .fng-section:hover,.dom-card:hover,.glass-card:hover{transform:none;filter:none}
+  .fng-section,.dom-card,.glass-card,.tool-card,.indic-guide-card{transition:none}
+  .fng-section:hover,.dom-card:hover,.glass-card:hover,.tool-card:hover,.indic-guide-card-link:hover{transform:none;filter:none}
 }
 .fng-section{border-radius:14px;padding:5px 12px 4px;margin-bottom:0;display:flex;flex-direction:column}
 /* "Vidrio Doble" (el mismo nombre que le pusimos entre Juan y yo para este estilo): el mismo
@@ -1640,7 +1643,6 @@ button{font-family:inherit;color:inherit}
 .indic-guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
 .indic-guide-card{
   border-radius:12px;padding:18px;border:1px solid rgba(59,130,246,.22);
-  background:var(--bg);
   text-align:left;width:100%;display:block;font-family:inherit;
 }
 .indic-guide-card-link{cursor:pointer;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
@@ -1803,7 +1805,6 @@ button{font-family:inherit;color:inherit}
 .pred-result-stamp.win{color:#0fa34a}
 .indic-chart-card{
   border-radius:16px;padding:20px;border:1px solid rgba(59,130,246,.22);
-  background:var(--bg);
 }
 .indic-chart-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:10px}
 .indic-chart-eyebrow{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#60a5fa;margin-bottom:4px}
@@ -2070,10 +2071,9 @@ button{font-family:inherit;color:inherit}
 .tool-card{
   --bc:color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius:12px;padding:18px;border:1px solid var(--bc);
-  background:transparent;
-  cursor:pointer;text-align:left;position:relative;width:100%;
+  cursor:pointer;text-align:left;width:100%;
   display:flex;flex-direction:column;align-items:stretch;
-  transition:transform var(--dur-base) var(--ease-out);
+  transition:transform var(--dur-base) var(--ease-out),box-shadow .22s ease,filter .22s ease;
 }
 .tool-card:hover{transform:translateY(-3px)}
 /* tarjetas con banner de foto (tool-card-head presente) - mismas medidas que
@@ -2182,7 +2182,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-board-tab-add svg{width:13px;height:13px}
 .arrecife-grid-host{min-height:120px}
 .arrecife-grid-host .grid-stack-item-content{
-  background:var(--grad-caja);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:14px;
+  border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:14px;
   display:flex;flex-direction:column;overflow:hidden
 }
 .arrecife-widget-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:move;border-bottom:1px solid color-mix(in srgb, var(--accent) 18%, transparent);flex-shrink:0}
@@ -2212,7 +2212,7 @@ button{font-family:inherit;color:inherit}
 .arrecife-quote-search-row svg{flex-shrink:0;color:var(--muted)}
 .arrecife-quote-search-row input{flex:1;min-width:0;background:none;border:none;color:var(--white);font-size:13px;outline:none}
 .arrecife-quote-search-hint{font-size:10.5px;color:var(--muted)}
-.arrecife-quote-widget{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:12px;background:var(--grad-caja);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);overflow:hidden}
+.arrecife-quote-widget{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:12px;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);overflow:hidden}
 .arrecife-quote-change{position:absolute;top:0;right:0;z-index:2;width:22px;height:22px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,color .15s}
 .arrecife-quote-change:hover{background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--white)}
 .arrecife-quote-head{display:flex;align-items:center;gap:6px}
@@ -3182,9 +3182,8 @@ img[src=""]{display:none}
 
 /* PARTNERS — bloques grandes tipo "vitrina", uno por partner */
 .partner-block{
-  position:relative;overflow:hidden;
+  overflow:hidden;
   border-radius:16px;border:1px solid var(--pbc,var(--border2));
-  background:var(--bg);
   padding:36px;margin-bottom:22px;
 }
 .partner-block:last-child{margin-bottom:0}
@@ -4041,7 +4040,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    adentro de su cajita - bug real reportado por Juan (página corrida/con scroll lateral en
    celular). Un grid/flex item sin min-width explícito usa por defecto el tamaño mínimo de su
    contenido más ancho como piso, así sea mucho más ancho que el espacio real disponible */
-.events-card{border:1px solid var(--border2);border-radius:14px;background:var(--grad-caja);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.events-card{border:1px solid var(--border2);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 /* barra de arriba de cada tarjeta (ojito/"eyebrow" + pildora) - mismo patron que Juan señalo
    que tiene melapela ("AGENDA"/"COBERTURA" a la izquierda, una pildorita a la derecha) */
 .events-card-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -4192,7 +4191,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 .news-pill-btn.active{background:color-mix(in srgb, var(--accent) 18%, transparent);border-color:var(--accent);color:var(--white)}
 
 .news-detail-view{display:none}
-.news-detail-card{position:relative;border-radius:20px;overflow:hidden;background:var(--grad-caja);border:1px solid var(--border2);box-shadow:0 24px 60px -24px rgba(0,0,0,.6)}
+.news-detail-card{border-radius:20px;overflow:hidden;border:1px solid var(--border2)}
 .news-detail-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid color-mix(in srgb, var(--white) 10%, transparent)}
 .news-detail-nav-btn{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;color:var(--muted2);background:color-mix(in srgb, var(--white) 6%, transparent);border:1px solid var(--border2);padding:8px 14px;border-radius:10px;cursor:pointer;transition:background .2s,color .2s}
 .news-detail-nav-btn:hover{background:color-mix(in srgb, var(--accent) 20%, transparent);color:var(--white)}
