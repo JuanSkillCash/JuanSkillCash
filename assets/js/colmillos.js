@@ -583,12 +583,25 @@ function applySharkAvatarCrop(el){
   el.style.backgroundRepeat = 'no-repeat';
   el.style.imageRendering = 'pixelated';
 }
+/* Sharkoins/la tienda de skins está bloqueada de momento (pedido de Juan, 28-nov-2026) - mientras
+   tanto, la foto de perfil en estos 3 lugares (botón de cuenta, círculo de "Mi perfil" y la
+   tarjeta de identidad del sidebar) ya NO usa el sistema de skins/accesorios equipados
+   (applySharkAvatarCrop, que sigue existiendo para cuando se reactive la tienda) - siempre es la
+   misma imagen oficial del tiburón que ya vivía en la cabecera grande (logo-skillcash-1050.webp),
+   fija para todo el mundo, sin personalización. */
+function renderStaticSharkAvatar(el){
+  if(!el) return;
+  el.textContent = '';
+  el.style.backgroundImage = "url('/logo-skillcash-1050.webp')";
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center 12%';
+  el.style.backgroundRepeat = 'no-repeat';
+  el.style.imageRendering = '';
+}
 function renderAccountMiniAvatar(){
-  applySharkAvatarCrop(document.getElementById('accountMiniBtn'));
-  applySharkAvatarCrop(document.getElementById('profileAvatarCircle'));
-  // tercer destino (28-nov-2026): avatar de identidad en el sidebar (.sb-identity, ver index.html)
-  // - mismo recurso, sin imagen nueva, applySharkAvatarCrop ya hace no-op si el elemento no existe
-  applySharkAvatarCrop(document.getElementById('sbIdentityAvatar'));
+  renderStaticSharkAvatar(document.getElementById('accountMiniBtn'));
+  renderStaticSharkAvatar(document.getElementById('profileAvatarCircle'));
+  renderStaticSharkAvatar(document.getElementById('sbIdentityAvatar'));
 }
 async function loadAccountMiniAvatar(){
   if(!currentUser){ colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT }; renderAccountMiniAvatar(); return; }
