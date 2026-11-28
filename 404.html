@@ -1929,14 +1929,23 @@ button{font-family:inherit;color:inherit}
    intermedio de 2) - a esos anchos (tablet/ventana angosta) una sola columna ancha ya se ve
    bien y nunca parte el título. */
 @media(max-width:900px){ .cat-overview-grid{grid-template-columns:1fr} }
+/* "Vidrio Doble" en las tarjetas individuales de "Tus herramientas": backdrop-filter (blur) va
+   acá; el fondo/borde/sombra "de verdad" que se ve en pantalla se define más abajo en la regla
+   con !important (línea ~3814, la que manda sobre var(--grad-caja)) para no pelear con esa. */
 .cat-overview-card{
-  border-radius:16px;padding:20px;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);
+  border-radius:16px;padding:20px;
+  transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow .22s ease,filter .22s ease;
   border:1px solid var(--bc);cursor:pointer;text-align:left;width:100%;height:100%;font-family:inherit;
-  background:radial-gradient(ellipse 130% 100% at 0% 0%, var(--tint), transparent 65%), var(--bg);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
   position:relative;display:flex;flex-direction:column;
 }
 .bite-mark{position:absolute;right:-2px;bottom:-2px;width:64px;height:64px;pointer-events:none}
-.cat-overview-card:hover{transform:translateY(-3px)}
+.cat-overview-card:hover{transform:translateY(-3px);filter:brightness(1.05)}
+@media(prefers-reduced-motion: reduce){
+  .cat-overview-card{transition:none}
+  .cat-overview-card:hover{transform:none;filter:none}
+}
 .cat-flip-outer{perspective:1600px;height:100%;position:relative}
 .cat-flip-inner{position:relative;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1)}
 .cat-flip-outer.flipped .cat-flip-inner{transform:rotateY(180deg)}
@@ -3772,14 +3781,39 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    (--cat-teal, ya definido mas arriba) desde la esquina superior derecha, + sombra suave de
    elevacion (pedido de Juan, inspirado en cryptobruj.com/exchanges pero con nuestros propios
    colores - ver docs/referencia si hace falta el prompt original). */
-/* fondo de la cara frontal de las 7 cajas de la portada - propuesta 14 ("Contraste extremo")
-   de la maqueta de degradados que Juan eligio (ver --grad-caja en :root). El reverso
-   (.cat-flip-back, cuando se voltea la caja) se queda con el degradado anterior a proposito -
-   Juan quiere hacerle cambios aparte despues, no tocar ese todavia. */
+/* fondo de la cara frontal de las 7 cajas de la portada - "Vidrio Doble" (28-nov-2026, a pedido
+   de Juan): reemplaza el degradado plano --grad-caja de la propuesta 14 por el mismo vidrio
+   esmerilado de Panorama/Sesiones/Quién-está-detrás, pero con var(--c)/var(--tint) (aguamarina,
+   --cat-teal forzado más arriba) en vez de var(--accent), para que combine con el resto de la
+   sección en vez de volverse azul genérico. El reverso (.cat-flip-back, al voltear la caja) se
+   queda con su degradado anterior a propósito - Juan quiere hacerle cambios aparte después, no
+   tocar ese todavía. */
 .cat-overview-card{
-  background:var(--grad-caja) !important;
+  background:
+    radial-gradient(75% 65% at 20% -10%, var(--tint) 0%, transparent 55%),
+    linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--c) 5%, transparent) 14%, transparent 30%),
+    radial-gradient(80% 80% at 102% 120%, rgba(0,0,0,.38) 0%, transparent 55%),
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg) 38%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 66%, transparent) 55%,
+      color-mix(in srgb, var(--bg) 85%, transparent) 100%) !important;
   border-color:color-mix(in srgb, var(--cat-teal) 35%, transparent) !important;
-  box-shadow:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--white) 8%, transparent),
+    inset 0 -1.5px 0 rgba(0,0,0,.32),
+    inset 1px 0 0 color-mix(in srgb, var(--white) 4%, transparent),
+    inset -1px 0 0 rgba(0,0,0,.22),
+    0 16px 36px -16px rgba(2,4,12,.55),
+    0 0 26px -14px color-mix(in srgb, var(--c) 18%, transparent);
+}
+.cat-overview-card:hover{
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--white) 13%, transparent),
+    inset 0 -1.5px 0 rgba(0,0,0,.34),
+    inset 1px 0 0 color-mix(in srgb, var(--white) 6%, transparent),
+    inset -1px 0 0 rgba(0,0,0,.24),
+    0 20px 40px -16px rgba(2,4,12,.6),
+    0 0 34px -10px color-mix(in srgb, var(--c) 30%, transparent);
 }
 .cat-flip-back{
   background:radial-gradient(120% 70% at 100% 0%, #0f1b3d 0%, var(--card) 70%) !important;
@@ -3814,7 +3848,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
    rgba, bajo en opacidad para que no quede "rojo vivo"), sin screen blend (ese blend era lo
    que lo hacia verse blanco/lavado sobre el fondo oscuro) */
 #categoryOverviewGrid{ isolation:isolate; }
-#categoryOverviewGrid > .cat-overview-featured, #categoryOverviewGrid > .cat-overview-grid{ position:relative; z-index:1; }
+#categoryOverviewGrid .cat-overview-featured, #categoryOverviewGrid .cat-overview-grid{ position:relative; z-index:1; }
 .mg-foco{
   position:absolute;left:0;top:0;z-index:0;width:600px;height:600px;margin:-300px 0 0 -300px;
   border-radius:50%;pointer-events:none;opacity:0;transition:opacity .4s;
@@ -5421,6 +5455,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
     <div class="section-eyebrow home-mirror" id="toolsEyebrow">Tus herramientas</div>
     <div id="categoryOverviewGrid">
+    <div class="glass-plate cat-overview-plate">
+    <span class="mo-bolt mo-bolt-tl" aria-hidden="true"></span>
+    <span class="mo-bolt mo-bolt-tr" aria-hidden="true"></span>
+    <span class="mo-bolt mo-bolt-bl" aria-hidden="true"></span>
+    <span class="mo-bolt mo-bolt-br" aria-hidden="true"></span>
     <div class="cat-overview-featured">
 
       <div class="cat-flip-outer big">
@@ -5540,6 +5579,7 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
       </div>
       </div>
 
+    </div>
     </div>
     </div>
 
