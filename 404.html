@@ -15235,9 +15235,11 @@ function closeAnyOpenToolInline(){
   const prevCatLabel = prevSectionEl ? prevSectionEl.querySelector('.tool-cat-label') : null;
   const prevIntroTitle = prevSectionEl ? prevSectionEl.querySelector('.section-intro-title') : null;
   const prevIntroText = prevSectionEl ? prevSectionEl.querySelector('.section-intro-text') : null;
+  const prevSectionBanner = prevSectionEl ? prevSectionEl.querySelector('.tool-section-banner') : null;
   if(prevCatLabel) prevCatLabel.style.display = '';
   if(prevIntroTitle) prevIntroTitle.style.display = '';
   if(prevIntroText) prevIntroText.style.display = '';
+  if(prevSectionBanner) prevSectionBanner.style.display = '';
   document.querySelectorAll('.sb-item[data-tool]').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.cat-pill[data-tool]').forEach(pill => pill.classList.remove('active'));
   document.querySelectorAll('[data-cat-home]').forEach(item => {
@@ -15262,9 +15264,17 @@ function openModalGeneric(overlay, panel, focusTarget){
     const catLabel = sectionEl ? sectionEl.querySelector('.tool-cat-label') : null;
     const introTitle = sectionEl ? sectionEl.querySelector('.section-intro-title') : null;
     const introText = sectionEl ? sectionEl.querySelector('.section-intro-text') : null;
+    // el banner grande de la categoria (.tool-section-banner, foto+titulo tipo "El Banco"/"Zona
+    // de Caza") se quedaba sin ocultar aqui (bug viejo, de antes de esta sesion - Juan lo reporto
+    // 28-nov-2026: "la imagen del tiburon... aparece en la parte inferior" en todas las
+    // categorias menos Sonar de Mercado, que no usa este mismo mecanismo) - mismo criterio que
+    // catLabel/introTitle/introText: solo debe verse en la cuadricula de tarjetas, nunca con una
+    // herramienta puntual abierta.
+    const sectionBanner = sectionEl ? sectionEl.querySelector('.tool-section-banner') : null;
     if(catLabel) catLabel.style.display = 'none';
     if(introTitle) introTitle.style.display = 'none';
     if(introText) introText.style.display = 'none';
+    if(sectionBanner) sectionBanner.style.display = 'none';
     const wrap = document.createElement('div');
     wrap.className = 'tool-detail-card';
     wrap.dataset.category = category;
