@@ -584,11 +584,16 @@ function applySharkAvatarCrop(el){
   el.style.imageRendering = 'pixelated';
 }
 /* Sharkoins/la tienda de skins está bloqueada de momento (pedido de Juan, 28-nov-2026) - mientras
-   tanto, la foto de perfil en estos 3 lugares (botón de cuenta, círculo de "Mi perfil" y la
-   tarjeta de identidad del sidebar) ya NO usa el sistema de skins/accesorios equipados
+   tanto, la foto de perfil en "Mi perfil" (profileAvatarCircle) y la tarjeta de identidad del
+   sidebar (sbIdentityAvatar) ya NO usa el sistema de skins/accesorios equipados
    (applySharkAvatarCrop, que sigue existiendo para cuando se reactive la tienda) - siempre es la
    misma imagen oficial del tiburón que ya vivía en la cabecera grande (logo-skillcash-1050.webp),
-   fija para todo el mundo, sin personalización. */
+   fija para todo el mundo, sin personalización.
+   accountMiniBtn (botoncito circular de cuenta, arriba a la derecha) YA NO entra en esta pintura
+   (mismo día, segundo ajuste): con la tarjeta grande del sidebar mostrando la foto+nombre+rango,
+   repetir la misma foto allá arriba se veía redundante ("va a quedar repetido como ahí y allá" -
+   Juan) - se deja con el emoji 👤 fijo que ya tenía en el HTML (ver <button id="accountMiniBtn">),
+   sin tocarlo desde JS en absoluto. */
 function renderStaticSharkAvatar(el){
   if(!el) return;
   el.textContent = '';
@@ -599,7 +604,6 @@ function renderStaticSharkAvatar(el){
   el.style.imageRendering = '';
 }
 function renderAccountMiniAvatar(){
-  renderStaticSharkAvatar(document.getElementById('accountMiniBtn'));
   renderStaticSharkAvatar(document.getElementById('profileAvatarCircle'));
   renderStaticSharkAvatar(document.getElementById('sbIdentityAvatar'));
 }
