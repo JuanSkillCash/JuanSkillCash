@@ -586,6 +586,9 @@ function applySharkAvatarCrop(el){
 function renderAccountMiniAvatar(){
   applySharkAvatarCrop(document.getElementById('accountMiniBtn'));
   applySharkAvatarCrop(document.getElementById('profileAvatarCircle'));
+  // tercer destino (28-nov-2026): avatar de identidad en el sidebar (.sb-identity, ver index.html)
+  // - mismo recurso, sin imagen nueva, applySharkAvatarCrop ya hace no-op si el elemento no existe
+  applySharkAvatarCrop(document.getElementById('sbIdentityAvatar'));
 }
 async function loadAccountMiniAvatar(){
   if(!currentUser){ colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT }; renderAccountMiniAvatar(); return; }
