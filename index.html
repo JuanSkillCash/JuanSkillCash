@@ -362,12 +362,19 @@ button{font-family:inherit;color:inherit}
 .mobile-menu-btn{width:38px;height:38px;border-radius:8px;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
 .sb-section-label{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:20px 20px 10px;white-space:nowrap}
 .sidebar.collapsed .sb-section-label{opacity:0}
-/* tarjeta de perfil del sidebar (28-nov-2026, segunda vuelta a pedido de Juan): antes era una
-   fila chiquita tipo botón; ahora es una tarjeta de identidad con más presencia - mismo tiburón
-   de siempre (accountMiniBtn/profileAvatarCircle, ver colmillos.js) pero a 72px, cristal oscuro
-   azul petróleo con acento cian (identidad submarina, igual criterio que la cabecera principal),
-   sin blur real (mismo criterio de rendimiento del resto de tarjetas nuevas de hoy - esta es una
-   sola tarjeta, no 45, pero se mantiene la misma receta "simulada" por consistencia). */
+/* tarjeta de perfil del sidebar (28-nov-2026, tercera vuelta a pedido de Juan): antes el avatar+
+   nombre eran un BOTÓN que abría "Mi perfil" (sb-identity-row) con las filas de rango/racha/
+   progreso/insignias sueltas debajo, fuera del cristal. Juan: "ese botón no debería existir ahí...
+   para editar perfil ve al botón de la derecha" (el círculo de cuenta del topbar, que ya tiene su
+   propio "⚙️ Mi perfil" en el dropdown) - así que esta tarjeta deja de ser clicable/abrir el
+   modal, y en su lugar TODO (foto, nombre, rango, racha, progreso, insignias) vive dentro de UNA
+   sola placa de vidrio con remaches en las esquinas (mismo motivo "Vidrio Doble" que el resto del
+   sitio, ver .mo-bolt), para que se sienta como una sola tarjeta completa y no una fila + una
+   lista suelta después. El avatar sigue siendo el mismo tiburón de siempre (profileAvatarCircle/
+   sbIdentityAvatar, ver colmillos.js) a 72px - accountMiniBtn (arriba a la derecha) ya NO pinta
+   este avatar (se deja con su emoji 👤 de siempre) precisamente para no repetir la misma foto en
+   dos lugares a la vez. Sin blur real (mismo criterio de rendimiento de siempre: una sola tarjeta,
+   no 45, pero se mantiene la receta "simulada" por consistencia). */
 .sb-identity{margin:14px 14px 4px}
 .sb-identity-row{
   width:100%;display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;
@@ -386,6 +393,22 @@ button{font-family:inherit;color:inherit}
   transition:border-color .2s ease,filter .2s ease;
 }
 .sb-identity-row:hover{border-color:color-mix(in srgb, var(--cat-cyan) 34%, transparent);filter:brightness(1.08)}
+.sb-identity-card{
+  position:relative;width:100%;padding:16px 16px 14px;border-radius:18px;color:var(--white);
+  background:
+    radial-gradient(75% 65% at 18% -15%, color-mix(in srgb, var(--cat-cyan) 16%, transparent) 0%, transparent 55%),
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg) 40%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 68%, transparent) 55%,
+      color-mix(in srgb, var(--bg) 88%, transparent) 100%);
+  border:1px solid color-mix(in srgb, var(--cat-cyan) 20%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--white) 7%, transparent),
+    inset 0 -1px 0 rgba(0,0,0,.3),
+    0 16px 34px -18px rgba(2,4,12,.6),
+    0 0 36px -16px color-mix(in srgb, var(--cat-cyan) 26%, transparent);
+}
+.sb-identity-card-top{display:flex;align-items:center;gap:14px}
 .sb-identity-avatar{
   width:72px;height:72px;border-radius:50%;flex-shrink:0;background-color:var(--bg2);
   border:1.5px solid color-mix(in srgb, var(--cat-cyan) 38%, transparent);
@@ -399,15 +422,17 @@ button{font-family:inherit;color:inherit}
 .sb-identity-sub{font-size:11.5px;color:var(--muted2)}
 .sidebar.collapsed .sb-identity{margin:8px;display:flex;justify-content:center}
 .sidebar.collapsed .sb-identity-row{padding:8px;width:auto}
+.sidebar.collapsed .sb-identity-card{padding:8px;width:auto}
 .sidebar.collapsed .sb-identity-avatar{width:40px;height:40px}
 .sidebar.collapsed .sb-identity-text{display:none}
+.sidebar.collapsed .sb-identity-card .mo-bolt{display:none}
 /* filas extra de la tarjeta de identidad (28-nov-2026, Juan pidió añadir rango/racha/progreso/
    insignias): ninguno de estos 4 sistemas existe todavia (Tu Rango/La Guarida sigue en
    construccion, igual que racha, barra de progreso e insignias) - "No inventes datos del
    usuario" (regla ya establecida antes en este mismo hilo) sigue aplicando, asi que cada fila
    muestra solo su etiqueta con un guion "—" de marcador en vez de un numero/valor inventado.
    Cuando cada sistema se construya de verdad, este bloque es donde se conecta el dato real. */
-.sb-identity-meta{margin:10px 0 0;padding-top:10px;border-top:1px solid color-mix(in srgb, var(--cat-cyan) 14%, transparent);display:flex;flex-direction:column;gap:7px}
+.sb-identity-meta{margin:12px 0 0;padding-top:12px;border-top:1px solid color-mix(in srgb, var(--cat-cyan) 16%, transparent);display:flex;flex-direction:column;gap:7px}
 .sb-identity-meta-row{display:flex;align-items:center;justify-content:space-between;font-size:11.5px}
 .sb-identity-meta-label{color:var(--muted2);font-weight:600}
 .sb-identity-meta-value{color:var(--muted2);font-weight:600}
@@ -4532,14 +4557,15 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
           </button>
         </div>
       </div>
-      <!-- "Vidrio Doble" + tiburón de perfil (28-nov-2026, a pedido de Juan): reusa el MISMO
-           avatar que ya existía para el botoncito de cuenta (accountMiniBtn, arriba a la
-           derecha) y para "Mi perfil" (profileAvatarCircle) - ver applySharkAvatarCrop() y
-           renderAccountMiniAvatar() en assets/js/colmillos.js. No es un tercer tiburón ni una
-           imagen nueva, es la misma superficie de pintado (background-image en capas) aplicada
-           a un tercer círculo. Clic abre el mismo modal "Mi perfil" de siempre (openProfileModal,
-           sin tocar su lógica). Sin dato de rango: "Tu Rango"/La Guarida sigue en construcción
-           (ver CLAUDE.md), así que no se inventa ningún número o nivel aquí todavía. -->
+      <!-- Tarjeta de identidad del sidebar (28-nov-2026, tercera vuelta a pedido de Juan): ya NO
+           es un botón que abre "Mi perfil" - esa entrada vive sólo en el círculo de cuenta del
+           topbar (arriba a la derecha, su dropdown ya tiene "⚙️ Mi perfil"); Juan: "ese botón no
+           debería existir ahí... para editar perfil ve al botón de la derecha". Esta tarjeta es
+           puramente informativa: foto (profileAvatarCircle/sbIdentityAvatar, ver colmillos.js,
+           mismo tiburón de siempre) + nombre + rango/racha/progreso/insignias, todo dentro de UNA
+           sola placa de vidrio con remaches (mo-bolt, mismo motivo "Vidrio Doble" del resto del
+           sitio). Sin dato de rango real: "Tu Rango"/La Guarida sigue en construcción (ver
+           CLAUDE.md), así que no se inventa ningún número o nivel aquí todavía. -->
 
       <div class="sb-identity" id="sbIdentity">
         <button type="button" class="sb-identity-row sb-identity-guest" id="sbIdentityGuest">
@@ -4551,21 +4577,26 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <span class="sb-identity-sub">Accede a tu cuenta</span>
           </span>
         </button>
-        <button type="button" class="sb-identity-row sb-identity-user" id="sbIdentityUser" style="display:none">
-          <span class="sb-identity-avatar" id="sbIdentityAvatar" aria-hidden="true"></span>
-          <span class="sb-identity-text">
-            <span class="sb-identity-name" id="sbIdentityName"></span>
-            <span class="sb-identity-sub">Ver o editar mi perfil</span>
-          </span>
-        </button>
-        <div class="sb-identity-meta" id="sbIdentityMeta" style="display:none">
-          <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Rango:</span><span class="sb-identity-meta-value">—</span></div>
-          <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Racha:</span><span class="sb-identity-meta-value">—</span></div>
-          <div class="sb-identity-progress">
-            <div class="sb-identity-progress-label">Progreso al siguiente rango</div>
-            <div class="sb-identity-progress-track"><div class="sb-identity-progress-fill"></div></div>
+        <div class="sb-identity-card" id="sbIdentityUser" style="display:none">
+          <span class="mo-bolt mo-bolt-tl" aria-hidden="true"></span>
+          <span class="mo-bolt mo-bolt-tr" aria-hidden="true"></span>
+          <span class="mo-bolt mo-bolt-bl" aria-hidden="true"></span>
+          <span class="mo-bolt mo-bolt-br" aria-hidden="true"></span>
+          <div class="sb-identity-card-top">
+            <span class="sb-identity-avatar" id="sbIdentityAvatar" aria-hidden="true"></span>
+            <span class="sb-identity-text">
+              <span class="sb-identity-name" id="sbIdentityName"></span>
+            </span>
           </div>
-          <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Insignias:</span><span class="sb-identity-meta-value">—</span></div>
+          <div class="sb-identity-meta" id="sbIdentityMeta">
+            <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Rango:</span><span class="sb-identity-meta-value">—</span></div>
+            <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Racha:</span><span class="sb-identity-meta-value">—</span></div>
+            <div class="sb-identity-progress">
+              <div class="sb-identity-progress-label">Progreso al siguiente rango</div>
+              <div class="sb-identity-progress-track"><div class="sb-identity-progress-fill"></div></div>
+            </div>
+            <div class="sb-identity-meta-row"><span class="sb-identity-meta-label">Insignias:</span><span class="sb-identity-meta-value">—</span></div>
+          </div>
         </div>
       </div>
       <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
@@ -17062,7 +17093,7 @@ function renderAuthState(){
     document.getElementById('accountAdminBtn').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
     document.getElementById('adminLiveToggle').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
     if(sbIdentityGuest) sbIdentityGuest.style.display = 'none';
-    if(sbIdentityUser) sbIdentityUser.style.display = 'flex';
+    if(sbIdentityUser) sbIdentityUser.style.display = 'block';
     if(sbIdentityName) sbIdentityName.textContent = getDisplayName(currentUser);
     if(sbIdentityMeta) sbIdentityMeta.style.display = 'flex';
     loadPortfolios();
@@ -17096,7 +17127,9 @@ function renderAuthState(){
   }
 }
 document.getElementById('sbIdentityGuest').addEventListener('click', () => { if(typeof openAuthModal === 'function') openAuthModal(); });
-document.getElementById('sbIdentityUser').addEventListener('click', () => { if(typeof openProfileModal === 'function') openProfileModal(); });
+// sbIdentityUser (la tarjeta de identidad logueada) ya NO es clicable (28-nov-2026, pedido de
+// Juan): "ese botón no debería existir ahí" - para editar perfil se usa el círculo de cuenta del
+// topbar (su dropdown ya tiene "⚙️ Mi perfil", ver accountBarProfileBtn), sin tocar esa lógica.
 document.getElementById('sbSessionLogout').addEventListener('click', async () => {
   await sbClient.auth.signOut();
 });
