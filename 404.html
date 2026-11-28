@@ -32107,14 +32107,16 @@ async function loadMarketDominance(){
 loadMarketDominance();
 setInterval(loadMarketDominance, 1800000); // se refresca solo cada 30 minutos
 
-/* ---- minigráficos de 7 días + variación % de Dominancia BTC/USDT (undécima vuelta) ----
+/* ---- minigráficos de 30 días + variación % de Dominancia BTC/USDT (duodécima vuelta,
+   28-nov-2026: Juan pidió que el % y el gráfico de ambas Dominancias fueran de 30 días en vez
+   de 7) ----
    Reutiliza fetchCryptocapSeries (ya definida más arriba, misma fuente - tabla Supabase
    cryptocap_history - que ya usan los paneles de detalle de Dominancia BTC/USDT), así que no
    hay ninguna API nueva ni dependencia nueva. Se pide una sola vez (el histórico diario no
    cambia dentro de la sesión) en vez de cada 30 min como el valor de hoy. Si falla, el
    minigráfico simplemente se queda vacío - nunca se dibuja con datos inventados. */
 // Monótona cúbica (Fritsch-Carlson, el mismo método que d3.curveMonotoneX) en vez de Catmull-Rom:
-// con solo 7-8 puntos diarios y un zigzag real (sube-baja-sube), Catmull-Rom puede "pasarse" más
+// con 31 puntos diarios y un zigzag real (sube-baja-sube), Catmull-Rom puede "pasarse" más
 // allá del valor real entre dos puntos (overshoot) - como el SVG recorta lo que sale del
 // viewBox, eso se veía con la curva cortada/rara en los picos ("se sigue viendo feo" - Juan).
 // Monótona garantiza que la curva NUNCA se pase del valor real entre dos puntos consecutivos,
@@ -32163,8 +32165,10 @@ async function renderDomSparkline(svgId, changeElId, symbolFull){
   try{
     const series = await fetchCryptocapSeries(symbolFull);
     if(!series || series.length < 2) return;
-    const last8 = series.slice(-8);
-    const vals = last8.map(p => p.c);
+    // 31 puntos diarios = 30 días de variación (de hoy a hace 30 días) - antes eran 8 puntos (7d),
+    // Juan pidió que tanto el % como el minigráfico reflejen los últimos 30 días (28-nov-2026)
+    const last31 = series.slice(-31);
+    const vals = last31.map(p => p.c);
     const minV = Math.min(...vals), maxV = Math.max(...vals);
     const range = (maxV - minV) || 1;
     const w = 100, h = 34, pad = 3;
@@ -32177,7 +32181,7 @@ async function renderDomSparkline(svgId, changeElId, symbolFull){
     const first = vals[0], last = vals[vals.length - 1];
     const changePct = first !== 0 ? ((last - first) / first) * 100 : 0;
     const sign = changePct > 0 ? '+' : '';
-    changeEl.textContent = sign + changePct.toFixed(2) + '% (7d)';
+    changeEl.textContent = sign + changePct.toFixed(2) + '% (30d)';
     changeEl.classList.remove('up', 'down', 'flat');
     changeEl.classList.add(changePct > 0.01 ? 'up' : changePct < -0.01 ? 'down' : 'flat');
   } catch(err){
