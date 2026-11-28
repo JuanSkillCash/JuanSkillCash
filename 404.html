@@ -629,6 +629,21 @@ button{font-family:inherit;color:inherit}
     0 20px 40px -16px rgba(2,4,12,.6),
     0 0 34px -10px color-mix(in srgb, var(--accent) 30%, transparent);
 }
+/* "Vidrio" simulado, no real, en todo lo que se agregó hoy (28-nov-2026) fuera de la portada:
+   Juan reportó la web "algo lenta" tanto en inicio como al abrir categorías con muchas
+   tarjetas, y pidió puntualmente que el efecto de Mi Arrecife sea "simulado pero no real... que
+   tenga los colores pero no sea real, sea color sólido" - el culpable es backdrop-filter:blur,
+   que fuerza una capa de composición GPU por cada tarjeta, y hoy se multiplicó de golpe en
+   decenas de tarjetas nuevas (.tool-card en las 6 categorías, 45 .indic-chart-card de Sonar de
+   Mercado, .indic-guide-card, etc.) además de lo que YA tenía la portada (Panorama/Sesiones/Tus
+   herramientas/Quién está detrás, sin tocar - esas no se tocan porque no fueron las señaladas).
+   Se quita el blur de vidrio pero se queda el mismo degradado/borde/sombra - se ve igual de
+   "vidrio" a simple vista, solo que es color sólido en vez de desenfoque real de lo que hay
+   detrás. */
+.tool-card,.indic-guide-card,.indic-chart-card,.events-card,.news-detail-card,
+.partner-block,.arrecife-quote-widget,.arrecife-grid-host .grid-stack-item-content{
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
 @media(prefers-reduced-motion: reduce){
   .fng-section,.dom-card,.glass-card,.tool-card,.indic-guide-card{transition:none}
   .fng-section:hover,.dom-card:hover,.glass-card:hover,.tool-card:hover,.indic-guide-card-link:hover{transform:none;filter:none}
