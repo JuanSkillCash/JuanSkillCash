@@ -736,7 +736,12 @@ button{font-family:inherit;color:inherit}
   .fng-section,.dom-card,.glass-card,.tool-card,.indic-guide-card{transition:none}
   .fng-section:hover,.dom-card:hover,.glass-card:hover,.tool-card:hover,.indic-guide-card-link:hover{transform:none;filter:none}
 }
-.fng-section{border-radius:14px;padding:5px 12px 4px;margin-bottom:0;display:flex;flex-direction:column}
+/* Juan: "haz un poquito más alto a lo vertical Panorama del mercado para que la info se vea
+   mejor" (28-nov-2026) - .fng-section (Miedo y Codicia) es la que más contenido tiene y la que
+   fija la altura de toda la fila (align-items:stretch en .market-overview le estira las otras 3
+   tarjetas a la misma altura), así que un poquito más de padding vertical aquí sube un poquito
+   TODA la sección de una vez, sin tocar el gauge ni ningún otro contenido interno. */
+.fng-section{border-radius:14px;padding:9px 12px 8px;margin-bottom:0;display:flex;flex-direction:column}
 /* "Vidrio Doble" (el mismo nombre que le pusimos entre Juan y yo para este estilo): el mismo
    material de vidrio esmerilado de Panorama del mercado / Sesiones de mercado, reutilizable en
    cualquier parte del sitio - .glass-plate es la placa grande de fondo (comparte selector con
