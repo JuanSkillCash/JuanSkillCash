@@ -68,10 +68,6 @@
      archivo DESDE AQUI, en paralelo con el resto del parseo, así que para cuando el parser
      POR FIN llega hasta ese <script> (varias miles de lineas de HTML despues), el archivo ya
      deberia estar completo en cache - lo unico que falta ahi es ejecutarlo, no descargarlo -->
-<!-- preload de la imagen LCP (Largest Contentful Paint) de la portada: el navegador normalmente
-     no descubre esta imagen hasta que parsea su <img> (varias miles de líneas de HTML después);
-     con el preload arranca la descarga desde el principio -->
-<link rel="preload" as="image" href="/logo-skillcash-1050.webp" fetchpriority="high">
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 <link rel="preconnect" href="https://api.alternative.me">
 <link rel="preconnect" href="https://skillcash-api-proxy.juanchodigital86.workers.dev">
@@ -240,7 +236,7 @@ button{font-family:inherit;color:inherit}
 .sidebar.collapsed{width:0;border-right:0}
 .sidebar.collapsed .sb-top{gap:10px;padding:16px 8px}
 .sb-top{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 14px 8px}
-.sb-top-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}
+.sb-top-actions{display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
 .sb-logo{display:flex;align-items:center;gap:7px;text-decoration:none;overflow:hidden;white-space:nowrap;min-width:0;width:100%}
 .sb-logo-mark{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 0 transparent)}
 .sb-logo-mark img{width:100%;height:100%;object-fit:contain}
@@ -366,6 +362,45 @@ button{font-family:inherit;color:inherit}
 .mobile-menu-btn{width:38px;height:38px;border-radius:8px;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
 .sb-section-label{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:20px 20px 10px;white-space:nowrap}
 .sidebar.collapsed .sb-section-label{opacity:0}
+/* tarjeta de perfil del sidebar (28-nov-2026, segunda vuelta a pedido de Juan): antes era una
+   fila chiquita tipo botón; ahora es una tarjeta de identidad con más presencia - mismo tiburón
+   de siempre (accountMiniBtn/profileAvatarCircle, ver colmillos.js) pero a 72px, cristal oscuro
+   azul petróleo con acento cian (identidad submarina, igual criterio que la cabecera principal),
+   sin blur real (mismo criterio de rendimiento del resto de tarjetas nuevas de hoy - esta es una
+   sola tarjeta, no 45, pero se mantiene la misma receta "simulada" por consistencia). */
+.sb-identity{margin:14px 14px 4px}
+.sb-identity-row{
+  width:100%;display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;
+  cursor:pointer;text-align:left;font-family:inherit;color:var(--white);
+  background:
+    radial-gradient(75% 65% at 18% -15%, color-mix(in srgb, var(--cat-cyan) 14%, transparent) 0%, transparent 55%),
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg) 40%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 68%, transparent) 55%,
+      color-mix(in srgb, var(--bg) 88%, transparent) 100%);
+  border:1px solid color-mix(in srgb, var(--cat-cyan) 16%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--white) 7%, transparent),
+    inset 0 -1px 0 rgba(0,0,0,.3),
+    0 14px 30px -18px rgba(2,4,12,.55);
+  transition:border-color .2s ease,filter .2s ease;
+}
+.sb-identity-row:hover{border-color:color-mix(in srgb, var(--cat-cyan) 34%, transparent);filter:brightness(1.08)}
+.sb-identity-avatar{
+  width:72px;height:72px;border-radius:50%;flex-shrink:0;background-color:var(--bg2);
+  border:1.5px solid color-mix(in srgb, var(--cat-cyan) 38%, transparent);
+  box-shadow:inset 0 1px 0 color-mix(in srgb, var(--white) 10%, transparent), 0 0 0 4px color-mix(in srgb, var(--cat-cyan) 8%, transparent);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.sb-identity-avatar--guest{color:var(--muted2)}
+.sb-identity-avatar--guest svg{width:30px;height:30px}
+.sb-identity-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sb-identity-name{font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-identity-sub{font-size:11.5px;color:var(--muted2)}
+.sidebar.collapsed .sb-identity{margin:8px;display:flex;justify-content:center}
+.sidebar.collapsed .sb-identity-row{padding:8px;width:auto}
+.sidebar.collapsed .sb-identity-avatar{width:40px;height:40px}
+.sidebar.collapsed .sb-identity-text{display:none}
 .sb-search-wrap{position:relative;margin:2px 18px 12px;display:flex;align-items:center}
 .sb-search-icon{position:absolute;left:11px;color:var(--muted);pointer-events:none;flex-shrink:0}
 .sb-search-wrap input{width:100%;background:var(--bg);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:8px;padding:9px 12px 9px 33px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
@@ -3532,175 +3567,32 @@ img[src=""]{display:none}
   .mobile-topbar{position:relative;min-height:58px}
 }
 
-/* ===== HERO MASCOTA (tiburón grande) ===== */
+/* ===== CABECERA DE BIENVENIDA, integrada al fondo (28-nov-2026, segundo ajuste pedido por
+   Juan) ===== La primera vuelta de este rediseño la dejaba dentro de una placa de vidrio
+   (fondo/borde/sombra propios) - Juan vio eso y pidió explícitamente lo contrario: "sin
+   recuadro... que parezca parte natural de la página, no una tarjeta adicional". Se quita TODO
+   lo que la hacía leer como contenedor (background, backdrop-filter, border, box-shadow,
+   border-radius) - solo queda el texto flotando directo sobre el fondo general del body, con
+   una única iluminación ambiental (el mismo resplandor cian de antes, ahora más sutil) detrás,
+   sin ninguna caja que lo contenga. Padding/margin bajan para ocupar menos alto. */
 .hero-mascot{
-  position:relative;display:flex;align-items:center;gap:24px;
-  padding:0 8px 4px;margin-bottom:6px;overflow:visible;
-  --hero-grafico-color:#ff2f4f;
+  position:relative;overflow:hidden;
+  padding:4px 2px 2px;margin-bottom:4px;
 }
-.hero-mascot-imgwrap, .hero-mascot-text{position:relative;z-index:1}
-/* fondo del hero: quitadas las "luces de profundidad" (rayos) - Juan solo quiso quedarse con la
-   bolita de resplandor chiquita (su propia palabra: "la mosca que se mueve") y pidio 2 mas.
-   Las 3 dan vueltas MUY despacio, cada una con su propia ruta irregular y velocidad (para que no
-   se vean sincronizadas ni repitiendo la misma forma), y SIN bajar de la zona de los hombros del
-   tiburon (su imagen se desvanece a partir de la mitad hacia abajo - mask-image en
-   .hero-mascot-imgwrap img - asi que ninguna pasa por ahi). Reemplaza intentos anteriores (ver
-   docs/referencia-competencia-mlp.md seccion "cryptobruj.com" punto 5). */
-.hero-orbe, .hero-orbe2, .hero-orbe3, .hero-orbe4{
-  position:absolute;z-index:0;width:28px;height:28px;border-radius:50%;
-  pointer-events:none;filter:blur(7px);
+/* único "detalle de luz" submarina: un resplandor cian fijo y sutil (nada que se mueva ni
+   parpadee), pintado directo sobre el fondo del dashboard - no es el fondo de una caja, por eso
+   vive en z-index:-1 (detrás del texto, delante del body) en vez de ser background de .hero-mascot */
+.hero-mascot-glow{
+  position:absolute;z-index:-1;pointer-events:none;top:-60px;right:-40px;
+  width:220px;height:220px;border-radius:50%;filter:blur(38px);
+  background:radial-gradient(circle, color-mix(in srgb, var(--cat-cyan) 14%, transparent) 0%, transparent 72%);
 }
-/* las 4 "moscas" ahora viven en la franja vacía que va desde la S de "Skill" hasta el borde
-   derecho (antes estaban pegadas a la imagen del tiburón) - un color distinto cada una: roja
-   (el acento de siempre), blanca, y las otras dos tomando el mismo amarillo/dorado y
-   azul-teal de las marcas bioluminiscentes del tiburón nuevo (var(--gold) y var(--cat-cyan),
-   ya usados en el resto del sitio) */
-.hero-orbe{ left:20%; top:12%; background:radial-gradient(circle, color-mix(in srgb, var(--hero-grafico-color) 70%, transparent) 0%, transparent 72%); }
-.hero-orbe2{ left:40%; top:30%; width:20px; height:20px; background:radial-gradient(circle, color-mix(in srgb, var(--white) 70%, transparent) 0%, transparent 72%); }
-.hero-orbe3{ left:60%; top:10%; width:23px; height:23px; background:radial-gradient(circle, color-mix(in srgb, var(--gold) 70%, transparent) 0%, transparent 72%); }
-.hero-orbe4{ left:80%; top:24%; width:18px; height:18px; background:radial-gradient(circle, color-mix(in srgb, var(--cat-cyan) 70%, transparent) 0%, transparent 72%); }
-@media(prefers-reduced-motion:no-preference){
-  /* animan transform (translate), nunca left/top - esas se quedan fijas en la regla de arriba
-     como posicion base. Las 3 "moscas" ANTES movian left/top/margin en bucle infinito -
-     propiedades de layout - lo que obligaba al navegador a recalcular el layout de TODA la
-     pagina cada ~33ms, sin parar, mientras la animacion corria (confirmado con
-     PerformanceObserver de layout-shift en vivo). transform/opacity nunca disparan layout, solo
-     composicion en GPU - mismo efecto visual (deriva lenta e irregular), sin ese costo. */
-  /* pedido de Juan: ya no es solo una deriva chiquita alrededor de su punto de partida - cada
-     mosca ahora recorre de un lado a otro buena parte del ancho de toda la franja (S de "Skill"
-     al borde derecho), con el movimiento vertical a propósito irregular/asimétrico (sin curva
-     suave tipo seno) para que se sienta más aleatorio, no como las 4 sincronizadas */
-  .hero-orbe{ animation:hero-orbita 20s ease-in-out infinite; }
-  @keyframes hero-orbita{
-    0%{ transform:translate(0,0); }
-    10%{ transform:translate(130px,-35px); }
-    22%{ transform:translate(300px,20px); }
-    35%{ transform:translate(480px,-45px); }
-    48%{ transform:translate(640px,15px); }
-    60%{ transform:translate(520px,-25px); }
-    72%{ transform:translate(360px,35px); }
-    85%{ transform:translate(150px,-15px); }
-    100%{ transform:translate(0,0); }
-  }
-  .hero-orbe2{ animation:hero-orbita2 16s ease-in-out infinite; }
-  @keyframes hero-orbita2{
-    0%{ transform:translate(0,0); }
-    15%{ transform:translate(-170px,30px); }
-    30%{ transform:translate(-330px,-25px); }
-    45%{ transform:translate(-120px,45px); }
-    60%{ transform:translate(180px,-15px); }
-    75%{ transform:translate(380px,30px); }
-    90%{ transform:translate(110px,-20px); }
-    100%{ transform:translate(0,0); }
-  }
-  .hero-orbe3{ animation:hero-orbita3 24s ease-in-out infinite; }
-  @keyframes hero-orbita3{
-    0%{ transform:translate(0,0); }
-    12%{ transform:translate(-200px,-30px); }
-    25%{ transform:translate(-380px,40px); }
-    40%{ transform:translate(-230px,-45px); }
-    55%{ transform:translate(60px,25px); }
-    70%{ transform:translate(280px,-35px); }
-    85%{ transform:translate(110px,20px); }
-    100%{ transform:translate(0,0); }
-  }
-  /* la cuarta mosca, agregada despues - mismo espiritu (ruta irregular propia, solo
-     transform/opacity) pero mas rapida que las otras 3, pedido explicito de Juan */
-  .hero-orbe4{ animation:hero-orbita4 11s ease-in-out infinite; }
-  @keyframes hero-orbita4{
-    0%{ transform:translate(0,0); }
-    18%{ transform:translate(-280px,40px); }
-    36%{ transform:translate(-540px,-30px); }
-    54%{ transform:translate(-380px,50px); }
-    72%{ transform:translate(-160px,-25px); }
-    88%{ transform:translate(-60px,20px); }
-    100%{ transform:translate(0,0); }
-  }
-}
-/* en celular .hero-mascot se apila en columna (ver mas abajo, max-width:860px) y ya no hay
-   "franja vacia ancha" que recorrer de lado a lado - redefine las mismas 4 animaciones con
-   amplitudes chiquitas (las que tenian antes de agrandarlas para desktop), porque Juan reporto
-   en su celular real que la pagina "parpadeaba la barra" y se desplazaba sola: con el recorrido
-   grande (hasta 640px, casi el doble del ancho de un celular) el area scrolleable que generaba
-   el transform alcanzaba a disparar el comportamiento de ocultar/mostrar la barra de direccion
-   del navegador movil en cada ciclo, aunque en pantalla no se viera nada fuera de lugar. Repetir
-   el @keyframes con el mismo nombre dentro de un @media hace que ESTA version gane solo cuando
-   el media query aplica (movil) - la version grande de arriba se usa intacta en desktop. */
-@media(max-width:860px) and (prefers-reduced-motion:no-preference){
-  @keyframes hero-orbita{
-    0%{ transform:translate(0,0); }
-    14%{ transform:translate(40px,18px); }
-    28%{ transform:translate(75px,-12px); }
-    42%{ transform:translate(110px,22px); }
-    57%{ transform:translate(70px,2px); }
-    71%{ transform:translate(30px,28px); }
-    85%{ transform:translate(8px,10px); }
-    100%{ transform:translate(0,0); }
-  }
-  @keyframes hero-orbita2{
-    0%{ transform:translate(0,0); }
-    20%{ transform:translate(-35px,16px); }
-    40%{ transform:translate(-60px,-4px); }
-    60%{ transform:translate(-45px,30px); }
-    80%{ transform:translate(-10px,24px); }
-    100%{ transform:translate(0,0); }
-  }
-  @keyframes hero-orbita3{
-    0%{ transform:translate(0,0); }
-    16%{ transform:translate(35px,-22px); }
-    33%{ transform:translate(65px,-12px); }
-    50%{ transform:translate(45px,-30px); }
-    66%{ transform:translate(22px,-6px); }
-    83%{ transform:translate(-12px,-18px); }
-    100%{ transform:translate(0,0); }
-  }
-  @keyframes hero-orbita4{
-    0%{ transform:translate(0,0); }
-    18%{ transform:translate(-28px,14px); }
-    36%{ transform:translate(-18px,-20px); }
-    54%{ transform:translate(20px,-10px); }
-    72%{ transform:translate(32px,16px); }
-    88%{ transform:translate(6px,24px); }
-    100%{ transform:translate(0,0); }
-  }
-}
-.hero-mascot-imgwrap{position:relative;flex-shrink:0;width:230px;line-height:0}
-.hero-mascot-imgwrap img,.hero-mascot-tint{
-  -webkit-mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
-  mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
-}
-/* la imagen del tiburon (logo-skillcash-1050) trae su propio fondo oscuro "horneado" en el
-   archivo (no es transparente ahi) - pensado para mezclarse con el fondo oscuro de siempre.
-   El mask-image de arriba solo le baja la opacidad a esos pixeles oscuros, asi que en temas
-   claros se alcanzaba a ver un "cuadro" oscuro traslucido en vez de desaparecer. Esta capa pinta
-   encima el --bg real del tema activo (mismo truco que .tool-card-banner::after mas abajo, que
-   si se ve bien en claro) para tapar ese borde sin importar que color tenga la imagen por dentro. */
-.hero-mascot-imgwrap::after{
-  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(to bottom, transparent 75%, var(--bg) 97%);
-}
-/* HISTORIAL del "cuadro" en temas claros (resumen - el detalle completo esta en el historial
-   de git si hace falta): el culpable real era .hero-mascot-glow (una copia borrosa de la MISMA
-   foto puesta detras como "aura" ambiental) - traia el fondo oscuro horneado de la imagen y,
-   por mas que se le ajusto mascara/blur/overflow en varias vueltas, seguia dejando algun rastro
-   de contorno en claro. Se elimino del todo (HTML + CSS). .hero-mascot-tint (el resplandor ROJO,
-   un gradiente de color puro, no una copia de la foto) NUNCA fue el problema - se habia quitado
-   por error pensando que si lo era, y se repuso aqui abajo una vez confirmado que el "cuadro"
-   ya no aparece sin .hero-mascot-glow. */
-.hero-mascot-imgwrap{overflow:hidden}
-.hero-mascot-imgwrap img{width:100%;height:auto;display:block}
-.hero-mascot-tint{
-  position:absolute;inset:-12%;z-index:-1;pointer-events:none;filter:blur(20px);
-  background:radial-gradient(ellipse 55% 60% at 50% 45%,rgba(255,47,79,.5),transparent 70%);
-}
-.hero-mascot-img{position:relative;z-index:1;animation:hero-mascot-float 4.6s ease-in-out infinite}
-@keyframes hero-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.hero-mascot-text{min-width:0;padding:0 0 22px}
-.hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
-.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(30px,5vw,62px);color:var(--white)}
+.hero-mascot-text{position:relative;z-index:1;min-width:0}
+.hero-mascot-eyebrow{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
+.hero-mascot-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.14em;font-family:'Poppins',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;font-size:clamp(22px,2.6vw,30px);color:var(--white)}
 .hero-mascot-title .ht-cash{color:var(--red)}
 .hero-mascot-title .ht-tools{font-family:'Caveat',cursive;font-weight:700;color:var(--red);font-size:1.15em;letter-spacing:0}
-.hero-mascot-desc{margin-top:12px;max-width:560px;color:var(--muted2);font-size:15px;line-height:1.65}
+.hero-mascot-desc{margin-top:5px;max-width:560px;color:var(--muted2);font-size:13px;line-height:1.5}
 
 /* ===== CINTA DE CRIPTOS ===== */
 .crypto-ticker{
@@ -3718,11 +3610,8 @@ img[src=""]{display:none}
 @keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.crypto-ticker-track{animation:none}}
 @media(max-width:860px){
-  .hero-mascot{flex-direction:column;align-items:center;text-align:center;padding:0 20px 4px;gap:4px}
-  .hero-mascot-imgwrap{width:170px}
-  .hero-mascot-text{padding:0}
-  .hero-mascot-title{justify-content:center}
-  .hero-mascot-desc{margin-left:auto;margin-right:auto}
+  .hero-mascot{padding:4px 18px 2px}
+  .hero-mascot-glow{width:150px;height:150px;top:-40px;right:-30px}
 }
 
 /* Regla global (pedida por Juan): todo el sitio usa Space Grotesk — la misma tipografía redonda
@@ -4609,11 +4498,12 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
 
   <aside class="sidebar" id="sidebar">
     <div class="sb-sticky-head">
+      <!-- logo "SKILLCASH Tools" del sidebar quitado (28-nov-2026, a pedido de Juan): quedaba
+           duplicado con la marca de la cabecera principal del dashboard. El clic que tenía
+           (volver al inicio) ya lo cubre #sbHomeBtn - mismo comentario que ya había aquí abajo
+           ("aunque el logo ya hace lo mismo"), así que no se pierde nada al quitarlo. El listener
+           de #sbLogo más abajo en el JS queda con un guard por si acaso. -->
       <div class="sb-top">
-        <a href="#" class="sb-logo" id="sbLogo">
-          <span class="sb-logo-mark"><img src="/logo-skillcash-600.webp" alt="SkillCash" width="256" height="256" loading="lazy" decoding="async"></span>
-          <span class="sb-logo-text">SKILL<span>CASH</span><span class="sb-logo-tools">Tools</span></span>
-        </a>
         <div class="sb-top-actions">
           <button type="button" class="sb-home-btn" id="sbHomeBtn" title="Ir al inicio" aria-label="Ir al inicio">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1v-9"/></svg>
@@ -4625,6 +4515,33 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><line x1="9.5" y1="4.5" x2="9.5" y2="19.5"/></svg>
           </button>
         </div>
+      </div>
+      <!-- "Vidrio Doble" + tiburón de perfil (28-nov-2026, a pedido de Juan): reusa el MISMO
+           avatar que ya existía para el botoncito de cuenta (accountMiniBtn, arriba a la
+           derecha) y para "Mi perfil" (profileAvatarCircle) - ver applySharkAvatarCrop() y
+           renderAccountMiniAvatar() en assets/js/colmillos.js. No es un tercer tiburón ni una
+           imagen nueva, es la misma superficie de pintado (background-image en capas) aplicada
+           a un tercer círculo. Clic abre el mismo modal "Mi perfil" de siempre (openProfileModal,
+           sin tocar su lógica). Sin dato de rango: "Tu Rango"/La Guarida sigue en construcción
+           (ver CLAUDE.md), así que no se inventa ningún número o nivel aquí todavía. -->
+
+      <div class="sb-identity" id="sbIdentity">
+        <button type="button" class="sb-identity-row sb-identity-guest" id="sbIdentityGuest">
+          <span class="sb-identity-avatar sb-identity-avatar--guest" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+          </span>
+          <span class="sb-identity-text">
+            <span class="sb-identity-name">Iniciar sesión</span>
+            <span class="sb-identity-sub">Accede a tu cuenta</span>
+          </span>
+        </button>
+        <button type="button" class="sb-identity-row sb-identity-user" id="sbIdentityUser" style="display:none">
+          <span class="sb-identity-avatar" id="sbIdentityAvatar" aria-hidden="true"></span>
+          <span class="sb-identity-text">
+            <span class="sb-identity-name" id="sbIdentityName"></span>
+            <span class="sb-identity-sub">Ver o editar mi perfil</span>
+          </span>
+        </button>
       </div>
       <div class="mh-eyebrow" style="margin:16px 18px 4px">Acceso libre</div>
       <div class="sb-search-wrap">
@@ -5320,16 +5237,11 @@ body :where(*):not(.hero-mascot-title, .hero-mascot-title *){ text-shadow:none !
     </div>
 
     <div class="hero-mascot">
-      <div class="hero-orbe" aria-hidden="true"></div>
-      <div class="hero-orbe2" aria-hidden="true"></div>
-      <div class="hero-orbe3" aria-hidden="true"></div>
-      <div class="hero-orbe4" aria-hidden="true"></div>
-      <div class="hero-mascot-imgwrap">
-        <img class="hero-mascot-img" src="/logo-skillcash-1050.webp" alt="SkillCash" width="700" height="700" fetchpriority="high" decoding="async">
-      </div>
+      <div class="hero-mascot-glow" aria-hidden="true"></div>
       <div class="hero-mascot-text">
         <div class="hero-mascot-eyebrow" id="heroWelcomeEyebrow">Bienvenido a</div>
         <h1 class="hero-mascot-title">SKILL<span class="ht-cash">CASH</span><span class="ht-tools">Tools</span></h1>
+        <p class="hero-mascot-desc">Tu centro de análisis, herramientas y oportunidades del mercado.</p>
         <script>
         /* la version anterior de este script escondia el titulo (opacity:0 via .pre-split) y
            esperaba a que assets/js/animacion-entrada.js (defer, corre solo DESPUES de parsear
@@ -14640,7 +14552,7 @@ document.querySelectorAll('[data-category]').forEach(el => {
   sub.textContent = sub.classList.contains('cat-flip-back-eyebrow') ? `LAS ${count} ${word}` : `${count} ${word}`;
 });
 document.getElementById('catBackBtn').addEventListener('click', () => goBackOneStep());
-document.getElementById('sbLogo').addEventListener('click', (e) => {
+if(document.getElementById('sbLogo')) document.getElementById('sbLogo').addEventListener('click', (e) => {
   e.preventDefault();
   showCategoryOverview();
   document.getElementById('sidebar').classList.remove('mobile-open');
@@ -17088,6 +17000,11 @@ function renderAuthState(){
   const accountBarSession = document.getElementById('accountBarSession');
   const accountBarEmail = document.getElementById('accountBarEmail');
   const heroWelcomeEyebrow = document.getElementById('heroWelcomeEyebrow');
+  // identidad del sidebar (avatar+nombre+acceso a perfil, ver .sb-identity en el CSS) - puramente
+  // nuevo, solo lee currentUser igual que el resto de esta función, no cambia nada existente
+  const sbIdentityGuest = document.getElementById('sbIdentityGuest');
+  const sbIdentityUser = document.getElementById('sbIdentityUser');
+  const sbIdentityName = document.getElementById('sbIdentityName');
 
   if(currentUser){
     if(heroWelcomeEyebrow) heroWelcomeEyebrow.textContent = 'Bienvenido, ' + getDisplayName(currentUser) + ' a';
@@ -17101,6 +17018,9 @@ function renderAuthState(){
     accountBarEmail.textContent = getDisplayName(currentUser);
     document.getElementById('accountAdminBtn').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
     document.getElementById('adminLiveToggle').style.display = (typeof OWNER_USER_ID !== 'undefined' && currentUser.id === OWNER_USER_ID) ? 'block' : 'none';
+    if(sbIdentityGuest) sbIdentityGuest.style.display = 'none';
+    if(sbIdentityUser) sbIdentityUser.style.display = 'flex';
+    if(sbIdentityName) sbIdentityName.textContent = getDisplayName(currentUser);
     loadPortfolios();
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof delistWatchlistWidget !== 'undefined') delistWatchlistWidget.onAuthChange();
@@ -17117,11 +17037,15 @@ function renderAuthState(){
     accountBarSession.style.display = 'none';
     document.getElementById('accountAdminBtn').style.display = 'none';
     document.getElementById('adminLiveToggle').style.display = 'none';
+    if(sbIdentityGuest) sbIdentityGuest.style.display = 'flex';
+    if(sbIdentityUser) sbIdentityUser.style.display = 'none';
     if(typeof renderNotifAuthState === 'function') renderNotifAuthState();
     if(typeof COLM_EQUIPPED_DEFAULT !== 'undefined') colmillosEquippedState = { ...COLM_EQUIPPED_DEFAULT };
     if(typeof renderAccountMiniAvatar === 'function') renderAccountMiniAvatar();
   }
 }
+document.getElementById('sbIdentityGuest').addEventListener('click', () => { if(typeof openAuthModal === 'function') openAuthModal(); });
+document.getElementById('sbIdentityUser').addEventListener('click', () => { if(typeof openProfileModal === 'function') openProfileModal(); });
 document.getElementById('sbSessionLogout').addEventListener('click', async () => {
   await sbClient.auth.signOut();
 });
